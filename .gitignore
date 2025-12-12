@@ -7,7 +7,6 @@ yarn-error.log
 package-lock.json
 yarn.lock
 
-dist/
 build/
 .cache/
 .sass-cache/
