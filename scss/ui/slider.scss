@@ -1,0 +1,116 @@
+.slider-arrow-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &.--mob {
+    .slider-arrow {
+      border: 1px solid $bg-gray;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider-arrow-next:before {
+      top: 18px;
+      right: 20px;
+    }
+
+    .slider-arrow-prev:before {
+      top: 18px;
+      left: 20px;
+    }
+  }
+}
+
+.slider-arrow {
+  border-radius: 100%;
+  background: $bg-gray;
+  width: 32px;
+  height: 32px;
+  position: relative;
+  cursor: pointer;
+  transition: $trans-text;
+
+  &.swiper-button-disabled {
+    opacity: 0.2;
+    pointer-events: none;
+
+    &:hover {
+    }
+  }
+
+  &.xl {
+    width: 48px;
+    height: 48px;
+    &.slider-arrow-next:before {
+      top: 20px;
+      right: 20px;
+      width: 8px;
+      height: 8px;
+    }
+    &.slider-arrow-prev:before {
+      top: 20px;
+      left: 20px;
+    }
+  }
+
+  &:hover {
+    background: $red;
+    border-color: $red;
+
+    &::before {
+      border-top: 2px solid #fff;
+      border-right: 2px solid #fff;
+    }
+  }
+}
+
+.slider-arrow-next:before {
+  content: "";
+  position: absolute;
+  transition: $trans-text;
+  top: 12px;
+  right: 13px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid $red;
+  border-right: 2px solid $red;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.slider-arrow-prev::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 13px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid $red;
+  border-right: 2px solid $red;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+  -webkit-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
+
+.main-banner__pagination {
+  left: 16px !important;
+  bottom: 16px !important;
+  width: auto !important;
+  display: flex !important;
+  border-radius: 100px;
+  background: #fff;
+  padding: 8px 12px;
+
+  .swiper-pagination-bullet-active {
+    background: $red !important;
+  }
+}

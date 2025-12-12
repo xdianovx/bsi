@@ -1,0 +1,162 @@
+* {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+
+  &,
+  &::before,
+  &::after {
+    box-sizing: border-box;
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+
+nav,
+footer,
+header,
+aside {
+  display: block;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  display: inline-block;
+  padding: 0;
+  border-radius: 0;
+  &::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+}
+
+a {
+  color: $red;
+  transition: all 0.3s ease-in-out;
+}
+
+a:hover,
+a:focus,
+a:active {
+  color: $red-hover;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+
+  &:visited {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+li {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+}
+
+sup {
+  color: inherit;
+}
+
+.page {
+  margin-bottom: 0;
+}
+
+.flatpickr-day.selected.startRange {
+  background: $red;
+  border-color: $red;
+  &:hover {
+    background: $red;
+    border-color: $red;
+  }
+}
+
+.flatpickr-day.selected.endRange {
+  background: $red;
+  border-color: $red;
+  &:hover {
+    background: $red;
+    border-color: $red;
+  }
+}
+
+.choices {
+  margin-bottom: 0;
+}
+
+.choices__inner {
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  min-height: 48px;
+  overflow: hidden;
+}
+
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+  display: none;
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #000;
+  top: 120%;
+  margin-top: -1px;
+  border-radius: 8px;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.choices[data-type*="select-one"]::after {
+  transition: $trans-text;
+}

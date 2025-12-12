@@ -1,0 +1,27 @@
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.social-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  background: $bg-gray-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+}
+
+.footer {
+  .social-item {
+    background: #fff;
+    color: #1b1b1b;
+  }
+}

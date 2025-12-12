@@ -1,0 +1,144 @@
+.header {
+  // padding: 0 0 16px;
+
+  .socials {
+    display: none;
+  }
+}
+
+.currency-select-trigger__wrap {
+  cursor: pointer;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 14px;
+  line-height: 100%;
+  transition: $trans-text;
+  padding: 4px 8px;
+  align-items: center;
+  display: flex;
+  align-content: inherit;
+  gap: 4px;
+
+  &:hover {
+    background: $red;
+    color: #fff;
+  }
+
+  img {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+}
+.header-top__wrap {
+  padding: 4px 0;
+  background: #f4f4f6;
+  line-height: 100%;
+}
+
+.header__wrap {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  margin-top: 8px;
+}
+
+.custom-logo-link {
+  width: 160px;
+}
+.header__div {
+  display: none;
+  height: 98px;
+  background: $bg-gray;
+  width: 1px;
+}
+
+.header__right {
+  display: flex;
+  // flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+}
+
+.header__top {
+  display: flex;
+  align-items: center;
+}
+
+.header__currencies {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header__contacts {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+}
+
+.header__bottom {
+  display: flex;
+  align-items: center;
+}
+
+.header__list {
+  display: flex;
+  align-content: inherit;
+  gap: 16px;
+
+  a {
+    font-weight: 400;
+    font-size: 16px;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+
+    &.active {
+      color: $red;
+    }
+  }
+}
+
+.header__button-login {
+  margin-left: auto;
+
+  &.--mob {
+    display: none;
+  }
+}
+
+.header-old-btns {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+
+  @media screen and (max-width: 1200px) {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .header-top__wrap {
+    padding: 4px 0;
+  }
+
+  .custom-logo-link {
+    width: 120px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .header-top__wrap {
+    display: none;
+  }
+  .header__nav {
+    display: none;
+  }
+}

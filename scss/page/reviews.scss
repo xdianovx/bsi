@@ -1,0 +1,125 @@
+.reviews-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-card {
+  background: $bg-gray;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.review-card__link {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reviews-page__content-section.archive-page__content-section {
+  margin-top: 32px;
+}
+
+.review-card__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.review-card__company-name {
+  line-height: 110%;
+}
+
+.review-card__company-logo {
+  width: 180px;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.review-card__title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.review-card__text {
+  margin-top: 8px;
+}
+
+.review-card__author {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.review-card__author-photo {
+  width: 40px;
+  flex-shrink: 0;
+  height: 40px;
+  border-radius: 100%;
+  overflow: hidden;
+  img {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.review-card__author-name {
+  font-weight: 600;
+}
+
+.review-card__footer {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.review-card__badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 110%;
+  svg {
+    display: block;
+  }
+
+  span {
+    display: block;
+    margin-top: 2px;
+  }
+}
+
+.review-card__author-position {
+  font-size: 15px;
+  line-height: 110%;
+  color: $text-gray;
+}
+
+.review-card-hr {
+  background: #fff;
+  margin: 8px 0;
+  height: 1px;
+  width: 100%;
+}
+
+.review-card__date {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.review-card__company-info {
+  margin-top: 16px;
+}
+
+@media screen and (max-width: 1024px) {
+  .archive-page__excerpt.--row {
+  }
+}

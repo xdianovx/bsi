@@ -1,0 +1,101 @@
+.visa-page__content {
+  max-width: 720px;
+  margin: 40px auto 0;
+}
+
+.visa-page__poster {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.visa-page__info-section {
+  margin-top: 40px;
+}
+
+.visa-info-item {
+  padding: 12px;
+  background: $bg-gray;
+  border-radius: 12px;
+}
+
+.visa-info-item__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  p {
+    margin-bottom: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 100%;
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.visa-info-item__key {
+}
+.visa-info-item__value {
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+.visa-info-item__wrap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.visa-page-features__section {
+  margin-top: 120px;
+  @media screen and (max-width: 1200px) {
+    margin-top: 80px;
+  }
+}
+
+.visa-page-features__wrap {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.visa-page-features__item {
+  border-radius: 12px;
+  padding: 8px;
+  background: $bg-gray;
+}
+
+.visa-page-features__item__wrap {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.visa-page-steps__section {
+  margin-top: 120px;
+  @media screen and (max-width: 1200px) {
+    margin-top: 80px;
+  }
+}
+
+.visa-page-steps__wrap {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.visa-page-steps-item {
+  background: $bg-gray;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.visa-page-consultation__section {
+  margin-top: 120px;
+  @media screen and (max-width: 1200px) {
+    margin-top: 80px;
+  }
+}

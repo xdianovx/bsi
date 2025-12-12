@@ -1,0 +1,72 @@
+.tour_content_row_item {
+	margin-bottom: 20px;
+}
+
+.block_sidebar .block_sidebar_items .inner_content .block_inner h1 {
+	width: 90%;
+}
+
+.visa_inner_page_s3 .block_inner_border {
+	color: #000;
+}
+
+.content_text p,
+.content_text div {
+	color: #000;
+}
+
+.submenu_city li {
+	margin-bottom: 46px;
+	width: calc(20% - 5px);
+}
+
+.footer_row1 {
+	border-top: 1px solid #c8c4c4;
+	padding-top: 30px;
+}
+
+table td {
+	color: #000;
+	font-family: Nunito, sans-serif;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+table td a {
+	color: #ee3145;
+	font-family: Nunito, sans-serif;
+}
+
+table td a:hover {
+	text-decoration: underline;
+}
+
+table td span a {
+	color: #ee3145;
+}
+
+table td span a:hover {
+	text-decoration: underline;
+}
+
+@media (max-width: 1319px) {
+}
+@media (max-width: 1199px) {
+}
+
+@media screen and (max-width: 992px) {
+	.block_sidebar .block_sidebar_content .block_inner {
+		margin-bottom: 0;
+	}
+	.tour_gal .country_gal_right {
+		margin-bottom: 10px;
+	}
+	.content_text h2 {
+		margin-top: 16px;
+	}
+}
+@media (max-width: 767px) {
+	.block_sidebar .block_sidebar_items .inner_content .block_inner h1 {
+		width: 100%;
+	}
+}

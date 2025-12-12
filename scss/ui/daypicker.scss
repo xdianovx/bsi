@@ -1,0 +1,35 @@
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  padding: 8px;
+}
+
+.day-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 42px;
+  border-radius: 8px;
+  background: #f4f4f6;
+  // color: #b7b7b7;
+  width: 42px;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.day-item.is-active {
+  background: $red; // твой $red
+  color: #fff;
+}
+
+.day-item.is-start {
+  background: #fff;
+  color: #000;
+  border: 2px solid #000;
+}
+
+.day-item.is-disabled {
+  opacity: 0.35;
+}

@@ -1,0 +1,28 @@
+import { Fancybox } from "@fancyapps/ui";
+import { gtmSearch } from "./modules/gtm-search";
+import { fitForm } from "./modules/forms/fit-form";
+import { sliders } from "./modules/sliders";
+import { phoneMask } from "./modules/forms/phone-mask";
+import MicroModal from "micromodal";
+import { tabs } from "./modules/tabs";
+import header, { initCurrency } from "./modules/currency";
+import { initNewsFilter } from "./modules/ajax/news-sort";
+import { promoPageAjax } from "./modules/ajax/promo-sort";
+
+window.addEventListener("DOMContentLoaded", () => {
+  MicroModal.init();
+  Fancybox.bind("[data-fancybox]", {});
+  const datepick = document.querySelector('input[name="daterange"]');
+
+  if (datepick) {
+  }
+
+  initCurrency();
+  tabs(".tabs", ".tab-button", ".tab-content__item");
+  sliders();
+  fitForm();
+  gtmSearch();
+  phoneMask();
+  initNewsFilter();
+  promoPageAjax();
+});

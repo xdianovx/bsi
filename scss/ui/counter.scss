@@ -1,0 +1,49 @@
+.counter-item {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.counter-item__wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.counter-item__title {
+  font-weight: 700;
+}
+
+.counter-item-minus,
+.counter-item-plus {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #f4f4f6;
+  border-radius: 8px;
+}
+
+.counter-item-value {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gtm-persons-dropdown {
+  right: 0;
+  inset-inline-start: auto !important;
+}
+
+.children-ages {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px;
+}

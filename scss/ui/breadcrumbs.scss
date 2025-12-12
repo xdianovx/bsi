@@ -1,0 +1,19 @@
+.breadcrumbs {
+  font-size: 16px;
+  margin-top: 24px;
+
+  a {
+    font-weight: 600;
+
+    color: $red;
+  }
+}
+
+.breadcrumb-separator {
+  background: $bg-gray;
+  margin: 0 8px 2px;
+  width: 4px;
+  height: 4px;
+  display: inline-block;
+  border-radius: 100%;
+}

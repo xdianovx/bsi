@@ -1,0 +1,373 @@
+// Стили для контента из WordPress редактора
+.editor-content {
+  margin-bottom: 64px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+  > * {
+    margin-bottom: 1.5em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Заголовки
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 1.5em 0 0.75em;
+    line-height: 1.2;
+    font-weight: 700;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h1 {
+    font-size: 40px;
+
+    @media (max-width: 1440px) {
+      font-size: 36px;
+    }
+
+    @media (max-width: 1200px) {
+      font-size: 32px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 26px;
+    }
+  }
+
+  h2 {
+    font-size: 32px;
+
+    @media (max-width: 1440px) {
+      font-size: 30px;
+    }
+
+    @media (max-width: 1200px) {
+      font-size: 26px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 22px;
+    }
+  }
+
+  h3 {
+    font-size: 24px;
+
+    @media (max-width: 1440px) {
+      font-size: 22px;
+    }
+
+    @media (max-width: 1200px) {
+      font-size: 20px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 18px;
+    }
+  }
+
+  h4 {
+    font-size: 20px;
+
+    @media (max-width: 1440px) {
+      font-size: 18px;
+    }
+
+    @media (max-width: 1200px) {
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
+  }
+
+  h5 {
+    font-size: 18px;
+
+    @media (max-width: 1200px) {
+      font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 15px;
+    }
+  }
+
+  h6 {
+    font-size: 16px;
+
+    @media (max-width: 1200px) {
+      font-size: 15px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
+  }
+
+  // Параграфы
+  p {
+    margin-bottom: 1em;
+  }
+
+  // Списки
+  ul,
+  ol {
+    margin: 1.5em 0;
+    padding-left: 2em;
+
+    li {
+      margin-bottom: 0.5em;
+      line-height: 1.6;
+      list-style-type: circle;
+    }
+  }
+
+  ul {
+    list-style-type: disc !important;
+
+    ul {
+      list-style-type: disc !important;
+      margin: 0.5em 0;
+    }
+  }
+
+  ol {
+    list-style-type: decimal !important;
+
+    ol {
+      list-style-type: lower-latin;
+      margin: 0.5em 0;
+    }
+  }
+
+  // Ссылки
+  a {
+    color: $red;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: $red;
+      border-bottom-color: $red;
+    }
+  }
+
+  // Изображения
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+
+    &.alignleft {
+      float: left;
+      margin: 0 1.5em 1em 0;
+    }
+
+    &.alignright {
+      float: right;
+      margin: 0 0 1em 1.5em;
+    }
+
+    &.aligncenter {
+      display: block;
+      margin: 1.5em auto;
+    }
+  }
+
+  // Блоки с изображениями
+  .wp-block-image {
+    margin: 2em 0;
+
+    figcaption {
+      text-align: center;
+      font-style: italic;
+      color: #666;
+      margin-top: 0.5em;
+      font-size: 0.9em;
+    }
+  }
+
+  // Цитаты
+  blockquote {
+    border-left: 4px solid $red;
+    padding: 16px;
+    margin: 2em 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-style: italic;
+
+    @media screen and (max-width: 1024px) {
+      margin: 1em 0;
+      border-left: 2px solid $red;
+      padding: 8px 16px;
+    }
+
+    p {
+      margin-bottom: 0.5em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    cite {
+      display: block;
+      margin-top: 1em;
+      font-style: normal;
+      font-weight: 500;
+      color: #666;
+
+      &:before {
+        content: "— ";
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0;
+  }
+
+  table th,
+  table td {
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+  }
+
+  table th {
+    background: #f8f9fa;
+    font-weight: 600;
+  }
+
+  table tr:nth-child(even) {
+    background: #fafafa;
+  }
+
+  // Адаптив
+  @media (max-width: 768px) {
+    table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table th,
+    table td {
+      padding: 12px;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+  }
+  // // Таблицы
+  // table {
+  //   width: 100%;
+  //   border-collapse: collapse;
+  //   margin: 2em 0;
+
+  //   th,
+  //   td {
+  //     padding: 1em;
+  //     border: 1px solid #e0e0e0;
+  //     text-align: left;
+  //   }
+
+  //   th {
+  //     background: #f8f9fa;
+  //     font-weight: 600;
+  //   }
+
+  //   tr:nth-child(even) {
+  //     background: #fafafa;
+  //   }
+  // }
+
+  // Код
+  code {
+    background: #f4f4f4;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: "Courier New", monospace;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: #f8f9fa;
+    padding: 1.5em;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 2em 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  // Разделители
+  hr {
+    border: none;
+    height: 2px;
+    background: #e0e0e0;
+    margin: 2em 0;
+  }
+
+  // WordPress блоки
+  .wp-block-group,
+  .wp-block-columns,
+  .wp-block-media-text {
+    margin: 2em 0;
+  }
+
+  // Галереи
+  .wp-block-gallery {
+    margin: 2em 0;
+
+    .blocks-gallery-grid {
+      margin: 0;
+    }
+  }
+}
+
+.editor-content {
+  table.contacts-table {
+    width: 100% !important;
+    border-collapse: collapse;
+  }
+
+  table.contacts-table td,
+  table.contacts-table th {
+    padding: 8px 12px;
+    vertical-align: middle;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .editor-content {
+    img {
+      &.alignleft,
+      &.alignright {
+        float: none;
+        margin: 1em auto;
+        display: block;
+      }
+    }
+  }
+}

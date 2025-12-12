@@ -1,0 +1,134 @@
+.promo-filter__section {
+  margin-top: 32px;
+}
+
+.promo-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.archive-page__content-section.promo-page__content-section {
+  margin-top: 20px;
+}
+
+.promo-filter__btn {
+  border-radius: 8px;
+  border: 1px solid $bg-gray;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    background: $bg-gray;
+  }
+
+  &.active {
+    background: $red;
+    color: #fff;
+  }
+
+  &.--all {
+    padding: 6px 16px;
+  }
+}
+
+.promo-filter__flag-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 100%;
+  overflow: hidden;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.promo-card__item-title.h3 {
+  font-size: 16px;
+}
+
+.promo-card__info {
+  padding: 24px 16px 16px;
+  background: $bg-gray;
+  margin-top: -8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  @media screen and (max-width: 768px) {
+    padding: 12px;
+    margin-top: 8px;
+  }
+}
+
+.promo-card__poster {
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px 16px;
+
+  @media screen and (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media screen and (max-width: 640px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.promo-card {
+}
+
+.promo-card__date-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  span {
+    margin-top: 2px;
+    display: block;
+  }
+}
+.promo-card__dates {
+  background: #fff;
+  padding: 2px 4px;
+  line-height: 100%;
+  width: auto;
+  font-size: 14px;
+  border-radius: 2px;
+  color: $text-gray;
+}
+
+.promo-card__item-title {
+  margin-top: 12px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 8px;
+  }
+}
+
+.promo-card__excerpt {
+  color: $text-gray;
+  margin-top: 8px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 4px;
+  }
+}

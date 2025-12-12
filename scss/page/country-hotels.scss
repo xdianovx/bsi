@@ -1,0 +1,63 @@
+.country-hotels__section {
+  margin-top: 16px;
+}
+
+.country-hotels__title {
+  margin-bottom: 0;
+}
+
+.country-hotels__hotel-count {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.country-hotels__wrap {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid $bg-gray;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.country-hotels__item {
+}
+
+.country-hotels__counter {
+  margin-top: 8px;
+}
+.country-hotels__item-title {
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.country-hotels__list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.country-hotel {
+}
+
+.country-hotel__image {
+}
+
+.hotel-rating {
+  background: #dedede;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  line-height: 100%;
+}
+
+.country-hotel__rating {
+  margin-left: 8px;
+}
+
+.country-hotel__title {
+  transition: $trans-text;
+  &:hover {
+    color: $red;
+  }
+}

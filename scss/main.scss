@@ -1,0 +1,165 @@
+@import "../../node_modules/swiper/swiper-bundle.css";
+@import "../../node_modules/@fancyapps/ui/dist/fancybox/fancybox.css";
+@import "../../node_modules/choices.js/public/assets/styles/choices.css";
+@import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+
+@import "config/vars";
+@import "config/fonts";
+@import "config/reset";
+@import "config/base";
+
+* {
+}
+// ui
+@import "./ui/**/*.scss";
+
+// sections
+@import "./sections/**/*.scss";
+
+// components
+@import "./components/**/*.scss";
+
+// pages
+@import "./page/**/*.scss";
+
+.phone-link {
+  display: inline-block;
+  color: $red;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 100%;
+  transition: $trans-text;
+  font-weight: 700;
+
+  span {
+    color: $text-gray;
+    display: none;
+    font-size: 12px;
+  }
+
+  &:hover {
+    color: $text-black;
+  }
+}
+
+.currency-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.currency-item__title {
+  color: $text-gray;
+}
+
+.currency-item__value {
+}
+
+.swiper {
+  max-width: 100%;
+}
+
+.sub-menu {
+  // display: none;
+}
+
+.archive-header {
+  margin-top: 40px;
+}
+
+.post-content-section {
+  max-width: 800px;
+  width: 100%;
+  margin: 64px auto 0;
+}
+
+.archive-page-head {
+}
+
+.archive-page__top {
+  padding-bottom: 24px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.archive-page__title {
+}
+.archive-page__excerpt {
+  margin-top: 8px;
+  color: #5c5c5c;
+  margin-bottom: 0;
+  p {
+    margin-bottom: 0;
+  }
+
+  &.--row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+
+    @media screen and (max-width: 1024px) {
+      grid-template-columns: repeat(1, 1fr);
+      gap: 8px;
+    }
+  }
+}
+
+.archive-page__content-section {
+  margin-top: 64px;
+}
+
+.archive-page__content {
+}
+
+@media screen and (max-width: 1024px) {
+  .review-card__company-logo {
+    width: 120px;
+  }
+
+  .review-card__body {
+    gap: 16px;
+  }
+
+  .review-card__date {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .review-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 0;
+  }
+
+  .review-card__company-logo {
+    width: 120px;
+  }
+
+  .review-card__body {
+    flex-direction: column;
+  }
+
+  .review-card__company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .review-card__company-info {
+    margin-top: 0;
+  }
+
+  .review-card__company {
+    gap: 16px;
+  }
+
+  // .review-card__date {
+  //   display: block;
+  // }
+  .review-card__company-name {
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
