@@ -16,6 +16,6 @@ jobs:
         with:
           server: webscape.beget.tech
           username: webscape_bsi
-          password: hYdH8sKV
+          password: hYdH8sKV!txP
           local-dir: ./
           server-dir: webscape.beget.tech/public_html/bsi/wp-content/themes/bsi/
