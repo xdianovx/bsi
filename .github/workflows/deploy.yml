@@ -13,4 +13,4 @@ jobs:
           user: webscape_bsi
           password: hYdH8sKV!txP
           localDir: "./"
-          remoteDir: "webscape.beget.tech/public_html/bsi/wp-content/themes/bsi"
+          remoteDir: "webscape.beget.tech/public_html/bsi/wp-content/themes/bsi/"
