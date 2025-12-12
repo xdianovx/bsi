@@ -1515,6 +1515,12 @@ input.error {
   gap: 16px;
   grid-column: span 2;
 }
+@media screen and (max-width: 768px) {
+  .footer-grid__links {
+    flex-direction: column;
+    align-items: center;
+  }
+}
 
 .footer-top {
   display: flex;
@@ -1522,6 +1528,12 @@ input.error {
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 16px;
+}
+@media screen and (max-width: 768px) {
+  .footer-top {
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 
 .footer .social-item {
@@ -1649,6 +1661,12 @@ input.error {
   align-items: center;
   gap: 16px;
   justify-content: space-between;
+}
+@media screen and (max-width: 768px) {
+  .footer-logos__wrap {
+    justify-content: start;
+    overflow-x: scroll;
+  }
 }
 
 @media screen and (max-width: 1200px) {
