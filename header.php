@@ -118,7 +118,8 @@
 
 
           <div class="header-old-btns">
-            <a href="https://online.bsigroup.ru/cl_refer"
+            <a href="https://www.bsigroup.ru/"
+               target="_blank"
                class="button-login header__button-login">Старый сайт</a>
             <a href="https://online.bsigroup.ru/cl_refer"
                class="button-login header__button-login">
