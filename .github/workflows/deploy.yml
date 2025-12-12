@@ -1,16 +1,21 @@
-name: Deploy via ftp
-on: push
+name: Deploy to FTP
+
+on:
+  push:
+    branches:
+      - main
 jobs:
-  deploy:
-    name: Deploy
+  ftp-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Upload ftp
-        uses: sebastianpopp/ftp-action@releases/v1
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Upload to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          host: webscape.beget.tech
-          user: webscape_bsi
-          password: hYdH8sKV!txP
-          localDir: "./"
-          remoteDir: "webscape.beget.tech/public_html/bsi/wp-content/themes/bsi/"
+          server: webscape.beget.tech
+          username: webscape_bsi
+          password: hYdH8sKV
+          local-dir: ./
+          server-dir: webscape.beget.tech/public_html/bsi/wp-content/themes/bsi/
