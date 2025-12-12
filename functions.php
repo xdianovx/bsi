@@ -145,12 +145,12 @@ add_action('widgets_init', 'bsi_widgets_init');
  */
 function bsi_scripts()
 {
-	wp_enqueue_style('bsi-style', get_stylesheet_uri(), array(), _S_VERSION);
-	wp_enqueue_style('main', get_template_directory_uri() . '/dist/css/main.min.css', [], _S_VERSION);
+	wp_enqueue_style('bsi-style', get_stylesheet_uri(), array(), time());
+	wp_enqueue_style('main', get_template_directory_uri() . '/dist/css/main.min.css', [], time());
 
 	wp_style_add_data('bsi-style', 'rtl', 'replace');
 
-	wp_enqueue_script('main', get_template_directory_uri() . '/dist/js/main.min.js', array(), _S_VERSION, true);
+	wp_enqueue_script('main', get_template_directory_uri() . '/dist/js/main.min.js', array(), time(), true);
 	wp_localize_script('main', 'ajax', array(
 		'url' => admin_url('admin-ajax.php'),
 	));
