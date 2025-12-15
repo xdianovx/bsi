@@ -7,6 +7,9 @@
 
 .best-offers__content {
   margin-top: 32px;
+  @media screen and (max-width: 768px) {
+    margin-top: 16px;
+  }
 }
 
 .best-offer-card {

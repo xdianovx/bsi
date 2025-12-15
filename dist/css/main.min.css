@@ -981,7 +981,7 @@ input.error {
 }
 @media screen and (max-width: 1024px) {
   .h2 {
-    font-size: 20px;
+    font-size: 24px;
   }
 }
 .best-offers__section {
@@ -995,6 +995,11 @@ input.error {
 
 .best-offers__content {
   margin-top: 32px;
+}
+@media screen and (max-width: 768px) {
+  .best-offers__content {
+    margin-top: 16px;
+  }
 }
 
 .best-offer-card {

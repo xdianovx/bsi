@@ -101,3 +101,18 @@ function add_cpt_separator()
 
   ksort($menu);
 }
+
+add_action('acf/init', function () {
+  if (!function_exists('acf_add_options_sub_page')) {
+    return;
+  }
+
+  acf_add_options_sub_page([
+    'page_title' => 'Лучшие предложения',
+    'menu_title' => 'Лучшие предложения',
+    'parent_slug' => 'sections',
+    'menu_slug' => 'best-offers',
+    'capability' => 'manage_options',
+    'redirect' => false,
+  ]);
+});
