@@ -173,33 +173,6 @@
           ]);
           ?>
 
-          <div class="mobile-nav__item">
-            <a href="#"
-               class="mobile-nav__link"
-               aria-expanded="false">
-              <span>Страны</span>
-              <div class="mobile-nav__link-chevron">
-                <img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d-red.svg"
-                     alt="">
-              </div>
-            </a>
-
-            <div class="mobile-nav__submenu">
-              <a href="/country/indoneziya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Индонезия</span>
-              </a>
-
-              <a href="/country/italiya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Италия</span>
-              </a>
-
-
-            </div>
-          </div>
-
-
         </div>
 
         <div class="mobile-nav-contacts">
