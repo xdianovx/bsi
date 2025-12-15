@@ -2463,6 +2463,10 @@ input.error {
   flex-direction: column;
 }
 
+.mobile-nav__link-chevron {
+  transition: all 0.3s ease-in-out;
+}
+
 .mobile-nav__link {
   display: flex;
   align-items: center;
@@ -2470,6 +2474,12 @@ input.error {
   padding: 12px 0;
   min-height: 40px;
   border-bottom: 1px solid #f4f4f6;
+}
+.mobile-nav__link.mobile-nav__link--child {
+  padding: 12px 0 12px 12px;
+}
+.mobile-nav__link.active .mobile-nav__link-chevron {
+  transform: rotate(180deg);
 }
 
 .mobile-nav-contacts {

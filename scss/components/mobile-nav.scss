@@ -28,6 +28,10 @@
   flex-direction: column;
 }
 
+.mobile-nav__link-chevron {
+  transition: all 0.3s ease-in-out;
+}
+
 .mobile-nav__link {
   display: flex;
   align-items: center;
@@ -35,6 +39,15 @@
   padding: 12px 0;
   min-height: 40px;
   border-bottom: 1px solid $bg-gray;
+  &.mobile-nav__link--child {
+    padding: 12px 0 12px 12px;
+  }
+
+  &.active {
+    .mobile-nav__link-chevron {
+      transform: rotate(180deg);
+    }
+  }
 }
 
 .mobile-nav-contacts {
