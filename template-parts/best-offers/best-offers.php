@@ -1,3 +1,72 @@
+<?php
+
+$collection = get_posts([
+  'post_type' => 'offer_collection',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'orderby' => 'date',
+  'order' => 'DESC',
+]);
+
+$collection_id = !empty($collection) ? $collection[0]->ID : 0;
+
+$sections = $collection_id ? (get_field('offer_sections', $collection_id) ?: []) : [];
+
+$slides_limit = 12;
+$slides = [];
+
+foreach ($sections as $section) {
+  $items = $section['items'] ?? [];
+  foreach ($items as $row) {
+    if (count($slides) >= $slides_limit)
+      break 2;
+
+    $post_obj = $row['post'] ?? null;
+    if (!$post_obj instanceof WP_Post)
+      continue;
+
+    $badges = $row['badges'] ?? [];
+    $tags = [];
+    if (is_array($badges)) {
+      foreach ($badges as $t) {
+        if (!empty($t->name))
+          $tags[] = $t->name;
+      }
+    }
+
+    $title = ($row['title_override'] ?? '') ?: get_the_title($post_obj->ID);
+    $url = ($row['link_override'] ?? '') ?: get_permalink($post_obj->ID);
+
+    $image = '';
+    if (!empty($row['image_override']['url'])) {
+      $image = $row['image_override']['url'];
+    } else {
+      $thumb = get_the_post_thumbnail_url($post_obj->ID, 'large');
+      if ($thumb)
+        $image = $thumb;
+    }
+
+    $type_obj = get_post_type_object($post_obj->post_type);
+    $type = $type_obj && !empty($type_obj->labels->singular_name) ? $type_obj->labels->singular_name : '';
+
+    $location_title = ($row['location_override'] ?? '') ?: '';
+    $price = $row['price'] ?? '';
+
+    $slides[] = [
+      'url' => $url,
+      'image' => $image,
+      'type' => $type,
+      'tags' => $tags,
+      'title' => $title,
+      'flag' => '',
+      'location_title' => $location_title,
+      'price' => $price,
+    ];
+  }
+}
+
+?>
+
 <section class="best-offers__section">
   <div class="container">
     <div class="title-wrap news-slider__title-wrap">
@@ -22,7 +91,7 @@
       </div>
 
       <div class="title-wrap__buttons">
-        <a href="http://localhost:8888/bsinew/novosti/"
+        <a href="<?= get_permalink(2267) ?>"
            class="title-wrap__link link-arrow">
           <span>Смотреть все</span>
           <div class="link-arrow__icon">
@@ -46,25 +115,21 @@
       </div>
     </div>
 
-    <div class="best-offers__content">
-      <div class="swiper best-offers-slider">
-        <div class="swiper-wrapper">
-
-          <div class="swiper-slide">
-            <?= get_template_part('template-parts/best-offers/card') ?>
+    <?php if (!empty($slides)): ?>
+      <div class="best-offers__content">
+        <div class="swiper best-offers-slider">
+          <div class="swiper-wrapper">
+            <?php foreach ($slides as $card): ?>
+              <div class="swiper-slide">
+                <?php get_template_part('template-parts/best-offers/card', null, [
+                  'best_offer' => $card,
+                  'post_id' => $post_obj->ID,
+                ]); ?>
+              </div>
+            <?php endforeach; ?>
           </div>
-          <div class="swiper-slide">
-            <?= get_template_part('template-parts/best-offers/card') ?>
-          </div>
-          <div class="swiper-slide">
-            <?= get_template_part('template-parts/best-offers/card') ?>
-          </div>
-          <div class="swiper-slide">
-            <?= get_template_part('template-parts/best-offers/card') ?>
-          </div>
-
         </div>
       </div>
-    </div>
+    <?php endif; ?>
   </div>
 </section>

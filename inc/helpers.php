@@ -36,3 +36,34 @@ function format_date_value($value)
 
   return $value;
 }
+
+
+function format_price_text(?string $text): string
+{
+  $text = trim((string) $text);
+  if ($text === '')
+    return '';
+
+  return preg_replace_callback('~\d{4,}~u', function ($m) {
+    return format_number($m[0]);
+  }, $text);
+}
+
+function offer_get_country_flag_url($country_id): string
+{
+  if (!$country_id)
+    return '';
+
+  $flag = get_field('flag', $country_id);
+  if (!$flag)
+    return '';
+
+  if (is_array($flag) && !empty($flag['url']))
+    return (string) $flag['url'];
+  if (is_numeric($flag))
+    return (string) wp_get_attachment_image_url((int) $flag, 'thumbnail');
+  if (is_string($flag))
+    return $flag;
+
+  return '';
+}

@@ -230,6 +230,7 @@ require get_template_directory() . '/inc/post-types/promo.php';
 require get_template_directory() . '/inc/post-types/awards.php';
 require get_template_directory() . '/inc/post-types/banner.php';
 require get_template_directory() . '/inc/post-types/visa.php';
+require get_template_directory() . '/inc/post-types/best-offers.php';
 
 
 
@@ -243,6 +244,7 @@ require get_template_directory() . '/custom-fields/pages/contacts.php';
 require get_template_directory() . '/custom-fields/award.php';
 require get_template_directory() . '/custom-fields/banner.php';
 require get_template_directory() . '/custom-fields/visa.php';
+require get_template_directory() . '/custom-fields/best-offers.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';
