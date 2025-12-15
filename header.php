@@ -28,17 +28,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
         rel="stylesheet">
 
-
   <?php wp_head(); ?>
 </head>
 
 <body <?php body_class(); ?>>
-
   <header class="header">
     <div class="header-top__wrap">
       <div class="container">
-
-
         <div class="header__top">
           <div class="header__currencies ">
 
@@ -96,7 +92,6 @@
       </div>
     </div>
     <div class="container">
-
       <div class="header__wrap">
         <?= get_custom_logo() ?>
         <div class="header__div"></div>
@@ -161,5 +156,37 @@
 
     </div>
   </header>
+
+
+  <section class="mobile-nav">
+    <div class="container">
+      <div class="mobile-nav__wrap">
+        <div class="mobile-nav__nav">
+          <?php
+          wp_nav_menu([
+            'theme_location' => 'mobile_nav',
+            'container' => false,
+            'items_wrap' => '%3$s',
+            'depth' => 2,
+            'walker' => new Mobile_Nav_Walker(),
+            'fallback_cb' => '__return_empty_string',
+          ]);
+          ?>
+
+        </div>
+
+        <div class="
+                   mobile-nav-contacts">
+          <div class="mobile-nav-contacts__item">
+
+          </div>
+        </div>
+
+        <div class="mobile-nav-bottom">
+          asds
+        </div>
+      </div>
+    </div>
+  </section>
 
   <?= get_template_part('template-parts/gtm-search') ?>

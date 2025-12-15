@@ -6,6 +6,7 @@ add_action('after_setup_theme', 'theme_register_nav_menu');
 function theme_register_nav_menu()
 {
     register_nav_menu('header_nav', 'Мегаменю в шапке');
+    register_nav_menu('mobile_nav', 'Мобильное меню');
 
 
 
@@ -160,6 +161,61 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
             $output .= "</div>\n";  // закрываем .mega-menu__col
         } elseif ($depth === 2) {
             $output .= "</li>\n";
+        }
+    }
+}
+
+
+class Mobile_Nav_Walker extends Walker_Nav_Menu
+{
+    public function start_lvl(&$output, $depth = 0, $args = null)
+    {
+        if ($depth === 0) {
+            $output .= '<div class="mobile-nav__submenu">';
+        }
+    }
+
+    public function end_lvl(&$output, $depth = 0, $args = null)
+    {
+        if ($depth === 0) {
+            $output .= '</div>';
+        }
+    }
+
+    public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0)
+    {
+        $title = esc_html($item->title);
+        $url = esc_url($item->url);
+
+        $classes = is_array($item->classes) ? $item->classes : [];
+        $has_children = in_array('menu-item-has-children', $classes, true);
+
+        if ($depth === 0) {
+            $output .= '<div class="mobile-nav__item">';
+            $output .= '<a href="' . $url . '" class="mobile-nav__link">';
+            $output .= '<span>' . $title . '</span>';
+
+            if ($has_children) {
+                $output .= '<div class="mobile-nav__link-chevron">';
+                $output .= '<img src="' . esc_url(get_template_directory_uri() . '/img/icons/chevron-d-red.svg') . '" alt="">';
+                $output .= '</div>';
+            }
+
+            $output .= '</a>';
+            return;
+        }
+
+        if ($depth === 1) {
+            $output .= '<a href="' . $url . '" class="mobile-nav__link">';
+            $output .= '<span>' . $title . '</span>';
+            $output .= '</a>';
+        }
+    }
+
+    public function end_el(&$output, $item, $depth = 0, $args = null)
+    {
+        if ($depth === 0) {
+            $output .= '</div>';
         }
     }
 }

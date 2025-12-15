@@ -1,6 +1,13 @@
 .header {
   // padding: 0 0 16px;
 
+  @media screen and (max-width: 768px) {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    padding: 8px 0;
+  }
   .socials {
     display: none;
   }
@@ -51,6 +58,9 @@
   align-items: center;
   gap: 64px;
   margin-top: 8px;
+  @media screen and (max-width: 768px) {
+    margin-top: 0;
+  }
 }
 
 .custom-logo-link {
