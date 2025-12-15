@@ -173,7 +173,7 @@
           ]);
           ?>
 
-          <div class="mobile-nav__item active">
+          <div class="mobile-nav__item">
             <a href="#"
                class="mobile-nav__link"
                aria-expanded="false">
@@ -185,6 +185,48 @@
             </a>
 
             <div class="mobile-nav__submenu">
+              <a href="/country/indoneziya/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Индонезия</span>
+              </a>
+
+              <a href="/country/italiya/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Италия</span>
+              </a>
+
+              <a href="/country/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Все страны</span>
+              </a>
+              <a href="/country/indoneziya/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Индонезия</span>
+              </a>
+
+              <a href="/country/italiya/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Италия</span>
+              </a>
+
+              <a href="/country/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Все страны</span>
+              </a>
+              <a href="/country/indoneziya/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Индонезия</span>
+              </a>
+
+              <a href="/country/italiya/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Италия</span>
+              </a>
+
+              <a href="/country/"
+                 class="mobile-nav__link mobile-nav__link--child">
+                <span>Все страны</span>
+              </a>
               <a href="/country/indoneziya/"
                  class="mobile-nav__link mobile-nav__link--child">
                 <span>Индонезия</span>

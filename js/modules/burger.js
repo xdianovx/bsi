@@ -14,3 +14,53 @@ export const burger = () => {
     }
   });
 };
+
+export const mobileNavAccordion = () => {
+  const items = document.querySelectorAll(".mobile-nav__item");
+
+  if (!items.length) return;
+
+  const setHeight = (item, open) => {
+    const submenu = item.querySelector(".mobile-nav__submenu");
+    if (!submenu) return;
+
+    if (open) {
+      submenu.style.maxHeight = submenu.scrollHeight + "px";
+    } else {
+      submenu.style.maxHeight = "0px";
+    }
+  };
+
+  items.forEach((item) => {
+    const trigger = item.querySelector(".mobile-nav__link");
+    const submenu = item.querySelector(".mobile-nav__submenu");
+
+    if (!trigger || !submenu) return;
+
+    setHeight(item, item.classList.contains("active"));
+
+    trigger.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const isOpen = item.classList.contains("active");
+
+      items.forEach((i) => {
+        if (i === item) return;
+        i.classList.remove("active");
+        const t = i.querySelector(".mobile-nav__link");
+        if (t) t.setAttribute("aria-expanded", "false");
+        setHeight(i, false);
+      });
+
+      item.classList.toggle("active", !isOpen);
+      trigger.setAttribute("aria-expanded", String(!isOpen));
+      setHeight(item, !isOpen);
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    document.querySelectorAll(".mobile-nav__item.active").forEach((item) => {
+      setHeight(item, true);
+    });
+  });
+};

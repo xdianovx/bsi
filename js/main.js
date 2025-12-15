@@ -8,10 +8,11 @@ import { tabs } from "./modules/tabs";
 import header, { initCurrency } from "./modules/currency";
 import { initNewsFilter } from "./modules/ajax/news-sort";
 import { promoPageAjax } from "./modules/ajax/promo-sort";
-import { burger } from "./modules/burger";
+import { burger, mobileNavAccordion } from "./modules/burger";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
+  mobileNavAccordion();
   MicroModal.init();
   Fancybox.bind("[data-fancybox]", {});
   const datepick = document.querySelector('input[name="daterange"]');
