@@ -195,67 +195,39 @@
                 <span>Италия</span>
               </a>
 
-              <a href="/country/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Все страны</span>
-              </a>
-              <a href="/country/indoneziya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Индонезия</span>
-              </a>
 
-              <a href="/country/italiya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Италия</span>
-              </a>
-
-              <a href="/country/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Все страны</span>
-              </a>
-              <a href="/country/indoneziya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Индонезия</span>
-              </a>
-
-              <a href="/country/italiya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Италия</span>
-              </a>
-
-              <a href="/country/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Все страны</span>
-              </a>
-              <a href="/country/indoneziya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Индонезия</span>
-              </a>
-
-              <a href="/country/italiya/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Италия</span>
-              </a>
-
-              <a href="/country/"
-                 class="mobile-nav__link mobile-nav__link--child">
-                <span>Все страны</span>
-              </a>
             </div>
           </div>
 
 
         </div>
 
-        <div class="
-                   mobile-nav-contacts">
+        <div class="mobile-nav-contacts">
           <div class="mobile-nav-contacts__item">
+            <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg"
+                 alt="">
+            <a href="tel:<?php the_field('telefon', 'option'); ?>"
+               class="mobile-nav-contacts__phone">
+              <?php the_field('telefon', 'option'); ?>
+            </a>
+          </div>
+          <div class="mobile-nav-contacts__item">
+            <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg"
+                 alt="">
+            <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>"
+               class="mobile-nav-contacts__phone">
+              <?php the_field('telefon', 'option'); ?>
+            </a>
+          </div>
+
+          <div class="mobile-nav-socials">
+            <?= get_template_part('template-parts/ui/socials') ?>
 
           </div>
         </div>
 
         <div class="mobile-nav-bottom">
-          asds
+          <!-- asds -->
         </div>
       </div>
     </div>

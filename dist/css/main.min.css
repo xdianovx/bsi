@@ -2535,6 +2535,31 @@ input.error {
   white-space: nowrap;
 }
 
+.mobile-nav-contacts {
+  background: #f4f4f6;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-nav-contacts__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 100%;
+}
+
+.mobile-nav-socials {
+  display: flex;
+  justify-content: flex-end;
+}
+.mobile-nav-socials .social-item {
+  background: #ee3145;
+  color: #fff;
+}
+
 .modal__overlay {
   position: fixed;
   top: 0;

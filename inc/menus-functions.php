@@ -184,15 +184,25 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
 
     public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0)
     {
-        $title = esc_html($item->title);
-        $url = esc_url($item->url);
-
         $classes = is_array($item->classes) ? $item->classes : [];
         $has_children = in_array('menu-item-has-children', $classes, true);
 
+        $is_active = (
+            in_array('current-menu-item', $classes, true) ||
+            in_array('current-menu-parent', $classes, true) ||
+            in_array('current-menu-ancestor', $classes, true) ||
+            in_array('current_page_item', $classes, true) ||
+            in_array('current_page_parent', $classes, true)
+        );
+
+        $title = esc_html($item->title);
+        $url = !empty($item->url) ? esc_url($item->url) : '#';
+        $target = !empty($item->target) ? ' target="' . esc_attr($item->target) . '"' : '';
+        $rel = !empty($item->xfn) ? ' rel="' . esc_attr($item->xfn) . '"' : '';
+
         if ($depth === 0) {
-            $output .= '<div class="mobile-nav__item">';
-            $output .= '<a href="' . $url . '" class="mobile-nav__link">';
+            $output .= '<div class="mobile-nav__item' . ($is_active ? ' active' : '') . '">';
+            $output .= '<a href="' . $url . '" class="mobile-nav__link"' . ($has_children ? ' aria-expanded="false"' : '') . $target . $rel . '>';
             $output .= '<span>' . $title . '</span>';
 
             if ($has_children) {
@@ -206,7 +216,7 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
         }
 
         if ($depth === 1) {
-            $output .= '<a href="' . $url . '" class="mobile-nav__link">';
+            $output .= '<a href="' . $url . '" class="mobile-nav__link mobile-nav__link--child"' . $target . $rel . '>';
             $output .= '<span>' . $title . '</span>';
             $output .= '</a>';
         }
