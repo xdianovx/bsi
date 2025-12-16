@@ -2,6 +2,7 @@
 /* Роутинг: отели/акции внутри страны */
 $country_hotels_slug = get_query_var('country_hotels');
 $country_promos_slug = get_query_var('country_promos');
+$gallery = get_field('galereya', get_the_ID());// или любое другое поле
 
 if ($country_hotels_slug) {
   $country = get_page_by_path($country_hotels_slug, OBJECT, 'country');
@@ -130,7 +131,14 @@ get_header();
             <p class="page-country__descr"><?= get_the_excerpt(); ?></p>
 
             <?= get_template_part('template-parts/pages/country/country-info'); ?>
-            <?= get_template_part('template-parts/pages/country/photo-gallery-slider'); ?>
+            <?php
+            get_template_part('template-parts/sections/gallery', null, [
+              'gallery' => $gallery,
+              'id' => 'hotel_' . get_the_ID(),
+            ]);
+            ?>
+
+
           </div>
 
           <?php /* Регионы + курорты */ ?>

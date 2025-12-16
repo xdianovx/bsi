@@ -1,11 +1,16 @@
 .breadcrumbs {
   font-size: 16px;
   margin-top: 24px;
+  margin-bottom: 16px;
 
   a {
-    font-weight: 600;
+    font-weight: 500;
 
     color: $red;
+  }
+
+  p {
+    margin-bottom: 0;
   }
 }
 

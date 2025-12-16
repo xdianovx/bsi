@@ -14,6 +14,13 @@
     border: 1px solid #cecece;
     object-fit: cover;
   }
+
+  @media screen and (max-width: 1200px) {
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
 }
 .country-page__values {
   margin-top: 34px;
@@ -35,6 +42,35 @@
     height: auto;
     display: block;
   }
+}
+
+.coutry-page__wrap > * {
+  min-width: 0;
+}
+
+.page-country__content {
+  min-width: 0;
+}
+
+.country-page__gallery {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.country-page__gallery .swiper {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.country-page__gallery .swiper,
+.country-page__gallery .swiper-wrapper,
+.country-page__gallery .swiper-slide {
+  max-width: 100%;
+  min-width: 0; /* тоже помогает, если внутри ещё flex */
 }
 
 .country-attr__key {
@@ -95,7 +131,15 @@
 .child-pages__list {
   display: flex;
   flex-direction: column;
-  // gap: 8px;
+
+  @media screen and (max-width: 1200px) {
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+
+  @media screen and (max-width: 768px) {
+    gap: 8px;
+  }
 }
 .child-page-item {
   padding: 12px 12px 10px;
@@ -123,6 +167,17 @@
     background: $red;
     color: #fff;
   }
+
+  @media screen and (max-width: 1200px) {
+    padding: 8px 12px;
+  }
+
+  @media screen and (max-width: 768px) {
+    background: $bg-gray;
+    line-height: 100%;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
 }
 
 .child-page-item__icon {
@@ -142,12 +197,22 @@
   grid-template-columns: 1fr 4fr;
   gap: 32px;
   align-items: flex-start;
+
+  @media screen and (max-width: 1200px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .coutry-page__aside {
   position: sticky;
   top: 40px;
   margin-top: 8px;
+
+  @media screen and (max-width: 1200px) {
+    margin-top: 0;
+    position: static;
+  }
 }
 
 .page-country__about {
@@ -162,7 +227,6 @@
 
 .country-page__gallery-slide {
   width: 100%;
-  height: 180px;
   overflow: hidden;
   border-radius: 8px;
 
@@ -219,4 +283,27 @@
 .country-regions__link {
   font-weight: 700;
   font-size: 18px;
+}
+
+.hotel-gallery-main-slide {
+  aspect-ratio: 19/9;
+  display: block;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.js-gallery {
+}
+
+.hotel-gallery-thumb-slide {
+  aspect-ratio: 16/9;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }

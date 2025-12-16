@@ -1,6 +1,40 @@
 import { Swiper } from "swiper/bundle";
 
 export const sliders = () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const blocks = document.querySelectorAll(".js-gallery");
+    if (!blocks.length || typeof Swiper === "undefined") return;
+
+    blocks.forEach((block) => {
+      const mainEl = block.querySelector(".js-gallery-main");
+      const thumbsEl = block.querySelector(".js-gallery-thumbs");
+      const prevEl = block.querySelector(".js-gallery-prev");
+      const nextEl = block.querySelector(".js-gallery-next");
+
+      if (!mainEl || !thumbsEl) return;
+
+      const thumbsSwiper = new Swiper(thumbsEl, {
+        loop: true,
+        slidesPerView: 4,
+        spaceBetween: 8,
+        slideToClickedSlide: true,
+        watchSlidesProgress: true,
+      });
+
+      const mainSwiper = new Swiper(mainEl, {
+        loop: true,
+        spaceBetween: 8,
+        navigation: {
+          prevEl,
+          nextEl,
+        },
+        thumbs: {
+          swiper: thumbsSwiper,
+        },
+      });
+    });
+  });
+
   const countryGallerySlider = new Swiper(".country-page__gallery-slider", {
     slidesPerView: 4,
     spaceBetween: 10,
@@ -81,7 +115,7 @@ export const sliders = () => {
     slidesPerView: 4,
     loopedSlides: 6,
     slideToClickedSlide: true,
-    spaceBetween: 16,
+    spaceBetween: 8,
 
     thumbs: {
       hotelGalleryMainSlider,
