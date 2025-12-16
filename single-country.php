@@ -1,5 +1,38 @@
 <?php
+/* Роутинг: отели/акции внутри страны */
+$country_hotels_slug = get_query_var('country_hotels');
+$country_promos_slug = get_query_var('country_promos');
+
+if ($country_hotels_slug) {
+  $country = get_page_by_path($country_hotels_slug, OBJECT, 'country');
+
+  global $country_hotels_data;
+  $country_hotels_data = [
+    'country' => $country,
+    'country_slug' => $country_hotels_slug,
+  ];
+
+  get_template_part('country-hotels');
+  exit;
+}
+
+if ($country_promos_slug) {
+  $country = get_page_by_path($country_promos_slug, OBJECT, 'country');
+
+  global $country_promos_data;
+  $country_promos_data = [
+    'country' => $country,
+    'country_slug' => $country_promos_slug,
+  ];
+
+  get_template_part('country-promo');
+  exit;
+}
+
+/* Контекст страны */
 $country_id = get_the_ID();
+
+/* Запрос новостей по стране */
 $news_query = new WP_Query([
   'post_type' => 'news',
   'post_status' => 'publish',
@@ -13,121 +46,190 @@ $news_query = new WP_Query([
   ],
 ]);
 
+/* Получение регионов страны (meta_query + fallback через ACF, если meta_query не отрабатывает) */
+$regions = get_terms([
+  'taxonomy' => 'region',
+  'hide_empty' => false,
+  'orderby' => 'name',
+  'order' => 'ASC',
+  'meta_query' => [
+    [
+      'key' => 'region_country',
+      'value' => $country_id,
+      'compare' => '=',
+    ],
+  ],
+]);
 
-$country_hotels_slug = get_query_var('country_hotels');
-$country_promos_slug = get_query_var('country_promos');
-
-if ($country_hotels_slug) {
-  $country = get_page_by_path($country_hotels_slug, OBJECT, 'country');
-
-  global $country_hotels_data;
-  $country_hotels_data = [
-    'country' => $country,
-    'country_slug' => $country_hotels_slug,
-  ];
-
-  get_template_part('country-hotels'); // твой файл списка отелей
-  exit;
+if (empty($regions) || is_wp_error($regions)) {
+  $regions = [];
 }
 
-if ($country_promos_slug) {
-  $country = get_page_by_path($country_promos_slug, OBJECT, 'country');
+if (empty($regions)) {
+  $all_regions = get_terms([
+    'taxonomy' => 'region',
+    'hide_empty' => false,
+    'orderby' => 'name',
+    'order' => 'ASC',
+  ]);
 
-  global $country_promos_data;
-  $country_promos_data = [
-    'country' => $country,
-    'country_slug' => $country_promos_slug,
-  ];
-
-  get_template_part('country-promo');  // тот файл, который ты показал
-  exit;
+  if (!empty($all_regions) && !is_wp_error($all_regions)) {
+    foreach ($all_regions as $term) {
+      $term_country = get_field('region_country', 'term_' . $term->term_id);
+      if ($term_country == $country_id) {
+        $regions[] = $term;
+      }
+    }
+  }
 }
 
+/* Флаг страны */
+$flag = get_field('flag', $country_id);
+$flag_url = '';
+if ($flag) {
+  $flag_url = is_array($flag) && !empty($flag['url']) ? $flag['url'] : $flag;
+}
 
-
-get_header(); ?>
+get_header();
+?>
 
 <main class="site-main">
 
   <?php
+  /* Хлебные крошки */
   if (function_exists('yoast_breadcrumb')) {
-    yoast_breadcrumb(
-      '<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
-      '</p></div></div>'
-    );
+    yoast_breadcrumb('<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>', '</p></div></div>');
   }
   ?>
 
   <section>
     <div class="container">
-
       <div class="coutry-page__wrap">
+
+        <?php /* Aside меню страны */ ?>
         <aside class="coutry-page__aside">
           <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
         </aside>
 
+        <?php /* Контент страны */ ?>
         <div class="page-country__content">
+
+          <?php /* Заголовок + краткое описание */ ?>
           <div class="page-country__about">
             <div class="page-country__title">
-              <?php
-
-              if (!wp_get_post_parent_id(get_the_ID()) && get_field('flag', get_the_ID())): ?>
-
-                <img src="<?= get_field('flag', get_the_ID()) ?>"
-                     alt="флаг <?php the_title() ?>" />
-
-
+              <?php if (!wp_get_post_parent_id($country_id) && $flag_url): ?>
+                <img src="<?= esc_url($flag_url); ?>"
+                     alt="флаг <?= esc_attr(get_the_title($country_id)); ?>">
               <?php endif; ?>
 
-              <h1 class="h1 h1-country">
-                Туры <?php the_title(); ?>
-              </h1>
+              <h1 class="h1 h1-country"><?php the_title(); ?></h1>
             </div>
 
-            <?= get_template_part('template-parts/pages/country/country-info') ?>
+            <p class="page-country__descr"><?= get_the_excerpt(); ?></p>
 
-            <p class="page-country__descr">
-              <?= get_the_excerpt() ?>
-            </p>
-
-            <?=
-              get_template_part('template-parts/pages/country/photo-gallery-slider');
-            ?>
+            <?= get_template_part('template-parts/pages/country/country-info'); ?>
+            <?= get_template_part('template-parts/pages/country/photo-gallery-slider'); ?>
           </div>
 
-          <div class="editor-content">
-            <?php the_content() ?>
+          <?php /* Регионы + курорты */ ?>
+          <?php if (!empty($regions)): ?>
+            <section class="country-regions">
+              <h2 class="h3">Регионы</h2>
+
+              <div class="country-regions__list">
+                <?php foreach ($regions as $region): ?>
+                  <div class="country-regions__item">
+                    <a class="country-regions__link"
+                       href="<?= esc_url(get_term_link($region)); ?>">
+                      <?= esc_html($region->name); ?>
+                    </a>
+
+                    <?php
+                    $resorts = get_terms([
+                      'taxonomy' => 'resort',
+                      'hide_empty' => false,
+                      'orderby' => 'name',
+                      'order' => 'ASC',
+                      'meta_query' => [
+                        [
+                          'key' => 'resort_region',
+                          'value' => $region->term_id,
+                          'compare' => '=',
+                        ],
+                      ],
+                    ]);
+
+                    if (empty($resorts) || is_wp_error($resorts)) {
+                      $resorts = [];
+                    }
+
+                    if (empty($resorts)) {
+                      $all_resorts = get_terms([
+                        'taxonomy' => 'resort',
+                        'hide_empty' => false,
+                        'orderby' => 'name',
+                        'order' => 'ASC',
+                      ]);
+
+                      if (!empty($all_resorts) && !is_wp_error($all_resorts)) {
+                        foreach ($all_resorts as $t) {
+                          $t_region = get_field('resort_region', 'term_' . $t->term_id);
+                          if ($t_region == $region->term_id) {
+                            $resorts[] = $t;
+                          }
+                        }
+                      }
+                    }
+                    ?>
+
+                    <?php if (!empty($resorts)): ?>
+                      <div class="country-regions__resorts">
+                        <?php foreach ($resorts as $resort): ?>
+                          <a class="country-regions__resort"
+                             href="<?= esc_url(get_term_link($resort)); ?>">
+                            <?= esc_html($resort->name); ?>
+                          </a>
+                        <?php endforeach; ?>
+                      </div>
+                    <?php endif; ?>
+
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </section>
+          <?php endif; ?>
+
+          <?php /* Контент из редактора */ ?>
+          <div class="editor-content page-country__editor-content">
+            <?php the_content(); ?>
           </div>
 
-          <section>
+          <?php /* Новости */ ?>
+          <section class="page-country__news">
             <h2 class="h2">Новости</h2>
-            <?php
-            if ($news_query->have_posts()): ?>
+
+            <?php if ($news_query->have_posts()): ?>
               <div class="swiper news-slider-slider">
                 <div class="swiper-wrapper">
-                  <?php
-                  while ($news_query->have_posts()):
-                    $news_query->the_post();
-                    ?>
+                  <?php while ($news_query->have_posts()):
+                    $news_query->the_post(); ?>
                     <div class="swiper-slide">
                       <?php get_template_part('template-parts/news/card'); ?>
                     </div>
                   <?php endwhile; ?>
                 </div>
-              <?php endif; ?>
+              </div>
+            <?php endif; ?>
+
+            <?php wp_reset_postdata(); ?>
           </section>
+
         </div>
-
-
 
       </div>
     </div>
   </section>
 
-
 </main>
 
-<?php
-get_footer();
-
-?>
+<?php get_footer(); ?>

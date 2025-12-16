@@ -217,7 +217,7 @@ require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/menus-functions.php';
 
 // Post Types
-require get_template_directory() . '/inc/post-types/custom-post-types.php';
+require get_template_directory() . '/inc/post-types/country.php';
 require get_template_directory() . '/inc/post-types/news.php';
 require get_template_directory() . '/inc/post-types/custom-post-event.php';
 require get_template_directory() . '/inc/post-types/custom-post-service.php';
@@ -231,6 +231,7 @@ require get_template_directory() . '/inc/post-types/awards.php';
 require get_template_directory() . '/inc/post-types/banner.php';
 require get_template_directory() . '/inc/post-types/visa.php';
 require get_template_directory() . '/inc/post-types/best-offers.php';
+require get_template_directory() . '/inc/post-types/tour.php';
 
 
 
@@ -291,4 +292,52 @@ add_action('acf/init', function () {
 		],
 	]);
 });
+
+
+
+add_action('admin_init', function () {
+	if (!current_user_can('manage_options'))
+		return;
+	if (empty($_GET['sync_country_regions']))
+		return;
+
+	$country_ids = get_posts([
+		'post_type' => 'country',
+		'post_status' => 'publish',
+		'posts_per_page' => -1,
+		'post_parent' => 0,
+		'fields' => 'ids',
+	]);
+
+	foreach ($country_ids as $country_id) {
+		$post = get_post($country_id);
+		if (!$post)
+			continue;
+
+		$slug = $post->post_name;
+		$title = $post->post_title;
+
+		$existing = term_exists($slug, 'region');
+
+		if (!$existing) {
+			$created = wp_insert_term($title, 'region', ['slug' => $slug, 'parent' => 0]);
+			if (!is_wp_error($created) && !empty($created['term_id'])) {
+				update_term_meta((int) $created['term_id'], 'country_post_id', (int) $country_id);
+				update_post_meta((int) $country_id, 'region_country_term_id', (int) $created['term_id']);
+			}
+			continue;
+		}
+
+		$term_id = is_array($existing) ? (int) $existing['term_id'] : (int) $existing;
+		wp_update_term($term_id, 'region', ['name' => $title, 'slug' => $slug, 'parent' => 0]);
+		update_term_meta($term_id, 'country_post_id', (int) $country_id);
+		update_post_meta((int) $country_id, 'region_country_term_id', (int) $term_id);
+	}
+
+	wp_die('OK');
+});
+
+// /wp-admin/?sync_country_regions=1
+
+
 

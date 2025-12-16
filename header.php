@@ -25,8 +25,9 @@
   <link rel="preconnect"
         href="https://fonts.gstatic.com"
         crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+
 
   <?php wp_head(); ?>
 </head>
@@ -40,12 +41,12 @@
 
             <div class="currency-item">
               <div class="currency-item__title">USD</div>
-              <div class="currency-item__value"></div>
+              <div class="currency-item__value numfont"></div>
             </div>
 
             <div class="currency-item">
               <div class="currency-item__title">EUR</div>
-              <div class="currency-item__value"></div>
+              <div class="currency-item__value numfont"></div>
             </div>
             <div class="currency-select js-dropdown">
               <button class="js-dropdown-trigger currency-select-trigger__wrap">
@@ -75,12 +76,12 @@
           <div class="header__contacts">
 
             <a href="tel:<?php the_field('telefon', 'option'); ?>"
-               class="phone-link">
+               class="phone-link numfont">
               <?php the_field('telefon', 'option'); ?>
             </a>
 
             <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>"
-               class="phone-link">
+               class="phone-link numfont">
 
               <?php the_field('telefon_po_rf', 'option'); ?>
               <span>бесплатно из регионов</span>
