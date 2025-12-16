@@ -9,6 +9,7 @@ add_action('acf/init', function () {
   acf_add_local_field_group([
     'key' => 'group_hotel_geo',
     'title' => 'ГЕО',
+    'position' => 'acf_after_title',
     'fields' => [
       [
         'key' => 'field_hotel_geo_notice',
