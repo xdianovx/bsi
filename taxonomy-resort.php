@@ -63,6 +63,8 @@ $posts_query = new WP_Query([
         <aside class="coutry-page__aside">
           <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
         </aside>
+
+
         <?php if (!empty($children) && !is_wp_error($children)): ?>
           <div class="region-children">
             <?php foreach ($children as $child): ?>

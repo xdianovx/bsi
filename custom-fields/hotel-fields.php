@@ -5,10 +5,21 @@ add_action('acf/init', function () {
     return;
   }
 
+  /* Группа: ГЕО */
   acf_add_local_field_group([
-    'key' => 'group_hotel_info',
-    'title' => 'Основная информация',
+    'key' => 'group_hotel_geo',
+    'title' => 'ГЕО',
     'fields' => [
+      [
+        'key' => 'field_hotel_geo_notice',
+        'label' => '',
+        'name' => 'hotel_geo_notice',
+        'type' => 'message',
+        'message' => 'Сначала выбираем страну в выпадающем списке, затем нажимаем на кнопку "Загрузить регионы". После загрузки регионов выбираем регион и нажимаем на кнопку "Загрузить курорты". После загрузки курортов выбираем нужный курорт.',
+        'new_lines' => 'wpautop',
+        'esc_html' => 0,
+        'wrapper' => ['width' => '100'],
+      ],
       [
         'key' => 'field_hotel_country',
         'label' => 'Страна',
@@ -19,9 +30,7 @@ add_action('acf/init', function () {
         'return_format' => 'id',
         'ui' => 1,
         'ajax' => 1,
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '33'],
       ],
       [
         'key' => 'field_hotel_region',
@@ -37,10 +46,8 @@ add_action('acf/init', function () {
         'allow_null' => 1,
         'multiple' => 0,
         'ui' => 1,
-        'ajax' => 1,
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'ajax' => 0, // ВАЖНО: выключаем ACF ajax
+        'wrapper' => ['width' => '33'],
       ],
       [
         'key' => 'field_hotel_resort',
@@ -56,7 +63,7 @@ add_action('acf/init', function () {
         'allow_null' => 1,
         'multiple' => 0,
         'ui' => 1,
-        'ajax' => 1,
+        'ajax' => 0, // ВАЖНО: выключаем ACF ajax
         'conditional_logic' => [
           [
             [
@@ -65,20 +72,26 @@ add_action('acf/init', function () {
             ],
           ],
         ],
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '33'],
       ],
+    ],
+    'location' => [
       [
-        'key' => 'field_hotel_city',
-        'label' => 'Город',
-        'name' => 'hotel_city',
-        'type' => 'text',
-        'required' => 0,
-        'wrapper' => [
-          'width' => '25',
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'hotel',
         ],
       ],
+    ],
+    'style' => 'seamless',
+  ]);
+
+  /* Группа: Основная информация */
+  acf_add_local_field_group([
+    'key' => 'group_hotel_info',
+    'title' => 'Основная информация',
+    'fields' => [
       [
         'key' => 'field_hotel_rating',
         'label' => 'Рейтинг',
@@ -88,9 +101,7 @@ add_action('acf/init', function () {
         'max' => 5,
         'step' => 1,
         'placeholder' => 'от 1 до 5',
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_is_featured',
@@ -99,45 +110,35 @@ add_action('acf/init', function () {
         'type' => 'true_false',
         'ui' => 1,
         'default_value' => 0,
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_hotel_address',
         'label' => 'Адрес',
         'name' => 'address',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_hotel_phone',
         'label' => 'Телефон',
         'name' => 'phone',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_website',
         'label' => 'Сайт отеля',
         'name' => 'website',
         'type' => 'url',
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_price',
         'label' => 'Стоимость',
         'name' => 'price',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '25',
-        ],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_hotel_gallery',
@@ -156,9 +157,7 @@ add_action('acf/init', function () {
         'label' => 'Время заезда',
         'name' => 'check_in_time',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '50',
-        ],
+        'wrapper' => ['width' => '50'],
         'placeholder' => '14:00',
       ],
       [
@@ -166,9 +165,7 @@ add_action('acf/init', function () {
         'label' => 'Время выезда',
         'name' => 'check_out_time',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '50',
-        ],
+        'wrapper' => ['width' => '50'],
         'placeholder' => '12:00',
       ],
       [
@@ -176,9 +173,7 @@ add_action('acf/init', function () {
         'label' => 'Wi-Fi',
         'name' => 'wifi',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '50',
-        ],
+        'wrapper' => ['width' => '50'],
         'placeholder' => 'Бесплатный',
       ],
       [
@@ -186,9 +181,7 @@ add_action('acf/init', function () {
         'label' => 'Завтрак',
         'name' => 'breakfast',
         'type' => 'text',
-        'wrapper' => [
-          'width' => '50',
-        ],
+        'wrapper' => ['width' => '50'],
         'placeholder' => 'Включен/Дополнительно',
       ],
     ],
@@ -204,99 +197,114 @@ add_action('acf/init', function () {
   ]);
 });
 
-add_filter('acf/fields/post_object/query/name=hotel_country', function ($args, $field, $post_id) {
+
+/* Ограничение списка стран (только верхний уровень) */
+add_filter('acf/fields/post_object/query/key=field_hotel_country', function ($args, $field, $post_id) {
   $args['post_parent'] = 0;
   return $args;
 }, 10, 3);
 
-add_filter('acf/fields/taxonomy/query/name=hotel_region', function ($args, $field, $post_id) {
-  $country_id = '';
 
-  if (!empty($_POST['acf']['field_hotel_country'])) {
-    $country_id = $_POST['acf']['field_hotel_country'];
+/* AJAX: отдать регионы по стране / курорты по региону */
+add_action('wp_ajax_bsi_geo_terms', function () {
+  if (!current_user_can('edit_posts')) {
+    wp_send_json_error(['message' => 'no_access']);
   }
 
-  if (!$country_id && $post_id) {
-    $country_id = get_field('hotel_country', $post_id);
+  $nonce = $_POST['nonce'] ?? '';
+  if (!wp_verify_nonce($nonce, 'bsi_geo')) {
+    wp_send_json_error(['message' => 'bad_nonce']);
   }
 
-  if ($country_id) {
-    if (empty($args['meta_query'])) {
-      $args['meta_query'] = [];
+  $taxonomy = sanitize_text_field($_POST['taxonomy'] ?? '');
+
+  if ($taxonomy === 'region') {
+    $country_id = sanitize_text_field($_POST['country_id'] ?? '');
+    if (!$country_id) {
+      wp_send_json_success([]);
     }
 
-    $args['meta_query'][] = [
-      'key' => 'region_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ];
-  }
+    $terms = get_terms([
+      'taxonomy' => 'region',
+      'hide_empty' => false,
+      'orderby' => 'name',
+      'order' => 'ASC',
+      'meta_query' => [
+        [
+          'key' => 'region_country',
+          'value' => $country_id,
+          'compare' => '=',
+        ],
+      ],
+    ]);
 
-  return $args;
-}, 10, 3);
-
-add_filter('acf/fields/taxonomy/query/name=hotel_resort', function ($args, $field, $post_id) {
-  $region_id = '';
-
-  if (!empty($_POST['acf']['field_hotel_region'])) {
-    $region_id = $_POST['acf']['field_hotel_region'];
-  }
-
-  if (!$region_id && $post_id) {
-    $region_id = get_field('hotel_region', $post_id);
-  }
-
-  if (is_array($region_id)) {
-    $region_id = reset($region_id);
-  }
-
-  if ($region_id) {
-    if (empty($args['meta_query'])) {
-      $args['meta_query'] = [];
+    if (is_wp_error($terms) || empty($terms)) {
+      wp_send_json_success([]);
     }
 
-    $args['meta_query'][] = [
-      'key' => 'resort_region',
-      'value' => $region_id,
-      'compare' => '=',
-    ];
+    $out = array_map(function ($t) {
+      return ['id' => $t->term_id, 'text' => $t->name];
+    }, $terms);
+
+    wp_send_json_success($out);
   }
 
-  return $args;
-}, 10, 3);
-
-add_filter('acf/fields/taxonomy/result/name=hotel_region', function ($text, $term, $field, $post_id) {
-  $country_id = get_field('region_country', 'term_' . $term->term_id);
-
-  if ($country_id) {
-    $country_title = get_the_title($country_id);
-    if ($country_title) {
-      return $country_title . ' — ' . $term->name;
+  if ($taxonomy === 'resort') {
+    $region_id = sanitize_text_field($_POST['region_id'] ?? '');
+    if (!$region_id) {
+      wp_send_json_success([]);
     }
+
+    $terms = get_terms([
+      'taxonomy' => 'resort',
+      'hide_empty' => false,
+      'orderby' => 'name',
+      'order' => 'ASC',
+      'meta_query' => [
+        [
+          'key' => 'resort_region',
+          'value' => $region_id,
+          'compare' => '=',
+        ],
+      ],
+    ]);
+
+    if (is_wp_error($terms) || empty($terms)) {
+      wp_send_json_success([]);
+    }
+
+    $out = array_map(function ($t) {
+      return ['id' => $t->term_id, 'text' => $t->name];
+    }, $terms);
+
+    wp_send_json_success($out);
   }
 
-  return $text;
-}, 10, 4);
+  wp_send_json_error(['message' => 'bad_taxonomy']);
+});
 
-add_filter('acf/fields/taxonomy/result/name=hotel_resort', function ($text, $term, $field, $post_id) {
-  $region_id = get_field('resort_region', 'term_' . $term->term_id);
+/* Подключение JS в админке отеля + локализация ajaxUrl/nonce */
+add_action('admin_enqueue_scripts', function ($hook) {
+  if (!in_array($hook, ['post.php', 'post-new.php'], true))
+    return;
 
-  if ($region_id) {
-    $region_term = get_term($region_id, 'region');
-    $region_title = $region_term && !is_wp_error($region_term) ? $region_term->name : '';
+  $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+  if (!$screen || $screen->post_type !== 'hotel')
+    return;
 
-    $country_id = $region_term ? get_field('region_country', 'term_' . $region_term->term_id) : '';
-    $country_title = $country_id ? get_the_title($country_id) : '';
+  $path = get_template_directory() . '/assets/admin/hotel-geo-cascade.js';
+  $ver = file_exists($path) ? filemtime($path) : time();
 
-    $parts = [];
-    if ($country_title)
-      $parts[] = $country_title;
-    if ($region_title)
-      $parts[] = $region_title;
-    $parts[] = $term->name;
+  wp_enqueue_script(
+    'hotel-geo-cascade',
+    get_template_directory_uri() . '/assets/admin/hotel-geo-cascade.js',
+    ['acf-input'],
+    $ver,
+    true
+  );
 
-    return implode(' — ', $parts);
-  }
-
-  return $text;
-}, 10, 4);
+  wp_localize_script('hotel-geo-cascade', 'BSI_GEO', [
+    'ajaxUrl' => admin_url('admin-ajax.php'),
+    'nonce' => wp_create_nonce('bsi_geo'),
+  ]);
+});

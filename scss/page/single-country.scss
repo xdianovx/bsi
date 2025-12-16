@@ -189,10 +189,11 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+
   margin-top: 12px;
 }
 
-.country-regions__link {
+.country-regions__resort {
   transition: all 0.3s ease-in-out;
   &:hover {
     color: $red;
@@ -205,6 +206,7 @@
 
 .country-regions__title {
   font-weight: 700;
+  font-size: 18px;
 }
 
 .country-regions__resorts {
@@ -212,4 +214,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.country-regions__link {
+  font-weight: 700;
+  font-size: 18px;
 }
