@@ -83,6 +83,8 @@ if (empty($regions)) {
   }
 }
 
+
+
 /* Флаг страны */
 $flag = get_field('flag', $country_id);
 $flag_url = '';
@@ -134,15 +136,15 @@ get_header();
           <?php /* Регионы + курорты */ ?>
           <?php if (!empty($regions)): ?>
             <section class="country-regions">
-              <h2 class="h3">Регионы</h2>
+              <h2 class="h3">Регионы и курорты</h2>
 
               <div class="country-regions__list">
                 <?php foreach ($regions as $region): ?>
                   <div class="country-regions__item">
-                    <a class="country-regions__link"
-                       href="<?= esc_url(get_term_link($region)); ?>">
+                    <h4 class="country-regions__title"
+                        href="<?= esc_url(get_term_link($region)); ?>">
                       <?= esc_html($region->name); ?>
-                    </a>
+                    </h4>
 
                     <?php
                     $resorts = get_terms([

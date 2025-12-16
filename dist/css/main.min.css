@@ -3777,6 +3777,9 @@ input.error {
 
 .child-page-item {
   padding: 12px 12px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.3s ease-in-out;
   display: flex;
   cursor: pointer;
@@ -3785,10 +3788,25 @@ input.error {
 }
 .child-page-item:hover {
   background: #f4f4f6;
+  color: #ee3145;
+}
+.child-page-item:hover .child-page-item__icon {
+  color: #ee3145;
 }
 .child-page-item.active {
   background: #ee3145;
   color: #fff;
+}
+
+.child-page-item__icon {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease-in-out;
+}
+.child-page-item__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .coutry-page__wrap {
@@ -3853,6 +3871,17 @@ input.error {
 
 .page-country__editor-content {
   margin-top: 40px;
+}
+
+.country-regions__title {
+  font-weight: 700;
+}
+
+.country-regions__resorts {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .single-hotel__title-wrap {
