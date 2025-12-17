@@ -9,7 +9,7 @@
 }
 
 .single-hotel__title {
-  margin-bottom: 0;
+  margin-bottom: 12px;
   flex-grow: 1;
 }
 
@@ -38,7 +38,7 @@
 
 .single-hotel__top-line {
   display: flex;
-  margin-top: 8px;
+  // margin-top: 8px;
   align-items: center;
   gap: 16px;
 
@@ -46,6 +46,16 @@
     width: 1px;
     height: 16px;
     background: $bg-gray;
+  }
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .div {
+      display: none;
+    }
   }
 }
 

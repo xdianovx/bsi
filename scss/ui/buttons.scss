@@ -4,6 +4,9 @@
   font-weight: 500;
   line-height: 100%;
   text-align: center;
+  &.sm {
+    padding: 12px 20px;
+  }
 }
 
 .btn-accent {
@@ -13,6 +16,17 @@
 
   &:hover {
     background: darken($red, 5%);
+  }
+}
+
+.btn-gray {
+  background: $bg-gray;
+  color: #000 !important;
+  transition: $trans-text;
+
+  &:hover {
+    background: darken($red, 5%);
+    color: #fff !important;
   }
 }
 

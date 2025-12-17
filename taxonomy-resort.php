@@ -10,12 +10,8 @@ if (!$term || empty($term->term_id)) {
   return;
 }
 
-/**
- * ACF поля термина курорта
- * (ВАЖНО: это term meta, поэтому второй аргумент 'term_{$id}')
- */
+/** ACF поля терма  */
 $term_meta_key = 'term_' . $term->term_id;
-
 $resort_desc = function_exists('get_field') ? get_field('resort_desc', $term_meta_key) : '';
 $resort_content = function_exists('get_field') ? get_field('resort_content', $term_meta_key) : '';
 $resort_gallery = function_exists('get_field') ? get_field('resort_gallery', $term_meta_key) : [];
@@ -84,12 +80,28 @@ $children = get_terms([
               <?= term_description($term); ?>
             </div>
           <?php endif; ?>
-          <!-- (вывод отелей/детей — ниже) -->
 
+
+          <!-- Отели -->
+          <section class="resort-hotels"
+                   data-term-id="<?= (int) $term->term_id; ?>">
+            <h2 class="h2">Все отели </h2>
+            <div class="resort-hotels__list"></div>
+
+            <button class="resort-hotels__more"
+                    type="button">
+              Показать еще
+            </button>
+          </section>
         </div>
+
+
       </div>
     </div>
   </section>
+
+
+
 </main>
 
 <?php get_footer(); ?>

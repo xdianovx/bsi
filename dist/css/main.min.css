@@ -226,6 +226,9 @@ main {
   line-height: 100%;
   text-align: center;
 }
+.btn.sm {
+  padding: 12px 20px;
+}
 
 .btn-accent {
   background: #ee3145;
@@ -234,6 +237,16 @@ main {
 }
 .btn-accent:hover {
   background: #ec1930;
+}
+
+.btn-gray {
+  background: #f4f4f6;
+  color: #000 !important;
+  transition: all 0.3s ease-in-out;
+}
+.btn-gray:hover {
+  background: #ec1930;
+  color: #fff !important;
 }
 
 .btn-white {
@@ -2137,6 +2150,182 @@ input.error {
   line-height: 100%;
 }
 
+.hotel-card-row {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.hotel-card-row__wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+@media screen and (max-width: 768px) {
+  .hotel-card-row__wrap {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.hotel-card-row__media {
+  aspect-ratio: 16/8;
+  height: 150px;
+  align-self: stretch;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.hotel-card-row__media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+@media screen and (max-width: 768px) {
+  .hotel-card-row__media {
+    height: auto;
+  }
+}
+
+.hotel-card-row__poster {
+  height: 100%;
+}
+
+.hotel-card-row__title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 4px;
+}
+@media screen and (max-width: 768px) {
+  .hotel-card-row__title {
+    margin-top: 8px;
+  }
+}
+
+.hotel-card-row__geo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 100%;
+  color: #5c5c5c;
+}
+
+.hotel-card-row__excerpt {
+  margin-top: auto;
+  color: #5c5c5c;
+}
+@media screen and (max-width: 768px) {
+  .hotel-card-row__excerpt {
+    margin-top: 8px;
+  }
+}
+
+.hotel-card-row__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hotel-card-button {
+  display: inline-block;
+  width: 100%;
+  font-size: 14px;
+}
+
+.hotel-card-cta {
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+@media screen and (max-width: 768px) {
+  .hotel-card-cta {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hotel-card-row__rating {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+}
+
+.hotel-card__buttons {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media screen and (max-width: 768px) {
+  .hotel-card__buttons {
+    display: grid;
+    margin-top: 16px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 550px) {
+  .hotel-card__buttons {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.hotel-card-row__body {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.hotel-card-cta__price {
+  color: #ee3145;
+  text-align: right;
+  font-weight: 500;
+}
+
+.resort-hotels__list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 32px;
+  gap: 24px;
+}
+@media screen and (max-width: 768px) {
+  .resort-hotels__list {
+    gap: 40px;
+  }
+}
+
+.single-hotel__amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hotel-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 100%;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: #f4f4f6;
+}
+.hotel-tag img {
+  width: 18px;
+  height: 18px;
+}
+
+.hotel-map {
+  aspect-ratio: 16/9;
+}
+
 .main-banner__section {
   margin-top: 8px;
 }
@@ -3968,7 +4157,7 @@ input.error {
 }
 
 .single-hotel__title {
-  margin-bottom: 0;
+  margin-bottom: 12px;
   flex-grow: 1;
 }
 
@@ -3996,7 +4185,6 @@ input.error {
 
 .single-hotel__top-line {
   display: flex;
-  margin-top: 8px;
   align-items: center;
   gap: 16px;
 }
@@ -4004,6 +4192,16 @@ input.error {
   width: 1px;
   height: 16px;
   background: #f4f4f6;
+}
+@media screen and (max-width: 768px) {
+  .single-hotel__top-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .single-hotel__top-line .div {
+    display: none;
+  }
 }
 
 .stars-rating {

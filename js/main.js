@@ -9,6 +9,8 @@ import header, { initCurrency } from "./modules/currency";
 import { initNewsFilter } from "./modules/ajax/news-sort";
 import { promoPageAjax } from "./modules/ajax/promo-sort";
 import { burger, mobileNavAccordion } from "./modules/burger";
+import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
+import { initHotelMap } from "./modules/maps";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -28,4 +30,6 @@ window.addEventListener("DOMContentLoaded", () => {
   phoneMask();
   initNewsFilter();
   promoPageAjax();
+  initResortHotelsAjax();
+  initHotelMap();
 });

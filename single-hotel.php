@@ -2,16 +2,42 @@
 $gallery = get_field('gallery', get_the_ID());
 $country_id = get_field('field_hotel_country', get_the_ID());
 $rating = get_field('rating', get_the_ID());
-// Если страна связана, получаем ее данные
 if ($country_id) {
   $country_title = get_the_title($country_id);
   $country_permalink = get_permalink($country_id);
 
-  // Получаем дополнительные поля страны
   $country_visa = get_field('is_visa', $country_id); // поле "Требуется виза"
   $country_flag = get_field('flag', $country_id); // поле "Флаг"
-  $country_description = get_field('description', $country_id); // поле "Описание"
-  // Добавьте другие поля по необходимости
+  $region_id = get_field('hotel_region', $post_id);
+  if (is_array($region_id))
+    $region_id = reset($region_id);
+  $region_id = (int) $region_id;
+
+  $region_name = '';
+  if ($region_id) {
+    $region_term = get_term($region_id, 'region');
+    if ($region_term && !is_wp_error($region_term))
+      $region_name = $region_term->name;
+  }
+
+  $resort_id = get_field('hotel_resort', $post_id);
+  if (is_array($resort_id))
+    $resort_id = reset($resort_id);
+  $resort_id = (int) $resort_id;
+
+  $resort_name = '';
+  if ($resort_id) {
+    $resort_term = get_term($resort_id, 'resort');
+    if ($resort_term && !is_wp_error($resort_term))
+      $resort_name = $resort_term->name;
+  }
+
+  // город
+  $city = trim((string) get_field('field_hotel_city', $post_id));
+
+  // собираем строку адреса
+  $parts = array_filter([$country_title, $region_name, $resort_name, $city]);
+  $address_line = implode(', ', $parts);
 }
 
 get_header();
@@ -33,7 +59,7 @@ get_header();
     <div class="container">
       <div class="single-hotel__title-wrap">
         <h1 class="h1 single-hotel__title">Отель <?php the_title() ?></h1>
-        <button class="print-btn single-hotel__print-btn"
+        <!-- <button class="print-btn single-hotel__print-btn"
                 data-micromodal-trigger="modal-hotel-pdf">
           <svg xmlns="http://www.w3.org/2000/svg"
                width="24"
@@ -53,18 +79,19 @@ get_header();
                   height="8"
                   rx="1" />
           </svg>
-        </button>
+        </button> -->
       </div>
 
       <div class="single-hotel__top-line">
-        <div class="single-hotel__address">
-          <img src="<?= $country_flag ?>"
-               alt="">
-          <div>
-            <?= $country_title ?>,
-            <?= get_field('field_hotel_city', get_the_ID()) ?>
+        <?php if ($address_line): ?>
+          <div class="single-hotel__address">
+            <?php if ($country_flag): ?>
+              <img src="<?= esc_url($country_flag); ?>"
+                   alt="">
+            <?php endif; ?>
+            <div><?= esc_html($address_line); ?></div>
           </div>
-        </div>
+        <?php endif; ?>
 
         <div class="div"></div>
 
@@ -86,6 +113,28 @@ get_header();
           <?php endif; ?>
         </div>
       </div>
+
+      <div class="single-hotel__amenities">
+
+        <?php
+        $amenities = get_the_terms(get_the_ID(), 'amenity');
+
+        if (!empty($amenities) && !is_wp_error($amenities)) {
+          foreach ($amenities as $t) {
+            $icon = function_exists('get_field') ? get_field('amenity_icon', 'term_' . $t->term_id) : null;
+            $icon_url = is_array($icon) && !empty($icon['url']) ? $icon['url'] : '';
+
+            echo '<span class="hotel-tag">';
+            if ($icon_url) {
+              echo '<img class="hotel-tag__icon" src="' . esc_url($icon_url) . '" alt="" loading="lazy">';
+            }
+            echo '<span class="hotel-tag__text">' . esc_html($t->name) . '</span>';
+            echo '</span>';
+          }
+        }
+        ?>
+      </div>
+
 
 
       <!-- <div class="single-hotel__main-opts">
@@ -139,13 +188,39 @@ get_header();
     </div>
   </section>
 
+
+
+
   <section class="single-hotel__content">
     <div class="container">
+
       <div class="hotel-content editor-content">
         <?php the_content() ?>
       </div>
     </div>
   </section>
+
+
+  <section>
+    <div class="container">
+      <?php
+      $lat = trim((string) get_field('hotel_lat', get_the_ID()));
+      $lng = trim((string) get_field('hotel_lng', get_the_ID()));
+      ?>
+
+      <?php if ($lat && $lng): ?>
+        <div class="hotel-map is-loading"
+             data-lat="<?= esc_attr($lat); ?>"
+             data-lng="<?= esc_attr($lng); ?>"
+             data-zoom="14"></div>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <div class="hotel-map is-loading"
+       data-lat="-8.337197"
+       data-lng="115.659987"
+       data-zoom="14"></div>
 
   <section>
     <div class="container">

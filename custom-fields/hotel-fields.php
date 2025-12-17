@@ -80,6 +80,34 @@ add_action('acf/init', function () {
         ],
         'wrapper' => ['width' => '33'],
       ],
+
+      [
+        'key' => 'field_hotel_map_lat',
+        'label' => 'Широта (lat)',
+        'name' => 'map_lat',
+        'type' => 'number',
+        'step' => 0.000001,
+        'wrapper' => ['width' => '33'],
+      ],
+      [
+        'key' => 'field_hotel_map_lng',
+        'label' => 'Долгота (lng)',
+        'name' => 'map_lng',
+        'type' => 'number',
+        'step' => 0.000001,
+        'wrapper' => ['width' => '33'],
+      ],
+      [
+        'key' => 'field_hotel_map_zoom',
+        'label' => 'Zoom (карта)',
+        'name' => 'map_zoom',
+        'type' => 'number',
+        'min' => 1,
+        'max' => 20,
+        'step' => 1,
+        'default_value' => 14,
+        'wrapper' => ['width' => '33'],
+      ],
     ],
     'location' => [
       [
@@ -191,6 +219,17 @@ add_action('acf/init', function () {
         'default_value' => 0,
         'wrapper' => ['width' => '25'],
       ],
+
+      [
+        'key' => 'field_hotel_booking_url',
+        'label' => 'Ссылка на бронирование',
+        'name' => 'booking_url',
+        'type' => 'url',
+        'instructions' => 'Сюда можно вставлять ссылку на Booking / сайт отеля / форму бронирования.',
+        'wrapper' => ['width' => '50'],
+      ],
+
+
     ],
     'location' => [
       [
@@ -198,6 +237,36 @@ add_action('acf/init', function () {
           'param' => 'post_type',
           'operator' => '==',
           'value' => 'hotel',
+        ],
+      ],
+    ],
+  ]);
+});
+
+add_action('acf/init', function () {
+  if (!function_exists('acf_add_local_field_group'))
+    return;
+
+  acf_add_local_field_group([
+    'key' => 'group_amenity_term_meta',
+    'title' => 'Удобство — иконка',
+    'fields' => [
+      [
+        'key' => 'field_amenity_icon',
+        'label' => 'Иконка',
+        'name' => 'amenity_icon',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'thumbnail',
+        'library' => 'all',
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'taxonomy',
+          'operator' => '==',
+          'value' => 'amenity',
         ],
       ],
     ],

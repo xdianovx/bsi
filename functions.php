@@ -252,6 +252,7 @@ require get_template_directory() . '/custom-fields/resort.php';
 require get_template_directory() . '/inc/requests/ajax.php';
 require get_template_directory() . '/inc/requests/news.php';
 require get_template_directory() . '/inc/requests/promo-filter.php';
+require get_template_directory() . '/inc/requests/resort-hotels.php';
 
 
 add_action('acf/init', function () {
@@ -341,9 +342,19 @@ add_action('admin_init', function () {
 // /wp-admin/?sync_country_regions=1
 
 
+add_action('wp_enqueue_scripts', function () {
+	// твой основной бандл
+	wp_enqueue_script('main', get_template_directory_uri() . '/assets/js/main.js', [], null, true);
 
+	// ключ лучше хранить в wp-config.php или option
+	$key = defined('YMAPS_KEY') ? YMAPS_KEY : '';
+
+	wp_add_inline_script('main', 'window.YMAPS_KEY = ' . wp_json_encode($key) . ';', 'before');
+});
 
 
 add_action('admin_init', function () {
 	flush_rewrite_rules(false);
 });
+
+

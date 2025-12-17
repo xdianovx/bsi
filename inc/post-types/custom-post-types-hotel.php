@@ -35,6 +35,30 @@ function register_post_types_hotel()
   ]);
 }
 
+/* Таксономия: Удобства (amenity) */
+add_action('init', function () {
+  register_taxonomy('amenity', ['hotel'], [
+    'labels' => [
+      'name' => 'Удобства',
+      'singular_name' => 'Удобство',
+      'search_items' => 'Найти удобство',
+      'all_items' => 'Все удобства',
+      'edit_item' => 'Редактировать удобство',
+      'update_item' => 'Обновить удобство',
+      'add_new_item' => 'Добавить удобство',
+      'new_item_name' => 'Новое удобство',
+      'menu_name' => 'Удобства',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => false,
+    'query_var' => true,
+  ]);
+}, 25);
+
 // Rewrite rules и query_varsцц
 add_action('init', function () {
   // Для архива отелей по стране
