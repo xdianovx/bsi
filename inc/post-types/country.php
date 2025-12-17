@@ -254,14 +254,7 @@ add_action('init', function () {
   );
 }, 20);
 
-/* Роут: ВИЗА как дочерняя страница страны /country/{country}/visa/ */
-add_action('init', function () {
-  add_rewrite_rule(
-    '^country/([^/]+)/visa/?$',
-    'index.php?post_type=country&pagename=$matches[1]/visa',
-    'top'
-  );
-}, 21);
+
 
 /* Роут курорта: /country/{country}/{region}/{resort}/ */
 add_action('init', function () {

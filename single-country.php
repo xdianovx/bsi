@@ -30,6 +30,8 @@ if ($country_promos_slug) {
   exit;
 }
 
+
+
 /* Контекст страны */
 $country_id = get_the_ID();
 
@@ -111,7 +113,7 @@ get_header();
 
         <?php /* Aside меню страны */ ?>
         <aside class="coutry-page__aside">
-          <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
+          <?php get_template_part('template-parts/pages/country/child-pages-menu'); ?>
         </aside>
 
         <?php /* Контент страны */ ?>
@@ -130,13 +132,15 @@ get_header();
 
             <p class="page-country__descr"><?= get_the_excerpt(); ?></p>
 
-            <?= get_template_part('template-parts/pages/country/country-info'); ?>
-            <?php
-            get_template_part('template-parts/sections/gallery', null, [
-              'gallery' => $gallery,
-              'id' => 'hotel_' . get_the_ID(),
-            ]);
-            ?>
+            <?php get_template_part('template-parts/pages/country/country-info'); ?>
+            <div class="country-page__gallery">
+              <?php
+              get_template_part('template-parts/sections/gallery', null, [
+                'gallery' => $gallery,
+                'id' => 'hotel_' . get_the_ID(),
+              ]);
+              ?>
+            </div>
 
 
           </div>
@@ -149,10 +153,9 @@ get_header();
               <div class="country-regions__list">
                 <?php foreach ($regions as $region): ?>
                   <div class="country-regions__item">
-                    <h4 class="country-regions__title"
-                        href="<?= esc_url(get_term_link($region)); ?>">
+                    <div class="country-regions__title">
                       <?= esc_html($region->name); ?>
-                    </h4>
+                    </div>
 
                     <?php
                     $resorts = get_terms([

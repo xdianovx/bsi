@@ -3079,6 +3079,20 @@ input.error {
   color: #5c5c5c;
 }
 
+/* Блок: галерея внутри контейнера (Swiper не вылезает за рамки) */
+.country-page__gallery {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.country-page__gallery .swiper,
+.country-page__gallery .swiper-wrapper,
+.country-page__gallery .swiper-slide {
+  max-width: 100%;
+  min-width: 0;
+}
+
 .country-hotels__section {
   margin-top: 16px;
 }
