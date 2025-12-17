@@ -1615,6 +1615,11 @@ input.error {
   line-height: 140%;
   margin-bottom: 0;
 }
+@media screen and (max-width: 768px) {
+  .footer-contact__value br {
+    display: none;
+  }
+}
 
 .footer__contancts {
   display: flex;

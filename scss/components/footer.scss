@@ -89,6 +89,12 @@
   font-size: 16px;
   line-height: 140%;
   margin-bottom: 0;
+
+  @media screen and (max-width: 768px) {
+    br {
+      display: none;
+    }
+  }
 }
 
 .footer__contancts {

@@ -1,50 +1,43 @@
 <?php
 get_header();
 ?>
+<?php if (function_exists('yoast_breadcrumb')) {
+  yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>');
+} ?>
+<section>
+  <div class="container">
+    <div class="coutry-page__wrap">
 
-<main class="site-main">
+      <?php /* Aside меню страны */ ?>
+      <aside class="coutry-page__aside">
+        <?php get_template_part('template-parts/pages/country/child-pages-menu'); ?>
+      </aside>
 
-  <?php if (function_exists('yoast_breadcrumb')) {
-    yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>');
-  } ?>
+      <?php /* Контент страницы */ ?>
+      <div class="page-country__content">
+        <?php /* Заголовок + краткое описание */ ?>
 
-  <?php if (have_posts()): ?>
-    <?php while (have_posts()):
-      the_post();
+        <div class="page-country__title">
+          <h1 class="h1"><?php the_title(); ?></h1>
 
-      $country_id = get_field('visa_country');
-      $country = $country_id ? get_post($country_id) : null;
-      $country_title = $country ? $country->post_title : get_the_title();
-      ?>
-
-      <section class="visa-page-head">
-        <div class="container">
-          <h1 class="h1 visa-page__title">
-            <?php the_title() ?>
-          </h1>
-
-          <div class="visa-page__poster">
-            <img src="<?= get_the_post_thumbnail_url() ?>"
-                 alt="">
-          </div>
         </div>
-      </section>
 
-      <section class="visa-page__content">
-        <div class="container">
-          <div class="visa-page__layout">
-            <div class="visa-page__main editor-content">
-              <?php the_content(); ?>
-            </div>
-
-          </div>
+        <div class="visa-page__poster">
+          <img src="<?= get_the_post_thumbnail_url() ?>"
+               alt="">
         </div>
-      </section>
 
-    <?php endwhile; ?>
-  <?php endif; ?>
+        <?php /* Контент из редактора */ ?>
+        <div class="editor-content page-country__editor-content">
+          <?php the_content(); ?>
+        </div>
 
-</main>
+
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <?php
 get_footer();
