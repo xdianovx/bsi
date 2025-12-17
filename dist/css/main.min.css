@@ -3865,7 +3865,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .child-pages__list {
-    gap: 8px;
+    gap: 4px;
   }
 }
 
