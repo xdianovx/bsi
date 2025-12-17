@@ -253,7 +253,7 @@ body {
   font-optical-sizing: auto;
   font-size: 16px;
   font-weight: 400;
-  line-height: 140%;
+  line-height: 150%;
   color: #000000;
   min-height: 100vh;
   display: flex;
@@ -1171,6 +1171,14 @@ input.error {
 .editor-content h5:first-child,
 .editor-content h6:first-child {
   margin-top: 0;
+}
+.editor-content h1 b,
+.editor-content h2 b,
+.editor-content h3 b,
+.editor-content h4 b,
+.editor-content h5 b,
+.editor-content h6 b {
+  font-weight: 700;
 }
 .editor-content h1 {
   font-size: 40px;

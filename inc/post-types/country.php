@@ -48,7 +48,7 @@ add_action('template_redirect', function () {
   }
 });
 
-/* Хелпер: страны, у которых есть акции */
+/* Хелпер: страны, у которых есть акции (старое — оставляем) */
 function bsi_get_promo_countries()
 {
   $result = [];
@@ -111,7 +111,7 @@ function bsi_get_promo_countries()
   return $result;
 }
 
-/* Регистрация таксономий: Регионы и Курорты */
+/* Регистрация таксономий: Регионы и Курорты (для привязок, фильтров, админки) */
 add_action('init', function () {
   $region_post_types = apply_filters('region_taxonomy_post_types', ['hotel']);
   $resort_post_types = apply_filters('resort_taxonomy_post_types', ['hotel']);
@@ -221,17 +221,19 @@ add_action('acf/init', function () {
   ]);
 });
 
-/* Query vars */
+/* Query vars (для виртуальных разделов страны) */
 add_filter('query_vars', function ($vars) {
   $vars[] = 'country_in_path';
   $vars[] = 'region_in_path';
+
   $vars[] = 'country_hotels';
   $vars[] = 'country_promos';
   $vars[] = 'country_resorts';
+
   return $vars;
 });
 
-/* Роуты внутренних разделов страны (чтобы открывалось в single-country.php) */
+/* Роуты виртуальных разделов страны (открываются внутри single-country.php) */
 add_action('init', function () {
   add_rewrite_rule(
     '^country/([^/]+)/hotel/?$',
@@ -252,15 +254,18 @@ add_action('init', function () {
   );
 }, 20);
 
-/* Реврайты регионов и курортов (НЕ должны ловить hotel/promo/visa/kurorty) */
+/* Роут: ВИЗА как дочерняя страница страны /country/{country}/visa/ */
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|news|fit|akcii|novosti|kurorty)';
-
   add_rewrite_rule(
-    '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',
-    'index.php?taxonomy=region&term=$matches[2]&country_in_path=$matches[1]',
+    '^country/([^/]+)/visa/?$',
+    'index.php?post_type=country&pagename=$matches[1]/visa',
     'top'
   );
+}, 21);
+
+/* Роут курорта: /country/{country}/{region}/{resort}/ */
+add_action('init', function () {
+  $reserved = '(?:hotel|promo|visa|news|fit|akcii|novosti|kurorty)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',
@@ -269,45 +274,53 @@ add_action('init', function () {
   );
 }, 30);
 
-/* Приоритет дочерних страниц страны над регионами/курортами */
-add_filter('request', function ($vars) {
-
-  if (
-    !empty($vars['country_in_path']) &&
-    !empty($vars['taxonomy']) &&
-    $vars['taxonomy'] === 'region' &&
-    !empty($vars['term'])
-  ) {
-    $country_slug = sanitize_title($vars['country_in_path']);
-    $maybe_child_slug = sanitize_title($vars['term']);
-
-    $country_child = get_page_by_path($country_slug . '/' . $maybe_child_slug, OBJECT, 'country');
-
-    if ($country_child) {
-      unset($vars['taxonomy'], $vars['term'], $vars['country_in_path'], $vars['region_in_path']);
-      $vars['post_type'] = 'country';
-      $vars['p'] = $country_child->ID;
-      return $vars;
-    }
+/* Канонические ссылки курорта (красивый URL) */
+add_filter('term_link', function ($url, $term, $taxonomy) {
+  if ($taxonomy !== 'resort') {
+    return $url;
   }
 
+  $region_id = function_exists('get_field') ? get_field('resort_region', 'term_' . $term->term_id) : '';
+  if (empty($region_id)) {
+    return $url;
+  }
+
+  $region_term = get_term($region_id, 'region');
+  if (empty($region_term) || is_wp_error($region_term)) {
+    return $url;
+  }
+
+  $country_id = function_exists('get_field') ? get_field('region_country', 'term_' . $region_term->term_id) : '';
+  if (empty($country_id)) {
+    return $url;
+  }
+
+  $country_slug = get_post_field('post_name', $country_id);
+  if (empty($country_slug)) {
+    return $url;
+  }
+
+  return home_url('/country/' . $country_slug . '/' . $region_term->slug . '/' . $term->slug . '/');
+}, 10, 3);
+
+/* Приоритет дочерних страниц страны над курортом (если вдруг совпадут пути) */
+add_filter('request', function ($vars) {
   if (
-    !empty($vars['country_in_path']) &&
-    !empty($vars['region_in_path']) &&
     !empty($vars['taxonomy']) &&
     $vars['taxonomy'] === 'resort' &&
-    !empty($vars['term'])
+    !empty($vars['term']) &&
+    !empty($vars['country_in_path']) &&
+    !empty($vars['region_in_path'])
   ) {
     $country_slug = sanitize_title($vars['country_in_path']);
     $region_slug = sanitize_title($vars['region_in_path']);
-    $maybe_child_slug = sanitize_title($vars['term']);
+    $resort_slug = sanitize_title($vars['term']);
 
-    $country_child = get_page_by_path($country_slug . '/' . $region_slug . '/' . $maybe_child_slug, OBJECT, 'country');
-
-    if ($country_child) {
+    $maybe_country_page = get_page_by_path($country_slug . '/' . $region_slug . '/' . $resort_slug, OBJECT, 'country');
+    if ($maybe_country_page) {
       unset($vars['taxonomy'], $vars['term'], $vars['country_in_path'], $vars['region_in_path']);
       $vars['post_type'] = 'country';
-      $vars['p'] = $country_child->ID;
+      $vars['p'] = $maybe_country_page->ID;
       return $vars;
     }
   }
@@ -315,120 +328,55 @@ add_filter('request', function ($vars) {
   return $vars;
 }, 0);
 
-/* Канонические ссылки терминов */
-add_filter('term_link', function ($url, $term, $taxonomy) {
-
-  if ($taxonomy === 'region') {
-    $country_id = get_field('region_country', 'term_' . $term->term_id);
-    if (empty($country_id)) {
-      return $url;
-    }
-
-    $country_slug = get_post_field('post_name', $country_id);
-    if (empty($country_slug)) {
-      return $url;
-    }
-
-    return home_url('/country/' . $country_slug . '/' . $term->slug . '/');
-  }
-
-  if ($taxonomy === 'resort') {
-    $region_id = get_field('resort_region', 'term_' . $term->term_id);
-    if (empty($region_id)) {
-      return $url;
-    }
-
-    $region_term = get_term($region_id, 'region');
-    if (empty($region_term) || is_wp_error($region_term)) {
-      return $url;
-    }
-
-    $country_id = get_field('region_country', 'term_' . $region_term->term_id);
-    if (empty($country_id)) {
-      return $url;
-    }
-
-    $country_slug = get_post_field('post_name', $country_id);
-    if (empty($country_slug)) {
-      return $url;
-    }
-
-    return home_url('/country/' . $country_slug . '/' . $region_term->slug . '/' . $term->slug . '/');
-  }
-
-  return $url;
-}, 10, 3);
-
-/* Валидация пути (если в URL не та страна/регион — отдаём 404) */
+/* Валидация пути курорта (если в URL не та страна/регион — отдаём 404) */
 add_action('template_redirect', function () {
-
-  if (is_tax('region')) {
-    $term = get_queried_object();
-    $country_in_path = get_query_var('country_in_path');
-
-    if (empty($country_in_path) || empty($term) || empty($term->term_id)) {
-      return;
-    }
-
-    $country_id = get_field('region_country', 'term_' . $term->term_id);
-    if (empty($country_id)) {
-      return;
-    }
-
-    $real_country_slug = get_post_field('post_name', $country_id);
-    if (!empty($real_country_slug) && $real_country_slug !== $country_in_path) {
-      global $wp_query;
-      $wp_query->set_404();
-      status_header(404);
-      return;
-    }
+  if (!is_tax('resort')) {
+    return;
   }
 
-  if (is_tax('resort')) {
-    $term = get_queried_object();
-    $country_in_path = get_query_var('country_in_path');
-    $region_in_path = get_query_var('region_in_path');
+  $term = get_queried_object();
+  $country_in_path = get_query_var('country_in_path');
+  $region_in_path = get_query_var('region_in_path');
 
-    if (empty($country_in_path) || empty($region_in_path) || empty($term) || empty($term->term_id)) {
-      return;
-    }
+  if (empty($term) || empty($term->term_id) || empty($country_in_path) || empty($region_in_path)) {
+    return;
+  }
 
-    $region_id = get_field('resort_region', 'term_' . $term->term_id);
-    if (empty($region_id)) {
-      return;
-    }
+  $region_id = function_exists('get_field') ? get_field('resort_region', 'term_' . $term->term_id) : '';
+  if (empty($region_id)) {
+    return;
+  }
 
-    $region_term = get_term($region_id, 'region');
-    if (empty($region_term) || is_wp_error($region_term)) {
-      global $wp_query;
-      $wp_query->set_404();
-      status_header(404);
-      return;
-    }
+  $region_term = get_term($region_id, 'region');
+  if (empty($region_term) || is_wp_error($region_term)) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
+  }
 
-    if ($region_term->slug !== $region_in_path) {
-      global $wp_query;
-      $wp_query->set_404();
-      status_header(404);
-      return;
-    }
+  if ($region_term->slug !== $region_in_path) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
+  }
 
-    $country_id = get_field('region_country', 'term_' . $region_term->term_id);
-    if (empty($country_id)) {
-      return;
-    }
+  $country_id = function_exists('get_field') ? get_field('region_country', 'term_' . $region_term->term_id) : '';
+  if (empty($country_id)) {
+    return;
+  }
 
-    $real_country_slug = get_post_field('post_name', $country_id);
-    if (!empty($real_country_slug) && $real_country_slug !== $country_in_path) {
-      global $wp_query;
-      $wp_query->set_404();
-      status_header(404);
-      return;
-    }
+  $real_country_slug = get_post_field('post_name', $country_id);
+  if (!empty($real_country_slug) && $real_country_slug !== $country_in_path) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
   }
 });
 
-/* Роутинг страницы курортов страны на отдельный файл country-resorts.php */
+/* Роутинг страницы курортов страны на country-resorts.php */
 add_action('template_redirect', function () {
   $country_slug = get_query_var('country_resorts');
   if (empty($country_slug)) {
@@ -456,64 +404,42 @@ add_action('template_redirect', function () {
   }
 });
 
-/* Хлебные крошки Yoast: регион и курорт */
+/* Хлебные крошки Yoast: курорт (без страницы региона) */
 add_filter('wpseo_breadcrumb_links', function ($links) {
-
-  if (is_tax('region')) {
-    $term = get_queried_object();
-    $country_id = get_field('region_country', 'term_' . $term->term_id);
-
-    $countries_page = get_page_by_path('strany');
-
-    $new_links = [];
-    $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
-
-    if ($countries_page) {
-      $new_links[] = ['url' => get_permalink($countries_page->ID), 'text' => $countries_page->post_title ?: 'Страны'];
-    } else {
-      $new_links[] = ['url' => get_post_type_archive_link('country'), 'text' => 'Страны'];
-    }
-
-    if (!empty($country_id)) {
-      $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
-    }
-
-    $new_links[] = ['text' => $term->name];
-
-    return $new_links;
+  if (!is_tax('resort')) {
+    return $links;
   }
 
-  if (is_tax('resort')) {
-    $term = get_queried_object();
+  $term = get_queried_object();
 
-    $region_id = get_field('resort_region', 'term_' . $term->term_id);
-    $region_term = $region_id ? get_term($region_id, 'region') : null;
+  $region_id = function_exists('get_field') ? get_field('resort_region', 'term_' . $term->term_id) : '';
+  $region_term = $region_id ? get_term($region_id, 'region') : null;
 
-    if (empty($region_term) || is_wp_error($region_term)) {
-      return $links;
-    }
-
-    $country_id = get_field('region_country', 'term_' . $region_term->term_id);
-    $countries_page = get_page_by_path('strany');
-
-    $new_links = [];
-    $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
-
-    if ($countries_page) {
-      $new_links[] = ['url' => get_permalink($countries_page->ID), 'text' => $countries_page->post_title ?: 'Страны'];
-    } else {
-      $new_links[] = ['url' => get_post_type_archive_link('country'), 'text' => 'Страны'];
-    }
-
-    if (!empty($country_id)) {
-      $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
-    }
-
-    $new_links[] = ['url' => get_term_link($region_term), 'text' => $region_term->name];
-    $new_links[] = ['text' => $term->name];
-
-    return $new_links;
+  $country_id = '';
+  if ($region_term && !is_wp_error($region_term)) {
+    $country_id = function_exists('get_field') ? get_field('region_country', 'term_' . $region_term->term_id) : '';
   }
 
-  return $links;
+  $countries_page = get_page_by_path('strany');
+
+  $new_links = [];
+  $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
+
+  if ($countries_page) {
+    $new_links[] = ['url' => get_permalink($countries_page->ID), 'text' => $countries_page->post_title ?: 'Страны'];
+  } else {
+    $new_links[] = ['url' => get_post_type_archive_link('country'), 'text' => 'Страны'];
+  }
+
+  if (!empty($country_id)) {
+    $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
+  }
+
+  if ($region_term && !is_wp_error($region_term)) {
+    $new_links[] = ['text' => $region_term->name];
+  }
+
+  $new_links[] = ['text' => $term->name];
+
+  return $new_links;
 });
