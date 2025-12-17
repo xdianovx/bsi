@@ -16,7 +16,11 @@ if (!$hotel_id)
   return;
 
 $link = $args['link'] ?? get_permalink($hotel_id);
+$booking_url = function_exists('get_field')
+  ? get_field('field_hotel_booking_url', $hotel_id)
+  : '';
 
+$booking_url = trim((string) $booking_url);
 // базовые
 $title = get_the_title($hotel_id);
 $thumb = get_the_post_thumbnail_url($hotel_id, 'medium') ?: '';
@@ -126,7 +130,9 @@ $resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') 
           Подробнее
         </a>
 
-        <a href="<?= esc_url($link); ?>"
+        <a href="<?= esc_url($libooking_urlnk); ?>"
+           target="_blank"
+           rel="nofollow noopener"
            class="btn btn-accent sm hotel-card-button --more">
           Забронировать
         </a>
