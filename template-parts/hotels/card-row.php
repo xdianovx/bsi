@@ -125,7 +125,7 @@ $resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') 
           Подробнее
         </a>
 
-        <a href="<?= esc_url($libooking_urlnk); ?>"
+        <a href="<?= esc_url($booking_urlasd); ?>"
            target="_blank"
            rel="nofollow noopener"
            class="btn btn-accent sm hotel-card-button --more">
