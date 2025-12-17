@@ -112,12 +112,7 @@ $resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') 
         <div class="hotel-card-row__price"><?= esc_html((string) $price); ?></div>
       </div>
 
-      <div class="hotel-card-row__details">
-        <div class="hotel-card-row__checkin"><?= esc_html((string) $check_in); ?></div>
-        <div class="hotel-card-row__checkout"><?= esc_html((string) $check_out); ?></div>
-        <div class="hotel-card-row__wifi"><?= esc_html((string) $wifi); ?></div>
-        <div class="hotel-card-row__breakfast"><?= esc_html((string) $breakfast); ?></div>
-      </div>
+
 
     </div>
 
