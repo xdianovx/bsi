@@ -214,11 +214,10 @@ get_header();
             <?php the_content(); ?>
           </div>
 
-          <?php /* Новости */ ?>
-          <section class="page-country__news">
-            <h2 class="h2">Новости</h2>
+          <?php if ($news_query && $news_query->have_posts()): ?>
+            <section class="page-country__news">
+              <h2 class="h2">Новости</h2>
 
-            <?php if ($news_query->have_posts()): ?>
               <div class="swiper news-slider-slider">
                 <div class="swiper-wrapper">
                   <?php while ($news_query->have_posts()):
@@ -229,10 +228,10 @@ get_header();
                   <?php endwhile; ?>
                 </div>
               </div>
-            <?php endif; ?>
 
-            <?php wp_reset_postdata(); ?>
-          </section>
+              <?php wp_reset_postdata(); ?>
+            </section>
+          <?php endif; ?>
 
         </div>
 
