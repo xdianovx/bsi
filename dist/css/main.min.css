@@ -1777,6 +1777,7 @@ input.error {
 
 .gtm-nights-select {
   cursor: pointer;
+  height: 48px;
 }
 
 .gtm-datepicker {
@@ -3005,6 +3006,22 @@ input.error {
   border-radius: 4px;
 }
 
+.countries-letter__wrap {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media screen and (max-width: 1200px) {
+  .countries-letter__wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 768px) {
+  .countries-letter__wrap {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
 .countries-letter__group {
   display: flex;
   gap: 24px;
@@ -3853,6 +3870,9 @@ input.error {
 }
 .child-page-item.active {
   background: #ee3145;
+  color: #fff;
+}
+.child-page-item.active:hover .child-page-item__icon {
   color: #fff;
 }
 @media screen and (max-width: 1200px) {

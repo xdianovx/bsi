@@ -166,6 +166,12 @@
   &.active {
     background: $red;
     color: #fff;
+    &:hover {
+      // color: #fff;
+      .child-page-item__icon {
+        color: #fff;
+      }
+    }
   }
 
   @media screen and (max-width: 1200px) {
