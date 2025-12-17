@@ -17,7 +17,7 @@ if (!$hotel_id)
 
 $link = $args['link'] ?? get_permalink($hotel_id);
 $booking_url = function_exists('get_field')
-  ? get_field('field_hotel_booking_url', $hotel_id)
+  ? get_field('booking_url', $hotel_id)
   : '';
 
 $booking_url = trim((string) $booking_url);
