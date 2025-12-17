@@ -399,40 +399,40 @@ add_action('template_redirect', function () {
 
 /* Хлебные крошки Yoast: курорт (без страницы региона) */
 add_filter('wpseo_breadcrumb_links', function ($links) {
-  if (!is_tax('resort')) {
-    return $links;
+
+  // Курорт (taxonomy resort)
+  if (is_tax('resort')) {
+    $term = get_queried_object(); // текущий курорт
+
+    // достаём страну через resort -> region -> country
+    $region_id = function_exists('get_field') ? get_field('resort_region', 'term_' . $term->term_id) : 0;
+    $region_term = $region_id ? get_term((int) $region_id, 'region') : null;
+
+    $country_id = 0;
+    if ($region_term && !is_wp_error($region_term)) {
+      $country_id = function_exists('get_field') ? (int) get_field('region_country', 'term_' . $region_term->term_id) : 0;
+    }
+
+    $countries_page = get_page_by_path('strany');
+
+    $new_links = [];
+    $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
+
+    if ($countries_page) {
+      $new_links[] = ['url' => get_permalink($countries_page->ID), 'text' => $countries_page->post_title ?: 'Страны'];
+    } else {
+      $new_links[] = ['url' => get_post_type_archive_link('country'), 'text' => 'Страны'];
+    }
+
+    if ($country_id) {
+      $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
+    }
+
+    // ВАЖНО: регион НЕ добавляем
+    $new_links[] = ['text' => $term->name];
+
+    return $new_links;
   }
 
-  $term = get_queried_object();
-
-  $region_id = function_exists('get_field') ? get_field('resort_region', 'term_' . $term->term_id) : '';
-  $region_term = $region_id ? get_term($region_id, 'region') : null;
-
-  $country_id = '';
-  if ($region_term && !is_wp_error($region_term)) {
-    $country_id = function_exists('get_field') ? get_field('region_country', 'term_' . $region_term->term_id) : '';
-  }
-
-  $countries_page = get_page_by_path('strany');
-
-  $new_links = [];
-  $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
-
-  if ($countries_page) {
-    $new_links[] = ['url' => get_permalink($countries_page->ID), 'text' => $countries_page->post_title ?: 'Страны'];
-  } else {
-    $new_links[] = ['url' => get_post_type_archive_link('country'), 'text' => 'Страны'];
-  }
-
-  if (!empty($country_id)) {
-    $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
-  }
-
-  if ($region_term && !is_wp_error($region_term)) {
-    $new_links[] = ['text' => $region_term->name];
-  }
-
-  $new_links[] = ['text' => $term->name];
-
-  return $new_links;
+  return $links;
 });

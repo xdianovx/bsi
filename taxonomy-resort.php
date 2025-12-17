@@ -2,15 +2,23 @@
 get_header();
 
 $term = get_queried_object();
+$excerpt = function_exists('get_field') ? get_field('term_excerpt', 'term_' . $term->term_id) : '';
+
 
 if (!$term || empty($term->term_id)) {
   get_footer();
   return;
 }
 
-$ancestors = get_ancestors($term->term_id, 'region');
-$country_term_id = !empty($ancestors) ? end($ancestors) : $term->term_id;
-$country_term = get_term($country_term_id, 'region');
+/**
+ * ACF поля термина курорта
+ * (ВАЖНО: это term meta, поэтому второй аргумент 'term_{$id}')
+ */
+$term_meta_key = 'term_' . $term->term_id;
+
+$resort_desc = function_exists('get_field') ? get_field('resort_desc', $term_meta_key) : '';
+$resort_content = function_exists('get_field') ? get_field('resort_content', $term_meta_key) : '';
+$resort_gallery = function_exists('get_field') ? get_field('resort_gallery', $term_meta_key) : [];
 
 $children = get_terms([
   'taxonomy' => 'resort',
@@ -18,91 +26,70 @@ $children = get_terms([
   'parent' => (int) $term->term_id,
 ]);
 
-$paged = max(1, (int) get_query_var('paged'));
-
-$posts_query = new WP_Query([
-  'post_type' => ['hotel'],
-  'post_status' => 'publish',
-  'posts_per_page' => 12,
-  'paged' => $paged,
-  'tax_query' => [
-    [
-      'taxonomy' => 'region',
-      'field' => 'term_id',
-      'terms' => (int) $term->term_id,
-      'include_children' => true,
-    ],
-  ],
-]);
 ?>
-
-<main class="site-main">
-
+<main>
   <?php if (function_exists('yoast_breadcrumb')) {
     yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>');
   } ?>
 
-  <section class="archive-page-head">
-    <div class="container">
-      <div class="archive-page__top">
-        <h1 class="h1 archive-page__title"><?= esc_html($term->name); ?></h1>
-
-        <?php if (!empty($term->description)): ?>
-          <div class="archive-page__excerpt --row">
-            <?= wp_kses_post(wpautop($term->description)); ?>
-          </div>
-        <?php endif; ?>
-      </div>
-    </div>
-  </section>
-
-  <section class="archive-page__content-section">
+  <section>
     <div class="container">
       <div class="coutry-page__wrap">
-        <!-- Aside -->
+
+        <!-- Aside меню страны -->
         <aside class="coutry-page__aside">
-          <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
+          <?php get_template_part('template-parts/pages/country/child-pages-menu'); ?>
         </aside>
 
+        <!-- Контент страницы -->
+        <div class="page-country__content">
+          <!-- Заголовок + описание -->
+          <div class="page-country__about page-country__resort-about">
+            <div class="page-country__title page-country__resort-title">
+              <h1 class="h1 country-promos__title"><?= esc_html($term->name); ?></h1>
+            </div>
 
-        <?php if (!empty($children) && !is_wp_error($children)): ?>
-          <div class="region-children">
-            <?php foreach ($children as $child): ?>
-              <a class="region-children__item"
-                 href="<?= esc_url(get_term_link($child)); ?>">
-                <?= esc_html($child->name); ?>
-              </a>
-            <?php endforeach; ?>
+            <?php
+            $term = get_queried_object();
+            $resort_excerpt = function_exists('get_field')
+              ? get_field('resort_excerpt', 'term_' . $term->term_id)
+              : '';
+
+            $resort_excerpt = trim((string) $resort_excerpt);
+            ?>
+
+            <?php if ($resort_excerpt): ?>
+              <p class="page-country__descr">
+                <?= nl2br(esc_html($resort_excerpt)); ?>
+              </p>
+            <?php endif; ?>
+
+
           </div>
-        <?php endif; ?>
 
-        <?php if ($posts_query->have_posts()): ?>
-          <div class="region-posts-grid">
-            <?php while ($posts_query->have_posts()):
-              $posts_query->the_post(); ?>
-              <?php get_template_part('template-parts/hotels/card'); ?>
-            <?php endwhile; ?>
-          </div>
+          <?php if (!empty($resort_gallery) && is_array($resort_gallery)): ?>
+            <div class="country-page__gallery">
+              <?php
+              get_template_part('template-parts/sections/gallery', null, [
+                'gallery' => $resort_gallery,
+                'id' => 'resort_' . $term->term_id,
+              ]);
+              ?>
+            </div>
+          <?php endif; ?>
 
-          <div class="region-posts-pagination">
-            <?= paginate_links([
-              'total' => (int) $posts_query->max_num_pages,
-              'current' => $paged,
-              'prev_text' => '&larr; Назад',
-              'next_text' => 'Вперёд &rarr;',
-              'mid_size' => 2,
-            ]); ?>
-          </div>
-        <?php else: ?>
-          <p>Пока нет записей в этом регионе.</p>
-        <?php endif; ?>
+          <!-- Подробный контент -->
+          <?php if (!empty($term->description)): ?>
+            <div class="editor-content page-country__editor-content">
+              <?= term_description($term); ?>
+            </div>
+          <?php endif; ?>
+          <!-- (вывод отелей/детей — ниже) -->
 
-        <?php wp_reset_postdata(); ?>
-
+        </div>
       </div>
     </div>
   </section>
-
 </main>
 
 <?php get_footer(); ?>

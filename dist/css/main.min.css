@@ -6,93 +6,9 @@
 @font-face {
   font-family: "Nunito";
   font-display: swap;
-  src: url("../../fonts/Nunito-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-Black.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-BlackItalic.ttf") format("truetype");
-  font-weight: 900;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-ExtraBold.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-ExtraBoldItalic.ttf") format("truetype");
-  font-weight: 800;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
   src: url("../../fonts/Nunito-Italic.ttf") format("truetype");
   font-weight: 400;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-Light.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-LightItalic.ttf") format("truetype");
-  font-weight: 300;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-MediumItalic.ttf") format("truetype");
-  font-weight: 500;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  src: url("../../fonts/Nunito-SemiBoldItalic.ttf") format("truetype");
-  font-weight: 600;
-  font-style: italic;
+  unicode-range: U+0030-0039; /* только цифры */
 }
 * {
   margin: 0;
@@ -3548,6 +3464,7 @@ input.error {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px 16px;
+  margin-top: 32px;
 }
 @media screen and (max-width: 1200px) {
   .promo-grid {
@@ -3950,10 +3867,6 @@ input.error {
   border-bottom: 1px solid #faf6f5;
 }
 
-.country-page__gallery {
-  margin-top: 32px;
-}
-
 .country-page__gallery-slide {
   width: 100%;
   overflow: hidden;
@@ -4029,6 +3942,19 @@ input.error {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.country-promos__title {
+  margin-bottom: 0;
+}
+
+.country-promos__counter {
+  margin-top: 16px;
+}
+
+.page-country__resort-about {
+  margin-bottom: 0;
+  padding-bottom: 24px;
 }
 
 .single-hotel__title-wrap {

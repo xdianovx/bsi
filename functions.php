@@ -246,6 +246,7 @@ require get_template_directory() . '/custom-fields/award.php';
 require get_template_directory() . '/custom-fields/banner.php';
 require get_template_directory() . '/custom-fields/visa.php';
 require get_template_directory() . '/custom-fields/best-offers.php';
+require get_template_directory() . '/custom-fields/resort.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';

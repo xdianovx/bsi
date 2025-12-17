@@ -54,15 +54,21 @@ get_header(); ?>
             </h1>
 
             <div class="country-promos__counter">
-              Найдено акций: <?= count($promos); ?>
+
+              <span>Нашли акций: <span class=""><?= count($promos); ?></span>
+              </span>
             </div>
 
             <div class="country-promos__list promo-grid">
               <?php
-              foreach ($promos as $promo):
-                setup_postdata($promo);
+              global $post;
+
+              foreach ($promos as $promo) {
+                $post = $promo;               // важно
+                setup_postdata($post);        // теперь get_the_ID() и т.п. точно про promo
                 get_template_part('template-parts/promo/card');
-              endforeach;
+              }
+
               wp_reset_postdata();
               ?>
             </div>

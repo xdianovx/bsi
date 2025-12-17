@@ -228,7 +228,6 @@
 }
 
 .country-page__gallery {
-  margin-top: 32px;
 }
 
 .country-page__gallery-slide {
@@ -312,4 +311,20 @@
     height: 100%;
     object-fit: cover;
   }
+}
+
+.country-promos__title {
+  margin-bottom: 0;
+}
+
+.country-promos__counter {
+  margin-top: 16px;
+}
+
+.page-country__resort-about {
+  margin-bottom: 0;
+  padding-bottom: 24px;
+}
+
+.page-country__resort-title {
 }
