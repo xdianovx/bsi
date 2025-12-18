@@ -55,8 +55,29 @@ get_header();
   <section class="">
     <div class="container">
       <div class="single-hotel__title-wrap">
-        <h1 class="h1 single-hotel__title">Отель <?php the_title() ?></h1>
-        <!-- <button class="print-btn single-hotel__print-btn"
+        <div class="title-rating__wrap">
+          <div class="single-hotel__rating">
+            <?php if ($rating): ?>
+              <div class="single-hotel__rating-stars rating-stars">
+                <div class="stars-rating">
+                  <?php
+                  for ($i = 1; $i <= 5; $i++):
+                    if ($i <= $rating) {
+                      echo '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star filled"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
+                    } else {
+                      echo '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
+                    }
+                  endfor;
+                  ?>
+                </div>
+              </div>
+            <?php endif; ?>
+          </div>
+          <h1 class="h1 single-hotel__title">Отель <?php the_title() ?></h1>
+
+        </div>
+
+        <button class="print-btn single-hotel__print-btn"
                 data-micromodal-trigger="modal-hotel-pdf">
           <svg xmlns="http://www.w3.org/2000/svg"
                width="24"
@@ -76,7 +97,7 @@ get_header();
                   height="8"
                   rx="1" />
           </svg>
-        </button> -->
+        </button>
       </div>
 
       <div class="single-hotel__top-line">
@@ -121,25 +142,7 @@ get_header();
           </div>
         <?php endif; ?>
 
-        <div class="div"></div>
 
-        <div class="single-hotel__rating">
-          <?php if ($rating): ?>
-            <div class="single-hotel__rating-stars rating-stars">
-              <div class="stars-rating">
-                <?php
-                for ($i = 1; $i <= 5; $i++):
-                  if ($i <= $rating) {
-                    echo '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star filled"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
-                  } else {
-                    echo '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
-                  }
-                endfor;
-                ?>
-              </div>
-            </div>
-          <?php endif; ?>
-        </div>
       </div>
 
       <div class="single-hotel__amenities">
@@ -208,11 +211,36 @@ get_header();
                     <img src="<?= esc_url($country_flag); ?>"
                          alt="">
                   <?php endif; ?>
+
                   <div><?= esc_html($address_line); ?></div>
                 </div>
               <?php endif; ?>
             </div>
-            <p class="hotel-widget__title"><?php the_title() ?></p>
+
+            <div class="hotel-widget__title-wrap">
+              <div class="single-hotel__rating-one">
+                <?php if ($rating): ?>
+                  <span class="single-hotel__rating-num numfont"><?= (int) $rating; ?></span>
+                  <span class="single-hotel__rating-star"
+                        aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="18"
+                         height="18"
+                         viewBox="0 0 24 24"
+                         fill="currentColor"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         class="lucide lucide-star-icon lucide-star filled">
+                      <path
+                            d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                    </svg>
+                  </span>
+                <?php endif; ?>
+              </div>
+              <p class="hotel-widget__title"><?php the_title() ?></p>
+            </div>
 
 
 

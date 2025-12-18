@@ -4166,6 +4166,8 @@ input.error {
   display: flex;
   align-items: flex-start;
   gap: 32px;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .single-hotel__print-btn {
@@ -4321,7 +4323,6 @@ input.error {
 }
 
 .hotel-widget__title {
-  margin-top: 8px;
   font-weight: 500;
   font-size: 16px;
   margin-bottom: 0 !important;
@@ -4360,6 +4361,27 @@ input.error {
 .hotel-widget__btn-map {
   justify-content: center;
   width: 100%;
+}
+
+.single-hotel__rating-one {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 100%;
+  background: #fff;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+.single-hotel__rating-one svg {
+  color: #ffd700;
+  display: block;
+}
+
+.hotel-widget__title-wrap {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .visa-page__content {
