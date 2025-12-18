@@ -225,6 +225,8 @@ main {
   font-weight: 500;
   line-height: 100%;
   text-align: center;
+  justify-content: center;
+  display: inline-flex;
 }
 .btn.sm {
   padding: 12px 20px;
@@ -256,6 +258,16 @@ main {
 }
 .btn-white:hover {
   background: #000;
+  color: #fff;
+}
+
+.btn-black {
+  background: #000000;
+  color: #fff;
+  transition: all 0.3s ease-in-out;
+}
+.btn-black:hover {
+  background: rgba(0, 0, 0, 0.8);
   color: #fff;
 }
 
@@ -4272,6 +4284,82 @@ input.error {
   .hotel-gallery-main-arrow-next {
     display: none;
   }
+}
+
+.single-hotel__content__wrap {
+  gap: 16px;
+  display: grid;
+  grid-template-columns: 5fr 2fr;
+  align-items: flex-start;
+}
+@media screen and (max-width: 1024px) {
+  .single-hotel__content__wrap {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.hotel-aside {
+  position: sticky;
+  top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hotel-widget {
+  background: #f4f4f6;
+  padding: 12px;
+  border-radius: 8px;
+}
+.hotel-widget .single-hotel__address {
+  font-size: 14px;
+  font-weight: 500;
+}
+.hotel-widget .single-hotel__address img {
+  width: 18px;
+  height: 18px;
+}
+
+.hotel-widget__title {
+  margin-top: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 0 !important;
+}
+
+.hotel-widget__checkin-time {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.hotel-widget__checkin-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  width: 100%;
+  padding: 8px 12px;
+  line-height: 100%;
+  border-radius: 4px;
+}
+
+.hotel-widget__checkin-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hotel-widget__btn-book {
+  width: 100%;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.hotel-widget__btn-map {
+  justify-content: center;
+  width: 100%;
 }
 
 .visa-page__content {

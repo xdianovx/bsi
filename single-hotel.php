@@ -1,44 +1,41 @@
 <?php
-$gallery = get_field('gallery', get_the_ID());
-$country_id = get_field('field_hotel_country', get_the_ID());
-$rating = get_field('rating', get_the_ID());
+$post_id = get_the_ID();
+$gallery = function_exists('get_field') ? get_field('gallery', $post_id) : [];
+$rating = function_exists('get_field') ? get_field('rating', $post_id) : '';
+
+$country_id = function_exists('get_field') ? get_field('hotel_country', $post_id) : 0;
+$country_id = is_array($country_id) ? (int) reset($country_id) : (int) $country_id;
+
+$country_title = '';
+$country_permalink = '';
+$country_visa = '';
+$country_flag = '';
+
 if ($country_id) {
   $country_title = get_the_title($country_id);
   $country_permalink = get_permalink($country_id);
-
-  $country_visa = get_field('is_visa', $country_id); // поле "Требуется виза"
-  $country_flag = get_field('flag', $country_id); // поле "Флаг"
-  $region_id = get_field('hotel_region', $post_id);
-  if (is_array($region_id))
-    $region_id = reset($region_id);
-  $region_id = (int) $region_id;
-
-  $region_name = '';
-  if ($region_id) {
-    $region_term = get_term($region_id, 'region');
-    if ($region_term && !is_wp_error($region_term))
-      $region_name = $region_term->name;
-  }
-
-  $resort_id = get_field('hotel_resort', $post_id);
-  if (is_array($resort_id))
-    $resort_id = reset($resort_id);
-  $resort_id = (int) $resort_id;
-
-  $resort_name = '';
-  if ($resort_id) {
-    $resort_term = get_term($resort_id, 'resort');
-    if ($resort_term && !is_wp_error($resort_term))
-      $resort_name = $resort_term->name;
-  }
-
-  // город
-  $city = trim((string) get_field('field_hotel_city', $post_id));
-
-  // собираем строку адреса
-  $parts = array_filter([$country_title, $region_name, $resort_name, $city]);
-  $address_line = implode(', ', $parts);
+  $country_visa = function_exists('get_field') ? get_field('is_visa', $country_id) : '';
+  $country_flag = function_exists('get_field') ? get_field('flag', $country_id) : '';
 }
+
+$region_terms = get_the_terms($post_id, 'region');
+$region_term = (!empty($region_terms) && !is_wp_error($region_terms)) ? $region_terms[0] : null;
+
+$resort_terms = get_the_terms($post_id, 'resort');
+$resort_term = (!empty($resort_terms) && !is_wp_error($resort_terms)) ? $resort_terms[0] : null;
+
+$region_name = $region_term ? $region_term->name : '';
+$resort_name = $resort_term ? $resort_term->name : '';
+
+$region_link = $region_term ? get_term_link($region_term) : '';
+$resort_link = $resort_term ? get_term_link($resort_term) : '';
+
+$city = trim((string) (function_exists('get_field') ? get_field('hotel_city', $post_id) : ''));
+
+$parts = array_filter([$country_title, $region_name, $resort_name, $city]);
+$address_line = implode(', ', $parts);
+
+$excerpt = get_the_excerpt($post_id);
 
 get_header();
 ?>
@@ -83,13 +80,44 @@ get_header();
       </div>
 
       <div class="single-hotel__top-line">
-        <?php if ($address_line): ?>
+        <?php if ($country_title || $region_term || $resort_term || $city): ?>
+          <?php
+          $items = [];
+
+          if ($country_title) {
+            $items[] = $country_permalink
+              ? '<a class="single-hotel__address-link" href="' . esc_url($country_permalink) . '">' . esc_html($country_title) . '</a>'
+              : '<span>' . esc_html($country_title) . '</span>';
+          }
+
+          if ($region_term) {
+            $region_link = get_term_link($region_term);
+            $items[] = !is_wp_error($region_link)
+              ? '<a class="single-hotel__address-link" href="' . esc_url($region_link) . '">' . esc_html($region_term->name) . '</a>'
+              : '<span>' . esc_html($region_term->name) . '</span>';
+          }
+
+          if ($resort_term) {
+            $resort_link = get_term_link($resort_term);
+            $items[] = !is_wp_error($resort_link)
+              ? '<a class="single-hotel__address-link" href="' . esc_url($resort_link) . '">' . esc_html($resort_term->name) . '</a>'
+              : '<span>' . esc_html($resort_term->name) . '</span>';
+          }
+
+          if ($city) {
+            $items[] = '<span>' . esc_html($city) . '</span>';
+          }
+          ?>
+
           <div class="single-hotel__address">
-            <?php if ($country_flag): ?>
+            <?php if (!empty($country_flag)): ?>
               <img src="<?= esc_url($country_flag); ?>"
                    alt="">
             <?php endif; ?>
-            <div><?= esc_html($address_line); ?></div>
+
+            <div class="single-hotel__address-text">
+              <?= implode(', ', $items); ?>
+            </div>
           </div>
         <?php endif; ?>
 
@@ -135,56 +163,27 @@ get_header();
         ?>
       </div>
 
+      <div class="page-country__descr">
+        <?= $excerpt ?>
 
+      </div>
 
-      <!-- <div class="single-hotel__main-opts">
-        тут основные опции отеля
-      </div> -->
     </div>
   </section>
 
   <section class="single-hotel__gallery-section">
     <div class="container">
-
-
-      <div class="hotel-gallery__wrap">
-        <div class="swiper hotel-gallery-main-slider">
-          <div class="swiper-wrapper">
-            <?php foreach ($gallery as $item): ?>
-              <div class="swiper-slide">
-                <div class="hotel-gallery-main-slide">
-                  <img src="<?= $item['url'] ?>"
-                       alt="<?= $item['alt'] ?>">
-                </div>
-              </div>
-            <?php endforeach ?>
-          </div>
-
-          <div class="slider-arrow  xl slider-arrow-prev hotel-gallery-main-arrow-prev">
-          </div>
-          <div class="slider-arrow  xl  slider-arrow-next hotel-gallery-main-arrow-next"></div>
-
-
-        </div>
+      <div class="country-page__gallery">
+        <?php
+        get_template_part('template-parts/sections/gallery', null, [
+          'gallery' => $gallery,
+          'id' => 'hotel_' . get_the_ID(),
+        ]);
+        ?>
       </div>
 
 
-      <div class="swiper hotel-gallery-main-slider-thumb">
-        <div class="swiper-wrapper">
-          <?php foreach ($gallery as $item): ?>
-            <div class="swiper-slide">
-              <div class="hotel-gallery-thumb-slide">
 
-                <img src="<?= $item['url'] ?>"
-                     alt="<?= $item['alt'] ?>">
-              </div>
-            </div>
-          <?php endforeach ?>
-        </div>
-      </div>
-
-
-    </div>
     </div>
   </section>
 
@@ -194,33 +193,67 @@ get_header();
   <section class="single-hotel__content">
     <div class="container">
 
-      <div class="hotel-content editor-content">
-        <?php the_content() ?>
+      <div class="single-hotel__content__wrap">
+
+        <div class="hotel-content editor-content">
+          <?php the_content() ?>
+        </div>
+
+        <aside class="hotel-aside">
+
+          <div class="hotel-widget">
+            <div class="hotel-widget__address"> <?php if ($address_line): ?>
+                <div class="single-hotel__address">
+                  <?php if ($country_flag): ?>
+                    <img src="<?= esc_url($country_flag); ?>"
+                         alt="">
+                  <?php endif; ?>
+                  <div><?= esc_html($address_line); ?></div>
+                </div>
+              <?php endif; ?>
+            </div>
+            <p class="hotel-widget__title"><?php the_title() ?></p>
+
+
+
+            <div class="hotel-widget__checkin-time">
+              <div class="hotel-widget__checkin-item">
+                <span class="hotel-widget__checkin-label">Заезд:</span>
+                <span class="hotel-widget__checkin-value numfont">
+                  <?= get_field('check_in_time', get_the_ID()); ?>
+                </span>
+              </div>
+              <div class="hotel-widget__checkin-item">
+                <span class="hotel-widget__checkin-label">Выезд:</span>
+                <span class="hotel-widget__checkin-value numfont">
+                  <?= get_field('check_in_time', get_the_ID()); ?>
+                </span>
+              </div>
+            </div>
+
+            <div class="hotel-widget__btns">
+              <a href=""
+                 class="btn btn-accent hotel-widget__btn-book sm">Забронировать</a>
+            </div>
+          </div>
+
+          <div class="hotel-widget">
+            <a href="#"
+               class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
+          </div>
+        </aside>
+
       </div>
     </div>
   </section>
 
 
-  <section>
-    <div class="container">
-      <?php
-      $lat = trim((string) get_field('hotel_lat', get_the_ID()));
-      $lng = trim((string) get_field('hotel_lng', get_the_ID()));
-      ?>
 
-      <?php if ($lat && $lng): ?>
-        <div class="hotel-map is-loading"
-             data-lat="<?= esc_attr($lat); ?>"
-             data-lng="<?= esc_attr($lng); ?>"
-             data-zoom="14"></div>
-      <?php endif; ?>
-    </div>
-  </section>
 
-  <div class="hotel-map is-loading"
+  <!-- <div class="hotel-map is-loading"
        data-lat="-8.337197"
        data-lng="115.659987"
-       data-zoom="14"></div>
+       data-zoom="14"></div> -->
 
   <section>
     <div class="container">

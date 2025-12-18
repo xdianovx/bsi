@@ -145,72 +145,7 @@ get_header();
 
           </div>
 
-          <?php /* Регионы + курорты */ ?>
-          <?php if (!empty($regions)): ?>
-            <section class="country-regions">
-              <h2 class="h3">Регионы и курорты</h2>
 
-              <div class="country-regions__list">
-                <?php foreach ($regions as $region): ?>
-                  <div class="country-regions__item">
-                    <div class="country-regions__title">
-                      <?= esc_html($region->name); ?>
-                    </div>
-
-                    <?php
-                    $resorts = get_terms([
-                      'taxonomy' => 'resort',
-                      'hide_empty' => false,
-                      'orderby' => 'name',
-                      'order' => 'ASC',
-                      'meta_query' => [
-                        [
-                          'key' => 'resort_region',
-                          'value' => $region->term_id,
-                          'compare' => '=',
-                        ],
-                      ],
-                    ]);
-
-                    if (empty($resorts) || is_wp_error($resorts)) {
-                      $resorts = [];
-                    }
-
-                    if (empty($resorts)) {
-                      $all_resorts = get_terms([
-                        'taxonomy' => 'resort',
-                        'hide_empty' => false,
-                        'orderby' => 'name',
-                        'order' => 'ASC',
-                      ]);
-
-                      if (!empty($all_resorts) && !is_wp_error($all_resorts)) {
-                        foreach ($all_resorts as $t) {
-                          $t_region = get_field('resort_region', 'term_' . $t->term_id);
-                          if ($t_region == $region->term_id) {
-                            $resorts[] = $t;
-                          }
-                        }
-                      }
-                    }
-                    ?>
-
-                    <?php if (!empty($resorts)): ?>
-                      <div class="country-regions__resorts">
-                        <?php foreach ($resorts as $resort): ?>
-                          <a class="country-regions__resort"
-                             href="<?= esc_url(get_term_link($resort)); ?>">
-                            <?= esc_html($resort->name); ?>
-                          </a>
-                        <?php endforeach; ?>
-                      </div>
-                    <?php endif; ?>
-
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            </section>
-          <?php endif; ?>
 
           <?php /* Контент из редактора */ ?>
           <div class="editor-content page-country__editor-content">

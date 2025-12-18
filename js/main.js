@@ -31,5 +31,5 @@ window.addEventListener("DOMContentLoaded", () => {
   initNewsFilter();
   promoPageAjax();
   initResortHotelsAjax();
-  initHotelMap();
+  // initHotelMap();
 });

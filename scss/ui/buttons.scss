@@ -4,6 +4,8 @@
   font-weight: 500;
   line-height: 100%;
   text-align: center;
+  justify-content: center;
+  display: inline-flex;
   &.sm {
     padding: 12px 20px;
   }
@@ -37,6 +39,17 @@
 
   &:hover {
     background: $bg-black;
+    color: #fff;
+  }
+}
+
+.btn-black {
+  background: $text-black;
+  color: #fff;
+  transition: $trans-text;
+
+  &:hover {
+    background: rgba($bg-black, 0.8);
     color: #fff;
   }
 }
