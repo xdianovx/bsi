@@ -127,7 +127,6 @@ function bsi_register_hotel_acf_groups(): void
         'insert' => 'append',
         'library' => 'all',
         'min' => 0,
-        'max' => 20,
       ],
       [
         'key' => 'field_check_in_time',
