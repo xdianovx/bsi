@@ -2,13 +2,6 @@
 /**
  * Hotel Card Row
  * template-parts/hotels/card-row.php
- *
- * Использование:
- * get_template_part('template-parts/hotels/card-row', null, [
- *   'hotel_id' => $hotel_id,
- *   // опционально:
- *   'link' => '',
- * ]);
  */
 
 $hotel_id = (int) ($args['hotel_id'] ?? get_the_ID());
@@ -16,11 +9,10 @@ if (!$hotel_id)
   return;
 
 $link = $args['link'] ?? get_permalink($hotel_id);
-$booking_url = function_exists('get_field')
-  ? get_field('booking_url', $hotel_id)
-  : '';
 
+$booking_url = function_exists('get_field') ? get_field('booking_url', $hotel_id) : '';
 $booking_url = trim((string) $booking_url);
+
 // базовые
 $title = get_the_title($hotel_id);
 $thumb = get_the_post_thumbnail_url($hotel_id, 'medium') ?: '';
@@ -42,15 +34,50 @@ $country_id = function_exists('get_field') ? get_field('hotel_country', $hotel_i
 $region_id = function_exists('get_field') ? get_field('hotel_region', $hotel_id) : 0;
 $resort_id = function_exists('get_field') ? get_field('hotel_resort', $hotel_id) : 0;
 
-// нормализуем taxonomy id (если вдруг массив)
 if (is_array($region_id))
   $region_id = reset($region_id);
 if (is_array($resort_id))
   $resort_id = reset($resort_id);
 
 $country_title = $country_id ? get_the_title($country_id) : '';
-$region_title = $region_id ? (get_term((int) $region_id, 'region')->name ?? '') : '';
-$resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') : '';
+
+$region_title = '';
+if ($region_id) {
+  $t = get_term((int) $region_id, 'region');
+  $region_title = (!is_wp_error($t) && $t) ? ($t->name ?? '') : '';
+}
+
+$resort_title = '';
+if ($resort_id) {
+  $t = get_term((int) $resort_id, 'resort');
+  $resort_title = (!is_wp_error($t) && $t) ? ($t->name ?? '') : '';
+}
+
+// ссылки
+$phone = trim((string) $phone);
+$tel_href = $phone ? preg_replace('/[^0-9+]/', '', $phone) : '';
+
+$website = trim((string) $website);
+if ($website && !preg_match('~^https?://~i', $website)) {
+  $website = 'https://' . ltrim($website, '/');
+}
+$website_url = $website ? esc_url($website) : '';
+
+// удобства (минимально)
+$amenities = [];
+if ($wifi)
+  $amenities[] = 'Wi-Fi';
+if ($breakfast)
+  $amenities[] = 'Завтрак';
+if ($check_in)
+  $amenities[] = 'Заезд: ' . $check_in;
+if ($check_out)
+  $amenities[] = 'Выезд: ' . $check_out;
+
+// цена
+$price_text = trim((string) $price);
+if (!$price_text)
+  $price_text = 'от 125 000 руб';
 ?>
 
 <article class="hotel-card-row"
@@ -61,9 +88,12 @@ $resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') 
     <div class="hotel-card-row__media">
       <div class="hotel-card-row__poster">
         <?php if ($thumb): ?>
-          <img class="hotel-card-row__img"
-               src="<?= esc_url($thumb); ?>"
-               alt="<?= esc_attr($title); ?>">
+          <a href="<?= esc_url($link); ?>"
+             class="hotel-card-row__poster-link">
+            <img class="hotel-card-row__img"
+                 src="<?= esc_url($thumb); ?>"
+                 alt="<?= esc_attr($title); ?>">
+          </a>
         <?php else: ?>
           <div class="hotel-card-row__img-placeholder"></div>
         <?php endif; ?>
@@ -71,7 +101,6 @@ $resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') 
     </div>
 
     <!-- Info -->
-
     <div class="hotel-card-row__body">
 
       <div class="hotel-card-row__head">
@@ -88,50 +117,86 @@ $resort_title = $resort_id ? (get_term((int) $resort_id, 'resort')->name ?? '') 
               endfor;
               ?>
             </div>
-
-
           </div>
-
-
         <?php endif; ?>
-
-
       </div>
-      <div class="hotel-card-row__title"><?= esc_html($title); ?></div>
+
+      <a class="hotel-card-row__title"
+         href="<?= esc_url($link); ?>">
+        <?= esc_html($title); ?>
+      </a>
 
       <div class="hotel-card-row__geo">
-        <div class="hotel-card-row__country"><?= esc_html((string) $country_title); ?></div>
-        <div class="hotel-card-row__region"><?= esc_html((string) $region_title); ?></div>
-        <div class="hotel-card-row__resort"><?= esc_html((string) $resort_title); ?></div>
+        <?php if ($country_title): ?>
+          <div class="hotel-card-row__country"><?= esc_html((string) $country_title); ?></div><?php endif; ?>
+        <?php if ($region_title): ?>
+          <div class="hotel-card-row__region"><?= esc_html((string) $region_title); ?></div><?php endif; ?>
+        <?php if ($resort_title): ?>
+          <div class="hotel-card-row__resort"><?= esc_html((string) $resort_title); ?></div><?php endif; ?>
       </div>
 
-      <div class="hotel-card-row__excerpt">
-        <?= esc_html((string) $excerpt); ?>
-      </div>
+      <?php if (!empty($excerpt)): ?>
+        <div class="hotel-card-row__excerpt">
+          <?= esc_html((string) $excerpt); ?>
+        </div>
+      <?php endif; ?>
 
+      <?php if ($address || $phone || $website_url): ?>
+        <div class="hotel-card-row__links">
+          <?php if ($address): ?>
+            <div class="hotel-card-row__link hotel-card-row__link--address">
+              <?= esc_html((string) $address); ?>
+            </div>
+          <?php endif; ?>
 
+          <?php if ($phone && $tel_href): ?>
+            <a class="hotel-card-row__link hotel-card-row__link--phone"
+               href="tel:<?= esc_attr($tel_href); ?>">
+              <?= esc_html($phone); ?>
+            </a>
+          <?php endif; ?>
 
+          <?php if ($website_url): ?>
+            <a class="hotel-card-row__link hotel-card-row__link--site"
+               href="<?= $website_url; ?>"
+               target="_blank"
+               rel="nofollow noopener">
+              Сайт
+            </a>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
 
+      <?php if (!empty($amenities)): ?>
+        <div class="hotel-card-row__amenities">
+          <?php foreach ($amenities as $a): ?>
+            <span class="hotel-card-row__amenity"><?= esc_html($a); ?></span>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
 
     </div>
 
     <!-- CTA -->
     <div class="hotel-card-cta">
+      <div class="hotel-card-cta__price numfont"><?= esc_html($price_text); ?></div>
 
-      <div class="hotel-card-cta__price numfont">от 125 000 руб</div>
       <div class="hotel-card__buttons">
         <a href="<?= esc_url($link); ?>"
            class="btn btn-gray sm hotel-card-button --more">
           Подробнее
         </a>
 
-        <a href="<?= esc_url($booking_urlasd); ?>"
-           target="_blank"
-           rel="nofollow noopener"
-           class="btn btn-accent sm hotel-card-button --more">
-          Забронировать
-        </a>
+        <?php if (!empty($booking_url)): ?>
+          <a href="<?= esc_url($booking_url); ?>"
+             target="_blank"
+             rel="nofollow noopener"
+             class="btn btn-accent sm hotel-card-button --more">
+            Забронировать
+          </a>
+        <?php endif; ?>
       </div>
     </div>
+
   </div>
 </article>

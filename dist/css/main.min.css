@@ -2238,7 +2238,8 @@ input.error {
 }
 
 .hotel-card-cta {
-  width: 420px;
+  width: 180px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-self: stretch;
