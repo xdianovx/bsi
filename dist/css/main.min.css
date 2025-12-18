@@ -2291,6 +2291,7 @@ input.error {
 }
 
 .resort-hotels__list {
+  margin-top: 32px;
   display: flex;
   flex-direction: column;
   margin-top: 32px;
