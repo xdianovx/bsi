@@ -1,6 +1,5 @@
 <?php
 
-
 add_action('wp_ajax_bsi_resort_hotels', 'bsi_resort_hotels_ajax');
 add_action('wp_ajax_nopriv_bsi_resort_hotels', 'bsi_resort_hotels_ajax');
 
@@ -18,22 +17,20 @@ function bsi_resort_hotels_ajax()
     wp_send_json_error(['message' => 'term_id is required']);
   }
 
-  // базовая сортировка
   $query_args = [
     'post_type' => 'hotel',
     'post_status' => 'publish',
     'posts_per_page' => $per_page,
     'paged' => $page,
-    'meta_query' => [
+    'tax_query' => [
       [
-        'key' => 'hotel_resort',
-        'value' => $term_id,
-        'compare' => '=',
+        'taxonomy' => 'resort',
+        'field' => 'term_id',
+        'terms' => [$term_id],
       ],
     ],
   ];
 
-  // orderby: title|date|rating
   if ($orderby === 'date') {
     $query_args['orderby'] = 'date';
     $query_args['order'] = $order;

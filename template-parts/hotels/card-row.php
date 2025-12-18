@@ -80,8 +80,8 @@ if (!$price_text)
   $price_text = 'от 125 000 руб';
 ?>
 
-<article class="hotel-card-row"
-         data-hotel-id="<?= esc_attr($hotel_id); ?>">
+<div class="hotel-card-row"
+     data-hotel-id="<?= esc_attr($hotel_id); ?>">
   <div class="hotel-card-row__wrap">
 
     <!-- Poster -->
@@ -127,12 +127,12 @@ if (!$price_text)
       </a>
 
       <div class="hotel-card-row__geo">
-        <?php if ($country_title): ?>
-          <div class="hotel-card-row__country"><?= esc_html((string) $country_title); ?></div><?php endif; ?>
-        <?php if ($region_title): ?>
-          <div class="hotel-card-row__region"><?= esc_html((string) $region_title); ?></div><?php endif; ?>
-        <?php if ($resort_title): ?>
-          <div class="hotel-card-row__resort"><?= esc_html((string) $resort_title); ?></div><?php endif; ?>
+        <?php if ($address): ?>
+          <div class="hotel-card-row__link hotel-card-row__link--address">
+            <?= esc_html((string) $address); ?>
+          </div>
+        <?php endif; ?>
+
       </div>
 
       <?php if (!empty($excerpt)): ?>
@@ -141,36 +141,12 @@ if (!$price_text)
         </div>
       <?php endif; ?>
 
-      <?php if ($address || $phone || $website_url): ?>
-        <div class="hotel-card-row__links">
-          <?php if ($address): ?>
-            <div class="hotel-card-row__link hotel-card-row__link--address">
-              <?= esc_html((string) $address); ?>
-            </div>
-          <?php endif; ?>
 
-          <?php if ($phone && $tel_href): ?>
-            <a class="hotel-card-row__link hotel-card-row__link--phone"
-               href="tel:<?= esc_attr($tel_href); ?>">
-              <?= esc_html($phone); ?>
-            </a>
-          <?php endif; ?>
-
-          <?php if ($website_url): ?>
-            <a class="hotel-card-row__link hotel-card-row__link--site"
-               href="<?= $website_url; ?>"
-               target="_blank"
-               rel="nofollow noopener">
-              Сайт
-            </a>
-          <?php endif; ?>
-        </div>
-      <?php endif; ?>
 
       <?php if (!empty($amenities)): ?>
         <div class="hotel-card-row__amenities">
           <?php foreach ($amenities as $a): ?>
-            <span class="hotel-card-row__amenity"><?= esc_html($a); ?></span>
+            <span class="hotel-card-row__amenity"><?= format_price_text(esc_html($a)); ?></span>
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
@@ -179,7 +155,7 @@ if (!$price_text)
 
     <!-- CTA -->
     <div class="hotel-card-cta">
-      <div class="hotel-card-cta__price numfont"><?= esc_html($price_text); ?></div>
+      <div class="hotel-card-cta__price numfont"><?= format_price_text(esc_html($price_text)); ?></div>
 
       <div class="hotel-card__buttons">
         <a href="<?= esc_url($link); ?>"
@@ -199,4 +175,4 @@ if (!$price_text)
     </div>
 
   </div>
-</article>
+</div>

@@ -353,8 +353,3 @@ add_action('wp_enqueue_scripts', function () {
 });
 
 
-add_action('admin_init', function () {
-	flush_rewrite_rules(false);
-});
-
-

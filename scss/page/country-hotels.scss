@@ -17,6 +17,7 @@
   border-top: 1px solid $bg-gray;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: 32px 16px;
 }
 
 .country-hotels__item {
