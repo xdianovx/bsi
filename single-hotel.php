@@ -34,7 +34,9 @@ $city = trim((string) (function_exists('get_field') ? get_field('hotel_city', $p
 
 $parts = array_filter([$country_title, $region_name, $resort_name, $city]);
 $address_line = implode(', ', $parts);
-
+$phone = trim((string) get_field('phone', get_the_ID()));
+$address = trim((string) get_field('address', get_the_ID()));
+$website = trim((string) get_field('website', get_the_ID()));
 $excerpt = get_the_excerpt($post_id);
 
 get_header();
@@ -242,6 +244,38 @@ get_header();
               <p class="hotel-widget__title"><?php the_title() ?></p>
             </div>
 
+            <div class="hotel-widget__contacts">
+              <?php if ($phone): ?>
+                <div class="hotel-widget__phone hotel-widget__contacts-item">
+                  <a href="tel:<?= esc_attr(preg_replace('/\s+/', '', $phone)); ?>">
+                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg"
+                         alt="">
+                    <span><?= esc_html($phone); ?></span>
+                  </a>
+                </div>
+              <?php endif; ?>
+
+              <?php if ($address): ?>
+                <div class="hotel-widget__address hotel-widget__contacts-item">
+                  <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg"
+                       alt="">
+                  <span><?= esc_html($address); ?></span>
+                </div>
+              <?php endif; ?>
+
+              <?php if ($website): ?>
+                <div class="hotel-widget__site hotel-widget__contacts-item">
+
+                  <a href="<?= esc_url($website); ?>"
+                     target="_blank"
+                     rel="nofollow noopener">
+                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg"
+                         alt="">
+                    <span> <?= esc_html($website); ?></span>
+                  </a>
+                </div>
+              <?php endif; ?>
+            </div>
 
 
             <div class="hotel-widget__checkin-time">
@@ -254,7 +288,7 @@ get_header();
               <div class="hotel-widget__checkin-item">
                 <span class="hotel-widget__checkin-label">Выезд:</span>
                 <span class="hotel-widget__checkin-value numfont">
-                  <?= get_field('check_in_time', get_the_ID()); ?>
+                  <?= get_field('check_out_time', get_the_ID()); ?>
                 </span>
               </div>
             </div>

@@ -418,6 +418,14 @@ main {
   mask-repeat: no-repeat;
   mask-position: center;
 }
+@media screen and (max-width: 768px) {
+  .callout__title {
+    padding-left: 0;
+  }
+  .callout__title:before {
+    display: none;
+  }
+}
 
 .callout-neutral {
   background: #f5f5f5;
@@ -4172,11 +4180,17 @@ input.error {
 
 .single-hotel__print-btn {
   flex-shrink: 0;
+  display: none;
 }
 
 .single-hotel__title {
   margin-bottom: 12px;
   flex-grow: 1;
+}
+@media screen and (max-width: 768px) {
+  .single-hotel__title {
+    font-size: 24px;
+  }
 }
 
 .single-hotel__address {
@@ -4344,7 +4358,7 @@ input.error {
   width: 100%;
   padding: 8px 12px;
   line-height: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .hotel-widget__checkin-label {
@@ -4382,6 +4396,29 @@ input.error {
   display: flex;
   gap: 8px;
   align-items: flex-start;
+}
+
+.hotel-widget__contacts {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hotel-widget__contacts-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hotel-widget__contacts-item a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hotel-widget__contacts-item img {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .visa-page__content {
