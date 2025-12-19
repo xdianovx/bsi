@@ -75,7 +75,7 @@ get_header();
               </div>
             <?php endif; ?>
           </div>
-          <h1 class="h1 single-hotel__title">Отель <?php the_title() ?></h1>
+          <h1 class="h1 single-hotel__title"><?php the_title() ?></h1>
 
         </div>
 
@@ -244,6 +244,32 @@ get_header();
               <p class="hotel-widget__title"><?php the_title() ?></p>
             </div>
 
+
+
+            <div class="hotel-widget__checkin-time">
+              <div class="hotel-widget__checkin-item">
+                <span class="hotel-widget__checkin-label">Заезд:</span>
+                <span class="hotel-widget__checkin-value numfont">
+                  <?= get_field('check_in_time', get_the_ID()); ?>
+                </span>
+              </div>
+              <div class="hotel-widget__checkin-item">
+                <span class="hotel-widget__checkin-label">Выезд:</span>
+                <span class="hotel-widget__checkin-value numfont">
+                  <?= get_field('check_out_time', get_the_ID()); ?>
+                </span>
+              </div>
+            </div>
+
+
+            <div class="hotel-widget__btns">
+              <a href=""
+                 class="btn btn-accent hotel-widget__btn-book sm">Забронировать</a>
+            </div>
+          </div>
+
+          <div class="hotel-widget">
+            <p class="hotel-widget__title">Контакты отеля</p>
             <div class="hotel-widget__contacts">
               <?php if ($phone): ?>
                 <div class="hotel-widget__phone hotel-widget__contacts-item">
@@ -271,32 +297,12 @@ get_header();
                      rel="nofollow noopener">
                     <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg"
                          alt="">
-                    <span> <?= esc_html($website); ?></span>
+                    <span>Сайт отеля</span>
                   </a>
                 </div>
               <?php endif; ?>
             </div>
 
-
-            <div class="hotel-widget__checkin-time">
-              <div class="hotel-widget__checkin-item">
-                <span class="hotel-widget__checkin-label">Заезд:</span>
-                <span class="hotel-widget__checkin-value numfont">
-                  <?= get_field('check_in_time', get_the_ID()); ?>
-                </span>
-              </div>
-              <div class="hotel-widget__checkin-item">
-                <span class="hotel-widget__checkin-label">Выезд:</span>
-                <span class="hotel-widget__checkin-value numfont">
-                  <?= get_field('check_out_time', get_the_ID()); ?>
-                </span>
-              </div>
-            </div>
-
-            <div class="hotel-widget__btns">
-              <a href=""
-                 class="btn btn-accent hotel-widget__btn-book sm">Забронировать</a>
-            </div>
           </div>
 
           <div class="hotel-widget">
@@ -327,6 +333,12 @@ get_header();
         <p>
           Перед бронированием необходимо обязательно уточнить актуальную информацию об оказываемых отелем услугах и его
           номерном фонде у менеджеров туроператора или на официальном сайте отеля.
+        </p>
+
+        <p class="callout__text-warn">
+          Нашли неточную информацию? Сообщите нам, и мы исправим ее! <a href="#">Написать сообщение</a>
+
+
         </p>
       </div>
     </div>
