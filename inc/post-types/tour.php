@@ -89,6 +89,74 @@ add_action('init', function () {
 
 }, 10);
 
+add_action('init', function () {
+
+  register_taxonomy('tour_include', ['tour'], [
+    'labels' => [
+      'name' => 'Включено в тур',
+      'singular_name' => 'Пункт включено',
+      'search_items' => 'Найти',
+      'all_items' => 'Все пункты',
+      'edit_item' => 'Редактировать',
+      'update_item' => 'Обновить',
+      'add_new_item' => 'Добавить пункт',
+      'new_item_name' => 'Новый пункт',
+      'menu_name' => 'Включено в тур',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+
+    // это как "теги": много значений, без иерархии
+    'hierarchical' => false,
+
+    // роуты не нужны
+    'rewrite' => false,
+    'query_var' => true,
+  ]);
+
+}, 20);
+
+add_action('acf/init', function () {
+  if (!function_exists('acf_add_local_field_group'))
+    return;
+
+  acf_add_local_field_group([
+    'key' => 'group_tour_include_term',
+    'title' => 'Включено в тур — иконка',
+    'fields' => [
+      [
+        'key' => 'field_tour_include_icon',
+        'label' => 'Иконка',
+        'name' => 'tour_include_icon',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'thumbnail',
+        'library' => 'all',
+        'wrapper' => ['width' => '50'],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'taxonomy',
+          'operator' => '==',
+          'value' => 'tour_include',
+        ],
+      ],
+    ],
+  ]);
+});
+
+/**
+ * На всякий: привязка таксы к tour (чтобы метабокс точно был)
+ */
+add_action('init', function () {
+  if (taxonomy_exists('tour_include')) {
+    register_taxonomy_for_object_type('tour_include', 'tour');
+  }
+}, 999);
 
 /**
  * 4) На всякий: привяжем таксы к tour, если они уже существуют

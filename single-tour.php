@@ -11,6 +11,7 @@ $country_id = (int) $country_id;
 $country_title = '';
 $country_permalink = '';
 $country_flag = '';
+$include_terms = get_the_terms(get_the_ID(), 'tour_include');
 
 if ($country_id) {
   $country_title = get_the_title($country_id);
@@ -105,6 +106,25 @@ get_header();
       <?php endif; ?>
 
     </div>
+
+    <?php if (!empty($include_terms) && !is_wp_error($include_terms)): ?>
+      <div class="tour-include">
+        <?php foreach ($include_terms as $t):
+          $icon = function_exists('get_field') ? get_field('tour_include_icon', 'term_' . $t->term_id) : null;
+          $icon_url = (is_array($icon) && !empty($icon['url'])) ? $icon['url'] : '';
+          ?>
+          <span class="tour-include__item">
+            <?php if ($icon_url): ?>
+              <img class="tour-include__icon"
+                   src="<?= esc_url($icon_url); ?>"
+                   alt=""
+                   loading="lazy">
+            <?php endif; ?>
+            <span class="tour-include__text"><?= esc_html($t->name); ?></span>
+          </span>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
   </section>
 
   <?php if (!empty($tour_gallery) && is_array($tour_gallery)): ?>

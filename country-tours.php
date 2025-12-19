@@ -65,11 +65,11 @@ get_header(); ?>
             <div class="country-tours__list">
               <?php while ($tours_query->have_posts()):
                 $tours_query->the_post(); ?>
-                <a class="hotel-card-row"
-                   href="<?= esc_url(get_permalink()); ?>">
-                  <div class="hotel-card-row__title"><?php the_title(); ?></div>
-                  <div class="hotel-card-row__excerpt"><?php the_excerpt(); ?></div>
-                </a>
+                <?php
+                get_template_part('template-parts/tour/card-row', null, [
+                  'post_id' => get_the_ID(),
+                ]);
+                ?>
               <?php endwhile; ?>
             </div>
 

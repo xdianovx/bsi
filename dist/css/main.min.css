@@ -4441,6 +4441,11 @@ input.error {
   height: 18px;
 }
 
+.tour-card-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
 .visa-page__content {
   max-width: 720px;
   margin: 40px auto 0;
