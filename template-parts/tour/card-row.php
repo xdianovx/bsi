@@ -102,7 +102,10 @@ $country_title = $country_id ? get_the_title($country_id) : '';
         </div>
       <?php endif; ?>
 
-      <h3 class="tour-card-row__title"><?= esc_html($title); ?></h3>
+      <h3 class="tour-card-row__title"><a href="<?= esc_url($link); ?>">
+
+          <?= esc_html($title); ?></h3>
+      </a>
 
       <?php if ($duration): ?>
         <div class="tour-card-row__duration">

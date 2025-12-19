@@ -4497,6 +4497,7 @@ input.error {
   margin-top: auto;
   display: flex;
   flex-direction: column;
+  margin-top: 16px;
   gap: 8px;
 }
 .tour-card-row__btns * {
@@ -4532,6 +4533,13 @@ input.error {
 }
 .tour-card-row__poster .tour-card-row__img {
   display: block;
+}
+
+.tour-card-row__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .tour-card-row__duration {
