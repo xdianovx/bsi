@@ -113,8 +113,8 @@ function bsi_get_promo_countries()
 
 /* Регистрация таксономий: Регионы и Курорты (для привязок, фильтров, админки) */
 add_action('init', function () {
-  $region_post_types = apply_filters('region_taxonomy_post_types', ['hotel']);
-  $resort_post_types = apply_filters('resort_taxonomy_post_types', ['hotel']);
+  $region_post_types = apply_filters('region_taxonomy_post_types', ['hotel', 'tour']);
+  $resort_post_types = apply_filters('resort_taxonomy_post_types', ['hotel', 'tour']);
 
   register_taxonomy('region', $region_post_types, [
     'labels' => [
@@ -258,7 +258,7 @@ add_action('init', function () {
 
 /* Роут курорта: /country/{country}/{region}/{resort}/ */
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|news|fit|akcii|novosti|kurorty)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',
