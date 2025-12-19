@@ -73,8 +73,7 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
 
             // Верхний пункт меню
             $output .= '<li class="header-menu__item --countries">';
-            $output .= '<a href="' . $url . '" class="header-menu__link --head' .
-                ($is_active ? ' is-active' : '') . '">' . $title . '</a>';
+            $output .= '<a href="' . $url . '" class="header-menu__link --head' . ($is_active ? ' is-active' : '') . '">' . $title . '</a>';
 
             // Начинаем мегаменю
             $output .= '<div class="mega-menu mega-menu--countries"><div class="mega-menu__inner">';
@@ -90,36 +89,60 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
                 'post_parent' => 0,
             ]);
 
-            foreach ($countries as $country) {
+            // Группируем по первой букве
+            $groups = [];
 
-                $country_title = esc_html($country->post_title);
+            foreach ($countries as $country) {
+                $country_title = (string) $country->post_title;
+                $letter = mb_strtoupper(mb_substr($country_title, 0, 1, 'UTF-8'), 'UTF-8');
+
+                // нормализация (по желанию)
+                if ($letter === 'Ё')
+                    $letter = 'Е';
+
                 $country_link = get_permalink($country->ID);
 
-                $flag = get_field('flag', $country->ID);
+                $flag = function_exists('get_field') ? get_field('flag', $country->ID) : '';
                 $flag_url = '';
                 if ($flag) {
-                    if (is_array($flag) && !empty($flag['url'])) {
-                        $flag_url = esc_url($flag['url']);
-                    } else {
-                        $flag_url = esc_url($flag);
-                    }
+                    $flag_url = is_array($flag) && !empty($flag['url']) ? esc_url($flag['url']) : esc_url($flag);
                 }
 
-                $is_visa = get_field('is_visa', $country->ID);
-                $visa_text = $is_visa ? 'Виза нужна' : 'Виза не нужна';
+                $is_visa = function_exists('get_field') ? get_field('is_visa', $country->ID) : false;
+                $visa_text = $is_visa ? 'Требуется виза' : 'Виза не нужна';
 
-                $output .= '<a href="' . $country_link . '" class="countries-letter__link">';
-
+                // Собираем HTML ссылки (как у тебя было)
+                $item_html = '<a href="' . esc_url($country_link) . '" class="countries-letter__link">';
                 if ($flag_url) {
-                    $output .= '<img src="' . $flag_url . '" alt="' . $country_title . '" class="countries-letter__flag">';
+                    $item_html .= '<img src="' . $flag_url . '" alt="' . esc_attr($country_title) . '" class="countries-letter__flag">';
                 }
+                $item_html .= '<div class="countries-letter__info">';
+                $item_html .= '<p class="countries-letter__name">' . esc_html($country_title) . '</p>';
+                $item_html .= '<div class="countries-letter__visa">' . esc_html($visa_text) . '</div>';
+                $item_html .= '</div>';
+                $item_html .= '</a>';
 
-                $output .= '<div class="countries-letter__info">';
-                $output .= '<p class="countries-letter__name">' . $country_title . '</p>';
-                $output .= '<div class="countries-letter__visa">' . $visa_text . '</div>';
-                $output .= '</div>'; // .info
+                $groups[$letter][] = $item_html;
+            }
 
-                $output .= '</a>';
+            // Сортируем буквы (обычно уже ок, но на всякий)
+            if (class_exists('Collator')) {
+                $collator = new Collator('ru_RU');
+                uksort($groups, function ($a, $b) use ($collator) {
+                    return $collator->compare($a, $b);
+                });
+            } else {
+                ksort($groups);
+            }
+
+            // Вывод групп: БУКВА + список
+            foreach ($groups as $letter => $items) {
+                $output .= '<div class="countries-letter-group">';
+                $output .= '<div class="countries-letter-group__letter">' . esc_html($letter) . '</div>';
+                $output .= '<div class="countries-letter-group__items">';
+                $output .= implode('', $items);
+                $output .= '</div>';
+                $output .= '</div>';
             }
 
             // Закрываем обёртки

@@ -2603,9 +2603,20 @@ input.error {
 
 .countries-letter-list__menu {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px 16px;
   width: 100%;
+}
+
+.countries-letter-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.countries-letter-group__letter {
+  font-size: 18px;
+  font-weight: 700;
 }
 
 @media (min-width: 1024px) {
