@@ -134,6 +134,7 @@ $country_title = $country_id ? get_the_title($country_id) : '';
   <div class="tour-card-row__actions">
     <?php if (!empty($included)): ?>
       <div class="tour-card-row__included">
+        <p>Включено:</p>
         <?php foreach ($included as $t): ?>
           <?php
           // ✅ ACF поле у термина: tour_include_icon

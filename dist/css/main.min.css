@@ -4443,7 +4443,7 @@ input.error {
 
 .tour-card-row {
   display: grid;
-  grid-template-columns: 2fr 3fr 1fr;
+  grid-template-columns: 2fr 3fr 2fr;
   position: relative;
   width: 100%;
   gap: 8px;
