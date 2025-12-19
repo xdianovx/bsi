@@ -1,7 +1,7 @@
 <?php
 /**
  * CPT: tour
- * Tax: tour_type
+ * Tax: tour_type, tour_include
  * Uses existing taxonomies: region, resort (registered elsewhere via filters)
  */
 
@@ -21,9 +21,11 @@ add_filter('resort_taxonomy_post_types', function ($types) {
 
 
 /**
- * 2) Таксономия типов туров
+ * 2) Таксономии тура
+ * Делай раньше CPT, чтобы в админке стабильно появились метабоксы.
  */
 add_action('init', function () {
+
   register_taxonomy('tour_type', ['tour'], [
     'labels' => [
       'name' => 'Типы туров',
@@ -44,12 +46,37 @@ add_action('init', function () {
     'rewrite' => false,
     'query_var' => true,
   ]);
-}, 20);
+
+  register_taxonomy('tour_include', ['tour'], [
+    'labels' => [
+      'name' => 'Включено в тур',
+      'singular_name' => 'Пункт включено',
+      'search_items' => 'Найти',
+      'all_items' => 'Все пункты',
+      'edit_item' => 'Редактировать',
+      'update_item' => 'Обновить',
+      'add_new_item' => 'Добавить пункт',
+      'new_item_name' => 'Новый пункт',
+      'menu_name' => 'Включено в тур',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+
+    // как теги
+    'hierarchical' => false,
+
+    'rewrite' => false,
+    'query_var' => true,
+  ]);
+
+}, 9);
 
 
 /**
  * 3) CPT: tour
- * ВАЖНО: rewrite выключаем — чтобы не было /tour/slug/ (нам нужен только /country/.../tours/.../)
+ * rewrite выключаем — чтобы не было /tour/slug/ (нам нужен только /country/.../tours/.../)
  */
 add_action('init', function () {
 
@@ -80,7 +107,7 @@ add_action('init', function () {
     'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
 
     // метабоксы таксономий
-    'taxonomies' => ['region', 'resort', 'tour_type'],
+    'taxonomies' => ['region', 'resort', 'tour_type', 'tour_include'],
 
     'has_archive' => false,
     'rewrite' => false,
@@ -89,35 +116,47 @@ add_action('init', function () {
 
 }, 10);
 
+
+/**
+ * 4) Привязки таксономий к tour (страхуемся от порядка подключения)
+ */
 add_action('init', function () {
+  if (taxonomy_exists('region')) {
+    register_taxonomy_for_object_type('region', 'tour');
+  }
+  if (taxonomy_exists('resort')) {
+    register_taxonomy_for_object_type('resort', 'tour');
+  }
+  if (taxonomy_exists('tour_type')) {
+    register_taxonomy_for_object_type('tour_type', 'tour');
+  }
+  if (taxonomy_exists('tour_include')) {
+    register_taxonomy_for_object_type('tour_include', 'tour');
+  }
+}, 30);
 
-  register_taxonomy('tour_include', ['tour'], [
-    'labels' => [
-      'name' => 'Включено в тур',
-      'singular_name' => 'Пункт включено',
-      'search_items' => 'Найти',
-      'all_items' => 'Все пункты',
-      'edit_item' => 'Редактировать',
-      'update_item' => 'Обновить',
-      'add_new_item' => 'Добавить пункт',
-      'new_item_name' => 'Новый пункт',
-      'menu_name' => 'Включено в тур',
-    ],
-    'public' => true,
-    'show_ui' => true,
-    'show_admin_column' => true,
-    'show_in_rest' => true,
 
-    // это как "теги": много значений, без иерархии
-    'hierarchical' => false,
+/**
+ * (опционально) Автосоздание дефолтных пунктов "Включено в тур"
+ * Если не нужно — просто удали этот блок.
+ */
+add_action('init', function () {
+  if (!taxonomy_exists('tour_include'))
+    return;
 
-    // роуты не нужны
-    'rewrite' => false,
-    'query_var' => true,
-  ]);
+  $defaults = ['Экскурсии', 'Трансфер', 'Страховка', 'Отель'];
 
-}, 20);
+  foreach ($defaults as $name) {
+    if (!term_exists($name, 'tour_include')) {
+      wp_insert_term($name, 'tour_include');
+    }
+  }
+}, 31);
 
+
+/**
+ * 5) ACF: иконка для термина tour_include
+ */
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group'))
     return;
@@ -149,34 +188,9 @@ add_action('acf/init', function () {
   ]);
 });
 
-/**
- * На всякий: привязка таксы к tour (чтобы метабокс точно был)
- */
-add_action('init', function () {
-  if (taxonomy_exists('tour_include')) {
-    register_taxonomy_for_object_type('tour_include', 'tour');
-  }
-}, 999);
 
 /**
- * 4) На всякий: привяжем таксы к tour, если они уже существуют
- * (спасает кейсы, когда фильтр/порядок подключения гуляет)
- */
-add_action('init', function () {
-  if (taxonomy_exists('region')) {
-    register_taxonomy_for_object_type('region', 'tour');
-  }
-  if (taxonomy_exists('resort')) {
-    register_taxonomy_for_object_type('resort', 'tour');
-  }
-  if (taxonomy_exists('tour_type')) {
-    register_taxonomy_for_object_type('tour_type', 'tour');
-  }
-}, 30);
-
-
-/**
- * 5) Query vars
+ * 6) Query vars
  */
 add_filter('query_vars', function ($vars) {
   if (!in_array('country_in_path', $vars, true))
@@ -188,20 +202,18 @@ add_filter('query_vars', function ($vars) {
 
 
 /**
- * 6) Роуты:
+ * 7) Роуты:
  * - /country/{country}/tours/ -> список туров страны
  * - /country/{country}/tours/{tour}/ -> single tour
  */
 add_action('init', function () {
 
-  // список туров страны
   add_rewrite_rule(
     '^country/([^/]+)/tours/?$',
     'index.php?country_tours=$matches[1]',
     'top'
   );
 
-  // single тура
   add_rewrite_rule(
     '^country/([^/]+)/tours/([^/]+)/?$',
     'index.php?post_type=tour&name=$matches[2]&country_in_path=$matches[1]',
@@ -212,7 +224,7 @@ add_action('init', function () {
 
 
 /**
- * 7) Генерация правильной ссылки на тур
+ * 8) Генерация правильной ссылки на тур
  */
 add_filter('post_type_link', function ($post_link, $post) {
   if ($post->post_type !== 'tour')
@@ -233,7 +245,7 @@ add_filter('post_type_link', function ($post_link, $post) {
 
 
 /**
- * 8) Валидация пути single: если страна в URL не совпадает — 404
+ * 9) Валидация пути single: если страна в URL не совпадает — 404
  */
 add_action('template_redirect', function () {
   if (!is_singular('tour'))
@@ -265,7 +277,7 @@ add_action('template_redirect', function () {
 
 
 /**
- * 9) Роутинг списка туров страны на country-tours.php
+ * 10) Роутинг списка туров страны на country-tours.php
  */
 add_action('template_redirect', function () {
   $country_slug = get_query_var('country_tours');
@@ -292,7 +304,6 @@ add_action('template_redirect', function () {
     exit;
   }
 
-  // если шаблона нет — честный 404, чтобы не было “пустых” страниц
   global $wp_query;
   $wp_query->set_404();
   status_header(404);
@@ -301,15 +312,12 @@ add_action('template_redirect', function () {
 
 
 /**
- * 10) ACF поля тура
- * - отдельная группа “Страна” под заголовком
- * - отдельная группа “Тур — поля” ниже (без seamless)
+ * 11) ACF поля тура
  */
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group'))
     return;
 
-  // страна под заголовком
   acf_add_local_field_group([
     'key' => 'group_tour_country',
     'title' => 'Тур — страна',
@@ -348,7 +356,6 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // остальные поля
   acf_add_local_field_group([
     'key' => 'group_tour_fields',
     'title' => 'Тур — поля',
@@ -453,9 +460,6 @@ add_action('acf/init', function () {
 });
 
 
-/**
- * 11) Ограничим список стран в поле tour_country только верхним уровнем
- */
 add_filter('acf/fields/post_object/query/key=field_tour_country', function ($args) {
   $args['post_parent'] = 0;
   return $args;
@@ -469,7 +473,6 @@ add_filter('acf/fields/post_object/query/key=field_tour_country', function ($arg
  */
 add_filter('wpseo_breadcrumb_links', function ($links) {
 
-  // список туров страны
   $country_slug = get_query_var('country_tours');
   if (!empty($country_slug)) {
     $country = get_page_by_path($country_slug, OBJECT, 'country');
@@ -493,7 +496,6 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
     return $new;
   }
 
-  // single тура
   if (is_singular('tour')) {
     $tour_id = get_queried_object_id();
     if (!$tour_id)

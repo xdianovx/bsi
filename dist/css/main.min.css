@@ -4443,7 +4443,157 @@ input.error {
 
 .tour-card-row {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: 2fr 3fr 1fr;
+  position: relative;
+  width: 100%;
+  gap: 8px;
+}
+@media screen and (max-width: 1024px) {
+  .tour-card-row {
+    grid-template-columns: 2fr 4fr 1fr;
+  }
+}
+@media screen and (max-width: 768px) {
+  .tour-card-row {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.tour-card-row__tags {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 14px;
+}
+
+.tour-card-row__tag {
+  background: #fff;
+  line-height: 100%;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.tour-card-row__location {
+  font-size: 14px;
+  line-height: 100%;
+  font-weight: 500;
+  color: #5c5c5c;
+}
+@media screen and (max-width: 768px) {
+  .tour-card-row__location {
+    margin-top: 12px;
+  }
+}
+
+.tour-card-row__title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 110%;
+  margin-top: 8px;
+}
+
+.tour-card-row__btns {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tour-card-row__btns * {
+  width: 100%;
+}
+@media screen and (max-width: 768px) {
+  .tour-card-row__btns {
+    margin-top: 16px;
+  }
+}
+
+.tour-card-row__actions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tour-card-row__location {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tour-card-row__poster {
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.tour-card-row__poster a {
+  display: block;
+}
+.tour-card-row__poster .tour-card-row__img {
+  display: block;
+}
+
+.tour-card-row__duration {
+  margin-top: 12px;
+}
+
+.tour-card-row__route {
+  margin-top: 8px;
+}
+
+.tour-card-row__duration,
+.tour-card-row__route {
+  display: flex;
+  gap: 8px;
+  line-height: 120%;
+}
+
+.tour-card-row__duration-label,
+.tour-card-row__route-label {
+  width: 20px;
+  display: block;
+  height: 20px;
+  flex-shrink: 0;
+}
+.tour-card-row__duration-label img,
+.tour-card-row__route-label img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tour-card-row__duration-value {
+  margin-top: 2px;
+}
+
+.country-tours__list {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tour-card-row__included {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tour-tag {
+  display: flex;
+  align-items: center;
+  background: #f4f4f6;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 14px;
+  line-height: 100%;
+}
+.tour-tag img {
+  width: 18px;
+  height: 18px;
+  display: block;
+  margin-right: 4px;
 }
 
 .visa-page__content {

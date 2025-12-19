@@ -12,6 +12,7 @@ $country_title = '';
 $country_permalink = '';
 $country_flag = '';
 $include_terms = get_the_terms(get_the_ID(), 'tour_include');
+$tour_booking_url = trim((string) (function_exists('get_field') ? get_field('tour_booking_url', get_the_ID()) : ''));
 
 if ($country_id) {
   $country_title = get_the_title($country_id);
@@ -57,6 +58,14 @@ get_header();
       <div class="single-hotel__title-wrap">
         <div class="title-rating__wrap">
           <h1 class="h1 single-hotel__title"><?php the_title(); ?></h1>
+          <?php if ($tour_booking_url): ?>
+            <a href="<?= esc_url($tour_booking_url); ?>"
+               class="btn btn-accent tour-widget__btn-book sm"
+               target="_blank"
+               rel="nofollow noopener">
+              Забронировать
+            </a>
+          <?php endif; ?>
         </div>
       </div>
 
