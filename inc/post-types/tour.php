@@ -328,6 +328,14 @@ add_action('acf/init', function () {
         'required' => 1,
         'wrapper' => ['width' => '50'],
       ],
+      [
+        'key' => 'field_tour_booking_url',
+        'label' => 'Ссылка для бронирования',
+        'name' => 'tour_booking_url',
+        'type' => 'url',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'https://...',
+      ],
     ],
     'location' => [
       [
