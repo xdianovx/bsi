@@ -42,7 +42,7 @@ $title = $args['title'] ?? ''; // если нужно
   </div>
 
 
-  <div class="swiper  js-gallery-thumbs">
+  <div class="swiper js-gallery-thumbs">
     <div class="swiper-wrapper">
       <?php foreach ($gallery as $item): ?>
         <?php
