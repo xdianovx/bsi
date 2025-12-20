@@ -28,9 +28,9 @@ $title = $args['title'] ?? ''; // если нужно
         ?>
         <div class="swiper-slide">
           <a class="hotel-gallery-main-slide country-page__gallery-slide"
-             href="<?= esc_url($full_url); ?>"
+             href="<?= esc_url($img_url); ?>"
              data-fancybox="<?= esc_attr($id); ?>">
-            <img src="<?= esc_url($full_url); ?>"
+            <img src="<?= esc_url($img_url); ?>"
                  alt="<?= esc_attr($img_alt); ?>">
           </a>
         </div>
@@ -42,7 +42,7 @@ $title = $args['title'] ?? ''; // если нужно
   </div>
 
 
-  <div class="swiper js-gallery-thumbs">
+  <div class="swiper  js-gallery-thumbs">
     <div class="swiper-wrapper">
       <?php foreach ($gallery as $item): ?>
         <?php
