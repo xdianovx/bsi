@@ -4152,6 +4152,17 @@ input.error {
   gap: 16px;
   margin-top: 12px;
 }
+@media screen and (max-width: 1024px) {
+  .country-regions__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 768px) {
+  .country-regions__list {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 40px;
+  }
+}
 
 .country-regions__resort {
   transition: all 0.3s ease-in-out;
@@ -4174,6 +4185,12 @@ input.error {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+@media screen and (max-width: 768px) {
+  .country-regions__resorts {
+    gap: 8px;
+    margin-top: 12px;
+  }
 }
 
 .country-regions__link {

@@ -260,6 +260,15 @@
   gap: 16px;
 
   margin-top: 12px;
+
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 40px;
+  }
 }
 
 .country-regions__resort {
@@ -283,6 +292,11 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  @media screen and (max-width: 768px) {
+    gap: 8px;
+    margin-top: 12px;
+  }
 }
 
 .country-regions__link {

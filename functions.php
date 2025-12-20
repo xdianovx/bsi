@@ -232,6 +232,8 @@ require get_template_directory() . '/inc/post-types/banner.php';
 require get_template_directory() . '/inc/post-types/visa.php';
 require get_template_directory() . '/inc/post-types/best-offers.php';
 require get_template_directory() . '/inc/post-types/tour.php';
+require get_template_directory() . '/inc/post-types/tourist-memo.php';
+require get_template_directory() . '/inc/post-types/entry-rules.php';
 
 
 
