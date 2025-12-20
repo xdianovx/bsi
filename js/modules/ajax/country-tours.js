@@ -1,5 +1,18 @@
 import Choices from "choices.js";
 
+const CHOICES_RU = {
+  itemSelectText: "",
+
+  loadingText: "Загрузка...",
+  noResultsText: "Ничего не найдено",
+  noChoicesText: "Нет вариантов",
+
+  addItemText: (value) => `Нажмите Enter, чтобы добавить «${value}»`,
+  maxItemText: (maxItemCount) => `Можно выбрать максимум: ${maxItemCount}`,
+
+  searchPlaceholderValue: "Поиск...",
+};
+
 export const initCountryToursFilters = () => {
   const root = document.querySelector("[data-tours-filter]");
   if (!root) return;
@@ -18,11 +31,36 @@ export const initCountryToursFilters = () => {
   const resortSelect = root.querySelector('select[name="resort[]"]');
   const typeSelect = root.querySelector('select[name="tour_type[]"]');
 
-  if (regionSelect) new Choices(regionSelect, { searchEnabled: true, shouldSort: false, itemSelectText: "" });
+  // region (single)
+  if (regionSelect) {
+    new Choices(regionSelect, {
+      ...CHOICES_RU,
+      searchEnabled: true,
+      shouldSort: false,
+    });
+  }
+
+  // resorts (multiple)
   const resortChoice = resortSelect
-    ? new Choices(resortSelect, { removeItemButton: true, searchEnabled: true, shouldSort: false, itemSelectText: "" })
+    ? new Choices(resortSelect, {
+        ...CHOICES_RU,
+        removeItemButton: true,
+        searchEnabled: true,
+        shouldSort: false,
+        placeholder: true,
+      })
     : null;
-  if (typeSelect) new Choices(typeSelect, { removeItemButton: true, searchEnabled: true, shouldSort: false, itemSelectText: "" });
+
+  // types (multiple)
+  if (typeSelect) {
+    new Choices(typeSelect, {
+      ...CHOICES_RU,
+      removeItemButton: true,
+      searchEnabled: true,
+      shouldSort: false,
+      placeholder: true,
+    });
+  }
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
@@ -89,7 +127,9 @@ export const initCountryToursFilters = () => {
 
       resortChoice.clearStore();
       resortChoice.setChoices(
-        (json.data.items || []).map((it) => ({ value: String(it.id), label: it.text })),
+        [{ value: "", label: "Все курорты", selected: true }].concat(
+          (json.data.items || []).map((it) => ({ value: String(it.id), label: it.text }))
+        ),
         "value",
         "label",
         true
