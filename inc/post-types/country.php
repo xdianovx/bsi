@@ -65,7 +65,7 @@ function bsi_get_promo_countries()
   }
 
   foreach ($promos as $promo_id) {
-    $countries = get_field('promo_countries', $promo_id);
+    $countries = function_exists('get_field') ? get_field('promo_countries', $promo_id) : [];
 
     if (empty($countries)) {
       continue;
@@ -81,7 +81,7 @@ function bsi_get_promo_countries()
       }
 
       if (empty($result[$country_id])) {
-        $flag = get_field('flag', $country_id);
+        $flag = function_exists('get_field') ? get_field('flag', $country_id) : '';
         $flag_url = '';
 
         if ($flag) {
@@ -230,11 +230,16 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_promos';
   $vars[] = 'country_resorts';
 
+  // NEW
+  $vars[] = 'country_memo';         // /country/{slug}/pamyatka/
+  $vars[] = 'country_entry_rules';  // /country/{slug}/pravila-vyezda/
+
   return $vars;
 });
 
-/* Роуты виртуальных разделов страны (открываются внутри single-country.php) */
+/* Роуты виртуальных разделов страны (открываются внутри single-country.php / отдельных шаблонов) */
 add_action('init', function () {
+
   add_rewrite_rule(
     '^country/([^/]+)/hotel/?$',
     'index.php?post_type=country&name=$matches[1]&country_hotels=$matches[1]',
@@ -252,13 +257,28 @@ add_action('init', function () {
     'index.php?post_type=country&name=$matches[1]&country_resorts=$matches[1]',
     'top'
   );
-}, 20);
 
+  // NEW: Памятка туристам
+  add_rewrite_rule(
+    '^country/([^/]+)/pamyatka/?$',
+    'index.php?post_type=country&name=$matches[1]&country_memo=$matches[1]',
+    'top'
+  );
+
+  // NEW: Правила въезда
+  add_rewrite_rule(
+    '^country/([^/]+)/pravila-vyezda/?$',
+    'index.php?post_type=country&name=$matches[1]&country_entry_rules=$matches[1]',
+    'top'
+  );
+
+}, 20);
 
 
 /* Роут курорта: /country/{country}/{region}/{resort}/ */
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty)';
+  // добавили pamyatka/pravila-vyezda в reserved, чтобы не конфликтовало с роутом курорта
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',
@@ -395,6 +415,77 @@ add_action('template_redirect', function () {
     include $template;
     exit;
   }
+
+  global $wp_query;
+  $wp_query->set_404();
+  status_header(404);
+  exit;
+});
+
+/* NEW: Роутинг /country/{slug}/pamyatka/ -> country-memo.php */
+add_action('template_redirect', function () {
+  $country_slug = (string) get_query_var('country_memo');
+  if (empty($country_slug)) {
+    return;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
+  }
+
+  global $country_memo_data;
+  $country_memo_data = [
+    'country' => $country,
+    'country_slug' => $country_slug,
+  ];
+
+  $template = locate_template('country-memo.php');
+  if ($template) {
+    include $template;
+    exit;
+  }
+
+  global $wp_query;
+  $wp_query->set_404();
+  status_header(404);
+  exit;
+});
+
+/* NEW: Роутинг /country/{slug}/pravila-vyezda/ -> country-entry-rules.php */
+add_action('template_redirect', function () {
+  $country_slug = (string) get_query_var('country_entry_rules');
+  if (empty($country_slug)) {
+    return;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
+  }
+
+  global $country_entry_rules_data;
+  $country_entry_rules_data = [
+    'country' => $country,
+    'country_slug' => $country_slug,
+  ];
+
+  $template = locate_template('country-entry-rules.php');
+  if ($template) {
+    include $template;
+    exit;
+  }
+
+  global $wp_query;
+  $wp_query->set_404();
+  status_header(404);
+  exit;
 });
 
 /* Хлебные крошки Yoast: курорт (без страницы региона) */
@@ -433,6 +524,8 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
 
     return $new_links;
   }
+
+  // (опционально) можно потом добавить breadcrumbs для pamyatka/pravila-vyezda — если скажешь
 
   return $links;
 });
