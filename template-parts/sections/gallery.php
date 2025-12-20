@@ -30,7 +30,7 @@ $title = $args['title'] ?? ''; // если нужно
           <a class="hotel-gallery-main-slide country-page__gallery-slide"
              href="<?= esc_url($full_url); ?>"
              data-fancybox="<?= esc_attr($id); ?>">
-            <img src="<?= esc_url($img_url); ?>"
+            <img src="<?= esc_url($full_url); ?>"
                  alt="<?= esc_attr($img_alt); ?>">
           </a>
         </div>
