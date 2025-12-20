@@ -4716,15 +4716,16 @@ input.error {
   gap: 8px;
 }
 
-.accordion__item {
-  text-align: left;
-}
 .accordion__item.is-open .accordion__title {
   color: #ee3145;
 }
 .accordion__item.is-open .accordion__icon {
   transform: rotate(180deg);
   color: #ee3145;
+}
+
+.accordion__title {
+  text-align: left;
 }
 
 .tour-program__day-btn {

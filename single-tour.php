@@ -141,9 +141,9 @@ get_header();
                     continue;
                   // что бы раскрыть первый день $is_open = ($i === 0);
               
-                  // $is_open = false;
-                  $is_open = ($i === 0)
-                    ?>
+                  $is_open = false;
+                  // $is_open = ($i === 0)
+                  ?>
                   <div class="accordion__item tour-program__day <?= $is_open ? 'is-open' : ''; ?>">
                     <button class="accordion__btn tour-program__day-btn"
                             type="button">

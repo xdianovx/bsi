@@ -185,7 +185,6 @@
 }
 
 .accordion__item {
-  text-align: left;
   &.is-open {
     .accordion__title {
       color: $red;
@@ -197,6 +196,11 @@
     }
   }
 }
+
+.accordion__title {
+  text-align: left;
+}
+
 .tour-program__day-btn {
   display: flex;
   align-items: center;
