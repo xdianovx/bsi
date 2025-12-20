@@ -185,6 +185,7 @@
 }
 
 .accordion__item {
+  text-align: left;
   &.is-open {
     .accordion__title {
       color: $red;

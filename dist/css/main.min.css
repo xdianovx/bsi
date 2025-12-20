@@ -4716,6 +4716,9 @@ input.error {
   gap: 8px;
 }
 
+.accordion__item {
+  text-align: left;
+}
 .accordion__item.is-open .accordion__title {
   color: #ee3145;
 }
