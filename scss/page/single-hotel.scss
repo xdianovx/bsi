@@ -170,7 +170,7 @@
 .hotel-widget {
   background: $bg-gray;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
 
   .single-hotel__address {
     font-size: 14px;
@@ -285,7 +285,11 @@
   height: 600px;
 
   @media screen and (max-width: 1200px) {
-    height: auto;
+    height: 120px;
+  }
+
+  @media screen and (max-width: 768px) {
+    height: 40px;
   }
 }
 

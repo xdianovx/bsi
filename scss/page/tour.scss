@@ -147,6 +147,10 @@
   padding: 4px 6px;
   font-size: 14px;
   line-height: 100%;
+
+  &.white {
+    background: #fff;
+  }
   img {
     width: 18px;
     height: 18px;
@@ -212,4 +216,36 @@
 
 .accordion__content {
   padding: 16px;
+}
+
+.tour-included {
+  margin-top: 64px;
+  @media screen and (max-width: 1024px) {
+    margin-top: 40px;
+  }
+}
+
+.tour-not-included {
+  margin-top: 64px;
+  @media screen and (max-width: 1024px) {
+    margin-top: 40px;
+  }
+}
+
+.tour-extra {
+  margin-top: 64px;
+  @media screen and (max-width: 1024px) {
+    margin-top: 40px;
+  }
+}
+
+.sigle-tour-include {
+  margin-top: 12px;
+}
+
+.single-tour-content {
+  margin-top: 64px;
+  @media screen and (max-width: 1024px) {
+    margin-top: 40px;
+  }
 }

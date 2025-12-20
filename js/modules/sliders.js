@@ -22,7 +22,7 @@ export const sliders = () => {
           320: {
             direction: "horizontal",
           },
-          1199: {
+          1201: {
             direction: "vertical",
           },
         },
