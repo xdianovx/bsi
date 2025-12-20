@@ -114,8 +114,8 @@
 .hotel-gallery-thumb-slide {
   border-radius: 8px;
   overflow: hidden;
-  aspect-ratio: 16/9;
-  margin-top: 8px;
+  // aspect-ratio: 16/9;
+  // margin-top: 8px;
 }
 
 .hotel-gallery-main-arrow-prev {
@@ -262,5 +262,23 @@
     display: block;
     width: 18px;
     height: 18px;
+  }
+}
+
+.js-gallery {
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  gap: 8px;
+
+  @media screen and (max-width: 1200px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.js-gallery-thumbs {
+  height: 600px;
+
+  @media screen and (max-width: 1200px) {
+    height: auto;
   }
 }

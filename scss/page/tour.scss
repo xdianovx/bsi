@@ -44,7 +44,7 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 110%;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 .tour-card-row__btns {
   margin-top: auto;
@@ -161,4 +161,10 @@
   color: $text-gray;
   line-height: 100%;
   margin-bottom: 8px;
+}
+
+.tour-gallery-section {
+  .single-hotel__gallery-section {
+    margin-top: 0;
+  }
 }

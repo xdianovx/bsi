@@ -4168,9 +4168,6 @@ input.error {
   object-fit: cover;
 }
 
-.hotel-gallery-thumb-slide {
-  aspect-ratio: 16/9;
-}
 .hotel-gallery-thumb-slide img {
   width: 100%;
   height: 100%;
@@ -4292,8 +4289,6 @@ input.error {
 .hotel-gallery-thumb-slide {
   border-radius: 8px;
   overflow: hidden;
-  aspect-ratio: 16/9;
-  margin-top: 8px;
 }
 
 .hotel-gallery-main-arrow-prev {
@@ -4441,6 +4436,26 @@ input.error {
   height: 18px;
 }
 
+.js-gallery {
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  gap: 8px;
+}
+@media screen and (max-width: 1200px) {
+  .js-gallery {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.js-gallery-thumbs {
+  height: 600px;
+}
+@media screen and (max-width: 1200px) {
+  .js-gallery-thumbs {
+    height: auto;
+  }
+}
+
 .tour-card-row {
   display: grid;
   grid-template-columns: 2fr 3fr 2fr;
@@ -4490,7 +4505,7 @@ input.error {
   font-size: 20px;
   font-weight: 700;
   line-height: 110%;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .tour-card-row__btns {
@@ -4610,6 +4625,10 @@ input.error {
   color: #5c5c5c;
   line-height: 100%;
   margin-bottom: 8px;
+}
+
+.tour-gallery-section .single-hotel__gallery-section {
+  margin-top: 0;
 }
 
 .visa-page__content {

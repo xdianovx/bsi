@@ -54,90 +54,16 @@ get_header();
 
   <section class="">
     <div class="container">
-
       <div class="single-hotel__title-wrap">
         <div class="title-rating__wrap">
           <h1 class="h1 single-hotel__title"><?php the_title(); ?></h1>
-          <?php if ($tour_booking_url): ?>
-            <a href="<?= esc_url($tour_booking_url); ?>"
-               class="btn btn-accent tour-widget__btn-book sm"
-               target="_blank"
-               rel="nofollow noopener">
-              Забронировать
-            </a>
-          <?php endif; ?>
         </div>
       </div>
-
-      <?php if ($country_title || $region_term || $resort_term): ?>
-        <?php
-        $items = [];
-
-        if ($country_title) {
-          $items[] = $country_permalink
-            ? '<a class="single-hotel__address-link" href="' . esc_url($country_permalink) . '">' . esc_html($country_title) . '</a>'
-            : '<span>' . esc_html($country_title) . '</span>';
-        }
-
-        if ($region_term) {
-          $region_link = get_term_link($region_term);
-          $items[] = !is_wp_error($region_link)
-            ? '<a class="single-hotel__address-link" href="' . esc_url($region_link) . '">' . esc_html($region_term->name) . '</a>'
-            : '<span>' . esc_html($region_term->name) . '</span>';
-        }
-
-        if ($resort_term) {
-          $resort_link = get_term_link($resort_term);
-          $items[] = !is_wp_error($resort_link)
-            ? '<a class="single-hotel__address-link" href="' . esc_url($resort_link) . '">' . esc_html($resort_term->name) . '</a>'
-            : '<span>' . esc_html($resort_term->name) . '</span>';
-        }
-        ?>
-
-        <div class="single-hotel__top-line">
-          <div class="single-hotel__address">
-            <?php if (!empty($country_flag)): ?>
-              <img src="<?= esc_url($country_flag); ?>"
-                   alt="">
-            <?php endif; ?>
-
-            <div class="single-hotel__address-text">
-              <?= implode(', ', $items); ?>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
-
-      <?php if (!empty($excerpt)): ?>
-        <div class="page-country__descr">
-          <?= wp_kses_post(wpautop($excerpt)); ?>
-        </div>
-      <?php endif; ?>
-
     </div>
-
-    <?php if (!empty($include_terms) && !is_wp_error($include_terms)): ?>
-      <div class="tour-include">
-        <?php foreach ($include_terms as $t):
-          $icon = function_exists('get_field') ? get_field('tour_include_icon', 'term_' . $t->term_id) : null;
-          $icon_url = (is_array($icon) && !empty($icon['url'])) ? $icon['url'] : '';
-          ?>
-          <span class="tour-include__item">
-            <?php if ($icon_url): ?>
-              <img class="tour-include__icon"
-                   src="<?= esc_url($icon_url); ?>"
-                   alt=""
-                   loading="lazy">
-            <?php endif; ?>
-            <span class="tour-include__text"><?= esc_html($t->name); ?></span>
-          </span>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
   </section>
 
   <?php if (!empty($tour_gallery) && is_array($tour_gallery)): ?>
-    <section class="single-hotel__gallery-section">
+    <section class="tour-gallery-section">
       <div class="container">
         <div class="country-page__gallery">
           <?php
@@ -156,7 +82,11 @@ get_header();
       <div class="single-hotel__content__wrap">
 
         <div class="hotel-content editor-content">
-
+          <?php if (!empty($excerpt)): ?>
+            <div class="page-country__descr">
+              <?= wp_kses_post(wpautop($excerpt)); ?>
+            </div>
+          <?php endif; ?>
           <?php if ($tour_duration || $tour_route): ?>
             <div class="tour-details">
               <?php if ($tour_duration): ?>
@@ -224,8 +154,79 @@ get_header();
 
         </div>
 
+
+
+
+        <!-- Виджеты -->
         <aside class="hotel-aside">
-          <!-- пока оставляем пустым / под будущие виджеты (кнопка/цена/даты/фильтры) -->
+
+
+          <?php if (!empty($include_terms) && !is_wp_error($include_terms)): ?>
+            <div class="tour-include">
+              <?php foreach ($include_terms as $t):
+                $icon = function_exists('get_field') ? get_field('tour_include_icon', 'term_' . $t->term_id) : null;
+                $icon_url = (is_array($icon) && !empty($icon['url'])) ? $icon['url'] : '';
+                ?>
+                <span class="tour-include__item">
+                  <?php if ($icon_url): ?>
+                    <img class="tour-include__icon"
+                         src="<?= esc_url($icon_url); ?>"
+                         alt=""
+                         loading="lazy">
+                  <?php endif; ?>
+                  <span class="tour-include__text"><?= esc_html($t->name); ?></span>
+                </span>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+          <?php if ($tour_booking_url): ?>
+            <a href="<?= esc_url($tour_booking_url); ?>"
+               class="btn btn-accent tour-widget__btn-book sm"
+               target="_blank"
+               rel="nofollow noopener">
+              Забронировать
+            </a>
+          <?php endif; ?>
+
+
+          <?php if ($country_title || $region_term || $resort_term): ?>
+            <?php
+            $items = [];
+
+            if ($country_title) {
+              $items[] = $country_permalink
+                ? '<a class="single-hotel__address-link" href="' . esc_url($country_permalink) . '">' . esc_html($country_title) . '</a>'
+                : '<span>' . esc_html($country_title) . '</span>';
+            }
+
+            if ($region_term) {
+              $region_link = get_term_link($region_term);
+              $items[] = !is_wp_error($region_link)
+                ? '<a class="single-hotel__address-link" href="' . esc_url($region_link) . '">' . esc_html($region_term->name) . '</a>'
+                : '<span>' . esc_html($region_term->name) . '</span>';
+            }
+
+            if ($resort_term) {
+              $resort_link = get_term_link($resort_term);
+              $items[] = !is_wp_error($resort_link)
+                ? '<a class="single-hotel__address-link" href="' . esc_url($resort_link) . '">' . esc_html($resort_term->name) . '</a>'
+                : '<span>' . esc_html($resort_term->name) . '</span>';
+            }
+            ?>
+
+            <div class="single-hotel__top-line">
+              <div class="single-hotel__address">
+                <?php if (!empty($country_flag)): ?>
+                  <img src="<?= esc_url($country_flag); ?>"
+                       alt="">
+                <?php endif; ?>
+
+                <div class="single-hotel__address-text">
+                  <?= implode(', ', $items); ?>
+                </div>
+              </div>
+            </div>
+          <?php endif; ?>
         </aside>
 
       </div>

@@ -1,10 +1,8 @@
 import { Swiper } from "swiper/bundle";
 
 export const sliders = () => {
-  document.addEventListener("DOMContentLoaded", () => {
-    const blocks = document.querySelectorAll(".js-gallery");
-    if (!blocks.length || typeof Swiper === "undefined") return;
-
+  const blocks = document.querySelectorAll(".js-gallery");
+  if (blocks) {
     blocks.forEach((block) => {
       const mainEl = block.querySelector(".js-gallery-main");
       const thumbsEl = block.querySelector(".js-gallery-thumbs");
@@ -14,15 +12,24 @@ export const sliders = () => {
       if (!mainEl || !thumbsEl) return;
 
       const thumbsSwiper = new Swiper(thumbsEl, {
-        loop: true,
+        // loop: true,
         slidesPerView: 4,
         spaceBetween: 8,
         slideToClickedSlide: true,
         watchSlidesProgress: true,
+
+        breakpoints: {
+          320: {
+            direction: "horizontal",
+          },
+          1199: {
+            direction: "vertical",
+          },
+        },
       });
 
       const mainSwiper = new Swiper(mainEl, {
-        loop: true,
+        // loop: true,
         spaceBetween: 8,
         navigation: {
           prevEl,
@@ -33,7 +40,7 @@ export const sliders = () => {
         },
       });
     });
-  });
+  }
 
   const countryGallerySlider = new Swiper(".country-page__gallery-slider", {
     slidesPerView: 4,
