@@ -4675,7 +4675,7 @@ input.error {
 }
 
 .tour-tag {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background: #f4f4f6;
   border-radius: 4px;
