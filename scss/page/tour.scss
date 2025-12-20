@@ -254,3 +254,42 @@
     margin-top: 40px;
   }
 }
+
+.country-tours__filters {
+  padding: 12px;
+  background: $bg-gray;
+  margin-top: 16px;
+  border-radius: 8px;
+}
+
+.country-tours__filters-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.tours-filter__label {
+  font-size: 14px;
+  line-height: 100%;
+  font-weight: 500;
+  line-height: 100%;
+  margin-bottom: 8px;
+}
+
+.tours-filter__select {
+  border-radius: 8px;
+
+  .choices__inner {
+    border-radius: 8px;
+  }
+}
+
+.tours-filter__field {
+  .choices__inner {
+    border-radius: 8px;
+  }
+}

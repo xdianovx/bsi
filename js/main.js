@@ -12,6 +12,7 @@ import { burger, mobileNavAccordion } from "./modules/burger";
 import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
 import { initHotelMap } from "./modules/maps";
 import { initAccordion } from "./modules/accordition";
+import { initCountryToursFilters } from "./modules/ajax/country-tours";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -32,5 +33,6 @@ window.addEventListener("DOMContentLoaded", () => {
   initNewsFilter();
   promoPageAjax();
   initResortHotelsAjax();
+  initCountryToursFilters();
   // initHotelMap();
 });

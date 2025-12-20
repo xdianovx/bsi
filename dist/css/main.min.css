@@ -164,6 +164,22 @@ sup {
   transition: all 0.3s ease-in-out;
 }
 
+.choices__list--multiple .choices__item {
+  background: #ee3145;
+  border: none;
+  border-radius: 4px;
+}
+
+.choices__input {
+  background: none;
+}
+
+.choices[data-type*=select-multiple] .choices__button,
+.choices[data-type*=text] .choices__button {
+  border: none;
+  top: 2px;
+}
+
 body {
   font-family: "Raleway", sans-serif;
   font-optical-sizing: auto;
@@ -4787,6 +4803,43 @@ input.error {
   .single-tour-content {
     margin-top: 40px;
   }
+}
+
+.country-tours__filters {
+  padding: 12px;
+  background: #f4f4f6;
+  margin-top: 16px;
+  border-radius: 8px;
+}
+
+.country-tours__filters-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+@media screen and (max-width: 768px) {
+  .country-tours__filters-row {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.tours-filter__label {
+  font-size: 14px;
+  line-height: 100%;
+  font-weight: 500;
+  line-height: 100%;
+  margin-bottom: 8px;
+}
+
+.tours-filter__select {
+  border-radius: 8px;
+}
+.tours-filter__select .choices__inner {
+  border-radius: 8px;
+}
+
+.tours-filter__field .choices__inner {
+  border-radius: 8px;
 }
 
 .visa-page__content {

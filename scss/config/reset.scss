@@ -160,3 +160,19 @@ sup {
 .choices[data-type*="select-one"]::after {
   transition: $trans-text;
 }
+
+.choices__list--multiple .choices__item {
+  background: $red;
+  border: none;
+  border-radius: 4px;
+}
+
+.choices__input {
+  background: none;
+}
+
+.choices[data-type*="select-multiple"] .choices__button,
+.choices[data-type*="text"] .choices__button {
+  border: none;
+  top: 2px;
+}
