@@ -11,6 +11,7 @@ import { promoPageAjax } from "./modules/ajax/promo-sort";
 import { burger, mobileNavAccordion } from "./modules/burger";
 import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
 import { initHotelMap } from "./modules/maps";
+import { initAccordion } from "./modules/accordition";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -21,7 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (datepick) {
   }
-
+  initAccordion();
   initCurrency();
   tabs(".tabs", ".tab-button", ".tab-content__item");
   sliders();

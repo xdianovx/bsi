@@ -271,6 +271,14 @@ main {
   color: #fff;
 }
 
+.btn-expand {
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+}
+.btn-expand:hover {
+  color: #ee3145;
+}
+
 .button-login {
   display: inline-flex;
   align-items: center;
@@ -4160,12 +4168,18 @@ input.error {
 .hotel-gallery-main-slide {
   aspect-ratio: 19/9;
   display: block;
+  height: 600px;
 }
 .hotel-gallery-main-slide img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+@media screen and (max-width: 1024px) {
+  .hotel-gallery-main-slide {
+    height: auto;
+  }
 }
 
 .hotel-gallery-thumb-slide img {
@@ -4185,6 +4199,16 @@ input.error {
 .page-country__resort-about {
   margin-bottom: 0;
   padding-bottom: 24px;
+}
+
+.tour-program {
+  margin-top: 64px;
+}
+
+.tour-program__acc-head {
+  display: flex;
+  align-content: inherit;
+  justify-content: space-between;
 }
 
 .single-hotel__title-wrap {
@@ -4461,6 +4485,43 @@ input.error {
   }
 }
 
+.single-tour__content {
+  margin-top: 16px;
+}
+
+.tour-page__details {
+  background: #f4f4f6;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tour-page-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tour-page-detail__key {
+  font-weight: 700;
+  line-height: 100%;
+  font-size: 14px;
+  color: #5c5c5c;
+}
+
+.tour-page-detail__value {
+  line-height: 120%;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.tour-page-detail__value img {
+  width: 18px;
+  height: 18px;
+}
+
 .tour-card-row {
   display: grid;
   grid-template-columns: 2fr 3fr 2fr;
@@ -4634,6 +4695,46 @@ input.error {
 
 .tour-gallery-section .single-hotel__gallery-section {
   margin-top: 0;
+}
+
+.tour-program__title {
+  margin-bottom: 0 !important;
+}
+
+.tour-program__list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accordion__item.is-open .accordion__title {
+  color: #ee3145;
+}
+.accordion__item.is-open .accordion__icon {
+  transform: rotate(180deg);
+  color: #ee3145;
+}
+
+.tour-program__day-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+  background: #f4f4f6;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+}
+.tour-program__day-btn.is-open {
+  background: #ee3145;
+  color: #fff;
+}
+
+.accordion__content {
+  padding: 16px;
 }
 
 .visa-page__content {

@@ -168,3 +168,48 @@
     margin-top: 0;
   }
 }
+
+.tour-program__title {
+  margin-bottom: 0 !important;
+}
+
+.tour-program__list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accordion__item {
+  &.is-open {
+    .accordion__title {
+      color: $red;
+    }
+
+    .accordion__icon {
+      transform: rotate(180deg);
+      color: $red;
+    }
+  }
+}
+.tour-program__day-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+  background: $bg-gray;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+
+  &.is-open {
+    background: $red;
+    color: #fff;
+  }
+}
+
+.accordion__content {
+  padding: 16px;
+}

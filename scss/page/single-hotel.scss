@@ -288,3 +288,39 @@
     height: auto;
   }
 }
+
+.single-tour__content {
+  margin-top: 16px;
+}
+
+.tour-page__details {
+  background: $bg-gray;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tour-page-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tour-page-detail__key {
+  font-weight: 700;
+  line-height: 100%;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.tour-page-detail__value {
+  line-height: 120%;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  img {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -77,52 +77,95 @@ get_header();
     </section>
   <?php endif; ?>
 
-  <section class="single-hotel__content">
+  <section class="single-tour__content">
     <div class="container">
       <div class="single-hotel__content__wrap">
 
+
+
         <div class="hotel-content editor-content">
+          <?php if ($tour_duration || $tour_route): ?>
+            <div class="tour-page__details">
+              <?php if ($tour_duration): ?>
+                <div class="tour-page-detail">
+
+                  <div class="tour-page-detail__key">
+
+                    <span>Продолжительность: </span>
+                  </div>
+
+                  <div class="tour-page-detail__value numfont">
+                    <!-- <img src="<?= get_template_directory_uri() ?>/img/icons/tour/cal.svg"
+                         alt=""> -->
+                    <span><?= esc_html($tour_duration); ?></span>
+                  </div>
+                </div>
+              <?php endif; ?>
+
+              <?php if ($tour_route): ?>
+                <div class="tour-page-detail">
+
+                  <div class="tour-page-detail__key">Маршрут: </div>
+
+                  <div class="tour-page-detail__value"><?= esc_html($tour_route); ?></div>
+                </div>
+              <?php endif; ?>
+            </div>
+          <?php endif; ?>
+
+
           <?php if (!empty($excerpt)): ?>
             <div class="page-country__descr">
               <?= wp_kses_post(wpautop($excerpt)); ?>
             </div>
           <?php endif; ?>
-          <?php if ($tour_duration || $tour_route): ?>
-            <div class="tour-details">
-              <?php if ($tour_duration): ?>
-                <p><strong>Продолжительность:</strong> <?= esc_html($tour_duration); ?></p>
-              <?php endif; ?>
-
-              <?php if ($tour_route): ?>
-                <p><strong>Маршрут:</strong> <?= esc_html($tour_route); ?></p>
-              <?php endif; ?>
-            </div>
-          <?php endif; ?>
 
           <?php if (!empty($tour_program) && is_array($tour_program)): ?>
-            <div class="tour-program">
-              <h2 class="h2">Программа тура</h2>
+            <section class="accordion tour-program">
+              <div class="tour-program__acc-head accordion__head">
+                <h2 class="h2 tour-program__title">Программа тура</h2>
+                <button class="btn-expand  accordion__toggle-all"
+                        type="button">Раскрыть все</button>
+              </div>
 
-              <?php foreach ($tour_program as $day): ?>
-                <?php
-                $day_title = !empty($day['day_title']) ? (string) $day['day_title'] : '';
-                $day_text = !empty($day['day_content']) ? (string) $day['day_content'] : '';
-                if (!$day_title && !$day_text)
-                  continue;
-                ?>
-                <div class="tour-program__day">
-                  <?php if ($day_title): ?>
-                    <h3 class="h3"><?= esc_html($day_title); ?></h3>
-                  <?php endif; ?>
+              <div class="accordion__list tour-program__list">
+                <?php foreach ($tour_program as $i => $day): ?>
+                  <?php
+                  $day_title = !empty($day['day_title']) ? (string) $day['day_title'] : '';
+                  $day_text = !empty($day['day_content']) ? (string) $day['day_content'] : '';
+                  if (!$day_title && !$day_text)
+                    continue;
+                  // что бы раскрыть первый день $is_open = ($i === 0);
+              
+                  // $is_open = false;
+                  $is_open = ($i === 0)
+                    ?>
+                  <div class="accordion__item tour-program__day <?= $is_open ? 'is-open' : ''; ?>">
+                    <button class="accordion__btn tour-program__day-btn"
+                            type="button">
+                      <span class="accordion__title">
+                        <?= esc_html($day_title ?: ('День ' . ($i + 1))); ?>
+                      </span>
+                      <span class="accordion__icon"
+                            aria-hidden="true">
+                        <img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg"
+                             alt="">
+                      </span>
+                    </button>
 
-                  <?php if ($day_text): ?>
-                    <div class="editor-content">
-                      <?= wp_kses_post($day_text); ?>
+                    <div class="accordion__panel">
+                      <div class="accordion__content">
+                        <?php if ($day_text): ?>
+                          <div class="editor-content">
+                            <?= wp_kses_post($day_text); ?>
+                          </div>
+                        <?php endif; ?>
+                      </div>
                     </div>
-                  <?php endif; ?>
-                </div>
-              <?php endforeach; ?>
-            </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </section>
           <?php endif; ?>
 
           <?php if (!empty($tour_included)): ?>

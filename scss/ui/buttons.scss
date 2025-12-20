@@ -53,6 +53,14 @@
     color: #fff;
   }
 }
+.btn-expand {
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    color: $red;
+  }
+}
 
 .button-login {
   display: inline-flex;
