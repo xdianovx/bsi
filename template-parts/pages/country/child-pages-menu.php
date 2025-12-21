@@ -13,13 +13,11 @@ $is_resorts_page = false;
 $is_tours_page = false;
 $is_memo_page = false;
 $is_entry_rules_page = false;
+
 $country_slug = '';
 $country_title = '';
 $main_parent_id = 0;
 
-/**
- * 0) TOUR (single) — берем страну из поля tour_country
- */
 if (is_singular('tour')) {
   $tour_country_id = function_exists('get_field') ? get_field('tour_country', $current_id) : 0;
 
@@ -42,9 +40,6 @@ if (is_singular('tour')) {
     $country_title = (string) get_the_title($main_parent_id);
   }
 
-  /**
-   * 0.1) Памятка туристам (single) — страна из memo_country
-   */
 } elseif (is_singular('tourist_memo')) {
 
   $memo_country_id = function_exists('get_field') ? get_field('memo_country', $current_id) : 0;
@@ -68,9 +63,6 @@ if (is_singular('tour')) {
     $country_title = (string) get_the_title($main_parent_id);
   }
 
-  /**
-   * 0.2) Правила въезда (single) — страна из entry_rules_country
-   */
 } elseif (is_singular('entry_rules')) {
 
   $rules_country_id = function_exists('get_field') ? get_field('entry_rules_country', $current_id) : 0;
@@ -94,9 +86,6 @@ if (is_singular('tour')) {
     $country_title = (string) get_the_title($main_parent_id);
   }
 
-  /**
-   * 1) ВИЗА (single visa) — берем страну из поля visa_country
-   */
 } elseif (is_singular('visa')) {
 
   $visa_country_id = function_exists('get_field') ? get_field('visa_country', $current_id) : 0;
@@ -120,9 +109,6 @@ if (is_singular('tour')) {
     $country_title = (string) get_the_title($main_parent_id);
   }
 
-  /**
-   * 2) Виртуальные разделы страны
-   */
 } elseif (get_query_var('country_hotels')) {
 
   $country_slug = (string) get_query_var('country_hotels');
@@ -177,9 +163,6 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_entry_rules_page = true;
 
-  /**
-   * 3) Курорт (taxonomy resort) — определяем страну через связку resort->region->country
-   */
 } elseif (is_tax('resort')) {
 
   $term = get_queried_object();
@@ -202,18 +185,12 @@ if (is_singular('tour')) {
     $country_title = (string) get_the_title($main_parent_id);
   }
 
-  /**
-   * 4) Обычные страницы country
-   */
 } else {
   $main_parent_id = $parent_id ?: $current_id;
   $country_slug = (string) get_post_field('post_name', $main_parent_id);
   $country_title = (string) get_the_title($main_parent_id);
 }
 
-/**
- * Дочерние страницы страны
- */
 $child_pages = get_posts([
   'post_type' => 'country',
   'post_parent' => $main_parent_id,
@@ -222,9 +199,6 @@ $child_pages = get_posts([
   'order' => 'ASC',
 ]);
 
-/**
- * Проверки наличия контента
- */
 $has_hotels = get_posts([
   'post_type' => 'hotel',
   'posts_per_page' => 1,
@@ -295,12 +269,47 @@ $is_country_overview = (
   !$is_resorts_page && !$is_tours_page &&
   !$is_memo_page && !$is_entry_rules_page
 );
+
+$active_tour_types = [];
+if (!empty($_GET['tour_type'])) {
+  $raw = $_GET['tour_type'];
+  $raw = is_array($raw) ? $raw : [$raw];
+  $active_tour_types = array_values(array_filter(array_map('intval', $raw)));
+}
+
+$tours_list_url = home_url("/country/{$country_slug}/tours/");
+$tour_types_for_country = [];
+
+if (!empty($has_tours)) {
+  $tour_ids = get_posts([
+    'post_type' => 'tour',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+    'meta_query' => [
+      ['key' => 'tour_country', 'value' => $main_parent_id, 'compare' => '='],
+    ],
+  ]);
+
+  if (!empty($tour_ids)) {
+    $terms = wp_get_object_terms($tour_ids, 'tour_type', [
+      'orderby' => 'name',
+      'order' => 'ASC',
+    ]);
+    if (!is_wp_error($terms) && !empty($terms)) {
+      $tour_types_for_country = $terms;
+    }
+  }
+}
+
+$is_tours_open = $is_tours_page || !empty($active_tour_types);
+$acc_id = 'sidebar-tours-' . (int) $main_parent_id;
 ?>
 
-<nav class="child-pages">
+<nav class="child-pages"
+     data-country-aside>
   <div class="child-pages__list">
 
-    <!-- Обзор -->
     <a href="<?= esc_url(get_permalink($main_parent_id)); ?>"
        class="child-page-item <?= $is_country_overview ? 'active' : ''; ?>">
       <span class="child-page-item__icon">
@@ -322,7 +331,6 @@ $is_country_overview = (
       <span>Обзор</span>
     </a>
 
-    <!-- Правила въезда -->
     <?php if (!empty($has_entry_rules)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/entry-rules/")); ?>"
          class="child-page-item <?= $is_entry_rules_page ? 'active' : ''; ?>">
@@ -342,14 +350,11 @@ $is_country_overview = (
             <path d="M12 9v4" />
             <path d="M12 17h.01" />
           </svg>
-
         </span>
         <span>Правила въезда</span>
       </a>
     <?php endif; ?>
 
-
-    <!-- Виза -->
     <?php if (!empty($has_visas)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/visa/")); ?>"
          class="child-page-item <?= $is_visas_page ? 'active' : ''; ?>">
@@ -383,7 +388,6 @@ $is_country_overview = (
       </a>
     <?php endif; ?>
 
-    <!-- Акции -->
     <?php if (!empty($has_promos)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/promo/")); ?>"
          class="child-page-item <?= $is_promos_page ? 'active' : ''; ?>">
@@ -405,11 +409,74 @@ $is_country_overview = (
       </a>
     <?php endif; ?>
 
+    <!-- ТУры -->
 
-    <!-- Туры -->
     <?php if (!empty($has_tours)): ?>
-      <a href="<?= esc_url(home_url("/country/{$country_slug}/tours/")); ?>"
-         class="child-page-item <?= $is_tours_page ? 'active' : ''; ?>">
+      <div class="child-page-accordion <?= $is_tours_open ? 'is-open' : ''; ?>"
+           data-accordion>
+        <button type="button"
+                class="child-page-item <?= $is_tours_page ? 'active' : ''; ?>"
+                data-accordion-trigger
+                aria-expanded="<?= $is_tours_open ? 'true' : 'false'; ?>"
+                aria-controls="<?= esc_attr($acc_id); ?>">
+          <span class="child-page-item__icon ">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24"
+                 height="24"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.5"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="lucide lucide-plane-icon lucide-plane">
+              <path
+                    d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
+            </svg>
+          </span>
+          <span>Туры</span>
+
+          <div class="child-page-item__icon child-page-item__chevrone">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24"
+                 height="24"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="lucide lucide-chevron-down-icon lucide-chevron-down">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        </button>
+
+        <div id="<?= esc_attr($acc_id); ?>"
+             class="child-page-submenu"
+             data-accordion-content
+             <?= $is_tours_open ? '' : 'hidden'; ?>>
+          <a class="child-page-subitem <?= ($is_tours_page && empty($active_tour_types)) ? 'active' : ''; ?>"
+             href="<?= esc_url($tours_list_url); ?>">Все туры</a>
+
+          <?php if (!empty($tour_types_for_country)): ?>
+            <?php foreach ($tour_types_for_country as $tt): ?>
+              <?php
+              $tt_id = (int) $tt->term_id;
+              $is_active_tt = in_array($tt_id, $active_tour_types, true);
+              $url = add_query_arg(['tour_type[]' => $tt_id], $tours_list_url);
+              ?>
+              <a class="child-page-subitem <?= $is_active_tt ? 'active' : ''; ?>"
+                 href="<?= esc_url($url); ?>"><?= esc_html($tt->name); ?></a>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($has_tours)): ?>
+      <a href="<?= esc_url($tours_list_url); ?>"
+         class="child-page-item --mobile <?= $is_tours_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
           <svg xmlns="http://www.w3.org/2000/svg"
                width="24"
@@ -429,7 +496,7 @@ $is_country_overview = (
       </a>
     <?php endif; ?>
 
-    <!-- Курорты -->
+
     <?php if (!empty($has_regions) && !is_wp_error($has_regions)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/kurorty/")); ?>"
          class="child-page-item <?= $is_resorts_page ? 'active' : ''; ?>">
@@ -455,7 +522,6 @@ $is_country_overview = (
       </a>
     <?php endif; ?>
 
-    <!-- Отели -->
     <?php if (!empty($has_hotels)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/hotel/")); ?>"
          class="child-page-item <?= $is_hotels_page ? 'active' : ''; ?>">
@@ -480,7 +546,6 @@ $is_country_overview = (
       </a>
     <?php endif; ?>
 
-    <!-- Памятка туристам -->
     <?php if (!empty($has_memo)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/memo/")); ?>"
          class="child-page-item <?= $is_memo_page ? 'active' : ''; ?>">
@@ -502,7 +567,6 @@ $is_country_overview = (
       </a>
     <?php endif; ?>
 
-    <!-- Дочерние страницы страны -->
     <?php if (!empty($child_pages)): ?>
       <?php foreach ($child_pages as $child): ?>
         <a href="<?= esc_url(get_permalink($child->ID)); ?>"

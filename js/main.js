@@ -13,6 +13,7 @@ import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
 import { initHotelMap } from "./modules/maps";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
+import { initCountryAside } from "./modules/country-aside";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -34,5 +35,6 @@ window.addEventListener("DOMContentLoaded", () => {
   promoPageAjax();
   initResortHotelsAjax();
   initCountryToursFilters();
+  initCountryAside();
   // initHotelMap();
 });
