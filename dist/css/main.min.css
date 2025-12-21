@@ -4075,15 +4075,17 @@ input.error {
 
 .child-page-subitem {
   display: block;
-  padding-left: 20px;
+  padding-left: 16px;
   margin-bottom: 8px;
   position: relative;
+  font-size: 14px;
+  font-weight: 500;
 }
 .child-page-subitem::before {
   content: "";
   position: absolute;
   left: 4px;
-  top: 10px;
+  top: 11px;
   width: 6px;
   height: 2px;
   background: #ee3145;

@@ -145,6 +145,19 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_tours_page = true;
 
+} elseif (get_query_var('country_visa') || get_query_var('country_visas')) {
+
+  $qv = get_query_var('country_visa');
+  if (empty($qv))
+    $qv = get_query_var('country_visas');
+
+  $country_slug = (string) $qv;
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_visas_page = true;
+
 } elseif (get_query_var('country_memo')) {
 
   $country_slug = (string) get_query_var('country_memo');
@@ -302,8 +315,43 @@ if (!empty($has_tours)) {
   }
 }
 
+$active_visa_types = [];
+if (!empty($_GET['visa_type'])) {
+  $raw = $_GET['visa_type'];
+  $raw = is_array($raw) ? $raw : [$raw];
+  $active_visa_types = array_values(array_filter(array_map('intval', $raw)));
+}
+
+$visas_list_url = home_url("/country/{$country_slug}/visa/");
+$visa_types_for_country = [];
+
+if (!empty($has_visas)) {
+  $visa_ids = get_posts([
+    'post_type' => 'visa',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+    'meta_query' => [
+      ['key' => 'visa_country', 'value' => $main_parent_id, 'compare' => '='],
+    ],
+  ]);
+
+  if (!empty($visa_ids)) {
+    $terms = wp_get_object_terms($visa_ids, 'visa_type', [
+      'orderby' => 'name',
+      'order' => 'ASC',
+    ]);
+    if (!is_wp_error($terms) && !empty($terms)) {
+      $visa_types_for_country = $terms;
+    }
+  }
+}
+
 $is_tours_open = $is_tours_page || !empty($active_tour_types);
 $acc_id = 'sidebar-tours-' . (int) $main_parent_id;
+
+$is_visas_open = $is_visas_page || !empty($active_visa_types);
+$visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 ?>
 
 <nav class="child-pages"
@@ -356,8 +404,79 @@ $acc_id = 'sidebar-tours-' . (int) $main_parent_id;
     <?php endif; ?>
 
     <?php if (!empty($has_visas)): ?>
-      <a href="<?= esc_url(home_url("/country/{$country_slug}/visa/")); ?>"
-         class="child-page-item <?= $is_visas_page ? 'active' : ''; ?>">
+      <div class="child-page-accordion <?= $is_visas_open ? 'is-open' : ''; ?>"
+           data-accordion>
+        <button type="button"
+                class="child-page-item <?= $is_visas_page ? 'active' : ''; ?>"
+                data-accordion-trigger
+                aria-expanded="<?= $is_visas_open ? 'true' : 'false'; ?>"
+                aria-controls="<?= esc_attr($visa_acc_id); ?>">
+          <span class="child-page-item__icon">
+            <svg width="24"
+                 height="24"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
+              <path d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
+              <path d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
+                    stroke-width="1.5"
+                    stroke-linecap="round" />
+              <path d="M7 13H11"
+                    stroke-width="1.5"
+                    stroke-linecap="round" />
+              <path d="M7 17H15"
+                    stroke-width="1.5"
+                    stroke-linecap="round" />
+            </svg>
+          </span>
+          <span>Виза</span>
+
+          <div class="child-page-item__icon child-page-item__chevrone">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24"
+                 height="24"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="lucide lucide-chevron-down-icon lucide-chevron-down">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        </button>
+
+        <div id="<?= esc_attr($visa_acc_id); ?>"
+             class="child-page-submenu"
+             data-accordion-content
+             <?= $is_visas_open ? '' : 'hidden'; ?>>
+          <?php if (!empty($visa_types_for_country)): ?>
+            <?php foreach ($visa_types_for_country as $vt): ?>
+              <?php
+              $vt_id = (int) $vt->term_id;
+              $is_active_vt = in_array($vt_id, $active_visa_types, true);
+              $url = add_query_arg(['visa_type[]' => $vt_id], $visas_list_url);
+              ?>
+              <a class="child-page-subitem <?= $is_active_vt ? 'active' : ''; ?>"
+                 href="<?= esc_url($url); ?>"><?= esc_html($vt->name); ?></a>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($has_visas)): ?>
+      <a href="<?= esc_url($visas_list_url); ?>"
+         class="child-page-item --mobile <?= $is_visas_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
           <svg width="24"
                height="24"
@@ -408,8 +527,6 @@ $acc_id = 'sidebar-tours-' . (int) $main_parent_id;
         <span>Акции</span>
       </a>
     <?php endif; ?>
-
-    <!-- ТУры -->
 
     <?php if (!empty($has_tours)): ?>
       <div class="child-page-accordion <?= $is_tours_open ? 'is-open' : ''; ?>"
@@ -495,7 +612,6 @@ $acc_id = 'sidebar-tours-' . (int) $main_parent_id;
         <span>Туры</span>
       </a>
     <?php endif; ?>
-
 
     <?php if (!empty($has_regions) && !is_wp_error($has_regions)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/kurorty/")); ?>"

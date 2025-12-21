@@ -11,7 +11,7 @@ get_header();
 ?>
 
 <main id="primary"
-	  class="site-main">
+			class="site-main">фывфывыв
 
 	<?php
 	if (function_exists('yoast_breadcrumb')) {

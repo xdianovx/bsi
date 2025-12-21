@@ -1,6 +1,5 @@
 <?php
 
-/* Регистрация CPT: Страны */
 add_action('init', 'register_post_types_country');
 function register_post_types_country()
 {
@@ -35,7 +34,6 @@ function register_post_types_country()
   ]);
 }
 
-/* Редирект архива стран на страницу /strany */
 add_action('template_redirect', function () {
   if (!is_post_type_archive('country')) {
     return;
@@ -48,7 +46,6 @@ add_action('template_redirect', function () {
   }
 });
 
-/* Хелпер: страны, у которых есть акции (старое — оставляем) */
 function bsi_get_promo_countries()
 {
   $result = [];
@@ -111,7 +108,6 @@ function bsi_get_promo_countries()
   return $result;
 }
 
-/* Регистрация таксономий: Регионы и Курорты (для привязок, фильтров, админки) */
 add_action('init', function () {
   $region_post_types = apply_filters('region_taxonomy_post_types', ['hotel', 'tour']);
   $resort_post_types = apply_filters('resort_taxonomy_post_types', ['hotel', 'tour']);
@@ -144,7 +140,7 @@ add_action('init', function () {
       'search_items' => 'Найти курорт',
       'all_items' => 'Все курорты',
       'edit_item' => 'Редактировать курорт',
-      'update_item' => 'Обновить курорт',
+      'update_item' => 'Обновить',
       'add_new_item' => 'Добавить курорт',
       'new_item_name' => 'Новый курорт',
       'menu_name' => 'Курорты',
@@ -159,7 +155,6 @@ add_action('init', function () {
   ]);
 }, 20);
 
-/* ACF поля терминов: регион -> страна, курорт -> регион */
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group')) {
     return;
@@ -221,7 +216,6 @@ add_action('acf/init', function () {
   ]);
 });
 
-/* Query vars (для виртуальных разделов страны) */
 add_filter('query_vars', function ($vars) {
   $vars[] = 'country_in_path';
   $vars[] = 'region_in_path';
@@ -230,14 +224,14 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_promos';
   $vars[] = 'country_resorts';
 
-  // NEW
-  $vars[] = 'country_memo';         // /country/{slug}/pamyatka/
-  $vars[] = 'country_entry_rules';  // /country/{slug}/pravila-vyezda/
+  $vars[] = 'country_memo';
+  $vars[] = 'country_entry_rules';
+
+  $vars[] = 'country_visa';
 
   return $vars;
 });
 
-/* Роуты виртуальных разделов страны (открываются внутри single-country.php / отдельных шаблонов) */
 add_action('init', function () {
 
   add_rewrite_rule(
@@ -258,26 +252,27 @@ add_action('init', function () {
     'top'
   );
 
-  // NEW: Памятка туристам
   add_rewrite_rule(
     '^country/([^/]+)/pamyatka/?$',
     'index.php?post_type=country&name=$matches[1]&country_memo=$matches[1]',
     'top'
   );
 
-  // NEW: Правила въезда
   add_rewrite_rule(
     '^country/([^/]+)/pravila-vyezda/?$',
     'index.php?post_type=country&name=$matches[1]&country_entry_rules=$matches[1]',
     'top'
   );
 
+  add_rewrite_rule(
+    '^country/([^/]+)/visa/?$',
+    'index.php?country_visa=$matches[1]',
+    'top'
+  );
+
 }, 20);
 
-
-/* Роут курорта: /country/{country}/{region}/{resort}/ */
 add_action('init', function () {
-  // добавили pamyatka/pravila-vyezda в reserved, чтобы не конфликтовало с роутом курорта
   $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda)';
 
   add_rewrite_rule(
@@ -287,7 +282,6 @@ add_action('init', function () {
   );
 }, 30);
 
-/* Канонические ссылки курорта (красивый URL) */
 add_filter('term_link', function ($url, $term, $taxonomy) {
   if ($taxonomy !== 'resort') {
     return $url;
@@ -316,7 +310,6 @@ add_filter('term_link', function ($url, $term, $taxonomy) {
   return home_url('/country/' . $country_slug . '/' . $region_term->slug . '/' . $term->slug . '/');
 }, 10, 3);
 
-/* Приоритет дочерних страниц страны над курортом (если вдруг совпадут пути) */
 add_filter('request', function ($vars) {
   if (
     !empty($vars['taxonomy']) &&
@@ -341,7 +334,6 @@ add_filter('request', function ($vars) {
   return $vars;
 }, 0);
 
-/* Валидация пути курорта (если в URL не та страна/регион — отдаём 404) */
 add_action('template_redirect', function () {
   if (!is_tax('resort')) {
     return;
@@ -389,7 +381,6 @@ add_action('template_redirect', function () {
   }
 });
 
-/* Роутинг страницы курортов страны на country-resorts.php */
 add_action('template_redirect', function () {
   $country_slug = get_query_var('country_resorts');
   if (empty($country_slug)) {
@@ -422,7 +413,6 @@ add_action('template_redirect', function () {
   exit;
 });
 
-/* NEW: Роутинг /country/{slug}/pamyatka/ -> country-memo.php */
 add_action('template_redirect', function () {
   $country_slug = (string) get_query_var('country_memo');
   if (empty($country_slug)) {
@@ -455,7 +445,6 @@ add_action('template_redirect', function () {
   exit;
 });
 
-/* NEW: Роутинг /country/{slug}/pravila-vyezda/ -> country-entry-rules.php */
 add_action('template_redirect', function () {
   $country_slug = (string) get_query_var('country_entry_rules');
   if (empty($country_slug)) {
@@ -488,14 +477,84 @@ add_action('template_redirect', function () {
   exit;
 });
 
-/* Хлебные крошки Yoast: курорт (без страницы региона) */
+add_action('pre_get_posts', function ($q) {
+  if (is_admin() || !$q->is_main_query()) {
+    return;
+  }
+
+  $country_slug = (string) get_query_var('country_visa');
+  if (!$country_slug) {
+    return;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    $q->set_404();
+    status_header(404);
+    return;
+  }
+
+  $visa_type_ids = [];
+  if (!empty($_GET['visa_type'])) {
+    $raw = $_GET['visa_type'];
+    $raw = is_array($raw) ? $raw : [$raw];
+    $visa_type_ids = array_values(array_filter(array_map('intval', $raw)));
+  }
+
+  $args = [
+    'post_type' => 'visa',
+    'post_status' => 'publish',
+    'posts_per_page' => 1,
+    'fields' => 'ids',
+    'meta_query' => [
+      ['key' => 'visa_country', 'value' => (int) $country->ID, 'compare' => '='],
+    ],
+  ];
+
+  if (!empty($visa_type_ids)) {
+    $args['tax_query'] = [
+      [
+        'taxonomy' => 'visa_type',
+        'field' => 'term_id',
+        'terms' => $visa_type_ids,
+        'operator' => 'IN',
+      ],
+    ];
+  }
+
+  $visa_ids = get_posts($args);
+
+  if (empty($visa_ids)) {
+    $q->set_404();
+    status_header(404);
+    return;
+  }
+
+  $visa_id = (int) $visa_ids[0];
+
+  $q->set('post_type', 'visa');
+  $q->set('p', $visa_id);
+
+  $q->set('name', '');
+  $q->set('pagename', '');
+  $q->set('page_id', '');
+
+  $q->is_singular = true;
+  $q->is_single = true;
+  $q->is_page = false;
+  $q->is_home = false;
+
+}, 0);
+
 add_filter('wpseo_breadcrumb_links', function ($links) {
 
-  // Курорт (taxonomy resort)
-  if (is_tax('resort')) {
-    $term = get_queried_object(); // текущий курорт
+  if (is_singular('visa')) {
+    return $links;
+  }
 
-    // достаём страну через resort -> region -> country
+  if (is_tax('resort')) {
+    $term = get_queried_object();
+
     $region_id = function_exists('get_field') ? get_field('resort_region', 'term_' . $term->term_id) : 0;
     $region_term = $region_id ? get_term((int) $region_id, 'region') : null;
 
@@ -519,13 +578,9 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
       $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
     }
 
-    // ВАЖНО: регион НЕ добавляем
     $new_links[] = ['text' => $term->name];
-
     return $new_links;
   }
-
-  // (опционально) можно потом добавить breadcrumbs для pamyatka/pravila-vyezda — если скажешь
 
   return $links;
 });

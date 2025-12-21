@@ -1,11 +1,5 @@
 <?php
 
-/**
- * CPT: Visa
- * URL: /country/{country-slug}/visa/
- * ВАЖНО: роут ищет визу по meta visa_country, а не по slug визы.
- */
-
 add_action('init', 'register_post_type_visa');
 function register_post_type_visa()
 {
@@ -24,7 +18,7 @@ function register_post_type_visa()
     'all_items' => 'Все визы',
   ];
 
-  $args = [
+  register_post_type('visa', [
     'labels' => $labels,
     'public' => true,
     'hierarchical' => false,
@@ -35,18 +29,42 @@ function register_post_type_visa()
     'menu_icon' => 'dashicons-flag',
     'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
     'has_archive' => false,
-    'rewrite' => false, // свои ссылки, без /visa/slug/
+    'rewrite' => false,
     'publicly_queryable' => true,
     'query_var' => true,
-  ];
-
-  register_post_type('visa', $args);
+  ]);
 }
 
-/**
- * (Опционально) синхронизируем slug визы со slug страны — чисто для админки/удобства.
- * На фронт-роутинг это больше НЕ влияет.
- */
+add_action('init', function () {
+  register_taxonomy('visa_type', ['visa'], [
+    'labels' => [
+      'name' => 'Типы виз',
+      'singular_name' => 'Тип визы',
+      'search_items' => 'Найти тип',
+      'all_items' => 'Все типы',
+      'edit_item' => 'Редактировать тип',
+      'update_item' => 'Обновить тип',
+      'add_new_item' => 'Добавить тип',
+      'new_item_name' => 'Новый тип',
+      'menu_name' => 'Типы виз',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => false,
+    'query_var' => false,
+  ]);
+}, 20);
+
+add_action('init', function () {
+  if (taxonomy_exists('visa_type')) {
+    register_taxonomy_for_object_type('visa_type', 'visa');
+  }
+}, 999);
+
+add_action('save_post_visa', 'sync_visa_slug_with_country', 10, 3);
 add_action('save_post_visa', 'sync_visa_slug_with_country', 10, 3);
 function sync_visa_slug_with_country($post_id, $post, $update)
 {
@@ -54,15 +72,23 @@ function sync_visa_slug_with_country($post_id, $post, $update)
     return;
   if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
     return;
-
   if (!function_exists('get_field'))
     return;
 
   $country_id = get_field('visa_country', $post_id);
+
+  if ($country_id instanceof WP_Post) {
+    $country_id = (int) $country_id->ID;
+  } elseif (is_array($country_id)) {
+    $country_id = (int) reset($country_id);
+  } else {
+    $country_id = (int) $country_id;
+  }
+
   if (!$country_id)
     return;
 
-  $country_slug = get_post_field('post_name', $country_id);
+  $country_slug = (string) get_post_field('post_name', $country_id);
   if (!$country_slug)
     return;
 
@@ -79,148 +105,29 @@ function sync_visa_slug_with_country($post_id, $post, $update)
   add_action('save_post_visa', 'sync_visa_slug_with_country', 10, 3);
 }
 
-/**
- * Query var для /country/{slug}/visa/
- */
-add_filter('query_vars', function ($vars) {
-  $vars[] = 'country_visa';
-  return $vars;
-});
 
-/**
- * Роут: /country/{country-slug}/visa/
- */
-add_action('init', function () {
-  add_rewrite_rule(
-    '^country/([^/]+)/visa/?$',
-    'index.php?country_visa=$matches[1]',
-    'top'
-  );
-}, 20);
-
-/**
- * Подмена main query:
- * 1) Находим страну по slug
- * 2) Находим 1 визу по meta visa_country = ID страны
- * 3) Подставляем её как singular через p={id}
- */
-add_action('pre_get_posts', function ($q) {
-  if (is_admin() || !$q->is_main_query())
-    return;
-
-  $country_slug = (string) get_query_var('country_visa');
-  if (!$country_slug)
-    return;
-
-  $country = get_page_by_path($country_slug, OBJECT, 'country');
-  if (!$country) {
-    $q->set_404();
-    status_header(404);
-    return;
-  }
-
-  // Ищем визу по метаполю, НЕ по slug
-  $visa_ids = get_posts([
-    'post_type' => 'visa',
-    'post_status' => 'publish',
-    'posts_per_page' => 1,
-    'fields' => 'ids',
-    'meta_query' => [
-      [
-        'key' => 'visa_country',
-        'value' => $country->ID,
-        'compare' => '=',
-      ],
-    ],
-  ]);
-
-  if (empty($visa_ids)) {
-    $q->set_404();
-    status_header(404);
-    return;
-  }
-
-  $visa_id = (int) $visa_ids[0];
-
-  // Делаем нормальный single
-  $q->set('post_type', 'visa');
-  $q->set('p', $visa_id);
-
-  // Чистим мусорные vars, чтобы WP не пытался трактовать как page
-  $q->set('name', '');
-  $q->set('pagename', '');
-  $q->set('page_id', '');
-
-  $q->is_singular = true;
-  $q->is_single = true;
-  $q->is_page = false;
-  $q->is_home = false;
-
-}, 0);
-
-/**
- * Генерим правильную ссылку на визу (везде на сайте)
- */
-add_filter('post_type_link', 'visa_permalink', 10, 2);
-function visa_permalink($post_link, $post)
-{
+add_filter('post_type_link', function ($post_link, $post) {
   if ($post->post_type !== 'visa')
     return $post_link;
-
   if (!function_exists('get_field'))
     return $post_link;
 
   $country_id = get_field('visa_country', $post->ID);
-  if (!$country_id)
-    return $post_link;
 
-  $country = get_post($country_id);
-  if (!$country)
-    return $post_link;
-
-  return trailingslashit(home_url('/country/' . $country->post_name . '/visa'));
-}
-
-/**
- * Хлебные крошки Yoast для single visa
- */
-add_filter('wpseo_breadcrumb_links', function ($links) {
-  if (!is_singular('visa'))
-    return $links;
-  if (!function_exists('get_field'))
-    return $links;
-
-  $country_id = get_field('visa_country');
-  if (!$country_id)
-    return $links;
-
-  $country = get_post($country_id);
-  if (!$country)
-    return $links;
-
-  $new_links = [];
-
-  $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
-
-  $countries_page = get_page_by_path('strany');
-  if ($countries_page) {
-    $new_links[] = [
-      'url' => get_permalink($countries_page->ID),
-      'text' => $countries_page->post_title ?: 'Страны',
-    ];
+  if ($country_id instanceof WP_Post) {
+    $country_id = (int) $country_id->ID;
+  } elseif (is_array($country_id)) {
+    $country_id = (int) reset($country_id);
   } else {
-    $new_links[] = [
-      'url' => get_post_type_archive_link('country'),
-      'text' => 'Страны',
-    ];
+    $country_id = (int) $country_id;
   }
 
-  $new_links[] = [
-    'url' => get_permalink($country->ID),
-    'text' => $country->post_title,
-  ];
+  if (!$country_id)
+    return $post_link;
 
-  $new_links[] = ['text' => get_the_title()];
+  $country_slug = (string) get_post_field('post_name', $country_id);
+  if (!$country_slug)
+    return $post_link;
 
-  return $new_links;
-});
+  return trailingslashit(home_url('/country/' . $country_slug . '/visa'));
+}, 10, 2);
