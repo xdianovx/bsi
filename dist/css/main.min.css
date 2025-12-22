@@ -588,6 +588,12 @@ main {
 .input-item {
   position: relative;
 }
+.input-item.white label {
+  padding: 0 4px;
+  background: #f4f4f6;
+  border-radius: 4px;
+  line-height: 120%;
+}
 
 .input-item label {
   display: block;
@@ -670,6 +676,7 @@ input.error {
   line-height: 120%;
   font-size: 14px;
   color: #5c5c5c;
+  margin-bottom: 0;
 }
 .form-policy a {
   color: #ee3145;
@@ -715,6 +722,11 @@ input.error {
 }
 .form-row.form-row-2 {
   grid-template-columns: repeat(2, 1fr);
+}
+@media screen and (max-width: 1024px) {
+  .form-row.form-row-2 {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .gtm-datepicker {
@@ -3468,6 +3480,21 @@ input.error {
   padding: 16px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 2;
+  aspect-ratio: 6/3;
+  color: #fff;
+  justify-content: flex-end;
+}
+
+.mice-hero-item__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  object-fit: cover;
 }
 
 .mice-hero-item__title {
@@ -3475,8 +3502,13 @@ input.error {
   font-size: 20px;
 }
 
+.mice-hero-item__descr {
+  margin-top: 8px;
+}
+
 .mice-hero-item__link {
   margin-left: auto;
+  font-weight: 500;
 }
 
 .mice-benefits-section {
@@ -3550,9 +3582,19 @@ input.error {
 }
 
 .page-mice-cta__wrap {
-  padding: 16px;
+  padding: 20px;
   border-radius: 12px;
   background: #f4f4f6;
+}
+@media screen and (max-width: 768px) {
+  .page-mice-cta__wrap {
+    padding: 16px;
+  }
+}
+
+.page-mice-cta-submit {
+  margin-top: 16px;
+  width: 100%;
 }
 
 .news-slider__section {

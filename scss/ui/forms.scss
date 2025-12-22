@@ -16,6 +16,15 @@
 
 .input-item {
   position: relative;
+
+  &.white {
+    label {
+      padding: 0 4px;
+      background: $bg-gray;
+      border-radius: 4px;
+      line-height: 120%;
+    }
+  }
 }
 
 .input-item label {
@@ -121,6 +130,7 @@ input.error {
   line-height: 120%;
   font-size: 14px;
   color: $text-gray;
+  margin-bottom: 0;
 
   a {
     color: $red;
@@ -165,6 +175,10 @@ input.error {
 
   &.form-row-2 {
     grid-template-columns: repeat(2, 1fr);
+
+    @media screen and (max-width: 1024px) {
+      grid-template-columns: repeat(1, 1fr);
+    }
   }
 }
 

@@ -37,6 +37,11 @@ get_header('mice');
 
             </div>
           </a>
+
+
+          <img src="<?= get_template_directory_uri() ?>/img/mice/1.png"
+               class="mice-hero-item__bg"
+               alt="">
         </div>
 
         <div class="mice-hero-item">
@@ -66,17 +71,15 @@ get_header('mice');
 
             </div>
           </a>
+
+          <img src="<?= get_template_directory_uri() ?>/img/mice/2.png"
+               class="mice-hero-item__bg"
+               alt="">
         </div>
 
       </div>
     </div>
   </section>
-
-  <?= get_template_part('template-parts/partners/partners-slider') ?>
-  <?= get_template_part('template-parts/news/news-slider') ?>
-  <?= get_template_part('template-parts/awards/slider') ?>
-  <?= get_template_part('template-parts/reviews/slider') ?>
-
 
   <?php
   $rows = function_exists('get_field') ? get_field('mice_benefits') : [];
@@ -109,8 +112,16 @@ get_header('mice');
     </section>
   <?php endif; ?>
 
-
   <?= get_template_part('template-parts/projects/slider') ?>
+
+
+  <?= get_template_part('template-parts/news/news-slider') ?>
+  <?= get_template_part('template-parts/awards/slider') ?>
+  <?= get_template_part('template-parts/reviews/slider') ?>
+  <?= get_template_part('template-parts/partners/partners-slider') ?>
+
+
+
 
   <section class="page-mice-cta">
     <div class="container">
@@ -119,50 +130,69 @@ get_header('mice');
       <div class="page-mice-cta__wrap">
 
         <form action="">
-          <div class="input-item">
-            <label for="phone">Телефон *</label>
-            <input type="tel"
-                   name="phone"
-                   id="phone"
-                   placeholder="+7 (___) ___-__-__">
+          <div class="form-row form-row-2">
+            <div class="input-item white ">
+              <label for="name">Имя *</label>
+              <input type="text"
+                     name="name"
+                     id="name"
+                     placeholder="Ваше имя">
 
-            <div class="error-message"
-                 data-field="phone">
+              <div class="error-message"
+                   data-field="phone">
+              </div>
+            </div>
+
+            <div class="input-item white">
+              <label for="company">Компания</label>
+              <input type="text"
+                     name="company"
+                     id="company"
+                     placeholder="Название">
+
+              <div class="error-message"
+                   data-field="phone">
+              </div>
+            </div>
+
+            <div class="input-item white">
+              <label for="phone">Телефон *</label>
+              <input type="tel"
+                     name="phone"
+                     id="phone"
+                     placeholder="+7 (___) ___-__-__">
+
+              <div class="error-message"
+                   data-field="phone">
+              </div>
+            </div>
+            <div class="input-item white">
+              <label for="email">Email</label>
+              <input type="email"
+                     name="email"
+                     id="email"
+                     placeholder="Почта">
+
+              <div class="error-message"
+                   data-field="phone">
+              </div>
             </div>
           </div>
 
-          <div class="input-item">
-            <label for="phone">Телефон *</label>
-            <input type="tel"
-                   name="phone"
-                   id="phone"
-                   placeholder="+7 (___) ___-__-__">
+          <div class="">
+            <div id="form-status"></div>
+            <button type="submit"
+                    class="btn btn-accent page-mice-cta-submit">
+              Отправить
+            </button>
 
-            <div class="error-message"
-                 data-field="phone">
-            </div>
-          </div>
-          <div class="input-item">
-            <label for="phone">Телефон *</label>
-            <input type="tel"
-                   name="phone"
-                   id="phone"
-                   placeholder="+7 (___) ___-__-__">
-
-            <div class="error-message"
-                 data-field="phone">
-            </div>
-          </div>
-          <div class="input-item">
-            <label for="phone">Телефон *</label>
-            <input type="tel"
-                   name="phone"
-                   id="phone"
-                   placeholder="+7 (___) ___-__-__">
-
-            <div class="error-message"
-                 data-field="phone">
-            </div>
+            <p class="form-policy fit-form__policy">
+              Нажимая на кнопку "Отправить", вы соглашаетесь с <a
+                 href="http://localhost:8888/bsinew/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
+                 class="policy-link">
+                нашей политикой обработки персональных данных
+              </a>
+            </p>
           </div>
         </form>
       </div>
