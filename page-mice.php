@@ -11,6 +11,7 @@ get_header('mice');
       <div class="mice-hero__wrap">
         <div class="mice-hero-item">
           <h3 class="mice-hero-item__title">Бизнес тревел</h3>
+
           <div class="mice-hero-item__descr">Тут короткое описание с преимущствами! В админку не вижу смысла выводить,
             так как 1 раз напишете этот текст и забудете</div>
 
@@ -113,8 +114,57 @@ get_header('mice');
 
   <section class="page-mice-cta">
     <div class="container">
+      <h2 class="h2">Оставьте заявку</h2>
+      <p class="page-mice-cta__description">И мы проконсультируем вас по всем вопросам</p>
       <div class="page-mice-cta__wrap">
 
+        <form action="">
+          <div class="input-item">
+            <label for="phone">Телефон *</label>
+            <input type="tel"
+                   name="phone"
+                   id="phone"
+                   placeholder="+7 (___) ___-__-__">
+
+            <div class="error-message"
+                 data-field="phone">
+            </div>
+          </div>
+
+          <div class="input-item">
+            <label for="phone">Телефон *</label>
+            <input type="tel"
+                   name="phone"
+                   id="phone"
+                   placeholder="+7 (___) ___-__-__">
+
+            <div class="error-message"
+                 data-field="phone">
+            </div>
+          </div>
+          <div class="input-item">
+            <label for="phone">Телефон *</label>
+            <input type="tel"
+                   name="phone"
+                   id="phone"
+                   placeholder="+7 (___) ___-__-__">
+
+            <div class="error-message"
+                 data-field="phone">
+            </div>
+          </div>
+          <div class="input-item">
+            <label for="phone">Телефон *</label>
+            <input type="tel"
+                   name="phone"
+                   id="phone"
+                   placeholder="+7 (___) ___-__-__">
+
+            <div class="error-message"
+                 data-field="phone">
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </section>

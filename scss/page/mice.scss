@@ -83,3 +83,20 @@
     font-size: 14px;
   }
 }
+
+.page-mice-cta {
+  margin-top: 120px;
+  @media screen and (max-width: 768px) {
+    margin-top: 80px;
+  }
+}
+
+.page-mice-cta__description {
+  margin-top: 16px;
+}
+
+.page-mice-cta__wrap {
+  padding: 16px;
+  border-radius: 12px;
+  background: $bg-gray;
+}

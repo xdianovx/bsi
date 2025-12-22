@@ -259,13 +259,13 @@ require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
+require get_template_directory() . '/inc/requests/projects.php';
 
 
 add_action('acf/init', function () {
 	// Отключаем проверку обновлений
 	acf_update_setting('show_updates', false);
 });
-
 
 add_action('acf/init', function () {
 	acf_add_local_field_group([

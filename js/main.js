@@ -15,6 +15,7 @@ import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initCountryAside } from "./modules/country-aside";
 import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
+import { archiveProjects } from "./modules/ajax/archive-projects";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -38,5 +39,6 @@ window.addEventListener("DOMContentLoaded", () => {
   initCountryToursFilters();
   initCountryAside();
   initPopularHotelsSlider();
+  archiveProjects();
   // initHotelMap();
 });
