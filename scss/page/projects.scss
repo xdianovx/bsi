@@ -110,7 +110,7 @@
 
 .page-project__top {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
 
   @media screen and (max-width: 1024px) {
     flex-direction: column;

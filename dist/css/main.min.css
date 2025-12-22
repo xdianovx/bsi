@@ -3868,7 +3868,7 @@ input.error {
 
 .page-project__top {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
 }
 @media screen and (max-width: 1024px) {
   .page-project__top {

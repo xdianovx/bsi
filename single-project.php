@@ -70,9 +70,6 @@ $project_date_attr = $project_date_ts
 
           <div class="page-country__title-left">
 
-
-
-
             <?php if ($country_id): ?>
               <div class="single-hotel__address single-project-country">
                 <?php if ($flag_url): ?>
