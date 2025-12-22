@@ -251,6 +251,7 @@ require get_template_directory() . '/custom-fields/visa.php';
 require get_template_directory() . '/custom-fields/best-offers.php';
 require get_template_directory() . '/custom-fields/resort.php';
 require get_template_directory() . '/custom-fields/pages/mice.php';
+require get_template_directory() . '/custom-fields/pages/visa.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';

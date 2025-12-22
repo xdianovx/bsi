@@ -17,8 +17,8 @@ $main_page_items = [
      ],
      [
           'title' => 'Круизы',
-          'url' => get_permalink(2064),
-          'target' => '',
+          'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
+          'target' => '_blank',
           'img' => 'cruise.png',
        
      ],
@@ -29,15 +29,14 @@ $main_page_items = [
           'img' => 'event.png',
        
      ],
-       [
+     [
           'title' => 'VIP-Concierge',
-          'url' => get_permalink(2064),
-          'target' => '',
+          'url' => 'https://bsivip.ru/',
+          'target' => '_blank',
           'img' => 'vip.png',
        
-     ],
-     
-        [
+     ], 
+     [
           'title' => "Образование <br> за рубежом",
           'url' => get_permalink(2064),
           'target' => '',
@@ -53,7 +52,7 @@ $main_page_items = [
      ],
      [
           'title' => 'Визы',
-          'url' => get_permalink(2064),
+          'url' => get_permalink( get_page_by_path( 'vizy' ) ),
           'target' => '',
           'img' => 'visa.png',
        
@@ -68,8 +67,8 @@ $main_page_items = [
      ],
      [
           'title' => 'Incoming',
-          'url' => get_permalink(2064),
-          'target' => '',
+          'url' => 'https://incoming.bsigroup.ru/',
+          'target' => '_blank',
           'img' => 'incoming.png',
        
      ],

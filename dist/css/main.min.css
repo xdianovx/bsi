@@ -1776,7 +1776,7 @@ input.error {
 
 .gtm-nights-select {
   cursor: pointer;
-  height: 48px;
+  height: 49px;
 }
 
 .gtm-datepicker {
@@ -5308,22 +5308,22 @@ input.error {
 }
 
 .visa-page-features__wrap {
-  margin-top: 32px;
+  margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
 .visa-page-features__item {
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 8px;
-  background: #f4f4f6;
+  border: 1px solid #f4f4f6;
 }
 
 .visa-page-features__item__wrap {
-  background: #fff;
   border-radius: 8px;
   padding: 8px;
+  height: 100%;
 }
 
 .visa-page-steps__section {
@@ -5336,15 +5336,15 @@ input.error {
 }
 
 .visa-page-steps__wrap {
-  margin-top: 32px;
+  margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 8px;
 }
 
 .visa-page-steps-item {
-  background: #f4f4f6;
-  border-radius: 12px;
+  border: #f4f4f6;
+  border-radius: 8px;
   padding: 12px;
 }
 
@@ -5355,6 +5355,88 @@ input.error {
   .visa-page-consultation__section {
     margin-top: 80px;
   }
+}
+
+.visa-page-steps-item__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 100%;
+}
+
+.visa-page-steps-item__num {
+  background: #ee3145;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  width: 28px;
+  height: 28px;
+}
+
+.visa-page-steps-item__title {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.visa-page-steps-item__description {
+  margin-top: 8px;
+  line-height: 130%;
+}
+
+.visa-page-contacts__section {
+  margin-top: 120px;
+}
+@media screen and (max-width: 768px) {
+  .visa-page-contacts__section {
+    margin-top: 80px;
+  }
+}
+
+.visa-contact-item {
+  border: 1px solid #f4f4f6;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.visa-page-contacts__wrap {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.visa-contact-item__name {
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.visa-contact-item__direction {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+  margin-top: 4px;
+  color: #5c5c5c;
+}
+
+.visa-contact-item__links {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  line-height: 100%;
+}
+
+.visa-contact-item__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.visa-contact-item__link svg {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .phone-link {
