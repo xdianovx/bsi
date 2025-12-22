@@ -5343,7 +5343,7 @@ input.error {
 }
 
 .visa-page-steps-item {
-  border: #f4f4f6;
+  border: 1px solid #f4f4f6;
   border-radius: 8px;
   padding: 12px;
 }
