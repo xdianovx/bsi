@@ -7,9 +7,7 @@ function theme_register_nav_menu()
 {
     register_nav_menu('header_nav', 'Мегаменю в шапке');
     register_nav_menu('mobile_nav', 'Мобильное меню');
-
-
-
+    register_nav_menu('footer_nav', 'Меню в подвале');
 }
 
 
@@ -252,3 +250,12 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
         }
     }
 }
+
+add_filter('nav_menu_link_attributes', function ($atts, $item, $args) {
+    if (!isset($args->theme_location) || $args->theme_location !== 'footer_nav') {
+        return $atts;
+    }
+
+    $atts['class'] = isset($atts['class']) ? trim($atts['class'] . ' footer-link') : 'footer-link';
+    return $atts;
+}, 10, 3);

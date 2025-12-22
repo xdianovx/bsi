@@ -18,18 +18,17 @@
 
 			<div class="footer-top">
 				<div class="footer-grid__links">
-					<a href=""
-						 class="footer-link">Акции</a>
-					<a href=""
-						 class="footer-link">Страны</a>
-					<a href=""
-						 class="footer-link">Турагенствам</a>
-					<a href=""
-						 class="footer-link">Туристам</a>
-					<a href=""
-						 class="footer-link">О компании</a>
-					<a href=""
-						 class="footer-link">Личный кабинет</a>
+					<?php
+					wp_nav_menu([
+						'theme_location' => 'footer_nav',
+						'container' => false,
+						'fallback_cb' => false,
+						'items_wrap' => '%3$s',
+						'depth' => 1,
+						'link_before' => '',
+						'link_after' => '',
+					]);
+					?>
 
 				</div>
 				<?= get_template_part('template-parts/ui/socials') ?>
