@@ -5265,11 +5265,16 @@ input.error {
 .visa-page__info-section {
   margin-top: 40px;
 }
+@media screen and (max-width: 1200px) {
+  .visa-page__info-section {
+    margin-top: 24px;
+  }
+}
 
 .visa-info-item {
   padding: 12px;
   background: #f4f4f6;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .visa-info-item__title {
@@ -5297,6 +5302,12 @@ input.error {
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
+@media screen and (max-width: 1200px) {
+  .visa-info-item__wrap {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 8px;
+  }
+}
 
 .visa-page-features__section {
   margin-top: 120px;
@@ -5312,6 +5323,16 @@ input.error {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+}
+@media screen and (max-width: 1024px) {
+  .visa-page-features__wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 768px) {
+  .visa-page-features__wrap {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .visa-page-features__item {
@@ -5340,6 +5361,16 @@ input.error {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+}
+@media screen and (max-width: 1024px) {
+  .visa-page-steps__wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 768px) {
+  .visa-page-steps__wrap {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .visa-page-steps-item {
@@ -5405,6 +5436,16 @@ input.error {
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-top: 16px;
+}
+@media screen and (max-width: 1024px) {
+  .visa-page-contacts__wrap {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 768px) {
+  .visa-page-contacts__wrap {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .visa-contact-item__name {
