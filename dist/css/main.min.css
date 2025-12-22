@@ -2388,6 +2388,30 @@ input.error {
   aspect-ratio: 16/9;
 }
 
+.hotel-card__anemeties {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.hotel-card__anemetie {
+  background: #f4f4f6;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+}
+.hotel-card__anemetie img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .main-banner__section {
   margin-top: 8px;
 }

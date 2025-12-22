@@ -14,7 +14,6 @@ export const initPopularHotelsSlider = () => {
 
   const swiper = new Swiper(".popular-hotels-slider", {
     spaceBetween: 16,
-    loop: true,
     navigation: {
       nextEl: ".popular-hotels-arrow-next",
       prevEl: ".popular-hotels-arrow-prev",

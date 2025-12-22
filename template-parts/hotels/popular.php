@@ -5,6 +5,9 @@ $popular_hotel_ids = get_posts([
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'fields' => 'ids',
+  'no_found_rows' => true,
+  'update_post_meta_cache' => false,
+  'update_post_term_cache' => false,
   'meta_query' => [
     [
       'key' => 'is_popular',
@@ -47,6 +50,9 @@ if (!empty($country_ids)) {
     'order' => 'ASC',
     'post_parent' => 0,
     'post__in' => $country_ids,
+    'no_found_rows' => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
   ]);
 }
 
@@ -60,6 +66,10 @@ if (!empty($popular_hotel_ids)) {
     'orderby' => 'date',
     'order' => 'DESC',
     'post__in' => $popular_hotel_ids,
+    'ignore_sticky_posts' => true,
+    'no_found_rows' => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
   ]);
 }
 
@@ -114,6 +124,7 @@ foreach ($hotel_posts as $hotel_post) {
   }
 
   $items[] = [
+    'id' => $hotel_id,
     'url' => get_permalink($hotel_id),
     'image' => get_the_post_thumbnail_url($hotel_id, 'large') ?: '',
     'type' => 'Отель',
@@ -191,7 +202,6 @@ foreach ($hotel_posts as $hotel_post) {
             <span class="promo-filter__title"><?php echo esc_html($country_title); ?></span>
           </button>
         <?php endforeach; ?>
-        <?php wp_reset_postdata(); ?>
       </div>
 
       <div class="popular-hotels__content">

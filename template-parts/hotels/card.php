@@ -3,6 +3,26 @@ $hotel = get_query_var('hotel');
 if (!$hotel || !is_array($hotel)) {
   return;
 }
+
+$hotel_id = 0;
+if (!empty($hotel['id'])) {
+  $hotel_id = (int) $hotel['id'];
+} elseif (!empty($hotel['url'])) {
+  $hotel_id = (int) url_to_postid($hotel['url']);
+}
+
+$amenities = [];
+if ($hotel_id) {
+  $terms = wp_get_post_terms($hotel_id, 'amenity', ['orderby' => 'name', 'order' => 'ASC']);
+  if (!is_wp_error($terms) && !empty($terms)) {
+    $amenities = array_slice($terms, 0, 4);
+  }
+}
+
+$extra_tags = [];
+if (!empty($hotel['tags']) && is_array($hotel['tags'])) {
+  $extra_tags = array_values(array_filter(array_map('strval', $hotel['tags'])));
+}
 ?>
 <a href="<?php echo esc_url($hotel['url']); ?>"
    class="hotel-card">
@@ -11,24 +31,21 @@ if (!$hotel || !is_array($hotel)) {
     <img src="<?php echo esc_url($hotel['image']); ?>"
          alt="<?php echo esc_attr($hotel['title']); ?>"
          class="hotel-card__image">
-
   </div>
 
   <div class="hotel-card__body">
     <div class="hotel-card__title-wrap">
-
       <h3 class="hotel-card__title"><?php echo esc_html($hotel['title']); ?></h3>
-
-
     </div>
+
+
 
     <div class="hotel-card__location">
       <div class="hotel-card__flag">
         <img src="<?php echo esc_url($hotel['flag']); ?>"
              alt="">
       </div>
-      <div class="hotel-card__location"><?php echo esc_html($hotel['location_title']); ?>
-      </div>
+      <div class="hotel-card__location"><?php echo esc_html($hotel['location_title']); ?></div>
       <div class="hotel-card__stars">
         <p>3</p>
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -46,11 +63,57 @@ if (!$hotel || !is_array($hotel)) {
           </path>
         </svg>
       </div>
-
     </div>
-    <?php if (!empty($hotel['tags'])): ?>
+
+    <div class="hotel-card__anemeties">
+      <?php if (!empty($amenities)): ?>
+        <?php foreach ($amenities as $term): ?>
+          <?php
+          $icon_url = '';
+
+          if (function_exists('get_field')) {
+            $icon = get_field('amenity_icon', 'term_' . $term->term_id);
+            if (is_array($icon) && !empty($icon['url'])) {
+              $icon_url = (string) $icon['url'];
+            } elseif (is_string($icon) && $icon !== '') {
+              $icon_url = (string) $icon;
+            } elseif (is_numeric($icon)) {
+              $tmp = wp_get_attachment_image_url((int) $icon, 'thumbnail');
+              if ($tmp) {
+                $icon_url = (string) $tmp;
+              }
+            }
+          }
+
+          if (!$icon_url) {
+            $meta = get_term_meta($term->term_id, 'amenity_icon', true);
+            if (is_array($meta) && !empty($meta['url'])) {
+              $icon_url = (string) $meta['url'];
+            } elseif (is_string($meta) && $meta !== '') {
+              $icon_url = (string) $meta;
+            } elseif (is_numeric($meta)) {
+              $tmp = wp_get_attachment_image_url((int) $meta, 'thumbnail');
+              if ($tmp) {
+                $icon_url = (string) $tmp;
+              }
+            }
+          }
+          ?>
+
+          <?php if ($icon_url): ?>
+            <span class="hotel-card__anemetie"
+                  title="<?php echo esc_attr($term->name); ?>">
+              <img src="<?php echo esc_url($icon_url); ?>"
+                   alt="<?php echo esc_attr($term->name); ?>">
+            </span>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+
+    <?php if (!empty($extra_tags)): ?>
       <div class="hotel-card__tags">
-        <?php foreach ($hotel['tags'] as $t): ?>
+        <?php foreach ($extra_tags as $t): ?>
           <span class="hotel-card__tag"><?php echo esc_html($t); ?></span>
         <?php endforeach; ?>
       </div>
@@ -58,10 +121,8 @@ if (!$hotel || !is_array($hotel)) {
 
 
 
-
     <div class="hotel-card__meta">
-
-      <?php if ($hotel['price']): ?>
+      <?php if (!empty($hotel['price'])): ?>
         <div class="hotel-card__price numfont"><?php echo esc_html($hotel['price']); ?></div>
       <?php endif; ?>
     </div>
