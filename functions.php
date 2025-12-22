@@ -256,6 +256,7 @@ require get_template_directory() . '/inc/requests/news.php';
 require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
+require get_template_directory() . '/inc/requests/popular-hotels-section.php';
 
 
 add_action('acf/init', function () {

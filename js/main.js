@@ -14,6 +14,7 @@ import { initHotelMap } from "./modules/maps";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initCountryAside } from "./modules/country-aside";
+import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -36,5 +37,6 @@ window.addEventListener("DOMContentLoaded", () => {
   initResortHotelsAjax();
   initCountryToursFilters();
   initCountryAside();
+  initPopularHotelsSlider();
   // initHotelMap();
 });

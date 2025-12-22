@@ -62,7 +62,7 @@ if (!$hotel || !is_array($hotel)) {
     <div class="hotel-card__meta">
 
       <?php if ($hotel['price']): ?>
-        <div class="hotel-card__price"><?php echo esc_html($hotel['price']); ?></div>
+        <div class="hotel-card__price numfont"><?php echo esc_html($hotel['price']); ?></div>
       <?php endif; ?>
     </div>
   </div>

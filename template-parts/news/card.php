@@ -13,7 +13,7 @@ $views = (int) get_post_meta(get_the_ID(), 'news_views', true);
     <?php endif; ?>
 
     <div class="news-card__content">
-      <div class="news-card__meta">
+      <div class="news-card__meta numfont">
         <div class="news-card__views">
           <svg xmlns="http://www.w3.org/2000/svg"
                width="18"

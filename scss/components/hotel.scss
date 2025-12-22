@@ -37,6 +37,11 @@
 
 .popular-hotels-filter {
   margin-top: 16px;
+
+  @media screen and (max-width: 1200px) {
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+  }
 }
 
 .hotel-card__flag {

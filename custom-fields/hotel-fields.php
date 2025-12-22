@@ -163,6 +163,7 @@ function bsi_register_hotel_acf_groups(): void
         'type' => 'true_false',
         'ui' => 1,
         'default_value' => 0,
+        'instructions' => 'Покажет отель в блоке «Популярные отели» (слайдер на главной/в секциях по странам).',
         'wrapper' => ['width' => '25'],
       ],
       [
