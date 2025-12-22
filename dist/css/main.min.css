@@ -3830,6 +3830,57 @@ input.error {
   overflow: hidden;
 }
 
+.project-date {
+  margin-left: auto;
+}
+
+.page-country__subtitle {
+  display: flex;
+  align-items: center;
+}
+
+.page-country__link {
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+}
+.page-country__link:hover {
+  color: #ee3145;
+}
+
+.single-project-div {
+  width: 1px;
+  height: 16px;
+  background: #f4f4f6;
+}
+
+.page-country__title-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+@media screen and (max-width: 1024px) {
+  .page-country__title-left {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}
+
+.page-project__top {
+  display: flex;
+  align-items: flex-start;
+}
+@media screen and (max-width: 1024px) {
+  .page-project__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.page-project__title {
+  margin-bottom: 0;
+}
+
 .promo-filter__section {
   margin-top: 32px;
 }
