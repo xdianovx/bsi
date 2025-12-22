@@ -13,7 +13,7 @@ get_header();
         <?php get_template_part('template-parts/pages/country/child-pages-menu'); ?>
       </aside>
 
-      <?php /* Контент страницы */ ?>
+      <?php ?>
       <div class="page-country__content">
         <?php /* Заголовок + краткое описание */ ?>
 

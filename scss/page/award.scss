@@ -28,11 +28,12 @@
 
 .award-card__image {
   width: 100%;
+  aspect-ratio: 12/16;
 
   img {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
   }
 }
 

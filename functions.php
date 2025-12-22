@@ -234,6 +234,7 @@ require get_template_directory() . '/inc/post-types/best-offers.php';
 require get_template_directory() . '/inc/post-types/tour.php';
 require get_template_directory() . '/inc/post-types/tourist-memo.php';
 require get_template_directory() . '/inc/post-types/entry-rules.php';
+require get_template_directory() . '/inc/post-types/project.php';
 
 
 
@@ -249,6 +250,7 @@ require get_template_directory() . '/custom-fields/banner.php';
 require get_template_directory() . '/custom-fields/visa.php';
 require get_template_directory() . '/custom-fields/best-offers.php';
 require get_template_directory() . '/custom-fields/resort.php';
+require get_template_directory() . '/custom-fields/pages/mice.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';

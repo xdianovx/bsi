@@ -8,6 +8,7 @@ function theme_register_nav_menu()
     register_nav_menu('header_nav', 'Мегаменю в шапке');
     register_nav_menu('mobile_nav', 'Мобильное меню');
     register_nav_menu('footer_nav', 'Меню в подвале');
+    register_nav_menu('mice_header_nav', 'MICE: меню в шапке');
 }
 
 

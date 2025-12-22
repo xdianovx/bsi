@@ -123,3 +123,15 @@
   .archive-page__excerpt.--row {
   }
 }
+
+.reviews-slider-section {
+  margin-top: 120px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 80px;
+  }
+}
+
+.reviews-slider-section__content {
+  margin-top: 24px;
+}

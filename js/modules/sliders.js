@@ -160,6 +160,7 @@ export const sliders = () => {
       },
     },
   });
+
   const popularHotelsSlider = new Swiper(".popular-hotels-slider", {
     spaceBetween: 16,
     loop: true,
@@ -167,6 +168,60 @@ export const sliders = () => {
     navigation: {
       nextEl: ".popular-hotels-arrow-next",
       prevEl: ".popular-hotels-arrow-prev",
+    },
+    breakpoints: {
+      320: {
+        slidesPerView: 1,
+      },
+      769: {
+        slidesPerView: 3,
+      },
+      1200: {
+        slidesPerView: 4,
+      },
+    },
+  });
+
+  const awardsSliderSection = new Swiper(".awards-slider", {
+    spaceBetween: 16,
+
+    navigation: {
+      nextEl: ".awards-arrow-next",
+      prevEl: ".awards-arrow-prev",
+    },
+    breakpoints: {
+      320: {
+        slidesPerView: 1,
+      },
+      769: {
+        slidesPerView: 4,
+      },
+      1200: {
+        slidesPerView: 6,
+      },
+    },
+  });
+
+  const reviewsSliderEl = document.querySelector(".reviews-slider");
+  if (reviewsSliderEl) {
+    const reviewsSectionSlider = new Swiper(reviewsSliderEl, {
+      spaceBetween: 16,
+      loop: false,
+      watchOverflow: true, // если слайдов мало — свайп/стрелки не активны
+      slidesPerView: 1,
+      navigation: {
+        nextEl: ".reviews-arrow-next",
+        prevEl: ".reviews-arrow-prev",
+      },
+    });
+  }
+
+  const projectsSectionSlider = new Swiper(".projects-section-slider", {
+    spaceBetween: 16,
+
+    navigation: {
+      nextEl: ".projects-section-arrow-next",
+      prevEl: ".projects-section-arrow-prev",
     },
     breakpoints: {
       320: {

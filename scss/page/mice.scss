@@ -1,0 +1,85 @@
+.mice-hero-section {
+  margin-top: 40px;
+}
+
+.mice-hero__wrap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.mice-hero-item {
+  border-radius: 8px;
+  overflow: hidden;
+  background: $bg-gray;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mice-hero-item__title {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.mice-hero-item__link {
+  margin-left: auto;
+}
+
+.mice-benefits-section {
+  margin-top: 120px;
+  @media screen and (max-width: 768px) {
+    margin-top: 80px;
+  }
+}
+
+.mice-benefit__wrap {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    > :last-child {
+      grid-column: span 2;
+    }
+  }
+}
+
+.mice-benefits-section__title {
+}
+
+.mice-benefit {
+  display: flex;
+  background: $bg-gray;
+  border-radius: 8px;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.mice-benefit__title {
+  font-weight: 500;
+  font-size: 20px;
+  color: $red;
+}
+
+.mice-benefit__text {
+  margin-top: 8px;
+  line-height: 140%;
+  @media screen and (max-width: 1200px) {
+    font-size: 14px;
+  }
+}
