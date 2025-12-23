@@ -60,7 +60,7 @@ $main_page_items = [
 
      [
           'title' => "Business Travel <br> & MICE",
-          'url' => get_permalink(2301),
+          'url' => get_permalink( get_page_by_path( 'mice' ) ),
           'target' => '',
           'img' => 'mice.png',
        

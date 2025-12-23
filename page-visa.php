@@ -195,8 +195,7 @@ get_header();
       </div>
     </div>
   </section>
-
-
+]123412312312312314лорлор
   <section class="visa-page-steps__section">
     <div class="container">
       <h2 class="h2">Процедура оформления</h2>
