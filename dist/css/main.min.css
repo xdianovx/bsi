@@ -2693,7 +2693,7 @@ input.error {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 @media (min-width: 1024px) {
@@ -3238,9 +3238,8 @@ input.error {
 }
 
 .countries-letter__wrap {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  column-count: 4;
+  column-gap: 48px;
 }
 @media screen and (max-width: 1200px) {
   .countries-letter__wrap {
@@ -3255,15 +3254,21 @@ input.error {
 
 .countries-letter__group {
   display: flex;
-  gap: 24px;
+  gap: 8px;
   align-items: flex-start;
   margin-bottom: 32px;
 }
 
 .countries-letter__letter {
+  font-size: 16px;
   font-weight: 700;
-  font-size: 20px;
-  margin-bottom: 0;
+  background: #f4f4f6;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 6px;
 }
 
