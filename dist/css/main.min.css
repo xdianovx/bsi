@@ -3243,12 +3243,12 @@ input.error {
 }
 @media screen and (max-width: 1200px) {
   .countries-letter__wrap {
-    grid-template-columns: repeat(2, 1fr);
+    column-count: 2;
   }
 }
 @media screen and (max-width: 768px) {
   .countries-letter__wrap {
-    grid-template-columns: repeat(1, 1fr);
+    column-count: 1;
   }
 }
 
