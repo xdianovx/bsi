@@ -113,7 +113,7 @@
 }
 
 .countries-letter-list__menu {
-  column-count: 5; /* сколько колонок */
+  column-count: 4;
   column-gap: 48px;
 }
 
@@ -121,11 +121,24 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  margin: 0 0 20px 0;
+  break-inside: avoid;
+  display: flex;
+  gap: 8px;
+  margin: 0 0 24px;
 }
 
 .countries-letter-group__letter {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
+  background: $bg-gray;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
 }
 
 @media (min-width: 1024px) {
