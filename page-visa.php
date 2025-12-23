@@ -259,6 +259,149 @@ get_header();
   </section>
 
 
+  <?php
+  /**
+   * Страны с визами + список доступных типов виз по стране
+   * Требования:
+   * - CPT: visa
+   * - ACF поле: visa_country (ID / post_object)
+   * - Таксономия: visa_type
+   * - У страны ACF поле: flag (url или array['url'])
+   */
+
+  $visa_ids = get_posts([
+    'post_type' => 'visa',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+    'orderby' => 'date',
+    'order' => 'DESC',
+  ]);
+
+  $country_to_visas = []; // [country_id => [visa_id, visa_id...]]
+  $country_ids = [];
+
+  if (!empty($visa_ids) && function_exists('get_field')) {
+    foreach ($visa_ids as $vid) {
+      $country_id = get_field('visa_country', $vid);
+
+      if ($country_id instanceof WP_Post) {
+        $country_id = (int) $country_id->ID;
+      } elseif (is_array($country_id)) {
+        $country_id = (int) reset($country_id);
+      } else {
+        $country_id = (int) $country_id;
+      }
+
+      if ($country_id > 0) {
+        $country_ids[] = $country_id;
+        if (empty($country_to_visas[$country_id])) {
+          $country_to_visas[$country_id] = [];
+        }
+        $country_to_visas[$country_id][] = (int) $vid;
+      }
+    }
+  }
+
+  $country_ids = array_values(array_unique(array_filter($country_ids)));
+
+  $countries = [];
+  if (!empty($country_ids)) {
+    $countries = get_posts([
+      'post_type' => 'country',
+      'post_status' => 'publish',
+      'posts_per_page' => -1,
+      'orderby' => 'title',
+      'order' => 'ASC',
+      'post__in' => $country_ids,
+    ]);
+  }
+  ?>
+
+  <?php if (!empty($countries)): ?>
+    <section class="visa-page-countries-section">
+      <div class="container">
+        <h2 class="h2">Визы по странам</h2>
+
+        <div class="visa-countries__list">
+          <?php foreach ($countries as $country): ?>
+            <?php
+            $cid = (int) $country->ID;
+            $country_slug = (string) $country->post_name;
+            $country_title = (string) get_the_title($cid);
+
+            // флаг
+            $flag_url = '';
+            if (function_exists('get_field')) {
+              $flag_field = get_field('flag', $cid);
+              if ($flag_field) {
+                if (is_array($flag_field) && !empty($flag_field['url'])) {
+                  $flag_url = (string) $flag_field['url'];
+                } elseif (is_string($flag_field)) {
+                  $flag_url = (string) $flag_field;
+                }
+              }
+            }
+
+            $visa_ids_for_country = !empty($country_to_visas[$cid]) ? $country_to_visas[$cid] : [];
+
+            // типы виз, которые реально есть у виз этой страны
+            $types = [];
+            if (!empty($visa_ids_for_country)) {
+              $types = wp_get_object_terms($visa_ids_for_country, 'visa_type', [
+                'orderby' => 'name',
+                'order' => 'ASC',
+              ]);
+              if (is_wp_error($types)) {
+                $types = [];
+              }
+            }
+
+            // если вдруг у страны есть визы, но не назначен ни один visa_type — можно скрыть блок типов
+            $country_visa_url = home_url('/country/' . $country_slug . '/visa/');
+            ?>
+
+            <div class="visa-country-card">
+              <div class="visa-country-card__head">
+                <?php if ($flag_url): ?>
+                  <img class="visa-country-card__flag"
+                       src="<?php echo esc_url($flag_url); ?>"
+                       alt="<?php echo esc_attr($country_title); ?>">
+                <?php endif; ?>
+
+                <div class="visa-country-card__title">
+                  <?php echo esc_html($country_title); ?>
+                </div>
+
+
+              </div>
+
+              <?php if (!empty($types)): ?>
+                <div class="visa-country-card__types">
+                  <?php foreach ($types as $t): ?>
+                    <?php
+                    $url = add_query_arg(['visa_type[]' => (int) $t->term_id], $country_visa_url);
+                    ?>
+                    <a class="visa-country-card__type"
+                       href="<?php echo esc_url($url); ?>">
+                      <?php echo esc_html($t->name); ?>
+                    </a>
+                  <?php endforeach; ?>
+                </div>
+              <?php else: ?>
+                <div class="visa-country-card__types">
+                  <!-- можно оставить пустым/скрывать стилями -->
+                </div>
+              <?php endif; ?>
+            </div>
+
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
+
+
   <?php if (function_exists('have_rows') && have_rows('vizy_contacts')): ?>
     <section class="visa-page-contacts__section">
       <div class="container">

@@ -229,3 +229,82 @@
   margin-top: 8px;
   margin-bottom: 0;
 }
+
+.visa-page-countries-section {
+  margin-top: 120px;
+  @media screen and (max-width: 768px) {
+    margin-top: 80px;
+  }
+}
+
+.visa-countries__list {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  margin-top: 20px;
+  gap: 32px 8px;
+
+  @media screen and (max-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media screen and (max-width: 640px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.visa-country-card {
+}
+
+.visa-country-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: $bg-gray;
+  border-radius: 8px;
+}
+
+.visa-country-card__flag {
+  width: 32px;
+  border-radius: 100%;
+  height: 32px;
+  overflow: hidden;
+  object-fit: cover;
+}
+
+.visa-country-card__title {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.visa-country-card__types {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 8px;
+}
+
+.visa-country-card__type {
+  transition: all 0.3s ease-in-out;
+  font-weight: 500;
+  position: relative;
+  padding-left: 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 0;
+    height: 2px;
+    width: 12px;
+    background: $red;
+  }
+  &:hover {
+    color: $red;
+  }
+}
