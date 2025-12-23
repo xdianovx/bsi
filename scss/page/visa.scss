@@ -216,3 +216,16 @@
     height: 20px;
   }
 }
+
+.visa-consultation-form {
+  padding: 24px 16px;
+  background: $bg-gray;
+  margin-top: 12px;
+  border-radius: 8px;
+}
+
+.visa-consultation-form__descr {
+  color: $text-gray;
+  margin-top: 8px;
+  margin-bottom: 0;
+}

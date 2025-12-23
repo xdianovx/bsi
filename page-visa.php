@@ -195,7 +195,6 @@ get_header();
       </div>
     </div>
   </section>
-]123412312312312314лорлор
   <section class="visa-page-steps__section">
     <div class="container">
       <h2 class="h2">Процедура оформления</h2>
@@ -346,16 +345,104 @@ get_header();
   <section class="visa-page-consultation__section">
     <div class="container">
       <h2 class="h2">Бесплатная консультация</h2>
+      <p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам получения виз</p>
+      <form action=""
+            class="visa-consultation-form">
 
-      <p>Форма важная</p>
+        <div class="form-row form-row-2">
 
-      <form action="">
-        <p>Страна</p>
-        <p>Тип визы?</p>
-        <p>Имя</p>
-        <p>Гражданство</p>
-        <p>Телефон</p>
-        <p>Способ связи?</p>
+          <div class="input-item white">
+
+            <label for="name">Страна</label>
+            <input type="text"
+                   name="country"
+                   id="country"
+                   placeholder="Страна">
+
+            <div class="error-message"
+                 data-field="country">
+            </div>
+          </div>
+
+          <div class="input-item white">
+            <label for="visatype">Тип визы</label>
+            <input type="text"
+                   name="visatype"
+                   id="visatype"
+                   placeholder="Страна">
+
+            <div class="error-message"
+                 data-field="visatype">
+            </div>
+          </div>
+
+          <div class="input-item white">
+            <label for="name">Имя</label>
+            <input type="text"
+                   name="name"
+                   id="name"
+                   placeholder="Имя">
+
+            <div class="error-message"
+                 data-field="name">
+            </div>
+          </div>
+
+          <div class="input-item white">
+            <label for="graz">Гражданство</label>
+            <input type="text"
+                   name="graz"
+                   id="graz"
+                   placeholder="Гражданство">
+
+            <div class="error-message"
+                 data-field="graz">
+            </div>
+          </div>
+
+
+          <div class="input-item white">
+            <label for="tel">Телефон</label>
+            <input type="tel"
+                   name="tel"
+                   id="tel"
+                   placeholder="Имя">
+
+            <div class="error-message"
+                 data-field="tel">
+            </div>
+          </div>
+
+
+          <div class="input-item white">
+            <label for="graz">Дата поездки</label>
+            <input type="text"
+                   name="graz"
+                   id="graz"
+                   placeholder="Гражданство">
+
+            <div class="error-message"
+                 data-field="graz">
+            </div>
+          </div>
+
+
+        </div>
+        <div class="visa-consultation-form__bottom">
+          <div id="form-status"></div>
+          <button type="submit"
+                  class="btn btn-accent fit-form__btn-submit">
+            Отправить
+          </button>
+
+          <p class="form-policy fit-form__policy">
+            Нажимая на кнопку "Отправить", вы соглашаетесь с <a
+               href="http://webscape.beget.tech/bsi/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
+               class="policy-link">
+              нашей политикой обработки персональных данных
+            </a>
+          </p>
+        </div>
       </form>
     </div>
   </section>

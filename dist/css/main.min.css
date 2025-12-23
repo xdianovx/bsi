@@ -5494,6 +5494,19 @@ input.error {
   height: 20px;
 }
 
+.visa-consultation-form {
+  padding: 24px 16px;
+  background: #f4f4f6;
+  margin-top: 12px;
+  border-radius: 8px;
+}
+
+.visa-consultation-form__descr {
+  color: #5c5c5c;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
 .phone-link {
   display: inline-block;
   color: #ee3145;
