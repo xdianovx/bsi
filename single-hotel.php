@@ -268,42 +268,42 @@ get_header();
             </div>
           </div>
 
-          <div class="hotel-widget">
-            <p class="hotel-widget__title">Контакты отеля</p>
-            <div class="hotel-widget__contacts">
-              <?php if ($phone): ?>
-                <div class="hotel-widget__phone hotel-widget__contacts-item">
-                  <a href="tel:<?= esc_attr(preg_replace('/\s+/', '', $phone)); ?>">
-                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg"
+          <?php if ($phone || $address || $website): ?>
+            <div class="hotel-widget">
+              <p class="hotel-widget__title">Контакты отеля</p>
+              <div class="hotel-widget__contacts">
+                <?php if ($phone): ?>
+                  <div class="hotel-widget__phone hotel-widget__contacts-item">
+                    <a href="tel:<?= esc_attr(preg_replace('/\s+/', '', $phone)); ?>">
+                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg"
+                           alt="">
+                      <span><?= esc_html($phone); ?></span>
+                    </a>
+                  </div>
+                <?php endif; ?>
+
+                <?php if ($address): ?>
+                  <div class="hotel-widget__address hotel-widget__contacts-item">
+                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg"
                          alt="">
-                    <span><?= esc_html($phone); ?></span>
-                  </a>
-                </div>
-              <?php endif; ?>
+                    <span><?= esc_html($address); ?></span>
+                  </div>
+                <?php endif; ?>
 
-              <?php if ($address): ?>
-                <div class="hotel-widget__address hotel-widget__contacts-item">
-                  <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg"
-                       alt="">
-                  <span><?= esc_html($address); ?></span>
-                </div>
-              <?php endif; ?>
-
-              <?php if ($website): ?>
-                <div class="hotel-widget__site hotel-widget__contacts-item">
-
-                  <a href="<?= esc_url($website); ?>"
-                     target="_blank"
-                     rel="nofollow noopener">
-                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg"
-                         alt="">
-                    <span>Сайт отеля</span>
-                  </a>
-                </div>
-              <?php endif; ?>
+                <?php if ($website): ?>
+                  <div class="hotel-widget__site hotel-widget__contacts-item">
+                    <a href="<?= esc_url($website); ?>"
+                       target="_blank"
+                       rel="nofollow noopener">
+                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg"
+                           alt="">
+                      <span>Сайт отеля</span>
+                    </a>
+                  </div>
+                <?php endif; ?>
+              </div>
             </div>
-
-          </div>
+          <?php endif; ?>
 
           <div class="hotel-widget">
             <a href="#"

@@ -286,6 +286,9 @@ main {
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
 }
+.btn-black:visited {
+  color: #fff;
+}
 
 .btn-expand {
   font-weight: 500;
@@ -4559,7 +4562,7 @@ input.error {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 32px;
 }
 @media screen and (max-width: 1024px) {
   .country-regions__list {

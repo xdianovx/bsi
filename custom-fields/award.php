@@ -29,13 +29,6 @@ add_action('acf/init', function () {
         ],
       ],
 
-
-
-
-
-
-
-
       [
         'key' => 'field_award_link',
         'label' => 'Ссылка на источник',
