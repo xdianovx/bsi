@@ -2668,10 +2668,8 @@ input.error {
 }
 
 .countries-letter-list__menu {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px 16px;
-  width: 100%;
+  column-count: 5; /* сколько колонок */
+  column-gap: 48px;
 }
 
 .countries-letter-group {
