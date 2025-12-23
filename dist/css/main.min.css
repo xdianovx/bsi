@@ -2540,7 +2540,7 @@ input.error {
   width: 40px;
   bottom: 0;
   z-index: 0;
-  object-fit: cover;
+  object-fit: contain;
 }
 .main-pages__item-img img {
   width: 100%;
