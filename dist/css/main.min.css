@@ -2693,7 +2693,7 @@ input.error {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 @media (min-width: 1024px) {
