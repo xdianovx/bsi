@@ -156,7 +156,6 @@ export const gtmSearch = async () => {
       true
     );
 
-    // дефолт — первая страна
     stateSelect.setChoiceByValue(String(states[0].id));
     updateTourLink({ activeState: String(states[0].id) });
   }
