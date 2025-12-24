@@ -369,43 +369,6 @@ add_action('wp_enqueue_scripts', function () {
 
 
 
-add_action('init', function () {
-	if (!isset($_GET['samo_test'])) {
-		return;
-	}
-
-	try {
-		$client = new SamoClient([
-			'base_url' => SAMO_API_URL,
-			'token' => SAMO_OAUTH_TOKEN,
-			'samo_action' => SAMO_ACTION,
-			'version' => SAMO_API_VERSION,
-			'type' => SAMO_API_TYPE,
-		]);
-
-		$res = $client->request('SearchTour_ALL', [
-			'TOWNFROMINC' => 2,
-			'STATEINC' => 31,
-		]);
-
-		echo '<pre>';
-		print_r($res);
-		echo '</pre>';
-		exit;
-
-	} catch (Throwable $e) {
-		echo 'ERROR: ' . $e->getMessage();
-		exit;
-	}
-});
 
 
-add_action('init', function () {
-	if (!current_user_can('manage_options'))
-		return;
-	if (!isset($_GET['iptest']))
-		return;
 
-	$res = wp_remote_get('https://api.ipify.org?format=json', ['timeout' => 10]);
-	wp_die(wp_remote_retrieve_body($res));
-});
