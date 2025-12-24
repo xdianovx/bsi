@@ -17,6 +17,12 @@
 
 .gtm-item__button {
   padding: 16px 40px;
+
+  @media screen and (max-width: 1024px) {
+    width: 100%;
+    background: #000;
+    color: #fff;
+  }
 }
 
 .gtm-nights-select {
@@ -33,6 +39,21 @@
   grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
   border-radius: 8px;
   align-items: stretch;
+  width: 100%;
+
+  &.--hotels {
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+  }
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+    width: 100%;
+    gap: 8px;
+
+    > * {
+      border-radius: 8px;
+      width: 100%;
+    }
+  }
   .choices {
     flex-grow: 1;
     width: 100%;
@@ -87,6 +108,10 @@
   position: relative;
   background: #fff;
   padding: 0 16px;
+
+  @media screen and (max-width: 768px) {
+    justify-content: flex-start;
+  }
 }
 
 .gtm-persons-select {
@@ -179,8 +204,9 @@
   }
 
   .gtm-search__item {
+    flex-direction: column;
     &.active {
-      display: none;
+      display: flex;
     }
   }
 }

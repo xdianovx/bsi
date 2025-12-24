@@ -1790,6 +1790,13 @@ input.error {
 .gtm-item__button {
   padding: 16px 40px;
 }
+@media screen and (max-width: 1024px) {
+  .gtm-item__button {
+    width: 100%;
+    background: #000;
+    color: #fff;
+  }
+}
 
 .gtm-nights-select {
   cursor: pointer;
@@ -1805,6 +1812,21 @@ input.error {
   grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
   border-radius: 8px;
   align-items: stretch;
+  width: 100%;
+}
+.gtm-search__wrap.--hotels {
+  grid-template-columns: 3fr 1fr 1fr 1fr;
+}
+@media screen and (max-width: 768px) {
+  .gtm-search__wrap {
+    grid-template-columns: repeat(1, 1fr);
+    width: 100%;
+    gap: 8px;
+  }
+  .gtm-search__wrap > * {
+    border-radius: 8px;
+    width: 100%;
+  }
 }
 .gtm-search__wrap .choices {
   flex-grow: 1;
@@ -1854,6 +1876,11 @@ input.error {
   position: relative;
   background: #fff;
   padding: 0 16px;
+}
+@media screen and (max-width: 768px) {
+  .gtm-nights-select {
+    justify-content: flex-start;
+  }
 }
 
 .gtm-persons-select {
@@ -1938,8 +1965,11 @@ input.error {
   .gtm-search__tab-btn {
     flex-shrink: 0;
   }
+  .gtm-search__item {
+    flex-direction: column;
+  }
   .gtm-search__item.active {
-    display: none;
+    display: flex;
   }
 }
 @media screen and (max-width: 768px) {

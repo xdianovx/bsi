@@ -1,3 +1,4 @@
+// gtm-search.js
 import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
@@ -6,23 +7,18 @@ import { createDayRange } from "./forms/day-range.js";
 import { peopleCounter } from "./gtm-people-counter.js";
 
 export const gtmSearch = async () => {
-  const gtmSection = document.querySelector(".gtm-search__section");
-  if (!gtmSection) return;
+  const section = document.querySelector(".gtm-search__section");
+  if (!section) return;
 
-  const setLoading = (on) => gtmSection.classList.toggle("is-loading", !!on);
-
+  // ============================================================
+  // 1) Общий AJAX хелпер (одна точка входа в WP: action=bsi_samo)
+  // ============================================================
   async function samoAjax(method, params = {}) {
-    const body = new URLSearchParams();
-    body.set("action", "bsi_samo");
-    body.set("method", method);
-
-    Object.entries(params).forEach(([k, v]) => {
-      if (v === undefined || v === null) return;
-      body.set(k, String(v));
+    const body = new URLSearchParams({
+      action: "bsi_samo",
+      method,
+      ...params,
     });
-
-    // nonce позже добавим
-    // body.set("nonce", bsiSamo.nonce);
 
     const res = await fetch(ajax.url, {
       method: "POST",
@@ -31,208 +27,394 @@ export const gtmSearch = async () => {
       body,
     });
 
-    const json = await res.json().catch(() => null);
-    if (!json || !json.success) throw new Error(json?.data?.message || "AJAX error");
-
-    // то, что вернул wp_send_json_success(...)
-    const wrap = json.data;
-
-    // если это наш SamoClient-формат: { ok, data, url }
-    if (wrap && typeof wrap === "object" && "ok" in wrap) {
-      if (!wrap.ok) throw new Error(wrap.error || "SAMO error");
-      return wrap.data; // <-- ВАЖНО: возвращаем чистый payload SamoTour
-    }
-
-    // иначе вернули уже payload напрямую
-    return wrap;
+    const json = await res.json();
+    if (!json.success) throw new Error(json.data?.message || "AJAX error");
+    return json.data;
   }
 
-  dropdown(".gtm-nights-select");
-  dropdown(".gtm-persons-select");
+  // ============================================================
+  // 2) Табы: переключение + ленивая инициализация
+  // ============================================================
+  const tabButtons = Array.from(section.querySelectorAll(".gtm-search__tab-btn"));
+  const tabPanels = Array.from(section.querySelectorAll(".gtm-search__item"));
 
-  const townSelectElement = gtmSection.querySelector(".gtm-town-select");
-  const stateSelectElement = gtmSection.querySelector(".gtm-state-select");
-  const submitBtn = gtmSection.querySelector(".gtm-item__button");
+  // по твоей разметке: panels идут в порядке (tours/hotels/tickets/excursions)
+  const tabNames = tabPanels.map((p) => p.getAttribute("data-tab") || "");
 
-  const searchParams = {
-    activeTown: "2",
-    activeState: "",
-    nightsFrom: 5,
-    nightsTill: 10,
-    checkInStart: "20251210",
-    checkInEnd: "20251219",
-    adultsCount: "2",
-    childCount: "0",
-    childAges: "",
-  };
+  const initedTabs = new Set();
 
-  let tourLink = "";
+  function setActiveTab(index) {
+    tabButtons.forEach((b) => b.classList.remove("active"));
+    tabPanels.forEach((p) => p.classList.remove("active"));
 
-  function formatDateYYYYMMDD(date) {
-    return date.getFullYear() + String(date.getMonth() + 1).padStart(2, "0") + String(date.getDate()).padStart(2, "0");
+    tabButtons[index]?.classList.add("active");
+    tabPanels[index]?.classList.add("active");
+
+    const name = tabNames[index];
+    if (name) initTab(name).catch(console.error);
   }
 
-  function updateTourLink(params = {}) {
-    Object.assign(searchParams, params);
+  tabButtons.forEach((btn, idx) => btn.addEventListener("click", () => setActiveTab(idx)));
 
-    if (searchParams.checkInStart instanceof Date) {
-      searchParams.checkInStart = formatDateYYYYMMDD(searchParams.checkInStart);
-    }
-    if (searchParams.checkInEnd instanceof Date) {
-      searchParams.checkInEnd = formatDateYYYYMMDD(searchParams.checkInEnd);
-    }
+  // ============================================================
+  // 3) ИНИТ конкретных табов (только 1 раз)
+  // ============================================================
+  async function initTab(name) {
+    if (initedTabs.has(name)) return;
 
-    tourLink =
-      `https://online.bsigroup.ru/default.php?page=search_tour` +
-      `&TOWNFROMINC=${searchParams.activeTown}` +
-      `&STATEINC=${searchParams.activeState}` +
-      `&CHECKIN_BEG=${searchParams.checkInStart}` +
-      `&CHECKIN_END=${searchParams.checkInEnd}` +
-      `&NIGHTS_FROM=${searchParams.nightsFrom}` +
-      `&NIGHTS_TILL=${searchParams.nightsTill}` +
-      `&ADULT=${searchParams.adultsCount}` +
-      `&CHILD=${searchParams.childCount}` +
-      `&AGES=${searchParams.childAges}` +
-      `&DOLOAD=1`;
+    if (name === "tours") await initToursTab();
+    if (name === "hotels") await initHotelsTab();
+    // tickets/excursions потом
+
+    initedTabs.add(name);
   }
 
-  updateTourLink();
+  // ============================================================
+  // 4) ТАБ "Туры"
+  // ============================================================
+  async function initToursTab() {
+    const rootEl = section.querySelector('.gtm-search__item[data-tab="tours"]');
+    if (!rootEl) return;
 
-  const townSelect = new Choices(townSelectElement, {
-    searchEnabled: true,
-    loadingText: "Загрузка...",
-    noResultsText: "Ничего не найдено",
-    itemSelectText: "",
-    noChoicesText: "",
-  });
+    // локальный лоадинг именно таба (можно и section трогать, как тебе удобнее)
+    section.classList.add("is-loading");
 
-  const stateSelect = new Choices(stateSelectElement, {
-    searchEnabled: false,
-    loadingText: "Загрузка...",
-    noResultsText: "Ничего не найдено",
-    itemSelectText: "",
-    noChoicesText: "",
-  });
+    // dropdown внутри этого таба (важно: селектор scoped)
+    dropdown('[data-tab="tours"] .gtm-nights-select');
+    dropdown('[data-tab="tours"] .gtm-persons-select');
 
-  async function loadTowns() {
-    townSelect.clearChoices();
-    townSelect.clearStore();
+    const townSelectElement = rootEl.querySelector(".gtm-town-select");
+    const stateSelectElement = rootEl.querySelector(".gtm-state-select");
+    const submitBtn = rootEl.querySelector(".gtm-item__button");
 
-    const payload = await samoAjax("townfroms");
-    const towns = payload?.SearchTour_TOWNFROMS || [];
+    // --- состояние таба "Туры"
+    const searchParams = {
+      activeTown: "2",
+      activeState: "",
+      nightsFrom: 5,
+      nightsTill: 10,
+      checkInStart: "20251210",
+      checkInEnd: "20251219",
+      adultsCount: "2",
+      childCount: "0",
+      childAges: "",
+    };
 
-    townSelect.setChoices(
-      towns.map((t) => ({ value: String(t.id), label: t.name })),
-      "value",
-      "label",
-      true
-    );
+    let tourLink = "";
 
-    // если дефолтного города нет — берем первый
-    const hasDefault = towns.some((t) => String(t.id) === String(searchParams.activeTown));
-    if (!hasDefault && towns.length) {
-      searchParams.activeTown = String(towns[0].id);
+    function formatDateYYYYMMDD(date) {
+      return date.getFullYear() + String(date.getMonth() + 1).padStart(2, "0") + String(date.getDate()).padStart(2, "0");
     }
 
-    townSelect.setChoiceByValue(String(searchParams.activeTown));
-  }
+    function updateLink(params = {}) {
+      Object.assign(searchParams, params);
 
-  async function loadStates(townId) {
-    stateSelect.clearChoices();
-    stateSelect.clearStore();
+      if (searchParams.checkInStart instanceof Date) {
+        searchParams.checkInStart = formatDateYYYYMMDD(searchParams.checkInStart);
+      }
+      if (searchParams.checkInEnd instanceof Date) {
+        searchParams.checkInEnd = formatDateYYYYMMDD(searchParams.checkInEnd);
+      }
 
-    const payload = await samoAjax("states", { TOWNFROMINC: String(townId) });
-    const states = payload?.SearchTour_STATES || [];
-
-    if (!states.length) {
-      updateTourLink({ activeState: "" });
-      return;
+      tourLink =
+        `https://online.bsigroup.ru/default.php?page=search_tour` +
+        `&TOWNFROMINC=${searchParams.activeTown}` +
+        `&STATEINC=${searchParams.activeState}` +
+        `&CHECKIN_BEG=${searchParams.checkInStart}` +
+        `&CHECKIN_END=${searchParams.checkInEnd}` +
+        `&NIGHTS_FROM=${searchParams.nightsFrom}` +
+        `&NIGHTS_TILL=${searchParams.nightsTill}` +
+        `&ADULT=${searchParams.adultsCount}` +
+        `&CHILD=${searchParams.childCount}` +
+        `&AGES=${searchParams.childAges}` +
+        `&DOLOAD=1`;
     }
 
-    stateSelect.setChoices(
-      states.map((s) => ({ value: String(s.id), label: s.name })),
-      "value",
-      "label",
-      true
-    );
+    updateLink();
 
-    stateSelect.setChoiceByValue(String(states[0].id));
-    updateTourLink({ activeState: String(states[0].id) });
-  }
+    // --- Choices (Туры)
+    const townSelect = new Choices(townSelectElement, {
+      searchEnabled: true,
+      loadingText: "Загрузка...",
+      noResultsText: "Ничего не найдено",
+      itemSelectText: "",
+      noChoicesText: "",
+    });
 
-  townSelect.passedElement.element.addEventListener("choice", async (e) => {
-    const townId = String(e.detail.value);
+    const stateSelect = new Choices(stateSelectElement, {
+      searchEnabled: false,
+      loadingText: "Загрузка...",
+      noResultsText: "Ничего не найдено",
+      itemSelectText: "",
+      noChoicesText: "",
+    });
 
-    setLoading(true);
-    try {
-      updateTourLink({ activeTown: townId, activeState: "" });
+    async function loadTowns() {
+      townSelect.clearChoices();
+      townSelect.clearStore();
+
+      const resp = await samoAjax("townfroms"); // PHP уже есть
+      const towns = resp?.SearchTour_TOWNFROMS || resp;
+
+      townSelect.setChoices(
+        (towns || []).map((t) => ({ value: String(t.id), label: t.name })),
+        "value",
+        "label",
+        true
+      );
+
+      townSelect.setChoiceByValue(String(searchParams.activeTown));
+    }
+
+    async function loadStates(townId) {
+      stateSelect.clearChoices();
+      stateSelect.clearStore();
+
+      const resp = await samoAjax("states", { TOWNFROMINC: String(townId) }); // PHP уже есть
+      const states = resp?.SearchTour_STATES || resp;
+
+      if (states && states.length) {
+        stateSelect.setChoices(
+          states.map((s) => ({ value: String(s.id), label: s.name })),
+          "value",
+          "label",
+          true
+        );
+        stateSelect.setChoiceByValue(String(states[0].id));
+        updateLink({ activeState: String(states[0].id) });
+      }
+    }
+
+    // --- listeners (Туры)
+    townSelect.passedElement.element.addEventListener("choice", async (e) => {
+      const townId = e.detail.value;
+      updateLink({ activeTown: String(townId), activeState: "" });
       await loadStates(townId);
-    } finally {
-      setLoading(false);
-    }
-  });
+    });
 
-  stateSelect.passedElement.element.addEventListener("choice", (e) => {
-    updateTourLink({ activeState: String(e.detail.value) });
-  });
+    stateSelect.passedElement.element.addEventListener("choice", (e) => {
+      updateLink({ activeState: String(e.detail.value) });
+    });
 
-  submitBtn.addEventListener("click", () => {
-    window.open(tourLink, "_blank");
-  });
+    submitBtn.addEventListener("click", () => {
+      window.open(tourLink, "_blank");
+    });
 
-  createDayRange({
-    gridSelector: ".day-grid",
-    defaultStartDay: searchParams.nightsFrom,
-    defaultEndDay: searchParams.nightsTill,
-    onChange: ({ startDay, endDay }) => {
-      updateTourLink({ nightsFrom: startDay, nightsTill: endDay });
-      gtmSection.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
-    },
-  });
-
-  peopleCounter({
-    rootSelector: ".gtm-persons-select",
-    outputSelector: ".gtm-people-total",
-    maxAdults: 4,
-    maxChildren: 3,
-    onChange: ({ adults, children, ages }) => {
-      const encodedAges = ages.length ? ages.join("%2C") : "";
-      updateTourLink({
-        adultsCount: String(adults),
-        childCount: String(children),
-        childAges: encodedAges,
-      });
-    },
-  });
-
-  const datepick = gtmSection.querySelector(".gtm-datepicker");
-  if (datepick) {
-    const today = new Date();
-    const nextWeek = new Date();
-    nextWeek.setDate(today.getDate() + 7);
-
-    flatpickr(datepick, {
-      mode: "range",
-      minDate: "today",
-      locale: Russian,
-      dateFormat: "d.m",
-      defaultDate: [today, nextWeek],
-      onChange: (selectedDates) => {
-        if (selectedDates.length === 2) {
-          updateTourLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+    // --- Ночи (важно: rootEl)
+    createDayRange({
+      rootEl,
+      gridSelector: ".day-grid",
+      defaultStartDay: searchParams.nightsFrom,
+      defaultEndDay: searchParams.nightsTill,
+      onChange: ({ startDay, endDay }) => {
+        if (startDay && endDay) {
+          updateLink({ nightsFrom: startDay, nightsTill: endDay });
+          rootEl.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
         }
       },
     });
-  }
 
-  // INIT
-  setLoading(true);
-  try {
+    // --- Люди (scoped через селектор таба)
+    peopleCounter({
+      rootSelector: '[data-tab="tours"] .gtm-persons-select',
+      outputSelector: '[data-tab="tours"] .gtm-people-total',
+      maxAdults: 4,
+      maxChildren: 3,
+      onChange: ({ adults, children, ages }) => {
+        const encodedAges = ages.length ? ages.join("%2C") : "";
+        updateLink({
+          adultsCount: String(adults),
+          childCount: String(children),
+          childAges: encodedAges,
+        });
+      },
+    });
+
+    // --- Даты (Туры)
+    const datepick = rootEl.querySelector(".gtm-datepicker");
+    if (datepick) {
+      const today = new Date();
+      const nextWeek = new Date();
+      nextWeek.setDate(today.getDate() + 7);
+
+      flatpickr(datepick, {
+        mode: "range",
+        minDate: "today",
+        locale: Russian,
+        dateFormat: "d.m",
+        defaultDate: [today, nextWeek],
+        onChange: (selectedDates) => {
+          if (selectedDates.length === 2) {
+            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          }
+        },
+      });
+    }
+
+    // --- init загрузки данных (Туры)
     await loadTowns();
     await loadStates(searchParams.activeTown);
-  } catch (e) {
-    console.error(e);
-  } finally {
-    setLoading(false);
+
+    section.classList.remove("is-loading");
   }
+
+  // ============================================================
+  // 5) ТАБ "Отели" (без дублирования логики табов, но параметры другие)
+  // ============================================================
+  async function initHotelsTab() {
+    const rootEl = section.querySelector('.gtm-search__item[data-tab="hotels"]');
+    if (!rootEl) return;
+
+    section.classList.add("is-loading");
+
+    dropdown('[data-tab="hotels"] .gtm-nights-select');
+    dropdown('[data-tab="hotels"] .gtm-persons-select');
+
+    const stateSelectElement = rootEl.querySelector(".gtm-state-select");
+    const submitBtn = rootEl.querySelector(".gtm-item__button");
+
+    const searchParams = {
+      STATEFROM: "2", // ты сказал “всегда 2”
+      activeState: "", // STATEINC
+      nightsFrom: 5,
+      nightsTill: 10,
+      checkInStart: "20251210",
+      checkInEnd: "20251219",
+      adultsCount: "2",
+      childCount: "0",
+      childAges: "",
+    };
+
+    let hotelLink = "";
+
+    function formatDateYYYYMMDD(date) {
+      return date.getFullYear() + String(date.getMonth() + 1).padStart(2, "0") + String(date.getDate()).padStart(2, "0");
+    }
+
+    function updateLink(params = {}) {
+      Object.assign(searchParams, params);
+
+      if (searchParams.checkInStart instanceof Date) {
+        searchParams.checkInStart = formatDateYYYYMMDD(searchParams.checkInStart);
+      }
+      if (searchParams.checkInEnd instanceof Date) {
+        searchParams.checkInEnd = formatDateYYYYMMDD(searchParams.checkInEnd);
+      }
+
+      hotelLink =
+        `https://online.bsigroup.ru/default.php?page=search_hotel` +
+        `&STATEFROM=${searchParams.STATEFROM}` +
+        `&STATEINC=${searchParams.activeState}` +
+        `&CHECKIN_BEG=${searchParams.checkInStart}` +
+        `&CHECKIN_END=${searchParams.checkInEnd}` +
+        `&NIGHTS_FROM=${searchParams.nightsFrom}` +
+        `&NIGHTS_TILL=${searchParams.nightsTill}` +
+        `&ADULT=${searchParams.adultsCount}` +
+        `&CHILD=${searchParams.childCount}` +
+        `&AGES=${searchParams.childAges}` +
+        `&DOLOAD=1`;
+    }
+
+    updateLink();
+
+    // Choices (Отели)
+    const stateSelect = new Choices(stateSelectElement, {
+      searchEnabled: true,
+      loadingText: "Загрузка...",
+      noResultsText: "Ничего не найдено",
+      itemSelectText: "",
+      noChoicesText: "",
+    });
+
+    //  !!! нужен PHP-роут: method=hotel_states
+    async function loadHotelStates() {
+      stateSelect.clearChoices();
+      stateSelect.clearStore();
+
+      const resp = await samoAjax("hotel_states", { STATEFROM: searchParams.STATEFROM });
+      const states = resp?.SearchHotel_STATES || resp;
+
+      if (states && states.length) {
+        stateSelect.setChoices(
+          states.map((s) => ({ value: String(s.id), label: s.name })),
+          "value",
+          "label",
+          true
+        );
+
+        stateSelect.setChoiceByValue(String(states[0].id));
+        updateLink({ activeState: String(states[0].id) });
+      }
+    }
+
+    // listeners (Отели)
+    stateSelect.passedElement.element.addEventListener("choice", (e) => {
+      updateLink({ activeState: String(e.detail.value) });
+    });
+
+    submitBtn.addEventListener("click", () => {
+      window.open(hotelLink, "_blank");
+    });
+
+    // Ночи (rootEl)
+    createDayRange({
+      rootEl,
+      gridSelector: ".day-grid",
+      defaultStartDay: searchParams.nightsFrom,
+      defaultEndDay: searchParams.nightsTill,
+      onChange: ({ startDay, endDay }) => {
+        if (startDay && endDay) {
+          updateLink({ nightsFrom: startDay, nightsTill: endDay });
+          rootEl.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
+        }
+      },
+    });
+
+    // Люди (Отели)
+    peopleCounter({
+      rootSelector: '[data-tab="hotels"] .gtm-persons-select',
+      outputSelector: '[data-tab="hotels"] .gtm-people-total',
+      maxAdults: 4,
+      maxChildren: 3,
+      onChange: ({ adults, children, ages }) => {
+        const encodedAges = ages.length ? ages.join("%2C") : "";
+        updateLink({
+          adultsCount: String(adults),
+          childCount: String(children),
+          childAges: encodedAges,
+        });
+      },
+    });
+
+    // Даты (Отели)
+    const datepick = rootEl.querySelector(".gtm-datepicker");
+    if (datepick) {
+      const today = new Date();
+      const nextWeek = new Date();
+      nextWeek.setDate(today.getDate() + 7);
+
+      flatpickr(datepick, {
+        mode: "range",
+        minDate: "today",
+        locale: Russian,
+        dateFormat: "d.m",
+        defaultDate: [today, nextWeek],
+        onChange: (selectedDates) => {
+          if (selectedDates.length === 2) {
+            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          }
+        },
+      });
+    }
+
+    await loadHotelStates();
+
+    section.classList.remove("is-loading");
+  }
+
+  // ============================================================
+  // 6) Стартуем: активный таб (по разметке уже active)
+  // ============================================================
+  const activeIndex = tabPanels.findIndex((p) => p.classList.contains("active"));
+  setActiveTab(activeIndex >= 0 ? activeIndex : 0);
 };

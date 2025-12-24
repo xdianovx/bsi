@@ -25,4 +25,16 @@ class SamoEndpoints
   {
     return $this->client->request('SearchTour_STATES', $params);
   }
+
+  public function searchHotelStates(array $params): array
+  {
+    return $this->client->request('SearchHotel_STATES', $params);
+  }
+
+  public function searchHotelHotels(array $params): array
+  {
+    return $this->client->request('SearchHotel_HOTELS', $params);
+  }
 }
+
+

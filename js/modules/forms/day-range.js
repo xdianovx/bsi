@@ -1,6 +1,21 @@
 // modules/day-range.js
-export function createDayRange({ gridSelector, defaultStartDay = null, defaultEndDay = null, onChange = null }) {
-  const grid = document.querySelector(gridSelector);
+// Выбор диапазона ночей (1..30) по кликам
+// Улучшения:
+// - Работает в scope (можно передавать gridEl или rootEl + gridSelector)
+// - Не завязан на document.querySelector напрямую
+// - Методы: getState(), setState(), reset(), destroy()
+
+export function createDayRange({
+  gridSelector, // ".day-grid"
+  gridEl, // можно сразу передать элемент грида
+  rootEl, // или корневой элемент таба/виджета
+  defaultStartDay = null,
+  defaultEndDay = null,
+  onChange = null,
+}) {
+  const grid =
+    gridEl || (rootEl ? rootEl.querySelector(gridSelector) : null) || (gridSelector ? document.querySelector(gridSelector) : null);
+
   if (!grid) return null;
 
   const items = Array.from(grid.querySelectorAll(".day-item"));
@@ -9,89 +24,130 @@ export function createDayRange({ gridSelector, defaultStartDay = null, defaultEn
   let startIndex = null;
   let endIndex = null;
 
+  // ---- helpers ----
   function getIndexByDay(day) {
     return items.findIndex((el) => Number(el.textContent) === Number(day));
   }
 
+  function isDisabled(el) {
+    return el.classList.contains("is-disabled");
+  }
+
+  function getDays() {
+    const startDay = startIndex === null ? null : Number(items[startIndex]?.textContent);
+    const endDay = endIndex === null ? null : Number(items[endIndex]?.textContent);
+    return { startDay, endDay };
+  }
+
+  function emitChange(reason = "change") {
+    if (typeof onChange !== "function") return;
+    const { startDay, endDay } = getDays();
+
+    onChange({
+      startDay,
+      endDay,
+      startIndex,
+      endIndex,
+      reason, // "init" | "click" | "setState" | "reset" | "change"
+    });
+  }
+
   function render() {
     items.forEach((item, index) => {
-      if (item.classList.contains("is-disabled")) return;
+      if (isDisabled(item)) return;
 
       item.classList.remove("is-active");
 
       if (startIndex === null) return;
 
-      // включаем диапазон
+      // один выбранный день (первый клик)
       if (endIndex === null && index === startIndex) {
         item.classList.add("is-active");
       }
 
+      // диапазон
       if (endIndex !== null && index >= startIndex && index <= endIndex) {
         item.classList.add("is-active");
       }
     });
   }
 
+  // ---- click handler ----
   function handleItemClick(e) {
     const item = e.currentTarget;
-    if (item.classList.contains("is-disabled")) return;
+    if (isDisabled(item)) return;
 
     const index = items.indexOf(item);
 
-    // первый клик или перезапуск
+    // первый клик или перезапуск, или клик "влево" от старта
     if (startIndex === null || (startIndex !== null && endIndex !== null) || index <= startIndex) {
       startIndex = index;
       endIndex = null;
     } else {
-      // второй клик
       endIndex = index;
     }
 
     render();
 
-    if (typeof onChange === "function" && startIndex !== null && endIndex !== null) {
-      const startDay = Number(items[startIndex].textContent);
-      const endDay = Number(items[endIndex].textContent);
-
-      onChange({ startDay, endDay, startIndex, endIndex });
-    }
+    // важно: шлем onChange только когда диапазон уже 2 точки
+    if (startIndex !== null && endIndex !== null) emitChange("click");
   }
 
-  // вешаем слушатели
-  items.forEach((item) => {
-    item.addEventListener("click", handleItemClick);
-  });
+  // ---- bind ----
+  items.forEach((item) => item.addEventListener("click", handleItemClick));
 
-  // ---- предвыбранные дни ----
-  if (defaultStartDay !== null) {
-    startIndex = getIndexByDay(defaultStartDay);
-  }
-
-  if (defaultEndDay !== null) {
-    endIndex = getIndexByDay(defaultEndDay);
-  }
+  // ---- init defaults ----
+  if (defaultStartDay !== null) startIndex = getIndexByDay(defaultStartDay);
+  if (defaultEndDay !== null) endIndex = getIndexByDay(defaultEndDay);
 
   if (startIndex !== null) {
+    // если endIndex есть, но он левее startIndex — сбрасываем
+    if (endIndex !== null && endIndex <= startIndex) endIndex = null;
+
     render();
 
-    if (endIndex !== null && typeof onChange === "function") {
-      onChange({
-        startDay: Number(items[startIndex].textContent),
-        endDay: Number(items[endIndex].textContent),
-        startIndex,
-        endIndex,
-      });
-    }
+    // если заданы оба — эмитим сразу (как раньше)
+    if (startIndex !== null && endIndex !== null) emitChange("init");
   }
 
+  // ---- API ----
   return {
-    getRange() {
-      return { startIndex, endIndex };
+    getState() {
+      const { startDay, endDay } = getDays();
+      return { startIndex, endIndex, startDay, endDay };
     },
+
+    // можно задавать через дни или индексы:
+    // setState({ startDay: 5, endDay: 10 })
+    // setState({ startIndex: 4, endIndex: 9 })
+    setState(next) {
+      if (!next) return;
+
+      if (typeof next.startIndex === "number") startIndex = next.startIndex;
+      if (typeof next.endIndex === "number") endIndex = next.endIndex;
+
+      if (typeof next.startDay === "number") startIndex = getIndexByDay(next.startDay);
+      if (typeof next.endDay === "number") endIndex = getIndexByDay(next.endDay);
+
+      // нормализация
+      if (startIndex === -1) startIndex = null;
+      if (endIndex === -1) endIndex = null;
+      if (startIndex !== null && endIndex !== null && endIndex <= startIndex) endIndex = null;
+
+      render();
+
+      if (startIndex !== null && endIndex !== null) emitChange("setState");
+    },
+
     reset() {
       startIndex = null;
       endIndex = null;
       render();
+      emitChange("reset");
+    },
+
+    destroy() {
+      items.forEach((item) => item.removeEventListener("click", handleItemClick));
     },
   };
 }

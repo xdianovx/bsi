@@ -85,7 +85,8 @@
 
 
     <div class="tab-content">
-      <div class="gtm-search__item active">
+      <div class="gtm-search__item active"
+           data-tab="tours">
         <div class="gtm-search__wrap">
 
           <select name=""
@@ -188,6 +189,105 @@
         <button class="btn btn-white gtm-item__button">Найти</button>
       </div>
 
+      <!-- Отели -->
+      <div class="gtm-search__item"
+           data-tab="hotels">
+        <div class="gtm-search__wrap --hotels">
+
+          <!-- Куда (страна) -->
+          <select class="gtm-state-select"></select>
+
+          <!-- Ночи -->
+          <div class="gtm-nights-select js-dropdown">
+            <button class="js-dropdown-trigger gtm-nights-select-value">5 - 7 ночей</button>
+            <div class="js-dropdown-panel numfont">
+              <div class="day-grid gtm-daypicker">
+                <div class="day-item">1</div>
+                <div class="day-item">2</div>
+                <div class="day-item">3</div>
+                <div class="day-item">4</div>
+                <div class="day-item">5</div>
+                <div class="day-item">6</div>
+                <div class="day-item">7</div>
+                <div class="day-item">8</div>
+                <div class="day-item">9</div>
+                <div class="day-item">10</div>
+                <div class="day-item">11</div>
+                <div class="day-item">12</div>
+                <div class="day-item">13</div>
+                <div class="day-item">14</div>
+                <div class="day-item">15</div>
+                <div class="day-item">16</div>
+                <div class="day-item">17</div>
+                <div class="day-item">18</div>
+                <div class="day-item">19</div>
+                <div class="day-item">20</div>
+                <div class="day-item">21</div>
+                <div class="day-item">22</div>
+                <div class="day-item">23</div>
+                <div class="day-item">24</div>
+                <div class="day-item">25</div>
+                <div class="day-item">26</div>
+                <div class="day-item">27</div>
+                <div class="day-item">28</div>
+                <div class="day-item">29</div>
+                <div class="day-item">30</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Даты -->
+          <input type="text"
+                 name="daterange"
+                 class="gtm-datepicker" />
+
+          <!-- Туристы -->
+          <div class="gtm-persons-select js-dropdown">
+            <button class="js-dropdown-trigger">
+              <span class="gtm-people-total">2 человека</span>
+            </button>
+
+            <div class="js-dropdown-panel gtm-persons-dropdown">
+              <div class="person-counter__wrap">
+                <div class="person-counter__wrap_top">
+                  <div class="people-counter counter-item__wrap">
+                    <span class="counter-item__title">Взрослые</span>
+                    <div class="people-counter counter-item people-counter--adults">
+                      <button class="people-btn counter-item-minus adults-minus">−</button>
+                      <span class="people-value counter-item-value adults-value">2</span>
+                      <button class="people-btn counter-item-plus adults-plus">+</button>
+                    </div>
+                  </div>
+
+                  <div class="people-row counter-item__wrap">
+                    <span class="counter-item__title">Дети</span>
+                    <div class="people-counter counter-item people-counter--children">
+                      <button class="people-btn counter-item-minus children-minus">−</button>
+                      <span class="people-value counter-item-value children-value">0</span>
+                      <button class="people-btn counter-item-plus children-plus">+</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="children-ages"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="btn btn-white gtm-item__button">Найти</button>
+      </div>
+
+      <div class="gtm-search__item"
+           data-tab="tickets">
+        asdasd11
+      </div>
+
+      <div class="gtm-search__item"
+           data-tab="excursions">
+        asdasd5666
+      </div>
     </div>
   </div>
 </section>
