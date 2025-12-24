@@ -47,10 +47,8 @@ function bsi_samo_ajax()
       ], 500);
     }
 
-    // 2) unwrap: в JS мы хотим получить “чистый JSON Самотура”
     $payload = $resp['data'] ?? $resp;
 
-    // 3) если Самотур вернул error внутри JSON — тоже ошибка
     if (is_array($payload) && isset($payload['error'])) {
       wp_send_json_error(['message' => $payload['error'], 'raw' => $payload], 500);
     }

@@ -1,4 +1,4 @@
-<section class="gtm-search__section">
+<section class="gtm-search__section is-loading">
   <div class="container">
 
     <div class="gtm-search__tab-btns">
@@ -102,7 +102,7 @@
 
           <div class="gtm-nights-select js-dropdown">
             <button class="js-dropdown-trigger gtm-nights-select-value">5 - 7 ночей</button>
-            <div class="js-dropdown-panel">
+            <div class="js-dropdown-panel numfont">
               <div class="day-grid gtm-daypicker">
                 <div class="day-item">1</div>
                 <div class="day-item">2</div>

@@ -9,13 +9,20 @@ export const gtmSearch = async () => {
   const gtmSection = document.querySelector(".gtm-search__section");
   if (!gtmSection) return;
 
+  const setLoading = (on) => gtmSection.classList.toggle("is-loading", !!on);
+
   async function samoAjax(method, params = {}) {
-    const body = new URLSearchParams({
-      action: "bsi_samo",
-      method,
-      ...params,
-      // nonce: bsiSamo.nonce, // потом добавим
+    const body = new URLSearchParams();
+    body.set("action", "bsi_samo");
+    body.set("method", method);
+
+    Object.entries(params).forEach(([k, v]) => {
+      if (v === undefined || v === null) return;
+      body.set(k, String(v));
     });
+
+    // nonce позже добавим
+    // body.set("nonce", bsiSamo.nonce);
 
     const res = await fetch(ajax.url, {
       method: "POST",
@@ -24,10 +31,20 @@ export const gtmSearch = async () => {
       body,
     });
 
-    const json = await res.json();
-    if (!json.success) throw new Error(json.data?.message || "AJAX error");
+    const json = await res.json().catch(() => null);
+    if (!json || !json.success) throw new Error(json?.data?.message || "AJAX error");
 
-    return json.data;
+    // то, что вернул wp_send_json_success(...)
+    const wrap = json.data;
+
+    // если это наш SamoClient-формат: { ok, data, url }
+    if (wrap && typeof wrap === "object" && "ok" in wrap) {
+      if (!wrap.ok) throw new Error(wrap.error || "SAMO error");
+      return wrap.data; // <-- ВАЖНО: возвращаем чистый payload SamoTour
+    }
+
+    // иначе вернули уже payload напрямую
+    return wrap;
   }
 
   dropdown(".gtm-nights-select");
@@ -38,7 +55,7 @@ export const gtmSearch = async () => {
   const submitBtn = gtmSection.querySelector(".gtm-item__button");
 
   const searchParams = {
-    activeTown: 2,
+    activeTown: "2",
     activeState: "",
     nightsFrom: 5,
     nightsTill: 10,
@@ -81,7 +98,6 @@ export const gtmSearch = async () => {
 
   updateTourLink();
 
-  // Choices
   const townSelect = new Choices(townSelectElement, {
     searchEnabled: true,
     loadingText: "Загрузка...",
@@ -98,54 +114,63 @@ export const gtmSearch = async () => {
     noChoicesText: "",
   });
 
-  // 2) загрузка городов в селект
   async function loadTowns() {
     townSelect.clearChoices();
     townSelect.clearStore();
 
-    const resp = await samoAjax("townfroms");
-    const towns = resp?.SearchTour_TOWNFROMS || resp;
-
-    console.log("asd ", towns);
+    const payload = await samoAjax("townfroms");
+    const towns = payload?.SearchTour_TOWNFROMS || [];
 
     townSelect.setChoices(
-      (towns || []).map((t) => ({ value: String(t.id), label: t.name })),
+      towns.map((t) => ({ value: String(t.id), label: t.name })),
       "value",
       "label",
       true
     );
 
-    // выбрать дефолт
+    // если дефолтного города нет — берем первый
+    const hasDefault = towns.some((t) => String(t.id) === String(searchParams.activeTown));
+    if (!hasDefault && towns.length) {
+      searchParams.activeTown = String(towns[0].id);
+    }
+
     townSelect.setChoiceByValue(String(searchParams.activeTown));
   }
 
-  // 3) загрузка стран по городу
   async function loadStates(townId) {
     stateSelect.clearChoices();
     stateSelect.clearStore();
 
-    const resp = await samoAjax("states", { TOWNFROMINC: String(townId) });
-    const states = resp?.SearchTour_STATES || resp;
+    const payload = await samoAjax("states", { TOWNFROMINC: String(townId) });
+    const states = payload?.SearchTour_STATES || [];
 
-    if (states && states.length) {
-      stateSelect.setChoices(
-        states.map((s) => ({ value: String(s.id), label: s.name })),
-        "value",
-        "label",
-        true
-      );
-
-      // дефолт — первая страна
-      stateSelect.setChoiceByValue(String(states[0].id));
-      updateTourLink({ activeState: String(states[0].id) });
+    if (!states.length) {
+      updateTourLink({ activeState: "" });
+      return;
     }
+
+    stateSelect.setChoices(
+      states.map((s) => ({ value: String(s.id), label: s.name })),
+      "value",
+      "label",
+      true
+    );
+
+    // дефолт — первая страна
+    stateSelect.setChoiceByValue(String(states[0].id));
+    updateTourLink({ activeState: String(states[0].id) });
   }
 
-  // listeners
   townSelect.passedElement.element.addEventListener("choice", async (e) => {
-    const townId = e.detail.value;
-    updateTourLink({ activeTown: String(townId), activeState: "" });
-    await loadStates(townId);
+    const townId = String(e.detail.value);
+
+    setLoading(true);
+    try {
+      updateTourLink({ activeTown: townId, activeState: "" });
+      await loadStates(townId);
+    } finally {
+      setLoading(false);
+    }
   });
 
   stateSelect.passedElement.element.addEventListener("choice", (e) => {
@@ -156,7 +181,6 @@ export const gtmSearch = async () => {
     window.open(tourLink, "_blank");
   });
 
-  // ночи
   createDayRange({
     gridSelector: ".day-grid",
     defaultStartDay: searchParams.nightsFrom,
@@ -167,7 +191,6 @@ export const gtmSearch = async () => {
     },
   });
 
-  // люди
   peopleCounter({
     rootSelector: ".gtm-persons-select",
     outputSelector: ".gtm-people-total",
@@ -183,7 +206,6 @@ export const gtmSearch = async () => {
     },
   });
 
-  // даты
   const datepick = gtmSection.querySelector(".gtm-datepicker");
   if (datepick) {
     const today = new Date();
@@ -196,7 +218,7 @@ export const gtmSearch = async () => {
       locale: Russian,
       dateFormat: "d.m",
       defaultDate: [today, nextWeek],
-      onChange: function (selectedDates) {
+      onChange: (selectedDates) => {
         if (selectedDates.length === 2) {
           updateTourLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
         }
@@ -204,7 +226,14 @@ export const gtmSearch = async () => {
     });
   }
 
-  // init
-  await loadTowns();
-  await loadStates(searchParams.activeTown);
+  // INIT
+  setLoading(true);
+  try {
+    await loadTowns();
+    await loadStates(searchParams.activeTown);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
 };

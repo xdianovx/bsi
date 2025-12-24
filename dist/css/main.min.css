@@ -1812,6 +1812,7 @@ input.error {
 }
 .gtm-search__wrap > * {
   border-right: 1px solid #dfdfdf;
+  height: 48px;
 }
 .gtm-search__wrap > *:last-child {
   border-right: none;
