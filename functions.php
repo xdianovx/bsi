@@ -398,3 +398,14 @@ add_action('init', function () {
 		exit;
 	}
 });
+
+
+add_action('init', function () {
+	if (!current_user_can('manage_options'))
+		return;
+	if (!isset($_GET['iptest']))
+		return;
+
+	$res = wp_remote_get('https://api.ipify.org?format=json', ['timeout' => 10]);
+	wp_die(wp_remote_retrieve_body($res));
+});
