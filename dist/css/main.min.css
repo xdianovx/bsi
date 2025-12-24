@@ -3568,18 +3568,22 @@ input.error {
   background: #f4f4f6;
   border-radius: 8px;
   flex-direction: column;
-  padding: 12px;
+  padding: 8px;
 }
 
 .mice-benefit__title {
-  font-weight: 500;
+  font-weight: 700;
   font-size: 20px;
   color: #ee3145;
 }
 
 .mice-benefit__text {
   margin-top: 8px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
   line-height: 140%;
+  height: 100%;
 }
 @media screen and (max-width: 1200px) {
   .mice-benefit__text {
