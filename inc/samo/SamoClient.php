@@ -24,9 +24,6 @@ class SamoClient
     }
   }
 
-  /**
-   * Универсальный вызов API: action=SearchTour_ALL и т.д.
-   */
   public function request(string $action, array $params = []): array
   {
     $query = array_merge([
@@ -37,7 +34,6 @@ class SamoClient
       'oauth_token' => $this->token,
     ], $params);
 
-    // удаляем пустые параметры (важно, Samo иногда ругается на пустые)
     $query = array_filter($query, static fn($v) => $v !== null && $v !== '');
 
     $url = $this->baseUrl . '?' . http_build_query($query);
@@ -54,7 +50,6 @@ class SamoClient
         'url' => $url,
       ];
     }
-
     $code = wp_remote_retrieve_response_code($res);
     $body = wp_remote_retrieve_body($res);
 
@@ -72,7 +67,7 @@ class SamoClient
     if (!is_array($json)) {
       return [
         'ok' => false,
-        'error' => 'Invalid JSON response',
+        'error' => 'Invalid JSON response 666',
         'body' => $body,
         'url' => $url,
       ];

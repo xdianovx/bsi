@@ -241,6 +241,7 @@ require_once get_template_directory() . '/inc/samo/config.php';
 require_once get_template_directory() . '/inc/samo/SamoClient.php';
 require_once get_template_directory() . '/inc/samo/SamoParams.php';
 require_once get_template_directory() . '/inc/samo/SamoEndpoints.php';
+require_once get_template_directory() . '/inc/samo/SamoService.php';
 require_once get_template_directory() . '/inc/samo/ajax/routes.php';
 
 // custom fields
@@ -259,6 +260,7 @@ require get_template_directory() . '/custom-fields/pages/visa.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';
+require get_template_directory() . '/inc/requests/samo.php';
 require get_template_directory() . '/inc/requests/news.php';
 require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';

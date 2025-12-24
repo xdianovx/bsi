@@ -150,7 +150,7 @@
                  placeholder="" />
 
           <div class="gtm-persons-select js-dropdown">
-            <!-- <span>Ночей</span> -->
+
             <button class="js-dropdown-trigger">
               <span class="gtm-people-total">2 человека</span>
             </button>

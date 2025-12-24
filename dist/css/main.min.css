@@ -644,6 +644,20 @@ input.error {
   width: 100%;
 }
 
+.choices[data-type*=select-one]::after {
+  width: 20px;
+  height: 18px;
+  border: none;
+  background: url("../../img/icons/chevron-d.svg") center/contain;
+  margin-top: 0;
+  transform: translateY(-50%);
+}
+
+.choices[data-type*=select-one].is-open::after {
+  margin-top: -8px;
+  transform: rotate(180deg);
+}
+
 .select-item .choices {
   margin-bottom: 0;
 }
