@@ -236,8 +236,12 @@ require get_template_directory() . '/inc/post-types/tourist-memo.php';
 require get_template_directory() . '/inc/post-types/entry-rules.php';
 require get_template_directory() . '/inc/post-types/project.php';
 
-
-
+// Samo
+require_once get_template_directory() . '/inc/samo/config.php';
+require_once get_template_directory() . '/inc/samo/SamoClient.php';
+require_once get_template_directory() . '/inc/samo/SamoParams.php';
+require_once get_template_directory() . '/inc/samo/SamoEndpoints.php';
+require_once get_template_directory() . '/inc/samo/ajax/routes.php';
 
 // custom fields
 require get_template_directory() . '/custom-fields/hotel-fields.php';
@@ -261,6 +265,8 @@ require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
 require get_template_directory() . '/inc/requests/projects.php';
+
+
 
 
 add_action('acf/init', function () {
@@ -360,3 +366,35 @@ add_action('wp_enqueue_scripts', function () {
 });
 
 
+
+
+
+add_action('init', function () {
+	if (!isset($_GET['samo_test'])) {
+		return;
+	}
+
+	try {
+		$client = new SamoClient([
+			'base_url' => SAMO_API_URL,
+			'token' => SAMO_OAUTH_TOKEN,
+			'samo_action' => SAMO_ACTION,
+			'version' => SAMO_API_VERSION,
+			'type' => SAMO_API_TYPE,
+		]);
+
+		$res = $client->request('SearchTour_ALL', [
+			'TOWNFROMINC' => 2,
+			'STATEINC' => 31,
+		]);
+
+		echo '<pre>';
+		print_r($res);
+		echo '</pre>';
+		exit;
+
+	} catch (Throwable $e) {
+		echo 'ERROR: ' . $e->getMessage();
+		exit;
+	}
+});
