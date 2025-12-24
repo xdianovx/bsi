@@ -35,3 +35,52 @@ function bsi_register_education_post_type()
 
   register_post_type('education', $args);
 }
+
+add_action('init', function () {
+
+  // Тип обучения
+  register_taxonomy('education_type', ['education'], [
+    'labels' => [
+      'name' => 'Типы обучения',
+      'singular_name' => 'Тип обучения',
+      'menu_name' => 'Типы обучения',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => ['slug' => 'education-type'],
+  ]);
+
+  // Тип размещения
+  register_taxonomy('education_accommodation_type', ['education'], [
+    'labels' => [
+      'name' => 'Типы размещения',
+      'singular_name' => 'Тип размещения',
+      'menu_name' => 'Размещение',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => ['slug' => 'accommodation-type'],
+  ]);
+
+  // Языки
+  register_taxonomy('education_language', ['education'], [
+    'labels' => [
+      'name' => 'Языки',
+      'singular_name' => 'Язык',
+      'menu_name' => 'Языки',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => ['slug' => 'education-language'],
+  ]);
+
+}, 20);

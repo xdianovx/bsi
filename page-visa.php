@@ -543,7 +543,6 @@ get_header();
             </div>
           </div>
 
-
           <div class="input-item white">
             <label for="tel">Телефон</label>
             <input type="tel"
@@ -556,7 +555,6 @@ get_header();
             </div>
           </div>
 
-
           <div class="input-item white">
             <label for="graz">Дата поездки</label>
             <input type="text"
@@ -568,11 +566,11 @@ get_header();
                  data-field="graz">
             </div>
           </div>
-
-
         </div>
+
         <div class="visa-consultation-form__bottom">
           <div id="form-status"></div>
+
           <button type="submit"
                   class="btn btn-accent fit-form__btn-submit">
             Отправить

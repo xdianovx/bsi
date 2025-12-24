@@ -66,11 +66,15 @@
 
 				<div class="footer-contact">
 					<span class="footer-contact__title">
-						Офис в Москве
+						Офисы в Москве
 					</span>
 
 					<p class="footer-contact__value">
 						<?php the_field('adres_ofis', 'option'); ?>
+					</p>
+
+					<p class="footer-contact__value">
+						<?php the_field('adres_ofis_2', 'option'); ?>
 					</p>
 				</div>
 
