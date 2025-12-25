@@ -10,10 +10,138 @@
 .fit-form__wrap {
   border-top: 1px solid $red;
   padding-top: 32px;
+  margin: 0 auto;
 }
 
 .fit-form {
   // margin-top: 40px;
+}
+
+// Стили ошибок для специальных элементов
+.select-item {
+  .choices.is-error {
+    .choices__inner {
+      border-color: #dc2626 !important;
+    }
+  }
+
+  .error-message {
+    display: block !important;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #dc2626;
+    position: relative;
+    left: 0;
+    top: 0;
+    background: transparent;
+    padding: 0;
+    min-height: 20px;
+  }
+}
+
+.fit-form__datepicker-wrapper {
+  &.error {
+    border: 1px solid #dc2626 !important;
+    border-radius: 8px;
+  }
+
+  .error-message {
+    display: block !important;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #dc2626;
+    position: relative;
+    left: 0;
+    top: 0;
+    background: transparent;
+    padding: 0;
+    min-height: 20px;
+  }
+}
+
+.fit-form__duration-wrapper {
+  .fit-form__daypicker.error {
+    border: 1px solid #dc2626 !important;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .error-message {
+    display: block !important;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #dc2626;
+    position: relative;
+    left: 0;
+    top: 0;
+    background: transparent;
+    padding: 0;
+    min-height: 20px;
+  }
+}
+
+.fit-form__hotel-stars-wrapper {
+  &.error {
+    border: 1px solid #dc2626 !important;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .error-message {
+    display: block !important;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #dc2626;
+    position: relative;
+    left: 0;
+    top: 0;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    min-height: 20px;
+  }
+}
+
+// Табы переключения типа клиента
+.fit-form__client-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid $bg-gray-light;
+  padding-bottom: 16px;
+}
+
+.fit-form__client-tab {
+  padding: 12px 24px;
+  line-height: 100%;
+  background: $bg-gray;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: $trans-text;
+
+  &.active {
+    background: $red;
+    color: #fff;
+  }
+
+  &:hover {
+    background: $red;
+    color: #fff;
+  }
+}
+
+// Корпоративные поля
+.fit-form__corporate-fields {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid $bg-gray-light;
 }
 
 .form-group__title {
@@ -24,8 +152,6 @@
 
 .fit-form__bottom {
   margin-top: 32px;
-  border-top: 1px solid $bg-gray-light;
-  padding-top: 32px;
 }
 
 .fit-form__btn-submit {
@@ -35,6 +161,21 @@
 
 .fit-form__policy {
   margin-top: 4px;
+}
+
+// Чекбоксы услуг (grid layout)
+.fit-form__services-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+
+  .checkbox-item {
+    margin: 0;
+
+    labal {
+      margin-top: 0;
+    }
+  }
 }
 
 // checkbox
@@ -83,11 +224,474 @@
   content: "";
   opacity: 1;
   position: absolute;
-  top: 2px;
+  top: 3px;
   left: 9px;
   width: 6px;
   height: 14px;
   border: solid $red;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+
+// PeopleCounter компонент
+.fit-form__people-select {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  background: #fff;
+  padding: 0 16px;
+  border: 1px solid $bg-gray;
+  border-radius: 8px;
+  min-height: 54px;
+  cursor: pointer;
+
+  .js-dropdown-trigger {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .js-dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid $bg-gray;
+    border-radius: 8px;
+    margin-top: 8px;
+    padding: 16px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &.is-open .js-dropdown-panel {
+    display: block;
+  }
+}
+
+// Стили для peopleCounter (используем существующие из GTM)
+.fit-form__people-select {
+  .person-counter__wrap {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .person-counter__wrap_top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .counter-item__wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .counter-item__title {
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 80px;
+  }
+
+  .people-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .people-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid $bg-gray;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    transition: $trans-text;
+
+    &:hover {
+      background: $red;
+      color: #fff;
+      border-color: $red;
+    }
+  }
+
+  .people-value {
+    font-weight: 600;
+    font-size: 16px;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .children-ages {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .child-age {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .child-age__label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .child-age__select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid $bg-gray;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+}
+
+// DatePicker стили (inline календарь)
+.fit-form__datepicker-wrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+.fit-form__datepicker-wrapper {
+  box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.input-item {
+  .flatpickr-calendar {
+    box-shadow: none !important;
+  }
+
+  .dayContainer + .dayContainer {
+    box-shadow: none !important;
+  }
+
+  .flatpickr-month {
+    left: 0 !important;
+    text-align: left !important;
+    font-family: "Raleway", sans-serif !important;
+
+    .flatpickr-current-month {
+      left: 0 !important;
+      text-align: left !important;
+      font-family: "Raleway", sans-serif !important;
+    }
+  }
+}
+
+.fit-form__datepicker-inline {
+  width: 100%;
+  max-width: 100%;
+
+  .flatpickr-calendar {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  .flatpickr-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+  }
+
+  .flatpickr-months {
+    padding: 0 !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    gap: 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .flatpickr-month {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  .flatpickr-current-month {
+    left: 0 !important;
+    text-align: left !important;
+    font-family: "Raleway", sans-serif !important;
+  }
+
+  .flatpickr-days {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .flatpickr-dayContainer {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .flatpickr-weekdays {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .flatpickr-weekday {
+    width: calc(100% / 7) !important;
+    max-width: calc(100% / 7) !important;
+    box-sizing: border-box !important;
+  }
+
+  .flatpickr-day {
+    border-radius: 4px !important;
+    width: calc(100% / 7) !important;
+    max-width: calc(100% / 7) !important;
+    box-sizing: border-box !important;
+
+    &.selected,
+    &.startRange,
+    &.endRange {
+      background: $red !important;
+      border-color: $red !important;
+      color: #fff !important;
+    }
+
+    &.inRange {
+      background: rgba($red, 0.1) !important;
+      border-color: rgba($red, 0.2) !important;
+    }
+
+    &.flatpickr-disabled {
+      opacity: 0.3;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .flatpickr-months {
+      flex-direction: column !important;
+      gap: 16px !important;
+    }
+  }
+}
+
+// Продолжительность тура (day grid)
+.fit-form__duration-wrapper {
+  width: 100%;
+}
+
+.fit-form__daypicker {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid $bg-gray;
+  border-radius: 8px;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+// Бюджет input
+.fit-form__budget-input {
+  width: 100%;
+  font-family: "numfont", monospace;
+}
+
+// Звездность отеля
+.fit-form__hotel-stars-wrapper {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.fit-form__star-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid $bg-gray;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: $trans-text;
+  min-width: 100px;
+
+  .stars-rating {
+    margin-bottom: 0;
+  }
+
+  &.active {
+    border-color: $red;
+    background: $red;
+    color: #fff;
+
+    .stars-rating svg {
+      fill: #fff;
+      stroke: #fff;
+    }
+  }
+}
+
+.stars-rating {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    transition: $trans-text;
+
+    &.filled {
+      fill: #ffd700;
+      stroke: #ffd700;
+    }
+
+    &:not(.filled) {
+      fill: none;
+      stroke: $text-gray;
+    }
+  }
+}
+
+.fit-form__star-btn.active .stars-rating svg.filled {
+  fill: #ffd700;
+  stroke: #ffd700;
+}
+
+.fit-form__star-btn.active .stars-rating svg:not(.filled) {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.5);
+}
+
+.fit-form__star-btn-text {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.fit-form__star-btn-label {
+  font-size: 14px;
+  margin-top: 0;
+  opacity: 0.8;
+}
+
+.fit-form__star-btn.active .fit-form__star-btn-label {
+  opacity: 1;
+  color: #fff;
+}
+
+@media screen and (max-width: 768px) {
+  .fit-form__hotel-stars-wrapper {
+    gap: 8px;
+  }
+
+  .fit-form__star-btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: auto;
+  }
+}
+
+.fit-form__daypicker .day-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 42px;
+  border-radius: 8px;
+  background: $bg-gray;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: $trans-text;
+  border: 2px solid transparent;
+
+  &:hover {
+    background: rgba($red, 0.1);
+    border-color: rgba($red, 0.3);
+  }
+
+  &.is-active {
+    background: $red;
+    color: #fff;
+    border-color: $red;
+  }
+
+  &.is-start {
+    background: #fff;
+    color: #000;
+    border-color: $red;
+    font-weight: 700;
+  }
+
+  &.is-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// Адаптивность
+@media screen and (max-width: 768px) {
+  .fit-form__client-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fit-form__client-tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .fit-form__services-row {
+    grid-template-columns: 1fr;
+  }
+
+  .fit-form__people-select {
+    .person-counter__wrap_top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .counter-item__wrap {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
 }
