@@ -68,7 +68,7 @@ input.error {
   display: inline-block;
   border-radius: 8px;
   padding: 14px 16px;
-  border: 1px solid $bg-gray;
+  border: 1px solid #bebebe;
   resize: vertical;
   width: 100%;
 }
@@ -94,7 +94,7 @@ input.error {
 
   .choices__inner {
     background: #fff;
-    border: 1px solid $bg-gray;
+    border: 1px solid #bebebe;
 
     border-radius: 8px;
     font-size: 16px;

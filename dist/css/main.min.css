@@ -639,7 +639,7 @@ input.error {
   display: inline-block;
   border-radius: 8px;
   padding: 14px 16px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   resize: vertical;
   width: 100%;
 }
@@ -663,7 +663,7 @@ input.error {
 }
 .select-item .choices__inner {
   background: #fff;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 8px;
   font-size: 16px;
   min-height: 54px;
@@ -834,7 +834,7 @@ input.error {
   gap: 8px;
 }
 .slider-arrow-wrap.--mob .slider-arrow {
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   width: 48px;
   height: 48px;
   display: flex;
@@ -2813,7 +2813,7 @@ input.error {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #f4f4f6;
+  border-top: 1px solid #bebebe;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -2836,7 +2836,7 @@ input.error {
   gap: 12px;
   padding: 12px 0;
   min-height: 40px;
-  border-bottom: 1px solid #f4f4f6;
+  border-bottom: 1px solid #bebebe;
 }
 
 .mobile-nav__link span {
@@ -3189,7 +3189,7 @@ input.error {
 }
 .award-page__top {
   padding-bottom: 24px;
-  border-bottom: 1px solid #f4f4f6;
+  border-bottom: 1px solid #bebebe;
 }
 .award-page__top p {
   margin-bottom: 0;
@@ -3423,7 +3423,7 @@ input.error {
 .country-hotels__wrap {
   margin-top: 32px;
   padding-top: 32px;
-  border-top: 1px solid #f4f4f6;
+  border-top: 1px solid #bebebe;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 32px 16px;
@@ -3569,7 +3569,7 @@ input.error {
   align-items: center;
   gap: 8px;
   margin-bottom: 32px;
-  border-bottom: 1px solid #faf6f5;
+  border-bottom: 1px solid #bebebe;
   padding-bottom: 16px;
 }
 
@@ -3595,7 +3595,7 @@ input.error {
 .fit-form__corporate-fields {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #faf6f5;
+  border-top: 1px solid #bebebe;
 }
 
 .form-group__title {
@@ -3715,7 +3715,7 @@ input.error {
   left: 0;
   right: 0;
   background: #fff;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 8px;
   margin-top: 8px;
   padding: 16px;
@@ -3757,7 +3757,7 @@ input.error {
 .fit-form__people-select .people-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   background: #fff;
   border-radius: 4px;
   cursor: pointer;
@@ -3797,7 +3797,7 @@ input.error {
 .fit-form__people-select .child-age__select {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 8px;
   font-size: 14px;
 }
@@ -4757,7 +4757,7 @@ input.error {
 
 .promo-filter__btn {
   border-radius: 8px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -5296,7 +5296,7 @@ input.error {
 .page-country__about {
   padding-bottom: 40px;
   margin-bottom: 32px;
-  border-bottom: 1px solid #faf6f5;
+  border-bottom: 1px solid #bebebe;
 }
 
 .country-page__gallery-slide {
@@ -6115,7 +6115,7 @@ input.error {
 .visa-page-features__item {
   border-radius: 8px;
   padding: 8px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
 }
 
 .visa-page-features__item__wrap {
@@ -6151,7 +6151,7 @@ input.error {
 }
 
 .visa-page-steps-item {
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 8px;
   padding: 12px;
 }
@@ -6203,7 +6203,7 @@ input.error {
 }
 
 .visa-contact-item {
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   padding: 12px;
   border-radius: 8px;
 }
