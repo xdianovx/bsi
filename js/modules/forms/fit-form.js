@@ -59,6 +59,16 @@ export const fitForm = () => {
         }
       });
     });
+
+    // Инициализация начального состояния (по умолчанию corporate)
+    const defaultType = clientTypeInput ? clientTypeInput.value : "corporate";
+    if (corporateFields && defaultType === "corporate") {
+      corporateFields.style.display = "block";
+      const companyName = document.getElementById("company_name");
+      const inn = document.getElementById("inn");
+      if (companyName) companyName.setAttribute("required", "required");
+      if (inn) inn.setAttribute("required", "required");
+    }
   }
 
   // Инициализация ChoicesJS для всех select полей
@@ -273,7 +283,7 @@ export const fitForm = () => {
   // Валидация формы
   function validateForm() {
     const errors = {};
-    const clientType = clientTypeInput ? clientTypeInput.value : "private";
+    const clientType = clientTypeInput ? clientTypeInput.value : "corporate";
 
     // Обязательные поля для всех
     const fullName = form.querySelector('[name="full_name"]');

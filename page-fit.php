@@ -50,16 +50,16 @@ $selected_country_id = isset($_GET['country']) ? (int) $_GET['country'] : 0;
 
         <!-- Табы переключения типа клиента -->
         <div class="fit-form__client-tabs tabs">
-          <button type="button" class="tab-button fit-form__client-tab active" data-client-type="private">
-            Частный клиент
+          <button type="button" class="tab-button fit-form__client-tab active" data-client-type="corporate">
+            Турагентство
           </button>
-          <button type="button" class="tab-button fit-form__client-tab" data-client-type="corporate">
-            Корпоративный клиент
+          <button type="button" class="tab-button fit-form__client-tab" data-client-type="private">
+            Частный клиент
           </button>
         </div>
 
         <form id="simple-form" class="fit-form">
-          <input type="hidden" name="client_type" id="client_type" value="private">
+          <input type="hidden" name="client_type" id="client_type" value="corporate">
 
           <!-- Контактные данные -->
           <div class="form-group">
@@ -89,7 +89,7 @@ $selected_country_id = isset($_GET['country']) ? (int) $_GET['country'] : 0;
             </div>
 
             <!-- Поля только для корпоративных клиентов -->
-            <div class="fit-form__corporate-fields" style="display: none;">
+            <div class="fit-form__corporate-fields">
               <div class="form-row form-row-2">
                 <div class="input-item">
                   <label for="company_name">Название организации *</label>
@@ -200,6 +200,34 @@ $selected_country_id = isset($_GET['country']) ? (int) $_GET['country'] : 0;
             <p class="form-group__title">Звездность отеля:</p>
             <div class="form-row">
               <div class="fit-form__hotel-stars-wrapper">
+                <button type="button" class="fit-form__star-btn" data-stars="1">
+                  <div class="stars-rating" data-rating="1">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="<?= $i <= 1 ? '#ffd700' : 'none' ?>" stroke="<?= $i <= 1 ? '#ffd700' : 'currentColor' ?>"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-star-icon lucide-star star-<?= $i ?> <?= $i <= 1 ? 'filled' : '' ?>">
+                        <path
+                          d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
+                        </path>
+                      </svg>
+                    <?php endfor; ?>
+                  </div>
+                </button>
+                <button type="button" class="fit-form__star-btn" data-stars="2">
+                  <div class="stars-rating" data-rating="2">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="<?= $i <= 2 ? '#ffd700' : 'none' ?>" stroke="<?= $i <= 2 ? '#ffd700' : 'currentColor' ?>"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-star-icon lucide-star star-<?= $i ?> <?= $i <= 2 ? 'filled' : '' ?>">
+                        <path
+                          d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
+                        </path>
+                      </svg>
+                    <?php endfor; ?>
+                  </div>
+                </button>
                 <button type="button" class="fit-form__star-btn" data-stars="3">
                   <div class="stars-rating" data-rating="3">
                     <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -285,7 +313,7 @@ $selected_country_id = isset($_GET['country']) ? (int) $_GET['country'] : 0;
           <!-- Количество человек -->
           <div class="form-group">
             <p class="form-group__title">Количество человек:</p>
-            <div class="form-row form-row-2">
+            <div class="form-row">
               <div class="fit-form__people-select js-dropdown">
                 <button type="button" class="js-dropdown-trigger">
                   <span class="fit-form__people-total">2 человека</span>

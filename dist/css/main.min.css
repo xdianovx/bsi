@@ -614,7 +614,7 @@ main {
   display: inline-block;
   border-radius: 8px;
   padding: 14px 16px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   width: 100%;
 }
 
@@ -3456,6 +3456,13 @@ input.error {
   margin: 0 auto;
 }
 
+.fit-form .select-item .choices__inner {
+  border: 1px solid #bebebe !important;
+}
+.fit-form .input-item textarea {
+  border: 1px solid #bebebe !important;
+}
+
 .select-item .choices.is-error .choices__inner {
   border-color: #dc2626 !important;
 }
@@ -3566,7 +3573,7 @@ input.error {
 
 .form-group__title {
   padding-bottom: 16px;
-  border-bottom: 1px solid #faf6f5;
+  border-bottom: 1px solid #bebebe;
   margin-bottom: 24px;
 }
 
@@ -3658,7 +3665,7 @@ input.error {
   position: relative;
   background: #fff;
   padding: 0 16px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 8px;
   min-height: 54px;
   cursor: pointer;
@@ -3890,7 +3897,7 @@ input.error {
   gap: 8px;
   padding: 16px;
   background: #fff;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 8px;
 }
 @media screen and (max-width: 768px) {
@@ -3917,7 +3924,7 @@ input.error {
   align-items: center;
   justify-content: center;
   padding: 8px;
-  border: 1px solid #f4f4f6;
+  border: 1px solid #bebebe;
   border-radius: 4px;
   background: #fff;
   cursor: pointer;
