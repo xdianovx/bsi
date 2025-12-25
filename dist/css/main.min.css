@@ -6335,15 +6335,15 @@ input.error {
   transition: all 0.3s ease-in-out;
   font-weight: 500;
   position: relative;
-  padding-left: 20px;
+  padding-left: 14px;
 }
 .visa-country-card__type::before {
   content: "";
   position: absolute;
-  top: 10px;
+  top: 11px;
   left: 0;
   height: 2px;
-  width: 12px;
+  width: 8px;
   background: #ee3145;
 }
 .visa-country-card__type:hover {
