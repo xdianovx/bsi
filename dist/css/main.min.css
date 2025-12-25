@@ -3545,11 +3545,12 @@ input.error {
 
 .insurance_item {
   background: #f4f4f6;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   gap: 16px;
   transition: all 0.3s ease-in-out;
+  position: relative;
 }
 .insurance_item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -3607,20 +3608,19 @@ input.error {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 8px;
 }
 
 .insurance_item_age {
-  display: inline-block;
-  width: max-content;
+  display: flex;
   font-size: 14px;
-  line-height: 140%;
+  line-height: 100%;
   color: #000000;
   background: #fff;
-  border: 1px solid #d9d9d9;
   border-radius: 4px;
   padding: 4px 8px;
-  font-weight: 500;
+  position: absolute;
+  top: 16px;
+  left: 16px;
   white-space: nowrap;
 }
 
