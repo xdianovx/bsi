@@ -13,6 +13,25 @@
   }
 }
 
+.header__contacts {
+  .socials {
+    display: flex;
+  }
+
+  .social-item {
+    width: 28px;
+    background: $red;
+    height: 28px;
+    color: #fff;
+    svg {
+      margin-top: 2px;
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+  }
+}
+
 .currency-select-trigger__wrap {
   cursor: pointer;
   border-radius: 4px;
@@ -103,6 +122,7 @@
 .header__contacts {
   margin-left: auto;
   display: flex;
+  align-items: center;
   gap: 16px;
 }
 

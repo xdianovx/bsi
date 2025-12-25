@@ -15,18 +15,14 @@
 
 <head>
   <meta charset="<?php bloginfo('charset'); ?>">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
-  <link rel="profile"
-        href="https://gmpg.org/xfn/11">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="profile" href="https://gmpg.org/xfn/11">
 
-  <link rel="preconnect"
-        href="https://fonts.googleapis.com">
-  <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
 
   <script src="https://api-maps.yandex.ru/v3/?apikey=3b3460ad-74f9-40ad-a5ef-f0369da57f75&lang=ru_RU"></script>
 
@@ -54,17 +50,13 @@
             <div class="currency-select js-dropdown">
               <button class="js-dropdown-trigger currency-select-trigger__wrap">
                 <span class="currency-current">RUB</span>
-                <img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg"
-                     alt="">
+                <img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg" alt="">
               </button>
 
               <div class="js-dropdown-panel">
-                <button class="currency-option"
-                        data-iso="RUB">RUB ₽</button>
-                <button class="currency-option"
-                        data-iso="USD">USD $</button>
-                <button class="currency-option"
-                        data-iso="EUR">EUR €</button>
+                <button class="currency-option" data-iso="RUB">RUB ₽</button>
+                <button class="currency-option" data-iso="USD">USD $</button>
+                <button class="currency-option" data-iso="EUR">EUR €</button>
               </div>
 
             </div>
@@ -78,13 +70,11 @@
 
           <div class="header__contacts">
 
-            <a href="tel:<?php the_field('telefon', 'option'); ?>"
-               class="phone-link numfont">
+            <a href="tel:<?php the_field('telefon', 'option'); ?>" class="phone-link numfont">
               <?php the_field('telefon', 'option'); ?>
             </a>
 
-            <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>"
-               class="phone-link numfont">
+            <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="phone-link numfont">
 
               <?php the_field('telefon_po_rf', 'option'); ?>
               <span>бесплатно из регионов</span>
@@ -117,29 +107,16 @@
 
 
           <div class="header-old-btns">
-            <a href="https://www.bsigroup.ru/"
-               target="_blank"
-               class="button-login header__button-login button-old-site">Старый сайт</a>
-            <a href="https://online.bsigroup.ru/cl_refer"
-               class="button-login header__button-login">
+            <a href="https://www.bsigroup.ru/" target="_blank"
+              class="button-login header__button-login button-old-site">Старый сайт</a>
+            <a href="https://online.bsigroup.ru/cl_refer" target="_blank" class="button-login header__button-login">
 
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   width="20"
-                   height="20"
-                   viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="currentColor"
-                   stroke-width="1.5"
-                   stroke-linecap="round"
-                   stroke-linejoin="round"
-                   class="lucide lucide-circle-user-round-icon lucide-circle-user-round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-circle-user-round-icon lucide-circle-user-round">
                 <path d="M18 20a6 6 0 0 0-12 0" />
-                <circle cx="12"
-                        cy="10"
-                        r="4" />
-                <circle cx="12"
-                        cy="12"
-                        r="10" />
+                <circle cx="12" cy="10" r="4" />
+                <circle cx="12" cy="12" r="10" />
               </svg>
               <span>Личный кабинет</span>
             </a>
@@ -181,18 +158,14 @@
 
         <div class="mobile-nav-contacts">
           <div class="mobile-nav-contacts__item">
-            <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg"
-                 alt="">
-            <a href="tel:<?php the_field('telefon', 'option'); ?>"
-               class="mobile-nav-contacts__phone">
+            <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">
+            <a href="tel:<?php the_field('telefon', 'option'); ?>" class="mobile-nav-contacts__phone">
               <?php the_field('telefon', 'option'); ?>
             </a>
           </div>
           <div class="mobile-nav-contacts__item">
-            <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg"
-                 alt="">
-            <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>"
-               class="mobile-nav-contacts__phone">
+            <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">
+            <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="mobile-nav-contacts__phone">
               <?php the_field('telefon', 'option'); ?>
             </a>
           </div>
