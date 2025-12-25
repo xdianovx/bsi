@@ -155,3 +155,34 @@ add_filter('acf/fields/post_object/query/key=field_entry_rules_country', functio
   $args['post_parent'] = 0;
   return $args;
 }, 10, 1);
+
+/**
+ * Yoast breadcrumbs для правил въезда:
+ * - country entry rules: Главная > Страны > {Страна} > Правила въезда
+ */
+add_filter('wpseo_breadcrumb_links', function ($links) {
+  $country_slug = get_query_var('country_entry_rules');
+  if (empty($country_slug)) {
+    return $links;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    return $links;
+  }
+
+  $countries_page = get_page_by_path('strany');
+  $countries_url = $countries_page ? get_permalink($countries_page->ID) : get_post_type_archive_link('country');
+
+  $new = [];
+  $new[] = ['url' => home_url('/'), 'text' => 'Главная'];
+
+  if ($countries_url) {
+    $new[] = ['url' => $countries_url, 'text' => $countries_page ? ($countries_page->post_title ?: 'Страны') : 'Страны'];
+  }
+
+  $new[] = ['url' => get_permalink($country->ID), 'text' => $country->post_title];
+  $new[] = ['text' => 'Правила въезда'];
+
+  return $new;
+});

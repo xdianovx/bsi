@@ -131,3 +131,53 @@ add_filter('post_type_link', function ($post_link, $post) {
 
   return trailingslashit(home_url('/country/' . $country_slug . '/visa'));
 }, 10, 2);
+
+/**
+ * Yoast breadcrumbs для виз:
+ * - single visa: Главная > Страны > {Страна} > {Название визы}
+ */
+add_filter('wpseo_breadcrumb_links', function ($links) {
+  if (is_singular('visa')) {
+    $visa_id = get_queried_object_id();
+    if (!$visa_id) {
+      return $links;
+    }
+
+    $country_id = function_exists('get_field') ? get_field('visa_country', $visa_id) : 0;
+    
+    if ($country_id instanceof WP_Post) {
+      $country_id = (int) $country_id->ID;
+    } elseif (is_array($country_id)) {
+      $country_id = (int) reset($country_id);
+    } else {
+      $country_id = (int) $country_id;
+    }
+
+    if (!$country_id) {
+      return $links;
+    }
+
+    $country_slug = get_post_field('post_name', $country_id);
+    $country_title = get_the_title($country_id);
+    if (!$country_slug || !$country_title) {
+      return $links;
+    }
+
+    $countries_page = get_page_by_path('strany');
+    $countries_url = $countries_page ? get_permalink($countries_page->ID) : get_post_type_archive_link('country');
+
+    $new = [];
+    $new[] = ['url' => home_url('/'), 'text' => 'Главная'];
+
+    if ($countries_url) {
+      $new[] = ['url' => $countries_url, 'text' => $countries_page ? ($countries_page->post_title ?: 'Страны') : 'Страны'];
+    }
+
+    $new[] = ['url' => get_permalink($country_id), 'text' => $country_title];
+    $new[] = ['text' => get_the_title($visa_id)];
+
+    return $new;
+  }
+
+  return $links;
+});

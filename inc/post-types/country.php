@@ -548,10 +548,6 @@ add_action('pre_get_posts', function ($q) {
 
 add_filter('wpseo_breadcrumb_links', function ($links) {
 
-  if (is_singular('visa')) {
-    return $links;
-  }
-
   if (is_tax('resort')) {
     $term = get_queried_object();
 
