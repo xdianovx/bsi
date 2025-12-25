@@ -48,6 +48,9 @@
 }
 
 .fit-form__datepicker-wrapper {
+  @media screen and (max-width: 768px) {
+    overflow-x: scroll;
+  }
   &.error {
     border: 1px solid #dc2626 !important;
     border-radius: 8px;

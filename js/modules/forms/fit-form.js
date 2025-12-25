@@ -382,8 +382,6 @@ export const fitForm = () => {
 
   // Показать ошибки полей
   function showFieldError(fieldName, message) {
-    console.log(`[showFieldError] Field: ${fieldName}, Message: ${message}`);
-
     const errorEl = form.querySelector(`[data-field="${fieldName}"]`);
 
     if (errorEl) {
@@ -393,18 +391,12 @@ export const fitForm = () => {
       errorEl.style.visibility = "visible";
       errorEl.style.opacity = "1";
       errorEl.style.color = "#dc2626";
-      console.log(`[showFieldError] Error message element updated:`, errorEl);
-    } else {
-      console.warn(`[showFieldError] Error element not found for field: ${fieldName}`);
     }
 
     // Обработка обычных input полей
     const inputEl = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#${fieldName}`);
     if (inputEl) {
       inputEl.classList.add("error");
-      console.log(`[showFieldError] Error class added to input:`, inputEl);
-    } else {
-      console.warn(`[showFieldError] Input element not found for field: ${fieldName}`);
     }
 
     // Обработка ChoicesJS select (country_id)
@@ -588,14 +580,10 @@ export const fitForm = () => {
 
     // Валидация перед отправкой
     const errors = validateForm();
-    console.log("=== Client-side Validation ===");
-    console.log("Errors found:", Object.keys(errors).length);
-    console.log("Errors:", errors);
 
     if (Object.keys(errors).length > 0) {
       // Показываем все ошибки
       Object.keys(errors).forEach((field) => {
-        console.log(`Showing client-side error for field: ${field}`, errors[field]);
         showFieldError(field, errors[field]);
       });
 
@@ -666,14 +654,6 @@ export const fitForm = () => {
     // Добавляем action для AJAX
     formData.append("action", "fit_form");
 
-    // Выводим данные в консоль для отладки
-    console.log("=== FIT Form Data ===");
-    const formDataObj = {};
-    for (const [key, value] of formData.entries()) {
-      formDataObj[key] = value;
-    }
-    console.log("Form Data:", formDataObj);
-
     try {
       const response = await fetch(ajax.url, {
         method: "POST",
@@ -681,11 +661,6 @@ export const fitForm = () => {
       });
 
       const result = await response.json();
-
-      // Выводим ответ сервера в консоль
-      console.log("=== Server Response ===");
-      console.log("Success:", result.success);
-      console.log("Data:", result.data);
 
       if (result.success) {
         showStatus("Успешно отправлено!", "success");
@@ -720,11 +695,6 @@ export const fitForm = () => {
           peopleSelect.classList.remove("is-open");
         }
       } else {
-        // Выводим ошибки в консоль
-        console.log("=== Form Errors ===");
-        console.log("Errors:", result.data?.errors);
-        console.log("Message:", result.data?.message);
-
         // Показываем ошибки полей
         if (result.data && result.data.errors) {
           // Очищаем все предыдущие ошибки перед показом новых
@@ -732,10 +702,7 @@ export const fitForm = () => {
 
           // Показываем все ошибки с сервера
           const errorFields = Object.keys(result.data.errors);
-          console.log(`Total errors to show: ${errorFields.length}`, errorFields);
-
           errorFields.forEach((field) => {
-            console.log(`Showing error for field: ${field}`, result.data.errors[field]);
             showFieldError(field, result.data.errors[field]);
           });
         }
@@ -747,7 +714,6 @@ export const fitForm = () => {
         }, 200);
       }
     } catch (error) {
-      console.error("Form submission error:", error);
       showStatus("Ошибка сети", "error");
     }
   });

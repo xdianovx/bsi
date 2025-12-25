@@ -9,7 +9,7 @@ add_action('wp_ajax_nopriv_fit_form', 'handle_fit_form');
 function handle_fit_form()
 {
   // Логируем все входящие данные для отладки
-  error_log('FIT Form Data: ' . print_r($_POST, true));
+  // error_log('FIT Form Data: ' . print_r($_POST, true));
 
   $errors = [];
   $client_type = sanitize_text_field($_POST['client_type'] ?? 'corporate');

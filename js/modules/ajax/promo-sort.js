@@ -42,7 +42,7 @@ export const promoPageAjax = () => {
         list.innerHTML = html;
       })
       .catch((error) => {
-        console.error(error);
+        // Error handling without console output
       })
       .finally(() => {
         setLoading(false);

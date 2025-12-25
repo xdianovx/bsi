@@ -38,7 +38,7 @@ export function initNewsFilter() {
         list.innerHTML = html;
       })
       .catch(function (error) {
-        console.error(error);
+        // Error handling without console output
       })
       .finally(function () {
         setLoading(false);

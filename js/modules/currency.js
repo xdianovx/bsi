@@ -60,6 +60,6 @@ export async function initCurrency() {
       });
     });
   } catch (err) {
-    console.error("Currency init error:", err);
+    // Error handling without console output
   }
 }

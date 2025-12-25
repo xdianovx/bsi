@@ -51,7 +51,7 @@ export const gtmSearch = async () => {
     tabPanels[index]?.classList.add("active");
 
     const name = tabNames[index];
-    if (name) initTab(name).catch(console.error);
+    if (name) initTab(name).catch(() => {});
   }
 
   tabButtons.forEach((btn, idx) => btn.addEventListener("click", () => setActiveTab(idx)));

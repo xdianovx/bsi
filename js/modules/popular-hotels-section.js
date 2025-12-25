@@ -109,7 +109,7 @@ export const initPopularHotelsSlider = () => {
 
       toggleControls(swiper, swiperConfig);
     } catch (e) {
-      console.error(e);
+      // Error handling without console output
     } finally {
       setLoading(false);
     }

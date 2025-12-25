@@ -35,7 +35,7 @@ async function makeDirectApiRequest(action, additionalParams = {}) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(error);
+    // Error handling without console output
     throw error;
   }
 }

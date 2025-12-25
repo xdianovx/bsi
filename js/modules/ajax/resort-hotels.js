@@ -40,7 +40,7 @@ export const initResortHotelsAjax = () => {
 
       state.page += 1;
     } catch (e) {
-      console.error(e);
+      // Error handling without console output
       if (!state.list.hasChildNodes()) state.list.textContent = "Не удалось загрузить отели.";
     } finally {
       state.loading = false;

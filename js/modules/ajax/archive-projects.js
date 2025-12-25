@@ -36,7 +36,7 @@ export const archiveProjects = () => {
 
       list.innerHTML = json.data?.html || "";
     } catch (e) {
-      console.error(e);
+      // Error handling without console output
     } finally {
       setLoading(false);
     }

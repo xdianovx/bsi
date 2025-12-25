@@ -2171,7 +2171,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const btns = parent.querySelectorAll(".header-form__page-btns button.btn-page");
     const bodys = parent.querySelectorAll(".header-form__inner");
     if (!btns.length || !bodys.length) return;
-    if (btns.length !== bodys.length) console.warn("Different length");
+    // Length check without console output
 
     const btnActiveClass = "_active";
     const bodyActiveClass = "active";
@@ -2225,7 +2225,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const btns = parent.querySelectorAll(".contacts2__btns button");
     const bodys = parent.querySelectorAll(".contacts2__left-item");
     if (!btns.length || !bodys.length) return;
-    if (btns.length !== bodys.length) console.warn("Different length");
+    // Length check without console output
 
     const btnActiveClass = "active";
     const bodyActiveClass = "active";
@@ -4986,12 +4986,7 @@ window.addEventListener("DOMContentLoaded", () => {
       timeout: 10000,
       type: "post",
       error: function (xhr, status, err) {
-        if (typeof console != "undefined")
-          console.log(
-            status || err
-              ? "Error sending search from: " + (status ? status + (status && err ? " / " : "") : "") + (err ? err : "")
-              : "Unknown error sending search from"
-          );
+        // Error handling without console output
       },
       success: function (data) {
         let $cur,
@@ -6168,12 +6163,7 @@ window.addEventListener("DOMContentLoaded", () => {
       timeout: 10000,
       type: "post",
       error: function (xhr, status, err) {
-        if (typeof console != "undefined")
-          console.log(
-            status || err
-              ? "Error sending blog post tours: " + (status ? status + (status && err ? " / " : "") : "") + (err ? err : "")
-              : "Unknown error sending blog post tours"
-          );
+        // Error handling without console output
       },
       success: function (data) {
         if (data) {
@@ -6228,7 +6218,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function errorMessage(msg) {
-    if (typeof console != "undefined") console.log("Error: " + (typeof msg == "undefined" ? "no data" : msg));
+    // Error handling without console output
   }
 
   /* show-more blog-list__item - ajax */
@@ -6413,8 +6403,6 @@ window.addEventListener("DOMContentLoaded", () => {
         var formBlock = $dashamail_form.get(0);
 
         if (formBlock.querySelector(".mesf-message") === null) {
-          if (typeof console != "undefined") console.log("Поле для сообщения не найдено");
-
           return;
         }
 
@@ -6466,8 +6454,6 @@ window.addEventListener("DOMContentLoaded", () => {
         var formBlock = $dashamail_form.get(0);
 
         if (formBlock.querySelector(".mesf-message") === null) {
-          if (typeof console != "undefined") console.log("Поле для сообщения не найдено");
-
           return;
         }
 
@@ -6648,7 +6634,6 @@ window.addEventListener("DOMContentLoaded", () => {
       "json"
     )
       .fail(function ($xhr) {
-        if (typeof console != "undefined") console.log($xhr.responseJSON.error);
         alert("Сервер временно недоступен. Попробуйте повторить позже");
       })
       .always(function () {
@@ -7104,8 +7089,6 @@ window.addEventListener("DOMContentLoaded", () => {
       "json"
     )
       .fail(function ($xhr) {
-        if (typeof console != "undefined") console.log($xhr.responseJSON.error);
-
         const active = "active",
           $alert = $form.find(".alert--error");
 
@@ -7676,7 +7659,6 @@ window.addEventListener("DOMContentLoaded", () => {
     function removeContents() {
       const contents = list.closest(".main-content2__block_index-nav");
       if (contents) contents.remove();
-      console.error(`".contents" was removed. Error: "${blocksParams.error}"`);
     }
   };
   initPageNav(() => {
@@ -8077,7 +8059,6 @@ window.addEventListener("DOMContentLoaded", () => {
           return response.json();
         })
         .then((data) => {
-          console.log("Форма успешно отправлена:", data);
           validator.form.classList.add(validator.options.formSentClass);
           if (validator.mainContainer) {
             validator.mainContainer.classList.add(validator.options.mainSentClass);
@@ -8089,7 +8070,6 @@ window.addEventListener("DOMContentLoaded", () => {
           }
         })
         .catch((error) => {
-          console.error("Ошибка отправки формы:", error);
           alertManager.showAlert("alert--error", "check-error", "При отправке формы произошла ошибка. Попробуйте ещё раз.");
           if (submitButton) {
             submitButton.disabled = false;
@@ -8519,11 +8499,6 @@ function updateMediaList() {
             }
 
             $(this).removeAttr("href");
-            console.log(f_key);
-            console.log($(this).data("value"));
-            console.log(data["active"][f_key]);
-            console.log($.inArray($(this).data("value").toString(), data["active"][f_key]));
-            console.log("========================");
             if ($.inArray($(this).data("value").toString(), data["active"][f_key]) > -1) {
               $(this).attr("href", "#");
             }
@@ -9394,7 +9369,6 @@ function fixIosImgSrcCopy(img) {
 /* moving elements */
 function moveElement(element, targetContainer, position = "append") {
   if (!element || !targetContainer) {
-    console.error("Элемент или контейнер не существует");
     return;
   }
 
@@ -9412,6 +9386,6 @@ function moveElement(element, targetContainer, position = "append") {
       targetContainer.parentNode.insertBefore(element, targetContainer.nextSibling);
       break;
     default:
-      console.error("Неверная позиция. Используйте 'append', 'prepend', 'before' или 'after'.");
+      // Invalid position
   }
 }

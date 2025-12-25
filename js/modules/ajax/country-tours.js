@@ -67,7 +67,7 @@ export const initCountryToursFilters = () => {
       list.innerHTML = json.data.html || "";
       if (count) count.textContent = `Найдено туров: ${json.data.total || 0}`;
     } catch (e) {
-      console.error(e);
+      // Error handling without console output
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export const initCountryToursFilters = () => {
         true
       );
     } catch (e) {
-      console.error(e);
+      // Error handling without console output
     }
   };
 
