@@ -80,6 +80,17 @@ function handle_fit_form()
     $errors['hotel_stars'] = 'Выберите звездность отеля';
   }
 
+  $budget = sanitize_text_field($_POST['budget'] ?? '');
+  if (empty($budget)) {
+    $errors['budget'] = 'Укажите бюджет';
+  } else {
+    // Проверяем, что бюджет содержит хотя бы одну цифру
+    $budget_digits = preg_replace('/\D/', '', $budget);
+    if (empty($budget_digits)) {
+      $errors['budget'] = 'Укажите корректный бюджет';
+    }
+  }
+
   // Явно убираем ошибку privacy_agreement, если она была добавлена где-то еще
   unset($errors['privacy_agreement']);
 

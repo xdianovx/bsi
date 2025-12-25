@@ -366,6 +366,17 @@ export const fitForm = () => {
       errors.hotel_stars = "Выберите звездность отеля";
     }
 
+    const budget = form.querySelector('[name="budget"]');
+    if (!budget || !budget.value.trim()) {
+      errors.budget = "Укажите бюджет";
+    } else {
+      // Проверяем, что бюджет содержит хотя бы одну цифру
+      const budgetDigits = budget.value.replace(/\D/g, "");
+      if (budgetDigits.length === 0) {
+        errors.budget = "Укажите корректный бюджет";
+      }
+    }
+
     return errors;
   }
 
