@@ -27,6 +27,39 @@ export const fitForm = () => {
 
   // Переключение типа клиента
   function initClientTypeTabs() {
+    // Функция для обновления состояния полей
+    function updateClientTypeFields(clientType) {
+      if (clientTypeInput) {
+        clientTypeInput.value = clientType;
+      }
+
+      if (corporateFields) {
+        if (clientType === "corporate") {
+          corporateFields.style.display = "block";
+          // Делаем поля обязательными
+          const companyName = document.getElementById("company_name");
+          const inn = document.getElementById("inn");
+          if (companyName) companyName.setAttribute("required", "required");
+          if (inn) inn.setAttribute("required", "required");
+        } else {
+          corporateFields.style.display = "none";
+          // Убираем обязательность
+          const companyName = document.getElementById("company_name");
+          const inn = document.getElementById("inn");
+          if (companyName) companyName.removeAttribute("required");
+          if (inn) inn.removeAttribute("required");
+        }
+      }
+    }
+
+    // Инициализация начального состояния (активный таб по умолчанию)
+    const activeTab = document.querySelector(".fit-form__client-tab.active");
+    if (activeTab) {
+      const initialClientType = activeTab.getAttribute("data-client-type");
+      updateClientTypeFields(initialClientType);
+    }
+
+    // Обработчики кликов на табы
     clientTabs.forEach((tab) => {
       tab.addEventListener("click", () => {
         const clientType = tab.getAttribute("data-client-type");
@@ -35,28 +68,8 @@ export const fitForm = () => {
         clientTabs.forEach((t) => t.classList.remove("active"));
         tab.classList.add("active");
 
-        // Обновляем скрытое поле и показываем/скрываем корпоративные поля
-        if (clientTypeInput) {
-          clientTypeInput.value = clientType;
-        }
-
-        if (corporateFields) {
-          if (clientType === "corporate") {
-            corporateFields.style.display = "block";
-            // Делаем поля обязательными
-            const companyName = document.getElementById("company_name");
-            const inn = document.getElementById("inn");
-            if (companyName) companyName.setAttribute("required", "required");
-            if (inn) inn.setAttribute("required", "required");
-          } else {
-            corporateFields.style.display = "none";
-            // Убираем обязательность
-            const companyName = document.getElementById("company_name");
-            const inn = document.getElementById("inn");
-            if (companyName) companyName.removeAttribute("required");
-            if (inn) inn.removeAttribute("required");
-          }
-        }
+        // Обновляем поля
+        updateClientTypeFields(clientType);
       });
     });
 
@@ -353,32 +366,34 @@ export const fitForm = () => {
       errors.hotel_stars = "Выберите звездность отеля";
     }
 
-    // Проверка согласия на обработку данных (если поле существует)
-    const privacyAgreement = form.querySelector('[name="privacy_agreement"]');
-    if (privacyAgreement && !privacyAgreement.checked) {
-      errors.privacy_agreement = "Необходимо согласие на обработку персональных данных";
-    }
-
     return errors;
   }
 
   // Показать ошибки полей
   function showFieldError(fieldName, message) {
+    console.log(`[showFieldError] Field: ${fieldName}, Message: ${message}`);
+
     const errorEl = form.querySelector(`[data-field="${fieldName}"]`);
 
     if (errorEl) {
       errorEl.textContent = message;
-      // Убираем display: none если был установлен, чтобы стили из forms.scss работали
-      errorEl.style.display = "";
       // Убеждаемся, что элемент видим
+      errorEl.style.display = "block";
       errorEl.style.visibility = "visible";
       errorEl.style.opacity = "1";
+      errorEl.style.color = "#dc2626";
+      console.log(`[showFieldError] Error message element updated:`, errorEl);
+    } else {
+      console.warn(`[showFieldError] Error element not found for field: ${fieldName}`);
     }
 
     // Обработка обычных input полей
     const inputEl = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#${fieldName}`);
     if (inputEl) {
       inputEl.classList.add("error");
+      console.log(`[showFieldError] Error class added to input:`, inputEl);
+    } else {
+      console.warn(`[showFieldError] Input element not found for field: ${fieldName}`);
     }
 
     // Обработка ChoicesJS select (country_id)
@@ -460,7 +475,10 @@ export const fitForm = () => {
   function clearErrors() {
     form.querySelectorAll(".error-message").forEach((el) => {
       el.textContent = "";
-      // Не устанавливаем display: none, чтобы стили из forms.scss работали
+      // Сбрасываем стили, но оставляем display как есть (будет управляться CSS)
+      el.style.visibility = "";
+      el.style.opacity = "";
+      el.style.color = "";
     });
     form.querySelectorAll(".error").forEach((el) => {
       el.classList.remove("error");
@@ -554,20 +572,29 @@ export const fitForm = () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // Очищаем все предыдущие ошибки
     clearErrors();
 
-    // Валидация
+    // Валидация перед отправкой
     const errors = validateForm();
+    console.log("=== Client-side Validation ===");
+    console.log("Errors found:", Object.keys(errors).length);
+    console.log("Errors:", errors);
+
     if (Object.keys(errors).length > 0) {
       // Показываем все ошибки
       Object.keys(errors).forEach((field) => {
+        console.log(`Showing client-side error for field: ${field}`, errors[field]);
         showFieldError(field, errors[field]);
       });
+
       showStatus("Исправьте ошибки в форме", "error");
+
       // Скролл к первому полю с ошибкой
       setTimeout(() => {
         scrollToFirstError();
       }, 200);
+
       return;
     }
 
@@ -626,7 +653,15 @@ export const fitForm = () => {
     }
 
     // Добавляем action для AJAX
-    formData.append("action", "simple_contact_form");
+    formData.append("action", "fit_form");
+
+    // Выводим данные в консоль для отладки
+    console.log("=== FIT Form Data ===");
+    const formDataObj = {};
+    for (const [key, value] of formData.entries()) {
+      formDataObj[key] = value;
+    }
+    console.log("Form Data:", formDataObj);
 
     try {
       const response = await fetch(ajax.url, {
@@ -635,6 +670,11 @@ export const fitForm = () => {
       });
 
       const result = await response.json();
+
+      // Выводим ответ сервера в консоль
+      console.log("=== Server Response ===");
+      console.log("Success:", result.success);
+      console.log("Data:", result.data);
 
       if (result.success) {
         showStatus("Успешно отправлено!", "success");
@@ -669,13 +709,31 @@ export const fitForm = () => {
           peopleSelect.classList.remove("is-open");
         }
       } else {
+        // Выводим ошибки в консоль
+        console.log("=== Form Errors ===");
+        console.log("Errors:", result.data?.errors);
+        console.log("Message:", result.data?.message);
+
         // Показываем ошибки полей
         if (result.data && result.data.errors) {
-          Object.keys(result.data.errors).forEach((field) => {
+          // Очищаем все предыдущие ошибки перед показом новых
+          clearErrors();
+
+          // Показываем все ошибки с сервера
+          const errorFields = Object.keys(result.data.errors);
+          console.log(`Total errors to show: ${errorFields.length}`, errorFields);
+
+          errorFields.forEach((field) => {
+            console.log(`Showing error for field: ${field}`, result.data.errors[field]);
             showFieldError(field, result.data.errors[field]);
           });
         }
         showStatus(result.data?.message || "Ошибка отправки", "error");
+
+        // Скролл к первому полю с ошибкой
+        setTimeout(() => {
+          scrollToFirstError();
+        }, 200);
       }
     } catch (error) {
       console.error("Form submission error:", error);

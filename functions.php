@@ -261,6 +261,7 @@ require get_template_directory() . '/custom-fields/pages/visa.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';
+require get_template_directory() . '/inc/requests/ajax-fit.php';
 require get_template_directory() . '/inc/requests/samo.php';
 require get_template_directory() . '/inc/requests/news.php';
 require get_template_directory() . '/inc/requests/promo-filter.php';
