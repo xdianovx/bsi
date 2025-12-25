@@ -54,7 +54,7 @@ $selected_country_id = isset($_GET['country']) ? (int) $_GET['country'] : 0;
             Частный клиент
           </button>
           <button type="button" class="tab-button fit-form__client-tab" data-client-type="corporate">
-            Турагенство
+            Корпоративный клиент
           </button>
         </div>
 
