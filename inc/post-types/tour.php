@@ -188,7 +188,6 @@ add_action('acf/init', function () {
   ]);
 });
 
-
 /**
  * 6) Query vars
  */
@@ -199,7 +198,6 @@ add_filter('query_vars', function ($vars) {
     $vars[] = 'country_tours';
   return $vars;
 });
-
 
 /**
  * 7) Роуты:

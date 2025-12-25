@@ -1,5 +1,6 @@
 .DS_Store
 Thumbs.db
+.cursor/
 
 node_modules/
 npm-debug.log*
