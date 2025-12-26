@@ -1,4 +1,5 @@
 import { Swiper } from "swiper/bundle";
+import { Fancybox } from "@fancyapps/ui";
 
 export const sliders = () => {
   const blocks = document.querySelectorAll(".js-gallery");
@@ -39,6 +40,38 @@ export const sliders = () => {
           swiper: thumbsSwiper,
         },
       });
+
+      // Обработчик клика на оверлей для открытия fancybox с остальными фото
+      const overlayEl = block.querySelector(".js-gallery-overlay");
+      if (overlayEl) {
+        // Предотвращаем прокрутку слайдера при клике на оверлей
+        overlayEl.addEventListener("mousedown", (e) => {
+          e.stopPropagation();
+        });
+        
+        overlayEl.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const galleryId = overlayEl.getAttribute("data-gallery-id");
+          // Находим все элементы галереи с данным gallery-id (начиная с 5-го фото)
+          const allGalleryItems = block.querySelectorAll(`a[data-fancybox="${galleryId}"]`);
+          const hiddenItems = Array.from(allGalleryItems).slice(4);
+          
+          if (hiddenItems.length > 0) {
+            // Открываем fancybox с первого скрытого элемента
+            Fancybox.show(
+              hiddenItems.map((item) => ({
+                src: item.getAttribute("href"),
+                caption: item.querySelector("img")?.getAttribute("alt") || "",
+              })),
+              {
+                groupAttr: `data-fancybox="${galleryId}"`,
+              }
+            );
+          }
+        });
+      }
     });
   }
 

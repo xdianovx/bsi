@@ -5562,10 +5562,38 @@ input.error {
   border-radius: 8px;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 .hotel-gallery-thumb-slide img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+.gallery-thumb-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+  pointer-events: auto;
+}
+.gallery-thumb-overlay:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+.gallery-thumb-overlay__text {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .hotel-gallery-main-arrow-prev {
@@ -5726,6 +5754,7 @@ input.error {
 
 .js-gallery-thumbs {
   height: 600px;
+  position: relative;
 }
 @media screen and (max-width: 1200px) {
   .js-gallery-thumbs {
@@ -5735,6 +5764,21 @@ input.error {
 @media screen and (max-width: 768px) {
   .js-gallery-thumbs {
     height: 40px;
+  }
+}
+@media screen and (min-width: 1201px) {
+  .js-gallery-thumbs .gallery-thumb-overlay {
+    top: calc(75% + 5px);
+    height: calc(25% - 5px);
+    width: 100%;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .js-gallery-thumbs .gallery-thumb-overlay {
+    left: calc(75% + 6px);
+    width: calc(25% - 6px);
+    height: 100%;
+    top: 0;
   }
 }
 

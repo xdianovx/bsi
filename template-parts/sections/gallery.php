@@ -8,8 +8,7 @@ $id = $args['id'] ?? uniqid('gallery_'); // уникальная группа д
 $title = $args['title'] ?? ''; // если нужно
 ?>
 
-<div class="single-hotel__gallery-section country-page__gallery js-gallery"
-     data-gallery-id="<?= esc_attr($id); ?>">
+<div class="single-hotel__gallery-section country-page__gallery js-gallery" data-gallery-id="<?= esc_attr($id); ?>">
 
   <?php if (!empty($title)): ?>
     <h2 class="h2"><?= esc_html($title); ?></h2>
@@ -27,11 +26,9 @@ $title = $args['title'] ?? ''; // если нужно
         $full_url = $item['sizes']['large'] ?? $img_url; // поменяй на 'full' если есть
         ?>
         <div class="swiper-slide">
-          <a class="hotel-gallery-main-slide country-page__gallery-slide"
-             href="<?= esc_url($img_url); ?>"
-             data-fancybox="<?= esc_attr($id); ?>">
-            <img src="<?= esc_url($img_url); ?>"
-                 alt="<?= esc_attr($img_alt); ?>">
+          <a class="hotel-gallery-main-slide country-page__gallery-slide" href="<?= esc_url($img_url); ?>"
+            data-fancybox="<?= esc_attr($id); ?>">
+            <img src="<?= esc_url($img_url); ?>" alt="<?= esc_attr($img_alt); ?>">
           </a>
         </div>
       <?php endforeach; ?>
@@ -44,8 +41,10 @@ $title = $args['title'] ?? ''; // если нужно
 
   <div class="swiper  js-gallery-thumbs">
     <div class="swiper-wrapper">
-      <?php foreach ($gallery as $item): ?>
-        <?php
+      <?php
+      $total_count = count($gallery);
+      $remaining_count = $total_count > 4 ? $total_count - 4 : 0;
+      foreach ($gallery as $index => $item):
         $img_url = $item['url'] ?? '';
         $img_alt = $item['alt'] ?? '';
         if (!$img_url)
@@ -53,12 +52,17 @@ $title = $args['title'] ?? ''; // если нужно
         ?>
         <div class="swiper-slide">
           <div class="hotel-gallery-thumb-slide">
-            <img src="<?= esc_url($img_url); ?>"
-                 alt="<?= esc_attr($img_alt); ?>">
+            <img src="<?= esc_url($img_url); ?>" alt="<?= esc_attr($img_alt); ?>">
           </div>
         </div>
       <?php endforeach; ?>
     </div>
+    <?php if ($remaining_count > 0): ?>
+      <div class="gallery-thumb-overlay js-gallery-overlay" data-gallery-id="<?= esc_attr($id); ?>"
+        data-remaining-count="<?= esc_attr($remaining_count); ?>">
+        <span class="gallery-thumb-overlay__text"><?= esc_html($remaining_count); ?>+</span>
+      </div>
+    <?php endif; ?>
   </div>
 
 </div>

@@ -115,12 +115,42 @@
   border-radius: 8px;
   height: 100%;
   overflow: hidden;
+  position: relative;
   // aspect-ratio: 16/9;
   // margin-top: 8px;
 
   img {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+  }
+}
+
+.gallery-thumb-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+  pointer-events: auto;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  &__text {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
   }
 }
 
@@ -283,6 +313,7 @@
 
 .js-gallery-thumbs {
   height: 600px;
+  position: relative;
 
   @media screen and (max-width: 1200px) {
     height: 120px;
@@ -290,6 +321,25 @@
 
   @media screen and (max-width: 768px) {
     height: 40px;
+  }
+
+  // Фиксируем оверлей на позиции 4-го слайда
+  .gallery-thumb-overlay {
+    // Для вертикального направления (desktop)
+    // При 4 слайдах: 4-й слайд начинается на 75% + отступы между слайдами
+    @media screen and (min-width: 1201px) {
+      top: calc(75% + 5px);
+      height: calc(25% - 5px);
+      width: 100%;
+    }
+
+    // Для горизонтального направления (mobile/tablet)
+    @media screen and (max-width: 1200px) {
+      left: calc(75% + 6px);
+      width: calc(25% - 6px);
+      height: 100%;
+      top: 0;
+    }
   }
 }
 
