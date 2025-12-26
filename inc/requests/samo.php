@@ -137,6 +137,25 @@ function samo_ajax()
 
       return $send(SamoService::endpoints()->searchExcursionPrices($params));
 
+    case 'excursion_all':
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $tours = isset($_POST['TOURS']) ? (int) $_POST['TOURS'] : 0;
+      $forceRefresh = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+
+      if (!$townFromInc || !$stateInc || !$tours) {
+        wp_send_json_error(['message' => 'TOWNFROMINC, STATEINC and TOURS required'], 400);
+      }
+      $params = [
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+        'TOURS' => $tours,
+      ];
+      if ($forceRefresh) {
+        $params['_force_refresh'] = true;
+      }
+      return $send(SamoService::endpoints()->searchExcursionAll($params));
+
     default:
       wp_send_json_error(['message' => 'Unknown endpoint'], 400);
   }

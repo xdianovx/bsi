@@ -66,13 +66,55 @@ export const tourPrices = () => {
   let allPricesData = []; // Храним все загруженные цены для фильтрации
   let currentStarFilter = ""; // Текущий выбранный фильтр звездности
   let starFilterChoice = null; // Экземпляр Choices для фильтра звездности
+  let availableDates = []; // Доступные даты из API
+  let datePickerInstance = null; // Экземпляр flatpickr
+
+  // Формат даты: YYYYMMDD (определяем раньше, чтобы использовать для начальных дат)
+  function formatDateYYYYMMDD(date) {
+    if (!date) return "";
+    const d = date instanceof Date ? date : new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}${month}${day}`;
+  }
+
+  // Парсинг даты из формата YYYYMMDD в Date объект
+  function parseDateFromYYYYMMDD(dateStr) {
+    if (!dateStr || dateStr.length !== 8) return null;
+    const year = parseInt(dateStr.substring(0, 4));
+    const month = parseInt(dateStr.substring(4, 6)) - 1;
+    const day = parseInt(dateStr.substring(6, 8));
+    return new Date(year, month, day);
+  }
+
+  // Парсинг битовой строки validDates в массив доступных дат
+  function parseValidDates(validDatesStr, startDateStr) {
+    if (!validDatesStr || !startDateStr) return [];
+
+    const startDate = parseDateFromYYYYMMDD(startDateStr);
+    if (!startDate) return [];
+
+    const dates = [];
+    // Проходим по каждому символу битовой строки
+    for (let i = 0; i < validDatesStr.length; i++) {
+      if (validDatesStr[i] === "1") {
+        // Если бит установлен, дата доступна
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        dates.push(formatDateYYYYMMDD(date));
+      }
+    }
+    return dates;
+  }
 
   // Параметры поиска
+  // Даты будут установлены после загрузки доступных дат из API
   const searchParams = {
     nightsFrom: 7,
     nightsTill: 7,
-    checkInBeg: "20260308",
-    checkInEnd: "20260315",
+    checkInBeg: "", // Будет установлено после загрузки доступных дат
+    checkInEnd: "", // Будет установлено после загрузки доступных дат
     adult: 2,
     child: 0,
     currency: 1, // RUB
@@ -482,6 +524,97 @@ export const tourPrices = () => {
     }
   }
 
+  // Загрузка доступных дат из SearchExcursion_ALL
+  async function loadAvailableDates(forceRefresh = false) {
+    try {
+      const params = {
+        TOWNFROMINC: townFromInc,
+        STATEINC: stateInc,
+        TOURS: tours,
+      };
+      if (forceRefresh) {
+        params._force_refresh = true;
+      }
+      const data = await samoAjax("excursion_all", params);
+
+      // Обработка JSON структуры: SearchExcursion_ALL.CHECKIN_BEG
+      if (data?.SearchExcursion_ALL?.CHECKIN_BEG) {
+        const checkInBeg = data.SearchExcursion_ALL.CHECKIN_BEG;
+        if (checkInBeg.validDates && checkInBeg.startDate) {
+          // Парсим доступные даты из битовой строки
+          availableDates = parseValidDates(checkInBeg.validDates, checkInBeg.startDate);
+
+          // Если есть доступные даты, находим ближайшую доступную дату
+          if (availableDates.length > 0) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Находим ближайшую доступную дату (не раньше сегодня)
+            let nearestDate = null;
+            for (const dateStr of availableDates) {
+              const dateObj = parseDateFromYYYYMMDD(dateStr);
+              if (dateObj && dateObj >= today) {
+                nearestDate = dateStr;
+                break;
+              }
+            }
+
+            // Если не нашли дату в будущем, берем первую доступную
+            if (!nearestDate) {
+              nearestDate = availableDates[0];
+            }
+
+            // Устанавливаем начальную дату
+            searchParams.checkInBeg = nearestDate;
+
+            // Устанавливаем конечную дату как начальная +7 дней
+            const startDateObj = parseDateFromYYYYMMDD(nearestDate);
+            if (startDateObj) {
+              const endDateObj = new Date(startDateObj);
+              endDateObj.setDate(startDateObj.getDate() + 7);
+              searchParams.checkInEnd = formatDateYYYYMMDD(endDateObj);
+            }
+
+            // Обновляем календарь с доступными датами
+            updateDatePicker();
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading available dates:", error);
+      // В случае ошибки используем текущую дату
+      const today = new Date();
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + 7);
+      searchParams.checkInBeg = formatDateYYYYMMDD(today);
+      searchParams.checkInEnd = formatDateYYYYMMDD(endDate);
+    }
+  }
+
+  // Обновление календаря с доступными датами
+  function updateDatePicker() {
+    if (!datePickerInstance || !datepicker) return;
+
+    // Преобразуем доступные даты в формат Date для flatpickr
+    const enabledDates = availableDates.map((dateStr) => parseDateFromYYYYMMDD(dateStr)).filter((d) => d !== null);
+
+    // Обновляем календарь - показываем только доступные даты
+    if (enabledDates.length > 0) {
+      datePickerInstance.set("enable", enabledDates);
+
+      // Если есть установленные даты, обновляем календарь и переключаем на нужный месяц
+      if (searchParams.checkInBeg && searchParams.checkInEnd) {
+        const startDate = parseDateFromYYYYMMDD(searchParams.checkInBeg);
+        const endDate = parseDateFromYYYYMMDD(searchParams.checkInEnd);
+        if (startDate && endDate) {
+          // Устанавливаем даты и переключаем календарь на месяц начальной даты
+          datePickerInstance.setDate([startDate, endDate], false);
+          datePickerInstance.jumpToDate(startDate); // Переключаем календарь на месяц начальной даты
+        }
+      }
+    }
+  }
+
   // Загрузка доступных ночей
   async function loadNights() {
     try {
@@ -530,16 +663,6 @@ export const tourPrices = () => {
       nightsData = { from: 7, till: 7, available: null }; // Значения по умолчанию
       updateNightsDropdown();
     }
-  }
-
-  // Формат даты: YYYYMMDD
-  function formatDateYYYYMMDD(date) {
-    if (!date) return "";
-    const d = date instanceof Date ? date : new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}${month}${day}`;
   }
 
   // Загрузка цен
@@ -649,28 +772,14 @@ export const tourPrices = () => {
 
     // Выбор дат
     if (datepicker) {
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
-
-      // Парсим начальные даты из searchParams
-      const parseDate = (dateStr) => {
-        if (!dateStr || dateStr.length !== 8) return null;
-        const year = parseInt(dateStr.substring(0, 4));
-        const month = parseInt(dateStr.substring(4, 6)) - 1;
-        const day = parseInt(dateStr.substring(6, 8));
-        return new Date(year, month, day);
-      };
-
-      const defaultStart = parseDate(searchParams.checkInBeg) || today;
-      const defaultEnd = parseDate(searchParams.checkInEnd) || nextWeek;
-
-      flatpickr(datepicker, {
+      // Инициализируем календарь без дат по умолчанию
+      // Даты будут установлены после загрузки доступных дат через updateDatePicker()
+      datePickerInstance = flatpickr(datepicker, {
         mode: "range",
-        minDate: "today",
         locale: Russian,
         dateFormat: "d.m",
-        defaultDate: [defaultStart, defaultEnd],
+        enable: [], // Будет обновлено после загрузки доступных дат через updateDatePicker()
+        // Не устанавливаем defaultDate, чтобы календарь не показывал старые даты
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
             searchParams.checkInBeg = formatDateYYYYMMDD(selectedDates[0]);
@@ -731,6 +840,9 @@ export const tourPrices = () => {
   async function init() {
     // Инициализируем фильтры (включая dropdown)
     initFilters();
+
+    // Сначала загружаем доступные даты из SearchExcursion_ALL
+    await loadAvailableDates();
 
     // Загружаем ночи для получения доступного диапазона
     await loadNights();

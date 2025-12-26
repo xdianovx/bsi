@@ -71,6 +71,18 @@ class SamoEndpoints
     $params['type'] = 'api'; // API возвращает JSON для экскурсий
     return $this->client->request('SearchExcursion_PRICES', $params);
   }
+
+  /**
+   * Получение всех данных для экскурсионного тура (включая доступные даты)
+   *
+   * @param array $params Параметры: TOWNFROMINC, STATEINC, TOURS
+   * @return array
+   */
+  public function searchExcursionAll(array $params): array
+  {
+    $params['type'] = 'api'; // API возвращает JSON для экскурсий
+    return $this->client->request('SearchExcursion_ALL', $params);
+  }
 }
 
 
