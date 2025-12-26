@@ -711,7 +711,7 @@ export const tourPrices = () => {
       peopleCounter({
         rootSelector: ".tour-prices__wrap .gtm-persons-select",
         outputSelector: ".tour-prices__wrap .gtm-people-total",
-        maxAdults: 4,
+        maxAdults: 3,
         maxChildren: 3,
         onChange: ({ adults, children }) => {
           searchParams.adult = adults;

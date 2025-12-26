@@ -6373,6 +6373,12 @@ input.error {
   height: 100%;
   width: 100%;
 }
+@media screen and (max-width: 768px) {
+  .tour-prices__filters-wrap .gtm-datepicker {
+    height: 48px;
+    text-align: left;
+  }
+}
 .tour-prices__filters-wrap .gtm-persons-select {
   align-self: stretch;
   display: flex;
@@ -6383,6 +6389,12 @@ input.error {
   position: relative;
   background: #fff;
   padding: 0 16px;
+}
+@media screen and (max-width: 768px) {
+  .tour-prices__filters-wrap .gtm-persons-select {
+    height: 48px;
+    text-align: left;
+  }
 }
 .tour-prices__filters-wrap .gtm-persons-select .js-dropdown-panel {
   position: absolute;

@@ -568,6 +568,11 @@
     padding: 0 16px;
     height: 100%;
     width: 100%;
+
+    @media screen and (max-width: 768px) {
+      height: 48px;
+      text-align: left;
+    }
   }
 
   .gtm-persons-select {
@@ -580,6 +585,11 @@
     position: relative;
     background: #fff;
     padding: 0 16px;
+
+    @media screen and (max-width: 768px) {
+      height: 48px;
+      text-align: left;
+    }
 
     // Стили для выпадающей панели
     .js-dropdown-panel {
