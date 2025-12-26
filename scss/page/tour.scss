@@ -3,7 +3,7 @@
   grid-template-columns: 2fr 3fr 2fr;
   position: relative;
   width: 100%;
-  gap: 8px;
+  gap: 16px;
 
   @media screen and (max-width: 1024px) {
     grid-template-columns: 2fr 4fr 1fr;
@@ -41,10 +41,10 @@
 }
 
 .tour-card-row__title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 110%;
-  margin-top: 16px;
+  line-height: 130%;
+  margin-top: 8px;
 }
 .tour-card-row__btns {
   margin-top: auto;
@@ -144,7 +144,7 @@
   align-items: center;
   background: $bg-gray;
   border-radius: 4px;
-  padding: 4px 6px;
+  padding: 4px 4px;
   font-size: 14px;
   line-height: 100%;
 
