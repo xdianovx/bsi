@@ -293,3 +293,462 @@
     border-radius: 8px;
   }
 }
+
+// Секция с ценами экскурсионного тура
+.tour-prices-section {
+  margin-top: 20px;
+
+  @media screen and (max-width: 1024px) {
+    padding: 32px 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    padding: 24px 0;
+  }
+}
+
+.tour-prices__wrap {
+  display: flex;
+  gap: 16px;
+  padding: 8px;
+  background: $red;
+  border-radius: 8px;
+  > *:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+
+    &.is-open .choices__inner {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+  }
+
+  .tour-prices__book-btn {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  .tour-prices__book-btn {
+    margin-top: 0;
+    background: #000;
+    color: #fff;
+  }
+}
+
+.tour-prices__book-btn {
+  align-self: flex-start;
+  margin-top: 8px;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    align-self: stretch;
+  }
+}
+
+.tour-prices__filter {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  .tour-prices__select {
+    width: 100%;
+    height: 100%;
+    padding: 0 16px;
+    padding-right: 40px;
+    border: none;
+    border-radius: 0;
+    background: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    color: $text-black;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+
+    &:hover {
+      background-color: #f9f9f9;
+    }
+
+    &:focus {
+      outline: none;
+      background-color: #f9f9f9;
+    }
+  }
+}
+
+.tour-prices__filter {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  .tour-prices__select {
+    width: 100%;
+    height: 100%;
+    padding: 0 16px;
+    padding-right: 40px;
+    border: none;
+    border-radius: 0;
+    background: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    color: $text-black;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+
+    &:hover {
+      background-color: #f9f9f9;
+    }
+
+    &:focus {
+      outline: none;
+      background-color: #f9f9f9;
+    }
+  }
+}
+
+.tour-prices__filters-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  border-radius: 8px;
+  align-items: stretch;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #dfdfdf;
+  overflow: visible; // Изменено с hidden на visible, чтобы панели dropdown были видны
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  > *:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+
+    &.is-open .choices__inner {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+  }
+
+  .tour-prices__book-btn {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 0;
+    border-radius: 8px;
+
+    > * {
+      border-radius: 8px;
+      width: 100%;
+      border-right: none !important;
+      border-bottom: 1px solid #dfdfdf;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .choices {
+    flex-grow: 1;
+    width: 100%;
+  }
+
+  > *:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+
+    &.is-open .choices__inner {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+  }
+
+  .tour-prices__book-btn {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  .is-open .choices__inner {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  // Стили для элементов внутри (как в GTM-search)
+  .gtm-nights-select {
+    align-self: stretch;
+    display: flex;
+    width: 520px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
+    position: relative;
+    background: #fff;
+    padding: 0 16px;
+
+    @media screen and (max-width: 768px) {
+      justify-content: flex-start;
+    }
+
+    // Стили для выпадающей панели
+    .js-dropdown-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      background: #fff;
+      border: 1px solid #dfdfdf;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 16px;
+      z-index: 1000;
+      display: none;
+    }
+
+    &.is-open .js-dropdown-panel {
+      display: block;
+    }
+  }
+
+  .gtm-datepicker {
+    text-align: center;
+    border: none;
+    background: #fff;
+    padding: 0 16px;
+    height: 100%;
+    width: 100%;
+  }
+
+  .gtm-persons-select {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
+    position: relative;
+    background: #fff;
+    padding: 0 16px;
+
+    // Стили для выпадающей панели
+    .js-dropdown-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      background: #fff;
+      border: 1px solid #dfdfdf;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 16px;
+      z-index: 1000;
+      display: none;
+    }
+
+    &.is-open .js-dropdown-panel {
+      display: block;
+    }
+  }
+}
+
+.tour-prices__price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+
+  @media screen and (max-width: 768px) {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+.tour-prices__price-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: $text-gray;
+  line-height: 100%;
+}
+
+.tour-prices__price-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 100%;
+  color: $text-black;
+
+  @media screen and (max-width: 768px) {
+    font-size: 28px;
+  }
+}
+
+.tour-prices__price {
+  color: $red;
+}
+
+.tour-prices__list {
+  position: relative;
+  min-height: 60px;
+}
+
+.tour-prices__error {
+  color: $red;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.tour-prices__no-price {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  padding-top: 32px;
+}
+
+.tour-prices__list {
+  width: 100%;
+  min-height: 60px;
+  position: relative;
+}
+
+.tour-prices__stars-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.tour-prices__star-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #dbdbdb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  @media screen and (max-width: 768px) {
+    padding: 16px;
+    gap: 12px;
+  }
+}
+
+.tour-prices__star-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.tour-prices__star-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  line-height: 130%;
+
+  @media screen and (max-width: 768px) {
+    font-size: 18px;
+  }
+}
+
+.tour-prices__star-stars {
+  flex-shrink: 0;
+
+  .stars-rating {
+    color: #ffd700;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.tour-prices__star-body {
+  display: flex;
+  flex-grow: 1;
+  gap: 32px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.tour-prices__star-field {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 140%;
+  flex-wrap: wrap;
+}
+
+.tour-prices__star-label {
+  font-weight: 500;
+  color: $text-gray;
+}
+
+.tour-prices__star-value {
+  color: $text-black;
+}
+
+.tour-prices__star-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+
+  @media screen and (max-width: 768px) {
+    justify-content: flex-start;
+  }
+}
+
+.tour-prices__star-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: $red;
+  line-height: 100%;
+  white-space: nowrap;
+
+  @media screen and (max-width: 768px) {
+    font-size: 20px;
+  }
+}

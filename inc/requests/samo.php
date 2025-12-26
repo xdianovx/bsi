@@ -52,6 +52,91 @@ function samo_ajax()
         'STATEINC' => $stateInc,
       ]));
 
+    // Экскурсионные туры
+    case 'excursion_hotels':
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $tours = isset($_POST['TOURS']) ? (int) $_POST['TOURS'] : 0;
+
+      if (!$townFromInc || !$stateInc || !$tours) {
+        wp_send_json_error(['message' => 'TOWNFROMINC, STATEINC and TOURS required'], 400);
+      }
+
+      return $send(SamoService::endpoints()->searchExcursionHotels([
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+        'TOURS' => $tours,
+      ]));
+
+    case 'excursion_nights':
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $tours = isset($_POST['TOURS']) ? (int) $_POST['TOURS'] : 0;
+
+      if (!$townFromInc || !$stateInc || !$tours) {
+        wp_send_json_error(['message' => 'TOWNFROMINC, STATEINC and TOURS required'], 400);
+      }
+
+      $params = [
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+        'TOURS' => $tours,
+      ];
+
+      // Проверяем флаг принудительного обновления кэша
+      $forceRefresh = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+      if ($forceRefresh) {
+        $params['_force_refresh'] = true;
+      }
+
+      return $send(SamoService::endpoints()->searchExcursionNights($params));
+
+    case 'excursion_prices':
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $tours = isset($_POST['TOURS']) ? (int) $_POST['TOURS'] : 0;
+      $checkinBeg = isset($_POST['CHECKIN_BEG']) ? sanitize_text_field($_POST['CHECKIN_BEG']) : '';
+      $checkinEnd = isset($_POST['CHECKIN_END']) ? sanitize_text_field($_POST['CHECKIN_END']) : '';
+      $nightsFrom = isset($_POST['NIGHTS_FROM']) ? (int) $_POST['NIGHTS_FROM'] : 0;
+      $nightsTill = isset($_POST['NIGHTS_TILL']) ? (int) $_POST['NIGHTS_TILL'] : 0;
+      $adult = isset($_POST['ADULT']) ? (int) $_POST['ADULT'] : 2;
+      $child = isset($_POST['CHILD']) ? (int) $_POST['CHILD'] : 0;
+      $currency = isset($_POST['CURRENCY']) ? (int) $_POST['CURRENCY'] : 1;
+
+      if (!$townFromInc || !$stateInc || !$tours) {
+        wp_send_json_error(['message' => 'TOWNFROMINC, STATEINC and TOURS required'], 400);
+      }
+
+      $params = [
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+        'TOURS' => $tours,
+        'ADULT' => $adult,
+        'CHILD' => $child,
+        'CURRENCY' => $currency,
+      ];
+
+      if ($checkinBeg) {
+        $params['CHECKIN_BEG'] = $checkinBeg;
+      }
+      if ($checkinEnd) {
+        $params['CHECKIN_END'] = $checkinEnd;
+      }
+      if ($nightsFrom) {
+        $params['NIGHTS_FROM'] = $nightsFrom;
+      }
+      if ($nightsTill) {
+        $params['NIGHTS_TILL'] = $nightsTill;
+      }
+
+      // Проверяем флаг принудительного обновления кэша
+      $forceRefresh = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+      if ($forceRefresh) {
+        $params['_force_refresh'] = true;
+      }
+
+      return $send(SamoService::endpoints()->searchExcursionPrices($params));
+
     default:
       wp_send_json_error(['message' => 'Unknown endpoint'], 400);
   }

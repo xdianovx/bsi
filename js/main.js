@@ -16,6 +16,7 @@ import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initCountryAside } from "./modules/country-aside";
 import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
 import { archiveProjects } from "./modules/ajax/archive-projects";
+import { tourPrices } from "./modules/tour-prices";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -40,5 +41,6 @@ window.addEventListener("DOMContentLoaded", () => {
   initCountryAside();
   initPopularHotelsSlider();
   archiveProjects();
+  tourPrices();
   // initHotelMap();
 });

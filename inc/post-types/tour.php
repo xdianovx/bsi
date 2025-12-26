@@ -339,8 +339,9 @@ add_action('acf/init', function () {
         'label' => 'Ссылка для бронирования',
         'name' => 'tour_booking_url',
         'type' => 'url',
-        'wrapper' => ['width' => '50'],
+        'wrapper' => ['width' => '100'],
         'placeholder' => 'https://...',
+        'instructions' => 'Обычная ссылка для бронирования или ссылка на поиск экскурсии из Самотура (https://online.bsigroup.ru/search_excursion?TOWNFROMINC=1&STATEINC=32&TOURINC=635). Если это ссылка на поиск экскурсии, будут автоматически загружены цены по звездности отелей.',
       ],
     ],
     'location' => [
