@@ -6069,13 +6069,20 @@ input.error {
 }
 
 .single-hotel__title {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   flex-grow: 1;
 }
 @media screen and (max-width: 768px) {
   .single-hotel__title {
     font-size: 24px;
   }
+}
+
+.single-hotel__rating-stars {
+  margin-bottom: 8px;
+}
+.single-hotel__rating-stars .stars-rating {
+  justify-content: flex-start;
 }
 
 .single-hotel__address {

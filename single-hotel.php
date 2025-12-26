@@ -79,25 +79,13 @@ get_header();
 
         </div>
 
-        <button class="print-btn single-hotel__print-btn"
-                data-micromodal-trigger="modal-hotel-pdf">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="2"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-printer-icon lucide-printer">
+        <button class="print-btn single-hotel__print-btn" data-micromodal-trigger="modal-hotel-pdf">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-printer-icon lucide-printer">
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
             <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
-            <rect x="6"
-                  y="14"
-                  width="12"
-                  height="8"
-                  rx="1" />
+            <rect x="6" y="14" width="12" height="8" rx="1" />
           </svg>
         </button>
       </div>
@@ -134,8 +122,7 @@ get_header();
 
           <div class="single-hotel__address">
             <?php if (!empty($country_flag)): ?>
-              <img src="<?= esc_url($country_flag); ?>"
-                   alt="">
+              <img src="<?= esc_url($country_flag); ?>" alt="">
             <?php endif; ?>
 
             <div class="single-hotel__address-text">
@@ -210,8 +197,7 @@ get_header();
             <div class="hotel-widget__address"> <?php if ($address_line): ?>
                 <div class="single-hotel__address">
                   <?php if ($country_flag): ?>
-                    <img src="<?= esc_url($country_flag); ?>"
-                         alt="">
+                    <img src="<?= esc_url($country_flag); ?>" alt="">
                   <?php endif; ?>
 
                   <div><?= esc_html($address_line); ?></div>
@@ -223,20 +209,12 @@ get_header();
               <div class="single-hotel__rating-one">
                 <?php if ($rating): ?>
                   <span class="single-hotel__rating-num numfont"><?= (int) $rating; ?></span>
-                  <span class="single-hotel__rating-star"
-                        aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="18"
-                         height="18"
-                         viewBox="0 0 24 24"
-                         fill="currentColor"
-                         stroke="currentColor"
-                         stroke-width="2"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         class="lucide lucide-star-icon lucide-star filled">
+                  <span class="single-hotel__rating-star" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-star-icon lucide-star filled">
                       <path
-                            d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                        d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
                     </svg>
                   </span>
                 <?php endif; ?>
@@ -263,8 +241,7 @@ get_header();
 
 
             <div class="hotel-widget__btns">
-              <a href=""
-                 class="btn btn-accent hotel-widget__btn-book sm">Забронировать</a>
+              <a href="" class="btn btn-accent hotel-widget__btn-book sm">Забронировать</a>
             </div>
           </div>
 
@@ -275,8 +252,7 @@ get_header();
                 <?php if ($phone): ?>
                   <div class="hotel-widget__phone hotel-widget__contacts-item">
                     <a href="tel:<?= esc_attr(preg_replace('/\s+/', '', $phone)); ?>">
-                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg"
-                           alt="">
+                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg" alt="">
                       <span><?= esc_html($phone); ?></span>
                     </a>
                   </div>
@@ -284,19 +260,15 @@ get_header();
 
                 <?php if ($address): ?>
                   <div class="hotel-widget__address hotel-widget__contacts-item">
-                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg"
-                         alt="">
+                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg" alt="">
                     <span><?= esc_html($address); ?></span>
                   </div>
                 <?php endif; ?>
 
                 <?php if ($website): ?>
                   <div class="hotel-widget__site hotel-widget__contacts-item">
-                    <a href="<?= esc_url($website); ?>"
-                       target="_blank"
-                       rel="nofollow noopener">
-                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg"
-                           alt="">
+                    <a href="<?= esc_url($website); ?>" target="_blank" rel="nofollow noopener">
+                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg" alt="">
                       <span>Сайт отеля</span>
                     </a>
                   </div>
@@ -306,8 +278,7 @@ get_header();
           <?php endif; ?>
 
           <div class="hotel-widget">
-            <a href="#"
-               class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
+            <a href="#" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
           </div>
         </aside>
 

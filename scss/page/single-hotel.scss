@@ -12,11 +12,18 @@
 }
 
 .single-hotel__title {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   flex-grow: 1;
 
   @media screen and (max-width: 768px) {
     font-size: 24px;
+  }
+}
+
+.single-hotel__rating-stars {
+  margin-bottom: 8px;
+  .stars-rating {
+    justify-content: flex-start;
   }
 }
 
