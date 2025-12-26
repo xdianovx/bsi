@@ -307,16 +307,36 @@
   }
 }
 
+.tour-prices-gtm {
+  // Добавляем границу справа всем элементам кроме последнего
+  > *:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
 .tour-prices__wrap {
   display: flex;
   gap: 16px;
   padding: 8px;
   background: $red;
   border-radius: 8px;
+
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  > * {
+    border: 1px solid #000;
+  }
+
   > *:first-child {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
-
+    .choices__inner {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
     &.is-open .choices__inner {
       border-top-left-radius: 8px;
       border-bottom-left-radius: 8px;
@@ -337,6 +357,10 @@
     margin-top: 0;
     background: #000;
     color: #fff;
+
+    @media screen and (max-width: 1024px) {
+      width: 100%;
+    }
   }
 }
 
@@ -520,7 +544,8 @@
       position: absolute;
       top: 100%;
       left: 0;
-      right: 0;
+      width: auto;
+      min-width: 100%;
       margin-top: 8px;
       background: #fff;
       border: 1px solid #dfdfdf;
@@ -663,7 +688,9 @@
 .tour-prices__star-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
+  width: 100%;
 
   @media screen and (max-width: 768px) {
     flex-direction: column;
@@ -677,6 +704,10 @@
   font-weight: 700;
   color: #000000;
   line-height: 130%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
 
   @media screen and (max-width: 768px) {
     font-size: 18px;
@@ -684,6 +715,8 @@
 }
 
 .tour-prices__star-stars {
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
 
   .stars-rating {
@@ -747,8 +780,11 @@
   color: $red;
   line-height: 100%;
   white-space: nowrap;
+  flex-shrink: 0;
 
   @media screen and (max-width: 768px) {
     font-size: 20px;
+    width: 100%;
+    text-align: left;
   }
 }

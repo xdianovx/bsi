@@ -4,8 +4,17 @@
 import { dropdown } from "./forms/dropdown.js";
 import { createDayRange } from "./forms/day-range.js";
 import { peopleCounter } from "./gtm-people-counter.js";
+import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
+
+const CHOICES_RU = {
+  itemSelectText: "",
+  loadingText: "Загрузка...",
+  noResultsText: "Ничего не найдено",
+  noChoicesText: "Нет вариантов",
+  searchPlaceholderValue: "Поиск...",
+};
 
 export const tourPrices = () => {
   const section = document.querySelector(".tour-prices-section");
@@ -56,6 +65,7 @@ export const tourPrices = () => {
   let nightsData = null;
   let allPricesData = []; // Храним все загруженные цены для фильтрации
   let currentStarFilter = ""; // Текущий выбранный фильтр звездности
+  let starFilterChoice = null; // Экземпляр Choices для фильтра звездности
 
   // Параметры поиска
   const searchParams = {
@@ -181,6 +191,8 @@ export const tourPrices = () => {
 
   // Обновление фильтра звездности на основе загруженных цен
   function updateStarFilter(prices) {
+    if (!starFilterChoice) return;
+
     const starGroups = new Set();
 
     prices.forEach((price) => {
@@ -190,9 +202,6 @@ export const tourPrices = () => {
       }
     });
 
-    // Очистка и заполнение select
-    starFilter.innerHTML = '<option value="">Все отели</option>';
-
     // Сортировка звездности (2*+, 3*+, 4*)
     const sortedStars = Array.from(starGroups).sort((a, b) => {
       const aNum = parseInt(a.replace(/[^\d]/g, "")) || 0;
@@ -200,12 +209,32 @@ export const tourPrices = () => {
       return aNum - bNum;
     });
 
-    sortedStars.forEach((star) => {
-      const option = document.createElement("option");
-      option.value = star;
-      option.textContent = star;
-      starFilter.appendChild(option);
-    });
+    // Формируем массив опций для Choices (убираем "+" из отображаемого текста)
+    // Добавляем "Все отели" как первую опцию (проверяем, что она еще не добавлена)
+    const starChoices = sortedStars.map((star) => ({ value: star, label: star.replace(/\+/g, "") }));
+    const choices = [{ value: "", label: "Все отели" }, ...starChoices];
+
+    // Проверяем на дубликаты по value
+    const uniqueChoices = choices.filter((choice, index, self) => index === self.findIndex((c) => c.value === choice.value));
+
+    // Сохраняем текущее выбранное значение перед обновлением
+    const currentValue = starFilterChoice.getValue(true);
+
+    // Обновляем Choices (очищаем и choices, и store, чтобы избежать дублирования)
+    starFilterChoice.clearChoices();
+    starFilterChoice.clearStore();
+    starFilterChoice.setChoices(uniqueChoices, "value", "label", true);
+
+    // Восстанавливаем предыдущее значение или устанавливаем "Все отели" по умолчанию
+    if (currentValue && uniqueChoices.some((c) => c.value === currentValue)) {
+      // Если предыдущее значение все еще доступно, восстанавливаем его
+      starFilterChoice.setChoiceByValue(currentValue);
+      currentStarFilter = currentValue;
+    } else {
+      // Иначе устанавливаем "Все отели" по умолчанию
+      starFilterChoice.setChoiceByValue("");
+      currentStarFilter = "";
+    }
   }
 
   // Функция для отображения звездности
@@ -353,17 +382,38 @@ export const tourPrices = () => {
         const hotelsCount = hotelsArray.length;
         const townsCount = townsArray.length;
 
-        let title = "";
-        if (hotelsCount === 1 && hotelsArray[0]) {
-          title = hotelsArray[0];
-        } else if (hotelsCount > 1) {
-          title = `${hotelsCount} отелей`;
-        } else if (townsCount === 1 && townsArray[0]) {
-          title = townsArray[0];
-        } else if (townsCount > 1) {
-          title = `${townsCount} городов`;
-        } else {
-          title = "Отели";
+        // Извлекаем число звездности из item.star (например "3*" -> "3")
+        const starNumber = parseInt(item.star.replace(/[^\d]/g, "")) || 0;
+
+        // Функция для правильного склонения слова "звезда"
+        function getStarWord(count) {
+          const lastDigit = count % 10;
+          const lastTwoDigits = count % 100;
+
+          // Исключения для 11-14
+          if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+            return "звезд";
+          }
+
+          // 1, 21, 31... звезда
+          if (lastDigit === 1) {
+            return "звезда";
+          }
+
+          // 2, 3, 4, 22, 23, 24... звезды
+          if (lastDigit >= 2 && lastDigit <= 4) {
+            return "звезды";
+          }
+
+          // 5, 6, 7, 8, 9, 0, 10, 20... звезд
+          return "звезд";
+        }
+
+        // Формируем заголовок: "Отель" + число звездности + правильное склонение
+        let title = "Отель";
+        if (starNumber > 0) {
+          const starWord = getStarWord(starNumber);
+          title = `Отель ${starNumber} ${starWord}`;
         }
 
         // Формируем данные для отображения
@@ -387,8 +437,10 @@ export const tourPrices = () => {
         html += `
           <div class="tour-prices__star-item">
             <div class="tour-prices__star-header">
-              <div class="tour-prices__star-title">${title}</div>
-              <div class="tour-prices__star-stars">${renderStars(item.star)}</div>
+              <div class="tour-prices__star-title">
+                ${title}
+              </div>
+              <div class="tour-prices__star-price">от ${formatPrice(item.minPrice)} ₽</div>
             </div>
             ${
               commonData.length > 0
@@ -408,9 +460,6 @@ export const tourPrices = () => {
             `
                 : ""
             }
-            <div class="tour-prices__star-footer">
-              <div class="tour-prices__star-price">от ${formatPrice(item.minPrice)} ₽</div>
-            </div>
           </div>
         `;
       });
@@ -648,6 +697,34 @@ export const tourPrices = () => {
         },
       });
     }
+
+    // Инициализация Choices для фильтра звездности
+    if (starFilter) {
+      // Очищаем исходные опции из HTML перед инициализацией Choices
+      // чтобы избежать дублирования с опциями, которые добавим через setChoices
+      starFilter.innerHTML = "";
+
+      starFilterChoice = new Choices(starFilter, {
+        ...CHOICES_RU,
+        searchEnabled: false,
+        shouldSort: false,
+      });
+
+      // Обработчик изменения фильтра звездности через Choices
+      starFilterChoice.passedElement.element.addEventListener("change", () => {
+        currentStarFilter = starFilterChoice.getValue(true) || "";
+
+        // Отправляем GTM событие
+        sendGTMEvent("tour_star_filter_changed", {
+          star_filter: currentStarFilter || "all",
+        });
+
+        // Фильтруем и отображаем цены из уже загруженных данных
+        if (allPricesData.length > 0) {
+          displayPrices(allPricesData);
+        }
+      });
+    }
   }
 
   // Инициализация: загрузка данных при загрузке страницы
@@ -678,21 +755,6 @@ export const tourPrices = () => {
     pricesList.classList.add("is-loading");
     pricesList.innerHTML = "";
     await loadPrices(false);
-
-    // Обработчик изменения фильтра звездности
-    starFilter.addEventListener("change", (e) => {
-      currentStarFilter = e.target.value || "";
-
-      // Отправляем GTM событие
-      sendGTMEvent("tour_star_filter_changed", {
-        star_filter: currentStarFilter || "all",
-      });
-
-      // Фильтруем и отображаем цены из уже загруженных данных
-      if (allPricesData.length > 0) {
-        displayPrices(allPricesData);
-      }
-    });
 
     // Функция для формирования URL бронирования
     function buildBookingUrl() {

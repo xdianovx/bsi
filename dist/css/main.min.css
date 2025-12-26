@@ -556,6 +556,46 @@ main {
   position: relative;
 }
 
+.js-dropdown-trigger {
+  position: relative;
+  width: 100%;
+  text-align: left;
+}
+.js-dropdown-trigger::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 18px;
+  background: url("../../img/icons/chevron-d.svg") center/contain no-repeat;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+.js-dropdown-trigger img[src*=chevron] {
+  width: 20px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+@supports selector(:has(*)) {
+  .js-dropdown-trigger:has(img[src*=chevron])::after {
+    display: none;
+  }
+}
+
+.js-dropdown.is-open .js-dropdown-trigger::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+.js-dropdown.is-open .js-dropdown-trigger img[src*=chevron] {
+  transform: rotate(180deg);
+}
+
 .js-dropdown-panel {
   position: absolute;
   inset-block-start: 100%;
@@ -6048,6 +6088,10 @@ input.error {
   }
 }
 
+.tour-prices-gtm > *:not(:last-child) {
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .tour-prices__wrap {
   display: flex;
   gap: 16px;
@@ -6055,7 +6099,20 @@ input.error {
   background: #ee3145;
   border-radius: 8px;
 }
+@media screen and (max-width: 1024px) {
+  .tour-prices__wrap {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+.tour-prices__wrap > * {
+  border: 1px solid #000;
+}
 .tour-prices__wrap > *:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.tour-prices__wrap > *:first-child .choices__inner {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
 }
@@ -6076,6 +6133,11 @@ input.error {
   margin-top: 0;
   background: #000;
   color: #fff;
+}
+@media screen and (max-width: 1024px) {
+  .tour-prices__wrap .tour-prices__book-btn {
+    width: 100%;
+  }
 }
 
 .tour-prices__book-btn {
@@ -6241,7 +6303,8 @@ input.error {
   position: absolute;
   top: 100%;
   left: 0;
-  right: 0;
+  width: auto;
+  min-width: 100%;
   margin-top: 8px;
   background: #fff;
   border: 1px solid #dfdfdf;
@@ -6380,7 +6443,9 @@ input.error {
 .tour-prices__star-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
+  width: 100%;
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-header {
@@ -6395,6 +6460,10 @@ input.error {
   font-weight: 700;
   color: #000000;
   line-height: 130%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-title {
@@ -6403,6 +6472,8 @@ input.error {
 }
 
 .tour-prices__star-stars {
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
 }
 .tour-prices__star-stars .stars-rating {
@@ -6466,10 +6537,13 @@ input.error {
   color: #ee3145;
   line-height: 100%;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-price {
     font-size: 20px;
+    width: 100%;
+    text-align: left;
   }
 }
 

@@ -2,6 +2,61 @@
   position: relative;
 }
 
+// Стрелка для всех dropdown триггеров
+.js-dropdown-trigger {
+  position: relative;
+  width: 100%; // Кнопка занимает всю доступную ширину
+
+  text-align: left;
+  // Добавляем стрелку через псевдоэлемент
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 18px;
+    background: url("../../img/icons/chevron-d.svg") center / contain no-repeat;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+    z-index: 1;
+  }
+
+  // Если стрелка уже есть в HTML (img), скрываем псевдоэлемент
+  // Используем :has() с fallback для старых браузеров
+  img[src*="chevron"] {
+    width: 20px;
+    height: 18px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  // Скрываем псевдоэлемент если есть img (для браузеров с поддержкой :has)
+  @supports selector(:has(*)) {
+    &:has(img[src*="chevron"])::after {
+      display: none;
+    }
+  }
+
+  // Для браузеров без поддержки :has() - если есть img, скрываем через общий селектор
+  // В этом случае оба элемента будут видны, но img будет поверх
+}
+
+// Поворачиваем стрелку когда dropdown открыт
+.js-dropdown.is-open {
+  .js-dropdown-trigger::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  .js-dropdown-trigger img[src*="chevron"] {
+    transform: rotate(180deg);
+  }
+}
+
 .js-dropdown-panel {
   position: absolute;
   inset-block-start: 100%;

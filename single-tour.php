@@ -80,10 +80,18 @@ get_header();
             'id' => 'tour_' . $post_id,
           ]);
           ?>
+
+          <?php if (!empty($excerpt)): ?>
+            <div class="page-country__descr">
+              <?= wp_kses_post(wpautop($excerpt)); ?>
+            </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
   <?php endif; ?>
+
+
 
 
   <?php if (!empty($excursion_params) && !empty($excursion_params['TOURS'])): ?>
@@ -225,11 +233,7 @@ get_header();
           <?php endif; ?>
 
 
-          <?php if (!empty($excerpt)): ?>
-            <div class="page-country__descr">
-              <?= wp_kses_post(wpautop($excerpt)); ?>
-            </div>
-          <?php endif; ?>
+
 
 
           <div class="single-tour-content editor-content">
