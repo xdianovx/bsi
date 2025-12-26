@@ -93,18 +93,32 @@ export const tourPrices = () => {
     if (!validDatesStr || !startDateStr) return [];
 
     const startDate = parseDateFromYYYYMMDD(startDateStr);
-    if (!startDate) return [];
+    if (!startDate) {
+      console.error("parseValidDates: Invalid startDate", startDateStr);
+      return [];
+    }
 
     const dates = [];
     // Проходим по каждому символу битовой строки
     for (let i = 0; i < validDatesStr.length; i++) {
       if (validDatesStr[i] === "1") {
         // Если бит установлен, дата доступна
+        // Создаем новую дату на основе startDate и добавляем i дней
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
         dates.push(formatDateYYYYMMDD(date));
       }
     }
+
+    console.log("parseValidDates:", {
+      startDateStr,
+      startDate,
+      validDatesLength: validDatesStr.length,
+      foundDates: dates.length,
+      firstDate: dates[0],
+      lastDate: dates[dates.length - 1],
+    });
+
     return dates;
   }
 
@@ -540,9 +554,21 @@ export const tourPrices = () => {
       // Обработка JSON структуры: SearchExcursion_ALL.CHECKIN_BEG
       if (data?.SearchExcursion_ALL?.CHECKIN_BEG) {
         const checkInBeg = data.SearchExcursion_ALL.CHECKIN_BEG;
+
+        // Проверяем наличие необходимых полей
         if (checkInBeg.validDates && checkInBeg.startDate) {
           // Парсим доступные даты из битовой строки
-          availableDates = parseValidDates(checkInBeg.validDates, checkInBeg.startDate);
+          const parsedDates = parseValidDates(checkInBeg.validDates, checkInBeg.startDate);
+          // Убеждаемся, что результат - массив
+          availableDates = Array.isArray(parsedDates) ? parsedDates : [];
+
+          if (availableDates.length === 0) {
+            console.warn("loadAvailableDates: No available dates found", {
+              validDates: checkInBeg.validDates,
+              startDate: checkInBeg.startDate,
+              validDatesLength: checkInBeg.validDates?.length,
+            });
+          }
 
           // Если есть доступные даты, находим ближайшую доступную дату
           if (availableDates.length > 0) {
@@ -567,16 +593,25 @@ export const tourPrices = () => {
             // Устанавливаем начальную дату
             searchParams.checkInBeg = nearestDate;
 
-            // Устанавливаем конечную дату как начальная +7 дней
+            // Устанавливаем конечную дату как начальная + количество ночей из API
+            // Используем значение по умолчанию из nightsData, если оно загружено
+            // Иначе используем значение из searchParams.nightsFrom (по умолчанию 7)
+            const nightsCount = nightsData?.from || searchParams.nightsFrom || 7;
             const startDateObj = parseDateFromYYYYMMDD(nearestDate);
             if (startDateObj) {
               const endDateObj = new Date(startDateObj);
-              endDateObj.setDate(startDateObj.getDate() + 7);
+              endDateObj.setDate(startDateObj.getDate() + nightsCount);
               searchParams.checkInEnd = formatDateYYYYMMDD(endDateObj);
+            } else {
+              // Если не удалось распарсить дату, используем костыль
+              searchParams.checkInEnd = nearestDate;
             }
 
             // Обновляем календарь с доступными датами
             updateDatePicker();
+
+            // Загружаем цены с первой доступной датой
+            reloadPrices();
           }
         }
       }
@@ -595,22 +630,98 @@ export const tourPrices = () => {
   function updateDatePicker() {
     if (!datePickerInstance || !datepicker) return;
 
-    // Преобразуем доступные даты в формат Date для flatpickr
-    const enabledDates = availableDates.map((dateStr) => parseDateFromYYYYMMDD(dateStr)).filter((d) => d !== null);
+    // Проверяем, что availableDates является массивом
+    if (!Array.isArray(availableDates) || availableDates.length === 0) {
+      return;
+    }
 
-    // Обновляем календарь - показываем только доступные даты
-    if (enabledDates.length > 0) {
-      datePickerInstance.set("enable", enabledDates);
+    // Находим первую и последнюю доступную дату
+    const firstAvailableDate = parseDateFromYYYYMMDD(availableDates[0]);
+    const lastAvailableDate = parseDateFromYYYYMMDD(availableDates[availableDates.length - 1]);
 
-      // Если есть установленные даты, обновляем календарь и переключаем на нужный месяц
+    // Устанавливаем minDate и maxDate для ограничения диапазона выбора
+    // Разрешаем выбирать любые даты между первой и последней доступной датой
+    if (firstAvailableDate && lastAvailableDate) {
+      console.log("updateDatePicker: Setting minDate and maxDate", {
+        firstAvailableDate,
+        lastAvailableDate,
+        firstDateStr: formatDateYYYYMMDD(firstAvailableDate),
+        lastDateStr: formatDateYYYYMMDD(lastAvailableDate),
+      });
+
+      // Используем minDate и maxDate для ограничения диапазона
+      // Это позволяет выбирать любые даты между первой и последней доступной датой
+      datePickerInstance.set("minDate", firstAvailableDate);
+      datePickerInstance.set("maxDate", lastAvailableDate);
+
+      // НЕ используем enable - minDate и maxDate уже ограничивают выбор
+      // enable требует массив дат, а не функцию, поэтому вызывал ошибку
+
+      console.log("updateDatePicker: minDate and maxDate set", {
+        minDate: datePickerInstance.config.minDate,
+        maxDate: datePickerInstance.config.maxDate,
+      });
+
+      // Всегда устанавливаем даты в календаре, если они есть в searchParams
+      // Если дат нет, устанавливаем ближайшую доступную дату по умолчанию
+      let startDate = null;
+      let endDate = null;
+
       if (searchParams.checkInBeg && searchParams.checkInEnd) {
-        const startDate = parseDateFromYYYYMMDD(searchParams.checkInBeg);
-        const endDate = parseDateFromYYYYMMDD(searchParams.checkInEnd);
-        if (startDate && endDate) {
-          // Устанавливаем даты и переключаем календарь на месяц начальной даты
-          datePickerInstance.setDate([startDate, endDate], false);
-          datePickerInstance.jumpToDate(startDate); // Переключаем календарь на месяц начальной даты
+        startDate = parseDateFromYYYYMMDD(searchParams.checkInBeg);
+        endDate = parseDateFromYYYYMMDD(searchParams.checkInEnd);
+      } else {
+        // Если даты не установлены, устанавливаем ближайшую доступную дату по умолчанию
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Находим ближайшую доступную дату (не раньше сегодня)
+        let nearestDate = null;
+        for (const dateStr of availableDates) {
+          const dateObj = parseDateFromYYYYMMDD(dateStr);
+          if (dateObj && dateObj >= today) {
+            nearestDate = dateObj;
+            break;
+          }
         }
+
+        // Если не нашли дату в будущем, берем первую доступную
+        if (!nearestDate) {
+          nearestDate = firstAvailableDate;
+        }
+
+        // Устанавливаем начальную дату как ближайшую доступную
+        endDate = new Date(nearestDate);
+        endDate.setDate(nearestDate.getDate() + 7);
+
+        // Убеждаемся, что конечная дата не превышает maxDate
+        if (endDate > lastAvailableDate) {
+          endDate.setTime(lastAvailableDate.getTime());
+        }
+
+        startDate = nearestDate;
+
+        // Обновляем searchParams
+        searchParams.checkInBeg = formatDateYYYYMMDD(nearestDate);
+        searchParams.checkInEnd = formatDateYYYYMMDD(endDate);
+      }
+
+      // Устанавливаем даты в календаре
+      if (startDate && endDate) {
+        // Убеждаемся, что даты в допустимом диапазоне
+        if (startDate < firstAvailableDate) {
+          startDate = firstAvailableDate;
+        }
+        if (endDate > lastAvailableDate) {
+          endDate = lastAvailableDate;
+        }
+        if (startDate > endDate) {
+          endDate = startDate;
+        }
+
+        // Устанавливаем даты и переключаем календарь на месяц начальной даты
+        datePickerInstance.setDate([startDate, endDate], true);
+        datePickerInstance.jumpToDate(startDate);
       }
     }
   }
@@ -778,7 +889,7 @@ export const tourPrices = () => {
         mode: "range",
         locale: Russian,
         dateFormat: "d.m",
-        enable: [], // Будет обновлено после загрузки доступных дат через updateDatePicker()
+        // Не устанавливаем enable при инициализации - будет установлено в updateDatePicker()
         // Не устанавливаем defaultDate, чтобы календарь не показывал старые даты
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
@@ -841,11 +952,12 @@ export const tourPrices = () => {
     // Инициализируем фильтры (включая dropdown)
     initFilters();
 
-    // Сначала загружаем доступные даты из SearchExcursion_ALL
-    await loadAvailableDates();
-
-    // Загружаем ночи для получения доступного диапазона
+    // Сначала загружаем ночи для получения доступного диапазона
+    // Это нужно, чтобы использовать количество ночей при установке конечной даты
     await loadNights();
+
+    // Затем загружаем доступные даты из SearchExcursion_ALL
+    await loadAvailableDates();
 
     // Устанавливаем начальные значения ночей из API
     if (nightsData) {
