@@ -44,6 +44,9 @@ export const tourPrices = () => {
     return;
   }
 
+  pricesList.classList.add("is-loading");
+  pricesList.innerHTML = "";
+
   let nightsData = null;
   let allPricesData = [];
   let currentStarFilter = "";
@@ -259,6 +262,10 @@ export const tourPrices = () => {
   }
 
   function displayPrices(prices = allPricesData) {
+    if (!searchParams.checkInBeg || !searchParams.checkInEnd) {
+      return;
+    }
+
     pricesList.classList.remove("is-loading");
 
     if (prices.length === 0) {
@@ -622,6 +629,10 @@ export const tourPrices = () => {
       await loadNights(forceRefresh);
     }
 
+    if (!searchParams.checkInBeg || !searchParams.checkInEnd) {
+      return;
+    }
+
     pricesList.classList.add("is-loading");
 
     try {
@@ -737,7 +748,7 @@ export const tourPrices = () => {
           star_filter: currentStarFilter || "all",
         });
 
-        if (allPricesData.length > 0) {
+        if (allPricesData.length > 0 && searchParams.checkInBeg && searchParams.checkInEnd) {
           displayPrices(allPricesData);
         }
       });
@@ -763,10 +774,6 @@ export const tourPrices = () => {
         }
       }
     }
-
-    pricesList.classList.add("is-loading");
-    pricesList.innerHTML = "";
-    await loadPrices(false);
 
     function buildBookingUrl() {
       const baseUrl = "https://online.bsigroup.ru/search_excursion";
