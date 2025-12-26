@@ -83,4 +83,19 @@ add_action('init', function () {
     'rewrite' => ['slug' => 'education-language'],
   ]);
 
+  // Тип образовательной программы
+  register_taxonomy('education_program', ['education'], [
+    'labels' => [
+      'name' => 'Программы',
+      'singular_name' => 'Программа',
+      'menu_name' => 'Программы',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => ['slug' => 'education-program'],
+  ]);
+
 }, 20);

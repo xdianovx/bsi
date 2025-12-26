@@ -258,6 +258,7 @@ require get_template_directory() . '/custom-fields/best-offers.php';
 require get_template_directory() . '/custom-fields/resort.php';
 require get_template_directory() . '/custom-fields/pages/mice.php';
 require get_template_directory() . '/custom-fields/pages/visa.php';
+require get_template_directory() . '/custom-fields/education-fields.php';
 
 // AJAX requests
 require get_template_directory() . '/inc/requests/ajax.php';
@@ -269,6 +270,7 @@ require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
 require get_template_directory() . '/inc/requests/projects.php';
+require get_template_directory() . '/inc/requests/education-filter.php';
 
 
 

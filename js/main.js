@@ -17,6 +17,9 @@ import { initCountryAside } from "./modules/country-aside";
 import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
 import { archiveProjects } from "./modules/ajax/archive-projects";
 import { tourPrices } from "./modules/tour-prices";
+import { initEducationFilter } from "./modules/ajax/education-filter";
+import { initCountryEducationFilters } from "./modules/ajax/country-education";
+import { initSingleEducationPrograms } from "./modules/ajax/single-education-programs";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -42,5 +45,8 @@ window.addEventListener("DOMContentLoaded", () => {
   initPopularHotelsSlider();
   archiveProjects();
   tourPrices();
+  initEducationFilter();
+  initCountryEducationFilters();
+  initSingleEducationPrograms();
   // initHotelMap();
 });

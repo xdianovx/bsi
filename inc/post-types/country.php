@@ -228,6 +228,7 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_entry_rules';
 
   $vars[] = 'country_visa';
+  $vars[] = 'country_education';
 
   return $vars;
 });
@@ -267,6 +268,12 @@ add_action('init', function () {
   add_rewrite_rule(
     '^country/([^/]+)/visa/?$',
     'index.php?country_visa=$matches[1]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/obuchenie/?$',
+    'index.php?post_type=country&name=$matches[1]&country_education=$matches[1]',
     'top'
   );
 
@@ -466,6 +473,38 @@ add_action('template_redirect', function () {
   ];
 
   $template = locate_template('country-entry-rules.php');
+  if ($template) {
+    include $template;
+    exit;
+  }
+
+  global $wp_query;
+  $wp_query->set_404();
+  status_header(404);
+  exit;
+});
+
+add_action('template_redirect', function () {
+  $country_slug = (string) get_query_var('country_education');
+  if (empty($country_slug)) {
+    return;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
+  }
+
+  global $country_education_data;
+  $country_education_data = [
+    'country' => $country,
+    'country_slug' => $country_slug,
+  ];
+
+  $template = locate_template('country-education.php');
   if ($template) {
     include $template;
     exit;
