@@ -60,7 +60,7 @@ $title = $args['title'] ?? ''; // если нужно
     <?php if ($remaining_count > 0): ?>
       <div class="gallery-thumb-overlay js-gallery-overlay" data-gallery-id="<?= esc_attr($id); ?>"
         data-remaining-count="<?= esc_attr($remaining_count); ?>">
-        <span class="gallery-thumb-overlay__text"><?= esc_html($remaining_count); ?>+</span>
+        <span class="gallery-thumb-overlay__text">Ещё <?= esc_html($remaining_count); ?> фото</span>
       </div>
     <?php endif; ?>
   </div>
