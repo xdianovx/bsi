@@ -244,9 +244,16 @@ get_header();
             </div>
 
 
-            <div class="hotel-widget__btns">
-              <a href="" class="btn btn-accent hotel-widget__btn-book sm">Забронировать</a>
-            </div>
+            <?php
+            $booking_url = trim((string) get_field('booking_url', get_the_ID()));
+            ?>
+            <?php if ($booking_url): ?>
+              <div class="hotel-widget__btns">
+                <a href="<?= esc_url($booking_url); ?>" class="btn btn-accent hotel-widget__btn-book sm" target="_blank"
+                  rel="noopener nofollow">Забронировать</a>
+              </div>
+            <?php endif; ?>
+
           </div>
 
           <?php if ($phone || $address || $website): ?>
@@ -304,20 +311,20 @@ get_header();
           setTimeout(initHotelMap, 100);
           return;
         }
-        
+
         var location = { lat: <?php echo esc_js($map_lat); ?>, lng: <?php echo esc_js($map_lng); ?> };
         var map = new google.maps.Map(document.getElementById('hotel-map-container'), {
           zoom: <?php echo esc_js($map_zoom); ?>,
           center: location
         });
-        
+
         var marker = new google.maps.Marker({
           position: location,
           map: map
         });
       }
-      
-      window.addEventListener('load', function() {
+
+      window.addEventListener('load', function () {
         initHotelMap();
       });
     </script>
