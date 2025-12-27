@@ -3000,7 +3000,7 @@ input.error {
   justify-content: space-between;
   align-items: flex-start;
   flex-direction: column;
-  margin-bottom: 4px;
+  gap: 6px;
 }
 
 .hotel-card__rating {
