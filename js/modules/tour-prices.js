@@ -135,6 +135,58 @@ export const tourPrices = () => {
     });
   }
 
+  function buildBookingUrlForHotel(hotelId, starRating = null) {
+    const baseUrl = "https://online.bsigroup.ru/search_excursion";
+    const params = new URLSearchParams();
+
+    params.append("TOWNFROMINC", townFromInc);
+    params.append("STATEINC", stateInc);
+    params.append("TOURINC", tours);
+    params.append("CHECKIN_BEG", searchParams.checkInBeg);
+    params.append("CHECKIN_END", searchParams.checkInEnd);
+    params.append("NIGHTS_FROM", searchParams.nightsFrom);
+    params.append("NIGHTS_TILL", searchParams.nightsTill);
+    params.append("ADULT", searchParams.adult);
+    params.append("CHILD", searchParams.child);
+    params.append("CURRENCY", searchParams.currency || 1);
+
+    if (starRating) {
+      const starNumber = parseInt(starRating.replace(/[^\d]/g, "")) || 0;
+      if (starNumber > 0) {
+        params.append("STAR", starNumber);
+      }
+    }
+
+    if (hotelId) {
+      params.append("HOTELS", hotelId);
+    } else if (currentStarFilter && allPricesData.length > 0) {
+      const filteredHotels = allPricesData
+        .filter((price) => {
+          const priceStar = price.star || price.starAlt || price.starGroup || "";
+          return priceStar === currentStarFilter;
+        })
+        .map((price) => {
+          return price.hotelInc || price.hotelId || price.hotelKey || price.hotel?.inc || price.hotel?.id || "";
+        })
+        .filter((id) => id && id !== "");
+
+      if (filteredHotels.length > 0) {
+        const uniqueHotels = [...new Set(filteredHotels)];
+        if (uniqueHotels.length === 1) {
+          params.append("HOTELS", uniqueHotels[0]);
+        }
+      }
+    }
+
+    params.append("MEALS_ANY", "1");
+    params.append("ROOMS_ANY", "1");
+    params.append("FREIGHT", "1");
+    params.append("PRICEPAGE", "1");
+    params.append("DOLOAD", "1");
+
+    return `${baseUrl}?${params.toString()}`;
+  }
+
   function updateNightsDropdown() {
     if (!filtersWrap || !nightsSelect || !nightsData) return;
 
@@ -324,6 +376,7 @@ export const tourPrices = () => {
             star: star,
             starKey: starKey,
             minPrice: numPrice,
+            minPriceItem: price,
             prices: [],
             hotels: new Set(),
             towns: new Set(),
@@ -335,6 +388,7 @@ export const tourPrices = () => {
 
         if (numPrice < pricesByStar[star].minPrice) {
           pricesByStar[star].minPrice = numPrice;
+          pricesByStar[star].minPriceItem = price;
         }
 
         pricesByStar[star].prices.push(price);
@@ -406,13 +460,14 @@ export const tourPrices = () => {
           if (nights) commonData.push({ label: "Ночей", value: nights });
         }
 
+        const hotelId = item.minPriceItem?.hotelInc || item.minPriceItem?.hotelId || item.minPriceItem?.hotelKey || item.minPriceItem?.hotel?.inc || item.minPriceItem?.hotel?.id || "";
+
         html += `
-          <div class="tour-prices__star-item">
+          <div class="tour-prices__star-item" data-hotel-id="${hotelId}" data-star-rating="${item.star}">
             <div class="tour-prices__star-header">
               <div class="tour-prices__star-title">
                 ${title}
               </div>
-              <div class="tour-prices__star-price">от ${formatPrice(item.minPrice)} ₽</div>
             </div>
             ${
               commonData.length > 0
@@ -432,11 +487,42 @@ export const tourPrices = () => {
             `
                 : ""
             }
+            <div class="tour-prices__star-footer">
+              <div class="tour-prices__star-price">от ${formatPrice(item.minPrice)} ₽</div>
+              <button class="btn btn-accent sm tour-prices__card-book-btn" type="button" data-hotel-id="${hotelId}">
+                Забронировать
+              </button>
+            </div>
           </div>
         `;
       });
       html += "</div>";
       pricesList.innerHTML = html;
+
+      const cardBookBtns = pricesList.querySelectorAll(".tour-prices__card-book-btn");
+      cardBookBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const hotelId = btn.getAttribute("data-hotel-id");
+          const starItem = btn.closest(".tour-prices__star-item");
+          const starRating = starItem?.getAttribute("data-star-rating") || null;
+          const bookingUrl = buildBookingUrlForHotel(hotelId, starRating);
+
+          sendGTMEvent("tour_card_booking_clicked", {
+            booking_url: bookingUrl,
+            hotel_id: hotelId,
+            star_rating: starRating,
+            star_filter: currentStarFilter || "all",
+            nights_from: searchParams.nightsFrom,
+            nights_till: searchParams.nightsTill,
+            checkin_beg: searchParams.checkInBeg,
+            checkin_end: searchParams.checkInEnd,
+            adult: searchParams.adult,
+            child: searchParams.child,
+          });
+
+          window.open(bookingUrl, "_blank", "noopener,noreferrer");
+        });
+      });
 
       sendGTMEvent("tour_prices_viewed", {
         stars_count: sortedStars.length,
@@ -776,46 +862,7 @@ export const tourPrices = () => {
     }
 
     function buildBookingUrl() {
-      const baseUrl = "https://online.bsigroup.ru/search_excursion";
-      const params = new URLSearchParams();
-
-      params.append("TOWNFROMINC", townFromInc);
-      params.append("STATEINC", stateInc);
-      params.append("TOURINC", tours);
-      params.append("CHECKIN_BEG", searchParams.checkInBeg);
-      params.append("CHECKIN_END", searchParams.checkInEnd);
-      params.append("NIGHTS_FROM", searchParams.nightsFrom);
-      params.append("NIGHTS_TILL", searchParams.nightsTill);
-      params.append("ADULT", searchParams.adult);
-      params.append("CHILD", searchParams.child);
-      params.append("CURRENCY", searchParams.currency || 1);
-
-      if (currentStarFilter && allPricesData.length > 0) {
-        const filteredHotels = allPricesData
-          .filter((price) => {
-            const priceStar = price.star || price.starAlt || price.starGroup || "";
-            return priceStar === currentStarFilter;
-          })
-          .map((price) => {
-            return price.hotelInc || price.hotelId || price.hotelKey || price.hotel?.inc || price.hotel?.id || "";
-          })
-          .filter((id) => id && id !== "");
-
-        if (filteredHotels.length > 0) {
-          const uniqueHotels = [...new Set(filteredHotels)];
-          if (uniqueHotels.length === 1) {
-            params.append("HOTELS", uniqueHotels[0]);
-          }
-        }
-      }
-
-      params.append("MEALS_ANY", "1");
-      params.append("ROOMS_ANY", "1");
-      params.append("FREIGHT", "1");
-      params.append("PRICEPAGE", "1");
-      params.append("DOLOAD", "1");
-
-      return `${baseUrl}?${params.toString()}`;
+      return buildBookingUrlForHotel(null);
     }
 
     bookBtn.addEventListener("click", () => {

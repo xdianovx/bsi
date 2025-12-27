@@ -333,6 +333,12 @@
     .choices__inner {
       border-top-left-radius: 8px;
       border-bottom-left-radius: 8px;
+
+      @media screen and (max-width: 768px) {
+        border-radius: 0;
+        border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
+      }
     }
     &.is-open .choices__inner {
       border-top-left-radius: 8px;
@@ -537,6 +543,7 @@
 
     @media screen and (max-width: 768px) {
       justify-content: flex-start;
+      border-radius: 0;
     }
 
     // Стили для выпадающей панели
@@ -591,6 +598,11 @@
     @media screen and (max-width: 768px) {
       height: 48px;
       text-align: left;
+      border-left: none;
+      border-top: 1px solid #dfdfdf;
+      border-radius: 0;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
     }
 
     // Стили для выпадающей панели
@@ -753,7 +765,7 @@
   border-top: 1px solid #f0f0f0;
 
   @media screen and (max-width: 768px) {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 8px;
   }
 }
@@ -777,19 +789,27 @@
 
 .tour-prices__star-footer {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 16px;
   padding-top: 12px;
   border-top: 1px solid #f0f0f0;
 
   @media screen and (max-width: 768px) {
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 }
 
+.tour-prices__card-book-btn {
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
+}
 .tour-prices__star-price {
   font-size: 20px;
   font-weight: 700;
-  color: $red;
   line-height: 100%;
   white-space: nowrap;
   flex-shrink: 0;
@@ -797,7 +817,7 @@
   @media screen and (max-width: 768px) {
     font-size: 20px;
     width: 100%;
-    text-align: left;
+    text-align: right;
   }
 }
 
