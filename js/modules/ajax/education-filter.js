@@ -273,13 +273,11 @@ export const initEducationFilter = () => {
           const endDate = selectedDates[1].toISOString().split("T")[0];
           if (dateFromInput) dateFromInput.value = startDate;
           if (dateToInput) dateToInput.value = endDate;
-          updateUrl();
           updateResetButton();
           loadEducation(1);
         } else if (selectedDates.length === 0) {
           if (dateFromInput) dateFromInput.value = "";
           if (dateToInput) dateToInput.value = "";
-          updateUrl();
           updateResetButton();
           loadEducation(1);
         }
@@ -432,7 +430,11 @@ export const initEducationFilter = () => {
       dateToInput.value = dateTo;
     }
 
-    const hasFilters = programs.length || languages.length || types.length || accommodations.length || country || ageMin || ageMax || durationMin || durationMax || dateFrom || dateTo;
+    if (sort && sortSelect) {
+      sortSelect.value = sort;
+    }
+
+    const hasFilters = programs.length || languages.length || types.length || accommodations.length || country || ageMin || ageMax || durationMin || durationMax || dateFrom || dateTo || sort;
     
     updateResetButton();
 
@@ -441,51 +443,10 @@ export const initEducationFilter = () => {
     }
   };
 
-  const updateUrl = () => {
-    const params = new URLSearchParams();
-
-    getValues(programSelect).forEach((v) => params.append("program[]", v));
-    getValues(languageSelect).forEach((v) => params.append("language[]", v));
-    getValues(typeSelect).forEach((v) => params.append("type[]", v));
-    getValues(accommodationSelect).forEach((v) => params.append("accommodation[]", v));
-
-    if (countrySelect && countrySelect.value) {
-      params.set("country", countrySelect.value);
-    }
-
-    if (ageMinInput && ageMinInput.value) {
-      params.set("age_min", ageMinInput.value);
-    }
-    if (ageMaxInput && ageMaxInput.value) {
-      params.set("age_max", ageMaxInput.value);
-    }
-
-    if (durationMinInput && durationMinInput.value) {
-      params.set("duration_min", durationMinInput.value);
-    }
-    if (durationMaxInput && durationMaxInput.value) {
-      params.set("duration_max", durationMaxInput.value);
-    }
-
-    if (dateFromInput && dateFromInput.value) {
-      params.set("date_from", dateFromInput.value);
-    }
-    if (dateToInput && dateToInput.value) {
-      params.set("date_to", dateToInput.value);
-    }
-    
-    if (sortSelect && sortSelect.value && sortSelect.value !== "title_asc") {
-      params.set("sort", sortSelect.value);
-    }
-
-    const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
-    window.history.pushState({}, "", newUrl);
-  };
 
   if (programChoice) {
     programSelect.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -493,7 +454,6 @@ export const initEducationFilter = () => {
   if (languageChoice) {
     languageSelect.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -501,7 +461,6 @@ export const initEducationFilter = () => {
   if (typeChoice) {
     typeSelect.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -509,7 +468,6 @@ export const initEducationFilter = () => {
   if (accommodationChoice) {
     accommodationSelect.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -525,7 +483,6 @@ export const initEducationFilter = () => {
       if (accommodationChoice) accommodationChoice.removeActiveItems();
       
       await updateFilterOptions(countryId);
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -534,7 +491,6 @@ export const initEducationFilter = () => {
   if (sortSelect) {
     sortSelect.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       loadEducation(1);
     });
   }
@@ -563,7 +519,6 @@ export const initEducationFilter = () => {
       if (sortSelect) sortSelect.value = "title_asc";
       
       updateFilterOptions("");
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -581,7 +536,6 @@ export const initEducationFilter = () => {
   if (ageMinInput) {
     ageMinInput.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -589,7 +543,6 @@ export const initEducationFilter = () => {
   if (ageMaxInput) {
     ageMaxInput.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -598,7 +551,6 @@ export const initEducationFilter = () => {
   if (durationMinInput) {
     durationMinInput.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });
@@ -606,7 +558,6 @@ export const initEducationFilter = () => {
   if (durationMaxInput) {
     durationMaxInput.addEventListener("change", () => {
       currentPage = 1;
-      updateUrl();
       updateResetButton();
       loadEducation(1);
     });

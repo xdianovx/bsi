@@ -272,6 +272,37 @@ require get_template_directory() . '/inc/requests/popular-hotels-section.php';
 require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
 
+// Разрешаем query параметры для страниц с шаблоном "Образование"
+add_action('template_redirect', function () {
+	if (!is_page()) {
+		return;
+	}
+
+	global $post;
+	if (!$post) {
+		return;
+	}
+
+	$template = get_page_template_slug($post->ID);
+	if ($template !== 'page-education.php') {
+		return;
+	}
+
+	// Если есть query параметры фильтров, не возвращаем 404
+	$has_education_params = !empty($_GET['program']) || !empty($_GET['language']) ||
+		!empty($_GET['type']) || !empty($_GET['accommodation']) ||
+		!empty($_GET['country']) || !empty($_GET['age_min']) ||
+		!empty($_GET['age_max']) || !empty($_GET['duration_min']) ||
+		!empty($_GET['duration_max']) || !empty($_GET['date_from']) ||
+		!empty($_GET['date_to']) || !empty($_GET['sort']);
+
+	if ($has_education_params) {
+		global $wp_query;
+		$wp_query->is_404 = false;
+		status_header(200);
+	}
+}, 1);
+
 
 
 
