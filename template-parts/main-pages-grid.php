@@ -38,7 +38,7 @@ $main_page_items = [
      ],
      [
           'title' => "Образование <br> за рубежом",
-          'url' => get_permalink(get_page_by_path('education')),
+          'url' => get_permalink(get_page_by_path('obrazovanie-za-rubezhom')),
           'target' => '',
           'img' => 'edu.png',
      ],

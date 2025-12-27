@@ -39,6 +39,10 @@ $address = trim((string) get_field('address', get_the_ID()));
 $website = trim((string) get_field('website', get_the_ID()));
 $excerpt = get_the_excerpt($post_id);
 
+$map_lat = function_exists('get_field') ? get_field('map_lat', $post_id) : '';
+$map_lng = function_exists('get_field') ? get_field('map_lng', $post_id) : '';
+$map_zoom = function_exists('get_field') ? get_field('map_zoom', $post_id) : 14;
+
 get_header();
 ?>
 
@@ -277,22 +281,25 @@ get_header();
             </div>
           <?php endif; ?>
 
-          <div class="hotel-widget">
-            <a href="#" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
-          </div>
+          <?php if ($map_lat && $map_lng): ?>
+            <div class="hotel-widget">
+              <a href="#hotel-map" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
+            </div>
+          <?php endif; ?>
         </aside>
 
       </div>
     </div>
   </section>
 
-
-
-
-  <!-- <div class="hotel-map is-loading"
-       data-lat="-8.337197"
-       data-lng="115.659987"
-       data-zoom="14"></div> -->
+  <?php if ($map_lat && $map_lng): ?>
+    <section class="single-hotel__map-section" id="hotel-map">
+      <div class="container">
+        <div class="hotel-map" data-lat="<?php echo esc_attr($map_lat); ?>" data-lng="<?php echo esc_attr($map_lng); ?>"
+          data-zoom="<?php echo esc_attr($map_zoom); ?>"></div>
+      </div>
+    </section>
+  <?php endif; ?>
 
   <section>
     <div class="container">

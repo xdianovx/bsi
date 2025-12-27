@@ -6422,6 +6422,17 @@ input.error {
   height: 18px;
 }
 
+.single-hotel__map-section {
+  margin-top: 64px;
+  margin-bottom: 64px;
+}
+@media screen and (max-width: 768px) {
+  .single-hotel__map-section {
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
+}
+
 .tour-card-row {
   display: grid;
   grid-template-columns: 2fr 3fr 2fr;

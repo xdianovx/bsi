@@ -10,7 +10,7 @@ import { initNewsFilter } from "./modules/ajax/news-sort";
 import { promoPageAjax } from "./modules/ajax/promo-sort";
 import { burger, mobileNavAccordion } from "./modules/burger";
 import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
-import { initHotelMap } from "./modules/maps";
+import { initMaps } from "./modules/maps";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initCountryAside } from "./modules/country-aside";
@@ -48,5 +48,5 @@ window.addEventListener("DOMContentLoaded", () => {
   initEducationFilter();
   initCountryEducationFilters();
   initSingleEducationPrograms();
-  // initHotelMap();
+  initMaps();
 });

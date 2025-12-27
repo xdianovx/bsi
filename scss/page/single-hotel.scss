@@ -385,3 +385,13 @@
     height: 18px;
   }
 }
+
+.single-hotel__map-section {
+  margin-top: 64px;
+  margin-bottom: 64px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
+}
