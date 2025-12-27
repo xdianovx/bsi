@@ -3394,6 +3394,9 @@ input.error {
 .header-menu__link.--head {
   line-height: 250%;
 }
+.header-menu__link.--head[href*="#"] {
+  cursor: default;
+}
 
 .mega-menu__link {
   color: #000000;

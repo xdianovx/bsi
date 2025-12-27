@@ -57,6 +57,10 @@
 }
 .header-menu__link.--head {
   line-height: 250%;
+
+  &[href*="#"] {
+    cursor: default;
+  }
 }
 .mega-menu__link {
   color: $text-black;
