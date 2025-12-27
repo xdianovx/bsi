@@ -6792,9 +6792,6 @@ input.error {
     gap: 8px;
   }
 }
-.tour-prices__wrap > * {
-  border: 1px solid #000;
-}
 .tour-prices__wrap > *:first-child {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
@@ -6811,6 +6808,7 @@ input.error {
 }
 .tour-prices__wrap .tour-prices__book-btn {
   margin-top: 0;
+  height: 50px;
 }
 .tour-prices__wrap > *:last-child {
   border-top-right-radius: 8px;
@@ -6842,6 +6840,7 @@ input.error {
   display: flex;
   align-items: center;
   height: 100%;
+  border-right: 1px solid #dfdfdf;
 }
 .tour-prices__filter .tour-prices__select {
   width: 100%;
@@ -6975,6 +6974,7 @@ input.error {
   width: 520px;
   align-items: center;
   justify-content: center;
+  border-right: 1px solid #dfdfdf;
   width: 100%;
   flex-grow: 1;
   position: relative;
@@ -7005,6 +7005,7 @@ input.error {
   display: block;
 }
 .tour-prices__filters-wrap .gtm-datepicker {
+  border-right: 1px solid #dfdfdf;
   text-align: center;
   border: none;
   background: #fff;
@@ -7019,6 +7020,7 @@ input.error {
   }
 }
 .tour-prices__filters-wrap .gtm-persons-select {
+  border-left: 1px solid #dfdfdf;
   align-self: stretch;
   display: flex;
   align-items: center;

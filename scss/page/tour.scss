@@ -326,13 +326,10 @@
     gap: 8px;
   }
 
-  > * {
-    border: 1px solid #000;
-  }
-
   > *:first-child {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
+
     .choices__inner {
       border-top-left-radius: 8px;
       border-bottom-left-radius: 8px;
@@ -347,6 +344,7 @@
 
   .tour-prices__book-btn {
     margin-top: 0;
+    height: 50px;
   }
 
   > *:last-child {
@@ -378,6 +376,7 @@
   display: flex;
   align-items: center;
   height: 100%;
+  border-right: 1px solid #dfdfdf;
 
   .tour-prices__select {
     width: 100%;
@@ -529,6 +528,7 @@
     width: 520px;
     align-items: center;
     justify-content: center;
+    border-right: 1px solid #dfdfdf;
     width: 100%;
     flex-grow: 1;
     position: relative;
@@ -562,6 +562,7 @@
   }
 
   .gtm-datepicker {
+    border-right: 1px solid #dfdfdf;
     text-align: center;
     border: none;
     background: #fff;
@@ -576,6 +577,7 @@
   }
 
   .gtm-persons-select {
+    border-left: 1px solid #dfdfdf;
     align-self: stretch;
     display: flex;
     align-items: center;
