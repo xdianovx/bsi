@@ -73,39 +73,23 @@ foreach ($sections as $section) {
       <div class="news-slider__title-wrap-left">
         <h2 class="h2 news-slider__title">Лучшие предложения</h2>
         <div class="slider-arrow-wrap news-slider__arrows-wrap">
-          <div class="slider-arrow slider-arrow-prev best-offers-arrow-prev"
-               tabindex="-1"
-               role="button"
-               aria-label="Previous slide"
-               aria-controls="swiper-wrapper-6afd786aee0e5cee"
-               aria-disabled="true">
+          <div class="slider-arrow slider-arrow-prev best-offers-arrow-prev" tabindex="-1" role="button"
+            aria-label="Previous slide" aria-controls="swiper-wrapper-6afd786aee0e5cee" aria-disabled="true">
           </div>
-          <div class="slider-arrow slider-arrow-next best-offers-arrow-next"
-               tabindex="0"
-               role="button"
-               aria-label="Next slide"
-               aria-controls="swiper-wrapper-6afd786aee0e5cee"
-               aria-disabled="false">
+          <div class="slider-arrow slider-arrow-next best-offers-arrow-next" tabindex="0" role="button"
+            aria-label="Next slide" aria-controls="swiper-wrapper-6afd786aee0e5cee" aria-disabled="false">
           </div>
         </div>
       </div>
 
       <div class="title-wrap__buttons">
-        <a href="<?= get_permalink(2267) ?>"
-           class="title-wrap__link link-arrow">
+        <a href="<?= get_permalink(get_page_by_path('luchshie-predlozheniya')) ?>" class="title-wrap__link link-arrow">
           <span>Смотреть все</span>
           <div class="link-arrow__icon">
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="24"
-                 height="24"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="1.5"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
               <path d="M7 7h10v10"></path>
               <path d="M7 17 17 7"></path>
             </svg>
