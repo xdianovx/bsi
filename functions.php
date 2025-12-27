@@ -258,6 +258,7 @@ require get_template_directory() . '/custom-fields/best-offers.php';
 require get_template_directory() . '/custom-fields/resort.php';
 require get_template_directory() . '/custom-fields/pages/mice.php';
 require get_template_directory() . '/custom-fields/pages/visa.php';
+require get_template_directory() . '/custom-fields/pages/main-banners.php';
 require get_template_directory() . '/custom-fields/education-fields.php';
 
 // AJAX requests
