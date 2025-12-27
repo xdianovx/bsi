@@ -215,21 +215,32 @@ get_header();
             </div>
 
 
+            <?php
+            $check_in_time = function_exists('get_field') ? get_field('check_in_time', get_the_ID()) : '';
+            $check_out_time = function_exists('get_field') ? get_field('check_out_time', get_the_ID()) : '';
+            ?>
 
-            <div class="hotel-widget__checkin-time">
-              <div class="hotel-widget__checkin-item">
-                <span class="hotel-widget__checkin-label">Заезд:</span>
-                <span class="hotel-widget__checkin-value numfont">
-                  <?= get_field('check_in_time', get_the_ID()); ?>
-                </span>
+            <?php if ($check_in_time || $check_out_time): ?>
+              <div class="hotel-widget__checkin-time">
+                <?php if ($check_in_time): ?>
+                  <div class="hotel-widget__checkin-item">
+                    <span class="hotel-widget__checkin-label">Заезд:</span>
+                    <span class="hotel-widget__checkin-value numfont">
+                      <?= esc_html($check_in_time); ?>
+                    </span>
+                  </div>
+                <?php endif; ?>
+                <?php if ($check_out_time): ?>
+                  <div class="hotel-widget__checkin-item">
+                    <span class="hotel-widget__checkin-label">Выезд:</span>
+                    <span class="hotel-widget__checkin-value numfont">
+                      <?= esc_html($check_out_time); ?>
+                    </span>
+                  </div>
+                <?php endif; ?>
               </div>
-              <div class="hotel-widget__checkin-item">
-                <span class="hotel-widget__checkin-label">Выезд:</span>
-                <span class="hotel-widget__checkin-value numfont">
-                  <?= get_field('check_out_time', get_the_ID()); ?>
-                </span>
-              </div>
-            </div>
+            <?php endif; ?>
+
 
 
             <?php
