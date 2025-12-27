@@ -48,16 +48,16 @@ export const sliders = () => {
         overlayEl.addEventListener("mousedown", (e) => {
           e.stopPropagation();
         });
-        
+
         overlayEl.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          
+
           const galleryId = overlayEl.getAttribute("data-gallery-id");
           // Находим все элементы галереи с данным gallery-id (начиная с 5-го фото)
           const allGalleryItems = block.querySelectorAll(`a[data-fancybox="${galleryId}"]`);
           const hiddenItems = Array.from(allGalleryItems).slice(4);
-          
+
           if (hiddenItems.length > 0) {
             // Открываем fancybox с первого скрытого элемента
             Fancybox.show(
@@ -89,7 +89,6 @@ export const sliders = () => {
     slidesPerView: 1,
     spaceBetween: 10,
     speed: 300,
-    loop: true,
     navigation: {
       nextEl: ".main-banner-arrow-next",
       prevEl: ".main-banner-arrow-prev",
