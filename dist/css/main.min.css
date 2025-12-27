@@ -2952,10 +2952,6 @@ input.error {
 .hotel-card__location p {
   margin-top: 0;
 }
-.hotel-card__location .hotel-card__flag {
-  margin-top: 3px;
-}
-
 .hotel-card__location-text {
   line-height: 130%;
 }
