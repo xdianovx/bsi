@@ -237,30 +237,27 @@ get_header();
             <?php if ($map_lat && $map_lng): ?>
               <div class="single-education__map" id="education-map-container"></div>
               <script>
-                async function initEducationMap() {
-                  if (typeof ymaps3 === 'undefined') {
+                function initEducationMap() {
+                  if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
                     setTimeout(initEducationMap, 100);
                     return;
                   }
-                  await ymaps3.ready;
-                  const {YMap, YMapDefaultSchemeLayer, YMapMarker} = ymaps3;
-                  const map = new YMap(
-                    document.getElementById('education-map-container'),
-                    {
-                      location: {
-                        center: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
-                        zoom: <?php echo esc_js($map_zoom); ?>
-                      }
-                    }
-                  );
-                  map.addChild(new YMapDefaultSchemeLayer());
-                  const marker = new YMapMarker({
-                    coordinates: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
-                    mapFollowsOnClick: false,
+                  
+                  var location = { lat: <?php echo esc_js($map_lat); ?>, lng: <?php echo esc_js($map_lng); ?> };
+                  var map = new google.maps.Map(document.getElementById('education-map-container'), {
+                    zoom: <?php echo esc_js($map_zoom); ?>,
+                    center: location
                   });
-                  map.addChild(marker);
+                  
+                  var marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                  });
                 }
-                initEducationMap();
+                
+                window.addEventListener('load', function() {
+                  initEducationMap();
+                });
               </script>
             <?php endif; ?>
 

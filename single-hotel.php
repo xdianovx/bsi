@@ -299,30 +299,27 @@ get_header();
       </div>
     </section>
     <script>
-      async function initHotelMap() {
-        if (typeof ymaps3 === 'undefined') {
+      function initHotelMap() {
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
           setTimeout(initHotelMap, 100);
           return;
         }
-        await ymaps3.ready;
-        const {YMap, YMapDefaultSchemeLayer, YMapMarker} = ymaps3;
-        const map = new YMap(
-          document.getElementById('hotel-map-container'),
-          {
-            location: {
-              center: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
-              zoom: <?php echo esc_js($map_zoom); ?>
-            }
-          }
-        );
-        map.addChild(new YMapDefaultSchemeLayer());
-        const marker = new YMapMarker({
-          coordinates: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
-          mapFollowsOnClick: false,
+        
+        var location = { lat: <?php echo esc_js($map_lat); ?>, lng: <?php echo esc_js($map_lng); ?> };
+        var map = new google.maps.Map(document.getElementById('hotel-map-container'), {
+          zoom: <?php echo esc_js($map_zoom); ?>,
+          center: location
         });
-        map.addChild(marker);
+        
+        var marker = new google.maps.Marker({
+          position: location,
+          map: map
+        });
       }
-      initHotelMap();
+      
+      window.addEventListener('load', function() {
+        initHotelMap();
+      });
     </script>
   <?php endif; ?>
 

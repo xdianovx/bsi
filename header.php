@@ -26,7 +26,12 @@
 
 
   <?php if (is_singular(['hotel', 'education']) || is_front_page()): ?>
-    <script src="https://api-maps.yandex.ru/v3/?apikey=e2acacad-47ea-4ef2-8273-61a3a5f50c5b&lang=ru_RU" defer></script>
+    <?php
+    $google_maps_key = defined('GOOGLE_MAPS_API_KEY') ? GOOGLE_MAPS_API_KEY : '';
+    if ($google_maps_key): ?>
+      <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo esc_attr($google_maps_key); ?>" async
+        defer></script>
+    <?php endif; ?>
   <?php endif; ?>
 
 

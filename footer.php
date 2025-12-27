@@ -44,13 +44,17 @@
 			<div class="footer-contact-col">
 				<div class="footer-contact">
 					<span class="footer-contact__title">
-						Круглосуточная поддержка
+						Телефон
 					</span>
+					<div class="footer-contact__links">
 
-					<a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>"
-						 class="footer-contact__link">
-						<?php the_field('telefon_po_rf', 'option'); ?>
-					</a>
+						<a href="tel:8 (495) 785-55-35" class="footer-contact__link">
+							8 (495) 785-55-35
+						</a>
+						<a href="tel:8 (800) 200-55-35" class="footer-contact__link">
+							8 (800) 200-55-35
+						</a>
+					</div>
 				</div>
 
 				<div class="footer-contact">
@@ -58,8 +62,7 @@
 						Email
 					</span>
 
-					<a href="mailto:<?php the_field('email', 'option'); ?>"
-						 class="footer-contact__link">
+					<a href="mailto:<?php the_field('email', 'option'); ?>" class="footer-contact__link">
 						<?php the_field('email', 'option'); ?>
 					</a>
 				</div>
@@ -86,17 +89,14 @@
 
 				<div class="payments">
 					<div class="payment-item">
-						<img src="<?= get_template_directory_uri() ?>/img/icons/mir.png"
-								 alt="mir pay">
+						<img src="<?= get_template_directory_uri() ?>/img/icons/mir.png" alt="mir pay">
 					</div>
 					<div class="payment-item">
-						<img src="<?= get_template_directory_uri() ?>/img/icons/visa.png"
-								 alt="visa pay">
+						<img src="<?= get_template_directory_uri() ?>/img/icons/visa.png" alt="visa pay">
 					</div>
 
 					<div class="payment-item">
-						<img src="<?= get_template_directory_uri() ?>/img/icons/mc.png"
-								 alt="mc pay">
+						<img src="<?= get_template_directory_uri() ?>/img/icons/mc.png" alt="mc pay">
 					</div>
 				</div>
 			</div>
@@ -107,8 +107,7 @@
 				BSI GROUP © 1990—<?= date("Y"); ?> Все права защищены.
 			</p>
 
-			<a href="<?= get_permalink(47) ?>"
-				 class="policy-link footer-policy-link">
+			<a href="<?= get_permalink(47) ?>" class="policy-link footer-policy-link">
 				Политика в отношении обработки персональных данных
 			</a>
 		</div>
@@ -119,30 +118,16 @@
 	<div class="container">
 		<div class="footer-logos__wrap">
 
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/1.jpg"
-					 alt="">
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/2.png"
-					 alt="">
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/3.png"
-					 alt="">
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/4.jpg"
-					 alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/1.jpg" alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/2.png" alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/3.png" alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/4.jpg" alt="">
 
 
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/6.png"
-					 alt="">
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/7.jpg"
-					 alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/6.png" alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/7.jpg" alt="">
 
-			<img class="footer-partner"
-					 src="<?= get_template_directory_uri() ?>/img/footer/8.jpg"
-					 alt="">
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/8.jpg" alt="">
 		</div>
 	</div>
 </div>
