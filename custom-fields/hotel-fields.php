@@ -22,6 +22,7 @@ function bsi_register_hotel_acf_groups(): void
     'key' => 'group_hotel_geo',
     'title' => 'ГЕО',
     'position' => 'acf_after_title',
+    'menu_order' => 0,
     'fields' => [
       [
         'key' => 'field_hotel_geo_notice',
@@ -86,35 +87,91 @@ function bsi_register_hotel_acf_groups(): void
   ]);
 
   acf_add_local_field_group([
-    'key' => 'group_hotel_info',
+    'key' => 'group_hotel_basic',
     'title' => 'Основная информация',
+    'fields' => [
+      [
+        'key' => 'field_hotel_rating',
+        'label' => 'Рейтинг (звезды)',
+        'name' => 'rating',
+        'type' => 'number',
+        'min' => 1,
+        'max' => 5,
+        'step' => 1,
+        'placeholder' => 'от 1 до 5',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_is_featured',
+        'label' => 'Популярный отель',
+        'name' => 'is_popular',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+        'instructions' => 'Покажет отель в блоке «Популярные отели» (слайдер на главной/в секциях по странам).',
+        'wrapper' => ['width' => '50'],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'hotel',
+        ],
+      ],
+    ],
+    'menu_order' => 1,
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_hotel_contacts',
+    'title' => 'Контакты и адрес',
     'fields' => [
       [
         'key' => 'field_hotel_address',
         'label' => 'Адрес',
         'name' => 'address',
         'type' => 'text',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_hotel_phone',
         'label' => 'Телефон',
         'name' => 'phone',
         'type' => 'text',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_website',
         'label' => 'Сайт отеля',
         'name' => 'website',
         'type' => 'url',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '100'],
       ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'hotel',
+        ],
+      ],
+    ],
+    'menu_order' => 2,
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_hotel_booking',
+    'title' => 'Бронирование и цены',
+    'fields' => [
       [
         'key' => 'field_price',
         'label' => 'Стоимость',
         'name' => 'price',
         'type' => 'text',
+        'instructions' => 'Минимальная цена в рублях',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -126,15 +183,23 @@ function bsi_register_hotel_acf_groups(): void
         'wrapper' => ['width' => '50'],
       ],
       [
-        'key' => 'field_hotel_gallery',
-        'label' => 'Галерея отеля',
-        'name' => 'gallery',
-        'type' => 'gallery',
-        'return_format' => 'array',
-        'preview_size' => 'medium',
-        'insert' => 'append',
-        'library' => 'all',
-        'min' => 0,
+        'key' => 'field_hotel_nights',
+        'label' => 'Количество ночей',
+        'name' => 'nights',
+        'type' => 'number',
+        'min' => 1,
+        'instructions' => 'Количество ночей для тура',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_hotel_checkin_date',
+        'label' => 'Дата начала заселения',
+        'name' => 'checkin_date',
+        'type' => 'date_picker',
+        'display_format' => 'd/m/Y',
+        'return_format' => 'Y-m-d',
+        'first_day' => 1,
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_check_in_time',
@@ -152,35 +217,13 @@ function bsi_register_hotel_acf_groups(): void
         'wrapper' => ['width' => '50'],
         'placeholder' => '12:00',
       ],
-
-      [
-        'key' => 'field_hotel_rating',
-        'label' => 'Рейтинг',
-        'name' => 'rating',
-        'type' => 'number',
-        'min' => 1,
-        'max' => 5,
-        'step' => 1,
-        'placeholder' => 'от 1 до 5',
-        'wrapper' => ['width' => '25'],
-      ],
-      [
-        'key' => 'field_is_featured',
-        'label' => 'Популярный?',
-        'name' => 'is_popular',
-        'type' => 'true_false',
-        'ui' => 1,
-        'default_value' => 0,
-        'instructions' => 'Покажет отель в блоке «Популярные отели» (слайдер на главной/в секциях по странам).',
-        'wrapper' => ['width' => '25'],
-      ],
       [
         'key' => 'field_hotel_booking_url',
         'label' => 'Ссылка на бронирование',
         'name' => 'booking_url',
         'type' => 'url',
         'instructions' => 'Сюда можно вставлять ссылку на Booking / сайт отеля / форму бронирования.',
-        'wrapper' => ['width' => '50'],
+        'wrapper' => ['width' => '100'],
       ],
     ],
     'location' => [
@@ -192,6 +235,35 @@ function bsi_register_hotel_acf_groups(): void
         ],
       ],
     ],
+    'menu_order' => 3,
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_hotel_media',
+    'title' => 'Медиа',
+    'fields' => [
+      [
+        'key' => 'field_hotel_gallery',
+        'label' => 'Галерея отеля',
+        'name' => 'gallery',
+        'type' => 'gallery',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'insert' => 'append',
+        'library' => 'all',
+        'min' => 0,
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'hotel',
+        ],
+      ],
+    ],
+    'menu_order' => 4,
   ]);
 }
 

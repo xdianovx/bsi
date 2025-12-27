@@ -8,6 +8,9 @@ $hotel_title = '';
 $hotel_flag = '';
 $price_value = '';
 $price_text = '';
+$nights = 0;
+$checkin_date = '';
+$booking_url = '';
 
 if ($hotel && is_array($hotel)) {
   if (!empty($hotel['id'])) {
@@ -21,6 +24,8 @@ if ($hotel && is_array($hotel)) {
   $hotel_flag = !empty($hotel['flag']) ? (string) $hotel['flag'] : '';
   $price_value = !empty($hotel['price']) ? (string) $hotel['price'] : '';
   $price_text = !empty($hotel['price_text']) ? (string) $hotel['price_text'] : '';
+  $nights = !empty($hotel['nights']) ? (int) $hotel['nights'] : 0;
+  $checkin_date = !empty($hotel['checkin_date']) ? (string) $hotel['checkin_date'] : '';
 } else {
   $hotel_id = get_the_ID();
   if (!$hotel_id) {
@@ -109,6 +114,25 @@ if (function_exists('get_field')) {
     }
   }
 
+  if (!$nights) {
+    $nights_val = get_field('nights', $hotel_id);
+    if (is_numeric($nights_val)) {
+      $nights = (int) $nights_val;
+    }
+  }
+
+  if (!$checkin_date) {
+    $checkin_date_val = get_field('checkin_date', $hotel_id);
+    if ($checkin_date_val) {
+      $checkin_date = (string) $checkin_date_val;
+    }
+  }
+
+  $booking_url_val = get_field('booking_url', $hotel_id);
+  if ($booking_url_val) {
+    $booking_url = trim((string) $booking_url_val);
+  }
+
   if (!$hotel_flag) {
     $country_id = function_exists('get_field') ? get_field('hotel_country', $hotel_id) : 0;
     if ($country_id instanceof WP_Post) {
@@ -129,7 +153,7 @@ if (function_exists('get_field')) {
   }
 }
 ?>
-<a href="<?php echo esc_url($hotel_url); ?>" class="hotel-card">
+<div class="hotel-card">
 
   <div class="hotel-card__media">
     <img src="<?php echo esc_url($hotel_image); ?>" alt="<?php echo esc_attr($hotel_title); ?>"
@@ -154,9 +178,48 @@ if (function_exists('get_field')) {
           <?php endfor; ?>
         </div>
       <?php endif; ?>
-      <h3 class="hotel-card__title"><?php echo esc_html($hotel_title); ?></h3>
+
+      <?php if ($nights > 0 || $checkin_date): ?>
+        <div class="hotel-card__booking-info">
+          <?php if ($nights > 0): ?>
+            <span class="hotel-card__nights"><?php echo esc_html($nights); ?>
+              <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?>,</span>
+          <?php endif; ?>
+          <?php if ($checkin_date): ?>
+            <?php
+            $date_obj = DateTime::createFromFormat('Y-m-d', $checkin_date);
+            if ($date_obj) {
+              // Получаем день и название месяца без года
+              $day = $date_obj->format('j');
+              // Массив месяцев на русском языке
+              $months = [
+                1 => 'января',
+                2 => 'февраля',
+                3 => 'марта',
+                4 => 'апреля',
+                5 => 'мая',
+                6 => 'июня',
+                7 => 'июля',
+                8 => 'августа',
+                9 => 'сентября',
+                10 => 'октября',
+                11 => 'ноября',
+                12 => 'декабря'
+              ];
+              $month_num = (int) $date_obj->format('n');
+              $month_str = isset($months[$month_num]) ? $months[$month_num] : $date_obj->format('F');
+              $formatted_date = $day . ' ' . $month_str;
+            } else {
+              $formatted_date = esc_html($checkin_date);
+            }
+            ?>
+            <span class="hotel-card__checkin-date">с <?php echo esc_html($formatted_date); ?></span>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
 
     </div>
+    <h3 class="hotel-card__title"><?php echo esc_html($hotel_title); ?></h3>
 
     <div class="hotel-card__location">
       <?php if ($hotel_flag): ?>
@@ -232,17 +295,16 @@ if (function_exists('get_field')) {
       </div>
     <?php endif; ?>
 
-
-
-    <div class="hotel-card__meta">
-      <?php if ($price_value): ?>
-        <div class="hotel-card__price">
-          от <?php echo esc_html($price_value); ?>
-          <?php if ($price_text): ?>
-            <span class="hotel-card__price-text">/ <?php echo esc_html($price_text); ?></span>
-          <?php endif; ?>
-        </div>
+    <div class="hotel-card__actions">
+      <a href="<?php echo esc_url($hotel_url); ?>" class="hotel-card__btn hotel-card__btn-details">
+        Подробнее
+      </a>
+      <?php if ($booking_url && $price_value): ?>
+        <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
+          target="_blank" rel="noopener nofollow">
+          <?php echo esc_html($price_value); ?>
+        </a>
       <?php endif; ?>
     </div>
   </div>
-</a>
+</div>

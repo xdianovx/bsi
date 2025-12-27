@@ -2899,7 +2899,7 @@ input.error {
 .hotel-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   position: relative;
 }
 .hotel-card:hover {
@@ -2911,7 +2911,7 @@ input.error {
 
 .hotel-card__media {
   aspect-ratio: 16/9;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
 }
 .hotel-card__media img {
@@ -2943,7 +2943,7 @@ input.error {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 8px;
   font-size: 14px;
 }
 .hotel-card__location svg {
@@ -2954,6 +2954,17 @@ input.error {
 }
 .hotel-card__location-text {
   line-height: 130%;
+}
+
+.hotel-card__booking-info {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hotel-card__booking-info .hotel-card__meta-separator {
+  opacity: 0.5;
 }
 
 .hotel-card__price {
@@ -2970,9 +2981,45 @@ input.error {
   opacity: 0.8;
 }
 
+.hotel-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  align-items: center;
+}
+.hotel-card__actions .hotel-card__btn {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  padding: 10px 16px;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  line-height: 100%;
+}
+.hotel-card__actions .hotel-card__btn-details {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #000;
+}
+.hotel-card__actions .hotel-card__btn-details:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+.hotel-card__actions .hotel-card__btn-book {
+  background: #ee3145;
+  color: #fff;
+  border: 1px solid #ee3145;
+  font-size: 16px;
+}
+.hotel-card__actions .hotel-card__btn-book:hover {
+  background: #ec1930;
+  border-color: #ec1930;
+}
+
 .hotel-card__title {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .hotel-card__tag {
@@ -3004,8 +3051,6 @@ input.error {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  flex-direction: column;
-  gap: 6px;
 }
 
 .hotel-card__rating {

@@ -68,6 +68,8 @@ function bsi_ajax_popular_hotels_by_country()
 
       $price_value = '';
       $price_text = '';
+      $nights = 0;
+      $checkin_date = '';
       if (function_exists('get_field')) {
         $price = get_field('price', $hotel_id);
         if ($price) {
@@ -81,6 +83,16 @@ function bsi_ajax_popular_hotels_by_country()
         $price_text_val = get_field('price_text', $hotel_id);
         if ($price_text_val) {
           $price_text = (string) $price_text_val;
+        }
+
+        $nights_val = get_field('nights', $hotel_id);
+        if (is_numeric($nights_val)) {
+          $nights = (int) $nights_val;
+        }
+
+        $checkin_date_val = get_field('checkin_date', $hotel_id);
+        if ($checkin_date_val) {
+          $checkin_date = (string) $checkin_date_val;
         }
       }
 
@@ -97,6 +109,8 @@ function bsi_ajax_popular_hotels_by_country()
         'resort_title' => $resort_name,
         'price' => $price_value,
         'price_text' => $price_text,
+        'nights' => $nights,
+        'checkin_date' => $checkin_date,
       ];
 
       echo '<div class="swiper-slide">';
