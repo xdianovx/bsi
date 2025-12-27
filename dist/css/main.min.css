@@ -3010,7 +3010,6 @@ input.error {
 .hotel-card__actions .hotel-card__btn-book {
   background: #ee3145;
   color: #fff;
-  border: 1px solid #ee3145;
 }
 .hotel-card__actions .hotel-card__btn-book:hover {
   background: #ec1930;
