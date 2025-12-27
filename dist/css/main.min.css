@@ -3216,6 +3216,21 @@ input.error {
   object-fit: cover;
 }
 
+@media screen and (max-width: 798px) {
+  .main-banner__slide_image--desktop {
+    display: none;
+  }
+}
+
+.main-banner__slide_image--mobile {
+  display: none;
+}
+@media screen and (max-width: 798px) {
+  .main-banner__slide_image--mobile {
+    display: block;
+  }
+}
+
 .main-banner__arrows {
   position: absolute;
   right: 16px;

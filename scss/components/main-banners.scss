@@ -22,6 +22,20 @@
   object-fit: cover;
 }
 
+.main-banner__slide_image--desktop {
+  @media screen and (max-width: 798px) {
+    display: none;
+  }
+}
+
+.main-banner__slide_image--mobile {
+  display: none;
+
+  @media screen and (max-width: 798px) {
+    display: block;
+  }
+}
+
 .main-banner__arrows {
   position: absolute;
   right: 16px;

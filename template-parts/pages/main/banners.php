@@ -11,9 +11,13 @@ $banners = get_field('banners', get_the_ID());
         <?php foreach ($banners as $banner): ?>
           <div class="swiper-slide">
             <div class="main-banner__slide">
-              <img class="main-banner__slide_image"
-                   src="<?= $banner['img']; ?>" />
-
+              <?php if (!empty($banner['mobilnyj_banner'])): ?>
+                <img class="main-banner__slide_image main-banner__slide_image--desktop" src="<?= $banner['img']; ?>" />
+                <img class="main-banner__slide_image main-banner__slide_image--mobile"
+                  src="<?= $banner['mobilnyj_banner']; ?>" />
+              <?php else: ?>
+                <img class="main-banner__slide_image" src="<?= $banner['img']; ?>" />
+              <?php endif; ?>
             </div>
           </div>
         <?php endforeach; ?>
