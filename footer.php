@@ -37,9 +37,7 @@
 
 
 
-			<div class="footer__row">
-				<div class=""> Написать текст про использование куки</div>
-			</div>
+
 
 			<div class="footer-contact-col">
 				<div class="footer-contact">
@@ -83,6 +81,16 @@
 
 
 
+			</div>
+
+			<div class="footer__row --no-border">
+				<div class="footer-cookie-policy">
+					Мы используем файлы cookie, чтобы запоминать ваши предпочтения, анализировать трафик и сделать наш
+					сайт более удобным для вас. Вы можете управлять настройками куки в своем браузере или прочитать нашу
+					<a href="<?= get_permalink(47) ?>" class="policy-link footer-policy-link">
+						политику в отношении обработки персональных данных
+					</a>
+				</div>
 			</div>
 
 			<div class="footer__currencies">
