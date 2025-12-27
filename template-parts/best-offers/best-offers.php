@@ -83,7 +83,7 @@ foreach ($sections as $section) {
       </div>
 
       <div class="title-wrap__buttons">
-        <a href="<?= get_permalink(get_page_by_path('luchshie-predlozheniya')) ?>" class="title-wrap__link link-arrow">
+        <a href="<?= esc_url(home_url('/luchshie-predlozheniya/')); ?>" class="title-wrap__link link-arrow">
           <span>Смотреть все</span>
           <div class="link-arrow__icon">
 
