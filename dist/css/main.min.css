@@ -2985,12 +2985,13 @@ input.error {
   display: flex;
   gap: 8px;
   margin-top: 16px;
+  font-weight: 500;
+  font-size: 14px;
   align-items: center;
 }
 .hotel-card__actions .hotel-card__btn {
   flex: 1;
   text-align: center;
-  font-size: 16px;
   padding: 10px 16px;
   text-decoration: none;
   border-radius: 4px;
@@ -3010,7 +3011,6 @@ input.error {
   background: #ee3145;
   color: #fff;
   border: 1px solid #ee3145;
-  font-size: 16px;
 }
 .hotel-card__actions .hotel-card__btn-book:hover {
   background: #ec1930;
