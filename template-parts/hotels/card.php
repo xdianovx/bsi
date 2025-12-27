@@ -47,6 +47,7 @@ if ($hotel && is_array($hotel) && !empty($hotel['tags']) && is_array($hotel['tag
 }
 
 $country_title = '';
+$region_title = '';
 $resort_title = '';
 $rating = 0;
 
@@ -63,6 +64,15 @@ if ($hotel && is_array($hotel) && !empty($hotel['country_title'])) {
   }
   if ($country_id) {
     $country_title = get_the_title($country_id);
+  }
+}
+
+if ($hotel && is_array($hotel) && !empty($hotel['region_title'])) {
+  $region_title = (string) $hotel['region_title'];
+} else {
+  $region_terms = wp_get_post_terms($hotel_id, 'region', ['orderby' => 'name', 'order' => 'ASC']);
+  if (!is_wp_error($region_terms) && !empty($region_terms)) {
+    $region_title = (string) $region_terms[0]->name;
   }
 }
 
@@ -156,10 +166,15 @@ if (function_exists('get_field')) {
       <?php endif; ?>
       <div class="hotel-card__location-text">
         <?php if ($country_title): ?>
-          <span class="hotel-card__country"><?php echo esc_html($country_title); ?></span>
+          <span class="hotel-card__country"><?php echo esc_html($country_title); ?>,</span>
+        <?php endif; ?>
+        <?php if ($region_title): ?>
+          <?php if ($country_title): ?>   <?php endif; ?>
+          <span class="hotel-card__region"><?php echo esc_html($region_title); ?>,</span>
         <?php endif; ?>
         <?php if ($resort_title): ?>
-          <?php if ($country_title): ?>, <?php endif; ?>
+          <?php if ($country_title || $region_title): ?>
+          <?php endif; ?>
           <span class="hotel-card__resort"><?php echo esc_html($resort_title); ?></span>
         <?php endif; ?>
       </div>

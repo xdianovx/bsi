@@ -54,6 +54,12 @@ function bsi_ajax_popular_hotels_by_country()
 
       $country_title = $country ? get_the_title($country) : '';
 
+      $region_name = '';
+      $regions = get_the_terms($hotel_id, 'region');
+      if (!empty($regions) && !is_wp_error($regions)) {
+        $region_name = $regions[0]->name;
+      }
+
       $resort_name = '';
       $resorts = get_the_terms($hotel_id, 'resort');
       if (!empty($resorts) && !is_wp_error($resorts)) {
@@ -87,6 +93,7 @@ function bsi_ajax_popular_hotels_by_country()
         'title' => get_the_title($hotel_id),
         'flag' => $flag_url ? esc_url($flag_url) : '',
         'country_title' => $country_title,
+        'region_title' => $region_name,
         'resort_title' => $resort_name,
         'price' => $price_value,
         'price_text' => $price_text,

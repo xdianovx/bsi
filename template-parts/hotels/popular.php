@@ -105,6 +105,12 @@ foreach ($hotel_posts as $hotel_post) {
     }
   }
 
+  $region_name = '';
+  $region_terms = wp_get_post_terms($hotel_id, 'region', ['orderby' => 'name', 'order' => 'ASC']);
+  if (!is_wp_error($region_terms) && !empty($region_terms)) {
+    $region_name = (string) $region_terms[0]->name;
+  }
+
   $resort_name = '';
   $resort_terms = wp_get_post_terms($hotel_id, 'resort', ['orderby' => 'name', 'order' => 'ASC']);
   if (!is_wp_error($resort_terms) && !empty($resort_terms)) {
@@ -136,6 +142,7 @@ foreach ($hotel_posts as $hotel_post) {
     'title' => get_the_title($hotel_id),
     'flag' => $flag_url,
     'country_title' => $country_title,
+    'region_title' => $region_name,
     'resort_title' => $resort_name,
     'price' => $price,
     'price_text' => $price_text,

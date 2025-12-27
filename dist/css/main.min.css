@@ -2943,6 +2943,7 @@ input.error {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 4px;
   font-size: 14px;
 }
 .hotel-card__location svg {
@@ -2953,7 +2954,8 @@ input.error {
 }
 
 .hotel-card__price {
-  font-weight: 500;
+  font-weight: 700;
+  font-size: 18px;
   text-align: right;
   margin-top: 8px;
 }
@@ -3006,7 +3008,7 @@ input.error {
 .hotel-card__rating {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   margin-top: 4px;
 }
 .hotel-card__rating svg {
@@ -3222,7 +3224,7 @@ input.error {
 }
 
 .hotel-card__anemeties {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   margin-top: 8px;
   gap: 4px;
