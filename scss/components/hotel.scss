@@ -54,7 +54,7 @@
 
 .hotel-card__location {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-top: 4px;
   font-size: 14px;
@@ -65,6 +65,14 @@
   p {
     margin-top: 0;
   }
+
+  .hotel-card__flag {
+    margin-top: 3px;
+  }
+}
+
+.hotel-card__location-text {
+  line-height: 130%;
 }
 
 .hotel-card__price {
