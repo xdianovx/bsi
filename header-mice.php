@@ -23,8 +23,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
 
-  <script src="https://api-maps.yandex.ru/v3/?apikey=3b3460ad-74f9-40ad-a5ef-f0369da57f75&lang=ru_RU"></script>
-
   <?php wp_head(); ?>
 </head>
 
