@@ -105,21 +105,25 @@ foreach ($hotel_posts as $hotel_post) {
     }
   }
 
-  $region_name = '';
-  $region_terms = wp_get_post_terms($hotel_id, 'region', ['orderby' => 'name', 'order' => 'ASC']);
-  if (!is_wp_error($region_terms) && !empty($region_terms)) {
-    $region_name = (string) $region_terms[0]->name;
+  $resort_name = '';
+  $resort_terms = wp_get_post_terms($hotel_id, 'resort', ['orderby' => 'name', 'order' => 'ASC']);
+  if (!is_wp_error($resort_terms) && !empty($resort_terms)) {
+    $resort_name = (string) $resort_terms[0]->name;
   }
 
-  $location_title = trim($country_title . ($region_name ? ', ' . $region_name : ''));
-
   $price = '';
+  $price_text = '';
   if (function_exists('get_field')) {
-    $price_val = get_field('price_from', $hotel_id);
+    $price_val = get_field('price', $hotel_id);
     if (is_numeric($price_val)) {
-      $price = 'от ' . number_format((float) $price_val, 0, '.', ' ') . ' руб';
+      $price = number_format((float) $price_val, 0, '.', ' ') . ' ₽';
     } elseif (is_string($price_val) && $price_val !== '') {
       $price = $price_val;
+    }
+
+    $price_text_val = get_field('price_text', $hotel_id);
+    if ($price_text_val) {
+      $price_text = (string) $price_text_val;
     }
   }
 
@@ -131,8 +135,10 @@ foreach ($hotel_posts as $hotel_post) {
     'tags' => [],
     'title' => get_the_title($hotel_id),
     'flag' => $flag_url,
-    'location_title' => $location_title,
+    'country_title' => $country_title,
+    'resort_title' => $resort_name,
     'price' => $price,
+    'price_text' => $price_text,
     'country_id' => $country_id,
     'country_slug' => $country_slug,
   ];

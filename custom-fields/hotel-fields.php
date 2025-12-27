@@ -115,7 +115,15 @@ function bsi_register_hotel_acf_groups(): void
         'label' => 'Стоимость',
         'name' => 'price',
         'type' => 'text',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_hotel_price_text',
+        'label' => 'Текст к цене',
+        'name' => 'price_text',
+        'type' => 'text',
+        'instructions' => 'Дополнительный текст к цене, например: "за 5 ночей", "за неделю" и т.д.',
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_hotel_gallery',

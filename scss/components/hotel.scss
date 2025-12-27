@@ -70,6 +70,14 @@
   font-weight: 500;
   text-align: right;
   margin-top: 8px;
+
+  .hotel-card__price-text {
+    display: block;
+    font-weight: 400;
+    font-size: 14px;
+    margin-top: 2px;
+    opacity: 0.8;
+  }
 }
 .hotel-card__title {
   font-weight: 700;
@@ -94,11 +102,30 @@
   left: 8px;
 }
 
+.hotel-card__price {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .hotel-card__title-wrap {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-direction: column;
   margin-bottom: 4px;
+}
+
+.hotel-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  svg {
+    display: block;
+    color: #ffd700;
+  }
 }
 
 .hotel-card__stars {

@@ -52,36 +52,44 @@ function bsi_ajax_popular_hotels_by_country()
           $flag_url = $flag;
       }
 
-      $region_name = '';
-      $regions = get_the_terms($hotel_id, 'region');
-      if (!empty($regions) && !is_wp_error($regions)) {
-        $region_name = $regions[0]->name;
+      $country_title = $country ? get_the_title($country) : '';
+
+      $resort_name = '';
+      $resorts = get_the_terms($hotel_id, 'resort');
+      if (!empty($resorts) && !is_wp_error($resorts)) {
+        $resort_name = $resorts[0]->name;
       }
 
-      $location_title = '';
-      if ($country) {
-        $location_title = get_the_title($country);
-        if ($region_name)
-          $location_title .= ', ' . $region_name;
-      }
-
+      $price_value = '';
       $price_text = '';
       if (function_exists('get_field')) {
-        $price = get_field('price_from', $hotel_id);
+        $price = get_field('price', $hotel_id);
         if ($price) {
-          $price_text = 'от ' . number_format((float) $price, 0, '.', ' ') . ' руб';
+          if (is_numeric($price)) {
+            $price_value = number_format((float) $price, 0, '.', ' ') . ' ₽';
+          } elseif (is_string($price)) {
+            $price_value = $price;
+          }
+        }
+
+        $price_text_val = get_field('price_text', $hotel_id);
+        if ($price_text_val) {
+          $price_text = (string) $price_text_val;
         }
       }
 
       $item = [
+        'id' => $hotel_id,
         'url' => get_permalink($hotel_id),
         'image' => (string) get_the_post_thumbnail_url($hotel_id, 'large'),
         'type' => 'Отель',
         'tags' => [],
         'title' => get_the_title($hotel_id),
         'flag' => $flag_url ? esc_url($flag_url) : '',
-        'location_title' => $location_title,
-        'price' => $price_text,
+        'country_title' => $country_title,
+        'resort_title' => $resort_name,
+        'price' => $price_value,
+        'price_text' => $price_text,
       ];
 
       echo '<div class="swiper-slide">';
