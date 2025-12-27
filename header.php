@@ -24,6 +24,13 @@
     href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
 
+
+  <?php if (is_singular(['hotel', 'education']) || is_front_page()): ?>
+    <script src="https://api-maps.yandex.ru/v3/?apikey=e2acacad-47ea-4ef2-8273-61a3a5f50c5b&lang=ru_RU" defer></script>
+  <?php endif; ?>
+
+
+
   <?php wp_head(); ?>
 </head>
 

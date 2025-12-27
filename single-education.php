@@ -235,8 +235,33 @@ get_header();
             </div>
 
             <?php if ($map_lat && $map_lng): ?>
-              <div class="single-education__map" id="education-map" data-lat="<?php echo esc_attr($map_lat); ?>"
-                data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"></div>
+              <div class="single-education__map" id="education-map-container"></div>
+              <script>
+                async function initEducationMap() {
+                  if (typeof ymaps3 === 'undefined') {
+                    setTimeout(initEducationMap, 100);
+                    return;
+                  }
+                  await ymaps3.ready;
+                  const {YMap, YMapDefaultSchemeLayer, YMapMarker} = ymaps3;
+                  const map = new YMap(
+                    document.getElementById('education-map-container'),
+                    {
+                      location: {
+                        center: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
+                        zoom: <?php echo esc_js($map_zoom); ?>
+                      }
+                    }
+                  );
+                  map.addChild(new YMapDefaultSchemeLayer());
+                  const marker = new YMapMarker({
+                    coordinates: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
+                    mapFollowsOnClick: false,
+                  });
+                  map.addChild(marker);
+                }
+                initEducationMap();
+              </script>
             <?php endif; ?>
 
             <?php if ($booking_button_text): ?>

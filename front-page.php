@@ -17,6 +17,10 @@ get_header();
 
 <main>
 
+
+
+
+
   <?= get_template_part('template-parts/pages/main/banners') ?>
   <?= get_template_part('template-parts/main-pages-grid') ?>
   <?= get_template_part('template-parts/best-offers/best-offers') ?>

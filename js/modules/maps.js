@@ -1,127 +1,39 @@
-export const initMaps = () => {
+export const initMaps = async () => {
   const mapElements = document.querySelectorAll("[data-lat][data-lng]");
   if (!mapElements.length) {
     return;
   }
 
-  const initMap = async (el) => {
+  if (typeof ymaps3 === "undefined") {
+    console.error("Yandex Maps API v3 is not loaded");
+    return;
+  }
+
+  await ymaps3.ready;
+
+  const { YMap, YMapDefaultSchemeLayer, YMapMarker } = ymaps3;
+
+  mapElements.forEach((el) => {
     const lng = parseFloat(el.dataset.lng);
     const lat = parseFloat(el.dataset.lat);
     const zoom = parseInt(el.dataset.zoom || "14", 10);
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      console.warn("Invalid coordinates:", { lat, lng, element: el });
       return;
     }
 
-    if (!el.offsetWidth || !el.offsetHeight) {
-      console.warn("Map container has no dimensions:", {
-        width: el.offsetWidth,
-        height: el.offsetHeight,
-        element: el,
-      });
-      el.style.minHeight = "400px";
-      el.style.width = "100%";
-    }
+    const map = new YMap(el, {
+      location: { center: [lng, lat], zoom },
+    });
 
-    const waitForYmaps3 = () => {
-      return new Promise((resolve, reject) => {
-        if (typeof window.ymaps3 !== "undefined" && window.ymaps3.ready) {
-          resolve();
-          return;
-        }
+    map.addChild(new YMapDefaultSchemeLayer());
 
-        const checkYmaps3 = () => {
-          if (typeof window.ymaps3 !== "undefined" && window.ymaps3.ready) {
-            resolve();
-            return true;
-          }
-          return false;
-        };
+    const marker = new YMapMarker({
+      coordinates: [lng, lat],
+      mapFollowsOnClick: false,
+    });
 
-        if (checkYmaps3()) {
-          return;
-        }
-
-        let attempts = 0;
-        const maxAttempts = 150;
-        const checkInterval = setInterval(() => {
-          attempts++;
-          if (checkYmaps3()) {
-            clearInterval(checkInterval);
-            return;
-          }
-          if (attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            reject(
-              new Error(
-                `Yandex Maps API v3 failed to load after ${maxAttempts * 0.1} seconds. Script tag present: ${document.querySelector('script[src*="api-maps.yandex.ru"]') !== null}`
-              )
-            );
-          }
-        }, 100);
-
-        window.addEventListener("load", () => {
-          setTimeout(() => {
-            if (checkYmaps3()) {
-              clearInterval(checkInterval);
-            }
-          }, 1000);
-        });
-      });
-    };
-
-    try {
-      await waitForYmaps3();
-
-      if (typeof window.ymaps3 === "undefined") {
-        throw new Error("window.ymaps3 is undefined after wait");
-      }
-
-      if (!window.ymaps3.ready) {
-        throw new Error("ymaps3.ready is not available");
-      }
-
-      await window.ymaps3.ready;
-
-      const { YMap, YMapDefaultSchemeLayer, YMapMarker } = window.ymaps3;
-
-      if (!YMap || !YMapDefaultSchemeLayer) {
-        throw new Error("YMap or YMapDefaultSchemeLayer is not available");
-      }
-
-      const map = new YMap(el, {
-        location: { center: [lng, lat], zoom },
-      });
-
-      map.addChild(new YMapDefaultSchemeLayer());
-
-      if (YMapMarker) {
-        const marker = new YMapMarker({
-          coordinates: [lng, lat],
-          mapFollowsOnClick: false,
-        });
-        map.addChild(marker);
-      }
-    } catch (error) {
-      console.error("Error initializing Yandex Map:", error, {
-        lat,
-        lng,
-        zoom,
-        element: el,
-        ymaps3Available: typeof ymaps3 !== "undefined",
-      });
-      el.style.backgroundColor = "#f0f0f0";
-      el.style.display = "flex";
-      el.style.alignItems = "center";
-      el.style.justifyContent = "center";
-      el.style.minHeight = "400px";
-      el.innerHTML = '<p style="color: #999; padding: 20px;">Карта временно недоступна</p>';
-    }
-  };
-
-  mapElements.forEach((el) => {
-    initMap(el);
+    map.addChild(marker);
   });
 
   const mapButtons = document.querySelectorAll(".hotel-widget__btn-map");

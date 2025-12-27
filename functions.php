@@ -384,31 +384,9 @@ add_action('admin_init', function () {
 	wp_die('OK');
 });
 
-// /wp-admin/?sync_country_regions=1
-
-
 add_action('wp_enqueue_scripts', function () {
-	// твой основной бандл
 	wp_enqueue_script('main', get_template_directory_uri() . '/assets/js/main.js', [], null, true);
-
-	// ключ лучше хранить в wp-config.php или option
-	$key = defined('YMAPS_KEY') ? YMAPS_KEY : 'e2acacad-47ea-4ef2-8273-61a3a5f50c5b';
-
-	wp_add_inline_script('main', 'window.YMAPS_KEY = ' . wp_json_encode($key) . ';', 'before');
 });
-
-add_action('wp_head', function () {
-	// Подключаем Яндекс карты API только на страницах, где нужны карты
-	if (is_singular(['hotel', 'education'])) {
-		$key = defined('YMAPS_KEY') ? YMAPS_KEY : 'e2acacad-47ea-4ef2-8273-61a3a5f50c5b';
-		$api_url = 'https://api-maps.yandex.ru/v3/?apikey=' . urlencode($key) . '&lang=ru_RU';
-		?>
-		<script src="<?php echo esc_url($api_url); ?>"></script>
-		<?php
-	}
-}, 5);
-
-
 
 
 

@@ -295,10 +295,35 @@ get_header();
   <?php if ($map_lat && $map_lng): ?>
     <section class="single-hotel__map-section" id="hotel-map">
       <div class="container">
-        <div class="hotel-map" data-lat="<?php echo esc_attr($map_lat); ?>" data-lng="<?php echo esc_attr($map_lng); ?>"
-          data-zoom="<?php echo esc_attr($map_zoom); ?>"></div>
+        <div class="hotel-map" id="hotel-map-container"></div>
       </div>
     </section>
+    <script>
+      async function initHotelMap() {
+        if (typeof ymaps3 === 'undefined') {
+          setTimeout(initHotelMap, 100);
+          return;
+        }
+        await ymaps3.ready;
+        const {YMap, YMapDefaultSchemeLayer, YMapMarker} = ymaps3;
+        const map = new YMap(
+          document.getElementById('hotel-map-container'),
+          {
+            location: {
+              center: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
+              zoom: <?php echo esc_js($map_zoom); ?>
+            }
+          }
+        );
+        map.addChild(new YMapDefaultSchemeLayer());
+        const marker = new YMapMarker({
+          coordinates: [<?php echo esc_js($map_lng); ?>, <?php echo esc_js($map_lat); ?>],
+          mapFollowsOnClick: false,
+        });
+        map.addChild(marker);
+      }
+      initHotelMap();
+    </script>
   <?php endif; ?>
 
   <section>
