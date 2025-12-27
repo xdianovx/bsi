@@ -264,6 +264,7 @@ require get_template_directory() . '/custom-fields/education-fields.php';
 require get_template_directory() . '/inc/requests/ajax.php';
 require get_template_directory() . '/inc/requests/ajax-fit.php';
 require get_template_directory() . '/inc/requests/samo.php';
+require get_template_directory() . '/inc/requests/ajax-cbr-rates.php';
 require get_template_directory() . '/inc/requests/news.php';
 require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';

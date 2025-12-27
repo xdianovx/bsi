@@ -14,10 +14,9 @@ const currencySymbols = {
   BYN: "Br",
 };
 
-let currencyMap = null;
-let currentRates = { USD: null, EUR: null };
+let ratesData = null;
+let currentRates = { USD: null, EUR: null, RUB: null };
 let baseISO = "RUB";
-let baseCurrencyId = 1;
 let dropdownInstance = null;
 
 function formatRate(num) {
@@ -45,7 +44,10 @@ function setStoredCurrency(iso) {
 }
 
 function updateHeaderPrices() {
-  const items = document.querySelectorAll(".header__currencies .currency-item");
+  const currenciesContainer = document.querySelector(".header__currencies");
+  if (!currenciesContainer) return;
+
+  const items = currenciesContainer.querySelectorAll(".currency-item");
   items.forEach((item) => {
     const codeEl = item.querySelector(".currency-item__title");
     const valueEl = item.querySelector(".currency-item__value");
@@ -54,11 +56,41 @@ function updateHeaderPrices() {
     const rate = currentRates[code];
     if (rate !== null && rate !== undefined) {
       valueEl.textContent = formatRate(rate);
+    } else {
+      valueEl.textContent = "";
     }
   });
+
+  if (baseISO !== "RUB" && currentRates.RUB !== null) {
+    let rubItem = currenciesContainer.querySelector('.currency-item[data-currency="RUB"]');
+    if (!rubItem) {
+      const selectElement = currenciesContainer.querySelector(".currency-select");
+      if (selectElement) {
+        rubItem = document.createElement("div");
+        rubItem.className = "currency-item";
+        rubItem.setAttribute("data-currency", "RUB");
+        rubItem.innerHTML = `
+          <div class="currency-item__title">RUB</div>
+          <div class="currency-item__value numfont"></div>
+        `;
+        currenciesContainer.insertBefore(rubItem, selectElement);
+      }
+    }
+    if (rubItem) {
+      const valueEl = rubItem.querySelector(".currency-item__value");
+      if (valueEl) {
+        valueEl.textContent = formatRate(currentRates.RUB);
+      }
+    }
+  } else {
+    const rubItem = currenciesContainer.querySelector('.currency-item[data-currency="RUB"]');
+    if (rubItem) {
+      rubItem.remove();
+    }
+  }
 }
 
-function populateCurrencyDropdown(currencies) {
+function populateCurrencyDropdown(rates) {
   const panel = document.querySelector(".currency-select .js-dropdown-panel");
   if (!panel) return;
 
@@ -66,48 +98,67 @@ function populateCurrencyDropdown(currencies) {
 
   panel.innerHTML = "";
 
-  currencies
-    .filter((currency) => allowedCurrencies.includes(currency.currencyISO))
-    .forEach((currency) => {
-      const iso = currency.currencyISO;
-      const symbol = getCurrencySymbol(iso);
+  allowedCurrencies.forEach((iso) => {
+    if (iso === "RUB" || rates[iso]) {
       const button = document.createElement("button");
       button.className = "currency-option";
       button.setAttribute("data-iso", iso);
-      button.textContent = `${iso} ${symbol}`;
+      button.textContent = iso;
       panel.appendChild(button);
-    });
+    }
+  });
+}
+
+function calculateRateInBaseCurrency(baseISO, targetISO) {
+  if (!ratesData || !ratesData.rates) return null;
+
+  if (baseISO === "RUB") {
+    const targetRate = ratesData.rates[targetISO];
+    if (!targetRate) return null;
+    return targetRate.value / targetRate.nominal;
+  }
+
+  if (targetISO === "RUB") {
+    const baseRate = ratesData.rates[baseISO];
+    if (!baseRate) return null;
+    const baseValue = baseRate.value / baseRate.nominal;
+    return 1 / baseValue;
+  }
+
+  const baseRate = ratesData.rates[baseISO];
+  const targetRate = ratesData.rates[targetISO];
+
+  if (!baseRate || !targetRate) return null;
+
+  const baseValue = baseRate.value / baseRate.nominal;
+  const targetValue = targetRate.value / targetRate.nominal;
+
+  return targetValue / baseValue;
 }
 
 async function loadCurrencyRates(baseISO) {
-  if (!currencyMap) return;
+  if (!ratesData || !ratesData.rates) return;
 
-  const baseId = currencyMap[baseISO]?.id;
-  if (!baseId) return;
+  const usdRate = calculateRateInBaseCurrency(baseISO, "USD");
+  const eurRate = calculateRateInBaseCurrency(baseISO, "EUR");
 
-  const usdId = currencyMap["USD"]?.id;
-  const eurId = currencyMap["EUR"]?.id;
-
-  if (!usdId || !eurId) return;
-
-  try {
-    const resp = await APIService.getCurrencyRates([eurId, usdId], baseId);
-    const rates = resp.Currency_RATES || [];
-
-    rates.forEach((rateItem) => {
-      const iso = rateItem.currencyISO;
-      if (iso === "USD" || iso === "EUR") {
-        const rate = parseFloat(rateItem.rate);
-        if (!isNaN(rate)) {
-          currentRates[iso] = rate;
-        }
-      }
-    });
-
-    updateHeaderPrices();
-  } catch (err) {
-    // Error handling without console output
+  if (usdRate !== null) {
+    currentRates.USD = usdRate;
   }
+  if (eurRate !== null) {
+    currentRates.EUR = eurRate;
+  }
+
+  if (baseISO !== "RUB") {
+    const rubRate = calculateRateInBaseCurrency(baseISO, "RUB");
+    if (rubRate !== null) {
+      currentRates.RUB = rubRate;
+    }
+  } else {
+    currentRates.RUB = null;
+  }
+
+  updateHeaderPrices();
 }
 
 export async function initCurrency() {
@@ -118,27 +169,17 @@ export async function initCurrency() {
   if (!currentEl || !panel) return;
 
   try {
-    const currenciesResp = await APIService.getCurrencyCurrencies();
-    const currencies = currenciesResp.Currency_CURRENCIES || [];
+    ratesData = await APIService.getCBRRates();
 
-    if (currencies.length === 0) return;
+    if (!ratesData || !ratesData.rates) return;
 
-    currencyMap = {};
-    currencies.forEach((currency) => {
-      currencyMap[currency.currencyISO] = {
-        id: currency.id,
-        name: currency.name,
-        iso: currency.currencyISO,
-      };
-    });
-
-    populateCurrencyDropdown(currencies);
+    populateCurrencyDropdown(ratesData.rates);
 
     baseISO = getStoredCurrency();
-    if (!currencyMap[baseISO]) {
+    const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT", "BYN"];
+    if (!allowedCurrencies.includes(baseISO) || (baseISO !== "RUB" && !ratesData.rates[baseISO])) {
       baseISO = "RUB";
     }
-    baseCurrencyId = currencyMap[baseISO]?.id || 1;
     currentEl.textContent = baseISO;
 
     await loadCurrencyRates(baseISO);
@@ -150,10 +191,9 @@ export async function initCurrency() {
       btn.addEventListener("click", async (e) => {
         e.preventDefault();
         const iso = btn.getAttribute("data-iso");
-        if (!iso || !currencyMap[iso]) return;
+        if (!iso || (iso !== "RUB" && !ratesData.rates[iso])) return;
 
         baseISO = iso;
-        baseCurrencyId = currencyMap[iso].id;
         currentEl.textContent = iso;
         setStoredCurrency(iso);
 
