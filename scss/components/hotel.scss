@@ -119,9 +119,8 @@
 
   .hotel-card__btn-details {
     background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.2);
     color: #000;
-
+    background: $bg-gray;
     &:hover {
       background: rgba(0, 0, 0, 0.05);
       border-color: rgba(0, 0, 0, 0.3);
