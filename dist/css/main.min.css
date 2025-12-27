@@ -7263,6 +7263,10 @@ input.error {
   margin-top: 20px;
 }
 
+.tour-card:hover {
+  color: inherit;
+}
+
 .visa-page__content {
   max-width: 720px;
   margin: 40px auto 0;

@@ -813,3 +813,9 @@
 .popular-tours__content {
   margin-top: 20px;
 }
+
+.tour-card {
+  &:hover {
+    color: inherit;
+  }
+}

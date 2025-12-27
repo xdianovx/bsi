@@ -24,7 +24,7 @@ if (!empty($tour['tags']) && is_array($tour['tags'])) {
   $extra_tags = array_values(array_filter(array_map('strval', $tour['tags'])));
 }
 ?>
-<a href="<?php echo esc_url($tour['url']); ?>" class="hotel-card">
+<a href="<?php echo esc_url($tour['url']); ?>" class="hotel-card tour-card">
 
   <div class="hotel-card__media">
     <img src="<?php echo esc_url($tour['image']); ?>" alt="<?php echo esc_attr($tour['title']); ?>"
