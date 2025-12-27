@@ -28,6 +28,7 @@
   &.active {
     background: $red;
     color: #fff;
+    border-color: $red;
   }
 
   &.--all {

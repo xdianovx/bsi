@@ -5477,6 +5477,7 @@ input.error {
 .promo-filter__btn.active {
   background: #ee3145;
   color: #fff;
+  border-color: #ee3145;
 }
 .promo-filter__btn.--all {
   padding: 6px 16px;
