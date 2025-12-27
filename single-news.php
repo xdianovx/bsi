@@ -47,37 +47,7 @@ get_header();
 			</div>
 		</div>
 	</section>
-	<div id="map" style="width: 600px; height: 400px"></div>
 
-	<script>
-		window.addEventListener('load', function () {
-			async function initMap() {
-				if (typeof ymaps3 === 'undefined') {
-					console.log('Waiting for ymaps3...');
-					setTimeout(initMap, 100);
-					return;
-				}
-
-				await ymaps3.ready;
-
-				const { YMap, YMapDefaultSchemeLayer } = ymaps3;
-
-				const map = new YMap(
-					document.getElementById('map'),
-					{
-						location: {
-							center: [37.588144, 55.733842],
-							zoom: 10
-						}
-					}
-				);
-
-				map.addChild(new YMapDefaultSchemeLayer());
-			}
-
-			initMap();
-		});
-	</script>
 
 </main><!-- #main -->
 

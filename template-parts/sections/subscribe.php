@@ -11,27 +11,22 @@
         </h2>
 
         <p class="subscribe-section__subtitle">
-          Получайте горячие предложения первыми, узнавайте <br> о лучших ценах и предложениях.
+          Получайте первыми самую актуальную информацию о наших планах, новинках, спецпредложениях, акциях и
+          мероприятиях.
         </p>
 
 
       </div>
       <div class="subscribe-section__form_wrap">
-        <form action=""
-              class="subscribe-section__form">
-          <input type="email"
-                 required
-                 class="input"
-                 placeholder="Ваш email">
+        <form action="" class="subscribe-section__form">
+          <input type="email" required class="input" placeholder="Ваш email">
 
-          <button class="btn btn-accent"
-                  type="submit">Подписаться</button>
+          <button class="btn btn-accent" type="submit">Подписаться</button>
         </form>
 
         <p class="form-policy subscribe-form__policy">
           Нажимая на кнопку "Отправить", вы соглашаетесь с <br> <a
-             href="http://localhost:8888/bsinew/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
-             class="policy-link">
+            href="http://localhost:8888/bsinew/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/" class="policy-link">
             нашей политикой обработки персональных данных
           </a>
         </p>
