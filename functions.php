@@ -269,6 +269,7 @@ require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
+require get_template_directory() . '/inc/requests/popular-tours-section.php';
 require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
 
@@ -333,14 +334,6 @@ add_action('acf/init', function () {
 					'value' => 'hotel',
 				],
 			],
-			[
-				[
-					'param' => 'post_type',
-					'operator' => '==',
-					'value' => 'tour',
-				],
-			]
-
 		],
 	]);
 });

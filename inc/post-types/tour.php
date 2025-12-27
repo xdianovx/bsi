@@ -362,6 +362,25 @@ add_action('acf/init', function () {
     'menu_order' => 10,
     'fields' => [
       [
+        'key' => 'field_tour_is_popular',
+        'label' => 'Популярный',
+        'name' => 'is_popular',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+        'instructions' => 'Если выбрано, тур отобразится в слайдере популярных туров',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_tour_price_from',
+        'label' => 'Цена от',
+        'name' => 'price_from',
+        'type' => 'number',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'Например: 50000',
+        'instructions' => 'Цена в рублях (только число)',
+      ],
+      [
         'key' => 'field_tour_gallery',
         'label' => 'Галерея тура',
         'name' => 'tour_gallery',

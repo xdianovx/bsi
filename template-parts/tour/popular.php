@@ -1,7 +1,7 @@
 <?php
 
-$popular_hotel_ids = get_posts([
-  'post_type' => 'hotel',
+$popular_tour_ids = get_posts([
+  'post_type' => 'tour',
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'fields' => 'ids',
@@ -19,9 +19,9 @@ $popular_hotel_ids = get_posts([
 
 $country_ids = [];
 
-if (!empty($popular_hotel_ids) && function_exists('get_field')) {
-  foreach ($popular_hotel_ids as $hotel_id) {
-    $c = get_field('hotel_country', $hotel_id);
+if (!empty($popular_tour_ids) && function_exists('get_field')) {
+  foreach ($popular_tour_ids as $tour_id) {
+    $c = get_field('tour_country', $tour_id);
 
     if ($c instanceof WP_Post) {
       $c = (int) $c->ID;
@@ -56,16 +56,16 @@ if (!empty($country_ids)) {
   ]);
 }
 
-$hotel_posts = [];
+$tour_posts = [];
 
-if (!empty($popular_hotel_ids)) {
-  $hotel_posts = get_posts([
-    'post_type' => 'hotel',
+if (!empty($popular_tour_ids)) {
+  $tour_posts = get_posts([
+    'post_type' => 'tour',
     'posts_per_page' => 12,
     'post_status' => 'publish',
     'orderby' => 'date',
     'order' => 'DESC',
-    'post__in' => $popular_hotel_ids,
+    'post__in' => $popular_tour_ids,
     'ignore_sticky_posts' => true,
     'no_found_rows' => true,
     'update_post_meta_cache' => false,
@@ -75,12 +75,12 @@ if (!empty($popular_hotel_ids)) {
 
 $items = [];
 
-foreach ($hotel_posts as $hotel_post) {
-  $hotel_id = (int) $hotel_post->ID;
+foreach ($tour_posts as $tour_post) {
+  $tour_id = (int) $tour_post->ID;
 
   $country_id = 0;
   if (function_exists('get_field')) {
-    $country_val = get_field('hotel_country', $hotel_id);
+    $country_val = get_field('tour_country', $tour_id);
     if ($country_val instanceof WP_Post) {
       $country_id = (int) $country_val->ID;
     } elseif (is_array($country_val)) {
@@ -106,7 +106,7 @@ foreach ($hotel_posts as $hotel_post) {
   }
 
   $region_name = '';
-  $region_terms = wp_get_post_terms($hotel_id, 'region', ['orderby' => 'name', 'order' => 'ASC']);
+  $region_terms = wp_get_post_terms($tour_id, 'region', ['orderby' => 'name', 'order' => 'ASC']);
   if (!is_wp_error($region_terms) && !empty($region_terms)) {
     $region_name = (string) $region_terms[0]->name;
   }
@@ -115,7 +115,7 @@ foreach ($hotel_posts as $hotel_post) {
 
   $price = '';
   if (function_exists('get_field')) {
-    $price_val = get_field('price_from', $hotel_id);
+    $price_val = get_field('price_from', $tour_id);
     if (is_numeric($price_val)) {
       $price = 'от ' . number_format((float) $price_val, 0, '.', ' ') . ' руб';
     } elseif (is_string($price_val) && $price_val !== '') {
@@ -123,16 +123,33 @@ foreach ($hotel_posts as $hotel_post) {
     }
   }
 
+  $duration = '';
+  if (function_exists('get_field')) {
+    $duration_val = get_field('tour_duration', $tour_id);
+    if (is_string($duration_val) && $duration_val !== '') {
+      $duration = (string) $duration_val;
+    }
+  }
+
+  $tour_types = [];
+  $type_terms = wp_get_post_terms($tour_id, 'tour_type', ['orderby' => 'name', 'order' => 'ASC']);
+  if (!is_wp_error($type_terms) && !empty($type_terms)) {
+    $tour_types = array_map(function($term) {
+      return $term->name;
+    }, $type_terms);
+  }
+
   $items[] = [
-    'id' => $hotel_id,
-    'url' => get_permalink($hotel_id),
-    'image' => get_the_post_thumbnail_url($hotel_id, 'large') ?: '',
-    'type' => 'Отель',
-    'tags' => [],
-    'title' => get_the_title($hotel_id),
+    'id' => $tour_id,
+    'url' => get_permalink($tour_id),
+    'image' => get_the_post_thumbnail_url($tour_id, 'large') ?: '',
+    'type' => 'Тур',
+    'tags' => $tour_types,
+    'title' => get_the_title($tour_id),
     'flag' => $flag_url,
     'location_title' => $location_title,
     'price' => $price,
+    'duration' => $duration,
     'country_id' => $country_id,
     'country_slug' => $country_slug,
   ];
@@ -140,24 +157,33 @@ foreach ($hotel_posts as $hotel_post) {
 ?>
 
 <?php if (!empty($items)): ?>
-  <section class="popular-hotels__section">
+  <section class="popular-tours__section">
     <div class="container">
       <div class="title-wrap news-slider__title-wrap">
         <div class="news-slider__title-wrap-left">
-          <h2 class="h2 news-slider__title">Популярные отели</h2>
+          <h2 class="h2 news-slider__title">Популярные туры</h2>
           <div class="slider-arrow-wrap news-slider__arrows-wrap">
-            <div class="slider-arrow slider-arrow-prev popular-hotels-arrow-prev" tabindex="-1" role="button"
-              aria-label="Previous slide" aria-controls="swiper-wrapper-6afd786aee0e5cee" aria-disabled="true">
+            <div class="slider-arrow slider-arrow-prev popular-tours-arrow-prev"
+                 tabindex="-1"
+                 role="button"
+                 aria-label="Previous slide"
+                 aria-controls="swiper-wrapper-popular-tours"
+                 aria-disabled="true">
             </div>
-            <div class="slider-arrow slider-arrow-next popular-hotels-arrow-next" tabindex="0" role="button"
-              aria-label="Next slide" aria-controls="swiper-wrapper-6afd786aee0e5cee" aria-disabled="false">
+            <div class="slider-arrow slider-arrow-next popular-tours-arrow-next"
+                 tabindex="0"
+                 role="button"
+                 aria-label="Next slide"
+                 aria-controls="swiper-wrapper-popular-tours"
+                 aria-disabled="false">
             </div>
           </div>
         </div>
       </div>
 
-      <div class="promo-filter popular-hotels-filter">
-        <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">
+      <div class="promo-filter popular-tours-filter">
+        <button class="promo-filter__btn --all active js-promo-filter-btn"
+                data-country="">
           Все
         </button>
 
@@ -179,12 +205,14 @@ foreach ($hotel_posts as $hotel_post) {
           }
           ?>
 
-          <button class="promo-filter__btn js-promo-filter-btn" data-country="<?php echo esc_attr($country_id); ?>"
-            data-country-slug="<?php echo esc_attr($country_slug); ?>">
+          <button class="promo-filter__btn js-promo-filter-btn"
+                  data-country="<?php echo esc_attr($country_id); ?>"
+                  data-country-slug="<?php echo esc_attr($country_slug); ?>">
             <?php if ($flag_url): ?>
               <span class="promo-filter__flag-wrap">
-                <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($country_title); ?>"
-                  class="promo-filter__flag">
+                <img src="<?php echo esc_url($flag_url); ?>"
+                     alt="<?php echo esc_attr($country_title); ?>"
+                     class="promo-filter__flag">
               </span>
             <?php endif; ?>
 
@@ -193,15 +221,16 @@ foreach ($hotel_posts as $hotel_post) {
         <?php endforeach; ?>
       </div>
 
-      <div class="popular-hotels__content">
-        <div class="swiper popular-hotels-slider">
+      <div class="popular-tours__content">
+        <div class="swiper popular-tours-slider">
           <div class="swiper-wrapper">
             <?php foreach ($items as $item): ?>
-              <div class="swiper-slide" data-country="<?php echo esc_attr($item['country_id']); ?>"
-                data-country-slug="<?php echo esc_attr($item['country_slug']); ?>">
+              <div class="swiper-slide"
+                   data-country="<?php echo esc_attr($item['country_id']); ?>"
+                   data-country-slug="<?php echo esc_attr($item['country_slug']); ?>">
                 <?php
-                set_query_var('hotel', $item);
-                get_template_part('template-parts/hotels/card');
+                set_query_var('tour', $item);
+                get_template_part('template-parts/tour/card');
                 ?>
               </div>
             <?php endforeach; ?>
@@ -212,3 +241,4 @@ foreach ($hotel_posts as $hotel_post) {
     </div>
   </section>
 <?php endif; ?>
+
