@@ -3272,7 +3272,7 @@ input.error {
 }
 
 .hotel-card__anemeties {
-  display: none;
+  display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
   gap: 4px;
