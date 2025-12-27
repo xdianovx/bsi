@@ -53,12 +53,6 @@
               </button>
 
               <div class="js-dropdown-panel">
-                <button class="currency-option"
-                        data-iso="RUB">RUB ₽</button>
-                <button class="currency-option"
-                        data-iso="USD">USD $</button>
-                <button class="currency-option"
-                        data-iso="EUR">EUR €</button>
               </div>
 
             </div>

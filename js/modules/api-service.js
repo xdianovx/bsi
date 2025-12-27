@@ -70,11 +70,24 @@ async function getCurrencyRate(cur, rate) {
   });
 }
 
+async function getCurrencyCurrencies() {
+  return makeDirectApiRequest("Currency_CURRENCIES");
+}
+
+async function getCurrencyRates(currencyIds, baseCurrencyId) {
+  return makeDirectApiRequest("Currency_RATES", {
+    CURRENCY: currencyIds.join(","),
+    CURRENCYBASE: baseCurrencyId,
+  });
+}
+
 export const APIService = {
   getTownFroms,
   getStates,
   getAllTours,
   getCurrencyRate,
+  getCurrencyCurrencies,
+  getCurrencyRates,
   getHotelTownFroms,
   getExcursionTownFrom,
 };
