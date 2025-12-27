@@ -237,7 +237,7 @@ if (function_exists('get_field')) {
     <div class="hotel-card__meta">
       <?php if ($price_value): ?>
         <div class="hotel-card__price">
-          от <?php echo esc_html($price_value); ?> ₽
+          от <?php echo esc_html($price_value); ?>
           <?php if ($price_text): ?>
             <span class="hotel-card__price-text">/ <?php echo esc_html($price_text); ?></span>
           <?php endif; ?>
