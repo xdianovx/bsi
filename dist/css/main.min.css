@@ -3265,7 +3265,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .main-banner__slide {
-    aspect-ratio: 9/12;
+    aspect-ratio: 10/12;
   }
 }
 
