@@ -2855,6 +2855,9 @@ input.error {
   gap: 8px;
   position: relative;
 }
+.hotel-card:hover {
+  color: inherit;
+}
 .hotel-card:hover .hotel-card__media img {
   transform: scale(1.05);
 }
