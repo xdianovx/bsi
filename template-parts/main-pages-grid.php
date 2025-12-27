@@ -38,8 +38,9 @@ $main_page_items = [
      ],
      [
           'title' => "Образование <br> за рубежом",
-          'url' => get_permalink(get_page_by_path('obrazovanie-za-rubezhom')),
-          'target' => '',
+          // 'url' => get_permalink(get_page_by_path('obrazovanie-za-rubezhom')),
+          'url' => 'https://www.bsistudy.ru',
+          'target' => '_blank',
           'img' => 'edu.png',
      ],
      [
