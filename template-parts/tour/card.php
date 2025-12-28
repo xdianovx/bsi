@@ -105,6 +105,18 @@ if (function_exists('get_field')) {
   </a>
 
   <div class="hotel-card__body">
+    <div class="hotel-card__location tour-card__location">
+      <?php if ($tour_flag): ?>
+        <div class="hotel-card__flag">
+          <img src="<?php echo esc_url($tour_flag); ?>" alt="">
+        </div>
+      <?php endif; ?>
+      <?php if ($country_title): ?>
+        <div class="hotel-card__location-text">
+          <?php echo esc_html($country_title); ?>
+        </div>
+      <?php endif; ?>
+    </div>
     <h3 class="hotel-card__title"><?php echo esc_html($tour_title); ?></h3>
 
     <?php if (!empty($tour_includes)): ?>
@@ -152,18 +164,7 @@ if (function_exists('get_field')) {
       </div>
     <?php endif; ?>
 
-    <div class="hotel-card__location tour-card__location">
-      <?php if ($tour_flag): ?>
-        <div class="hotel-card__flag">
-          <img src="<?php echo esc_url($tour_flag); ?>" alt="">
-        </div>
-      <?php endif; ?>
-      <?php if ($country_title): ?>
-        <div class="hotel-card__location-text">
-          <?php echo esc_html($country_title); ?>
-        </div>
-      <?php endif; ?>
-    </div>
+
 
     <?php if ($nights > 0 || $checkin_dates || $excursions_count > 0): ?>
       <div class="tour-card__booking-info">
