@@ -390,13 +390,30 @@
   position: relative;
 }
 
+.hotel-card__includes {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .hotel-card__includes-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  .hotel-card__anemeties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+
 .hotel-card__anemeties {
-  // display: flex;
   display: none;
   flex-wrap: wrap;
   margin-top: 8px;
   gap: 4px;
-  flex-wrap: wrap;
 }
 
 .hotel-card__anemetie {

@@ -3270,12 +3270,28 @@ input.error {
   position: relative;
 }
 
+.hotel-card__includes {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.hotel-card__includes .hotel-card__includes-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+}
+.hotel-card__includes .hotel-card__anemeties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
 .hotel-card__anemeties {
   display: none;
   flex-wrap: wrap;
   margin-top: 8px;
   gap: 4px;
-  flex-wrap: wrap;
 }
 
 .hotel-card__anemetie {
@@ -7435,6 +7451,27 @@ input.error {
 
 .tour-card:hover {
   color: inherit;
+}
+
+.tour-card__anemeties {
+  margin-top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tour-card__includes {
+  margin-top: 4px;
+}
+
+.tour-card__booking-info {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #5c5c5c;
+}
+
+.tour-card__location {
+  margin-top: 12px;
 }
 
 .visa-page__content {

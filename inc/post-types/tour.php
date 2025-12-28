@@ -317,8 +317,8 @@ add_action('acf/init', function () {
     return;
 
   acf_add_local_field_group([
-    'key' => 'group_tour_country',
-    'title' => 'Тур — страна',
+    'key' => 'group_tour_geo',
+    'title' => 'Тур — ГЕО',
     'position' => 'acf_after_title',
     'menu_order' => 0,
     'fields' => [
@@ -332,16 +332,8 @@ add_action('acf/init', function () {
         'ui' => 1,
         'ajax' => 1,
         'required' => 1,
-        'wrapper' => ['width' => '50'],
-      ],
-      [
-        'key' => 'field_tour_booking_url',
-        'label' => 'Ссылка для бронирования',
-        'name' => 'tour_booking_url',
-        'type' => 'url',
         'wrapper' => ['width' => '100'],
-        'placeholder' => 'https://...',
-        'instructions' => 'Обычная ссылка для бронирования или ссылка на поиск экскурсии из Самотура (https://online.bsigroup.ru/search_excursion?TOWNFROMINC=1&STATEINC=32&TOURINC=635). Если это ссылка на поиск экскурсии, будут автоматически загружены цены по звездности отелей.',
+        'instructions' => 'Выберите страну тура. Курорты выбираются через таксономию "Курорты" справа.',
       ],
     ],
     'location' => [
@@ -356,8 +348,8 @@ add_action('acf/init', function () {
   ]);
 
   acf_add_local_field_group([
-    'key' => 'group_tour_fields',
-    'title' => 'Тур — поля',
+    'key' => 'group_tour_main',
+    'title' => 'Тур — Основная информация',
     'position' => 'normal',
     'menu_order' => 10,
     'fields' => [
@@ -381,18 +373,77 @@ add_action('acf/init', function () {
         'instructions' => 'Цена в рублях (только число)',
       ],
       [
-        'key' => 'field_tour_gallery',
-        'label' => 'Галерея тура',
-        'name' => 'tour_gallery',
-        'type' => 'gallery',
-        'return_format' => 'array',
-        'preview_size' => 'medium',
-        'insert' => 'append',
-        'library' => 'all',
-        'min' => 0,
-        'max' => 30,
-        'wrapper' => ['width' => '100'],
+        'key' => 'field_tour_price_text',
+        'label' => 'Текст к цене',
+        'name' => 'tour_price_text',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'Например: за 7 ночей',
+        'instructions' => 'Дополнительный текст к цене',
       ],
+      [
+        'key' => 'field_tour_nights',
+        'label' => 'Количество ночей',
+        'name' => 'tour_nights',
+        'type' => 'number',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'Например: 7',
+        'instructions' => 'Количество ночей в туре',
+      ],
+      [
+        'key' => 'field_tour_checkin_dates',
+        'label' => 'Даты заездов',
+        'name' => 'tour_checkin_dates',
+        'type' => 'text',
+        'wrapper' => ['width' => '100'],
+        'placeholder' => 'Например: 15 марта, 22 марта, 29 марта',
+        'instructions' => 'Даты заездов (можно указать несколько через запятую)',
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'tour',
+        ],
+      ],
+    ],
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_tour_booking',
+    'title' => 'Тур — Бронирование',
+    'position' => 'normal',
+    'menu_order' => 20,
+    'fields' => [
+      [
+        'key' => 'field_tour_booking_url',
+        'label' => 'Ссылка для бронирования',
+        'name' => 'tour_booking_url',
+        'type' => 'url',
+        'wrapper' => ['width' => '100'],
+        'placeholder' => 'https://...',
+        'instructions' => 'Обычная ссылка для бронирования или ссылка на поиск экскурсии из Самотура (https://online.bsigroup.ru/search_excursion?TOWNFROMINC=1&STATEINC=32&TOURINC=635). Если это ссылка на поиск экскурсии, будут автоматически загружены цены по звездности отелей.',
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'tour',
+        ],
+      ],
+    ],
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_tour_program',
+    'title' => 'Тур — Программа',
+    'position' => 'normal',
+    'menu_order' => 30,
+    'fields' => [
       [
         'key' => 'field_tour_duration',
         'label' => 'Продолжительность',
@@ -437,6 +488,24 @@ add_action('acf/init', function () {
           ],
         ],
       ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'tour',
+        ],
+      ],
+    ],
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_tour_included',
+    'title' => 'Тур — Включено/Не включено',
+    'position' => 'normal',
+    'menu_order' => 40,
+    'fields' => [
       [
         'key' => 'field_tour_included',
         'label' => 'В стоимость включено',
@@ -463,6 +532,37 @@ add_action('acf/init', function () {
         'tabs' => 'all',
         'toolbar' => 'full',
         'media_upload' => 0,
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'tour',
+        ],
+      ],
+    ],
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_tour_media',
+    'title' => 'Тур — Медиа',
+    'position' => 'normal',
+    'menu_order' => 50,
+    'fields' => [
+      [
+        'key' => 'field_tour_gallery',
+        'label' => 'Галерея тура',
+        'name' => 'tour_gallery',
+        'type' => 'gallery',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'insert' => 'append',
+        'library' => 'all',
+        'min' => 0,
+        'max' => 30,
+        'wrapper' => ['width' => '100'],
       ],
     ],
     'location' => [

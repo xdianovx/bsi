@@ -841,3 +841,24 @@
     color: inherit;
   }
 }
+
+.tour-card__anemeties {
+  margin-top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tour-card__includes {
+  margin-top: 4px;
+}
+
+.tour-card__booking-info {
+  margin-top: 8px;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.tour-card__location {
+  margin-top: 12px;
+}
