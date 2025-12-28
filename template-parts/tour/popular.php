@@ -116,10 +116,12 @@ foreach ($tour_posts as $tour_post) {
   $price = '';
   if (function_exists('get_field')) {
     $price_val = get_field('price_from', $tour_id);
+    $show_from = get_field('show_price_from', $tour_id) !== false;
     if (is_numeric($price_val)) {
-      $price = 'от ' . number_format((float) $price_val, 0, '.', ' ') . ' руб';
+      $price_formatted = number_format((float) $price_val, 0, '.', ' ') . ' руб';
+      $price = format_price_with_from($price_formatted, $show_from);
     } elseif (is_string($price_val) && $price_val !== '') {
-      $price = $price_val;
+      $price = format_price_with_from($price_val, $show_from);
     }
   }
 

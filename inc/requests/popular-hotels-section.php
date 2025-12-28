@@ -70,11 +70,14 @@ function bsi_ajax_popular_hotels_by_country()
       $price_text = '';
       $nights = 0;
       $checkin_date = '';
+      $show_from = true;
       if (function_exists('get_field')) {
         $price = get_field('price', $hotel_id);
+        $show_from_field = get_field('show_price_from', $hotel_id);
+        $show_from = $show_from_field !== false;
         if ($price) {
           if (is_numeric($price)) {
-            $price_value = number_format((float) $price, 0, '.', ' ') . ' ₽';
+            $price_value = number_format((float) $price, 0, '.', ' ');
           } elseif (is_string($price)) {
             $price_value = $price;
           }
@@ -111,6 +114,7 @@ function bsi_ajax_popular_hotels_by_country()
         'price_text' => $price_text,
         'nights' => $nights,
         'checkin_date' => $checkin_date,
+        'show_price_from' => $show_from,
       ];
 
       echo '<div class="swiper-slide">';

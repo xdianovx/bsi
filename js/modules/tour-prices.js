@@ -27,6 +27,8 @@ export const tourPrices = () => {
   const townFromInc = wrap.getAttribute("data-town-from-inc");
   const stateInc = wrap.getAttribute("data-state-inc");
   const tours = wrap.getAttribute("data-tours");
+  const showPriceFromAttr = wrap.getAttribute("data-show-price-from");
+  const showPriceFrom = showPriceFromAttr === null || showPriceFromAttr === "1";
 
   if (!tourId || !townFromInc || !stateInc || !tours) {
     return;
@@ -122,6 +124,27 @@ export const tourPrices = () => {
   function formatPrice(price) {
     if (!price || isNaN(price)) return "0";
     return parseInt(price, 10).toLocaleString("ru-RU");
+  }
+
+  function formatPriceWithFrom(priceText, showFrom) {
+    if (!priceText) return "";
+    
+    priceText = priceText.replace(/₽/g, "руб");
+    
+    const priceLower = priceText.toLowerCase();
+    const hasRub = priceLower.includes("руб");
+    
+    if (!hasRub) {
+      priceText = priceText + " руб";
+    }
+    
+    if (priceLower.includes("от")) {
+      return priceText;
+    }
+    if (!showFrom) {
+      return priceText;
+    }
+    return "от " + priceText;
   }
 
   function sendGTMEvent(eventName, data = {}) {
@@ -488,7 +511,7 @@ export const tourPrices = () => {
                 : ""
             }
             <div class="tour-prices__star-footer">
-              <div class="tour-prices__star-price">от ${formatPrice(item.minPrice)} ₽</div>
+              <div class="tour-prices__star-price">${formatPriceWithFrom(formatPrice(item.minPrice), showPriceFrom)}</div>
               <button class="btn btn-accent sm tour-prices__card-book-btn" type="button" data-hotel-id="${hotelId}">
                 Забронировать
               </button>

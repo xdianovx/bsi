@@ -24,6 +24,7 @@ $address = function_exists('get_field') ? get_field('address', $hotel_id) : '';
 $phone = function_exists('get_field') ? get_field('phone', $hotel_id) : '';
 $website = function_exists('get_field') ? get_field('website', $hotel_id) : '';
 $price = function_exists('get_field') ? get_field('price', $hotel_id) : '';
+$show_from = function_exists('get_field') ? (bool) get_field('show_price_from', $hotel_id) : false;
 $check_in = function_exists('get_field') ? get_field('check_in_time', $hotel_id) : '';
 $check_out = function_exists('get_field') ? get_field('check_out_time', $hotel_id) : '';
 $wifi = function_exists('get_field') ? get_field('wifi', $hotel_id) : '';
@@ -77,7 +78,7 @@ if ($check_out)
 // цена
 $price_text = trim((string) $price);
 if (!$price_text)
-  $price_text = 'от 125 000 руб';
+  $price_text = '125 000 руб';
 ?>
 
 <div class="hotel-card-row"
@@ -155,7 +156,7 @@ if (!$price_text)
 
     <!-- CTA -->
     <div class="hotel-card-cta">
-      <div class="hotel-card-cta__price numfont"><?= format_price_text(esc_html($price_text)); ?></div>
+      <div class="hotel-card-cta__price numfont"><?= format_price_text(format_price_with_from($price_text, $show_from)); ?></div>
 
       <div class="hotel-card__buttons">
         <a href="<?= esc_url($link); ?>"

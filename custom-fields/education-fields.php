@@ -31,6 +31,16 @@ function bsi_register_education_acf_groups(): void
         'wrapper' => ['width' => '50'],
       ],
       [
+        'key' => 'field_education_show_price_from',
+        'label' => 'Показывать "от" перед ценой',
+        'name' => 'show_price_from',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+        'instructions' => 'Если включено, перед ценой будет добавлен префикс "от"',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
         'key' => 'field_education_map_lat',
         'label' => 'Широта (lat)',
         'name' => 'education_map_lat',

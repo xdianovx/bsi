@@ -72,6 +72,8 @@ if (!is_wp_error($include_terms) && !empty($include_terms)) {
 
 if (function_exists('get_field')) {
   $price_val = get_field('price_from', $tour_id);
+  $show_from_field = get_field('show_price_from', $tour_id);
+  $show_from = $show_from_field !== false;
   if (is_numeric($price_val)) {
     $price_value = number_format((float) $price_val, 0, '.', ' ');
   } elseif (is_string($price_val) && $price_val !== '') {
@@ -207,7 +209,7 @@ if (function_exists('get_field')) {
       <?php if ($booking_url && $price_value): ?>
         <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
           target="_blank" rel="noopener nofollow">
-          от <?php echo esc_html($price_value); ?> ₽
+          <?php echo esc_html(format_price_with_from($price_value, $show_from)); ?>
         </a>
       <?php endif; ?>
     </div>

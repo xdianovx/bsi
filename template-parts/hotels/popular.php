@@ -121,10 +121,13 @@ foreach ($hotel_posts as $hotel_post) {
   $price_text = '';
   $nights = 0;
   $checkin_date = '';
+  $show_from = true;
   if (function_exists('get_field')) {
     $price_val = get_field('price', $hotel_id);
+    $show_from_field = get_field('show_price_from', $hotel_id);
+    $show_from = $show_from_field !== false;
     if (is_numeric($price_val)) {
-      $price = number_format((float) $price_val, 0, '.', ' ') . ' ₽';
+      $price = number_format((float) $price_val, 0, '.', ' ');
     } elseif (is_string($price_val) && $price_val !== '') {
       $price = $price_val;
     }
@@ -162,6 +165,7 @@ foreach ($hotel_posts as $hotel_post) {
     'checkin_date' => $checkin_date,
     'country_id' => $country_id,
     'country_slug' => $country_slug,
+    'show_price_from' => $show_from,
   ];
 }
 ?>

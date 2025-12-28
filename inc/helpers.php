@@ -49,6 +49,34 @@ function format_price_text(?string $text): string
   }, $text);
 }
 
+function format_price_with_from(?string $price, bool $show_from = true): string
+{
+  $price = trim((string) $price);
+  if ($price === '')
+    return '';
+
+  $price_lower_original = mb_strtolower($price, 'UTF-8');
+  $has_rub = mb_strpos($price_lower_original, 'руб') !== false || mb_strpos($price_lower_original, '₽') !== false;
+  
+  $price = str_replace('₽', 'руб', $price);
+  
+  if (!$has_rub) {
+    $price = $price . ' руб';
+  }
+
+  $price_lower = mb_strtolower($price, 'UTF-8');
+  
+  if (!$show_from) {
+    return $price;
+  }
+
+  if (mb_strpos($price_lower, 'от') !== false) {
+    return $price;
+  }
+
+  return 'от ' . $price;
+}
+
 function offer_get_country_flag_url($country_id): string
 {
   if (!$country_id)

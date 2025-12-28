@@ -16,7 +16,7 @@ $location_extra = $best_offer['location_extra'] ?? '';
 $flag_url = (string) ($best_offer['flag'] ?? '');
 
 $price_raw = $best_offer['price'] ?? '';
-$price = format_price_text($price_raw);
+$price = format_price_with_from($price_raw, true);
 ?>
 
 <a href="<?= esc_url($url); ?>"

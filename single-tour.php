@@ -95,13 +95,18 @@ get_header();
 
 
   <?php if (!empty($excursion_params) && !empty($excursion_params['TOURS'])): ?>
+    <?php
+    $show_price_from_field = function_exists('get_field') ? get_field('show_price_from', $post_id) : null;
+    $show_price_from = $show_price_from_field !== false;
+    ?>
     <section class="tour-prices-section">
       <div class="container">
         <div class="tour-prices-gtm">
           <div class="tour-prices__wrap" data-tour-id="<?= esc_attr($post_id); ?>"
             data-town-from-inc="<?= esc_attr($excursion_params['TOWNFROMINC'] ?? ''); ?>"
             data-state-inc="<?= esc_attr($excursion_params['STATEINC'] ?? ''); ?>"
-            data-tours="<?= esc_attr($excursion_params['TOURS'] ?? ''); ?>">
+            data-tours="<?= esc_attr($excursion_params['TOURS'] ?? ''); ?>"
+            data-show-price-from="<?= esc_attr($show_price_from ? '1' : '0'); ?>">
             <div class="tour-prices__filters-wrap">
               <!-- Звездность отеля -->
               <div class="tour-prices__filter">

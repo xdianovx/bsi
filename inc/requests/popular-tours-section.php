@@ -68,11 +68,13 @@ function bsi_ajax_popular_tours_by_country()
       $price_text = '';
       if (function_exists('get_field')) {
         $price = get_field('price_from', $tour_id);
+        $show_from = get_field('show_price_from', $tour_id) !== false;
         if ($price) {
           if (is_numeric($price)) {
-            $price_text = 'от ' . number_format((float) $price, 0, '.', ' ') . ' руб';
+            $price_formatted = number_format((float) $price, 0, '.', ' ') . ' руб';
+            $price_text = format_price_with_from($price_formatted, $show_from);
           } elseif (is_string($price) && $price !== '') {
-            $price_text = $price;
+            $price_text = format_price_with_from($price, $show_from);
           }
         }
       }

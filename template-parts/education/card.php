@@ -56,8 +56,11 @@ if ($thumb) {
 }
 
 $price = '';
+$show_from = true;
 if (function_exists('get_field')) {
   $price = (string) get_field('education_price', $education_id);
+  $show_from_field = get_field('show_price_from', $education_id);
+  $show_from = $show_from_field !== false;
 }
 
 // Получаем языки обучения
@@ -90,7 +93,7 @@ if (function_exists('get_field')) {
     if (!empty($prices)) {
       $min_price_value = min($prices);
       // Форматируем цену
-      $min_price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+      $min_price = number_format($min_price_value, 0, ',', ' ') . ' руб/неделя';
     }
   }
 }
@@ -149,11 +152,11 @@ $excerpt = get_the_excerpt($education_id);
     <div class="education-card__footer">
       <?php if (!empty($min_price)): ?>
         <div class="education-card__price">
-          от <?php echo esc_html($min_price); ?>
+          <?php echo esc_html(format_price_with_from($min_price, $show_from)); ?>
         </div>
       <?php elseif (!empty($price)): ?>
         <div class="education-card__price">
-          <?php echo esc_html($price); ?>
+          <?php echo esc_html(format_price_with_from($price, $show_from)); ?>
         </div>
       <?php endif; ?>
     </div>

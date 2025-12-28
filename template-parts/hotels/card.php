@@ -26,6 +26,7 @@ if ($hotel && is_array($hotel)) {
   $price_text = !empty($hotel['price_text']) ? (string) $hotel['price_text'] : '';
   $nights = !empty($hotel['nights']) ? (int) $hotel['nights'] : 0;
   $checkin_date = !empty($hotel['checkin_date']) ? (string) $hotel['checkin_date'] : '';
+  $show_from = isset($hotel['show_price_from']) ? ($hotel['show_price_from'] !== false) : true;
 } else {
   $hotel_id = get_the_ID();
   if (!$hotel_id) {
@@ -98,13 +99,18 @@ if (function_exists('get_field')) {
 
   if (!$price_value) {
     $price_val = get_field('price', $hotel_id);
+    $show_from_field = get_field('show_price_from', $hotel_id);
+    $show_from = $show_from_field !== false;
     if ($price_val) {
       if (is_numeric($price_val)) {
-        $price_value = number_format((float) $price_val, 0, '.', ' ') . ' ₽';
+        $price_value = number_format((float) $price_val, 0, '.', ' ');
       } elseif (is_string($price_val)) {
         $price_value = $price_val;
       }
     }
+  } else {
+    $show_from_field = get_field('show_price_from', $hotel_id);
+    $show_from = $show_from_field !== false;
   }
 
   if (!$price_text) {
@@ -302,7 +308,7 @@ if (function_exists('get_field')) {
       <?php if ($booking_url && $price_value): ?>
         <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
           target="_blank" rel="noopener nofollow">
-          от <?php echo esc_html($price_value); ?>
+          <?php echo esc_html(format_price_with_from($price_value, $show_from)); ?>
         </a>
       <?php endif; ?>
     </div>
