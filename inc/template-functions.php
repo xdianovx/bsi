@@ -76,17 +76,9 @@ function bsi_prepare_offer_item( $row ) {
 	$location_title = $row['location_override'] ?? '';
 	$price = $row['price'] ?? '';
 
-	$resort_name = '';
-	if ( ! $location_title ) {
-		$resort_terms = get_the_terms( $post_id, 'resort' );
-		if ( ! empty( $resort_terms ) && ! is_wp_error( $resort_terms ) ) {
-			$resort_name = $resort_terms[0]->name;
-		}
-		$location_title = $resort_name;
-	}
-
 	$flag_url = '';
 	$country_id = 0;
+	$country_title = '';
 
 	if ( $post_type === 'hotel' && function_exists( 'get_field' ) ) {
 		$country_val = get_field( 'hotel_country', $post_id );
@@ -108,8 +100,44 @@ function bsi_prepare_offer_item( $row ) {
 		}
 	}
 
-	if ( $country_id && function_exists( 'offer_get_country_flag_url' ) ) {
-		$flag_url = offer_get_country_flag_url( $country_id );
+	if ( $country_id ) {
+		$country_title = get_the_title( $country_id );
+		if ( function_exists( 'offer_get_country_flag_url' ) ) {
+			$flag_url = offer_get_country_flag_url( $country_id );
+		}
+	}
+
+	$location_extra = '';
+	if ( ! $location_title ) {
+		$resort_terms = get_the_terms( $post_id, 'resort' );
+		if ( ! empty( $resort_terms ) && ! is_wp_error( $resort_terms ) ) {
+			$resort_count = count( $resort_terms );
+			if ( $resort_count > 0 ) {
+				$location_title = $resort_terms[0]->name;
+				if ( $resort_count > 1 ) {
+					$remaining = $resort_count - 1;
+					$resort_word = '';
+					$last_digit = $remaining % 10;
+					$last_two_digits = $remaining % 100;
+					
+					if ( $last_two_digits >= 11 && $last_two_digits <= 14 ) {
+						$resort_word = 'курортов';
+					} elseif ( $last_digit === 1 ) {
+						$resort_word = 'курорт';
+					} elseif ( $last_digit >= 2 && $last_digit <= 4 ) {
+						$resort_word = 'курорта';
+					} else {
+						$resort_word = 'курортов';
+					}
+					
+					$location_extra = sprintf( 'и еще %d %s', $remaining, $resort_word );
+				}
+			}
+		}
+
+		if ( ! $location_title && $country_title ) {
+			$location_title = $country_title;
+		}
 	}
 
 	return [
@@ -120,6 +148,7 @@ function bsi_prepare_offer_item( $row ) {
 		'title'          => $title,
 		'flag'           => $flag_url,
 		'location_title' => $location_title,
+		'location_extra' => $location_extra,
 		'price'          => $price,
 		'post_id'        => $post_id,
 	];

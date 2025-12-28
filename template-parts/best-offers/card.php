@@ -11,6 +11,7 @@ $type = $best_offer['type'] ?? '';
 $tags = $best_offer['tags'] ?? [];
 $title = $best_offer['title'] ?? '';
 $location_title = $best_offer['location_title'] ?? '';
+$location_extra = $best_offer['location_extra'] ?? '';
 $flag_url = (string) ($best_offer['flag'] ?? '');
 
 $price_raw = $best_offer['price'] ?? '';
@@ -61,7 +62,12 @@ $price = format_price_text($price_raw);
           </div>
         <?php endif; ?>
         <?php if ($location_title): ?>
-          <div class="best-offer-card__location-title"><?= esc_html($location_title); ?></div>
+          <div class="best-offer-card__location-title">
+            <?= esc_html($location_title); ?>
+            <?php if ($location_extra): ?>
+              <span class="best-offer-card__location-extra"><?= esc_html($location_extra); ?></span>
+            <?php endif; ?>
+          </div>
         <?php endif; ?>
       </div>
     <?php endif; ?>
