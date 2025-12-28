@@ -27,6 +27,10 @@
   aspect-ratio: 16/9;
   border-radius: 8px;
   overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+
   img {
     width: 100%;
     height: 100%;

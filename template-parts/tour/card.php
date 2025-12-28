@@ -100,9 +100,9 @@ if (function_exists('get_field')) {
 }
 ?>
 <div class="hotel-card tour-card">
-  <div class="hotel-card__media">
+  <a href="<?php echo esc_url($tour_url); ?>" class="hotel-card__media">
     <img src="<?php echo esc_url($tour_image); ?>" alt="<?php echo esc_attr($tour_title); ?>" class="hotel-card__image">
-  </div>
+  </a>
 
   <div class="hotel-card__body">
     <h3 class="hotel-card__title"><?php echo esc_html($tour_title); ?></h3>

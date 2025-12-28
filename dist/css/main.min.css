@@ -2913,6 +2913,9 @@ input.error {
   aspect-ratio: 16/9;
   border-radius: 8px;
   overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 .hotel-card__media img {
   width: 100%;
