@@ -4989,6 +4989,7 @@ input.error {
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
+  margin-left: auto;
 }
 @media screen and (max-width: 768px) {
   .insurance_item_content {
