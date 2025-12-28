@@ -22,14 +22,14 @@
         <div class="features-row">
           <div class="features-item">
             <div class="features-item__title">3 000</div>
-            <div class="features-item__subtitle">Турагенств</div>
+            <div class="features-item__subtitle">турагенств</div>
 
             <img class="features-item__img" src="<?php echo get_template_directory_uri(); ?>/img/features/3.png"
               alt="3 000 турагенств">
           </div>
           <div class="features-item">
             <div class="features-item__title">> 30</div>
-            <div class="features-item__subtitle">Стран и направлений</div>
+            <div class="features-item__subtitle">стран и направлений</div>
 
             <img class="features-item__img" src="<?php echo get_template_directory_uri(); ?>/img/features/4.png"
               alt="30 стран и направлений">
