@@ -1673,7 +1673,7 @@ input.error {
 }
 
 .best-offers__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .best-offers__section {
@@ -2140,7 +2140,7 @@ input.error {
   }
 }
 .features-section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .features-section {
@@ -2884,7 +2884,7 @@ input.error {
   }
 }
 .popular-hotels__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .popular-hotels__section {
@@ -3842,7 +3842,7 @@ input.error {
 }
 
 .partners-slider__section {
-  margin-top: 120px;
+  margin-top: 80px;
   overflow-x: hidden;
 }
 
@@ -3869,7 +3869,7 @@ input.error {
   }
 }
 .promo-banner__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .promo-banner__section {
@@ -3915,7 +3915,7 @@ input.error {
   }
 }
 .subscribe-section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .subscribe-section {
@@ -5211,7 +5211,7 @@ input.error {
 }
 
 .news-slider__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 
 .news-slider__title-wrap {
@@ -7449,7 +7449,7 @@ input.error {
 }
 
 .popular-tours__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1024px) {
   .popular-tours__section {
