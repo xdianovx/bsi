@@ -156,6 +156,74 @@ function samo_ajax()
       }
       return $send(SamoService::endpoints()->searchExcursionAll($params));
 
+    // Авиабилеты
+    case 'tickets_transporttypes':
+      $params = [];
+      if (isset($_POST['WITH_CHARTER'])) {
+        $params['WITH_CHARTER'] = (int) $_POST['WITH_CHARTER'];
+      }
+      if (isset($_POST['WITH_REGULAR'])) {
+        $params['WITH_REGULAR'] = (int) $_POST['WITH_REGULAR'];
+      }
+      return $send(SamoService::endpoints()->ticketsTransportTypes($params));
+
+    case 'tickets_sources':
+      $params = [];
+      if (isset($_POST['SUGGEST'])) {
+        $params['SUGGEST'] = sanitize_text_field($_POST['SUGGEST']);
+      }
+      if (isset($_POST['WITH_CHARTER'])) {
+        $params['WITH_CHARTER'] = (int) $_POST['WITH_CHARTER'];
+      }
+      if (isset($_POST['WITH_REGULAR'])) {
+        $params['WITH_REGULAR'] = (int) $_POST['WITH_REGULAR'];
+      }
+      if (isset($_POST['TRANSPORTTYPE'])) {
+        $params['TRANSPORTTYPE'] = (int) $_POST['TRANSPORTTYPE'];
+      }
+      return $send(SamoService::endpoints()->ticketsSources($params));
+
+    case 'tickets_targets':
+      $params = [];
+      if (isset($_POST['SUGGEST'])) {
+        $params['SUGGEST'] = sanitize_text_field($_POST['SUGGEST']);
+      }
+      if (isset($_POST['SOURCE'])) {
+        $params['SOURCE'] = sanitize_text_field($_POST['SOURCE']);
+      }
+      if (isset($_POST['WITH_CHARTER'])) {
+        $params['WITH_CHARTER'] = (int) $_POST['WITH_CHARTER'];
+      }
+      if (isset($_POST['WITH_REGULAR'])) {
+        $params['WITH_REGULAR'] = (int) $_POST['WITH_REGULAR'];
+      }
+      if (isset($_POST['TRANSPORTTYPE'])) {
+        $params['TRANSPORTTYPE'] = (int) $_POST['TRANSPORTTYPE'];
+      }
+      return $send(SamoService::endpoints()->ticketsTargets($params));
+
+    case 'tickets_all':
+      $params = [];
+      if (isset($_POST['SOURCE'])) {
+        $params['SOURCE'] = sanitize_text_field($_POST['SOURCE']);
+      }
+      if (isset($_POST['TARGET'])) {
+        $params['TARGET'] = sanitize_text_field($_POST['TARGET']);
+      }
+      if (isset($_POST['FREIGHTBACK'])) {
+        $params['FREIGHTBACK'] = (int) $_POST['FREIGHTBACK'];
+      }
+      if (isset($_POST['WITH_CHARTER'])) {
+        $params['WITH_CHARTER'] = (int) $_POST['WITH_CHARTER'];
+      }
+      if (isset($_POST['WITH_REGULAR'])) {
+        $params['WITH_REGULAR'] = (int) $_POST['WITH_REGULAR'];
+      }
+      if (isset($_POST['TRANSPORTTYPE'])) {
+        $params['TRANSPORTTYPE'] = (int) $_POST['TRANSPORTTYPE'];
+      }
+      return $send(SamoService::endpoints()->ticketsAll($params));
+
     default:
       wp_send_json_error(['message' => 'Unknown endpoint'], 400);
   }

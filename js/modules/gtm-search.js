@@ -44,13 +44,19 @@ export const gtmSearch = async () => {
   const initedTabs = new Set();
 
   function setActiveTab(index) {
+    const name = tabNames[index];
+    
+    if (name === "tickets") {
+      window.open("https://online.bsigroup.ru/tickets", "_blank");
+      return;
+    }
+
     tabButtons.forEach((b) => b.classList.remove("active"));
     tabPanels.forEach((p) => p.classList.remove("active"));
 
     tabButtons[index]?.classList.add("active");
     tabPanels[index]?.classList.add("active");
 
-    const name = tabNames[index];
     if (name) initTab(name).catch(() => {});
   }
 
@@ -64,7 +70,7 @@ export const gtmSearch = async () => {
 
     if (name === "tours") await initToursTab();
     if (name === "hotels") await initHotelsTab();
-    // tickets/excursions потом
+    if (name === "excursions") await initExcursionsTab();
 
     initedTabs.add(name);
   }
@@ -413,7 +419,161 @@ export const gtmSearch = async () => {
   }
 
   // ============================================================
-  // 6) Стартуем: активный таб (по разметке уже active)
+  // 6) ТАБ "Экскурсионные туры"
+  // ============================================================
+  async function initExcursionsTab() {
+    const rootEl = section.querySelector('.gtm-search__item[data-tab="excursions"]');
+    if (!rootEl) return;
+
+    section.classList.add("is-loading");
+
+    dropdown('[data-tab="excursions"] .gtm-nights-select');
+    dropdown('[data-tab="excursions"] .gtm-persons-select');
+
+    const stateSelectElement = rootEl.querySelector(".gtm-state-select");
+    const submitBtn = rootEl.querySelector(".gtm-item__button");
+
+    const searchParams = {
+      activeState: "",
+      nightsFrom: 5,
+      nightsTill: 10,
+      checkInStart: "20251210",
+      checkInEnd: "20251219",
+      adultsCount: "2",
+      childCount: "0",
+      childAges: "",
+    };
+
+    let excursionLink = "";
+
+    function formatDateYYYYMMDD(date) {
+      return date.getFullYear() + String(date.getMonth() + 1).padStart(2, "0") + String(date.getDate()).padStart(2, "0");
+    }
+
+    function updateLink(params = {}) {
+      Object.assign(searchParams, params);
+
+      if (searchParams.checkInStart instanceof Date) {
+        searchParams.checkInStart = formatDateYYYYMMDD(searchParams.checkInStart);
+      }
+      if (searchParams.checkInEnd instanceof Date) {
+        searchParams.checkInEnd = formatDateYYYYMMDD(searchParams.checkInEnd);
+      }
+
+      const paramsArray = [];
+      paramsArray.push(`TOWNFROMINC=1`);
+      if (searchParams.activeState) paramsArray.push(`STATEINC=${searchParams.activeState}`);
+      if (searchParams.checkInStart) paramsArray.push(`CHECKIN_BEG=${searchParams.checkInStart}`);
+      if (searchParams.checkInEnd) paramsArray.push(`CHECKIN_END=${searchParams.checkInEnd}`);
+      if (searchParams.nightsFrom) paramsArray.push(`NIGHTS_FROM=${searchParams.nightsFrom}`);
+      if (searchParams.nightsTill) paramsArray.push(`NIGHTS_TILL=${searchParams.nightsTill}`);
+      if (searchParams.adultsCount) paramsArray.push(`ADULT=${searchParams.adultsCount}`);
+      paramsArray.push(`CURRENCY=1`);
+      if (searchParams.childCount) paramsArray.push(`CHILD=${searchParams.childCount}`);
+      paramsArray.push(`TOWNS_ANY=1`);
+      paramsArray.push(`STARS_ANY=1`);
+      paramsArray.push(`HOTELS_ANY=1`);
+      paramsArray.push(`MEALS_ANY=1`);
+      paramsArray.push(`ROOMS_ANY=1`);
+      paramsArray.push(`FREIGHT=1`);
+      paramsArray.push(`PRICEPAGE=1`);
+      paramsArray.push(`DOLOAD=1`);
+
+      excursionLink = `https://online.bsigroup.ru/search_excursion?${paramsArray.join("&")}`;
+    }
+
+    updateLink();
+
+    const stateSelect = new Choices(stateSelectElement, {
+      searchEnabled: true,
+      loadingText: "Загрузка...",
+      noResultsText: "Ничего не найдено",
+      itemSelectText: "",
+      noChoicesText: "",
+    });
+
+    async function loadStates() {
+      stateSelect.clearChoices();
+      stateSelect.clearStore();
+
+      const resp = await samoAjax("states", { TOWNFROMINC: 1 });
+      const states = resp?.SearchTour_STATES || resp;
+
+      if (states && states.length) {
+        stateSelect.setChoices(
+          states.map((s) => ({ value: String(s.id), label: s.name })),
+          "value",
+          "label",
+          true
+        );
+        stateSelect.setChoiceByValue(String(states[0].id));
+        updateLink({ activeState: String(states[0].id) });
+      }
+    }
+
+    stateSelect.passedElement.element.addEventListener("choice", (e) => {
+      updateLink({ activeState: String(e.detail.value) });
+    });
+
+    submitBtn.addEventListener("click", () => {
+      window.open(excursionLink, "_blank");
+    });
+
+    createDayRange({
+      rootEl,
+      gridSelector: ".day-grid",
+      defaultStartDay: searchParams.nightsFrom,
+      defaultEndDay: searchParams.nightsTill,
+      onChange: ({ startDay, endDay }) => {
+        if (startDay && endDay) {
+          updateLink({ nightsFrom: startDay, nightsTill: endDay });
+          rootEl.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
+        }
+      },
+    });
+
+    peopleCounter({
+      rootSelector: '[data-tab="excursions"] .gtm-persons-select',
+      outputSelector: '[data-tab="excursions"] .gtm-people-total',
+      maxAdults: 4,
+      maxChildren: 3,
+      onChange: ({ adults, children, ages }) => {
+        const encodedAges = ages.length ? ages.join("%2C") : "";
+        updateLink({
+          adultsCount: String(adults),
+          childCount: String(children),
+          childAges: encodedAges,
+        });
+      },
+    });
+
+    const datepick = rootEl.querySelector(".gtm-datepicker");
+    if (datepick) {
+      const today = new Date();
+      const nextWeek = new Date();
+      nextWeek.setDate(today.getDate() + 7);
+
+      flatpickr(datepick, {
+        mode: "range",
+        minDate: "today",
+        locale: Russian,
+        dateFormat: "d.m",
+        defaultDate: [today, nextWeek],
+        onChange: (selectedDates) => {
+          if (selectedDates.length === 2) {
+            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          }
+        },
+      });
+    }
+
+    await loadStates();
+
+    section.classList.remove("is-loading");
+  }
+
+  // ============================================================
+  // 7) Стартуем: активный таб (по разметке уже active)
   // ============================================================
   const activeIndex = tabPanels.findIndex((p) => p.classList.contains("active"));
   setActiveTab(activeIndex >= 0 ? activeIndex : 0);

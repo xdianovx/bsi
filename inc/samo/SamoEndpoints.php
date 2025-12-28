@@ -83,6 +83,66 @@ class SamoEndpoints
     $params['type'] = 'api'; // API возвращает JSON для экскурсий
     return $this->client->request('SearchExcursion_ALL', $params);
   }
+
+  /**
+   * Получение типов транспорта для авиабилетов
+   *
+   * @param array $params Параметры: WITH_CHARTER (по умолчанию 1), WITH_REGULAR (по умолчанию 1)
+   * @return array
+   */
+  public function ticketsTransportTypes(array $params = []): array
+  {
+    $defaultParams = [
+      'WITH_CHARTER' => 1,
+      'WITH_REGULAR' => 1,
+    ];
+    return $this->client->request('Tickets_TRANSPORTTYPES', array_merge($defaultParams, $params));
+  }
+
+  /**
+   * Получение аэропортов отправления для авиабилетов
+   *
+   * @param array $params Параметры: SUGGEST, WITH_CHARTER, WITH_REGULAR, TRANSPORTTYPE
+   * @return array
+   */
+  public function ticketsSources(array $params = []): array
+  {
+    $defaultParams = [
+      'WITH_CHARTER' => 1,
+      'WITH_REGULAR' => 1,
+    ];
+    return $this->client->request('Tickets_SOURCES', array_merge($defaultParams, $params));
+  }
+
+  /**
+   * Получение аэропортов прибытия для авиабилетов
+   *
+   * @param array $params Параметры: SUGGEST, WITH_CHARTER, WITH_REGULAR, TRANSPORTTYPE, SOURCE
+   * @return array
+   */
+  public function ticketsTargets(array $params = []): array
+  {
+    $defaultParams = [
+      'WITH_CHARTER' => 1,
+      'WITH_REGULAR' => 1,
+    ];
+    return $this->client->request('Tickets_TARGETS', array_merge($defaultParams, $params));
+  }
+
+  /**
+   * Получение всех данных для фильтров авиабилетов
+   *
+   * @param array $params Параметры: SOURCE, TARGET, FREIGHTBACK, WITH_CHARTER, WITH_REGULAR, TRANSPORTTYPE
+   * @return array
+   */
+  public function ticketsAll(array $params = []): array
+  {
+    $defaultParams = [
+      'WITH_CHARTER' => 1,
+      'WITH_REGULAR' => 1,
+    ];
+    return $this->client->request('Tickets_ALL', array_merge($defaultParams, $params));
+  }
 }
 
 
