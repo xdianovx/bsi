@@ -101,18 +101,21 @@
 }
 
 .best-offer-card__type {
-  font-size: 14px;
+  font-size: 16px;
   position: absolute;
   top: 16px;
   right: 16px;
   background: #fff;
   line-height: 100%;
-  padding: 4px 6px;
+  padding: 8px 12px;
   border-radius: 4px;
   font-weight: 500;
 }
 
 .best-offer-card__location {
+  @media screen and (max-width: 1024px) {
+    font-size: 12px;
+  }
   margin-top: 8px;
   line-height: 100%;
   color: #fff;

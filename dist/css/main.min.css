@@ -1775,13 +1775,13 @@ input.error {
 }
 
 .best-offer-card__type {
-  font-size: 14px;
+  font-size: 16px;
   position: absolute;
   top: 16px;
   right: 16px;
   background: #fff;
   line-height: 100%;
-  padding: 4px 6px;
+  padding: 8px 12px;
   border-radius: 4px;
   font-weight: 500;
 }
@@ -1793,6 +1793,11 @@ input.error {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+@media screen and (max-width: 1024px) {
+  .best-offer-card__location {
+    font-size: 12px;
+  }
 }
 
 .best-offer-card__location-flag {
