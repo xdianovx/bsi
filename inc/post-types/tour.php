@@ -367,10 +367,10 @@ add_action('acf/init', function () {
         'key' => 'field_tour_price_from',
         'label' => 'Цена от',
         'name' => 'price_from',
-        'type' => 'number',
+        'type' => 'text',
         'wrapper' => ['width' => '50'],
-        'placeholder' => 'Например: 50000',
-        'instructions' => 'Цена в рублях (только число)',
+        'placeholder' => 'Например: 50000 или от 50 000 ₽',
+        'instructions' => 'Цена в рублях (можно указать текст)',
       ],
       [
         'key' => 'field_tour_nights',

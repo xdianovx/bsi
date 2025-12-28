@@ -75,6 +75,17 @@ function bsi_prepare_offer_item( $row ) {
 
 	$location_title = $row['location_override'] ?? '';
 	$price = $row['price'] ?? '';
+	
+	if ( ! $price && $post_type === 'tour' && function_exists( 'get_field' ) ) {
+		$tour_price = get_field( 'price_from', $post_id );
+		if ( $tour_price ) {
+			if ( is_numeric( $tour_price ) ) {
+				$price = number_format( (float) $tour_price, 0, '.', ' ' );
+			} else {
+				$price = (string) $tour_price;
+			}
+		}
+	}
 
 	$flag_url = '';
 	$country_id = 0;
