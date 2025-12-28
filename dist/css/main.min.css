@@ -170,6 +170,15 @@ sup {
   border-radius: 4px;
 }
 
+.choices__list--single .choices__item {
+  width: 100%;
+  height: 28px;
+  padding-right: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .choices__input {
   background: none;
 }
@@ -2561,6 +2570,35 @@ input.error {
   grid-template-columns: 3fr 1fr 1fr 1fr;
 }
 @media screen and (max-width: 768px) {
+  .gtm-search__wrap.--hotels {
+    grid-template-columns: repeat(1, 1fr);
+    width: 100%;
+    gap: 8px;
+  }
+  .gtm-search__wrap.--hotels > * {
+    border-radius: 8px;
+    width: 100%;
+  }
+}
+.gtm-search__wrap.--excursions {
+  grid-template-columns: 1fr 3fr 1fr 1fr;
+}
+@media screen and (max-width: 768px) {
+  .gtm-search__wrap.--excursions {
+    grid-template-columns: repeat(1, 1fr);
+    width: 100%;
+    gap: 8px;
+  }
+  .gtm-search__wrap.--excursions > * {
+    border-radius: 8px;
+    width: 100%;
+  }
+}
+.gtm-search__wrap.--excursions > .gtm-tours-select {
+  min-width: 0;
+  overflow: hidden;
+}
+@media screen and (max-width: 768px) {
   .gtm-search__wrap {
     grid-template-columns: repeat(1, 1fr);
     width: 100%;
@@ -2575,12 +2613,65 @@ input.error {
   flex-grow: 1;
   width: 100%;
 }
+.gtm-search__wrap .gtm-tours-select {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.gtm-search__wrap .gtm-tours-select,
+.gtm-search__wrap .gtm-tours-select * {
+  box-sizing: border-box;
+}
+.gtm-search__wrap .gtm-tours-select .choices {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+.gtm-search__wrap .gtm-tours-select .choices__inner {
+  overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 48px !important;
+  max-height: 48px !important;
+}
+.gtm-search__wrap .gtm-tours-select .choices__list {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.gtm-search__wrap .gtm-tours-select .choices__list--single {
+  overflow: hidden !important;
+  padding-right: 30px !important;
+  padding-left: 16px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  height: 48px !important;
+  max-height: 48px !important;
+  line-height: 48px !important;
+}
+.gtm-search__wrap .gtm-tours-select .choices__list--dropdown .choices__item--selectable,
+.gtm-search__wrap .gtm-tours-select .choices__list[aria-expanded] .choices__item--selectable {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+}
 .gtm-search__wrap > * {
   border-right: 1px solid #dfdfdf;
   height: 48px;
+  min-width: 0;
 }
 .gtm-search__wrap > *:last-child {
   border-right: none;
+}
+.gtm-search__wrap > .gtm-tours-select {
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 .gtm-search__wrap > *:first-child {
   border-top-left-radius: 8px;

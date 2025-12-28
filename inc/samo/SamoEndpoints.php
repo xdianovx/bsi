@@ -37,6 +37,30 @@ class SamoEndpoints
   }
 
   /**
+   * Получение списка стран для экскурсионного тура
+   *
+   * @param array $params Параметры: TOWNFROMINC
+   * @return array
+   */
+  public function searchExcursionStates(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchExcursion_STATES', $params);
+  }
+
+  /**
+   * Получение списка туров для экскурсионного тура по стране
+   *
+   * @param array $params Параметры: TOWNFROMINC, STATEINC
+   * @return array
+   */
+  public function searchExcursionTours(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchExcursion_TOURS', $params);
+  }
+
+  /**
    * Поиск отелей для экскурсионного тура
    *
    * @param array $params Параметры: TOWNFROMINC, STATEINC, TOURS

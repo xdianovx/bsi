@@ -427,16 +427,15 @@ export const gtmSearch = async () => {
 
     section.classList.add("is-loading");
 
-    dropdown('[data-tab="excursions"] .gtm-nights-select');
     dropdown('[data-tab="excursions"] .gtm-persons-select');
 
     const stateSelectElement = rootEl.querySelector(".gtm-state-select");
+    const toursSelectElement = rootEl.querySelector(".gtm-tours-select");
     const submitBtn = rootEl.querySelector(".gtm-item__button");
 
     const searchParams = {
       activeState: "",
-      nightsFrom: 5,
-      nightsTill: 10,
+      tours: "",
       checkInStart: "20251210",
       checkInEnd: "20251219",
       adultsCount: "2",
@@ -463,10 +462,9 @@ export const gtmSearch = async () => {
       const paramsArray = [];
       paramsArray.push(`TOWNFROMINC=1`);
       if (searchParams.activeState) paramsArray.push(`STATEINC=${searchParams.activeState}`);
+      if (searchParams.tours) paramsArray.push(`TOURS=${searchParams.tours}`);
       if (searchParams.checkInStart) paramsArray.push(`CHECKIN_BEG=${searchParams.checkInStart}`);
       if (searchParams.checkInEnd) paramsArray.push(`CHECKIN_END=${searchParams.checkInEnd}`);
-      if (searchParams.nightsFrom) paramsArray.push(`NIGHTS_FROM=${searchParams.nightsFrom}`);
-      if (searchParams.nightsTill) paramsArray.push(`NIGHTS_TILL=${searchParams.nightsTill}`);
       if (searchParams.adultsCount) paramsArray.push(`ADULT=${searchParams.adultsCount}`);
       paramsArray.push(`CURRENCY=1`);
       if (searchParams.childCount) paramsArray.push(`CHILD=${searchParams.childCount}`);
@@ -492,12 +490,20 @@ export const gtmSearch = async () => {
       noChoicesText: "",
     });
 
+    const toursSelect = new Choices(toursSelectElement, {
+      searchEnabled: true,
+      loadingText: "Загрузка...",
+      noResultsText: "Ничего не найдено",
+      itemSelectText: "",
+      noChoicesText: "",
+    });
+
     async function loadStates() {
       stateSelect.clearChoices();
       stateSelect.clearStore();
 
-      const resp = await samoAjax("states", { TOWNFROMINC: 1 });
-      const states = resp?.SearchTour_STATES || resp;
+      const resp = await samoAjax("excursion_states", { TOWNFROMINC: 1 });
+      const states = resp?.SearchExcursion_STATES || resp;
 
       if (states && states.length) {
         stateSelect.setChoices(
@@ -507,29 +513,48 @@ export const gtmSearch = async () => {
           true
         );
         stateSelect.setChoiceByValue(String(states[0].id));
-        updateLink({ activeState: String(states[0].id) });
+        updateLink({ activeState: String(states[0].id), tours: "" });
+        await loadTours(String(states[0].id));
       }
     }
 
-    stateSelect.passedElement.element.addEventListener("choice", (e) => {
-      updateLink({ activeState: String(e.detail.value) });
+    async function loadTours(stateId) {
+      toursSelect.clearChoices();
+      toursSelect.clearStore();
+
+      if (!stateId) {
+        return;
+      }
+
+      const resp = await samoAjax("excursion_tours", { TOWNFROMINC: 1, STATEINC: stateId });
+      const tours = resp?.SearchExcursion_TOURS || resp || [];
+
+      if (tours.length) {
+        toursSelect.setChoices(
+          tours.map((t) => ({ value: String(t.id), label: t.name || t.title || String(t.id) })),
+          "value",
+          "label",
+          true
+        );
+        if (tours.length === 1) {
+          toursSelect.setChoiceByValue(String(tours[0].id));
+          updateLink({ tours: String(tours[0].id) });
+        }
+      }
+    }
+
+    stateSelect.passedElement.element.addEventListener("choice", async (e) => {
+      const stateId = e.detail.value;
+      updateLink({ activeState: String(stateId), tours: "" });
+      await loadTours(stateId);
+    });
+
+    toursSelect.passedElement.element.addEventListener("choice", (e) => {
+      updateLink({ tours: String(e.detail.value) });
     });
 
     submitBtn.addEventListener("click", () => {
       window.open(excursionLink, "_blank");
-    });
-
-    createDayRange({
-      rootEl,
-      gridSelector: ".day-grid",
-      defaultStartDay: searchParams.nightsFrom,
-      defaultEndDay: searchParams.nightsTill,
-      onChange: ({ startDay, endDay }) => {
-        if (startDay && endDay) {
-          updateLink({ nightsFrom: startDay, nightsTill: endDay });
-          rootEl.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
-        }
-      },
     });
 
     peopleCounter({

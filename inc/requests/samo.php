@@ -53,6 +53,26 @@ function samo_ajax()
       ]));
 
     // Экскурсионные туры
+    case 'excursion_states':
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 1;
+
+      return $send(SamoService::endpoints()->searchExcursionStates([
+        'TOWNFROMINC' => $townFromInc,
+      ]));
+
+    case 'excursion_tours':
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 1;
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+
+      if (!$stateInc) {
+        wp_send_json_error(['message' => 'STATEINC required'], 400);
+      }
+
+      return $send(SamoService::endpoints()->searchExcursionTours([
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+      ]));
+
     case 'excursion_hotels':
       $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
       $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;

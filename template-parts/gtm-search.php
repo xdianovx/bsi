@@ -265,44 +265,10 @@
           <!-- Страна назначения -->
           <select class="gtm-state-select"></select>
 
-          <!-- Ночи -->
-          <div class="gtm-nights-select js-dropdown">
-            <button class="js-dropdown-trigger gtm-nights-select-value">5 - 7 ночей</button>
-            <div class="js-dropdown-panel numfont">
-              <div class="day-grid gtm-daypicker">
-                <div class="day-item">1</div>
-                <div class="day-item">2</div>
-                <div class="day-item">3</div>
-                <div class="day-item">4</div>
-                <div class="day-item">5</div>
-                <div class="day-item">6</div>
-                <div class="day-item">7</div>
-                <div class="day-item">8</div>
-                <div class="day-item">9</div>
-                <div class="day-item">10</div>
-                <div class="day-item">11</div>
-                <div class="day-item">12</div>
-                <div class="day-item">13</div>
-                <div class="day-item">14</div>
-                <div class="day-item">15</div>
-                <div class="day-item">16</div>
-                <div class="day-item">17</div>
-                <div class="day-item">18</div>
-                <div class="day-item">19</div>
-                <div class="day-item">20</div>
-                <div class="day-item">21</div>
-                <div class="day-item">22</div>
-                <div class="day-item">23</div>
-                <div class="day-item">24</div>
-                <div class="day-item">25</div>
-                <div class="day-item">26</div>
-                <div class="day-item">27</div>
-                <div class="day-item">28</div>
-                <div class="day-item">29</div>
-                <div class="day-item">30</div>
-              </div>
-            </div>
-          </div>
+          <!-- Выбор тура -->
+          <select class="gtm-tours-select">
+            <option value="">Выберите тур</option>
+          </select>
 
           <!-- Даты -->
           <input type="text" name="daterange" class="gtm-datepicker" />

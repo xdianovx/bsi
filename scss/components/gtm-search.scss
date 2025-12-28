@@ -43,6 +43,35 @@
 
   &.--hotels {
     grid-template-columns: 3fr 1fr 1fr 1fr;
+    @media screen and (max-width: 768px) {
+      grid-template-columns: repeat(1, 1fr);
+      width: 100%;
+      gap: 8px;
+
+      > * {
+        border-radius: 8px;
+        width: 100%;
+      }
+    }
+  }
+
+  &.--excursions {
+    grid-template-columns: 1fr 3fr 1fr 1fr;
+
+    @media screen and (max-width: 768px) {
+      grid-template-columns: repeat(1, 1fr);
+      width: 100%;
+      gap: 8px;
+
+      > * {
+        border-radius: 8px;
+        width: 100%;
+      }
+    }
+    > .gtm-tours-select {
+      min-width: 0;
+      overflow: hidden;
+    }
   }
   @media screen and (max-width: 768px) {
     grid-template-columns: repeat(1, 1fr);
@@ -59,12 +88,73 @@
     width: 100%;
   }
 
+  .gtm-tours-select {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    &,
+    * {
+      box-sizing: border-box;
+    }
+
+    .choices {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    .choices__inner {
+      overflow: hidden !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      height: 48px !important;
+      max-height: 48px !important;
+    }
+
+    .choices__list {
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .choices__list--single {
+      overflow: hidden !important;
+      padding-right: 30px !important;
+      padding-left: 16px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      display: block !important;
+      height: 48px !important;
+      max-height: 48px !important;
+      line-height: 48px !important;
+    }
+
+    .choices__list--dropdown .choices__item--selectable,
+    .choices__list[aria-expanded] .choices__item--selectable {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      word-wrap: normal !important;
+      word-break: normal !important;
+    }
+  }
+
   > * {
     border-right: 1px solid #dfdfdf;
     height: 48px;
+    min-width: 0;
     &:last-child {
       border-right: none;
     }
+  }
+
+  > .gtm-tours-select {
+    min-width: 0 !important;
+    overflow: hidden !important;
   }
 
   > *:first-child {

@@ -167,6 +167,15 @@ sup {
   border-radius: 4px;
 }
 
+.choices__list--single .choices__item {
+  width: 100%;
+  height: 28px;
+  padding-right: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .choices__input {
   background: none;
 }
