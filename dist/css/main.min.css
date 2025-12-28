@@ -5580,6 +5580,16 @@ input.error {
   flex-wrap: wrap;
   gap: 8px;
 }
+@media screen and (max-width: 768px) {
+  .promo-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    align-items: center;
+  }
+}
+.promo-filter::-webkit-scrollbar {
+  display: none;
+}
 
 .archive-page__content-section.promo-page__content-section {
   margin-top: 20px;
@@ -5593,6 +5603,7 @@ input.error {
   gap: 12px;
   padding: 4px 8px;
   transition: all 0.3s ease-in-out;
+  flex-shrink: 0;
 }
 .promo-filter__btn:hover {
   background: #f4f4f6;
