@@ -6883,6 +6883,9 @@ input.error {
 .tour-extra {
   margin-top: 64px;
 }
+.tour-extra .editor-content {
+  margin-top: 16px;
+}
 @media screen and (max-width: 1024px) {
   .tour-extra {
     margin-top: 40px;

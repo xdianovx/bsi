@@ -239,6 +239,10 @@
 
 .tour-extra {
   margin-top: 64px;
+
+  .editor-content {
+    margin-top: 16px;
+  }
   @media screen and (max-width: 1024px) {
     margin-top: 40px;
   }
