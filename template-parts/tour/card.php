@@ -10,9 +10,9 @@ $tour_image = '';
 $tour_title = '';
 $tour_flag = '';
 $price_value = '';
-$price_text = '';
 $nights = 0;
 $checkin_dates = '';
+$excursions_count = 0;
 $booking_url = '';
 
 if (!empty($tour['id'])) {
@@ -78,11 +78,6 @@ if (function_exists('get_field')) {
     $price_value = (string) $price_val;
   }
 
-  $price_text_val = get_field('tour_price_text', $tour_id);
-  if (is_string($price_text_val) && $price_text_val !== '') {
-    $price_text = (string) $price_text_val;
-  }
-
   $nights_val = get_field('tour_nights', $tour_id);
   if (is_numeric($nights_val)) {
     $nights = (int) $nights_val;
@@ -91,6 +86,11 @@ if (function_exists('get_field')) {
   $checkin_dates_val = get_field('tour_checkin_dates', $tour_id);
   if (is_string($checkin_dates_val) && $checkin_dates_val !== '') {
     $checkin_dates = (string) $checkin_dates_val;
+  }
+
+  $excursions_count_val = get_field('tour_excursions_count', $tour_id);
+  if (is_numeric($excursions_count_val)) {
+    $excursions_count = (int) $excursions_count_val;
   }
 
   $booking_url_val = get_field('tour_booking_url', $tour_id);
@@ -165,14 +165,35 @@ if (function_exists('get_field')) {
       <?php endif; ?>
     </div>
 
-    <?php if ($nights > 0 || $checkin_dates): ?>
+    <?php if ($nights > 0 || $checkin_dates || $excursions_count > 0): ?>
       <div class="tour-card__booking-info">
         <?php if ($nights > 0): ?>
           <span class="hotel-card__nights"><?php echo esc_html($nights); ?>
             <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?>,</span>
         <?php endif; ?>
-        <?php if ($checkin_dates): ?>
+        <?php if ($excursions_count > 0): ?>
           <?php if ($nights > 0): ?>     <?php endif; ?>
+          <span class="tour-card__excursions">
+            <?php echo esc_html($excursions_count); ?>
+            <?php
+            $excursions_text = '';
+            $last_digit = $excursions_count % 10;
+            $last_two_digits = $excursions_count % 100;
+            if ($last_two_digits >= 11 && $last_two_digits <= 14) {
+              $excursions_text = 'экскурсий';
+            } elseif ($last_digit === 1) {
+              $excursions_text = 'экскурсия';
+            } elseif ($last_digit >= 2 && $last_digit <= 4) {
+              $excursions_text = 'экскурсии';
+            } else {
+              $excursions_text = 'экскурсий';
+            }
+            echo esc_html($excursions_text);
+            ?>,
+          </span>
+        <?php endif; ?>
+        <?php if ($checkin_dates): ?>
+          <?php if ($nights > 0 || $excursions_count > 0): ?>     <?php endif; ?>
           <span class="hotel-card__checkin-date"><?php echo esc_html($checkin_dates); ?></span>
         <?php endif; ?>
       </div>
@@ -186,9 +207,6 @@ if (function_exists('get_field')) {
         <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
           target="_blank" rel="noopener nofollow">
           от <?php echo esc_html($price_value); ?> ₽
-          <?php if ($price_text): ?>
-            <span class="hotel-card__price-text">/ <?php echo esc_html($price_text); ?></span>
-          <?php endif; ?>
         </a>
       <?php endif; ?>
     </div>
