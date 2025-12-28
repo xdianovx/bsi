@@ -22,11 +22,7 @@ add_action('init', function () {
     'menu_position' => 23,
     'menu_icon' => 'dashicons-star-filled',
     'supports' => ['title', 'thumbnail', 'excerpt'],
-    'has_archive' => 'luchshie-predlozheniya',
-    'rewrite' => [
-      'slug' => 'luchshie-predlozheniya',
-      'with_front' => false,
-    ],
+    'has_archive' => false,
   ]);
 });
 

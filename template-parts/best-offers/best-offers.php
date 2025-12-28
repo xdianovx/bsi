@@ -21,47 +21,10 @@ foreach ($sections as $section) {
     if (count($slides) >= $slides_limit)
       break 2;
 
-    $post_obj = $row['post'] ?? null;
-    if (!$post_obj instanceof WP_Post)
-      continue;
-
-    $badges = $row['badges'] ?? [];
-    $tags = [];
-    if (is_array($badges)) {
-      foreach ($badges as $t) {
-        if (!empty($t->name))
-          $tags[] = $t->name;
-      }
+    $card = bsi_prepare_offer_item($row);
+    if ($card) {
+      $slides[] = $card;
     }
-
-    $title = ($row['title_override'] ?? '') ?: get_the_title($post_obj->ID);
-    $url = ($row['link_override'] ?? '') ?: get_permalink($post_obj->ID);
-
-    $image = '';
-    if (!empty($row['image_override']['url'])) {
-      $image = $row['image_override']['url'];
-    } else {
-      $thumb = get_the_post_thumbnail_url($post_obj->ID, 'large');
-      if ($thumb)
-        $image = $thumb;
-    }
-
-    $type_obj = get_post_type_object($post_obj->post_type);
-    $type = $type_obj && !empty($type_obj->labels->singular_name) ? $type_obj->labels->singular_name : '';
-
-    $location_title = ($row['location_override'] ?? '') ?: '';
-    $price = $row['price'] ?? '';
-
-    $slides[] = [
-      'url' => $url,
-      'image' => $image,
-      'type' => $type,
-      'tags' => $tags,
-      'title' => $title,
-      'flag' => '',
-      'location_title' => $location_title,
-      'price' => $price,
-    ];
   }
 }
 
@@ -82,21 +45,6 @@ foreach ($sections as $section) {
         </div>
       </div>
 
-      <div class="title-wrap__buttons">
-        <a href="<?= esc_url(home_url('/luchshie-predlozheniya/')); ?>" class="title-wrap__link link-arrow">
-          <span>Смотреть все</span>
-          <div class="link-arrow__icon">
-
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
-              <path d="M7 7h10v10"></path>
-              <path d="M7 17 17 7"></path>
-            </svg>
-
-          </div>
-        </a>
-      </div>
     </div>
 
     <?php if (!empty($slides)): ?>
@@ -107,7 +55,7 @@ foreach ($sections as $section) {
               <div class="swiper-slide">
                 <?php get_template_part('template-parts/best-offers/card', null, [
                   'best_offer' => $card,
-                  'post_id' => $post_obj->ID,
+                  'post_id' => $card['post_id'] ?? 0,
                 ]); ?>
               </div>
             <?php endforeach; ?>

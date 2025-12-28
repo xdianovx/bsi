@@ -10,38 +10,18 @@ $image = $best_offer['image'] ?? '';
 $type = $best_offer['type'] ?? '';
 $tags = $best_offer['tags'] ?? [];
 $title = $best_offer['title'] ?? '';
-$flag = $best_offer['flag'] ?? '';
 $location_title = $best_offer['location_title'] ?? '';
+$flag_url = (string) ($best_offer['flag'] ?? '');
 
 $price_raw = $best_offer['price'] ?? '';
 $price = format_price_text($price_raw);
-
-$data = $args['best_offer'] ?? [];
-$post_id = (int) ($args['post_id'] ?? 0);
-
-$flag_url = (string) ($data['flag'] ?? '');
-
-if (!$flag_url && $post_id && get_post_type($post_id) === 'hotel') {
-  $country_id = (int) get_field('hotel_country', $post_id);
-  $flag = $country_id ? get_field('flag', $country_id) : null;
-
-  if (is_array($flag) && !empty($flag['url'])) {
-    $flag_url = (string) $flag['url'];
-  } elseif (is_numeric($flag)) {
-    $flag_url = (string) wp_get_attachment_image_url((int) $flag, 'thumbnail');
-  } elseif (is_string($flag)) {
-    $flag_url = $flag;
-  }
-}
-
-$data['flag'] = $flag_url;
 ?>
 
 <a href="<?= esc_url($url); ?>"
    class="best-offer-card">
-  <?php if ($flag): ?>
+  <?php if ($flag_url): ?>
     <div class="best-offer-card__location-flag">
-      <img src="<?= esc_url($flag) ?>"
+      <img src="<?= esc_url($flag_url) ?>"
            alt="">
     </div>
   <?php endif; ?>
@@ -68,18 +48,18 @@ $data['flag'] = $flag_url;
     <?php endif; ?>
 
     <?php if ($title): ?>
-      <div class="best-offer-card__title"> <?php if ($flag): ?>
-          <div class="best-offer-card__location-flag">
-            <img src="<?= esc_url($flag); ?>"
-                 alt="">
-          </div>
-          <h3> <?php endif; ?>   <?= esc_html($title); ?></h3>
+      <div class="best-offer-card__title">
+        <h3><?= esc_html($title); ?></h3>
       </div>
     <?php endif; ?>
 
-    <?php if ($flag || $location_title): ?>
+    <?php if ($flag_url || $location_title): ?>
       <div class="best-offer-card__location">
-
+        <?php if ($flag_url): ?>
+          <div class="best-offer-card__location-flag">
+            <img src="<?= esc_url($flag_url); ?>" alt="">
+          </div>
+        <?php endif; ?>
         <?php if ($location_title): ?>
           <div class="best-offer-card__location-title"><?= esc_html($location_title); ?></div>
         <?php endif; ?>

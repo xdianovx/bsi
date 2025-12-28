@@ -14,7 +14,12 @@ add_action('acf/init', function () {
         'layout' => 'block',
         'button_label' => 'Добавить блок',
         'sub_fields' => [
-
+          [
+            'key' => 'field_offer_section_title',
+            'label' => 'Заголовок секции',
+            'name' => 'title',
+            'type' => 'text',
+          ],
           [
             'key' => 'field_offer_section_items',
             'label' => 'Элементы',
@@ -28,7 +33,7 @@ add_action('acf/init', function () {
                 'label' => 'Сущность',
                 'name' => 'post',
                 'type' => 'post_object',
-                'post_type' => ['hotel', 'news'],
+                'post_type' => ['hotel', 'news', 'tour', 'education'],
                 'return_format' => 'object',
                 'ui' => 1,
                 'wrapper' => ['width' => '40'],
@@ -54,13 +59,6 @@ add_action('acf/init', function () {
                 'wrapper' => ['width' => '30'],
               ],
               [
-                'key' => 'field_offer_item_title_override',
-                'label' => 'Заголовок (если нужно переопределить)',
-                'name' => 'title_override',
-                'type' => 'text',
-                'wrapper' => ['width' => '50'],
-              ],
-              [
                 'key' => 'field_offer_item_link_override',
                 'label' => 'Ссылка (если нужно переопределить)',
                 'name' => 'link_override',
@@ -68,19 +66,11 @@ add_action('acf/init', function () {
                 'wrapper' => ['width' => '50'],
               ],
               [
-                'key' => 'field_offer_item_image_override',
-                'label' => 'Картинка (если нужно переопределить)',
-                'name' => 'image_override',
-                'type' => 'image',
-                'return_format' => 'array',
-                'preview_size' => 'medium',
-                'wrapper' => ['width' => '50'],
-              ],
-              [
                 'key' => 'field_offer_item_location_override',
-                'label' => 'Локация (если нужно переопределить)',
+                'label' => 'Курорт (если нужно переопределить)',
                 'name' => 'location_override',
                 'type' => 'text',
+                'instructions' => 'Если не указано, курорт подтянется автоматически из таксономии поста',
                 'wrapper' => ['width' => '50'],
               ],
             ],

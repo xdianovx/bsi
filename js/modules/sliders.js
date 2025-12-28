@@ -174,7 +174,6 @@ export const sliders = () => {
 
   const bestOffersSlider = new Swiper(".best-offers-slider", {
     spaceBetween: 16,
-    loop: true,
 
     navigation: {
       nextEl: ".best-offers-arrow-next",
