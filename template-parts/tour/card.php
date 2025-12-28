@@ -158,18 +158,11 @@ if (function_exists('get_field')) {
           <img src="<?php echo esc_url($tour_flag); ?>" alt="">
         </div>
       <?php endif; ?>
-      <div class="hotel-card__location-text">
-        <?php
-        $location_parts = [];
-        if ($country_title) {
-          $location_parts[] = $country_title;
-        }
-        if (!empty($resort_titles)) {
-          $location_parts = array_merge($location_parts, $resort_titles);
-        }
-        echo esc_html(implode(', ', $location_parts));
-        ?>
-      </div>
+      <?php if ($country_title): ?>
+        <div class="hotel-card__location-text">
+          <?php echo esc_html($country_title); ?>
+        </div>
+      <?php endif; ?>
     </div>
 
     <?php if ($nights > 0 || $checkin_dates): ?>
