@@ -73,6 +73,14 @@ function bsi_prepare_offer_item( $row ) {
 	$type_obj = get_post_type_object( $post_type );
 	$type = $type_obj && ! empty( $type_obj->labels->singular_name ) ? $type_obj->labels->singular_name : '';
 
+	$rating = 0;
+	if ( $post_type === 'hotel' && function_exists( 'get_field' ) ) {
+		$rating_val = get_field( 'rating', $post_id );
+		if ( is_numeric( $rating_val ) ) {
+			$rating = (int) $rating_val;
+		}
+	}
+
 	$location_title = $row['location_override'] ?? '';
 	$price = $row['price'] ?? '';
 	
@@ -119,36 +127,8 @@ function bsi_prepare_offer_item( $row ) {
 	}
 
 	$location_extra = '';
-	if ( ! $location_title ) {
-		$resort_terms = get_the_terms( $post_id, 'resort' );
-		if ( ! empty( $resort_terms ) && ! is_wp_error( $resort_terms ) ) {
-			$resort_count = count( $resort_terms );
-			if ( $resort_count > 0 ) {
-				$location_title = $resort_terms[0]->name;
-				if ( $resort_count > 1 ) {
-					$remaining = $resort_count - 1;
-					$resort_word = '';
-					$last_digit = $remaining % 10;
-					$last_two_digits = $remaining % 100;
-					
-					if ( $last_two_digits >= 11 && $last_two_digits <= 14 ) {
-						$resort_word = 'курортов';
-					} elseif ( $last_digit === 1 ) {
-						$resort_word = 'курорт';
-					} elseif ( $last_digit >= 2 && $last_digit <= 4 ) {
-						$resort_word = 'курорта';
-					} else {
-						$resort_word = 'курортов';
-					}
-					
-					$location_extra = sprintf( 'и еще %d %s', $remaining, $resort_word );
-				}
-			}
-		}
-
-		if ( ! $location_title && $country_title ) {
-			$location_title = $country_title;
-		}
+	if ( ! $location_title && $country_title ) {
+		$location_title = $country_title;
 	}
 
 	return [
@@ -157,6 +137,7 @@ function bsi_prepare_offer_item( $row ) {
 		'type'           => $type,
 		'tags'           => $tags,
 		'title'          => $title,
+		'rating'         => $rating,
 		'flag'           => $flag_url,
 		'location_title' => $location_title,
 		'location_extra' => $location_extra,
