@@ -7319,19 +7319,26 @@ input.error {
 
 .tour-prices__star-item {
   display: flex;
-  flex-direction: column;
   gap: 16px;
   padding: 12px;
   background: #fff;
+  justify-content: space-between;
   border-radius: 8px;
   border: 1px solid #dbdbdb;
   transition: border-color 0.2s, box-shadow 0.2s;
   width: 100%;
 }
+@media screen and (max-width: 1024px) {
+  .tour-prices__star-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
 @media screen and (max-width: 768px) {
   .tour-prices__star-item {
-    padding: 16px;
-    gap: 12px;
+    padding: 12px;
+    gap: 8px;
   }
 }
 
@@ -7340,7 +7347,6 @@ input.error {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  width: 100%;
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-header {
@@ -7385,24 +7391,20 @@ input.error {
 
 .tour-prices__star-body {
   display: flex;
-  flex-grow: 1;
   gap: 32px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-body {
     flex-direction: column;
-    gap: 8px;
+    gap: 0px;
   }
 }
 
 .tour-prices__star-field {
   display: flex;
   gap: 8px;
+  align-items: center;
   font-size: 14px;
-  line-height: 140%;
-  flex-wrap: wrap;
 }
 
 .tour-prices__star-label {
@@ -7419,8 +7421,11 @@ input.error {
   align-items: center;
   justify-content: flex-end;
   gap: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+}
+@media screen and (max-width: 1024px) {
+  .tour-prices__star-footer {
+    width: 100%;
+  }
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-footer {
