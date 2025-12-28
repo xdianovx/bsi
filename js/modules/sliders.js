@@ -13,7 +13,6 @@ export const sliders = () => {
       if (!mainEl || !thumbsEl) return;
 
       const thumbsSwiper = new Swiper(thumbsEl, {
-        // loop: true,
         slidesPerView: 4,
         spaceBetween: 8,
         slideToClickedSlide: true,
@@ -30,7 +29,6 @@ export const sliders = () => {
       });
 
       const mainSwiper = new Swiper(mainEl, {
-        // loop: true,
         spaceBetween: 8,
         navigation: {
           prevEl,
@@ -41,10 +39,8 @@ export const sliders = () => {
         },
       });
 
-      // Обработчик клика на оверлей для открытия fancybox с остальными фото
       const overlayEl = block.querySelector(".js-gallery-overlay");
       if (overlayEl) {
-        // Предотвращаем прокрутку слайдера при клике на оверлей
         overlayEl.addEventListener("mousedown", (e) => {
           e.stopPropagation();
         });
@@ -54,12 +50,10 @@ export const sliders = () => {
           e.stopPropagation();
 
           const galleryId = overlayEl.getAttribute("data-gallery-id");
-          // Находим все элементы галереи с данным gallery-id (начиная с 5-го фото)
           const allGalleryItems = block.querySelectorAll(`a[data-fancybox="${galleryId}"]`);
           const hiddenItems = Array.from(allGalleryItems).slice(4);
 
           if (hiddenItems.length > 0) {
-            // Открываем fancybox с первого скрытого элемента
             Fancybox.show(
               hiddenItems.map((item) => ({
                 src: item.getAttribute("href"),

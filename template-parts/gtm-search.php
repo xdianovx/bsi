@@ -168,14 +168,11 @@
         <button class="btn btn-white gtm-item__button">Найти</button>
       </div>
 
-      <!-- Отели -->
       <div class="gtm-search__item" data-tab="hotels">
         <div class="gtm-search__wrap --hotels">
 
-          <!-- Куда (страна) -->
           <select class="gtm-state-select"></select>
 
-          <!-- Ночи -->
           <div class="gtm-nights-select js-dropdown">
             <button class="js-dropdown-trigger gtm-nights-select-value">5 - 7 ночей</button>
             <div class="js-dropdown-panel numfont">
@@ -214,10 +211,8 @@
             </div>
           </div>
 
-          <!-- Даты -->
           <input type="text" name="daterange" class="gtm-datepicker" />
 
-          <!-- Туристы -->
           <div class="gtm-persons-select js-dropdown">
             <button class="js-dropdown-trigger">
               <span class="gtm-people-total">2 человека</span>
@@ -255,25 +250,19 @@
         <button class="btn btn-white gtm-item__button">Найти</button>
       </div>
 
-      <!-- Авиабилеты -->
       <div class="gtm-search__item" data-tab="tickets" style="display: none;">
       </div>
 
-      <!-- Экскурсионные туры -->
       <div class="gtm-search__item" data-tab="excursions">
         <div class="gtm-search__wrap --excursions">
-          <!-- Страна назначения -->
           <select class="gtm-state-select"></select>
 
-          <!-- Выбор тура -->
           <select class="gtm-tours-select">
             <option value="">Выберите тур</option>
           </select>
 
-          <!-- Даты -->
           <input type="text" name="daterange" class="gtm-datepicker" />
 
-          <!-- Пассажиры -->
           <div class="gtm-persons-select js-dropdown">
             <button class="js-dropdown-trigger">
               <span class="gtm-people-total">2 человека</span>

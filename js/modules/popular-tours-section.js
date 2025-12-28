@@ -1,4 +1,3 @@
-// popular-tours-slider.js
 import Swiper from "swiper";
 
 export const initPopularToursSlider = () => {
@@ -109,7 +108,6 @@ export const initPopularToursSlider = () => {
 
       toggleControls(swiper, swiperConfig);
     } catch (e) {
-      // Error handling without console output
     } finally {
       setLoading(false);
     }

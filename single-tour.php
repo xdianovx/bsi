@@ -35,10 +35,8 @@ $tour_program = function_exists('get_field') ? get_field('tour_program', $post_i
 $tour_included = function_exists('get_field') ? (string) get_field('tour_included', $post_id) : '';
 $tour_not_inc = function_exists('get_field') ? (string) get_field('tour_not_included', $post_id) : '';
 $tour_extra = function_exists('get_field') ? (string) get_field('tour_extra', $post_id) : '';
-// Проверяем, является ли ссылка на бронирование ссылкой на поиск экскурсии
 $excursion_params = [];
 if (!empty($tour_booking_url)) {
-  // Проверяем наличие 'search_excursion' в URL (регистронезависимо)
   if (stripos($tour_booking_url, 'search_excursion') !== false) {
     $excursion_params = parse_excursion_url($tour_booking_url);
   }
@@ -259,10 +257,7 @@ get_header();
                   $day_text = !empty($day['day_content']) ? (string) $day['day_content'] : '';
                   if (!$day_title && !$day_text)
                     continue;
-                  // что бы раскрыть первый день $is_open = ($i === 0);
-              
                   $is_open = false;
-                  // $is_open = ($i === 0)
                   ?>
                   <div class="accordion__item tour-program__day <?= $is_open ? 'is-open' : ''; ?>">
                     <button class="accordion__btn tour-program__day-btn" type="button">

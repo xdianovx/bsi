@@ -298,7 +298,6 @@
   }
 }
 
-// Секция с ценами экскурсионного тура
 .tour-prices-section {
   margin-top: 20px;
 
@@ -312,7 +311,6 @@
 }
 
 .tour-prices-gtm {
-  // Добавляем границу справа всем элементам кроме последнего
   > *:not(:last-child) {
     border-right: 1px solid rgba(255, 255, 255, 0.2);
   }
@@ -531,7 +529,6 @@
     border-bottom-right-radius: 0px;
   }
 
-  // Стили для элементов внутри (как в GTM-search)
   .gtm-nights-select {
     align-self: stretch;
     display: flex;
@@ -550,7 +547,6 @@
       border-radius: 0;
     }
 
-    // Стили для выпадающей панели
     .js-dropdown-panel {
       position: absolute;
       top: 100%;
@@ -609,7 +605,6 @@
       border-bottom-right-radius: 8px;
     }
 
-    // Стили для выпадающей панели
     .js-dropdown-panel {
       position: absolute;
       top: 100%;
@@ -868,5 +863,4 @@
 }
 
 .tour-card__location {
-  // margin-top: 12px;
 }

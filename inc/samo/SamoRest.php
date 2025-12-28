@@ -4,12 +4,11 @@ class SamoRest
 {
   public function request(string $method, array $params = []): array
   {
-    // Базовые параметры
     $baseParams = [
       'samo_action' => SAMO_ACTION,
       'version' => SAMO_API_VERSION,
       'type' => SAMO_API_TYPE,
-      'action' => $method, // SearchTour_ALL, SearchTour_PRICES ...
+      'action' => $method,
       'oauth_token' => SAMO_OAUTH_TOKEN,
     ];
 

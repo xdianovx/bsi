@@ -1,6 +1,3 @@
-// tour-prices.js
-// Модуль для работы с ценами экскурсионных туров из API Самотура
-
 import { dropdown } from "./forms/dropdown.js";
 import { createDayRange } from "./forms/day-range.js";
 import { peopleCounter } from "./gtm-people-counter.js";

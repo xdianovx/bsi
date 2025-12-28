@@ -1,4 +1,3 @@
-// modules/currency.js
 import { APIService } from "./api-service";
 import { dropdown } from "./forms/dropdown.js";
 
@@ -39,7 +38,6 @@ function setStoredCurrency(iso) {
   try {
     localStorage.setItem("selectedCurrency", iso);
   } catch {
-    // Ignore localStorage errors
   }
 }
 
@@ -205,6 +203,5 @@ export async function initCurrency() {
       });
     });
   } catch (err) {
-    // Error handling without console output
   }
 }

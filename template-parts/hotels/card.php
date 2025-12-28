@@ -195,9 +195,7 @@ if (function_exists('get_field')) {
             <?php
             $date_obj = DateTime::createFromFormat('Y-m-d', $checkin_date);
             if ($date_obj) {
-              // Получаем день и название месяца без года
               $day = $date_obj->format('j');
-              // Массив месяцев на русском языке
               $months = [
                 1 => 'января',
                 2 => 'февраля',

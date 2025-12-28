@@ -1,9 +1,7 @@
 <?php
-// Скрытие пунктов меню в админке
 add_action('admin_menu', 'remove_admin_menu_items');
 function remove_admin_menu_items()
 {
-  // Скрыть комментарии
   remove_menu_page('edit-comments.php');
 
   add_menu_page(
@@ -20,32 +18,9 @@ function remove_admin_menu_items()
 
   remove_menu_page('edit.php');
 
-  // Скрыть медиафайлы
-  // remove_menu_page('upload.php');
-
-  // Скрыть страницы
-  // remove_menu_page('edit.php?post_type=page');
-
-  // Скрыть внешний вид
-  // remove_menu_page('themes.php');
-
-  // Скрыть плагины
-  // remove_menu_page('plugins.php');
-
-  // Скрыть пользователей
-  // remove_menu_page('users.php');
-
-  // Скрыть инструменты
   remove_menu_page('tools.php');
-
-  // Скрыть настройки
-  // remove_menu_page('options-general.php');
 }
 
-
-
-
-// Вкладка секции
 function render_sections_page()
 {
   ?>
@@ -63,11 +38,9 @@ function render_sections_page()
 
       if (!empty($submenu['sections'])) {
         foreach ($submenu['sections'] as $item) {
-          // $item = [0 => 'Название', 1 => capability, 2 => slug, ...]
           $label = $item[0];
           $slug = $item[2];
 
-          // Пропускаем саму "Секции", чтобы не дублировать
           if ($slug === 'sections') {
             continue;
           }

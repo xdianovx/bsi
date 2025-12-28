@@ -152,7 +152,6 @@ export const initEducationFilter = () => {
       if (page === 1) {
         list.innerHTML = json.data.html || "";
       } else {
-        // Добавляем новые карточки к существующим
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = json.data.html || "";
         while (tempDiv.firstChild) {
@@ -167,7 +166,6 @@ export const initEducationFilter = () => {
       totalPages = json.data.pages || 1;
       currentPage = page;
       
-      // Показываем/скрываем кнопку "Показать еще"
       if (loadMoreWrap) {
         if (currentPage < totalPages) {
           loadMoreWrap.style.display = "block";
@@ -179,7 +177,6 @@ export const initEducationFilter = () => {
       
       updateResetButton();
     } catch (e) {
-      // Error handling without console output
     } finally {
       setLoading(false);
     }
@@ -201,7 +198,6 @@ export const initEducationFilter = () => {
       loadMoreButton.textContent = "Показать еще";
     }
     
-    // Прокрутка к первой новой карточке
     const items = list.querySelectorAll(".education-archive__item");
     if (items.length > 0) {
       const firstNewItem = items[items.length - (totalPages > currentPage ? 12 : items.length)];
@@ -289,7 +285,6 @@ export const initEducationFilter = () => {
     try {
       const body = new URLSearchParams();
       body.set("action", "education_filter_options");
-      // Отправляем country_id даже если он пустой, чтобы получить все опции
       body.set("country_id", countryId || "0");
 
       const res = await fetch(ajaxUrl, {
@@ -356,7 +351,6 @@ export const initEducationFilter = () => {
         }
       }
     } catch (e) {
-      // Error handling without console output
     }
   };
 
@@ -376,8 +370,6 @@ export const initEducationFilter = () => {
     const dateTo = params.get("date_to");
     const sort = params.get("sort");
 
-    // Если страна выбрана - обновляем опции фильтров для этой страны
-    // Если страна не выбрана - обновляем опции для всех школ
     const countryId = country || "";
     await updateFilterOptions(countryId);
 
@@ -476,7 +468,6 @@ export const initEducationFilter = () => {
     countrySelect.addEventListener("change", async () => {
       currentPage = 1;
       const countryId = countrySelect.value || "";
-      // Очищаем выбранные значения в других фильтрах при смене страны
       if (programChoice) programChoice.removeActiveItems();
       if (languageChoice) languageChoice.removeActiveItems();
       if (typeChoice) typeChoice.removeActiveItems();

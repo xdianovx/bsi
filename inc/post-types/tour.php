@@ -1,14 +1,5 @@
 <?php
-/**
- * CPT: tour
- * Tax: tour_type, tour_include
- * Uses existing taxonomies: region, resort (registered elsewhere via filters)
- */
 
-/**
- * 1) Добавляем tour в post_types, где подключены region/resort
- * ВАЖНО: этот файл должен быть подключен ДО кода, который регистрирует region/resort через apply_filters(...).
- */
 add_filter('region_taxonomy_post_types', function ($types) {
   $types[] = 'tour';
   return array_values(array_unique($types));
@@ -19,11 +10,6 @@ add_filter('resort_taxonomy_post_types', function ($types) {
   return array_values(array_unique($types));
 }, 5);
 
-
-/**
- * 2) Таксономии тура
- * Делай раньше CPT, чтобы в админке стабильно появились метабоксы.
- */
 add_action('init', function () {
 
   register_taxonomy('tour_type', ['tour'], [
@@ -64,7 +50,6 @@ add_action('init', function () {
     'show_admin_column' => true,
     'show_in_rest' => true,
 
-    // как теги
     'hierarchical' => false,
 
     'rewrite' => false,
@@ -72,12 +57,6 @@ add_action('init', function () {
   ]);
 
 }, 9);
-
-
-/**
- * 3) CPT: tour
- * rewrite выключаем — чтобы не было /tour/slug/ (нам нужен только /country/.../tours/.../)
- */
 add_action('init', function () {
 
   register_post_type('tour', [
@@ -106,7 +85,6 @@ add_action('init', function () {
 
     'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
 
-    // метабоксы таксономий
     'taxonomies' => ['region', 'resort', 'tour_type', 'tour_include'],
 
     'has_archive' => false,
@@ -116,10 +94,6 @@ add_action('init', function () {
 
 }, 10);
 
-
-/**
- * 4) Привязки таксономий к tour (страхуемся от порядка подключения)
- */
 add_action('init', function () {
   if (taxonomy_exists('region')) {
     register_taxonomy_for_object_type('region', 'tour');
@@ -135,11 +109,6 @@ add_action('init', function () {
   }
 }, 30);
 
-
-/**
- * (опционально) Автосоздание дефолтных пунктов "Включено в тур"
- * Если не нужно — просто удали этот блок.
- */
 add_action('init', function () {
   if (!taxonomy_exists('tour_include'))
     return;
@@ -153,10 +122,6 @@ add_action('init', function () {
   }
 }, 31);
 
-
-/**
- * 5) ACF: иконка для термина tour_include
- */
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group'))
     return;
@@ -188,9 +153,6 @@ add_action('acf/init', function () {
   ]);
 });
 
-/**
- * 6) Query vars
- */
 add_filter('query_vars', function ($vars) {
   if (!in_array('country_in_path', $vars, true))
     $vars[] = 'country_in_path';
@@ -199,11 +161,6 @@ add_filter('query_vars', function ($vars) {
   return $vars;
 });
 
-/**
- * 7) Роуты:
- * - /country/{country}/tours/ -> список туров страны
- * - /country/{country}/tours/{tour}/ -> single tour
- */
 add_action('init', function () {
 
   add_rewrite_rule(
@@ -220,10 +177,6 @@ add_action('init', function () {
 
 }, 25);
 
-
-/**
- * 8) Генерация правильной ссылки на тур
- */
 add_filter('post_type_link', function ($post_link, $post) {
   if ($post->post_type !== 'tour')
     return $post_link;
@@ -241,10 +194,6 @@ add_filter('post_type_link', function ($post_link, $post) {
   return trailingslashit(home_url('/country/' . $country_slug . '/tours/' . $post->post_name));
 }, 10, 2);
 
-
-/**
- * 9) Валидация пути single: если страна в URL не совпадает — 404
- */
 add_action('template_redirect', function () {
   if (!is_singular('tour'))
     return;
@@ -273,10 +222,6 @@ add_action('template_redirect', function () {
   }
 });
 
-
-/**
- * 10) Роутинг списка туров страны на country-tours.php
- */
 add_action('template_redirect', function () {
   $country_slug = get_query_var('country_tours');
   if (empty($country_slug))
@@ -308,10 +253,6 @@ add_action('template_redirect', function () {
   exit;
 });
 
-
-/**
- * 11) ACF поля тура
- */
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group'))
     return;
@@ -593,12 +534,6 @@ add_filter('acf/fields/post_object/query/key=field_tour_country', function ($arg
   return $args;
 }, 10, 1);
 
-
-/**
- * 12) Yoast breadcrumbs:
- * - single tour: Главная > Страны > {Страна} > Туры > {Тур}
- * - country tours list: Главная > Страны > {Страна} > Туры
- */
 add_filter('wpseo_breadcrumb_links', function ($links) {
 
   $country_slug = get_query_var('country_tours');

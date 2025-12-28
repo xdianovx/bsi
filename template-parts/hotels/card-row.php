@@ -1,8 +1,4 @@
 <?php
-/**
- * Hotel Card Row
- * template-parts/hotels/card-row.php
- */
 
 $hotel_id = (int) ($args['hotel_id'] ?? get_the_ID());
 if (!$hotel_id)
@@ -13,12 +9,10 @@ $link = $args['link'] ?? get_permalink($hotel_id);
 $booking_url = function_exists('get_field') ? get_field('booking_url', $hotel_id) : '';
 $booking_url = trim((string) $booking_url);
 
-// базовые
 $title = get_the_title($hotel_id);
 $thumb = get_the_post_thumbnail_url($hotel_id, 'medium') ?: '';
 $excerpt = get_the_excerpt($hotel_id);
 
-// ACF (под твои поля)
 $rating = function_exists('get_field') ? get_field('rating', $hotel_id) : '';
 $address = function_exists('get_field') ? get_field('address', $hotel_id) : '';
 $phone = function_exists('get_field') ? get_field('phone', $hotel_id) : '';
@@ -30,7 +24,6 @@ $check_out = function_exists('get_field') ? get_field('check_out_time', $hotel_i
 $wifi = function_exists('get_field') ? get_field('wifi', $hotel_id) : '';
 $breakfast = function_exists('get_field') ? get_field('breakfast', $hotel_id) : '';
 
-// GEO (если нужно)
 $country_id = function_exists('get_field') ? get_field('hotel_country', $hotel_id) : 0;
 $region_id = function_exists('get_field') ? get_field('hotel_region', $hotel_id) : 0;
 $resort_id = function_exists('get_field') ? get_field('hotel_resort', $hotel_id) : 0;
@@ -54,7 +47,6 @@ if ($resort_id) {
   $resort_title = (!is_wp_error($t) && $t) ? ($t->name ?? '') : '';
 }
 
-// ссылки
 $phone = trim((string) $phone);
 $tel_href = $phone ? preg_replace('/[^0-9+]/', '', $phone) : '';
 
@@ -64,7 +56,6 @@ if ($website && !preg_match('~^https?://~i', $website)) {
 }
 $website_url = $website ? esc_url($website) : '';
 
-// удобства (минимально)
 $amenities = [];
 if ($wifi)
   $amenities[] = 'Wi-Fi';
@@ -75,7 +66,6 @@ if ($check_in)
 if ($check_out)
   $amenities[] = 'Выезд: ' . $check_out;
 
-// цена
 $price_text = trim((string) $price);
 if (!$price_text)
   $price_text = '125 000 руб';

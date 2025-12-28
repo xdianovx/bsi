@@ -1,4 +1,3 @@
-// gtm-search.js
 import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
@@ -10,9 +9,6 @@ export const gtmSearch = async () => {
   const section = document.querySelector(".gtm-search__section");
   if (!section) return;
 
-  // ============================================================
-  // 1) Общий AJAX хелпер (одна точка входа в WP: action=bsi_samo)
-  // ============================================================
   async function samoAjax(method, params = {}) {
     const body = new URLSearchParams({
       action: "bsi_samo",
@@ -32,13 +28,9 @@ export const gtmSearch = async () => {
     return json.data;
   }
 
-  // ============================================================
-  // 2) Табы: переключение + ленивая инициализация
-  // ============================================================
   const tabButtons = Array.from(section.querySelectorAll(".gtm-search__tab-btn"));
   const tabPanels = Array.from(section.querySelectorAll(".gtm-search__item"));
 
-  // по твоей разметке: panels идут в порядке (tours/hotels/tickets/excursions)
   const tabNames = tabPanels.map((p) => p.getAttribute("data-tab") || "");
 
   const initedTabs = new Set();
@@ -62,9 +54,6 @@ export const gtmSearch = async () => {
 
   tabButtons.forEach((btn, idx) => btn.addEventListener("click", () => setActiveTab(idx)));
 
-  // ============================================================
-  // 3) ИНИТ конкретных табов (только 1 раз)
-  // ============================================================
   async function initTab(name) {
     if (initedTabs.has(name)) return;
 
@@ -75,17 +64,12 @@ export const gtmSearch = async () => {
     initedTabs.add(name);
   }
 
-  // ============================================================
-  // 4) ТАБ "Туры"
-  // ============================================================
   async function initToursTab() {
     const rootEl = section.querySelector('.gtm-search__item[data-tab="tours"]');
     if (!rootEl) return;
 
-    // локальный лоадинг именно таба (можно и section трогать, как тебе удобнее)
     section.classList.add("is-loading");
 
-    // dropdown внутри этого таба (важно: селектор scoped)
     dropdown('[data-tab="tours"] .gtm-nights-select');
     dropdown('[data-tab="tours"] .gtm-persons-select');
 
@@ -93,7 +77,6 @@ export const gtmSearch = async () => {
     const stateSelectElement = rootEl.querySelector(".gtm-state-select");
     const submitBtn = rootEl.querySelector(".gtm-item__button");
 
-    // --- состояние таба "Туры"
     const searchParams = {
       activeTown: "2",
       activeState: "",
@@ -138,7 +121,6 @@ export const gtmSearch = async () => {
 
     updateLink();
 
-    // --- Choices (Туры)
     const townSelect = new Choices(townSelectElement, {
       searchEnabled: true,
       loadingText: "Загрузка...",
@@ -159,7 +141,7 @@ export const gtmSearch = async () => {
       townSelect.clearChoices();
       townSelect.clearStore();
 
-      const resp = await samoAjax("townfroms"); // PHP уже есть
+      const resp = await samoAjax("townfroms");
       const towns = resp?.SearchTour_TOWNFROMS || resp;
 
       townSelect.setChoices(
@@ -176,7 +158,7 @@ export const gtmSearch = async () => {
       stateSelect.clearChoices();
       stateSelect.clearStore();
 
-      const resp = await samoAjax("states", { TOWNFROMINC: String(townId) }); // PHP уже есть
+      const resp = await samoAjax("states", { TOWNFROMINC: String(townId) });
       const states = resp?.SearchTour_STATES || resp;
 
       if (states && states.length) {
@@ -191,7 +173,6 @@ export const gtmSearch = async () => {
       }
     }
 
-    // --- listeners (Туры)
     townSelect.passedElement.element.addEventListener("choice", async (e) => {
       const townId = e.detail.value;
       updateLink({ activeTown: String(townId), activeState: "" });
@@ -206,7 +187,6 @@ export const gtmSearch = async () => {
       window.open(tourLink, "_blank");
     });
 
-    // --- Ночи (важно: rootEl)
     createDayRange({
       rootEl,
       gridSelector: ".day-grid",
@@ -220,7 +200,6 @@ export const gtmSearch = async () => {
       },
     });
 
-    // --- Люди (scoped через селектор таба)
     peopleCounter({
       rootSelector: '[data-tab="tours"] .gtm-persons-select',
       outputSelector: '[data-tab="tours"] .gtm-people-total',
@@ -236,7 +215,6 @@ export const gtmSearch = async () => {
       },
     });
 
-    // --- Даты (Туры)
     const datepick = rootEl.querySelector(".gtm-datepicker");
     if (datepick) {
       const today = new Date();
@@ -257,16 +235,12 @@ export const gtmSearch = async () => {
       });
     }
 
-    // --- init загрузки данных (Туры)
     await loadTowns();
     await loadStates(searchParams.activeTown);
 
     section.classList.remove("is-loading");
   }
 
-  // ============================================================
-  // 5) ТАБ "Отели" (без дублирования логики табов, но параметры другие)
-  // ============================================================
   async function initHotelsTab() {
     const rootEl = section.querySelector('.gtm-search__item[data-tab="hotels"]');
     if (!rootEl) return;
@@ -280,8 +254,8 @@ export const gtmSearch = async () => {
     const submitBtn = rootEl.querySelector(".gtm-item__button");
 
     const searchParams = {
-      STATEFROM: "2", // ты сказал “всегда 2”
-      activeState: "", // STATEINC
+      STATEFROM: "2",
+      activeState: "",
       nightsFrom: 5,
       nightsTill: 10,
       checkInStart: "20251210",
@@ -323,7 +297,6 @@ export const gtmSearch = async () => {
 
     updateLink();
 
-    // Choices (Отели)
     const stateSelect = new Choices(stateSelectElement, {
       searchEnabled: true,
       loadingText: "Загрузка...",
@@ -332,7 +305,6 @@ export const gtmSearch = async () => {
       noChoicesText: "",
     });
 
-    //  !!! нужен PHP-роут: method=hotel_states
     async function loadHotelStates() {
       stateSelect.clearChoices();
       stateSelect.clearStore();
@@ -353,7 +325,6 @@ export const gtmSearch = async () => {
       }
     }
 
-    // listeners (Отели)
     stateSelect.passedElement.element.addEventListener("choice", (e) => {
       updateLink({ activeState: String(e.detail.value) });
     });
@@ -362,7 +333,6 @@ export const gtmSearch = async () => {
       window.open(hotelLink, "_blank");
     });
 
-    // Ночи (rootEl)
     createDayRange({
       rootEl,
       gridSelector: ".day-grid",
@@ -376,7 +346,6 @@ export const gtmSearch = async () => {
       },
     });
 
-    // Люди (Отели)
     peopleCounter({
       rootSelector: '[data-tab="hotels"] .gtm-persons-select',
       outputSelector: '[data-tab="hotels"] .gtm-people-total',
@@ -392,7 +361,6 @@ export const gtmSearch = async () => {
       },
     });
 
-    // Даты (Отели)
     const datepick = rootEl.querySelector(".gtm-datepicker");
     if (datepick) {
       const today = new Date();
@@ -418,9 +386,6 @@ export const gtmSearch = async () => {
     section.classList.remove("is-loading");
   }
 
-  // ============================================================
-  // 6) ТАБ "Экскурсионные туры"
-  // ============================================================
   async function initExcursionsTab() {
     const rootEl = section.querySelector('.gtm-search__item[data-tab="excursions"]');
     if (!rootEl) return;
@@ -597,9 +562,6 @@ export const gtmSearch = async () => {
     section.classList.remove("is-loading");
   }
 
-  // ============================================================
-  // 7) Стартуем: активный таб (по разметке уже active)
-  // ============================================================
   const activeIndex = tabPanels.findIndex((p) => p.classList.contains("active"));
   setActiveTab(activeIndex >= 0 ? activeIndex : 0);
 };

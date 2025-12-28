@@ -96,12 +96,6 @@ function offer_get_country_flag_url($country_id): string
   return '';
 }
 
-/**
- * Парсит URL экскурсии и извлекает параметры для API Самотура
- *
- * @param string $url URL вида: https://online.bsigroup.ru/search_excursion?TOWNFROMINC=1&STATEINC=32&TOURINC=635
- * @return array Массив с параметрами ['TOWNFROMINC' => 1, 'STATEINC' => 32, 'TOURS' => 635] или пустой массив
- */
 function parse_excursion_url(string $url): array
 {
   if (empty($url)) {
@@ -125,7 +119,6 @@ function parse_excursion_url(string $url): array
     $result['STATEINC'] = (int) $params['STATEINC'];
   }
 
-  // TOURINC в URL соответствует TOURS в API
   if (!empty($params['TOURINC'])) {
     $result['TOURS'] = (int) $params['TOURINC'];
   }
@@ -133,12 +126,6 @@ function parse_excursion_url(string $url): array
   return $result;
 }
 
-/**
- * Получает параметры экскурсии для тура из ACF поля
- *
- * @param int $tour_id ID тура
- * @return array Массив с параметрами для API или пустой массив
- */
 function get_tour_excursion_params(int $tour_id): array
 {
   if (!$tour_id || !function_exists('get_field')) {

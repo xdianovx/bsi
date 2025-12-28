@@ -1,11 +1,9 @@
-// Константы
 const OAUTH_TOKEN = "ddcb768f480a4d769bc960c76ac29528";
 const BASE_URL = "https://online.bsigroup.ru/export/default.php";
 const VERSION = "1.0";
 const TYPE = "json";
 const SEMO_ACTION = "api";
 
-// Основная функция для запросов
 async function makeDirectApiRequest(action, additionalParams = {}) {
   try {
     const baseParams = {
@@ -35,7 +33,6 @@ async function makeDirectApiRequest(action, additionalParams = {}) {
     const data = await response.json();
     return data;
   } catch (error) {
-    // Error handling without console output
     throw error;
   }
 }
@@ -52,17 +49,14 @@ async function getAllTours(town_id, state_id) {
   return makeDirectApiRequest("SearchTour_ALL", { TOWNFROMINC: town_id, STATEINC: state_id });
 }
 
-// Отели
 async function getHotelTownFroms() {
   return makeDirectApiRequest("HotelStopsale_TOWNFROMS");
 }
 
-// Экскурсионные туры
 async function getExcursionTownFrom(cur, rate) {
   return makeDirectApiRequest("SearchExcursion__TOWNFROMS");
 }
 
-// Валюты
 async function getCurrencyRate(cur, rate) {
   return makeDirectApiRequest("Currency_TodayRates", {
     CURRENCY: cur,

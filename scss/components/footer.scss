@@ -6,7 +6,6 @@
 
 .footer__top {
   padding-top: 32px;
-  // border-top: 1px solid #c8c4c4;
   display: grid;
   gap: 24px;
   grid-template-columns: 2fr 1fr 1fr;
@@ -14,7 +13,6 @@
 
 .footer-grid {
   padding-top: 16px;
-  // display: grid;
   align-items: flex-start;
   gap: 32px;
   grid-template-columns: repeat(4, 1fr);
@@ -22,7 +20,6 @@
 
 .footer-grid__links {
   display: flex;
-  // grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   grid-column: span 2;
 
@@ -81,7 +78,6 @@
 .footer-contact__link {
   color: $red;
   font-size: 16px;
-  // font-weight: 600;
   line-height: 100%;
 }
 
@@ -241,12 +237,6 @@
 }
 
 @media screen and (max-width: 768px) {
-  //   .footer__list {
-  //     flex-direction: column;
-  //     justify-content: center;
-  //     align-items: center;
-  //   }
-
   .footer__policy {
     flex-direction: column;
     gap: 8px;

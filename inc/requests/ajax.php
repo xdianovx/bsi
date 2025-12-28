@@ -7,13 +7,11 @@ function handle_simple_form()
   $errors = [];
   $client_type = sanitize_text_field($_POST['client_type'] ?? 'private');
 
-  // Валидация ФИО
   $full_name = sanitize_text_field($_POST['full_name'] ?? '');
   if (empty($full_name)) {
     $errors['full_name'] = 'Введите ФИО';
   }
 
-  // Валидация email
   $email = sanitize_email($_POST['email'] ?? '');
   if (empty($email)) {
     $errors['email'] = 'Введите email';
@@ -21,19 +19,16 @@ function handle_simple_form()
     $errors['email'] = 'Неверный формат email';
   }
 
-  // Валидация телефона
   $phone = sanitize_text_field($_POST['phone'] ?? '');
   if (empty($phone)) {
     $errors['phone'] = 'Введите телефон';
   } else {
-    // Проверка что телефон содержит достаточно цифр
     $phone_digits = preg_replace('/\D/', '', $phone);
     if (strlen($phone_digits) < 10) {
       $errors['phone'] = 'Введите корректный номер телефона';
     }
   }
 
-  // Валидация для корпоративных клиентов
   if ($client_type === 'corporate') {
     $company_name = sanitize_text_field($_POST['company_name'] ?? '');
     if (empty($company_name)) {
@@ -51,13 +46,11 @@ function handle_simple_form()
     }
   }
 
-  // Проверка согласия на обработку данных
   $privacy_agreement = isset($_POST['privacy_agreement']) && $_POST['privacy_agreement'] === 'on';
   if (!$privacy_agreement) {
     $errors['privacy_agreement'] = 'Необходимо согласие на обработку персональных данных';
   }
 
-  // Если есть ошибки - возвращаем
   if (!empty($errors)) {
     wp_send_json_error([
       'message' => 'Исправьте ошибки в форме',
@@ -65,7 +58,6 @@ function handle_simple_form()
     ]);
   }
 
-  // Собираем данные для письма
   $country_id = intval($_POST['country_id'] ?? 0);
   $country_name = '';
   if ($country_id) {
@@ -95,7 +87,6 @@ function handle_simple_form()
     }
   }
 
-  // Формируем сообщение для email
   $message = "Новая заявка с формы FIT\n\n";
   $message .= "Тип клиента: " . ($client_type === 'corporate' ? 'Корпоративный' : 'Частный') . "\n\n";
   
@@ -164,7 +155,6 @@ function handle_simple_form()
   $message .= "Дата отправки: " . date('d.m.Y H:i:s') . "\n";
   $message .= "IP адрес: " . $_SERVER['REMOTE_ADDR'] . "\n";
 
-  // Отправка письма
   $subject = 'Новая заявка FIT - ' . ($client_type === 'corporate' ? 'Корпоративный клиент' : 'Частный клиент');
   $sent = wp_mail(get_bloginfo('admin_email'), $subject, $message);
 

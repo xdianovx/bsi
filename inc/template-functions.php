@@ -1,23 +1,10 @@
 <?php
-/**
- * Functions which enhance the theme by hooking into WordPress
- *
- * @package bsi
- */
 
-/**
- * Adds custom classes to the array of body classes.
- *
- * @param array $classes Classes for the body element.
- * @return array
- */
 function bsi_body_classes( $classes ) {
-	// Adds a class of hfeed to non-singular pages.
 	if ( ! is_singular() ) {
 		$classes[] = 'hfeed';
 	}
 
-	// Adds a class of no-sidebar when there is no sidebar present.
 	if ( ! is_active_sidebar( 'sidebar-1' ) ) {
 		$classes[] = 'no-sidebar';
 	}
@@ -26,9 +13,6 @@ function bsi_body_classes( $classes ) {
 }
 add_filter( 'body_class', 'bsi_body_classes' );
 
-/**
- * Add a pingback url auto-discovery header for single posts, pages, or attachments.
- */
 function bsi_pingback_header() {
 	if ( is_singular() && pings_open() ) {
 		printf( '<link rel="pingback" href="%s">', esc_url( get_bloginfo( 'pingback_url' ) ) );
@@ -36,12 +20,6 @@ function bsi_pingback_header() {
 }
 add_action( 'wp_head', 'bsi_pingback_header' );
 
-/**
- * Подготавливает элемент подборки для вывода
- *
- * @param array $row Массив данных элемента из ACF
- * @return array|null Подготовленный массив данных карточки или null если элемент невалиден
- */
 function bsi_prepare_offer_item( $row ) {
 	$post_obj = $row['post'] ?? null;
 	if ( ! $post_obj instanceof WP_Post ) {

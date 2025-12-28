@@ -63,15 +63,12 @@ if (function_exists('get_field')) {
   $show_from = $show_from_field !== false;
 }
 
-// Получаем языки обучения
 $languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'names']);
 $languages = is_wp_error($languages) ? [] : $languages;
 
-// Получаем программы обучения
 $programs = wp_get_post_terms($education_id, 'education_program', ['fields' => 'names']);
 $programs = is_wp_error($programs) ? [] : $programs;
 
-// Получаем минимальную цену из программ
 $min_price = '';
 if (function_exists('get_field')) {
   $education_programs = get_field('education_programs', $education_id);
@@ -82,7 +79,6 @@ if (function_exists('get_field')) {
     foreach ($education_programs as $program) {
       $program_price = isset($program['price_per_week']) ? (string) $program['price_per_week'] : '';
       if ($program_price) {
-        // Извлекаем число из строки цены
         preg_match('/[\d\s]+/', $program_price, $matches);
         if (!empty($matches[0])) {
           $prices[] = (int) str_replace(' ', '', $matches[0]);
@@ -92,7 +88,6 @@ if (function_exists('get_field')) {
     
     if (!empty($prices)) {
       $min_price_value = min($prices);
-      // Форматируем цену
       $min_price = number_format($min_price_value, 0, ',', ' ') . ' руб/неделя';
     }
   }
