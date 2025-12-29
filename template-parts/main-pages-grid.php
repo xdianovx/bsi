@@ -9,7 +9,7 @@ $main_page_items = [
 
      // ],
      [
-          'title' => 'FIT Запрос',
+          'title' => 'индивидуальные запросы',
           'url' => get_permalink(2064),
           'target' => '',
           'img' => 'fit.png',
