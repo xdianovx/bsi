@@ -79,8 +79,12 @@ export function createDayRange({
 
     const index = items.indexOf(item);
 
+    // если клик на уже выбранный элемент (когда выбран только startIndex) - делаем его диапазоном (одно число)
+    if (startIndex !== null && endIndex === null && index === startIndex) {
+      endIndex = index;
+    }
     // первый клик или перезапуск, или клик "влево" от старта
-    if (startIndex === null || (startIndex !== null && endIndex !== null) || index <= startIndex) {
+    else if (startIndex === null || (startIndex !== null && endIndex !== null) || index <= startIndex) {
       startIndex = index;
       endIndex = null;
     } else {
@@ -89,8 +93,10 @@ export function createDayRange({
 
     render();
 
-    // важно: шлем onChange только когда диапазон уже 2 точки
-    if (startIndex !== null && endIndex !== null) emitChange("click");
+    // вызываем onChange когда выбран хотя бы один день
+    if (startIndex !== null) {
+      emitChange("click");
+    }
   }
 
   // ---- bind ----
@@ -106,8 +112,8 @@ export function createDayRange({
 
     render();
 
-    // если заданы оба — эмитим сразу (как раньше)
-    if (startIndex !== null && endIndex !== null) emitChange("init");
+    // эмитим сразу при инициализации
+    emitChange("init");
   }
 
   // ---- API ----

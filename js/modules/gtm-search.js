@@ -202,9 +202,17 @@ export const gtmSearch = async () => {
       defaultStartDay: searchParams.nightsFrom,
       defaultEndDay: searchParams.nightsTill,
       onChange: ({ startDay, endDay }) => {
-        if (startDay && endDay) {
-          updateLink({ nightsFrom: startDay, nightsTill: endDay });
-          rootEl.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
+        if (startDay) {
+          const nightsTill = endDay || startDay;
+          updateLink({ nightsFrom: startDay, nightsTill: nightsTill });
+          const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
+          if (nightsValue) {
+            if (startDay === nightsTill) {
+              nightsValue.textContent = `${startDay} ночей`;
+            } else {
+              nightsValue.textContent = `${startDay} - ${nightsTill} ночей`;
+            }
+          }
         }
       },
     });
@@ -348,9 +356,17 @@ export const gtmSearch = async () => {
       defaultStartDay: searchParams.nightsFrom,
       defaultEndDay: searchParams.nightsTill,
       onChange: ({ startDay, endDay }) => {
-        if (startDay && endDay) {
-          updateLink({ nightsFrom: startDay, nightsTill: endDay });
-          rootEl.querySelector(".gtm-nights-select-value").textContent = `${startDay} - ${endDay} ночей`;
+        if (startDay) {
+          const nightsTill = endDay || startDay;
+          updateLink({ nightsFrom: startDay, nightsTill: nightsTill });
+          const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
+          if (nightsValue) {
+            if (startDay === nightsTill) {
+              nightsValue.textContent = `${startDay} ночей`;
+            } else {
+              nightsValue.textContent = `${startDay} - ${nightsTill} ночей`;
+            }
+          }
         }
       },
     });

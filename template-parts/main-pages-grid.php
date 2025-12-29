@@ -30,7 +30,7 @@ $main_page_items = [
 
      ],
      [
-          'title' => 'VIP-Concierge',
+          'title' => 'VIP УСЛУГИ',
           'url' => 'https://bsivip.ru/',
           'target' => '_blank',
           'img' => 'vip.png',
