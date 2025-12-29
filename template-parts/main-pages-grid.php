@@ -1,13 +1,13 @@
 <?php
 
 $main_page_items = [
-     [
-          'title' => "Онлайн <br> бронирование",
-          'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
-          'target' => '_blank',
-          'img' => 'online.png',
+     // [
+     //      'title' => "Онлайн <br> бронирование",
+     //      'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
+     //      'target' => '_blank',
+     //      'img' => 'online.png',
 
-     ],
+     // ],
      [
           'title' => 'FIT',
           'url' => get_permalink(2064),
@@ -15,15 +15,15 @@ $main_page_items = [
           'img' => 'fit.png',
 
      ],
-     [
-          'title' => 'Круизы',
-          'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
-          'target' => '_blank',
-          'img' => 'cruise.png',
+     // [
+     //      'title' => 'Круизы',
+     //      'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
+     //      'target' => '_blank',
+     //      'img' => 'cruise.png',
 
-     ],
+     // ],
      [
-          'title' => 'События',
+          'title' => 'Событийные туры',
           'url' => get_permalink(2064),
           'target' => '',
           'img' => 'event.png',
@@ -36,13 +36,13 @@ $main_page_items = [
           'img' => 'vip.png',
 
      ],
-     [
-          'title' => "Образование <br> за рубежом",
-          // 'url' => get_permalink(get_page_by_path('obrazovanie-za-rubezhom')),
-          'url' => 'https://www.bsistudy.ru',
-          'target' => '_blank',
-          'img' => 'edu.png',
-     ],
+     // [
+     //      'title' => "Образование <br> за рубежом",
+     //      // 'url' => get_permalink(get_page_by_path('obrazovanie-za-rubezhom')),
+     //      'url' => 'https://www.bsistudy.ru',
+     //      'target' => '_blank',
+     //      'img' => 'edu.png',
+     // ],
      [
           'title' => 'Страхование',
           'url' => get_permalink(get_page_by_path('strahovanie')),
@@ -50,21 +50,21 @@ $main_page_items = [
           'img' => 'esur.png',
 
      ],
-     [
-          'title' => 'Визы',
-          'url' => get_permalink(get_page_by_path('vizy')),
-          'target' => '',
-          'img' => 'visa.png',
+     // [
+     //      'title' => 'Визы',
+     //      'url' => get_permalink(get_page_by_path('vizy')),
+     //      'target' => '',
+     //      'img' => 'visa.png',
 
-     ],
+     // ],
 
-     [
-          'title' => "Business Travel <br> & MICE",
-          'url' => get_permalink(get_page_by_path('mice')),
-          'target' => '',
-          'img' => 'mice.png',
+     // [
+     //      'title' => "Business Travel <br> & MICE",
+     //      'url' => get_permalink(get_page_by_path('mice')),
+     //      'target' => '',
+     //      'img' => 'mice.png',
 
-     ],
+     // ],
      [
           'title' => 'Incoming',
           'url' => 'https://incoming.bsigroup.ru/',
