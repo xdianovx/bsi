@@ -2577,7 +2577,13 @@ input.error {
 @media screen and (max-width: 768px) {
   .gtm-datepicker {
     text-align: left;
-    padding: 0 16px;
+    padding: 0 12px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .gtm-persons-select {
+    padding: 0 12px;
   }
 }
 
@@ -2736,6 +2742,13 @@ input.error {
 @media screen and (max-width: 768px) {
   .gtm-nights-select {
     justify-content: flex-start;
+    padding: 0 12px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .js-dropdown-trigger::after {
+    right: -2px;
   }
 }
 
