@@ -2,7 +2,7 @@
 $news_page_link = get_post_type_archive_link('news');
 $news_query = new WP_Query([
   'post_type' => 'news',
-  'posts_per_page' => 6, // количество постов
+  'posts_per_page' => 6,
   'orderby' => 'date',
   'order' => 'DESC'
 ]);
@@ -23,21 +23,13 @@ $news_query = new WP_Query([
       </div>
 
       <div class="title-wrap__buttons">
-        <a href="<?= get_permalink(2223) ?>"
-           class="title-wrap__link link-arrow">
+        <a href="<?= get_permalink(2223) ?>" class="title-wrap__link link-arrow">
           <span>Все новости </span>
           <div class="link-arrow__icon">
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="24"
-                 height="24"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="1.5"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
               <path d="M7 7h10v10" />
               <path d="M7 17 17 7" />
             </svg>
@@ -73,8 +65,7 @@ $news_query = new WP_Query([
       </div>
 
       <div class="news-slider__buttons-mob">
-        <a href="<?= get_permalink(2223) ?>"
-           class="btn btn-accent">Все новости</a>
+        <a href="<?= get_permalink(2223) ?>" class="btn btn-accent">Все новости</a>
       </div>
 
       <?php wp_reset_postdata(); ?>

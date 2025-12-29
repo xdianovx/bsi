@@ -1,14 +1,14 @@
 <?php
-// Ожидаем аргумент section_id при вызове get_template_part(..., ..., ['section_id' => 123])
+
 $section_id = isset($args['section_id']) ? (int) $args['section_id'] : 0;
 
-// Если аргумента нет, а слайдер выводится внутри записи секции – берём текущий ID
+
 if (!$section_id && is_singular('banner_section')) {
   $section_id = get_the_ID();
 }
 
 $query_args = [
-  'post_type' => 'banner', // слаг твоего CPT для баннеров
+  'post_type' => 'banner',
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'orderby' => [
@@ -20,7 +20,7 @@ $query_args = [
 if ($section_id) {
   $query_args['meta_query'] = [
     [
-      'key' => 'banner_section', // ACF поле-связка баннера с секцией
+      'key' => 'banner_section',
       'value' => $section_id,
       'compare' => '=',
     ],

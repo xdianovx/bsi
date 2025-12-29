@@ -16,16 +16,11 @@ if (!empty($file)) {
   }
 }
 
-// что открываем в fancybox:
-// 1) если есть файл — открываем его
-// 2) иначе если есть ссылка — открываем её (в iframe)
-// 3) иначе — просто не делаем ссылку
 $fb_href = '';
 $fb_type = '';
 
 if ($file_url) {
   $fb_href = $file_url;
-  // fancybox сам часто понимает pdf/jpg/png, но тип можно не задавать
 } elseif (!empty($link)) {
   $fb_href = (string) $link;
   $fb_type = 'iframe';
@@ -33,17 +28,11 @@ if ($file_url) {
 ?>
 
 <?php if ($fb_href): ?>
-  <a href="<?php echo esc_url($fb_href); ?>"
-     class="award-card__link"
-     data-fancybox="awards"
-     <?php if ($fb_type): ?>
-       data-type="<?php echo esc_attr($fb_type); ?>"
-     <?php endif; ?>
-     aria-label="<?php echo esc_attr(get_the_title()); ?>">
+  <a href="<?php echo esc_url($fb_href); ?>" class="award-card__link" data-fancybox="awards" <?php if ($fb_type): ?>
+      data-type="<?php echo esc_attr($fb_type); ?>" <?php endif; ?> aria-label="<?php echo esc_attr(get_the_title()); ?>">
   <?php endif; ?>
 
-  <article id="post-<?php the_ID(); ?>"
-           <?php post_class('award-card'); ?>>
+  <article id="post-<?php the_ID(); ?>" <?php post_class('award-card'); ?>>
     <div class="award-card__inner">
       <?php if (has_post_thumbnail()): ?>
         <div class="award-card__image">

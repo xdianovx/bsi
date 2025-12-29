@@ -4,8 +4,8 @@ if (empty($gallery) || !is_array($gallery)) {
   return;
 }
 
-$id = $args['id'] ?? uniqid('gallery_'); // уникальная группа для fancybox и js
-$title = $args['title'] ?? ''; // если нужно
+$id = $args['id'] ?? uniqid('gallery_');
+$title = $args['title'] ?? '';
 ?>
 
 <div class="single-hotel__gallery-section country-page__gallery js-gallery" data-gallery-id="<?= esc_attr($id); ?>">
@@ -22,8 +22,7 @@ $title = $args['title'] ?? ''; // если нужно
         if (!$img_url)
           continue;
 
-        // если ACF отдает sizes, можно открыть крупнее:
-        $full_url = $item['sizes']['large'] ?? $img_url; // поменяй на 'full' если есть
+        $full_url = $item['sizes']['large'] ?? $img_url;
         ?>
         <div class="swiper-slide">
           <a class="hotel-gallery-main-slide country-page__gallery-slide" href="<?= esc_url($img_url); ?>"

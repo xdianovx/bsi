@@ -1,9 +1,6 @@
 <section class="subscribe-section">
   <div class="container">
     <div class="subscribe-section__wrap">
-      <!-- <img src="<?= get_template_directory_uri() ?>/img/subscribe/form_img.png"
-           alt="Рассылка BSI Group"
-           class="subscribe-section__img"> -->
 
       <div class="subscribe-section__info">
         <h2 class="h2 subscribe-section__h2">

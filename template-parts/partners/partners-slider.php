@@ -2,7 +2,7 @@
 $partners_page_link = get_post_type_archive_link('partner');
 $partners_query = new WP_Query([
   'post_type' => 'partner',
-  'posts_per_page' => -1, // количество постов
+  'posts_per_page' => -1,
   'orderby' => 'date',
   'order' => 'DESC'
 ]);
@@ -31,8 +31,7 @@ $partners_query = new WP_Query([
             <div class="swiper-slide">
               <div class="partner-card">
 
-                <img src="<?= get_the_post_thumbnail_url() ?>"
-                     alt="<?php the_title() ?>">
+                <img src="<?= get_the_post_thumbnail_url() ?>" alt="<?php the_title() ?>">
               </div>
             </div>
 

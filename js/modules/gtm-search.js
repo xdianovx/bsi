@@ -31,25 +31,34 @@ export const gtmSearch = async () => {
   const tabButtons = Array.from(section.querySelectorAll(".gtm-search__tab-btn"));
   const tabPanels = Array.from(section.querySelectorAll(".gtm-search__item"));
 
-  const tabNames = tabPanels.map((p) => p.getAttribute("data-tab") || "");
-
   const initedTabs = new Set();
 
   function setActiveTab(index) {
-    const name = tabNames[index];
-    
-    if (name === "tickets") {
-      window.open("https://online.bsigroup.ru/tickets", "_blank");
+    const btn = tabButtons[index];
+    const href = btn?.getAttribute("data-href");
+
+    if (href) {
+      const target = btn?.getAttribute("data-target");
+      if (target === "_blank") {
+        window.open(href, "_blank");
+      } else {
+        window.location.href = href;
+      }
       return;
     }
+
+    const tabName = btn?.getAttribute("data-tab");
+    const panel = tabName ? section.querySelector(`.gtm-search__item[data-tab="${tabName}"]`) : null;
+
+    if (!panel) return;
 
     tabButtons.forEach((b) => b.classList.remove("active"));
     tabPanels.forEach((p) => p.classList.remove("active"));
 
-    tabButtons[index]?.classList.add("active");
-    tabPanels[index]?.classList.add("active");
+    btn?.classList.add("active");
+    panel.classList.add("active");
 
-    if (name) initTab(name).catch(() => {});
+    initTab(tabName).catch(() => {});
   }
 
   tabButtons.forEach((btn, idx) => btn.addEventListener("click", () => setActiveTab(idx)));

@@ -1,9 +1,7 @@
 <?php
 $project = get_query_var('project');
 
-// Поддержка 2 вариантов:
-// 1) передали массивом через set_query_var('project', $item)
-// 2) просто вызвали внутри WP Loop
+
 $project_id = 0;
 
 if (is_array($project) && !empty($project['id'])) {
@@ -19,7 +17,7 @@ if (!$project_id) {
 $url = is_array($project) && !empty($project['url']) ? (string) $project['url'] : (string) get_permalink($project_id);
 $title = is_array($project) && !empty($project['title']) ? (string) $project['title'] : (string) get_the_title($project_id);
 
-// Страна (ACF: project_country)
+
 $country_id = 0;
 if (function_exists('get_field')) {
   $c = get_field('project_country', $project_id);
@@ -47,7 +45,6 @@ if ($country_id && function_exists('get_field')) {
   }
 }
 
-// Картинка: featured -> иначе первая из project_gallery
 $image_url = '';
 $thumb = get_the_post_thumbnail_url($project_id, 'large');
 if ($thumb) {
@@ -72,7 +69,6 @@ if ($thumb) {
   }
 }
 
-// Текст (коротко)
 $excerpt = '';
 if (is_array($project) && !empty($project['excerpt'])) {
   $excerpt = (string) $project['excerpt'];
@@ -82,13 +78,10 @@ if (is_array($project) && !empty($project['excerpt'])) {
 }
 ?>
 
-<a href="<?php echo esc_url($url); ?>"
-   class="project-card">
+<a href="<?php echo esc_url($url); ?>" class="project-card">
   <?php if ($image_url): ?>
     <div class="project-card__media">
-      <img class="project-card__image"
-           src="<?php echo esc_url($image_url); ?>"
-           alt="<?php echo esc_attr($title); ?>">
+      <img class="project-card__image" src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>">
     </div>
   <?php endif; ?>
 
@@ -98,8 +91,7 @@ if (is_array($project) && !empty($project['excerpt'])) {
         <div class="project-card__country">
           <?php if ($flag_url): ?>
             <span class="project-card__flag">
-              <img src="<?php echo esc_url($flag_url); ?>"
-                   alt="">
+              <img src="<?php echo esc_url($flag_url); ?>" alt="">
             </span>
           <?php endif; ?>
           <?php if ($country_title): ?>

@@ -354,26 +354,18 @@ $is_visas_open = $is_visas_page || !empty($active_visa_types);
 $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 ?>
 
-<nav class="child-pages"
-     data-country-aside>
+<nav class="child-pages" data-country-aside>
   <div class="child-pages__list">
 
     <a href="<?= esc_url(get_permalink($main_parent_id)); ?>"
-       class="child-page-item <?= $is_country_overview ? 'active' : ''; ?>">
+      class="child-page-item <?= $is_country_overview ? 'active' : ''; ?>">
       <span class="child-page-item__icon">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="24"
-             height="24"
-             viewBox="0 0 24 24"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="1.5"
-             stroke-linecap="round"
-             stroke-linejoin="round"
-             class="lucide lucide-house-icon lucide-house">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+          class="lucide lucide-house-icon lucide-house">
           <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
           <path
-                d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
         </svg>
       </span>
       <span>Обзор</span>
@@ -381,20 +373,13 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 
     <?php if (!empty($has_entry_rules)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/entry-rules/")); ?>"
-         class="child-page-item <?= $is_entry_rules_page ? 'active' : ''; ?>">
+        class="child-page-item <?= $is_entry_rules_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-file-exclamation-point-icon lucide-file-exclamation-point">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-file-exclamation-point-icon lucide-file-exclamation-point">
             <path
-                  d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+              d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
             <path d="M12 9v4" />
             <path d="M12 17h.01" />
           </svg>
@@ -404,61 +389,36 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
     <?php endif; ?>
 
     <?php if (!empty($has_visas)): ?>
-      <div class="child-page-accordion <?= $is_visas_open ? 'is-open' : ''; ?>"
-           data-accordion>
-        <button type="button"
-                class="child-page-item <?= $is_visas_page ? 'active' : ''; ?>"
-                data-accordion-trigger
-                aria-expanded="<?= $is_visas_open ? 'true' : 'false'; ?>"
-                aria-controls="<?= esc_attr($visa_acc_id); ?>">
+      <div class="child-page-accordion <?= $is_visas_open ? 'is-open' : ''; ?>" data-accordion>
+        <button type="button" class="child-page-item <?= $is_visas_page ? 'active' : ''; ?>" data-accordion-trigger
+          aria-expanded="<?= $is_visas_open ? 'true' : 'false'; ?>" aria-controls="<?= esc_attr($visa_acc_id); ?>">
           <span class="child-page-item__icon">
-            <svg width="24"
-                 height="24"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round" />
-              <path d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round" />
-              <path d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
-                    stroke-width="1.5"
-                    stroke-linecap="round" />
-              <path d="M7 13H11"
-                    stroke-width="1.5"
-                    stroke-linecap="round" />
-              <path d="M7 17H15"
-                    stroke-width="1.5"
-                    stroke-linecap="round" />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path
+                d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path
+                d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
+                stroke-width="1.5" stroke-linecap="round" />
+              <path d="M7 13H11" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M7 17H15" stroke-width="1.5" stroke-linecap="round" />
             </svg>
           </span>
           <span>Виза</span>
 
           <div class="child-page-item__icon child-page-item__chevrone">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="24"
-                 height="24"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 class="lucide lucide-chevron-down-icon lucide-chevron-down">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-chevron-down-icon lucide-chevron-down">
               <path d="m6 9 6 6 6-6" />
             </svg>
           </div>
         </button>
 
-        <div id="<?= esc_attr($visa_acc_id); ?>"
-             class="child-page-submenu"
-             data-accordion-content
-             <?= $is_visas_open ? '' : 'hidden'; ?>>
+        <div id="<?= esc_attr($visa_acc_id); ?>" class="child-page-submenu" data-accordion-content <?= $is_visas_open ? '' : 'hidden'; ?>>
           <?php if (!empty($visa_types_for_country)): ?>
             <?php foreach ($visa_types_for_country as $vt): ?>
               <?php
@@ -467,7 +427,7 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
               $url = add_query_arg(['visa_type[]' => $vt_id], $visas_list_url);
               ?>
               <a class="child-page-subitem <?= $is_active_vt ? 'active' : ''; ?>"
-                 href="<?= esc_url($url); ?>"><?= esc_html($vt->name); ?></a>
+                href="<?= esc_url($url); ?>"><?= esc_html($vt->name); ?></a>
             <?php endforeach; ?>
           <?php endif; ?>
         </div>
@@ -475,32 +435,20 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
     <?php endif; ?>
 
     <?php if (!empty($has_visas)): ?>
-      <a href="<?= esc_url($visas_list_url); ?>"
-         class="child-page-item --mobile <?= $is_visas_page ? 'active' : ''; ?>">
+      <a href="<?= esc_url($visas_list_url); ?>" class="child-page-item --mobile <?= $is_visas_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round" />
-            <path d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round" />
-            <path d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
-                  stroke-width="1.5"
-                  stroke-linecap="round" />
-            <path d="M7 13H11"
-                  stroke-width="1.5"
-                  stroke-linecap="round" />
-            <path d="M7 17H15"
-                  stroke-width="1.5"
-                  stroke-linecap="round" />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path
+              d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
+              stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
+              stroke-width="1.5" stroke-linecap="round" />
+            <path d="M7 13H11" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M7 17H15" stroke-width="1.5" stroke-linecap="round" />
           </svg>
         </span>
         <span>Виза</span>
@@ -509,18 +457,11 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 
     <?php if (!empty($has_promos)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/promo/")); ?>"
-         class="child-page-item <?= $is_promos_page ? 'active' : ''; ?>">
+        class="child-page-item <?= $is_promos_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-flame-icon lucide-flame">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-flame-icon lucide-flame">
             <path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" />
           </svg>
         </span>
@@ -529,31 +470,19 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
     <?php endif; ?>
 
     <?php if (!empty($has_tours)): ?>
-      <div class="child-page-accordion <?= $is_tours_open ? 'is-open' : ''; ?>"
-           data-accordion>
-        <button type="button"
-                class="child-page-item <?= $is_tours_page ? 'active' : ''; ?>"
-                data-accordion-trigger
-                aria-expanded="<?= $is_tours_open ? 'true' : 'false'; ?>"
-                aria-controls="<?= esc_attr($acc_id); ?>">
+      <div class="child-page-accordion <?= $is_tours_open ? 'is-open' : ''; ?>" data-accordion>
+        <button type="button" class="child-page-item <?= $is_tours_page ? 'active' : ''; ?>" data-accordion-trigger
+          aria-expanded="<?= $is_tours_open ? 'true' : 'false'; ?>" aria-controls="<?= esc_attr($acc_id); ?>">
           <span class="child-page-item__icon ">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 width="24"
-                 height="24"
-                 color="currentColor"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="1.5"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="currentColor"
+              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path
-                    d="M3 22C7.67798 16.3864 9.95978 9.8784 10.8382 4.98644C10.8643 4.84129 10.8773 4.76868 10.8931 4.71553C11.0101 4.32106 11.3323 4.05162 11.7412 4.00613C11.7963 4 11.8642 4 12 4C12.1358 4 12.2037 4 12.2588 4.00613C12.6677 4.05162 12.9899 4.32106 13.1069 4.71553C13.1227 4.76868 13.1357 4.84129 13.1618 4.98644C14.0402 9.8784 16.322 16.3864 21 22" />
+                d="M3 22C7.67798 16.3864 9.95978 9.8784 10.8382 4.98644C10.8643 4.84129 10.8773 4.76868 10.8931 4.71553C11.0101 4.32106 11.3323 4.05162 11.7412 4.00613C11.7963 4 11.8642 4 12 4C12.1358 4 12.2037 4 12.2588 4.00613C12.6677 4.05162 12.9899 4.32106 13.1069 4.71553C13.1227 4.76868 13.1357 4.84129 13.1618 4.98644C14.0402 9.8784 16.322 16.3864 21 22" />
               <path d="M12 4V2" />
               <path d="M8 11H16" />
               <path d="M6 15H18" />
               <path
-                    d="M15.5 22C15.2904 20.959 15.1855 20.4386 14.9348 19.9979C14.822 19.7995 14.6881 19.6148 14.5358 19.447C14.1973 19.0744 13.7412 18.8227 12.8289 18.3194C12.48 18.1269 12.3055 18.0306 12.1198 18.0074C12.0402 17.9975 11.9598 17.9975 11.8802 18.0074C11.6945 18.0306 11.52 18.1269 11.1711 18.3194C10.2588 18.8227 9.8027 19.0744 9.46424 19.447C9.31188 19.6148 9.17804 19.7995 9.06518 19.9979C8.81446 20.4386 8.70964 20.959 8.5 22" />
+                d="M15.5 22C15.2904 20.959 15.1855 20.4386 14.9348 19.9979C14.822 19.7995 14.6881 19.6148 14.5358 19.447C14.1973 19.0744 13.7412 18.8227 12.8289 18.3194C12.48 18.1269 12.3055 18.0306 12.1198 18.0074C12.0402 17.9975 11.9598 17.9975 11.8802 18.0074C11.6945 18.0306 11.52 18.1269 11.1711 18.3194C10.2588 18.8227 9.8027 19.0744 9.46424 19.447C9.31188 19.6148 9.17804 19.7995 9.06518 19.9979C8.81446 20.4386 8.70964 20.959 8.5 22" />
               <path d="M15 22L22 22" />
               <path d="M2 22H9" />
             </svg>
@@ -561,27 +490,17 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
           <span>Туры</span>
 
           <div class="child-page-item__icon child-page-item__chevrone">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="24"
-                 height="24"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 class="lucide lucide-chevron-down-icon lucide-chevron-down">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-chevron-down-icon lucide-chevron-down">
               <path d="m6 9 6 6 6-6" />
             </svg>
           </div>
         </button>
 
-        <div id="<?= esc_attr($acc_id); ?>"
-             class="child-page-submenu"
-             data-accordion-content
-             <?= $is_tours_open ? '' : 'hidden'; ?>>
+        <div id="<?= esc_attr($acc_id); ?>" class="child-page-submenu" data-accordion-content <?= $is_tours_open ? '' : 'hidden'; ?>>
           <a class="child-page-subitem <?= ($is_tours_page && empty($active_tour_types)) ? 'active' : ''; ?>"
-             href="<?= esc_url($tours_list_url); ?>">Все туры</a>
+            href="<?= esc_url($tours_list_url); ?>">Все туры</a>
 
           <?php if (!empty($tour_types_for_country)): ?>
             <?php foreach ($tour_types_for_country as $tt): ?>
@@ -591,7 +510,7 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
               $url = add_query_arg(['tour_type[]' => $tt_id], $tours_list_url);
               ?>
               <a class="child-page-subitem <?= $is_active_tt ? 'active' : ''; ?>"
-                 href="<?= esc_url($url); ?>"><?= esc_html($tt->name); ?></a>
+                href="<?= esc_url($url); ?>"><?= esc_html($tt->name); ?></a>
             <?php endforeach; ?>
           <?php endif; ?>
         </div>
@@ -599,26 +518,17 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
     <?php endif; ?>
 
     <?php if (!empty($has_tours)): ?>
-      <a href="<?= esc_url($tours_list_url); ?>"
-         class="child-page-item --mobile <?= $is_tours_page ? 'active' : ''; ?>">
+      <a href="<?= esc_url($tours_list_url); ?>" class="child-page-item --mobile <?= $is_tours_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               viewBox="0 0 24 24"
-               width="24"
-               height="24"
-               color="currentColor"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="currentColor"
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path
-                  d="M3 22C7.67798 16.3864 9.95978 9.8784 10.8382 4.98644C10.8643 4.84129 10.8773 4.76868 10.8931 4.71553C11.0101 4.32106 11.3323 4.05162 11.7412 4.00613C11.7963 4 11.8642 4 12 4C12.1358 4 12.2037 4 12.2588 4.00613C12.6677 4.05162 12.9899 4.32106 13.1069 4.71553C13.1227 4.76868 13.1357 4.84129 13.1618 4.98644C14.0402 9.8784 16.322 16.3864 21 22" />
+              d="M3 22C7.67798 16.3864 9.95978 9.8784 10.8382 4.98644C10.8643 4.84129 10.8773 4.76868 10.8931 4.71553C11.0101 4.32106 11.3323 4.05162 11.7412 4.00613C11.7963 4 11.8642 4 12 4C12.1358 4 12.2037 4 12.2588 4.00613C12.6677 4.05162 12.9899 4.32106 13.1069 4.71553C13.1227 4.76868 13.1357 4.84129 13.1618 4.98644C14.0402 9.8784 16.322 16.3864 21 22" />
             <path d="M12 4V2" />
             <path d="M8 11H16" />
             <path d="M6 15H18" />
             <path
-                  d="M15.5 22C15.2904 20.959 15.1855 20.4386 14.9348 19.9979C14.822 19.7995 14.6881 19.6148 14.5358 19.447C14.1973 19.0744 13.7412 18.8227 12.8289 18.3194C12.48 18.1269 12.3055 18.0306 12.1198 18.0074C12.0402 17.9975 11.9598 17.9975 11.8802 18.0074C11.6945 18.0306 11.52 18.1269 11.1711 18.3194C10.2588 18.8227 9.8027 19.0744 9.46424 19.447C9.31188 19.6148 9.17804 19.7995 9.06518 19.9979C8.81446 20.4386 8.70964 20.959 8.5 22" />
+              d="M15.5 22C15.2904 20.959 15.1855 20.4386 14.9348 19.9979C14.822 19.7995 14.6881 19.6148 14.5358 19.447C14.1973 19.0744 13.7412 18.8227 12.8289 18.3194C12.48 18.1269 12.3055 18.0306 12.1198 18.0074C12.0402 17.9975 11.9598 17.9975 11.8802 18.0074C11.6945 18.0306 11.52 18.1269 11.1711 18.3194C10.2588 18.8227 9.8027 19.0744 9.46424 19.447C9.31188 19.6148 9.17804 19.7995 9.06518 19.9979C8.81446 20.4386 8.70964 20.959 8.5 22" />
             <path d="M15 22L22 22" />
             <path d="M2 22H9" />
           </svg>
@@ -629,18 +539,11 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 
     <?php if (!empty($has_regions) && !is_wp_error($has_regions)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/kurorty/")); ?>"
-         class="child-page-item <?= $is_resorts_page ? 'active' : ''; ?>">
+        class="child-page-item <?= $is_resorts_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-tree-palm-icon lucide-tree-palm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-tree-palm-icon lucide-tree-palm">
             <path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-1 1 1h4"></path>
             <path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-3l-1-1-1 1h-3"></path>
             <path d="M5.89 9.71c-2.15 2.15-2.3 5.47-.35 7.43l4.24-4.25.7-.7.71-.71 2.12-2.12c-1.95-1.96-5.27-1.8-7.42.35">
@@ -654,18 +557,11 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 
     <?php if (!empty($has_hotels)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/hotel/")); ?>"
-         class="child-page-item <?= $is_hotels_page ? 'active' : ''; ?>">
+        class="child-page-item <?= $is_hotels_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-bed-double-icon lucide-bed-double">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-bed-double-icon lucide-bed-double">
             <path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8" />
             <path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4" />
             <path d="M12 4v6" />
@@ -678,18 +574,11 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 
     <?php if (!empty($has_memo)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/memo/")); ?>"
-         class="child-page-item <?= $is_memo_page ? 'active' : ''; ?>">
+        class="child-page-item <?= $is_memo_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="24"
-               height="24"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-bookmark-icon lucide-bookmark">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-bookmark-icon lucide-bookmark">
             <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
           </svg>
         </span>
@@ -700,7 +589,7 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
     <?php if (!empty($child_pages)): ?>
       <?php foreach ($child_pages as $child): ?>
         <a href="<?= esc_url(get_permalink($child->ID)); ?>"
-           class="child-page-item <?= ((int) $current_id === (int) $child->ID) ? 'active' : ''; ?>">
+          class="child-page-item <?= ((int) $current_id === (int) $child->ID) ? 'active' : ''; ?>">
           <span><?= esc_html($child->post_title); ?></span>
         </a>
       <?php endforeach; ?>
