@@ -13,7 +13,7 @@ $partners_query = new WP_Query([
 
     <div class="title-wrap">
       <div class="title-wrap__left">
-        <h2 class="h2 partners-slider__title">Парнеры</h2>
+        <h2 class="h2 partners-slider__title">Партнеры</h2>
       </div>
 
 
