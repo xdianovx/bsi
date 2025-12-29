@@ -58,10 +58,11 @@ function format_price_with_from(?string $price, bool $show_from = true): string
   $price_lower_original = mb_strtolower($price, 'UTF-8');
   $has_rub = mb_strpos($price_lower_original, 'руб') !== false || mb_strpos($price_lower_original, '₽') !== false;
   
-  $price = str_replace('₽', 'руб', $price);
+  $price = str_replace('руб', '₽', $price);
+  $price = str_replace('₽₽', '₽', $price);
   
   if (!$has_rub) {
-    $price = $price . ' руб';
+    $price = $price . ' ₽';
   }
 
   $price_lower = mb_strtolower($price, 'UTF-8');

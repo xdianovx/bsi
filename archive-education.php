@@ -173,7 +173,8 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Даты заезда</div>
-          <input type="text" class="education-filter__input education-filter__datepicker" name="date_range" placeholder="Выберите даты" readonly>
+          <input type="text" class="education-filter__input education-filter__datepicker" name="date_range"
+            placeholder="Выберите даты" readonly>
           <input type="hidden" name="date_from" value="">
           <input type="hidden" name="date_to" value="">
         </div>
@@ -183,11 +184,9 @@ $initial_query = new WP_Query([
     <div class="education-archive__controls">
       <div class="education-archive__counter-wrap">
         <div class="education-archive__counter js-education-counter">
-          Найдено школ: <?php echo (int) $initial_query->found_posts; ?>
+          Найдено: <?php echo (int) $initial_query->found_posts; ?>
         </div>
-        <div class="education-archive__active-filters js-education-active-filters" style="display: none;">
-          <span class="education-archive__active-filters-count">0</span> активных фильтров
-        </div>
+
       </div>
 
       <div class="education-archive__controls-right">
@@ -209,7 +208,8 @@ $initial_query = new WP_Query([
 
     <div class="education-archive__list js-education-list">
       <?php if ($initial_query->have_posts()): ?>
-        <?php while ($initial_query->have_posts()): $initial_query->the_post(); ?>
+        <?php while ($initial_query->have_posts()):
+          $initial_query->the_post(); ?>
           <div class="education-archive__item">
             <?php get_template_part('template-parts/education/card'); ?>
           </div>
