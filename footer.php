@@ -95,18 +95,7 @@
 
 			<div class="footer__currencies">
 
-				<div class="payments">
-					<div class="payment-item">
-						<img src="<?= get_template_directory_uri() ?>/img/icons/mir.png" alt="mir pay">
-					</div>
-					<div class="payment-item">
-						<img src="<?= get_template_directory_uri() ?>/img/icons/visa.png" alt="visa pay">
-					</div>
 
-					<div class="payment-item">
-						<img src="<?= get_template_directory_uri() ?>/img/icons/mc.png" alt="mc pay">
-					</div>
-				</div>
 			</div>
 		</div>
 
