@@ -3,6 +3,10 @@
   grid-template-columns: repeat(10, 1fr);
   gap: 6px;
   padding: 8px;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  }
 }
 
 .day-item {
@@ -17,6 +21,10 @@
   font-size: 14px;
   font-weight: 500;
   user-select: none;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .day-item.is-active {

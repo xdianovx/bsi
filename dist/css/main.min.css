@@ -532,6 +532,11 @@ main {
   gap: 6px;
   padding: 8px;
 }
+@media screen and (max-width: 768px) {
+  .day-grid {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  }
+}
 
 .day-item {
   display: flex;
@@ -544,6 +549,11 @@ main {
   font-size: 14px;
   font-weight: 500;
   user-select: none;
+}
+@media screen and (max-width: 768px) {
+  .day-item {
+    width: 100%;
+  }
 }
 
 .day-item.is-active {
@@ -616,6 +626,11 @@ main {
   padding: 16px;
   display: none;
   z-index: 50;
+}
+@media screen and (max-width: 768px) {
+  .js-dropdown-panel {
+    width: 100%;
+  }
 }
 
 .js-dropdown.is-open .js-dropdown-panel {
@@ -2558,6 +2573,12 @@ input.error {
 
 .gtm-datepicker {
   text-align: center;
+}
+@media screen and (max-width: 768px) {
+  .gtm-datepicker {
+    text-align: left;
+    padding: 0 16px;
+  }
 }
 
 .gtm-search__wrap {

@@ -32,6 +32,11 @@
 
 .gtm-datepicker {
   text-align: center;
+
+  @media screen and (max-width: 768px) {
+    text-align: left;
+    padding: 0 16px;
+  }
 }
 
 .gtm-search__wrap {

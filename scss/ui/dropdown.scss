@@ -68,6 +68,10 @@
   padding: 16px;
   display: none;
   z-index: 50;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .js-dropdown.is-open .js-dropdown-panel {
