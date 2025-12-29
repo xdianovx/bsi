@@ -9,7 +9,7 @@ $main_page_items = [
 
      // ],
      [
-          'title' => 'индивидуальный запрос',
+          'title' => 'индивидуальные запросы',
           'url' => get_permalink(2064),
           'target' => '',
           'img' => 'fit.png',
@@ -23,7 +23,7 @@ $main_page_items = [
 
      // ],
      [
-          'title' => 'Событийные туры',
+          'title' => 'Событийные <br> туры',
           'url' => get_permalink(2064),
           'target' => '',
           'img' => 'event.png',
