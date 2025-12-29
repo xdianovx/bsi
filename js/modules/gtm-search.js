@@ -9,6 +9,34 @@ export const gtmSearch = async () => {
   const section = document.querySelector(".gtm-search__section");
   if (!section) return;
 
+  function getNightsWord(count) {
+    const mod10 = count % 10;
+    const mod100 = count % 100;
+    
+    if (mod100 >= 11 && mod100 <= 14) {
+      return "ночей";
+    }
+    if (mod10 === 1) {
+      return "ночь";
+    }
+    if (mod10 >= 2 && mod10 <= 4) {
+      return "ночи";
+    }
+    return "ночей";
+  }
+
+  function formatNightsText(startDay, endDay) {
+    if (startDay === endDay) {
+      return `${startDay} ${getNightsWord(startDay)}`;
+    }
+    const startWord = getNightsWord(startDay);
+    const endWord = getNightsWord(endDay);
+    if (startWord === endWord) {
+      return `${startDay} - ${endDay} ${startWord}`;
+    }
+    return `${startDay} ${startWord} - ${endDay} ${endWord}`;
+  }
+
   async function samoAjax(method, params = {}) {
     const body = new URLSearchParams({
       action: "bsi_samo",
@@ -196,7 +224,7 @@ export const gtmSearch = async () => {
       window.open(tourLink, "_blank");
     });
 
-    createDayRange({
+    const dayRange = createDayRange({
       rootEl,
       gridSelector: ".day-grid",
       defaultStartDay: searchParams.nightsFrom,
@@ -207,15 +235,22 @@ export const gtmSearch = async () => {
           updateLink({ nightsFrom: startDay, nightsTill: nightsTill });
           const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
           if (nightsValue) {
-            if (startDay === nightsTill) {
-              nightsValue.textContent = `${startDay} ночей`;
-            } else {
-              nightsValue.textContent = `${startDay} - ${nightsTill} ночей`;
-            }
+            nightsValue.textContent = formatNightsText(startDay, nightsTill);
           }
         }
       },
     });
+
+    if (dayRange) {
+      const state = dayRange.getState();
+      if (state.startDay) {
+        const nightsTill = state.endDay || state.startDay;
+        const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
+        if (nightsValue) {
+          nightsValue.textContent = formatNightsText(state.startDay, nightsTill);
+        }
+      }
+    }
 
     peopleCounter({
       rootSelector: '[data-tab="tours"] .gtm-persons-select',
@@ -350,7 +385,7 @@ export const gtmSearch = async () => {
       window.open(hotelLink, "_blank");
     });
 
-    createDayRange({
+    const dayRange = createDayRange({
       rootEl,
       gridSelector: ".day-grid",
       defaultStartDay: searchParams.nightsFrom,
@@ -361,15 +396,22 @@ export const gtmSearch = async () => {
           updateLink({ nightsFrom: startDay, nightsTill: nightsTill });
           const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
           if (nightsValue) {
-            if (startDay === nightsTill) {
-              nightsValue.textContent = `${startDay} ночей`;
-            } else {
-              nightsValue.textContent = `${startDay} - ${nightsTill} ночей`;
-            }
+            nightsValue.textContent = formatNightsText(startDay, nightsTill);
           }
         }
       },
     });
+
+    if (dayRange) {
+      const state = dayRange.getState();
+      if (state.startDay) {
+        const nightsTill = state.endDay || state.startDay;
+        const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
+        if (nightsValue) {
+          nightsValue.textContent = formatNightsText(state.startDay, nightsTill);
+        }
+      }
+    }
 
     peopleCounter({
       rootSelector: '[data-tab="hotels"] .gtm-persons-select',
