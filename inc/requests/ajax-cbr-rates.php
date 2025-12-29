@@ -7,9 +7,21 @@ function handle_cbr_rates()
   $cacheKey = 'bsi_cbr_rates';
   $cacheExpiration = HOUR_IN_SECONDS;
 
+  $markup = floatval(get_field('currency_markup', 'option') ?: 0);
+
   $cached = get_transient($cacheKey);
-  if ($cached !== false) {
-    wp_send_json_success($cached);
+  if ($cached !== false && is_array($cached) && isset($cached['rates'])) {
+    $result = $cached;
+    if ($markup > 0) {
+      foreach ($result['rates'] as $code => &$rate) {
+        if (!isset($rate['value']) || !isset($rate['nominal'])) {
+          continue;
+        }
+        $rate['value'] = $rate['value'] * (1 + $markup / 100);
+      }
+      unset($rate);
+    }
+    wp_send_json_success($result);
     return;
   }
 
@@ -24,8 +36,18 @@ function handle_cbr_rates()
   ]);
 
   if (is_wp_error($response)) {
-    if ($oldCached !== false) {
-      wp_send_json_success($oldCached);
+    if ($oldCached !== false && is_array($oldCached) && isset($oldCached['rates'])) {
+      $result = $oldCached;
+      if ($markup > 0) {
+        foreach ($result['rates'] as $code => &$rate) {
+          if (!isset($rate['value']) || !isset($rate['nominal'])) {
+            continue;
+          }
+          $rate['value'] = $rate['value'] * (1 + $markup / 100);
+        }
+        unset($rate);
+      }
+      wp_send_json_success($result);
       return;
     }
     wp_send_json_error([
@@ -37,8 +59,18 @@ function handle_cbr_rates()
 
   $code = wp_remote_retrieve_response_code($response);
   if ($code >= 400) {
-    if ($oldCached !== false) {
-      wp_send_json_success($oldCached);
+    if ($oldCached !== false && is_array($oldCached) && isset($oldCached['rates'])) {
+      $result = $oldCached;
+      if ($markup > 0) {
+        foreach ($result['rates'] as $code => &$rate) {
+          if (!isset($rate['value']) || !isset($rate['nominal'])) {
+            continue;
+          }
+          $rate['value'] = $rate['value'] * (1 + $markup / 100);
+        }
+        unset($rate);
+      }
+      wp_send_json_success($result);
       return;
     }
     wp_send_json_error([
@@ -52,8 +84,18 @@ function handle_cbr_rates()
   $data = json_decode($body, true);
 
   if (!is_array($data) || !isset($data['Valute'])) {
-    if ($oldCached !== false) {
-      wp_send_json_success($oldCached);
+    if ($oldCached !== false && is_array($oldCached) && isset($oldCached['rates'])) {
+      $result = $oldCached;
+      if ($markup > 0) {
+        foreach ($result['rates'] as $code => &$rate) {
+          if (!isset($rate['value']) || !isset($rate['nominal'])) {
+            continue;
+          }
+          $rate['value'] = $rate['value'] * (1 + $markup / 100);
+        }
+        unset($rate);
+      }
+      wp_send_json_success($result);
       return;
     }
     wp_send_json_error([
@@ -83,6 +125,13 @@ function handle_cbr_rates()
   }
 
   set_transient($cacheKey, $result, $cacheExpiration);
+
+  if ($markup > 0) {
+    foreach ($result['rates'] as $code => &$rate) {
+      $rate['value'] = $rate['value'] * (1 + $markup / 100);
+    }
+    unset($rate);
+  }
 
   wp_send_json_success($result);
 }

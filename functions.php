@@ -182,6 +182,7 @@ require get_template_directory() . '/custom-fields/pages/mice.php';
 require get_template_directory() . '/custom-fields/pages/visa.php';
 require get_template_directory() . '/custom-fields/pages/main-banners.php';
 require get_template_directory() . '/custom-fields/education-fields.php';
+require get_template_directory() . '/custom-fields/currency-settings.php';
 
 require get_template_directory() . '/inc/requests/ajax.php';
 require get_template_directory() . '/inc/requests/ajax-fit.php';
