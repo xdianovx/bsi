@@ -31,7 +31,6 @@ get_header();
   <!-- <?= get_template_part('template-parts/sections/features') ?> -->
   <?= get_template_part('template-parts/news/news-slider') ?>
   <?= get_template_part('template-parts/partners/partners-slider') ?>
-  <?= get_template_part('template-parts/promo-banner/slider') ?>
   <?= get_template_part('template-parts/sections/subscribe') ?>
 </main>
 
