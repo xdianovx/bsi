@@ -148,7 +148,7 @@
           <input type="text" name="daterange" class="gtm-datepicker" placeholder="" />
 
           <div class="gtm-nights-select js-dropdown">
-            <button class="js-dropdown-trigger gtm-nights-select-value">5 - 7 ночей</button>
+            <button class="js-dropdown-trigger gtm-nights-select-value">ночей: 5-7</button>
             <div class="js-dropdown-panel numfont">
               <div class="day-grid gtm-daypicker">
                 <div class="day-item">1</div>
@@ -237,7 +237,7 @@
           <input type="text" name="daterange" class="gtm-datepicker" />
 
           <div class="gtm-nights-select js-dropdown">
-            <button class="js-dropdown-trigger gtm-nights-select-value">5 - 7 ночей</button>
+            <button class="js-dropdown-trigger gtm-nights-select-value">ночей: 5-7</button>
             <div class="js-dropdown-panel numfont">
               <div class="day-grid gtm-daypicker">
                 <div class="day-item">1</div>

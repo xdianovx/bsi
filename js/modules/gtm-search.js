@@ -9,32 +9,11 @@ export const gtmSearch = async () => {
   const section = document.querySelector(".gtm-search__section");
   if (!section) return;
 
-  function getNightsWord(count) {
-    const mod10 = count % 10;
-    const mod100 = count % 100;
-    
-    if (mod100 >= 11 && mod100 <= 14) {
-      return "ночей";
-    }
-    if (mod10 === 1) {
-      return "ночь";
-    }
-    if (mod10 >= 2 && mod10 <= 4) {
-      return "ночи";
-    }
-    return "ночей";
-  }
-
   function formatNightsText(startDay, endDay) {
     if (startDay === endDay) {
-      return `${startDay} ${getNightsWord(startDay)}`;
+      return `ночей: ${startDay}`;
     }
-    const startWord = getNightsWord(startDay);
-    const endWord = getNightsWord(endDay);
-    if (startWord === endWord) {
-      return `${startDay} - ${endDay} ${startWord}`;
-    }
-    return `${startDay} ${startWord} - ${endDay} ${endWord}`;
+    return `ночей: ${startDay}-${endDay}`;
   }
 
   async function samoAjax(method, params = {}) {
