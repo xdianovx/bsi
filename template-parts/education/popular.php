@@ -253,6 +253,29 @@ foreach ($education_posts as $education_post) {
     ];
 }
 
+if (!empty($items)) {
+    usort($items, function ($a, $b) {
+        $price_a = 0;
+        $price_b = 0;
+
+        if (!empty($a['price'])) {
+            preg_match('/[\d\s]+/', $a['price'], $matches_a);
+            if (!empty($matches_a[0])) {
+                $price_a = (int) str_replace(' ', '', $matches_a[0]);
+            }
+        }
+
+        if (!empty($b['price'])) {
+            preg_match('/[\d\s]+/', $b['price'], $matches_b);
+            if (!empty($matches_b[0])) {
+                $price_b = (int) str_replace(' ', '', $matches_b[0]);
+            }
+        }
+
+        return $price_a <=> $price_b;
+    });
+}
+
 if (empty($items)) {
     $test_items = [
         [
@@ -328,6 +351,27 @@ if (empty($items)) {
             'nearest_date' => '28.06.2026',
         ],
     ];
+
+    usort($test_items, function ($a, $b) {
+        $price_a = 0;
+        $price_b = 0;
+
+        if (!empty($a['price'])) {
+            preg_match('/[\d\s]+/', $a['price'], $matches_a);
+            if (!empty($matches_a[0])) {
+                $price_a = (int) str_replace(' ', '', $matches_a[0]);
+            }
+        }
+
+        if (!empty($b['price'])) {
+            preg_match('/[\d\s]+/', $b['price'], $matches_b);
+            if (!empty($matches_b[0])) {
+                $price_b = (int) str_replace(' ', '', $matches_b[0]);
+            }
+        }
+
+        return $price_a <=> $price_b;
+    });
 
     $items = $test_items;
 }
