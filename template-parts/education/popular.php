@@ -312,7 +312,7 @@ if (empty($items)) {
             'booking_url' => 'https://www.bsistudy.ru/scountry/gbr/school/9991/center/13372/?id=201558434&LANGUAGES=1&DURATION=14,15',
             'age_min' => 14,
             'age_max' => 17,
-            'nearest_date' => '04.01.2026',
+            'nearest_date' => '08.02.2026',
         ],
         [
             'id' => 0,
