@@ -14,8 +14,8 @@ jobs:
       - name: Upload to FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: webscape.beget.tech
-          username: webscape_bsi
-          password: hYdH8sKV!txP
+          server: new.bsigroup.ru
+          username: u2362957_new_bsi
+          password: hQ1nM0eK6vfW3aO9
           local-dir: ./
-          server-dir: webscape.beget.tech/public_html/bsi/wp-content/themes/bsi/
+          server-dir: wp-content/themes/bsi/

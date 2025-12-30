@@ -78,7 +78,7 @@ $main_page_items = [
 
 <section class="main-pages-grid__section">
      <div class="container">
-          <div class="main-pages-grid">
+          <div class="main-pages-grid">asd
                <?php foreach ($main_page_items as $item): ?>
                     <a href="<?= esc_url($item['url']) ?>" class="main-pages__item" <?= !empty($item['target']) ? 'target="' . esc_attr($item['target']) . '"' : '' ?>>
                          <div class="main-page__item-top">
