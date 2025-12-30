@@ -28,16 +28,45 @@ function bsi_register_education_acf_groups(): void
         'label' => 'Стоимость',
         'name' => 'education_price',
         'type' => 'text',
+        'instructions' => 'Например: "100 000 руб / 1 неделя" или "от 50 000 руб"',
+        'wrapper' => ['width' => '50'],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'education',
+        ],
+      ],
+    ],
+    'menu_order' => 1,
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_education_contacts',
+    'title' => 'Контакты и местоположение',
+    'fields' => [
+      [
+        'key' => 'field_education_address',
+        'label' => 'Адрес',
+        'name' => 'education_address',
+        'type' => 'text',
+        'wrapper' => ['width' => '100'],
+      ],
+      [
+        'key' => 'field_education_phone',
+        'label' => 'Телефон',
+        'name' => 'education_phone',
+        'type' => 'text',
         'wrapper' => ['width' => '50'],
       ],
       [
-        'key' => 'field_education_show_price_from',
-        'label' => 'Показывать "от" перед ценой',
-        'name' => 'show_price_from',
-        'type' => 'true_false',
-        'ui' => 1,
-        'default_value' => 0,
-        'instructions' => 'Если включено, перед ценой будет добавлен префикс "от"',
+        'key' => 'field_education_website',
+        'label' => 'Сайт школы',
+        'name' => 'education_website',
+        'type' => 'url',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -46,6 +75,7 @@ function bsi_register_education_acf_groups(): void
         'name' => 'education_map_lat',
         'type' => 'number',
         'step' => 0.000001,
+        'instructions' => 'Координаты для отображения на карте',
         'wrapper' => ['width' => '33'],
       ],
       [
@@ -58,13 +88,14 @@ function bsi_register_education_acf_groups(): void
       ],
       [
         'key' => 'field_education_map_zoom',
-        'label' => 'Zoom (карта)',
+        'label' => 'Масштаб карты',
         'name' => 'education_map_zoom',
         'type' => 'number',
         'min' => 1,
         'max' => 20,
         'step' => 1,
         'default_value' => 14,
+        'instructions' => 'От 1 (весь мир) до 20 (улица)',
         'wrapper' => ['width' => '33'],
       ],
     ],
@@ -77,44 +108,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
-    'style' => 'seamless',
-  ]);
-
-  acf_add_local_field_group([
-    'key' => 'group_education_contacts',
-    'title' => 'Контакты',
-    'fields' => [
-      [
-        'key' => 'field_education_website',
-        'label' => 'Сайт школы',
-        'name' => 'education_website',
-        'type' => 'url',
-        'wrapper' => ['width' => '33'],
-      ],
-      [
-        'key' => 'field_education_phone',
-        'label' => 'Телефон',
-        'name' => 'education_phone',
-        'type' => 'text',
-        'wrapper' => ['width' => '33'],
-      ],
-      [
-        'key' => 'field_education_address',
-        'label' => 'Адрес',
-        'name' => 'education_address',
-        'type' => 'text',
-        'wrapper' => ['width' => '33'],
-      ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'education',
-        ],
-      ],
-    ],
+    'menu_order' => 2,
   ]);
 
   acf_add_local_field_group([
@@ -142,6 +136,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
+    'menu_order' => 3,
   ]);
 
   acf_add_local_field_group([
@@ -157,11 +152,28 @@ function bsi_register_education_acf_groups(): void
         'button_label' => 'Добавить программу',
         'sub_fields' => [
           [
+            'key' => 'field_program_title',
+            'label' => 'Название программы',
+            'name' => 'program_title',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '100'],
+          ],
+          [
             'key' => 'field_program_price_per_week',
             'label' => 'Цена за неделю',
             'name' => 'program_price_per_week',
             'type' => 'text',
-            'wrapper' => ['width' => '33'],
+            'instructions' => 'Например: "50 000 руб" или "от 45 000 руб"',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_program_booking_url',
+            'label' => 'URL для бронирования',
+            'name' => 'program_booking_url',
+            'type' => 'url',
+            'instructions' => 'Если указан, будет использоваться для этой программы. Иначе используется общий URL бронирования.',
+            'wrapper' => ['width' => '50'],
           ],
           [
             'key' => 'field_program_age_min',
@@ -170,7 +182,7 @@ function bsi_register_education_acf_groups(): void
             'type' => 'number',
             'min' => 0,
             'step' => 1,
-            'wrapper' => ['width' => '33'],
+            'wrapper' => ['width' => '25'],
           ],
           [
             'key' => 'field_program_age_max',
@@ -179,25 +191,16 @@ function bsi_register_education_acf_groups(): void
             'type' => 'number',
             'min' => 0,
             'step' => 1,
-            'wrapper' => ['width' => '33'],
+            'wrapper' => ['width' => '25'],
           ],
           [
-            'key' => 'field_program_duration_min',
-            'label' => 'Минимальная продолжительность (недели)',
-            'name' => 'program_duration_min',
+            'key' => 'field_program_duration',
+            'label' => 'Продолжительность (недели)',
+            'name' => 'program_duration',
             'type' => 'number',
             'min' => 1,
             'step' => 1,
-            'wrapper' => ['width' => '33'],
-          ],
-          [
-            'key' => 'field_program_duration_max',
-            'label' => 'Максимальная продолжительность (недели)',
-            'name' => 'program_duration_max',
-            'type' => 'number',
-            'min' => 1,
-            'step' => 1,
-            'wrapper' => ['width' => '33'],
+            'wrapper' => ['width' => '50'],
           ],
           [
             'key' => 'field_program_description',
@@ -209,23 +212,24 @@ function bsi_register_education_acf_groups(): void
             'wrapper' => ['width' => '100'],
           ],
           [
-            'key' => 'field_program_checkin_dates',
-            'label' => 'Даты заселения',
-            'name' => 'program_checkin_dates',
-            'type' => 'repeater',
-            'layout' => 'table',
-            'button_label' => 'Добавить дату',
-            'sub_fields' => [
-              [
-                'key' => 'field_checkin_date',
-                'label' => 'Дата заселения',
-                'name' => 'checkin_date',
-                'type' => 'date_picker',
-                'display_format' => 'd/m/Y',
-                'return_format' => 'Y-m-d',
-                'first_day' => 1,
-              ],
-            ],
+            'key' => 'field_program_checkin_date_from',
+            'label' => 'Дата заселения (от)',
+            'name' => 'program_checkin_date_from',
+            'type' => 'date_picker',
+            'display_format' => 'd/m/Y',
+            'return_format' => 'Y-m-d',
+            'first_day' => 1,
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_program_checkin_date_to',
+            'label' => 'Дата заселения (до)',
+            'name' => 'program_checkin_date_to',
+            'type' => 'date_picker',
+            'display_format' => 'd/m/Y',
+            'return_format' => 'Y-m-d',
+            'first_day' => 1,
+            'wrapper' => ['width' => '50'],
           ],
           [
             'key' => 'field_program_accommodation_options',
@@ -252,6 +256,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
+    'menu_order' => 4,
   ]);
 
   acf_add_local_field_group([
@@ -259,19 +264,11 @@ function bsi_register_education_acf_groups(): void
     'title' => 'Бронирование',
     'fields' => [
       [
-        'key' => 'field_education_booking_button_text',
-        'label' => 'Текст кнопки',
-        'name' => 'education_booking_button_text',
-        'type' => 'text',
-        'default_value' => 'Запронировать',
-        'wrapper' => ['width' => '50'],
-      ],
-      [
         'key' => 'field_education_booking_url',
         'label' => 'URL для бронирования',
         'name' => 'education_booking_url',
         'type' => 'url',
-        'wrapper' => ['width' => '50'],
+        'instructions' => 'Если указан, кнопка "Забронировать" будет вести на этот URL',
       ],
     ],
     'location' => [
@@ -283,6 +280,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
+    'menu_order' => 5,
   ]);
 }
 

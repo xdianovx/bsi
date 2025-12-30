@@ -93,13 +93,16 @@ $initial_query = new WP_Query([
   <?php yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>'); ?>
 <?php endif; ?>
 
-<section class="education-archive js-education-archive">
+<section class="education-page js-education-page">
   <div class="container">
-    <div class="education-title-wrap">
-      <h1 class="h1 news-slider__title"><?php the_title(); ?></h1>
-
-      <div class="news-slider__title-description">
-        <?= the_excerpt(); ?>
+    <div class="title-wrap">
+      <div class="">
+        <h1 class="h1"><?php the_title(); ?></h1>
+        <?php if (has_excerpt()): ?>
+          <div class="news-slider__title-description">
+            <?php the_excerpt(); ?>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -200,22 +203,17 @@ $initial_query = new WP_Query([
       </div>
     </form>
 
-    <div class="education-archive__controls">
-      <div class="education-archive__counter-wrap">
-        <div class="education-archive__counter js-education-counter">
+    <div class="education-page__controls">
+      <div class="education-page__counter-wrap">
+        <div class="education-page__counter js-education-counter">
           Найдено: <?php echo (int) $initial_query->found_posts; ?>
         </div>
-
-        <button type="button" class="education-archive__reset-btn js-education-reset" style="display: none;">
-          Сбросить фильтры
-        </button>
-
       </div>
 
-      <div class="education-archive__controls-right">
-        <div class="education-archive__sort">
-          <label class="education-archive__sort-label">Сортировка:</label>
-          <select class="education-archive__sort-select js-education-sort" name="sort">
+      <div class="education-page__controls-right">
+        <div class="education-page__sort">
+          <label class="education-page__sort-label">Сортировка:</label>
+          <select class="education-page__sort-select js-education-sort" name="sort">
             <option value="title_asc">По названию (А-Я)</option>
             <option value="title_desc">По названию (Я-А)</option>
             <option value="price_asc">По цене (возрастание)</option>
@@ -223,30 +221,30 @@ $initial_query = new WP_Query([
           </select>
         </div>
 
-
+        <button type="button" class="education-page__reset-btn js-education-reset" style="display: none;">
+          Сбросить фильтры
+        </button>
       </div>
     </div>
 
-    <div class="education-archive__list js-education-list">
+    <div class="education-page__list js-education-list">
       <?php if ($initial_query->have_posts()): ?>
         <?php while ($initial_query->have_posts()):
           $initial_query->the_post(); ?>
-          <div class="education-archive__item">
+          <div class="education-page__item">
             <?php get_template_part('template-parts/education/card'); ?>
           </div>
         <?php endwhile; ?>
       <?php else: ?>
-        <div class="education-archive__empty">
-          По данным фильтрам ничего не найдено.
-          <br>
-          Попробуйте изменить фильтры.
+        <div class="education-page__empty">
+          Школы не найдены.
         </div>
       <?php endif; ?>
       <?php wp_reset_postdata(); ?>
     </div>
 
-    <div class="education-archive__load-more js-education-load-more" style="display: none;">
-      <button type="button" class="education-archive__load-more-btn">
+    <div class="education-page__load-more js-education-load-more" style="display: none;">
+      <button type="button" class="education-page__load-more-btn">
         Показать еще
       </button>
     </div>

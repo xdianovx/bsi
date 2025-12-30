@@ -13,7 +13,7 @@ const CHOICES_RU = {
 };
 
 export const initEducationFilter = () => {
-  const root = document.querySelector(".js-education-archive");
+  const root = document.querySelector(".js-education-page");
   if (!root) return;
 
   const form = root.querySelector(".js-education-filter");
@@ -37,12 +37,12 @@ export const initEducationFilter = () => {
   const dateRangeInput = form.querySelector('input[name="date_range"]');
   const dateFromInput = form.querySelector('input[name="date_from"]');
   const dateToInput = form.querySelector('input[name="date_to"]');
-  const sortSelect = root.querySelector('.js-education-sort');
-  const resetBtn = root.querySelector('.js-education-reset');
-  const activeFiltersEl = root.querySelector('.js-education-active-filters');
-  const activeFiltersCount = activeFiltersEl?.querySelector('.education-archive__active-filters-count');
-  const loadMoreWrap = root.querySelector('.js-education-load-more');
-  const loadMoreButton = loadMoreWrap?.querySelector('.education-archive__load-more-btn');
+  const sortSelect = root.querySelector(".js-education-sort");
+  const resetBtn = root.querySelector(".js-education-reset");
+  const activeFiltersEl = root.querySelector(".js-education-active-filters");
+  const activeFiltersCount = activeFiltersEl?.querySelector(".education-page__active-filters-count");
+  const loadMoreWrap = root.querySelector(".js-education-load-more");
+  const loadMoreButton = loadMoreWrap?.querySelector(".education-page__load-more-btn");
 
   let datePickerInstance = null;
   let currentPage = 1;
@@ -50,10 +50,10 @@ export const initEducationFilter = () => {
   let isLoadingMore = false;
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
-  
+
   const countActiveFilters = () => {
     let count = 0;
-    
+
     if (countrySelect?.value) count++;
     if (getValues(programSelect).length) count += getValues(programSelect).length;
     if (getValues(languageSelect).length) count += getValues(languageSelect).length;
@@ -65,21 +65,21 @@ export const initEducationFilter = () => {
     if (durationMaxInput?.value) count++;
     if (dateFromInput?.value) count++;
     if (dateToInput?.value) count++;
-    
+
     return count;
   };
-  
+
   const hasActiveFilters = () => {
     return countActiveFilters() > 0;
   };
-  
+
   const updateResetButton = () => {
     const count = countActiveFilters();
-    
+
     if (resetBtn) {
       resetBtn.style.display = count > 0 ? "block" : "none";
     }
-    
+
     if (activeFiltersEl && activeFiltersCount) {
       if (count > 0) {
         activeFiltersCount.textContent = count;
@@ -104,7 +104,7 @@ export const initEducationFilter = () => {
       const body = new URLSearchParams();
       body.set("action", "education_filter");
       body.set("paged", String(page));
-      
+
       if (sortSelect && sortSelect.value) {
         body.set("sort", sortSelect.value);
       }
@@ -158,14 +158,14 @@ export const initEducationFilter = () => {
           list.appendChild(tempDiv.firstChild);
         }
       }
-      
+
       if (counter) {
         counter.textContent = `Найдено школ: ${json.data.total || 0}`;
       }
 
       totalPages = json.data.pages || 1;
       currentPage = page;
-      
+
       if (loadMoreWrap) {
         if (currentPage < totalPages) {
           loadMoreWrap.style.display = "block";
@@ -174,7 +174,7 @@ export const initEducationFilter = () => {
           loadMoreWrap.style.display = "none";
         }
       }
-      
+
       updateResetButton();
     } catch (e) {
     } finally {
@@ -184,21 +184,21 @@ export const initEducationFilter = () => {
 
   const handleLoadMore = async () => {
     if (isLoadingMore || currentPage >= totalPages) return;
-    
+
     isLoadingMore = true;
     if (loadMoreButton) {
       loadMoreButton.disabled = true;
       loadMoreButton.textContent = "Загрузка...";
     }
-    
+
     await loadEducation(currentPage + 1);
-    
+
     if (loadMoreButton) {
       loadMoreButton.disabled = false;
       loadMoreButton.textContent = "Показать еще";
     }
-    
-    const items = list.querySelectorAll(".education-archive__item");
+
+    const items = list.querySelectorAll(".education-page__item");
     if (items.length > 0) {
       const firstNewItem = items[items.length - (totalPages > currentPage ? 12 : items.length)];
       if (firstNewItem) {
@@ -350,8 +350,7 @@ export const initEducationFilter = () => {
           accommodationChoice.setChoices(accommodationOptions, "value", "label", true);
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   };
 
   const applyFromUrl = async () => {
@@ -426,15 +425,26 @@ export const initEducationFilter = () => {
       sortSelect.value = sort;
     }
 
-    const hasFilters = programs.length || languages.length || types.length || accommodations.length || country || ageMin || ageMax || durationMin || durationMax || dateFrom || dateTo || sort;
-    
+    const hasFilters =
+      programs.length ||
+      languages.length ||
+      types.length ||
+      accommodations.length ||
+      country ||
+      ageMin ||
+      ageMax ||
+      durationMin ||
+      durationMax ||
+      dateFrom ||
+      dateTo ||
+      sort;
+
     updateResetButton();
 
     if (hasFilters) {
       await loadEducation(1);
     }
   };
-
 
   if (programChoice) {
     programSelect.addEventListener("change", () => {
@@ -472,20 +482,20 @@ export const initEducationFilter = () => {
       if (languageChoice) languageChoice.removeActiveItems();
       if (typeChoice) typeChoice.removeActiveItems();
       if (accommodationChoice) accommodationChoice.removeActiveItems();
-      
+
       await updateFilterOptions(countryId);
       updateResetButton();
       loadEducation(1);
     });
   }
-  
+
   if (sortSelect) {
     sortSelect.addEventListener("change", () => {
       currentPage = 1;
       loadEducation(1);
     });
   }
-  
+
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
       currentPage = 1;
@@ -495,20 +505,20 @@ export const initEducationFilter = () => {
       if (languageChoice) languageChoice.removeActiveItems();
       if (typeChoice) typeChoice.removeActiveItems();
       if (accommodationChoice) accommodationChoice.removeActiveItems();
-      
+
       if (ageMinInput) ageMinInput.value = "";
       if (ageMaxInput) ageMaxInput.value = "";
       if (durationMinInput) durationMinInput.value = "";
       if (durationMaxInput) durationMaxInput.value = "";
-      
+
       if (datePickerInstance) {
         datePickerInstance.clear();
       }
       if (dateFromInput) dateFromInput.value = "";
       if (dateToInput) dateToInput.value = "";
-      
+
       if (sortSelect) sortSelect.value = "title_asc";
-      
+
       updateFilterOptions("");
       updateResetButton();
       loadEducation(1);
@@ -518,7 +528,7 @@ export const initEducationFilter = () => {
   // При загрузке страницы обновляем опции фильтров (для всех школ, если страна не выбрана)
   updateFilterOptions("");
   updateResetButton();
-  
+
   // Обработчик кнопки "Показать еще"
   if (loadMoreButton) {
     loadMoreButton.addEventListener("click", handleLoadMore);
@@ -554,7 +564,5 @@ export const initEducationFilter = () => {
     });
   }
 
-
   applyFromUrl();
 };
-

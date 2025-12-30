@@ -128,11 +128,8 @@ foreach ($education_posts as $education_post) {
     }
 
     $price = '';
-    $show_from = true;
     if (function_exists('get_field')) {
         $price_val = get_field('education_price', $education_id);
-        $show_from_field = get_field('show_price_from', $education_id);
-        $show_from = $show_from_field !== false;
 
         if (is_string($price_val) && $price_val !== '') {
             $price = (string) $price_val;
@@ -144,7 +141,12 @@ foreach ($education_posts as $education_post) {
         if (empty($price) && !empty($education_programs)) {
             $prices = [];
             foreach ($education_programs as $program) {
-                $program_price = isset($program['price_per_week']) ? (string) $program['price_per_week'] : '';
+                $program_price = '';
+                if (isset($program['program_price_per_week'])) {
+                    $program_price = (string) $program['program_price_per_week'];
+                } elseif (isset($program['price_per_week'])) {
+                    $program_price = (string) $program['price_per_week'];
+                }
                 if ($program_price) {
                     preg_match('/[\d\s]+/', $program_price, $matches);
                     if (!empty($matches[0])) {
@@ -155,8 +157,12 @@ foreach ($education_posts as $education_post) {
 
             if (!empty($prices)) {
                 $min_price_value = min($prices);
-                $price = number_format($min_price_value, 0, ',', ' ') . ' ₽';
+                $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
             }
+        }
+
+        if (!empty($price)) {
+            $price = format_price_text($price);
         }
     }
 
@@ -188,8 +194,8 @@ foreach ($education_posts as $education_post) {
             $all_dates = [];
 
             foreach ($education_programs as $program) {
-                $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
-                $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
+                $program_age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
+                $program_age_max = isset($program['program_age_max']) && $program['program_age_max'] !== '' ? (int) $program['program_age_max'] : 0;
 
                 if ($program_age_min > 0) {
                     $ages_min[] = $program_age_min;
@@ -198,14 +204,9 @@ foreach ($education_posts as $education_post) {
                     $ages_max[] = $program_age_max;
                 }
 
-                $program_dates = isset($program['program_checkin_dates']) ? $program['program_checkin_dates'] : [];
-                $program_dates = is_array($program_dates) ? $program_dates : [];
-
-                foreach ($program_dates as $date_item) {
-                    $checkin_date = is_array($date_item) ? ($date_item['checkin_date'] ?? '') : '';
-                    if ($checkin_date) {
-                        $all_dates[] = $checkin_date;
-                    }
+                $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+                if ($date_from) {
+                    $all_dates[] = $date_from;
                 }
             }
 
@@ -245,7 +246,6 @@ foreach ($education_posts as $education_post) {
         'programs' => $programs,
         'country_id' => $country_id,
         'country_slug' => $country_slug,
-        'show_price_from' => $show_from,
         'booking_url' => $booking_url,
         'age_min' => $age_min,
         'age_max' => $age_max,

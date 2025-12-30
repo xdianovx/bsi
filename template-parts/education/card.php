@@ -10,7 +10,6 @@ $country_title = '';
 $price = '';
 $languages = [];
 $programs = [];
-$show_from = true;
 $booking_url = '';
 $age_min = 0;
 $age_max = 0;
@@ -31,10 +30,9 @@ if ($education && is_array($education)) {
   $price = !empty($education['price']) ? (string) $education['price'] : '';
   $languages = !empty($education['languages']) && is_array($education['languages']) ? $education['languages'] : [];
   $programs = !empty($education['programs']) && is_array($education['programs']) ? $education['programs'] : [];
-  $show_from = isset($education['show_price_from']) ? ($education['show_price_from'] !== false) : true;
   $booking_url = !empty($education['booking_url']) ? (string) $education['booking_url'] : '';
-  $age_min = !empty($education['age_min']) ? (int) $education['age_min'] : 0;
-  $age_max = !empty($education['age_max']) ? (int) $education['age_max'] : 0;
+  $age_min = !empty($education['age_min']) && $education['age_min'] !== '' ? (int) $education['age_min'] : 0;
+  $age_max = !empty($education['age_max']) && $education['age_max'] !== '' ? (int) $education['age_max'] : 0;
   $nearest_date = !empty($education['nearest_date']) ? (string) $education['nearest_date'] : '';
 } else {
   $education_id = (int) get_the_ID();
@@ -130,8 +128,8 @@ if (($age_min === 0 && $age_max === 0) && $education_id && function_exists('get_
     $ages_max = [];
 
     foreach ($education_programs as $program) {
-      $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
-      $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
+      $program_age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
+      $program_age_max = isset($program['program_age_max']) && $program['program_age_max'] !== '' ? (int) $program['program_age_max'] : 0;
 
       if ($program_age_min > 0) {
         $ages_min[] = $program_age_min;
@@ -158,14 +156,9 @@ if (empty($nearest_date) && $education_id && function_exists('get_field')) {
     $all_dates = [];
 
     foreach ($education_programs as $program) {
-      $program_dates = isset($program['program_checkin_dates']) ? $program['program_checkin_dates'] : [];
-      $program_dates = is_array($program_dates) ? $program_dates : [];
-
-      foreach ($program_dates as $date_item) {
-        $checkin_date = is_array($date_item) ? ($date_item['checkin_date'] ?? '') : '';
-        if ($checkin_date) {
-          $all_dates[] = $checkin_date;
-        }
+      $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+      if ($date_from) {
+        $all_dates[] = $date_from;
       }
     }
 
@@ -188,8 +181,6 @@ if (empty($nearest_date) && $education_id && function_exists('get_field')) {
 
 if (empty($price) && $education_id && function_exists('get_field')) {
   $price_val = get_field('education_price', $education_id);
-  $show_from_field = get_field('show_price_from', $education_id);
-  $show_from = $show_from_field !== false;
 
   if (is_string($price_val) && $price_val !== '') {
     $price = (string) $price_val;
@@ -202,7 +193,12 @@ if (empty($price) && $education_id && function_exists('get_field')) {
     if (!empty($education_programs)) {
       $prices = [];
       foreach ($education_programs as $program) {
-        $program_price = isset($program['price_per_week']) ? (string) $program['price_per_week'] : '';
+        $program_price = '';
+        if (isset($program['program_price_per_week'])) {
+          $program_price = (string) $program['program_price_per_week'];
+        } elseif (isset($program['price_per_week'])) {
+          $program_price = (string) $program['price_per_week'];
+        }
         if ($program_price) {
           preg_match('/[\d\s]+/', $program_price, $matches);
           if (!empty($matches[0])) {
@@ -216,6 +212,10 @@ if (empty($price) && $education_id && function_exists('get_field')) {
         $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
       }
     }
+  }
+
+  if (!empty($price)) {
+    $price = format_price_text($price);
   }
 }
 
@@ -323,11 +323,11 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
       <?php if ($booking_url && $price): ?>
         <a href="<?php echo esc_url($booking_url); ?>" target="_blank"
           class="btn btn-accent education-card__btn education-card__btn-book" target="_blank" rel="noopener nofollow">
-          <?php echo esc_html(format_price_with_from($price, $show_from)); ?>
+          <?php echo esc_html($price); ?>
         </a>
       <?php elseif ($price): ?>
         <div class="education-card__price">
-          <?php echo esc_html(format_price_with_from($price, $show_from)); ?>
+          <?php echo esc_html($price); ?>
         </div>
       <?php endif; ?>
     </div>

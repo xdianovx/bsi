@@ -99,3 +99,51 @@ add_action('init', function () {
   ]);
 
 }, 20);
+
+add_filter('wpseo_breadcrumb_links', function ($links) {
+  if (!is_singular('education')) {
+    return $links;
+  }
+
+  $education_page = get_posts([
+    'post_type' => 'page',
+    'post_status' => 'publish',
+    'meta_query' => [
+      [
+        'key' => '_wp_page_template',
+        'value' => 'page-education.php',
+        'compare' => '=',
+      ],
+    ],
+    'posts_per_page' => 1,
+    'fields' => 'ids',
+  ]);
+
+  if (empty($education_page)) {
+    return $links;
+  }
+
+  $education_page_id = (int) $education_page[0];
+  $education_page_permalink = get_permalink($education_page_id);
+  $education_page_title = get_the_title($education_page_id);
+
+  if (!$education_page_permalink || !$education_page_title) {
+    return $links;
+  }
+
+  $archive_url = get_post_type_archive_link('education');
+  $new_links = [];
+
+  foreach ($links as $link) {
+    if (isset($link['url']) && $archive_url && $link['url'] === $archive_url) {
+      $new_links[] = [
+        'url' => $education_page_permalink,
+        'text' => $education_page_title,
+      ];
+    } else {
+      $new_links[] = $link;
+    }
+  }
+
+  return $new_links;
+}, 20);

@@ -128,8 +128,7 @@ function bsi_ajax_education_filter(): void
         foreach ($school_programs as $program) {
           $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
           $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
-          $program_duration_min = isset($program['program_duration_min']) ? (int) $program['program_duration_min'] : 0;
-          $program_duration_max = isset($program['program_duration_max']) ? (int) $program['program_duration_max'] : 0;
+          $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
 
           $age_match = true;
           if ($age_min > 0 || $age_max > 0) {
@@ -143,38 +142,36 @@ function bsi_ajax_education_filter(): void
 
           $duration_match = true;
           if ($duration_min > 0 || $duration_max > 0) {
-            if ($duration_min > 0 && $program_duration_max > 0 && $duration_min > $program_duration_max) {
+            if ($program_duration <= 0) {
               $duration_match = false;
-            }
-            if ($duration_max > 0 && $program_duration_min > 0 && $duration_max < $program_duration_min) {
-              $duration_match = false;
+            } else {
+              if ($duration_min > 0 && $program_duration < $duration_min) {
+                $duration_match = false;
+              }
+              if ($duration_max > 0 && $program_duration > $duration_max) {
+                $duration_match = false;
+              }
             }
           }
 
           $date_match = true;
           if ($date_from || $date_to) {
-            $program_dates = $program['program_checkin_dates'] ?? [];
-            $program_dates = is_array($program_dates) ? $program_dates : [];
+            $program_date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+            $program_date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
 
-            if (empty($program_dates)) {
+            if (!$program_date_from) {
               $date_match = false;
             } else {
-              $has_date_in_range = false;
-              foreach ($program_dates as $date_item) {
-                $checkin_date = is_array($date_item) ? ($date_item['checkin_date'] ?? '') : '';
-                if ($checkin_date) {
-                  $date_ts = strtotime($checkin_date);
-                  if ($date_from && strtotime($date_from) > $date_ts) {
-                    continue;
-                  }
-                  if ($date_to && strtotime($date_to) < $date_ts) {
-                    continue;
-                  }
-                  $has_date_in_range = true;
-                  break;
-                }
+              $program_from_ts = strtotime($program_date_from);
+              $program_to_ts = $program_date_to ? strtotime($program_date_to) : $program_from_ts;
+              $filter_from_ts = $date_from ? strtotime($date_from) : 0;
+              $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
+
+              if ($filter_from_ts && $program_to_ts < $filter_from_ts) {
+                $date_match = false;
+              } elseif ($filter_to_ts && $program_from_ts > $filter_to_ts) {
+                $date_match = false;
               }
-              $date_match = $has_date_in_range;
             }
           }
 
@@ -200,7 +197,7 @@ function bsi_ajax_education_filter(): void
 
   if (empty($filtered_ids)) {
     wp_send_json_success([
-      'html' => '<div class="education-archive__empty">Школы не найдены.</div>',
+      'html' => '<div class="education-page__empty">Школы не найдены.</div>',
       'total' => 0,
       'pages' => 0,
     ]);
@@ -209,7 +206,7 @@ function bsi_ajax_education_filter(): void
   // Определяем сортировку
   $orderby = 'title';
   $order = 'ASC';
-  
+
   switch ($sort) {
     case 'title_desc':
       $orderby = 'title';
@@ -242,28 +239,28 @@ function bsi_ajax_education_filter(): void
   }
 
   $final_query = new WP_Query($query_args);
-  
+
   // Если сортировка по цене, но не все посты имеют цену, нужно отсортировать вручную
   if (($sort === 'price_asc' || $sort === 'price_desc') && $final_query->have_posts()) {
     $posts = $final_query->posts;
-    usort($posts, function($a, $b) use ($sort) {
+    usort($posts, function ($a, $b) use ($sort) {
       $price_a = function_exists('get_field') ? get_field('education_price', $a->ID) : '';
       $price_b = function_exists('get_field') ? get_field('education_price', $b->ID) : '';
-      
+
       // Извлекаем числа из строк цен
-      preg_match('/[\d\s]+/', (string)$price_a, $matches_a);
-      preg_match('/[\d\s]+/', (string)$price_b, $matches_b);
-      
-      $num_a = isset($matches_a[0]) ? (int)str_replace(' ', '', $matches_a[0]) : 0;
-      $num_b = isset($matches_b[0]) ? (int)str_replace(' ', '', $matches_b[0]) : 0;
-      
+      preg_match('/[\d\s]+/', (string) $price_a, $matches_a);
+      preg_match('/[\d\s]+/', (string) $price_b, $matches_b);
+
+      $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
+      $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
+
       if ($sort === 'price_asc') {
         return $num_a <=> $num_b;
       } else {
         return $num_b <=> $num_a;
       }
     });
-    
+
     // Пересоздаем запрос с отсортированными постами
     $final_query->posts = array_slice($posts, ($paged - 1) * $per_page, $per_page);
     $final_query->post_count = count($final_query->posts);
@@ -273,7 +270,7 @@ function bsi_ajax_education_filter(): void
   if ($final_query->have_posts()) {
     while ($final_query->have_posts()) {
       $final_query->the_post();
-      echo '<div class="education-archive__item">';
+      echo '<div class="education-page__item">';
       get_template_part('template-parts/education/card');
       echo '</div>';
     }
@@ -403,8 +400,7 @@ function bsi_ajax_country_education_filter(): void
         foreach ($school_programs as $program) {
           $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
           $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
-          $program_duration_min = isset($program['program_duration_min']) ? (int) $program['program_duration_min'] : 0;
-          $program_duration_max = isset($program['program_duration_max']) ? (int) $program['program_duration_max'] : 0;
+          $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
 
           $age_match = true;
           if ($age_min > 0 || $age_max > 0) {
@@ -418,38 +414,36 @@ function bsi_ajax_country_education_filter(): void
 
           $duration_match = true;
           if ($duration_min > 0 || $duration_max > 0) {
-            if ($duration_min > 0 && $program_duration_max > 0 && $duration_min > $program_duration_max) {
+            if ($program_duration <= 0) {
               $duration_match = false;
-            }
-            if ($duration_max > 0 && $program_duration_min > 0 && $duration_max < $program_duration_min) {
-              $duration_match = false;
+            } else {
+              if ($duration_min > 0 && $program_duration < $duration_min) {
+                $duration_match = false;
+              }
+              if ($duration_max > 0 && $program_duration > $duration_max) {
+                $duration_match = false;
+              }
             }
           }
 
           $date_match = true;
           if ($date_from || $date_to) {
-            $program_dates = $program['program_checkin_dates'] ?? [];
-            $program_dates = is_array($program_dates) ? $program_dates : [];
+            $program_date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+            $program_date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
 
-            if (empty($program_dates)) {
+            if (!$program_date_from) {
               $date_match = false;
             } else {
-              $has_date_in_range = false;
-              foreach ($program_dates as $date_item) {
-                $checkin_date = is_array($date_item) ? ($date_item['checkin_date'] ?? '') : '';
-                if ($checkin_date) {
-                  $date_ts = strtotime($checkin_date);
-                  if ($date_from && strtotime($date_from) > $date_ts) {
-                    continue;
-                  }
-                  if ($date_to && strtotime($date_to) < $date_ts) {
-                    continue;
-                  }
-                  $has_date_in_range = true;
-                  break;
-                }
+              $program_from_ts = strtotime($program_date_from);
+              $program_to_ts = $program_date_to ? strtotime($program_date_to) : $program_from_ts;
+              $filter_from_ts = $date_from ? strtotime($date_from) : 0;
+              $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
+
+              if ($filter_from_ts && $program_to_ts < $filter_from_ts) {
+                $date_match = false;
+              } elseif ($filter_to_ts && $program_from_ts > $filter_to_ts) {
+                $date_match = false;
               }
-              $date_match = $has_date_in_range;
             }
           }
 
@@ -672,20 +666,21 @@ function bsi_ajax_education_programs_by_school(): void
 
   $age_min = isset($_POST['program_age_min']) ? absint(wp_unslash($_POST['program_age_min'])) : 0;
   $age_max = isset($_POST['program_age_max']) ? absint(wp_unslash($_POST['program_age_max'])) : 0;
-  $duration_min = isset($_POST['program_duration_min']) ? absint(wp_unslash($_POST['program_duration_min'])) : 0;
-  $duration_max = isset($_POST['program_duration_max']) ? absint(wp_unslash($_POST['program_duration_max'])) : 0;
+  $duration = isset($_POST['program_duration']) ? absint(wp_unslash($_POST['program_duration'])) : 0;
   $date = isset($_POST['program_date']) ? sanitize_text_field(wp_unslash($_POST['program_date'])) : '';
 
   $programs = function_exists('get_field') ? get_field('education_programs', $education_id) : [];
   $programs = is_array($programs) ? $programs : [];
+
+  $booking_url = function_exists('get_field') ? get_field('education_booking_url', $education_id) : '';
+  $booking_url = trim((string) $booking_url);
 
   $filtered_programs = [];
 
   foreach ($programs as $program) {
     $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
     $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
-    $program_duration_min = isset($program['program_duration_min']) ? (int) $program['program_duration_min'] : 0;
-    $program_duration_max = isset($program['program_duration_max']) ? (int) $program['program_duration_max'] : 0;
+    $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
 
     $age_match = true;
     if ($age_min > 0 || $age_max > 0) {
@@ -698,33 +693,27 @@ function bsi_ajax_education_programs_by_school(): void
     }
 
     $duration_match = true;
-    if ($duration_min > 0 || $duration_max > 0) {
-      if ($duration_min > 0 && $program_duration_max > 0 && $duration_min > $program_duration_max) {
-        $duration_match = false;
-      }
-      if ($duration_max > 0 && $program_duration_min > 0 && $duration_max < $program_duration_min) {
+    if ($duration > 0) {
+      if ($program_duration <= 0 || $program_duration !== $duration) {
         $duration_match = false;
       }
     }
 
     $date_match = true;
     if ($date) {
-      $program_dates = $program['program_checkin_dates'] ?? [];
-      $program_dates = is_array($program_dates) ? $program_dates : [];
+      $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+      $date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
 
-      if (empty($program_dates)) {
+      if (!$date_from) {
         $date_match = false;
       } else {
-        $has_date_match = false;
         $date_ts = strtotime($date);
-        foreach ($program_dates as $date_item) {
-          $checkin_date = is_array($date_item) ? ($date_item['checkin_date'] ?? '') : '';
-          if ($checkin_date && strtotime($checkin_date) >= $date_ts) {
-            $has_date_match = true;
-            break;
-          }
+        $from_ts = strtotime($date_from);
+        $to_ts = $date_to ? strtotime($date_to) : $from_ts;
+
+        if ($date_ts < $from_ts || ($to_ts && $date_ts > $to_ts)) {
+          $date_match = false;
         }
-        $date_match = $has_date_match;
       }
     }
 
@@ -735,11 +724,11 @@ function bsi_ajax_education_programs_by_school(): void
 
   ob_start();
   if (!empty($filtered_programs)) {
-    foreach ($filtered_programs as $program) {
-      echo '<div class="single-education__program-item">';
+    foreach ($filtered_programs as $index => $program) {
       set_query_var('program', $program);
+      set_query_var('program_index', $index);
+      set_query_var('booking_url', $booking_url);
       get_template_part('template-parts/education/program-card');
-      echo '</div>';
     }
   } else {
     echo '<div class="education-programs__empty">Программы не найдены.</div>';
