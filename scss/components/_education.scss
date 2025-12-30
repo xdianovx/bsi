@@ -152,15 +152,6 @@
   text-align: center;
 }
 
-.education-card {
-  display: flex;
-  background: #fff;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  height: 100%;
-}
-
 .education-card__media {
   width: 100%;
   position: relative;
@@ -639,7 +630,7 @@
 
 .education-card {
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   gap: 4px;
   position: relative;
 

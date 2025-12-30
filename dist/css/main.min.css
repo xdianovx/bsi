@@ -1214,15 +1214,6 @@ input.error {
   text-align: center;
 }
 
-.education-card {
-  display: flex;
-  background: #fff;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  height: 100%;
-}
-
 .education-card__media {
   width: 100%;
   position: relative;
@@ -1680,7 +1671,6 @@ input.error {
 
 .education-card {
   display: flex;
-  flex-direction: column;
   gap: 4px;
   position: relative;
 }
