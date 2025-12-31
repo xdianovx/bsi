@@ -39,8 +39,16 @@ get_header();
 			<div class="editor-content">
 
 				<?php
-				the_content()
+				if (bsi_is_page_empty()):
 					?>
+					<div class="page-empty-message">
+						Страница заполняется
+					</div>
+					<?php
+				else:
+					the_content();
+				endif;
+				?>
 			</div>
 		</div>
 	</section>

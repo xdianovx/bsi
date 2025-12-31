@@ -200,7 +200,17 @@ get_header('mice');
   </section>
 
   <?php
-  the_content();
+  if (bsi_is_page_empty()):
+    ?>
+    <div class="container">
+      <div class="page-empty-message">
+        Страница заполняется
+      </div>
+    </div>
+    <?php
+  else:
+    the_content();
+  endif;
   ?>
 </main>
 
