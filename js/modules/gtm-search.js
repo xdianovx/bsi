@@ -16,6 +16,16 @@ export const gtmSearch = async () => {
     return `ночей: ${startDay}-${endDay}`;
   }
 
+  function parseDateYYYYMMDD(dateStr) {
+    if (!dateStr || typeof dateStr !== "string" || dateStr.length !== 8) {
+      return null;
+    }
+    const year = parseInt(dateStr.substring(0, 4), 10);
+    const month = parseInt(dateStr.substring(4, 6), 10) - 1;
+    const day = parseInt(dateStr.substring(6, 8), 10);
+    return new Date(year, month, day);
+  }
+
   async function samoAjax(method, params = {}) {
     const body = new URLSearchParams({
       action: "bsi_samo",
@@ -99,7 +109,7 @@ export const gtmSearch = async () => {
       nightsFrom: 5,
       nightsTill: 10,
       checkInStart: "20251210",
-      checkInEnd: "20251219",
+      checkInEnd: "20261002",
       adultsCount: "2",
       childCount: "0",
       childAges: "",
@@ -248,18 +258,58 @@ export const gtmSearch = async () => {
 
     const datepick = rootEl.querySelector(".gtm-datepicker");
     if (datepick) {
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
+      const startDate = parseDateYYYYMMDD(searchParams.checkInStart);
+      const endDate = parseDateYYYYMMDD(searchParams.checkInEnd);
 
-      flatpickr(datepick, {
+      let defaultStart, defaultEnd;
+
+      if (startDate) {
+        defaultStart = new Date(startDate);
+        defaultStart.setDate(defaultStart.getDate() + 2);
+      } else {
+        defaultStart = new Date();
+        defaultStart.setDate(defaultStart.getDate() + 2);
+      }
+
+      if (endDate) {
+        defaultEnd = new Date(endDate);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      } else {
+        defaultEnd = new Date();
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      if (defaultEnd <= defaultStart) {
+        defaultEnd = new Date(defaultStart);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (defaultStart < today) {
+        defaultStart = new Date(today);
+        defaultStart.setDate(defaultStart.getDate() + 2);
+        defaultEnd = new Date(defaultStart);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      const fp = flatpickr(datepick, {
         mode: "range",
         minDate: "today",
         locale: Russian,
         dateFormat: "d.m",
-        defaultDate: [today, nextWeek],
+        defaultDate: [defaultStart, defaultEnd],
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
+            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          }
+        },
+        onReady: (selectedDates, dateStr, instance) => {
+          if (!selectedDates || selectedDates.length !== 2) {
+            setTimeout(() => {
+              instance.setDate([defaultStart, defaultEnd], true);
+            }, 10);
+          } else {
             updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
           }
         },
@@ -409,18 +459,58 @@ export const gtmSearch = async () => {
 
     const datepick = rootEl.querySelector(".gtm-datepicker");
     if (datepick) {
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
+      const startDate = parseDateYYYYMMDD(searchParams.checkInStart);
+      const endDate = parseDateYYYYMMDD(searchParams.checkInEnd);
 
-      flatpickr(datepick, {
+      let defaultStart, defaultEnd;
+
+      if (startDate) {
+        defaultStart = new Date(startDate);
+        defaultStart.setDate(defaultStart.getDate() + 2);
+      } else {
+        defaultStart = new Date();
+        defaultStart.setDate(defaultStart.getDate() + 2);
+      }
+
+      if (endDate) {
+        defaultEnd = new Date(endDate);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      } else {
+        defaultEnd = new Date();
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      if (defaultEnd <= defaultStart) {
+        defaultEnd = new Date(defaultStart);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (defaultStart < today) {
+        defaultStart = new Date(today);
+        defaultStart.setDate(defaultStart.getDate() + 2);
+        defaultEnd = new Date(defaultStart);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      const fp = flatpickr(datepick, {
         mode: "range",
         minDate: "today",
         locale: Russian,
         dateFormat: "d.m",
-        defaultDate: [today, nextWeek],
+        defaultDate: [defaultStart, defaultEnd],
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
+            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          }
+        },
+        onReady: (selectedDates, dateStr, instance) => {
+          if (!selectedDates || selectedDates.length !== 2) {
+            setTimeout(() => {
+              instance.setDate([defaultStart, defaultEnd], true);
+            }, 10);
+          } else {
             updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
           }
         },
@@ -585,18 +675,58 @@ export const gtmSearch = async () => {
 
     const datepick = rootEl.querySelector(".gtm-datepicker");
     if (datepick) {
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
+      const startDate = parseDateYYYYMMDD(searchParams.checkInStart);
+      const endDate = parseDateYYYYMMDD(searchParams.checkInEnd);
 
-      flatpickr(datepick, {
+      let defaultStart, defaultEnd;
+
+      if (startDate) {
+        defaultStart = new Date(startDate);
+        defaultStart.setDate(defaultStart.getDate() + 2);
+      } else {
+        defaultStart = new Date();
+        defaultStart.setDate(defaultStart.getDate() + 2);
+      }
+
+      if (endDate) {
+        defaultEnd = new Date(endDate);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      } else {
+        defaultEnd = new Date();
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      if (defaultEnd <= defaultStart) {
+        defaultEnd = new Date(defaultStart);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (defaultStart < today) {
+        defaultStart = new Date(today);
+        defaultStart.setDate(defaultStart.getDate() + 2);
+        defaultEnd = new Date(defaultStart);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+      }
+
+      const fp = flatpickr(datepick, {
         mode: "range",
         minDate: "today",
         locale: Russian,
         dateFormat: "d.m",
-        defaultDate: [today, nextWeek],
+        defaultDate: [defaultStart, defaultEnd],
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
+            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          }
+        },
+        onReady: (selectedDates, dateStr, instance) => {
+          if (!selectedDates || selectedDates.length !== 2) {
+            setTimeout(() => {
+              instance.setDate([defaultStart, defaultEnd], true);
+            }, 10);
+          } else {
             updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
           }
         },
