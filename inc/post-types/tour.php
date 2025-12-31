@@ -94,6 +94,16 @@ add_action('init', function () {
 
 }, 10);
 
+add_action('pre_get_posts', function ($query) {
+  if (is_admin() && $query->is_main_query()) {
+    $screen = get_current_screen();
+    if ($screen && $screen->post_type === 'tour' && $screen->id === 'edit-tour') {
+      $query->set('orderby', 'menu_order');
+      $query->set('order', 'ASC');
+    }
+  }
+});
+
 add_action('init', function () {
   if (taxonomy_exists('region')) {
     register_taxonomy_for_object_type('region', 'tour');

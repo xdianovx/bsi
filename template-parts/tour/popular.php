@@ -1,15 +1,10 @@
 <?php
 
-$popular_tour_ids = get_posts([
+$tour_query = new WP_Query([
   'post_type' => 'tour',
   'post_status' => 'publish',
-  'posts_per_page' => -1,
-  'fields' => 'ids',
-  'orderby' => 'menu_order',
-  'order' => 'ASC',
-  'no_found_rows' => true,
-  'update_post_meta_cache' => false,
-  'update_post_term_cache' => false,
+  'posts_per_page' => 12,
+  // 'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
   'meta_query' => [
     [
       'key' => 'is_popular',
@@ -17,12 +12,20 @@ $popular_tour_ids = get_posts([
       'compare' => '=',
     ],
   ],
+  'ignore_sticky_posts' => true,
+  'no_found_rows' => true,
+  'update_post_meta_cache' => false,
+  'update_post_term_cache' => false,
 ]);
+
+$tour_posts = $tour_query->posts;
+wp_reset_postdata();
 
 $country_ids = [];
 
-if (!empty($popular_tour_ids) && function_exists('get_field')) {
-  foreach ($popular_tour_ids as $tour_id) {
+if (!empty($tour_posts) && function_exists('get_field')) {
+  foreach ($tour_posts as $tour_post) {
+    $tour_id = (int) $tour_post->ID;
     $c = get_field('tour_country', $tour_id);
 
     if ($c instanceof WP_Post) {
@@ -56,27 +59,6 @@ if (!empty($country_ids)) {
     'update_post_meta_cache' => false,
     'update_post_term_cache' => false,
   ]);
-}
-
-$tour_posts = [];
-
-if (!empty($popular_tour_ids)) {
-  $limited_ids = array_slice($popular_tour_ids, 0, 12);
-
-  $tour_query = new WP_Query([
-    'post_type' => 'tour',
-    'posts_per_page' => 12,
-    'post_status' => 'publish',
-    'orderby' => 'post__in',
-    'post__in' => $limited_ids,
-    'ignore_sticky_posts' => true,
-    'no_found_rows' => true,
-    'update_post_meta_cache' => false,
-    'update_post_term_cache' => false,
-  ]);
-
-  $tour_posts = $tour_query->posts;
-  wp_reset_postdata();
 }
 
 $items = [];
