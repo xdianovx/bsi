@@ -88,7 +88,10 @@ export const sliders = () => {
       prevEl: ".main-banner-arrow-prev",
     },
     pagination: {
-      el: ".swiper-pagination",
+      el: ".main-banner__pagination",
+      type: "fraction",
+      renderFraction: (currentClass, totalClass) =>
+        `<span class="${currentClass}"></span>/<span class="${totalClass}"></span>`,
     },
   });
 

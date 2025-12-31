@@ -991,9 +991,17 @@ input.error {
   border-radius: 100px;
   background: #fff;
   padding: 8px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  color: #111;
 }
-.main-banner__pagination .swiper-pagination-bullet-active {
-  background: #ee3145 !important;
+.main-banner__pagination.swiper-pagination-fraction {
+  align-items: center;
+  gap: 0;
+}
+.main-banner__pagination .swiper-pagination-current {
+  color: #ee3145;
 }
 
 .socials {

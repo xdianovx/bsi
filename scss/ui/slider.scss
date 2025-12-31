@@ -109,8 +109,17 @@
   border-radius: 100px;
   background: #fff;
   padding: 8px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  color: #111;
 
-  .swiper-pagination-bullet-active {
-    background: $red !important;
+  &.swiper-pagination-fraction {
+    align-items: center;
+    gap: 0;
+  }
+
+  .swiper-pagination-current {
+    color: $red;
   }
 }
