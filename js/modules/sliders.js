@@ -83,6 +83,7 @@ export const sliders = () => {
     slidesPerView: 1,
     spaceBetween: 10,
     speed: 300,
+    loop: true,
     navigation: {
       nextEl: ".main-banner-arrow-next",
       prevEl: ".main-banner-arrow-prev",
@@ -90,8 +91,7 @@ export const sliders = () => {
     pagination: {
       el: ".main-banner__pagination",
       type: "fraction",
-      renderFraction: (currentClass, totalClass) =>
-        `<span class="${currentClass}"></span>/<span class="${totalClass}"></span>`,
+      renderFraction: (currentClass, totalClass) => `<span class="${currentClass}"></span>/<span class="${totalClass}"></span>`,
     },
   });
 
