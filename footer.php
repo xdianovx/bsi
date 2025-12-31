@@ -94,8 +94,17 @@
 			</div>
 
 			<div class="footer__currencies">
+				<div class="footer__currencies-inner">
+					<div class="currency-item">
+						<div class="currency-item__title">USD</div>
+						<div class="currency-item__value numfont"></div>
+					</div>
 
-
+					<div class="currency-item">
+						<div class="currency-item__title">EUR</div>
+						<div class="currency-item__value numfont"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 

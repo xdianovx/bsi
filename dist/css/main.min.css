@@ -2635,6 +2635,28 @@ input.error {
   gap: 16px;
 }
 
+.footer__currencies-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.footer__currencies .currency-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer__currencies .currency-item__title {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footer__currencies .currency-item__value {
+  color: #fff;
+}
+
 .payments {
   display: flex;
   align-items: center;

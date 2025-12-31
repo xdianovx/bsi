@@ -41,11 +41,10 @@ function setStoredCurrency(iso) {
   }
 }
 
-function updateHeaderPrices() {
-  const currenciesContainer = document.querySelector(".header__currencies");
-  if (!currenciesContainer) return;
+function updateCurrencyPrices(container) {
+  if (!container) return;
 
-  const items = currenciesContainer.querySelectorAll(".currency-item");
+  const items = container.querySelectorAll(".currency-item");
   items.forEach((item) => {
     const codeEl = item.querySelector(".currency-item__title");
     const valueEl = item.querySelector(".currency-item__value");
@@ -58,33 +57,45 @@ function updateHeaderPrices() {
       valueEl.textContent = "";
     }
   });
+}
 
-  if (baseISO !== "RUB" && currentRates.RUB !== null) {
-    let rubItem = currenciesContainer.querySelector('.currency-item[data-currency="RUB"]');
-    if (!rubItem) {
-      const selectElement = currenciesContainer.querySelector(".currency-select");
-      if (selectElement) {
-        rubItem = document.createElement("div");
-        rubItem.className = "currency-item";
-        rubItem.setAttribute("data-currency", "RUB");
-        rubItem.innerHTML = `
-          <div class="currency-item__title">RUB</div>
-          <div class="currency-item__value numfont"></div>
-        `;
-        currenciesContainer.insertBefore(rubItem, selectElement);
+function updateHeaderPrices() {
+  const headerContainer = document.querySelector(".header__currencies");
+  if (headerContainer) {
+    updateCurrencyPrices(headerContainer);
+
+    if (baseISO !== "RUB" && currentRates.RUB !== null) {
+      let rubItem = headerContainer.querySelector('.currency-item[data-currency="RUB"]');
+      if (!rubItem) {
+        const selectElement = headerContainer.querySelector(".currency-select");
+        if (selectElement) {
+          rubItem = document.createElement("div");
+          rubItem.className = "currency-item";
+          rubItem.setAttribute("data-currency", "RUB");
+          rubItem.innerHTML = `
+            <div class="currency-item__title">RUB</div>
+            <div class="currency-item__value numfont"></div>
+          `;
+          headerContainer.insertBefore(rubItem, selectElement);
+        }
+      }
+      if (rubItem) {
+        const valueEl = rubItem.querySelector(".currency-item__value");
+        if (valueEl) {
+          valueEl.textContent = formatRate(currentRates.RUB);
+        }
+      }
+    } else {
+      const rubItem = headerContainer.querySelector('.currency-item[data-currency="RUB"]');
+      if (rubItem) {
+        rubItem.remove();
       }
     }
-    if (rubItem) {
-      const valueEl = rubItem.querySelector(".currency-item__value");
-      if (valueEl) {
-        valueEl.textContent = formatRate(currentRates.RUB);
-      }
-    }
-  } else {
-    const rubItem = currenciesContainer.querySelector('.currency-item[data-currency="RUB"]');
-    if (rubItem) {
-      rubItem.remove();
-    }
+  }
+
+  const footerContainer = document.querySelector(".footer__currencies");
+  if (footerContainer) {
+    updateCurrencyPrices(footerContainer);
   }
 }
 
