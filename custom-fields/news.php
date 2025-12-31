@@ -31,6 +31,29 @@ add_action('acf/init', function () {
     ],
   ]);
 
+  acf_add_local_field_group([
+    'key' => 'group_news_poster',
+    'title' => 'Настройки отображения новости',
+    'fields' => [
+      [
+        'key' => 'field_news_use_poster',
+        'label' => 'Использовать изображение в качестве постера на странице',
+        'name' => 'news_use_poster',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'news',
+        ],
+      ],
+    ],
+  ]);
 
 });
 
