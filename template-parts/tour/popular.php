@@ -63,8 +63,8 @@ if (!empty($popular_tour_ids)) {
     'post_type' => 'tour',
     'posts_per_page' => 12,
     'post_status' => 'publish',
-    'orderby' => 'date',
-    'order' => 'DESC',
+    'orderby' => 'menu_order',
+    'order' => 'ASC',
     'post__in' => $popular_tour_ids,
     'ignore_sticky_posts' => true,
     'no_found_rows' => true,
@@ -136,7 +136,7 @@ foreach ($tour_posts as $tour_post) {
   $tour_types = [];
   $type_terms = wp_get_post_terms($tour_id, 'tour_type', ['orderby' => 'name', 'order' => 'ASC']);
   if (!is_wp_error($type_terms) && !empty($type_terms)) {
-    $tour_types = array_map(function($term) {
+    $tour_types = array_map(function ($term) {
       return $term->name;
     }, $type_terms);
   }
@@ -165,27 +165,18 @@ foreach ($tour_posts as $tour_post) {
         <div class="news-slider__title-wrap-left">
           <h2 class="h2 news-slider__title">Популярные туры</h2>
           <div class="slider-arrow-wrap news-slider__arrows-wrap">
-            <div class="slider-arrow slider-arrow-prev popular-tours-arrow-prev"
-                 tabindex="-1"
-                 role="button"
-                 aria-label="Previous slide"
-                 aria-controls="swiper-wrapper-popular-tours"
-                 aria-disabled="true">
+            <div class="slider-arrow slider-arrow-prev popular-tours-arrow-prev" tabindex="-1" role="button"
+              aria-label="Previous slide" aria-controls="swiper-wrapper-popular-tours" aria-disabled="true">
             </div>
-            <div class="slider-arrow slider-arrow-next popular-tours-arrow-next"
-                 tabindex="0"
-                 role="button"
-                 aria-label="Next slide"
-                 aria-controls="swiper-wrapper-popular-tours"
-                 aria-disabled="false">
+            <div class="slider-arrow slider-arrow-next popular-tours-arrow-next" tabindex="0" role="button"
+              aria-label="Next slide" aria-controls="swiper-wrapper-popular-tours" aria-disabled="false">
             </div>
           </div>
         </div>
       </div>
 
       <div class="promo-filter popular-tours-filter">
-        <button class="promo-filter__btn --all active js-promo-filter-btn"
-                data-country="">
+        <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">
           Все
         </button>
 
@@ -207,14 +198,12 @@ foreach ($tour_posts as $tour_post) {
           }
           ?>
 
-          <button class="promo-filter__btn js-promo-filter-btn"
-                  data-country="<?php echo esc_attr($country_id); ?>"
-                  data-country-slug="<?php echo esc_attr($country_slug); ?>">
+          <button class="promo-filter__btn js-promo-filter-btn" data-country="<?php echo esc_attr($country_id); ?>"
+            data-country-slug="<?php echo esc_attr($country_slug); ?>">
             <?php if ($flag_url): ?>
               <span class="promo-filter__flag-wrap">
-                <img src="<?php echo esc_url($flag_url); ?>"
-                     alt="<?php echo esc_attr($country_title); ?>"
-                     class="promo-filter__flag">
+                <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($country_title); ?>"
+                  class="promo-filter__flag">
               </span>
             <?php endif; ?>
 
@@ -227,9 +216,8 @@ foreach ($tour_posts as $tour_post) {
         <div class="swiper popular-tours-slider">
           <div class="swiper-wrapper">
             <?php foreach ($items as $item): ?>
-              <div class="swiper-slide"
-                   data-country="<?php echo esc_attr($item['country_id']); ?>"
-                   data-country-slug="<?php echo esc_attr($item['country_slug']); ?>">
+              <div class="swiper-slide" data-country="<?php echo esc_attr($item['country_id']); ?>"
+                data-country-slug="<?php echo esc_attr($item['country_slug']); ?>">
                 <?php
                 set_query_var('tour', $item);
                 get_template_part('template-parts/tour/card');
@@ -243,4 +231,3 @@ foreach ($tour_posts as $tour_post) {
     </div>
   </section>
 <?php endif; ?>
-
