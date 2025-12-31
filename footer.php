@@ -58,6 +58,9 @@
 
 
 						<div class="footer__currencies">
+							<div class="footer__currencies-date">
+								Курс на <?= date_i18n('d.m.Y') ?>
+							</div>
 							<div class="footer__currencies-inner">
 								<div class="currency-item">
 									<div class="currency-item__title">USD</div>
