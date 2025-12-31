@@ -84,6 +84,10 @@ export const sliders = () => {
     spaceBetween: 10,
     speed: 300,
     loop: true,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
     navigation: {
       nextEl: ".main-banner-arrow-next",
       prevEl: ".main-banner-arrow-prev",
