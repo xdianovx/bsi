@@ -4,7 +4,7 @@ $tour_query = new WP_Query([
   'post_type' => 'tour',
   'post_status' => 'publish',
   'posts_per_page' => 12,
-  // 'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
+  'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
   'meta_query' => [
     [
       'key' => 'is_popular',
