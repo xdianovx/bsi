@@ -62,7 +62,8 @@ $tour_posts = [];
 
 if (!empty($popular_tour_ids)) {
   $limited_ids = array_slice($popular_tour_ids, 0, 12);
-  $tour_posts = get_posts([
+
+  $tour_query = new WP_Query([
     'post_type' => 'tour',
     'posts_per_page' => 12,
     'post_status' => 'publish',
@@ -73,6 +74,9 @@ if (!empty($popular_tour_ids)) {
     'update_post_meta_cache' => false,
     'update_post_term_cache' => false,
   ]);
+
+  $tour_posts = $tour_query->posts;
+  wp_reset_postdata();
 }
 
 $items = [];

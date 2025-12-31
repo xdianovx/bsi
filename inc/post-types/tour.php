@@ -83,7 +83,7 @@ add_action('init', function () {
     'menu_position' => 23,
     'menu_icon' => 'dashicons-location-alt',
 
-    'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+    'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'page-attributes'],
 
     'taxonomies' => ['region', 'resort', 'tour_type', 'tour_include'],
 
