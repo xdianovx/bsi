@@ -16,7 +16,8 @@ const currencySymbols = {
 let ratesData = null;
 let currentRates = { USD: null, EUR: null, RUB: null };
 let baseISO = "RUB";
-let dropdownInstance = null;
+let dropdownInstances = [];
+let currencySelectEls = [];
 
 function formatRate(num) {
   return num.toFixed(2).replace(".", ",");
@@ -59,50 +60,63 @@ function updateCurrencyPrices(container) {
   });
 }
 
+function updateBaseCurrencyLabels() {
+  currencySelectEls.forEach((selectEl) => {
+    const currentEl = selectEl.querySelector(".currency-current");
+    if (currentEl) {
+      currentEl.textContent = baseISO;
+    }
+  });
+}
+
+function updateRubItem(container) {
+  if (!container) return;
+
+  const selectElement = container.querySelector(".currency-select");
+  if (!selectElement) return;
+
+  const parent = selectElement.parentElement || container;
+
+  if (baseISO !== "RUB" && currentRates.RUB !== null) {
+    let rubItem = parent.querySelector('.currency-item[data-currency="RUB"]');
+    if (!rubItem) {
+      rubItem = document.createElement("div");
+      rubItem.className = "currency-item";
+      rubItem.setAttribute("data-currency", "RUB");
+      rubItem.innerHTML = `
+        <div class="currency-item__title">RUB</div>
+        <div class="currency-item__value numfont"></div>
+      `;
+      parent.insertBefore(rubItem, selectElement);
+    }
+
+    const valueEl = rubItem.querySelector(".currency-item__value");
+    if (valueEl) {
+      valueEl.textContent = formatRate(currentRates.RUB);
+    }
+  } else {
+    const rubItem = parent.querySelector('.currency-item[data-currency="RUB"]');
+    if (rubItem) {
+      rubItem.remove();
+    }
+  }
+}
+
 function updateHeaderPrices() {
   const headerContainer = document.querySelector(".header__currencies");
   if (headerContainer) {
     updateCurrencyPrices(headerContainer);
-
-    if (baseISO !== "RUB" && currentRates.RUB !== null) {
-      let rubItem = headerContainer.querySelector('.currency-item[data-currency="RUB"]');
-      if (!rubItem) {
-        const selectElement = headerContainer.querySelector(".currency-select");
-        if (selectElement) {
-          rubItem = document.createElement("div");
-          rubItem.className = "currency-item";
-          rubItem.setAttribute("data-currency", "RUB");
-          rubItem.innerHTML = `
-            <div class="currency-item__title">RUB</div>
-            <div class="currency-item__value numfont"></div>
-          `;
-          headerContainer.insertBefore(rubItem, selectElement);
-        }
-      }
-      if (rubItem) {
-        const valueEl = rubItem.querySelector(".currency-item__value");
-        if (valueEl) {
-          valueEl.textContent = formatRate(currentRates.RUB);
-        }
-      }
-    } else {
-      const rubItem = headerContainer.querySelector('.currency-item[data-currency="RUB"]');
-      if (rubItem) {
-        rubItem.remove();
-      }
-    }
+    updateRubItem(headerContainer);
   }
 
   const footerContainer = document.querySelector(".footer__currencies");
   if (footerContainer) {
     updateCurrencyPrices(footerContainer);
+    updateRubItem(footerContainer);
   }
 }
 
-function populateCurrencyDropdown(rates) {
-  const panel = document.querySelector(".currency-select .js-dropdown-panel");
-  if (!panel) return;
-
+function populateCurrencyDropdown(panel, rates) {
   const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT", "BYN"];
 
   panel.innerHTML = "";
@@ -171,46 +185,46 @@ async function loadCurrencyRates(baseISO) {
 }
 
 export async function initCurrency() {
-  const select = document.querySelector(".currency-select");
-  if (!select) return;
-  const currentEl = select.querySelector(".currency-current");
-  const panel = select.querySelector(".js-dropdown-panel");
-  if (!currentEl || !panel) return;
+  currencySelectEls = Array.from(document.querySelectorAll(".currency-select"));
+  if (!currencySelectEls.length) return;
 
   try {
     ratesData = await APIService.getCBRRates();
 
     if (!ratesData || !ratesData.rates) return;
 
-    populateCurrencyDropdown(ratesData.rates);
-
     baseISO = getStoredCurrency();
     const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT", "BYN"];
     if (!allowedCurrencies.includes(baseISO) || (baseISO !== "RUB" && !ratesData.rates[baseISO])) {
       baseISO = "RUB";
     }
-    currentEl.textContent = baseISO;
+    updateBaseCurrencyLabels();
 
     await loadCurrencyRates(baseISO);
 
-    dropdownInstance = dropdown(".currency-select");
+    dropdownInstances = currencySelectEls.map((selectEl) => dropdown(selectEl)).filter(Boolean);
 
-    const options = panel.querySelectorAll(".currency-option");
-    options.forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const iso = btn.getAttribute("data-iso");
-        if (!iso || (iso !== "RUB" && !ratesData.rates[iso])) return;
+    currencySelectEls.forEach((selectEl) => {
+      const panel = selectEl.querySelector(".js-dropdown-panel");
+      if (!panel) return;
 
-        baseISO = iso;
-        currentEl.textContent = iso;
-        setStoredCurrency(iso);
+      populateCurrencyDropdown(panel, ratesData.rates);
 
-        if (dropdownInstance) {
-          dropdownInstance.close();
-        }
+      const options = panel.querySelectorAll(".currency-option");
+      options.forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const iso = btn.getAttribute("data-iso");
+          if (!iso || (iso !== "RUB" && !ratesData.rates[iso])) return;
 
-        await loadCurrencyRates(baseISO);
+          baseISO = iso;
+          setStoredCurrency(iso);
+          updateBaseCurrencyLabels();
+
+          dropdownInstances.forEach((d) => d && d.close && d.close());
+
+          await loadCurrencyRates(baseISO);
+        });
       });
     });
   } catch (err) {

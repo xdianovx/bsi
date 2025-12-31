@@ -56,10 +56,29 @@
 
 .footer-contact-col {
   margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 8px;
+}
+
+.footer-contact-col__inner {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
+.footer-contact-col__currencies {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 8px;
+}
+
 .footer-contact {
   display: flex;
   flex-direction: column;
@@ -67,6 +86,12 @@
   background: rgba(255, 255, 255, 0.05);
   padding: 8px;
   border-radius: 8px;
+
+  &.footer-contact--phone {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
 }
 
 .footer-contact__title {
@@ -114,9 +139,19 @@
   gap: 16px;
 }
 
+.footer-contact .footer__currencies {
+  align-items: flex-end;
+  margin-top: 12px;
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+}
+
 .footer__currencies-inner {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 16px;
   font-size: 14px;
   font-weight: 600;
@@ -134,6 +169,28 @@
 
 .footer__currencies .currency-item__value {
   color: #fff;
+}
+
+.footer__currencies .currency-select-trigger__wrap {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.footer__currencies .currency-select-trigger__wrap img {
+  filter: invert(1);
+}
+
+.footer__currencies .currency-select-trigger__wrap:hover {
+  background: $red;
+  color: #fff;
+}
+
+.footer__currencies .currency-select .js-dropdown-panel {
+  background: #fff;
+}
+
+.footer__currencies .currency-select .currency-option {
+  color: #1b1b1b;
 }
 
 .payments {

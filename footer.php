@@ -40,44 +40,72 @@
 
 
 			<div class="footer-contact-col">
-				<div class="footer-contact">
-					<span class="footer-contact__title">
-						Телефон
-					</span>
-					<div class="footer-contact__links">
+				<div class="footer-contact-col__inner">
+					<div class="footer-contact footer-contact--phone">
+						<div class=""> <span class="footer-contact__title">
+								Телефон
+							</span>
+							<div class="footer-contact__links">
 
-						<a href="tel:8 (495) 785-55-35" class="footer-contact__link">
-							8 (495) 785-55-35
+								<a href="tel:8 (495) 785-55-35" class="footer-contact__link">
+									8 (495) 785-55-35
+								</a>
+								<a href="tel:8 (800) 200-55-35" class="footer-contact__link">
+									8 (800) 200-55-35
+								</a>
+							</div>
+						</div>
+
+
+						<div class="footer__currencies">
+							<div class="footer__currencies-inner">
+								<div class="currency-item">
+									<div class="currency-item__title">USD</div>
+									<div class="currency-item__value numfont"></div>
+								</div>
+
+								<div class="currency-item">
+									<div class="currency-item__title">EUR</div>
+									<div class="currency-item__value numfont"></div>
+								</div>
+
+								<div class="currency-select js-dropdown">
+									<button class="js-dropdown-trigger currency-select-trigger__wrap">
+										<span class="currency-current">RUB</span>
+										<img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg" alt="">
+									</button>
+
+									<div class="js-dropdown-panel"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="footer-contact">
+						<span class="footer-contact__title">
+							Email
+						</span>
+
+						<a href="mailto:<?php the_field('email', 'option'); ?>" class="footer-contact__link">
+							<?php the_field('email', 'option'); ?>
 						</a>
-						<a href="tel:8 (800) 200-55-35" class="footer-contact__link">
-							8 (800) 200-55-35
-						</a>
+					</div>
+
+					<div class="footer-contact">
+						<span class="footer-contact__title">
+							Офисы в Москве
+						</span>
+
+						<p class="footer-contact__value">
+							<?php the_field('adres_ofis', 'option'); ?>
+						</p>
+
+						<p class="footer-contact__value">
+							<?php the_field('adres_ofis_2', 'option'); ?>
+						</p>
 					</div>
 				</div>
 
-				<div class="footer-contact">
-					<span class="footer-contact__title">
-						Email
-					</span>
-
-					<a href="mailto:<?php the_field('email', 'option'); ?>" class="footer-contact__link">
-						<?php the_field('email', 'option'); ?>
-					</a>
-				</div>
-
-				<div class="footer-contact">
-					<span class="footer-contact__title">
-						Офисы в Москве
-					</span>
-
-					<p class="footer-contact__value">
-						<?php the_field('adres_ofis', 'option'); ?>
-					</p>
-
-					<p class="footer-contact__value">
-						<?php the_field('adres_ofis_2', 'option'); ?>
-					</p>
-				</div>
 
 
 
@@ -93,19 +121,7 @@
 				</div>
 			</div>
 
-			<div class="footer__currencies">
-				<div class="footer__currencies-inner">
-					<div class="currency-item">
-						<div class="currency-item__title">USD</div>
-						<div class="currency-item__value numfont"></div>
-					</div>
 
-					<div class="currency-item">
-						<div class="currency-item__title">EUR</div>
-						<div class="currency-item__value numfont"></div>
-					</div>
-				</div>
-			</div>
 		</div>
 
 		<div class="footer__policy">
