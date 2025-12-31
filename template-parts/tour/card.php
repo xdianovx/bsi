@@ -87,7 +87,7 @@ if (function_exists('get_field')) {
 
   $checkin_dates_val = get_field('tour_checkin_dates', $tour_id);
   if (is_string($checkin_dates_val) && $checkin_dates_val !== '') {
-    $checkin_dates = (string) $checkin_dates_val;
+    $checkin_dates = format_dates_string_russian($checkin_dates_val);
   }
 
   $excursions_count_val = get_field('tour_excursions_count', $tour_id);

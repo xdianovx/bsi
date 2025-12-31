@@ -66,8 +66,7 @@ $views = (int) get_post_meta(get_the_ID(), 'news_views', true);
             <path d="M16 18h.01" />
           </svg>
           <span>
-
-            <?php echo get_the_date('j F Y'); ?>
+            <?php echo format_date_russian(get_the_date('Y-m-d')); ?>
           </span>
         </time>
       </div>

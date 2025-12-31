@@ -7998,7 +7998,7 @@ input.error {
 }
 
 .visa-page-steps__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .visa-page-steps__section {
@@ -8030,7 +8030,7 @@ input.error {
 }
 
 .visa-page-consultation__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 1200px) {
   .visa-page-consultation__section {
@@ -8067,7 +8067,7 @@ input.error {
 }
 
 .visa-page-contacts__section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 768px) {
   .visa-page-contacts__section {
@@ -8144,7 +8144,7 @@ input.error {
 }
 
 .visa-page-countries-section {
-  margin-top: 120px;
+  margin-top: 80px;
 }
 @media screen and (max-width: 768px) {
   .visa-page-countries-section {

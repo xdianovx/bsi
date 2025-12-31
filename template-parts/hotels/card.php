@@ -192,32 +192,7 @@ if (function_exists('get_field')) {
               <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?>,</span>
           <?php endif; ?>
           <?php if ($checkin_date): ?>
-            <?php
-            $date_obj = DateTime::createFromFormat('Y-m-d', $checkin_date);
-            if ($date_obj) {
-              $day = $date_obj->format('j');
-              $months = [
-                1 => 'января',
-                2 => 'февраля',
-                3 => 'марта',
-                4 => 'апреля',
-                5 => 'мая',
-                6 => 'июня',
-                7 => 'июля',
-                8 => 'августа',
-                9 => 'сентября',
-                10 => 'октября',
-                11 => 'ноября',
-                12 => 'декабря'
-              ];
-              $month_num = (int) $date_obj->format('n');
-              $month_str = isset($months[$month_num]) ? $months[$month_num] : $date_obj->format('F');
-              $formatted_date = $day . ' ' . $month_str;
-            } else {
-              $formatted_date = esc_html($checkin_date);
-            }
-            ?>
-            <span class="hotel-card__checkin-date">с <?php echo esc_html($formatted_date); ?></span>
+            <span class="hotel-card__checkin-date">с <?php echo esc_html(format_date_russian($checkin_date)); ?></span>
           <?php endif; ?>
         </div>
       <?php endif; ?>

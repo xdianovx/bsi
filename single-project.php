@@ -45,8 +45,8 @@ $project_date_raw = function_exists('get_field') ? (string) get_field('project_d
 $project_date_ts = $project_date_raw ? strtotime($project_date_raw) : 0;
 
 $project_date_human = $project_date_ts
-  ? date_i18n('j F Y', $project_date_ts)
-  : get_the_date('j F Y', $project_id);
+  ? format_date_russian($project_date_raw)
+  : format_date_russian(get_the_date('Y-m-d', $project_id));
 
 $project_date_attr = $project_date_ts
   ? date('Y-m-d', $project_date_ts)

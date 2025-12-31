@@ -20,7 +20,7 @@ $excerpt = $review_text ?: get_the_excerpt($review_id);
     <?php if ($review_date): ?>
       <time class="review-card__date"
             datetime="<?= esc_attr($review_date); ?>">
-        <?= esc_html(date_i18n('j F Y', strtotime($review_date))); ?>
+        <?= esc_html(format_date_russian($review_date)); ?>
       </time>
     <?php endif; ?>
 

@@ -56,16 +56,9 @@ $date_range_text = '';
 if ($checkin_date_from) {
   $nearest_date = $checkin_date_from;
   if ($checkin_date_to && $checkin_date_to !== $checkin_date_from) {
-    $date_from_obj = DateTime::createFromFormat('Y-m-d', $checkin_date_from);
-    $date_to_obj = DateTime::createFromFormat('Y-m-d', $checkin_date_to);
-    if ($date_from_obj && $date_to_obj) {
-      $date_range_text = date_i18n('d.m.Y', $date_from_obj->getTimestamp()) . ' - ' . date_i18n('d.m.Y', $date_to_obj->getTimestamp());
-    }
+    $date_range_text = format_date_russian($checkin_date_from) . ' - ' . format_date_russian($checkin_date_to);
   } else {
-    $date_from_obj = DateTime::createFromFormat('Y-m-d', $checkin_date_from);
-    if ($date_from_obj) {
-      $date_range_text = date_i18n('d.m.Y', $date_from_obj->getTimestamp());
-    }
+    $date_range_text = format_date_russian($checkin_date_from);
   }
 }
 

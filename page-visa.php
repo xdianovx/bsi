@@ -42,8 +42,8 @@ get_header();
         <h1 class="h1 page-award__title archive-page__title ">
           <?php the_title(); ?>
         </h1>
-
-        <p class="page-award__excerpt archive-page__excerpt"><?= get_the_excerpt(); ?></p>
+        <!-- 
+        <p class="page-award__excerpt archive-page__excerpt"><?= get_the_excerpt(); ?></p> -->
       </div>
     </div>
   </section>
@@ -59,20 +59,11 @@ get_header();
           <div class="visa-info-item">
             <div class="visa-info-item__title">
               <div class="visa-info-item__icon">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     width="20"
-                     height="20"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     class="lucide lucide-clock-icon lucide-clock">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-clock-icon lucide-clock">
                   <path d="M12 6v6l4 2" />
-                  <circle cx="12"
-                          cy="12"
-                          r="10" />
+                  <circle cx="12" cy="12" r="10" />
                 </svg>
               </div>
               <p class="visa-info-item__key">Прием и выдача документов:</p>
@@ -84,30 +75,21 @@ get_header();
           <div class="visa-info-item">
             <div class="visa-info-item__title">
               <div class="visa-info-item__icon">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     width="20"
-                     height="20"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     class="lucide lucide-map-pin-house-icon lucide-map-pin-house">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-map-pin-house-icon lucide-map-pin-house">
                   <path
-                        d="M15 22a1 1 0 0 1-1-1v-4a1 1 0 0 1 .445-.832l3-2a1 1 0 0 1 1.11 0l3 2A1 1 0 0 1 22 17v4a1 1 0 0 1-1 1z" />
+                    d="M15 22a1 1 0 0 1-1-1v-4a1 1 0 0 1 .445-.832l3-2a1 1 0 0 1 1.11 0l3 2A1 1 0 0 1 22 17v4a1 1 0 0 1-1 1z" />
                   <path d="M18 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 .601.2" />
                   <path d="M18 22v-3" />
-                  <circle cx="10"
-                          cy="10"
-                          r="3" />
+                  <circle cx="10" cy="10" r="3" />
                 </svg>
               </div>
               <p class="visa-info-item__key">Адрес:</p>
             </div>
             <p class="visa-info-item__value">
               г. Москва, ул. Садовая-Кудринская д. 2/62/35, строение 1, этаж 3. м. Баррикадная, тел.: <a
-                 href="tel:+7 (495) 785-55-35">+7 (495) 785-55-35</a>
+                href="tel:+7 (495) 785-55-35">+7 (495) 785-55-35</a>
             </p>
           </div>
 
@@ -127,7 +109,7 @@ get_header();
   </section>
 
 
-  <section class="visa-page-features__section">
+  <!-- <section class="visa-page-features__section">
     <div class="container">
       <h2 class="h2">Наши преимущества</h2>
 
@@ -145,8 +127,7 @@ get_header();
 
                 <?php if (!empty($img['url'])): ?>
                   <div class="visa-page-features__item-icon">
-                    <img src="<?php echo esc_url($img['url']); ?>"
-                         alt="<?php echo esc_attr($title); ?>">
+                    <img src="<?php echo esc_url($img['url']); ?>" alt="<?php echo esc_attr($title); ?>">
                   </div>
                 <?php endif; ?>
 
@@ -168,95 +149,36 @@ get_header();
 
         <?php else: ?>
           <!-- Фолбэк, если ACF ещё не заполнен -->
-          <div class="visa-page-features__item">
-            <div class="visa-page-features__item__wrap">
-              <div class="visa-page-features__item-title">
-                Оформляем визы с 2005 года
-              </div>
-            </div>
-          </div>
-
-          <div class="visa-page-features__item">
-            <div class="visa-page-features__item__wrap">
-              <div class="visa-page-features__item-title">
-                Индивидуальный подход к каждому клиенту
-              </div>
-            </div>
-          </div>
-
-          <div class="visa-page-features__item">
-            <div class="visa-page-features__item__wrap">
-              <div class="visa-page-features__item-title">
-                Поддержка на всех этапах оформления
-              </div>
-            </div>
-          </div>
-        <?php endif; ?>
+    <div class="visa-page-features__item">
+      <div class="visa-page-features__item__wrap">
+        <div class="visa-page-features__item-title">
+          Оформляем визы с 2005 года
+        </div>
       </div>
     </div>
-  </section>
-  <section class="visa-page-steps__section">
-    <div class="container">
-      <h2 class="h2">Процедура оформления</h2>
 
-      <div class="visa-page-steps__wrap">
-        <?php if (function_exists('have_rows') && have_rows('vizy_procedure')): ?>
-          <?php while (have_rows('vizy_procedure')):
-            the_row(); ?>
-            <?php
-            $img = get_sub_field('image');
-            $num = get_sub_field('order');
-            $title = (string) get_sub_field('title');
-            $descr = (string) get_sub_field('description');
-            ?>
-            <div class="visa-page-steps-item">
-              <div class="visa-page-steps-item__top">
-                <?php if (!empty($num) || $num === 0 || $num === '0'): ?>
-                  <div class="visa-page-steps-item__num numfont">
-                    <?php echo esc_html($num); ?>
-                  </div>
-                <?php endif; ?>
-
-                <?php if (!empty($title)): ?>
-                  <div class="visa-page-steps-item__title">
-                    <?php echo esc_html($title); ?>
-                  </div>
-                <?php endif; ?>
-              </div>
-
-              <?php if (!empty($descr)): ?>
-                <div class="visa-page-steps-item__description">
-                  <?php echo wp_kses_post($descr); ?>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($img['url'])): ?>
-                <div class="visa-page-steps-item__icon">
-                  <img src="<?php echo esc_url($img['url']); ?>"
-                       alt="<?php echo esc_attr($title); ?>">
-                </div>
-              <?php endif; ?>
-            </div>
-          <?php endwhile; ?>
-
-        <?php else: ?>
-          <?php foreach ($steps as $step): ?>
-            <div class="visa-page-steps-item">
-              <div class="visa-page-steps-item__num">
-                <?php echo esc_html($step['num']); ?>
-              </div>
-              <div class="visa-page-steps-item__title">
-                <?php echo esc_html($step['title']); ?>
-              </div>
-              <div class="visa-page-steps-item__description">
-                <?php echo esc_html($step['descr']); ?>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
+    <div class="visa-page-features__item">
+      <div class="visa-page-features__item__wrap">
+        <div class="visa-page-features__item-title">
+          Индивидуальный подход к каждому клиенту
+        </div>
       </div>
     </div>
-  </section>
+
+    <div class="visa-page-features__item">
+      <div class="visa-page-features__item__wrap">
+        <div class="visa-page-features__item-title">
+          Поддержка на всех этапах оформления
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+  </div>
+  </div>
+  </section> -->
+
+
+
 
 
   <?php
@@ -364,9 +286,8 @@ get_header();
             <div class="visa-country-card">
               <div class="visa-country-card__head">
                 <?php if ($flag_url): ?>
-                  <img class="visa-country-card__flag"
-                       src="<?php echo esc_url($flag_url); ?>"
-                       alt="<?php echo esc_attr($country_title); ?>">
+                  <img class="visa-country-card__flag" src="<?php echo esc_url($flag_url); ?>"
+                    alt="<?php echo esc_attr($country_title); ?>">
                 <?php endif; ?>
 
                 <div class="visa-country-card__title">
@@ -382,8 +303,7 @@ get_header();
                     <?php
                     $url = add_query_arg(['visa_type[]' => (int) $t->term_id], $country_visa_url);
                     ?>
-                    <a class="visa-country-card__type"
-                       href="<?php echo esc_url($url); ?>">
+                    <a class="visa-country-card__type" href="<?php echo esc_url($url); ?>">
                       <?php echo esc_html($t->name); ?>
                     </a>
                   <?php endforeach; ?>
@@ -434,21 +354,14 @@ get_header();
                 <div class="visa-contact-item__links">
                   <?php if ($phone): ?>
                     <a class="visa-contact-item__phone visa-contact-item__link numfont"
-                       href="<?php echo esc_url('tel:' . $tel); ?>">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="24"
-                           height="24"
-                           viewBox="0 0 24 24"
-                           fill="none"
-                           stroke="currentColor"
-                           stroke-width="1.5"
-                           stroke-linecap="round"
-                           stroke-linejoin="round"
-                           class="lucide lucide-phone-call-icon lucide-phone-call">
+                      href="<?php echo esc_url('tel:' . $tel); ?>">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-phone-call-icon lucide-phone-call">
                         <path d="M13 2a9 9 0 0 1 9 9" />
                         <path d="M13 6a5 5 0 0 1 5 5" />
                         <path
-                              d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
+                          d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
                       </svg>
                       <span><?php echo esc_html($phone_label ?: $phone); ?></span>
                     </a>
@@ -456,17 +369,10 @@ get_header();
 
                   <?php if ($email): ?>
                     <a class="visa-contact-item__email visa-contact-item__link numfont"
-                       href="<?php echo esc_url('mailto:' . $email); ?>">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="24"
-                           height="24"
-                           viewBox="0 0 24 24"
-                           fill="none"
-                           stroke="currentColor"
-                           stroke-width="1.5"
-                           stroke-linecap="round"
-                           stroke-linejoin="round"
-                           class="lucide lucide-mail-check-icon lucide-mail-check">
+                      href="<?php echo esc_url('mailto:' . $email); ?>">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-mail-check-icon lucide-mail-check">
                         <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" />
                         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                         <path d="m16 19 2 2 4-4" />
@@ -485,85 +391,122 @@ get_header();
     </section>
   <?php endif; ?>
 
+  <section class="visa-page-steps__section">
+    <div class="container">
+      <h2 class="h2">Процедура оформления</h2>
+
+      <div class="visa-page-steps__wrap">
+        <?php if (function_exists('have_rows') && have_rows('vizy_procedure')): ?>
+          <?php while (have_rows('vizy_procedure')):
+            the_row(); ?>
+            <?php
+            $img = get_sub_field('image');
+            $num = get_sub_field('order');
+            $title = (string) get_sub_field('title');
+            $descr = (string) get_sub_field('description');
+            ?>
+            <div class="visa-page-steps-item">
+              <div class="visa-page-steps-item__top">
+                <?php if (!empty($num) || $num === 0 || $num === '0'): ?>
+                  <div class="visa-page-steps-item__num numfont">
+                    <?php echo esc_html($num); ?>
+                  </div>
+                <?php endif; ?>
+
+                <?php if (!empty($title)): ?>
+                  <div class="visa-page-steps-item__title">
+                    <?php echo esc_html($title); ?>
+                  </div>
+                <?php endif; ?>
+              </div>
+
+              <?php if (!empty($descr)): ?>
+                <div class="visa-page-steps-item__description">
+                  <?php echo wp_kses_post($descr); ?>
+                </div>
+              <?php endif; ?>
+
+              <?php if (!empty($img['url'])): ?>
+                <div class="visa-page-steps-item__icon">
+                  <img src="<?php echo esc_url($img['url']); ?>" alt="<?php echo esc_attr($title); ?>">
+                </div>
+              <?php endif; ?>
+            </div>
+          <?php endwhile; ?>
+
+        <?php else: ?>
+          <?php foreach ($steps as $step): ?>
+            <div class="visa-page-steps-item">
+              <div class="visa-page-steps-item__num">
+                <?php echo esc_html($step['num']); ?>
+              </div>
+              <div class="visa-page-steps-item__title">
+                <?php echo esc_html($step['title']); ?>
+              </div>
+              <div class="visa-page-steps-item__description">
+                <?php echo esc_html($step['descr']); ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
+    </div>
+  </section>
+
   <section class="visa-page-consultation__section">
     <div class="container">
       <h2 class="h2">Бесплатная консультация</h2>
       <p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам получения виз</p>
-      <form action=""
-            class="visa-consultation-form">
+      <form action="" class="visa-consultation-form">
 
         <div class="form-row form-row-2">
 
           <div class="input-item white">
 
             <label for="name">Страна</label>
-            <input type="text"
-                   name="country"
-                   id="country"
-                   placeholder="Страна">
+            <input type="text" name="country" id="country" placeholder="Страна">
 
-            <div class="error-message"
-                 data-field="country">
+            <div class="error-message" data-field="country">
             </div>
           </div>
 
           <div class="input-item white">
             <label for="visatype">Тип визы</label>
-            <input type="text"
-                   name="visatype"
-                   id="visatype"
-                   placeholder="Страна">
+            <input type="text" name="visatype" id="visatype" placeholder="Страна">
 
-            <div class="error-message"
-                 data-field="visatype">
+            <div class="error-message" data-field="visatype">
             </div>
           </div>
 
           <div class="input-item white">
             <label for="name">Имя</label>
-            <input type="text"
-                   name="name"
-                   id="name"
-                   placeholder="Имя">
+            <input type="text" name="name" id="name" placeholder="Имя">
 
-            <div class="error-message"
-                 data-field="name">
+            <div class="error-message" data-field="name">
             </div>
           </div>
 
           <div class="input-item white">
             <label for="graz">Гражданство</label>
-            <input type="text"
-                   name="graz"
-                   id="graz"
-                   placeholder="Гражданство">
+            <input type="text" name="graz" id="graz" placeholder="Гражданство">
 
-            <div class="error-message"
-                 data-field="graz">
+            <div class="error-message" data-field="graz">
             </div>
           </div>
 
           <div class="input-item white">
             <label for="tel">Телефон</label>
-            <input type="tel"
-                   name="tel"
-                   id="tel"
-                   placeholder="Имя">
+            <input type="tel" name="tel" id="tel" placeholder="Имя">
 
-            <div class="error-message"
-                 data-field="tel">
+            <div class="error-message" data-field="tel">
             </div>
           </div>
 
           <div class="input-item white">
             <label for="graz">Дата поездки</label>
-            <input type="text"
-                   name="graz"
-                   id="graz"
-                   placeholder="Гражданство">
+            <input type="text" name="graz" id="graz" placeholder="Гражданство">
 
-            <div class="error-message"
-                 data-field="graz">
+            <div class="error-message" data-field="graz">
             </div>
           </div>
         </div>
@@ -571,15 +514,14 @@ get_header();
         <div class="visa-consultation-form__bottom">
           <div id="form-status"></div>
 
-          <button type="submit"
-                  class="btn btn-accent fit-form__btn-submit">
+          <button type="submit" class="btn btn-accent fit-form__btn-submit">
             Отправить
           </button>
 
           <p class="form-policy fit-form__policy">
             Нажимая на кнопку "Отправить", вы соглашаетесь с <a
-               href="http://webscape.beget.tech/bsi/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
-               class="policy-link">
+              href="http://webscape.beget.tech/bsi/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
+              class="policy-link">
               нашей политикой обработки персональных данных
             </a>
           </p>

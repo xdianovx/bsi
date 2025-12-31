@@ -14,27 +14,77 @@ function format_number($number, $decimals = 0)
   );
 }
 
-function format_date_value($value)
+function format_date_russian($value)
 {
   if (!$value) {
     return '';
   }
 
+  $date_obj = null;
   $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
 
   foreach ($formats as $format) {
-    $dt = DateTime::createFromFormat($format, $value);
-    if ($dt instanceof DateTime) {
-      return $dt->format('d.m.Y');
+    $date_obj = DateTime::createFromFormat($format, trim($value));
+    if ($date_obj instanceof DateTime) {
+      break;
     }
   }
 
-  $timestamp = strtotime($value);
-  if ($timestamp) {
-    return date('d.m.Y', $timestamp);
+  if (!$date_obj) {
+    $timestamp = strtotime($value);
+    if ($timestamp) {
+      $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
+    }
+  }
+
+  if ($date_obj instanceof DateTime) {
+    $day = $date_obj->format('j');
+    $months = [
+      1 => 'января',
+      2 => 'февраля',
+      3 => 'марта',
+      4 => 'апреля',
+      5 => 'мая',
+      6 => 'июня',
+      7 => 'июля',
+      8 => 'августа',
+      9 => 'сентября',
+      10 => 'октября',
+      11 => 'ноября',
+      12 => 'декабря'
+    ];
+    $month_num = (int) $date_obj->format('n');
+    $month_str = isset($months[$month_num]) ? $months[$month_num] : $date_obj->format('F');
+    return $day . ' ' . $month_str;
   }
 
   return $value;
+}
+
+function format_dates_string_russian($dates_string)
+{
+  if (!$dates_string || !is_string($dates_string)) {
+    return $dates_string;
+  }
+
+  $dates = array_map('trim', explode(',', $dates_string));
+  $formatted_dates = [];
+
+  foreach ($dates as $date) {
+    $formatted = format_date_russian($date);
+    if ($formatted !== $date || preg_match('/\d{1,2}\.\d{1,2}\.\d{4}/', $date)) {
+      $formatted_dates[] = $formatted;
+    } else {
+      $formatted_dates[] = $date;
+    }
+  }
+
+  return implode(', ', $formatted_dates);
+}
+
+function format_date_value($value)
+{
+  return format_date_russian($value);
 }
 
 

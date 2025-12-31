@@ -285,31 +285,7 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 
     <?php if ($nearest_date): ?>
       <div class="education-card__date">
-        Ближайший заезд: <?php
-        $date_obj = DateTime::createFromFormat('Y-m-d', $nearest_date);
-        if ($date_obj) {
-          $day = $date_obj->format('j');
-          $months = [
-            1 => 'января',
-            2 => 'февраля',
-            3 => 'марта',
-            4 => 'апреля',
-            5 => 'мая',
-            6 => 'июня',
-            7 => 'июля',
-            8 => 'августа',
-            9 => 'сентября',
-            10 => 'октября',
-            11 => 'ноября',
-            12 => 'декабря'
-          ];
-          $month_num = (int) $date_obj->format('n');
-          $month_str = isset($months[$month_num]) ? $months[$month_num] : $date_obj->format('F');
-          echo esc_html($day . ' ' . $month_str);
-        } else {
-          echo esc_html($nearest_date);
-        }
-        ?>
+        Ближайший заезд: <?php echo esc_html(format_date_russian($nearest_date)); ?>
       </div>
     <?php endif; ?>
 
