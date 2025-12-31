@@ -5,6 +5,8 @@ $popular_tour_ids = get_posts([
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'fields' => 'ids',
+  'orderby' => 'menu_order',
+  'order' => 'ASC',
   'no_found_rows' => true,
   'update_post_meta_cache' => false,
   'update_post_term_cache' => false,
@@ -59,13 +61,13 @@ if (!empty($country_ids)) {
 $tour_posts = [];
 
 if (!empty($popular_tour_ids)) {
+  $limited_ids = array_slice($popular_tour_ids, 0, 12);
   $tour_posts = get_posts([
     'post_type' => 'tour',
     'posts_per_page' => 12,
     'post_status' => 'publish',
-    'orderby' => 'menu_order',
-    'order' => 'ASC',
-    'post__in' => $popular_tour_ids,
+    'orderby' => 'post__in',
+    'post__in' => $limited_ids,
     'ignore_sticky_posts' => true,
     'no_found_rows' => true,
     'update_post_meta_cache' => false,
