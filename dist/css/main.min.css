@@ -5497,11 +5497,11 @@ input.error {
 }
 
 .insurance_item_img {
-  width: 45%;
+  aspect-ratio: 1/1;
   flex-shrink: 0;
-  height: 201px;
   border-radius: 8px;
   overflow: hidden;
+  height: 200px;
 }
 .insurance_item_img a {
   display: block;
@@ -5510,7 +5510,6 @@ input.error {
 }
 .insurance_item_img img {
   width: 100%;
-  height: 100%;
   object-fit: cover;
   display: block;
   transition: all 0.3s ease-in-out;
@@ -5521,12 +5520,11 @@ input.error {
 @media screen and (max-width: 768px) {
   .insurance_item_img {
     width: 100%;
-    height: 200px;
+    height: auto;
   }
 }
 
 .insurance_item_content {
-  width: 55%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
