@@ -24,8 +24,8 @@ $main_page_items = [
      // ],
      [
           'title' => 'Событийные <br> туры',
-          'url' => get_permalink(2064),
-          'target' => '',
+          'url' => 'https://www.bsigroup.ru/tip-tura/event-tours',
+          'target' => '_blank',
           'img' => 'event.png',
 
      ],
