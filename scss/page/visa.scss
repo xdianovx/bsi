@@ -308,3 +308,28 @@
     color: $red;
   }
 }
+
+.visa-consultation-form__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.visa-consultation-form {
+  .input-item {
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: $red;
+      flex-shrink: 0;
+    }
+
+    label {
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+}
