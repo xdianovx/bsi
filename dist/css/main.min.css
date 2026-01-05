@@ -3235,6 +3235,12 @@ input.error {
   height: 28px;
   color: #fff;
 }
+.header__contacts .social-item.--tg {
+  background: #0088cc;
+}
+.header__contacts .social-item.--vk {
+  background: #0077ff;
+}
 .header__contacts .social-item svg {
   margin-top: 2px;
   width: 18px;

@@ -21,6 +21,12 @@
   .social-item {
     width: 28px;
     background: $red;
+    &.--tg {
+      background: #0088cc;
+    }
+    &.--vk {
+      background: #0077ff;
+    }
     height: 28px;
     color: #fff;
     svg {
