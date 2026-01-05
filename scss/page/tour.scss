@@ -193,6 +193,7 @@
     .accordion__icon {
       transform: rotate(180deg);
       color: $red;
+      flex-shrink: 0;
     }
   }
 }
@@ -216,6 +217,11 @@
   &.is-open {
     background: $red;
     color: #fff;
+  }
+
+  @media screen and (max-width: 768px) {
+    font-size: 14px;
+    padding: 12px;
   }
 }
 

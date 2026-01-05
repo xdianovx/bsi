@@ -7434,6 +7434,7 @@ input.error {
 .accordion__item.is-open .accordion__icon {
   transform: rotate(180deg);
   color: #ee3145;
+  flex-shrink: 0;
 }
 
 .accordion__title {
@@ -7455,6 +7456,12 @@ input.error {
 .tour-program__day-btn.is-open {
   background: #ee3145;
   color: #fff;
+}
+@media screen and (max-width: 768px) {
+  .tour-program__day-btn {
+    font-size: 14px;
+    padding: 12px;
+  }
 }
 
 .accordion__content {
