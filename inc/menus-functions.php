@@ -206,12 +206,16 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
     {
         if ($depth === 0) {
             $output .= '<div class="mobile-nav__submenu">';
+        } elseif ($depth === 1) {
+            $output .= '<div class="mobile-nav__submenu mobile-nav__submenu--nested">';
         }
     }
 
     public function end_lvl(&$output, $depth = 0, $args = null)
     {
         if ($depth === 0) {
+            $output .= '</div>';
+        } elseif ($depth === 1) {
             $output .= '</div>';
         }
     }
@@ -250,7 +254,22 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
         }
 
         if ($depth === 1) {
-            $output .= '<a href="' . $url . '" class="mobile-nav__link mobile-nav__link--child"' . $target . $rel . '>';
+            $has_children_level2 = in_array('menu-item-has-children', $classes, true);
+            $output .= '<div class="mobile-nav__item mobile-nav__item--level2' . ($is_active ? ' active' : '') . '">';
+            $output .= '<a href="' . $url . '" class="mobile-nav__link mobile-nav__link--child"' . ($has_children_level2 ? ' aria-expanded="false"' : '') . $target . $rel . '>';
+            $output .= '<span>' . $title . '</span>';
+            
+            if ($has_children_level2) {
+                $output .= '<div class="mobile-nav__link-chevron">';
+                $output .= '<img src="' . esc_url(get_template_directory_uri() . '/img/icons/chevron-d-red.svg') . '" alt="">';
+                $output .= '</div>';
+            }
+            
+            $output .= '</a>';
+        }
+
+        if ($depth === 2) {
+            $output .= '<a href="' . $url . '" class="mobile-nav__link mobile-nav__link--level3"' . $target . $rel . '>';
             $output .= '<span>' . $title . '</span>';
             $output .= '</a>';
         }
@@ -259,6 +278,8 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
     public function end_el(&$output, $item, $depth = 0, $args = null)
     {
         if ($depth === 0) {
+            $output .= '</div>';
+        } elseif ($depth === 1) {
             $output .= '</div>';
         }
     }
