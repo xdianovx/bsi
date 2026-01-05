@@ -1137,7 +1137,7 @@ input.error {
 }
 @media screen and (max-width: 1024px) {
   .h2 {
-    font-size: 24px;
+    font-size: 20px;
   }
 }
 .education-page {
@@ -6875,7 +6875,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .single-hotel__title {
-    font-size: 20px;
+    font-size: 22px;
   }
 }
 
