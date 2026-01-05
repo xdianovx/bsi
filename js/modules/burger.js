@@ -16,9 +16,8 @@ export const burger = () => {
 };
 
 export const mobileNavAccordion = () => {
-  const items = document.querySelectorAll(".mobile-nav__item");
-
-  if (!items.length) return;
+  const items = document.querySelectorAll(".mobile-nav__item:not(.mobile-nav__item--level2)");
+  const itemsLevel2 = document.querySelectorAll(".mobile-nav__item--level2");
 
   const setHeight = (item, open) => {
     const submenu = item.querySelector(".mobile-nav__submenu");
@@ -31,32 +30,71 @@ export const mobileNavAccordion = () => {
     }
   };
 
-  items.forEach((item) => {
-    const trigger = item.querySelector(".mobile-nav__link");
-    const submenu = item.querySelector(".mobile-nav__submenu");
+  // Обработка элементов первого уровня
+  if (items.length) {
+    items.forEach((item) => {
+      const trigger = item.querySelector(".mobile-nav__link");
+      const submenu = item.querySelector(".mobile-nav__submenu");
 
-    if (!trigger || !submenu) return;
+      if (!trigger || !submenu) return;
 
-    setHeight(item, item.classList.contains("active"));
+      setHeight(item, item.classList.contains("active"));
 
-    trigger.addEventListener("click", (e) => {
-      e.preventDefault();
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
 
-      const isOpen = item.classList.contains("active");
+        const isOpen = item.classList.contains("active");
 
-      items.forEach((i) => {
-        if (i === item) return;
-        i.classList.remove("active");
-        const t = i.querySelector(".mobile-nav__link");
-        if (t) t.setAttribute("aria-expanded", "false");
-        setHeight(i, false);
+        // Закрываем только другие элементы первого уровня
+        items.forEach((i) => {
+          if (i === item) return;
+          i.classList.remove("active");
+          const t = i.querySelector(".mobile-nav__link");
+          if (t) t.setAttribute("aria-expanded", "false");
+          setHeight(i, false);
+        });
+
+        item.classList.toggle("active", !isOpen);
+        trigger.setAttribute("aria-expanded", String(!isOpen));
+        setHeight(item, !isOpen);
       });
-
-      item.classList.toggle("active", !isOpen);
-      trigger.setAttribute("aria-expanded", String(!isOpen));
-      setHeight(item, !isOpen);
     });
-  });
+  }
+
+  // Обработка элементов второго уровня
+  if (itemsLevel2.length) {
+    itemsLevel2.forEach((item) => {
+      const trigger = item.querySelector(".mobile-nav__link");
+      const submenu = item.querySelector(".mobile-nav__submenu");
+
+      if (!trigger || !submenu) return;
+
+      setHeight(item, item.classList.contains("active"));
+
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const isOpen = item.classList.contains("active");
+        const parentItem = item.closest(".mobile-nav__item:not(.mobile-nav__item--level2)");
+
+        // Закрываем только другие элементы второго уровня в том же родителе
+        if (parentItem) {
+          const siblings = parentItem.querySelectorAll(".mobile-nav__item--level2");
+          siblings.forEach((i) => {
+            if (i === item) return;
+            i.classList.remove("active");
+            const t = i.querySelector(".mobile-nav__link");
+            if (t) t.setAttribute("aria-expanded", "false");
+            setHeight(i, false);
+          });
+        }
+
+        item.classList.toggle("active", !isOpen);
+        trigger.setAttribute("aria-expanded", String(!isOpen));
+        setHeight(item, !isOpen);
+      });
+    });
+  }
 
   window.addEventListener("resize", () => {
     document.querySelectorAll(".mobile-nav__item.active").forEach((item) => {
