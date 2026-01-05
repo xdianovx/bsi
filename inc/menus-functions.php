@@ -77,6 +77,7 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
 
             $groups = [];
 
+            // Сначала группируем страны по буквам
             foreach ($countries as $country) {
                 $country_title = (string) $country->post_title;
                 $letter = mb_strtoupper(mb_substr($country_title, 0, 1, 'UTF-8'), 'UTF-8');
@@ -84,40 +85,72 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
                 if ($letter === 'Ё')
                     $letter = 'Е';
 
-                $country_link = get_permalink($country->ID);
-
-                $flag = function_exists('get_field') ? get_field('flag', $country->ID) : '';
-                $flag_url = '';
-                if ($flag) {
-                    $flag_url = is_array($flag) && !empty($flag['url']) ? esc_url($flag['url']) : esc_url($flag);
+                if (!isset($groups[$letter])) {
+                    $groups[$letter] = [];
                 }
-
-                $is_visa = function_exists('get_field') ? get_field('is_visa', $country->ID) : false;
-                $visa_text = $is_visa ? 'Требуется виза' : 'Виза не нужна';
-
-                $item_html = '<a href="' . esc_url($country_link) . '" class="countries-letter__link">';
-                if ($flag_url) {
-                    $item_html .= '<img src="' . $flag_url . '" alt="' . esc_attr($country_title) . '" class="countries-letter__flag">';
-                }
-                $item_html .= '<div class="countries-letter__info">';
-                $item_html .= '<p class="countries-letter__name">' . esc_html($country_title) . '</p>';
-                $item_html .= '<div class="countries-letter__visa">' . esc_html($visa_text) . '</div>';
-                $item_html .= '</div>';
-                $item_html .= '</a>';
-
-                $groups[$letter][] = $item_html;
+                $groups[$letter][] = $country;
             }
 
+            // Сортировка стран по алфавиту внутри каждой буквенной группы
             if (class_exists('Collator')) {
                 $collator = new Collator('ru_RU');
-                uksort($groups, function ($a, $b) use ($collator) {
+                foreach ($groups as $letter => &$country_list) {
+                    usort($country_list, function ($a, $b) use ($collator) {
+                        return $collator->compare($a->post_title, $b->post_title);
+                    });
+                }
+                unset($country_list);
+            } else {
+                foreach ($groups as $letter => &$country_list) {
+                    usort($country_list, function ($a, $b) {
+                        return mb_strcasecmp($a->post_title, $b->post_title, 'UTF-8');
+                    });
+                }
+                unset($country_list);
+            }
+
+            // Теперь формируем HTML для каждой страны
+            $groups_html = [];
+            foreach ($groups as $letter => $country_list) {
+                $groups_html[$letter] = [];
+                foreach ($country_list as $country) {
+                    $country_title = (string) $country->post_title;
+                    $country_link = get_permalink($country->ID);
+
+                    $flag = function_exists('get_field') ? get_field('flag', $country->ID) : '';
+                    $flag_url = '';
+                    if ($flag) {
+                        $flag_url = is_array($flag) && !empty($flag['url']) ? esc_url($flag['url']) : esc_url($flag);
+                    }
+
+                    $is_visa = function_exists('get_field') ? get_field('is_visa', $country->ID) : false;
+                    $visa_text = $is_visa ? 'Требуется виза' : 'Виза не нужна';
+
+                    $item_html = '<a href="' . esc_url($country_link) . '" class="countries-letter__link">';
+                    if ($flag_url) {
+                        $item_html .= '<img src="' . $flag_url . '" alt="' . esc_attr($country_title) . '" class="countries-letter__flag">';
+                    }
+                    $item_html .= '<div class="countries-letter__info">';
+                    $item_html .= '<p class="countries-letter__name">' . esc_html($country_title) . '</p>';
+                    $item_html .= '<div class="countries-letter__visa">' . esc_html($visa_text) . '</div>';
+                    $item_html .= '</div>';
+                    $item_html .= '</a>';
+
+                    $groups_html[$letter][] = $item_html;
+                }
+            }
+
+            // Сортировка самих групп по буквам
+            if (class_exists('Collator')) {
+                $collator = new Collator('ru_RU');
+                uksort($groups_html, function ($a, $b) use ($collator) {
                     return $collator->compare($a, $b);
                 });
             } else {
-                ksort($groups);
+                ksort($groups_html);
             }
 
-            foreach ($groups as $letter => $items) {
+            foreach ($groups_html as $letter => $items) {
                 $output .= '<div class="countries-letter-group">';
                 $output .= '<div class="countries-letter-group__letter">' . esc_html($letter) . '</div>';
                 $output .= '<div class="countries-letter-group__items">';

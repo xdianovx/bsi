@@ -25,6 +25,24 @@ foreach ($countries as $country) {
 		$grouped_countries[$first_letter_upper][] = $country;
 	}
 }
+
+// Сортировка стран по алфавиту внутри каждой буквенной группы
+if (class_exists('Collator')) {
+	$collator = new Collator('ru_RU');
+	foreach ($grouped_countries as $letter => &$country_list) {
+		usort($country_list, function ($a, $b) use ($collator) {
+			return $collator->compare($a->post_title, $b->post_title);
+		});
+	}
+	unset($country_list);
+} else {
+	foreach ($grouped_countries as $letter => &$country_list) {
+		usort($country_list, function ($a, $b) {
+			return mb_strcasecmp($a->post_title, $b->post_title, 'UTF-8');
+		});
+	}
+	unset($country_list);
+}
 ?>
 
 <main class="site-main">
