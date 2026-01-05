@@ -189,13 +189,13 @@
     .accordion__title {
       color: $red;
     }
-
-    .accordion__icon {
-      transform: rotate(180deg);
-      color: $red;
-      flex-shrink: 0;
-    }
   }
+}
+
+.accordion__icon {
+  transform: rotate(180deg);
+  color: $red;
+  flex-shrink: 0;
 }
 
 .accordion__title {
