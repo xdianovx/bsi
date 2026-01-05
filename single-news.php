@@ -30,9 +30,9 @@ get_header();
 		<div class="container">
 			<?php the_title('<h1 class="h1 single-news__title">', '</h1>'); ?>
 
-			<p class="single-news__excerpt">
+			<!-- <p class="single-news__excerpt">
 				<?= get_the_excerpt() ?>
-			</p>
+			</p> -->
 
 			<?php if (get_field('news_use_poster')): ?>
 				<div class="single-news__poster">
