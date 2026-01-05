@@ -171,7 +171,8 @@
           <div class="mobile-nav-contacts__item">
             <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">
             <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="mobile-nav-contacts__phone">
-              <?php the_field('telefon', 'option'); ?>
+              <?php the_field('telefon_po_rf', 'option'); ?>
+              <span>бесплатно из регионов</span>
             </a>
           </div>
 
