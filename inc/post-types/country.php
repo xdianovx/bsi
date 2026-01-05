@@ -101,9 +101,16 @@ function bsi_get_promo_countries()
     }
   }
 
-  uasort($result, function ($a, $b) {
-    return strcmp($a['title'], $b['title']);
-  });
+  if (class_exists('Collator')) {
+    $collator = new Collator('ru_RU');
+    uasort($result, function ($a, $b) use ($collator) {
+      return $collator->compare($a['title'], $b['title']);
+    });
+  } else {
+    uasort($result, function ($a, $b) {
+      return mb_strcasecmp($a['title'], $b['title']);
+    });
+  }
 
   return $result;
 }

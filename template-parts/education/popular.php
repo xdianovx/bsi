@@ -54,6 +54,17 @@ if (!empty($country_ids)) {
         'update_post_meta_cache' => false,
         'update_post_term_cache' => false,
     ]);
+
+    if (class_exists('Collator')) {
+        $collator = new Collator('ru_RU');
+        usort($promo_countries, function ($a, $b) use ($collator) {
+            return $collator->compare($a->post_title, $b->post_title);
+        });
+    } else {
+        usort($promo_countries, function ($a, $b) {
+            return mb_strcasecmp($a->post_title, $b->post_title);
+        });
+    }
 }
 
 $education_posts = [];

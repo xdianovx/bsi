@@ -54,6 +54,17 @@ if (!empty($country_ids)) {
 		'order' => 'ASC',
 		'post__in' => $country_ids,
 	]);
+
+	if (class_exists('Collator')) {
+		$collator = new Collator('ru_RU');
+		usort($countries, function ($a, $b) use ($collator) {
+			return $collator->compare($a->post_title, $b->post_title);
+		});
+	} else {
+		usort($countries, function ($a, $b) {
+			return mb_strcasecmp($a->post_title, $b->post_title);
+		});
+	}
 }
 
 // подготовим элементы проектов для вывода и для фильтра
