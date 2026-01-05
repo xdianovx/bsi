@@ -4237,7 +4237,6 @@ input.error {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #bebebe;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
