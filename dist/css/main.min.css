@@ -2677,6 +2677,12 @@ input.error {
   font-size: 16px;
   line-height: 100%;
 }
+.footer-contact__link span {
+  display: block;
+  font-size: 14px;
+  color: #5c5c5c;
+  margin-top: 4px;
+}
 
 .footer-contact__value {
   font-size: 16px;
@@ -2894,6 +2900,7 @@ input.error {
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-top: 4px;
 }
 @media screen and (max-width: 768px) {
   .footer-contact__links {

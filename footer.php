@@ -49,9 +49,11 @@
 
 								<a href="tel:8 (495) 785-55-35" class="footer-contact__link">
 									8 (495) 785-55-35
+									<span>ПН – ПТ Круглосуточно</span>
 								</a>
 								<a href="tel:8 (800) 200-55-35" class="footer-contact__link">
 									8 (800) 200-55-35
+									<span>Бесплатно из регионов</span>
 								</a>
 							</div>
 						</div>

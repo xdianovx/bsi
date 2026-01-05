@@ -103,6 +103,13 @@
 .footer-contact__link {
   font-size: 16px;
   line-height: 100%;
+
+  span {
+    display: block;
+    font-size: 14px;
+    color: $text-gray;
+    margin-top: 4px;
+  }
 }
 
 .footer-contact__value {
@@ -329,6 +336,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-top: 4px;
 
   @media screen and (max-width: 768px) {
     flex-direction: column;
