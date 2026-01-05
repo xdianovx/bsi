@@ -131,10 +131,10 @@
 			<p>
 				BSI GROUP © 1990—<?= date("Y"); ?> Все права защищены.
 			</p>
-
+			<!-- 
 			<a href="<?= get_permalink(47) ?>" class="policy-link footer-policy-link">
 				Политика в отношении обработки персональных данных
-			</a>
+			</a> -->
 		</div>
 	</div>
 </footer>
