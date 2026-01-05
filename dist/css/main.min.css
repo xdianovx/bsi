@@ -2681,6 +2681,11 @@ input.error {
     grid-template-columns: 1fr;
   }
 }
+@media screen and (max-width: 768px) {
+  .footer-contact {
+    padding: 12px;
+  }
+}
 
 .footer-contact__title {
   font-size: 14px;
@@ -4255,7 +4260,6 @@ input.error {
   gap: 12px;
   padding: 12px 0;
   min-height: 40px;
-  border-bottom: 1px solid #bebebe;
 }
 
 .mobile-nav__link span {

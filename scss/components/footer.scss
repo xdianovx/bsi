@@ -96,6 +96,10 @@
       grid-template-columns: 1fr;
     }
   }
+
+  @media screen and (max-width: 768px) {
+    padding: 12px;
+  }
 }
 
 .footer-contact__title {
