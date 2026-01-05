@@ -167,14 +167,14 @@
             <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">
             <a href="tel:<?php the_field('telefon', 'option'); ?>" class="mobile-nav-contacts__phone">
               <?php the_field('telefon', 'option'); ?>
-              <span>ПН–ПТ 10:00 - 19:00</span>
+              <span>ПН – ПТ Круглосуточно</span>
             </a>
           </div>
           <div class="mobile-nav-contacts__item">
             <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">
             <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="mobile-nav-contacts__phone">
               <?php the_field('telefon_po_rf', 'option'); ?>
-              <span>бесплатно из регионов</span>
+              <span>Бесплатно из регионов</span>
             </a>
           </div>
 
