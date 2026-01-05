@@ -250,6 +250,11 @@ main {
   display: inline-block;
   border-radius: 100%;
 }
+@media screen and (max-width: 768px) {
+  .breadcrumb-separator {
+    margin: 0 4px 2px;
+  }
+}
 
 .btn {
   border-radius: 8px;
@@ -6870,7 +6875,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .single-hotel__title {
-    font-size: 24px;
+    font-size: 20px;
   }
 }
 

@@ -26,4 +26,8 @@
   height: 4px;
   display: inline-block;
   border-radius: 100%;
+
+  @media screen and (max-width: 768px) {
+    margin: 0 4px 2px;
+  }
 }
