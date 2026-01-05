@@ -3914,6 +3914,11 @@ input.error {
   bottom: 16px;
   z-index: 10;
 }
+@media screen and (max-width: 798px) {
+  .main-banner__arrows {
+    display: none;
+  }
+}
 
 .main-pages-grid__section {
   margin-top: 8px;
