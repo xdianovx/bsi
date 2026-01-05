@@ -7472,6 +7472,7 @@ input.error {
   font-size: 16px;
   font-weight: 500;
   line-height: 120%;
+  gap: 8px;
 }
 .tour-program__day-btn.is-open {
   background: #ee3145;
@@ -7479,7 +7480,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .tour-program__day-btn {
-    font-size: 14px;
+    font-size: 16px;
     padding: 12px;
     align-items: flex-start;
   }
