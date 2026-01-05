@@ -227,6 +227,7 @@ main {
   font-size: 16px;
   margin-top: 16px;
   margin-bottom: 16px;
+  line-height: 150%;
 }
 .breadcrumbs a {
   font-weight: 500;
@@ -234,6 +235,11 @@ main {
 }
 .breadcrumbs p {
   margin-bottom: 0;
+}
+@media screen and (max-width: 768px) {
+  .breadcrumbs {
+    font-size: 14px;
+  }
 }
 
 .breadcrumb-separator {
@@ -6841,7 +6847,7 @@ input.error {
   .tour-program__acc-head {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 8px;
   }
 }
 
@@ -7210,6 +7216,11 @@ input.error {
 .tour-page-detail__value img {
   width: 18px;
   height: 18px;
+}
+@media screen and (max-width: 768px) {
+  .tour-page-detail__value {
+    line-height: 140%;
+  }
 }
 
 .single-hotel__map-section {
@@ -7951,7 +7962,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-title {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 
@@ -8014,7 +8025,7 @@ input.error {
   .tour-prices__star-footer {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
   }
 }
 
@@ -8033,7 +8044,7 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-price {
-    font-size: 20px;
+    font-size: 16px;
     width: 100%;
     text-align: right;
   }

@@ -371,6 +371,10 @@
     width: 18px;
     height: 18px;
   }
+
+  @media screen and (max-width: 768px) {
+    line-height: 140%;
+  }
 }
 
 .single-hotel__map-section {
