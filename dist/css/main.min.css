@@ -2665,6 +2665,11 @@ input.error {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+@media screen and (max-width: 768px) {
+  .footer-contact.footer-contact--phone {
+    grid-template-columns: 1fr;
+  }
+}
 
 .footer-contact__title {
   font-size: 14px;
