@@ -77,13 +77,13 @@
 
             <a href="tel:<?php the_field('telefon', 'option'); ?>" class="phone-link numfont">
               <?php the_field('telefon', 'option'); ?>
-              <span>ПН–ПТ с 10:00 до 19:00</span>
+              <span>ПН – ПТ Круглосуточно</span>
             </a>
 
             <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="phone-link numfont">
 
               <?php the_field('telefon_po_rf', 'option'); ?>
-              <span>бесплатно из регионов</span>
+              <span>Бесплатно из регионов</span>
             </a>
 
             <?= get_template_part('template-parts/ui/socials') ?>
