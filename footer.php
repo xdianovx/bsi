@@ -152,13 +152,15 @@
 
 			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/2.png" alt="">
 
+			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/7.jpg" alt="">
+
 			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/8.jpg" alt="">
 
 			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/4.jpg" alt="">
 
 
 			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/6.png" alt="">
-			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/7.jpg" alt="">
+
 
 
 		</div>
