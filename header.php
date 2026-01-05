@@ -150,10 +150,10 @@
         <div class="mobile-nav__nav">
           <?php
           wp_nav_menu([
-            'theme_location' => 'mobile_nav',
+            'theme_location' => 'header_nav',
             'container' => false,
             'items_wrap' => '%3$s',
-            'depth' => 2,
+            'depth' => 3,
             'walker' => new Mobile_Nav_Walker(),
             'fallback_cb' => '__return_empty_string',
           ]);
