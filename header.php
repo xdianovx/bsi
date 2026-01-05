@@ -77,7 +77,7 @@
 
             <a href="tel:<?php the_field('telefon', 'option'); ?>" class="phone-link numfont">
               <?php the_field('telefon', 'option'); ?>
-              <span>ПН – ПТ Круглосуточно</span>
+              <span>ПН-ПТ 10:00-19:00</span>
             </a>
 
             <a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="phone-link numfont">
@@ -167,7 +167,7 @@
             <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">
             <a href="tel:<?php the_field('telefon', 'option'); ?>" class="mobile-nav-contacts__phone">
               <?php the_field('telefon', 'option'); ?>
-              <span>ПН – ПТ Круглосуточно</span>
+              <span>ПН-ПТ 10:00-19:00</span>
             </a>
           </div>
           <div class="mobile-nav-contacts__item">
