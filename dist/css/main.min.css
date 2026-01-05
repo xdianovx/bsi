@@ -1060,6 +1060,12 @@ input.error {
   justify-content: center;
   transition: all 0.3s ease-in-out;
 }
+.social-item.--tg {
+  background: #0088cc;
+}
+.social-item.--vk {
+  background: #0077ff;
+}
 .social-item:hover {
   color: #ee3145;
 }
