@@ -7034,7 +7034,8 @@ input.error {
 }
 @media screen and (max-width: 1024px) {
   .single-hotel__content__wrap {
-    grid-template-columns: repeat(1, 1fr);
+    display: flex;
+    flex-direction: column-reverse;
   }
 }
 
@@ -7043,6 +7044,11 @@ input.error {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+@media screen and (max-width: 1024px) {
+  .hotel-aside {
+    width: 100%;
+  }
 }
 
 .hotel-widget {
@@ -7466,6 +7472,7 @@ input.error {
   .tour-program__day-btn {
     font-size: 14px;
     padding: 12px;
+    align-items: flex-start;
   }
 }
 
@@ -8011,8 +8018,8 @@ input.error {
 }
 @media screen and (max-width: 768px) {
   .tour-prices__star-body {
-    flex-direction: column;
-    gap: 0px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 
@@ -8022,10 +8029,15 @@ input.error {
   align-items: center;
   font-size: 14px;
 }
+@media screen and (max-width: 768px) {
+  .tour-prices__star-field {
+    line-height: 120%;
+  }
+}
 
 .tour-prices__star-label {
   font-weight: 500;
-  color: #5c5c5c;
+  color: #000;
 }
 
 .tour-prices__star-value {

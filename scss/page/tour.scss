@@ -227,6 +227,7 @@
   @media screen and (max-width: 768px) {
     font-size: 14px;
     padding: 12px;
+    align-items: flex-start;
   }
 }
 
@@ -782,8 +783,8 @@
   gap: 32px;
 
   @media screen and (max-width: 768px) {
-    flex-direction: column;
-    gap: 0px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 
@@ -792,11 +793,14 @@
   gap: 8px;
   align-items: center;
   font-size: 14px;
+  @media screen and (max-width: 768px) {
+    line-height: 120%;
+  }
 }
 
 .tour-prices__star-label {
   font-weight: 500;
-  color: $text-gray;
+  color: #000;
 }
 
 .tour-prices__star-value {
