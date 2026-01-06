@@ -99,7 +99,7 @@
 
 
           <div class="header-old-btns">
-            <a href="https://www.bsigroup.ru/"
+            <a href="https://past.bsigroup.ru/"
                target="_blank"
                class="button-login header__button-login button-old-site">Старый сайт</a>
             <a href="https://online.bsigroup.ru/cl_refer"
