@@ -145,6 +145,10 @@ sup {
   overflow: hidden;
 }
 
+.choices[data-type*=select-one] .choices__inner {
+  padding-bottom: 0 !important;
+}
+
 .choices__list--dropdown,
 .choices__list[aria-expanded] {
   display: none;
@@ -3040,6 +3044,7 @@ input.error {
 .gtm-search__wrap .choices {
   flex-grow: 1;
   width: 100%;
+  padding-bottom: 0 !important;
 }
 .gtm-search__wrap .gtm-tours-select {
   min-width: 0 !important;
@@ -7792,12 +7797,6 @@ input.error {
 .tour-prices__filters-wrap > *:last-child {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
-}
-.tour-prices__filters-wrap .is-open .choices__inner {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
 }
 .tour-prices__filters-wrap .gtm-nights-select {
   align-self: stretch;

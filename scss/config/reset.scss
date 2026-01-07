@@ -142,6 +142,10 @@ sup {
   overflow: hidden;
 }
 
+.choices[data-type*="select-one"] .choices__inner {
+  padding-bottom: 0 !important;
+}
+
 .choices__list--dropdown,
 .choices__list[aria-expanded] {
   display: none;
