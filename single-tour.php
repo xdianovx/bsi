@@ -31,6 +31,8 @@ $resort_term = (!empty($resort_terms) && !is_wp_error($resort_terms)) ? $resort_
 $tour_gallery = function_exists('get_field') ? get_field('tour_gallery', $post_id) : [];
 $tour_duration = function_exists('get_field') ? trim((string) get_field('tour_duration', $post_id)) : '';
 $tour_route = function_exists('get_field') ? trim((string) get_field('tour_route', $post_id)) : '';
+$tour_checkin_dates = function_exists('get_field') ? trim((string) get_field('tour_checkin_dates', $post_id)) : '';
+$tour_price_from = function_exists('get_field') ? trim((string) get_field('price_from', $post_id)) : '';
 $tour_program = function_exists('get_field') ? get_field('tour_program', $post_id) : [];
 $tour_included = function_exists('get_field') ? (string) get_field('tour_included', $post_id) : '';
 $tour_not_inc = function_exists('get_field') ? (string) get_field('tour_not_included', $post_id) : '';
@@ -206,8 +208,17 @@ get_header();
 
 
         <div class="hotel-content">
-          <?php if ($tour_duration || $tour_route): ?>
+          <?php if ($tour_duration || $tour_route || $tour_checkin_dates): ?>
             <div class="tour-page__details">
+              <?php if ($tour_checkin_dates): ?>
+                <div class="tour-page-detail">
+                  <div class="tour-page-detail__key">Даты заездов: </div>
+                  <div class="tour-page-detail__value">
+                    <?= esc_html($tour_checkin_dates); ?>
+                  </div>
+                </div>
+              <?php endif; ?>
+
               <?php if ($tour_duration): ?>
                 <div class="tour-page-detail">
 
@@ -223,6 +234,8 @@ get_header();
                   </div>
                 </div>
               <?php endif; ?>
+
+
 
               <?php if ($tour_route): ?>
                 <div class="tour-page-detail">
@@ -358,6 +371,8 @@ get_header();
               </div>
             <?php endif; ?>
 
+
+
             <?php if (!empty($include_terms) && !is_wp_error($include_terms)): ?>
               <div class="sigle-tour-include tour-card-row__included">
                 <?php foreach ($include_terms as $t):
@@ -373,6 +388,14 @@ get_header();
                 <?php endforeach; ?>
               </div>
             <?php endif; ?>
+
+            <?php if ($tour_price_from): ?>
+              <div class="hotel-widget__price numfont">
+                <?= esc_html($tour_price_from); ?>
+              </div>
+            <?php endif; ?>
+
+
             <?php if ($tour_booking_url): ?>
               <a href="<?= esc_url($tour_booking_url); ?>" class="btn btn-accent hotel-widget__btn-book sm"
                 target="_blank" rel="nofollow noopener">
