@@ -3116,6 +3116,14 @@ input.error {
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
 }
+@media screen and (max-width: 768px) {
+  .gtm-search__wrap > *:first-child.is-open .choices__inner {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+}
 .gtm-search__wrap > *:last-child {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
@@ -3125,6 +3133,14 @@ input.error {
   border-bottom-left-radius: 0px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
+}
+@media screen and (max-width: 768px) {
+  .gtm-search__wrap .is-open .choices__inner {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 }
 
 .gtm-search__item {
@@ -8146,6 +8162,12 @@ input.error {
   font-size: 18px;
   margin-top: 8px;
   text-align: right;
+}
+@media screen and (max-width: 768px) {
+  .hotel-widget__price {
+    font-size: 16px;
+    margin-top: 14px;
+  }
 }
 
 .visa-page__content {
