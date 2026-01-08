@@ -73,13 +73,14 @@
 }
 
 .stars-rating {
-  color: #ffd700;
+  color: #ffd700 !important;
   display: flex;
   align-items: center;
   gap: 2px;
 
   svg {
     display: block;
+    stroke: #ffd700 !important;
   }
 }
 
