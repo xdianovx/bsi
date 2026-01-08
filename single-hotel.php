@@ -246,6 +246,7 @@ get_header();
             <?php
             $booking_url_tour = trim((string) get_field('booking_url', get_the_ID()));
             $booking_url_hotel = trim((string) get_field('booking_url_hotel_only', get_the_ID()));
+            $price = trim((string) get_field('price', get_the_ID()));
             ?>
 
 
@@ -267,6 +268,11 @@ get_header();
                 </div>
               <?php endif; ?>
 
+              <?php if ($price): ?>
+                <div class="hotel-widget__booking-price numfont">
+                  <?= format_price_text($price); ?>
+                </div>
+              <?php endif; ?>
 
             </div>
           </div>
