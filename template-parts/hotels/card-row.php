@@ -18,7 +18,6 @@ $address = function_exists('get_field') ? get_field('address', $hotel_id) : '';
 $phone = function_exists('get_field') ? get_field('phone', $hotel_id) : '';
 $website = function_exists('get_field') ? get_field('website', $hotel_id) : '';
 $price = function_exists('get_field') ? get_field('price', $hotel_id) : '';
-$show_from = function_exists('get_field') ? (bool) get_field('show_price_from', $hotel_id) : false;
 $check_in = function_exists('get_field') ? get_field('check_in_time', $hotel_id) : '';
 $check_out = function_exists('get_field') ? get_field('check_out_time', $hotel_id) : '';
 $wifi = function_exists('get_field') ? get_field('wifi', $hotel_id) : '';
@@ -67,23 +66,17 @@ if ($check_out)
   $amenities[] = 'Выезд: ' . $check_out;
 
 $price_text = trim((string) $price);
-if (!$price_text)
-  $price_text = '125 000 руб';
 ?>
 
-<div class="hotel-card-row"
-     data-hotel-id="<?= esc_attr($hotel_id); ?>">
+<div class="hotel-card-row" data-hotel-id="<?= esc_attr($hotel_id); ?>">
   <div class="hotel-card-row__wrap">
 
     <!-- Poster -->
     <div class="hotel-card-row__media">
       <div class="hotel-card-row__poster">
         <?php if ($thumb): ?>
-          <a href="<?= esc_url($link); ?>"
-             class="hotel-card-row__poster-link">
-            <img class="hotel-card-row__img"
-                 src="<?= esc_url($thumb); ?>"
-                 alt="<?= esc_attr($title); ?>">
+          <a href="<?= esc_url($link); ?>" class="hotel-card-row__poster-link">
+            <img class="hotel-card-row__img" src="<?= esc_url($thumb); ?>" alt="<?= esc_attr($title); ?>">
           </a>
         <?php else: ?>
           <div class="hotel-card-row__img-placeholder"></div>
@@ -112,8 +105,7 @@ if (!$price_text)
         <?php endif; ?>
       </div>
 
-      <a class="hotel-card-row__title"
-         href="<?= esc_url($link); ?>">
+      <a class="hotel-card-row__title" href="<?= esc_url($link); ?>">
         <?= esc_html($title); ?>
       </a>
 
@@ -146,19 +138,20 @@ if (!$price_text)
 
     <!-- CTA -->
     <div class="hotel-card-cta">
-      <div class="hotel-card-cta__price numfont"><?= format_price_text(format_price_with_from($price_text, $show_from)); ?></div>
+      <?php if ($price_text): ?>
+        <div class="hotel-card-cta__price numfont">
+          <?= format_price_text($price_text); ?>
+        </div>
+      <?php endif; ?>
 
       <div class="hotel-card__buttons">
-        <a href="<?= esc_url($link); ?>"
-           class="btn btn-gray sm hotel-card-button --more">
+        <a href="<?= esc_url($link); ?>" class="btn btn-gray sm hotel-card-button --more">
           Подробнее
         </a>
 
         <?php if (!empty($booking_url)): ?>
-          <a href="<?= esc_url($booking_url); ?>"
-             target="_blank"
-             rel="nofollow noopener"
-             class="btn btn-accent sm hotel-card-button --more">
+          <a href="<?= esc_url($booking_url); ?>" target="_blank" rel="nofollow noopener"
+            class="btn btn-accent sm hotel-card-button --more">
             Забронировать
           </a>
         <?php endif; ?>

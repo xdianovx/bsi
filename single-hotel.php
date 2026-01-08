@@ -244,15 +244,31 @@ get_header();
 
 
             <?php
-            $booking_url = trim((string) get_field('booking_url', get_the_ID()));
+            $booking_url_tour = trim((string) get_field('booking_url', get_the_ID()));
+            $booking_url_hotel = trim((string) get_field('booking_url_hotel_only', get_the_ID()));
             ?>
-            <?php if ($booking_url): ?>
-              <div class="hotel-widget__btns">
-                <a href="<?= esc_url($booking_url); ?>" class="btn btn-accent hotel-widget__btn-book sm" target="_blank"
-                  rel="noopener nofollow">Забронировать</a>
-              </div>
-            <?php endif; ?>
 
+
+            <div class="hotel-widget__btns_wrap">
+
+              <?php if ($booking_url_tour): ?>
+                <div class="hotel-widget__btns">
+                  <p class="hotel-widget__booking-label">Тур с перелетом</p>
+                  <a href="<?= esc_url($booking_url_tour); ?>" class="btn btn-accent hotel-widget__btn-book sm"
+                    target="_blank" rel="noopener nofollow">Забронировать</a>
+                </div>
+              <?php endif; ?>
+
+              <?php if ($booking_url_hotel): ?>
+                <div class="hotel-widget__btns">
+                  <p class="hotel-widget__booking-label">Отель без перелета</p>
+                  <a href="<?= esc_url($booking_url_hotel); ?>" class="btn btn-accent hotel-widget__btn-book sm"
+                    target="_blank" rel="noopener nofollow">Забронировать</a>
+                </div>
+              <?php endif; ?>
+
+
+            </div>
           </div>
 
           <?php if ($phone || $address || $website): ?>
@@ -310,19 +326,16 @@ get_header();
           setTimeout(initHotelMap, 100);
           return;
         }
-
         var location = { lat: <?php echo esc_js($map_lat); ?>, lng: <?php echo esc_js($map_lng); ?> };
         var map = new google.maps.Map(document.getElementById('hotel-map-container'), {
           zoom: <?php echo esc_js($map_zoom); ?>,
           center: location
         });
-
         var marker = new google.maps.Marker({
           position: location,
           map: map
         });
       }
-
       window.addEventListener('load', function () {
         initHotelMap();
       });

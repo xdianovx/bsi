@@ -7285,6 +7285,25 @@ input.error {
   }
 }
 
+.hotel-widget__booking-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #5c5c5c;
+  margin-bottom: 8px;
+  line-height: 100%;
+}
+
+.hotel-widget__btn-book {
+  margin-top: 0;
+}
+
+.hotel-widget__btns_wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
 .tour-card-row {
   display: grid;
   grid-template-columns: 2fr 3fr 2fr;
