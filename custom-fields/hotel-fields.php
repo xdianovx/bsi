@@ -273,6 +273,49 @@ function bsi_register_hotel_acf_groups(): void
     ],
     'menu_order' => 4,
   ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_hotel_distances',
+    'title' => 'Расстояния и дополнительная информация',
+    'fields' => [
+      [
+        'key' => 'field_hotel_distances',
+        'label' => 'Информация',
+        'name' => 'hotel_distances',
+        'type' => 'repeater',
+        'layout' => 'row',
+        'button_label' => 'Добавить элемент',
+        'sub_fields' => [
+          [
+            'key' => 'field_hotel_distance_key',
+            'label' => 'Ключ',
+            'name' => 'key',
+            'type' => 'text',
+            'placeholder' => 'Например: до пляжа',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_hotel_distance_value',
+            'label' => 'Значение',
+            'name' => 'value',
+            'type' => 'text',
+            'placeholder' => 'Например: 35км',
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'hotel',
+        ],
+      ],
+    ],
+    'menu_order' => 5,
+  ]);
 }
 
 add_action('acf/init', 'bsi_register_amenity_term_meta');

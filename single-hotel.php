@@ -309,6 +309,30 @@ get_header();
             </div>
           <?php endif; ?>
 
+          <?php if (function_exists('have_rows') && have_rows('hotel_distances', $post_id)): ?>
+            <div class="hotel-widget">
+              <p class="hotel-widget__title">Расстояния</p>
+              <div class="hotel-widget__distances">
+                <?php while (have_rows('hotel_distances', $post_id)): the_row(); ?>
+                  <?php
+                  $key = trim((string) get_sub_field('key'));
+                  $value = trim((string) get_sub_field('value'));
+                  ?>
+                  <?php if ($key || $value): ?>
+                    <div class="hotel-widget__distance-item">
+                      <?php if ($key): ?>
+                        <span class="hotel-widget__distance-key"><?= esc_html($key); ?></span>
+                      <?php endif; ?>
+                      <?php if ($value): ?>
+                        <span class="hotel-widget__distance-value"><?= esc_html($value); ?></span>
+                      <?php endif; ?>
+                    </div>
+                  <?php endif; ?>
+                <?php endwhile; ?>
+              </div>
+            </div>
+          <?php endif; ?>
+
           <?php if ($map_lat && $map_lng): ?>
             <div class="hotel-widget">
               <a href="#hotel-map" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>

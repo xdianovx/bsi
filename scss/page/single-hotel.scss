@@ -307,6 +307,35 @@
   }
 }
 
+.hotel-widget__distances {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.hotel-widget__distance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.hotel-widget__distance-key {
+  font-size: 14px;
+  color: #666;
+}
+
+.hotel-widget__distance-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+}
+
 .js-gallery {
   display: grid;
   grid-template-columns: 5fr 1fr;
