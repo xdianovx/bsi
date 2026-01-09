@@ -270,7 +270,7 @@ get_header();
 
               <?php if ($price): ?>
                 <div class="hotel-widget__booking-price numfont">
-                  <?= format_price_text($price); ?>
+                  <?= format_price_text($price); ?> ₽
                 </div>
               <?php endif; ?>
 
