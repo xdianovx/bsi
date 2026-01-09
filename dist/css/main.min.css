@@ -3597,12 +3597,14 @@ input.error {
 .hotel-card__actions {
   display: flex;
   gap: 8px;
+  flex-direction: column;
   margin-top: 16px;
   font-weight: 500;
   font-size: 14px;
   align-items: center;
 }
 .hotel-card__actions .hotel-card__btn {
+  width: 100%;
   flex: 1;
   text-align: center;
   padding: 10px 16px;
@@ -3612,6 +3614,7 @@ input.error {
   line-height: 100%;
 }
 .hotel-card__actions .hotel-card__btn-details {
+  width: 100%;
   background: transparent;
   color: #000;
   background: #f4f4f6;
