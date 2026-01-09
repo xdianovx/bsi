@@ -189,11 +189,11 @@ if (function_exists('get_field')) {
         <div class="hotel-card__booking-info">
           <?php if ($nights > 0): ?>
             <span class="hotel-card__nights"><?php echo esc_html($nights); ?>
-              <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?>,</span>
-          <?php endif; ?>
-          <?php if ($checkin_date): ?>
-            <span class="hotel-card__checkin-date">с <?php echo esc_html(format_date_russian($checkin_date)); ?></span>
-          <?php endif; ?>
+              <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?></span>
+            <?php endif; ?>
+            <?php if ($checkin_date): ?>
+              <span class="hotel-card__checkin-date">с <?php echo esc_html(format_date_russian($checkin_date)); ?></span>
+            <?php endif; ?>
         </div>
       <?php endif; ?>
 
