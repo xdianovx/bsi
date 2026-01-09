@@ -7174,7 +7174,7 @@ input.error {
 .hotel-widget__contacts {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   margin-top: 8px;
 }
 
@@ -7182,7 +7182,7 @@ input.error {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-weight: 500;
+  font-weight: 400;
 }
 .hotel-widget__contacts-item a {
   display: flex;
@@ -7191,6 +7191,7 @@ input.error {
 }
 .hotel-widget__contacts-item img {
   display: block;
+  margin-top: 2px;
   width: 18px;
   height: 18px;
 }
