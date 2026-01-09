@@ -254,7 +254,7 @@ get_header();
 
               <?php if ($booking_url_tour): ?>
                 <div class="hotel-widget__btns">
-                  <p class="hotel-widget__booking-label">Тур с перелетом</p>
+                  <p class="hotel-widget__booking-label">Тур - отель с перелетом</p>
                   <a href="<?= esc_url($booking_url_tour); ?>" class="btn btn-accent hotel-widget__btn-book sm"
                     target="_blank" rel="noopener nofollow">Забронировать</a>
                 </div>
