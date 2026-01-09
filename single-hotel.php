@@ -247,6 +247,7 @@ get_header();
             $booking_url_tour = trim((string) get_field('booking_url', get_the_ID()));
             $booking_url_hotel = trim((string) get_field('booking_url_hotel_only', get_the_ID()));
             $price = trim((string) get_field('price', get_the_ID()));
+            $price_text = trim((string) get_field('price_text', get_the_ID()));
             ?>
 
 
@@ -270,7 +271,7 @@ get_header();
 
               <?php if ($price): ?>
                 <div class="hotel-widget__booking-price numfont">
-                  <?= format_price_text($price); ?> ₽
+                  <?= format_price_text($price); ?> ₽<?php if ($price_text): ?> / <span><?= esc_html($price_text); ?></span><?php endif; ?>
                 </div>
               <?php endif; ?>
 
