@@ -7211,6 +7211,8 @@ input.error {
   font-weight: 500;
   padding: 8px 12px;
   background: #fff;
+  flex-wrap: wrap;
+  line-height: 120%;
   border-radius: 8px;
 }
 
@@ -7223,6 +7225,7 @@ input.error {
   font-size: 14px;
   font-weight: 600;
   color: #000;
+  margin-left: auto;
 }
 
 .js-gallery {
