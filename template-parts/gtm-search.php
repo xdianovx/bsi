@@ -34,7 +34,8 @@
       </div>
 
       <!-- <div class="gtm-search__tab-btn" data-tab="excursions"> -->
-      <div class="gtm-search__tab-btn" data-href="https://past.bsigroup.ru/search_tour/agency" data-target="_blank">
+      <a href="https://past.bsigroup.ru/search_tour/agency" target="_blank" rel="noopener noreferrer"
+        class="gtm-search__tab-btn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="currentColor"
           fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path
@@ -48,16 +49,14 @@
           <path d="M2 22H9" />
         </svg>
         <span>Экскурсионные туры</span>
-      </div>
+      </a>
 
       <?php
-      // Используем прямой тег <a> вместо JavaScript для обхода SSO редиректа
-      // Если проблема сохраняется, попробуйте альтернативные варианты URL:
-      // - https://bsistudy.ru/ (без www)
-      // - https://www.bsistudy.ru/?direct=1
-      // - https://www.bsistudy.ru/index.php
+      // bsistudy.ru требует SSO авторизацию, поэтому используем tokens_exchange.php flow
+      // Это нормальное поведение SSO системы - она редиректит на авторизацию если нет куков
+      $bsistudy_url = 'https://bsigroup.ru/auth/tokens_exchange.php?ret_path=' . urlencode('https://www.bsistudy.ru/');
       ?>
-      <a href="https://www.bsistudy.ru/" target="_blank" rel="noopener noreferrer" class="gtm-search__tab-btn">
+      <a href="<?php echo esc_url($bsistudy_url); ?>" target="_blank" rel="noopener noreferrer" class="gtm-search__tab-btn">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
           xmlns="http://www.w3.org/2000/svg">
           <path
@@ -106,7 +105,8 @@
         <span>Визы</span>
       </div>
 
-      <div class="gtm-search__tab-btn" data-target="_blank" data-href="https://online.bsigroup.ru/tickets">
+      <a href="https://online.bsigroup.ru/tickets" target="_blank" rel="noopener noreferrer"
+        class="gtm-search__tab-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
           class="lucide lucide-plane-icon lucide-plane">
@@ -114,14 +114,15 @@
             d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
         </svg>
         <span>Авиабилеты</span>
-      </div>
+      </a>
 
       <?php
       // Get page by slug 'mice'
       $mice_page = get_page_by_path('mice');
       $mice_url = $mice_page ? get_permalink($mice_page->ID) : '#';
       ?>
-      <div class="gtm-search__tab-btn" data-target="_blank" data-href="https://past.bsigroup.ru/business/">
+      <a href="https://past.bsigroup.ru/business/" target="_blank" rel="noopener noreferrer"
+        class="gtm-search__tab-btn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor">
           <path
@@ -137,7 +138,7 @@
         </svg>
 
         <span>Деловой туризм</span>
-      </div>
+      </a>
 
     </div>
 

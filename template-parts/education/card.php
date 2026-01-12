@@ -292,12 +292,22 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 
 
     <div class="education-card__actions">
-      <a href="<?php echo esc_url($education_url); ?>" target="_blank" rel="noopener noreferrer"
+      <?php
+      // bsistudy.ru требует SSO авторизацию, преобразуем URL в SSO flow
+      $education_url_processed = function_exists('bsi_convert_bsistudy_url') ? bsi_convert_bsistudy_url($education_url) : $education_url;
+      $education_rel = 'noopener noreferrer';
+      ?>
+      <a href="<?php echo esc_url($education_url_processed); ?>" target="_blank" rel="<?php echo esc_attr($education_rel); ?>"
         class="education-card__btn education-card__btn-details">
         Подробнее
       </a>
       <?php if ($booking_url && $price): ?>
-        <a href="<?php echo esc_url($booking_url); ?>" target="_blank" rel="noopener noreferrer"
+        <?php
+        // bsistudy.ru требует SSO авторизацию, преобразуем URL в SSO flow
+        $booking_url_processed = function_exists('bsi_convert_bsistudy_url') ? bsi_convert_bsistudy_url($booking_url) : $booking_url;
+        $booking_rel = 'noopener noreferrer';
+        ?>
+        <a href="<?php echo esc_url($booking_url_processed); ?>" target="_blank" rel="<?php echo esc_attr($booking_rel); ?>"
           class="btn btn-accent education-card__btn education-card__btn-book">
           <?php echo esc_html($price); ?>
         </a>

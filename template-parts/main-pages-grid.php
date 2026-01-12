@@ -80,7 +80,7 @@ $main_page_items = [
      <div class="container">
           <div class="main-pages-grid">
                <?php foreach ($main_page_items as $item): ?>
-                    <a href="<?= esc_url($item['url']) ?>" class="main-pages__item" <?= !empty($item['target']) ? 'target="' . esc_attr($item['target']) . '"' : '' ?>>
+                    <a href="<?= esc_url($item['url']) ?>" class="main-pages__item" <?= !empty($item['target']) ? 'target="' . esc_attr($item['target']) . '" rel="noopener noreferrer"' : '' ?>>
                          <div class="main-page__item-top">
                               <img class="main-pages__item-img"
                                    src="<?= get_template_directory_uri() . '/img/page-grid/' . esc_attr($item['img']); ?>"

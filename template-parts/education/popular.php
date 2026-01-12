@@ -288,6 +288,7 @@ if (!empty($items)) {
 }
 
 if (empty($items)) {
+    // Тестовые данные - URL будут преобразованы в SSO flow в education/card.php
     $test_items = [
         [
             'id' => 0,

@@ -52,12 +52,14 @@ export const gtmSearch = async () => {
 
   function setActiveTab(index) {
     const btn = tabButtons[index];
-    
+
     // Пропускаем элементы <a> - они обрабатываются нативно браузером
+    // Это позволяет использовать прямые ссылки для внешних доменов bsigroup.ru
+    // и избежать проблем с SSO редиректом через window.open()
     if (btn?.tagName === "A") {
       return;
     }
-    
+
     const href = btn?.getAttribute("data-href");
 
     if (href) {
