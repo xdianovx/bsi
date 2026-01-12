@@ -14,6 +14,15 @@ $country_flag = '';
 $include_terms = get_the_terms(get_the_ID(), 'tour_include');
 $tour_booking_url = trim((string) (function_exists('get_field') ? get_field('tour_booking_url', get_the_ID()) : ''));
 
+$is_old_site_url = false;
+if (!empty($tour_booking_url)) {
+  $parsed_url = parse_url($tour_booking_url);
+  $host = $parsed_url['host'] ?? '';
+  if (!empty($host) && stripos($host, 'past.') === 0) {
+    $is_old_site_url = true;
+  }
+}
+
 if ($country_id) {
   $country_title = get_the_title($country_id);
   $country_permalink = get_permalink($country_id);
@@ -94,7 +103,7 @@ get_header();
 
 
 
-  <?php if (!empty($excursion_params) && !empty($excursion_params['TOURS'])): ?>
+  <?php if (!empty($excursion_params) && !empty($excursion_params['TOURS']) && !$is_old_site_url): ?>
     <?php
     $show_price_from_field = function_exists('get_field') ? get_field('show_price_from', $post_id) : null;
     $show_price_from = $show_price_from_field !== false;
