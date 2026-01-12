@@ -52,11 +52,11 @@
       </a>
 
       <?php
-      // bsistudy.ru требует SSO авторизацию, поэтому используем tokens_exchange.php flow
-      // Это нормальное поведение SSO системы - она редиректит на авторизацию если нет куков
+
       $bsistudy_url = 'https://bsigroup.ru/auth/tokens_exchange.php?ret_path=' . urlencode('https://www.bsistudy.ru/');
       ?>
-      <a href="<?php echo esc_url($bsistudy_url); ?>" target="_blank" rel="noopener noreferrer" class="gtm-search__tab-btn">
+      <a href="<?php echo esc_url($bsistudy_url); ?>" target="_blank" rel="noopener noreferrer"
+        class="gtm-search__tab-btn">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
           xmlns="http://www.w3.org/2000/svg">
           <path
