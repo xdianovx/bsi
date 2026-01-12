@@ -52,6 +52,12 @@ export const gtmSearch = async () => {
 
   function setActiveTab(index) {
     const btn = tabButtons[index];
+    
+    // Пропускаем элементы <a> - они обрабатываются нативно браузером
+    if (btn?.tagName === "A") {
+      return;
+    }
+    
     const href = btn?.getAttribute("data-href");
 
     if (href) {
@@ -78,7 +84,12 @@ export const gtmSearch = async () => {
     initTab(tabName).catch(() => {});
   }
 
-  tabButtons.forEach((btn, idx) => btn.addEventListener("click", () => setActiveTab(idx)));
+  tabButtons.forEach((btn, idx) => {
+    // Пропускаем элементы <a> - они обрабатываются нативно браузером
+    if (btn.tagName !== "A") {
+      btn.addEventListener("click", () => setActiveTab(idx));
+    }
+  });
 
   async function initTab(name) {
     if (initedTabs.has(name)) return;

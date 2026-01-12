@@ -50,7 +50,14 @@
         <span>Экскурсионные туры</span>
       </div>
 
-      <div class="gtm-search__tab-btn" data-href="https://www.bsistudy.ru/" data-target="_blank">
+      <?php
+      // Используем прямой тег <a> вместо JavaScript для обхода SSO редиректа
+      // Если проблема сохраняется, попробуйте альтернативные варианты URL:
+      // - https://bsistudy.ru/ (без www)
+      // - https://www.bsistudy.ru/?direct=1
+      // - https://www.bsistudy.ru/index.php
+      ?>
+      <a href="https://www.bsistudy.ru/" target="_blank" rel="noopener noreferrer" class="gtm-search__tab-btn">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
           xmlns="http://www.w3.org/2000/svg">
           <path
@@ -65,7 +72,7 @@
         </svg>
 
         <span>Образование за рубежом</span>
-      </div>
+      </a>
 
 
 
