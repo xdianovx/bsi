@@ -292,13 +292,13 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 
 
     <div class="education-card__actions">
-      <a href="<?php echo esc_url($education_url); ?>" target="_blank"
+      <a href="<?php echo esc_url($education_url); ?>" target="_blank" rel="noopener noreferrer"
         class="education-card__btn education-card__btn-details">
         Подробнее
       </a>
       <?php if ($booking_url && $price): ?>
-        <a href="<?php echo esc_url($booking_url); ?>" target="_blank"
-          class="btn btn-accent education-card__btn education-card__btn-book" target="_blank" rel="noopener nofollow">
+        <a href="<?php echo esc_url($booking_url); ?>" target="_blank" rel="noopener noreferrer"
+          class="btn btn-accent education-card__btn education-card__btn-book">
           <?php echo esc_html($price); ?>
         </a>
       <?php elseif ($price): ?>
