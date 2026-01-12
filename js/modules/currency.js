@@ -109,6 +109,12 @@ function updateHeaderPrices() {
     updateRubItem(headerContainer);
   }
 
+  const mobileNavContainer = document.querySelector(".mobile-nav__currencies");
+  if (mobileNavContainer) {
+    updateCurrencyPrices(mobileNavContainer);
+    updateRubItem(mobileNavContainer);
+  }
+
   const footerContainer = document.querySelector(".footer__currencies");
   if (footerContainer) {
     updateCurrencyPrices(footerContainer);

@@ -4322,6 +4322,42 @@ input.error {
   font-weight: 500;
 }
 
+.mobile-nav__currencies {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 0 0 8px 0;
+}
+.mobile-nav__currencies .currency-select .js-dropdown-panel {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 8px;
+  min-width: 100%;
+  padding: 8px;
+  white-space: normal;
+}
+.mobile-nav__currencies .currency-select.is-open .js-dropdown-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  left: auto;
+  right: 0;
+}
+.mobile-nav__currencies .currency-select .currency-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  width: 100%;
+  border-radius: 4px;
+  background: #f4f4f6;
+  text-align: center;
+}
+
 .mobile-nav-contacts {
   display: flex;
   flex-direction: column;

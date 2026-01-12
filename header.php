@@ -162,6 +162,34 @@
 
         </div>
 
+        <div class="mobile-nav__currencies">
+          <div class="currency-item">
+            <div class="currency-item__title">USD</div>
+            <div class="currency-item__value numfont"></div>
+          </div>
+
+          <div class="currency-item">
+            <div class="currency-item__title">EUR</div>
+            <div class="currency-item__value numfont"></div>
+          </div>
+          <div class="currency-select js-dropdown">
+            <button class="js-dropdown-trigger currency-select-trigger__wrap">
+              <span class="currency-current">RUB</span>
+              <img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg" alt="">
+            </button>
+
+            <div class="js-dropdown-panel">
+            </div>
+
+          </div>
+
+          <div class="currency-rates">
+            <span class="currency-rate currency-rate--usd"></span>
+            <span class="currency-rate currency-rate--eur"></span>
+            <span class="currency-rate currency-rate--rub"></span>
+          </div>
+        </div>
+
         <div class="mobile-nav-contacts">
           <div class="mobile-nav-contacts__item">
             <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg" alt="">

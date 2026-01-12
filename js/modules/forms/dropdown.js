@@ -1,9 +1,6 @@
 // /modules/dropdown.js
 export function dropdown(containerSelector, options = {}) {
-  const container =
-    typeof containerSelector === "string"
-      ? document.querySelector(containerSelector)
-      : containerSelector;
+  const container = typeof containerSelector === "string" ? document.querySelector(containerSelector) : containerSelector;
   if (!container) return null;
 
   const trigger = container.querySelector(options.triggerSelector || ".js-dropdown-trigger");
