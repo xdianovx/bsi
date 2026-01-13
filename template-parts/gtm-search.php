@@ -53,7 +53,7 @@
 
       <?php
 
-      $bsistudy_url = ' https://bsistudy.ru'; ?>
+      $bsistudy_url = 'https://bsistudy.ru'; ?>
       <a href="<?php echo esc_url($bsistudy_url); ?>" target="_blank" rel="noopener noreferrer"
         class="gtm-search__tab-btn">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
