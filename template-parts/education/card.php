@@ -252,7 +252,8 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
     <?php if (!empty($programs)): ?>
       <div class="education-card__programs">
         <?php foreach (array_slice($programs, 0, 4) as $program): ?>
-          <span class="education-card__program-tag"><?php echo esc_html($program); ?></span>
+          <span
+            class="education-card__program-tag <?php echo ($program === 'Групповой заезд') ? '--group-arrival' : ''; ?>"><?php echo esc_html($program); ?></span>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>

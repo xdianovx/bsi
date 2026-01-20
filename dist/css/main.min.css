@@ -229,9 +229,10 @@ main {
 
 .breadcrumbs {
   font-size: 16px;
-  margin-top: 16px;
+  margin-top: 8px;
   margin-bottom: 16px;
   line-height: 150%;
+  font-weight: 500;
 }
 .breadcrumbs a {
   font-weight: 500;
@@ -1377,6 +1378,7 @@ input.error {
 
 .single-education__title-wrap {
   margin-bottom: 32px;
+  margin-top: 40px;
 }
 
 .single-education__title {
@@ -1921,6 +1923,9 @@ input.error {
   font-size: 14px;
   line-height: 100%;
   color: #000000;
+}
+.education-card__program-tag.--group-arrival {
+  color: #ee3145;
 }
 
 .education-card__actions {

@@ -246,6 +246,7 @@
 
 .single-education__title-wrap {
   margin-bottom: 32px;
+  margin-top: 40px;
 }
 
 .single-education__title {
@@ -821,6 +822,10 @@
   font-size: 14px;
   line-height: 100%;
   color: $text-black;
+
+  &.--group-arrival {
+    color: $red;
+  }
 }
 
 .education-card__actions {

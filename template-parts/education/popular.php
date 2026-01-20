@@ -266,6 +266,18 @@ foreach ($education_posts as $education_post) {
 
 if (!empty($items)) {
     usort($items, function ($a, $b) {
+        $priority_a = !empty($a['priority']) && $a['priority'] === true;
+        $priority_b = !empty($b['priority']) && $b['priority'] === true;
+
+        // Приоритетные элементы идут первыми
+        if ($priority_a && !$priority_b) {
+            return -1;
+        }
+        if (!$priority_a && $priority_b) {
+            return 1;
+        }
+
+        // Если оба приоритетные или оба не приоритетные - сортируем по цене
         $price_a = 0;
         $price_b = 0;
 
@@ -292,6 +304,24 @@ if (empty($items)) {
     $test_items = [
         [
             'id' => 0,
+            'url' => 'https://www.bsistudy.ru/scountry/cyp/school/36469/center/38452/?id=201534186&LANGUAGES=1&DURATION=15',
+            'image' => 'https://www.bsistudy.ru/upload/resize_cache/tour/3/e/0/640_410_2/3e0fd1a965b4ba16188364fd561738bf.jpg',
+            'title' => 'English in Cyprus (Ларнака)',
+            'flag' => 'http://webscape.beget.tech/bsi/wp-content/uploads/2025/11/cy.svg',
+            'country_title' => 'Кипр',
+            'price' => '211 190 ₽ / 2 недели',
+            'languages' => ['Английский'],
+            'programs' => ['Каникулярные программы'],
+            'country_id' => 0,
+            'country_slug' => '',
+            'show_price_from' => true,
+            'booking_url' => 'https://www.bsistudy.ru/scountry/cyp/school/36469/center/38452/?id=201534186&LANGUAGES=1&DURATION=15',
+            'age_min' => 12,
+            'age_max' => 17,
+            'nearest_date' => '28.06.2026',
+        ],
+        [
+            'id' => 0,
             'url' => 'https://www.bsistudy.ru/scountry/gbr/school/36329/center/37188/?id=201575237',
             'image' => 'https://www.bsistudy.ru/upload/tour/1/8/b/18b8ba5ab26aaaaf7217341bf8f753bc.jpg',
             'title' => 'Queen Mary University',
@@ -299,7 +329,7 @@ if (empty($items)) {
             'country_title' => 'Великобритания',
             'price' => '335 023 ₽ / 2 недели',
             'languages' => ['Английский'],
-            'programs' => ['Каникулярные программы'],
+            'programs' => ['Групповой заезд'],
             'country_id' => 0,
             'country_slug' => '',
             'show_price_from' => true,
@@ -307,6 +337,7 @@ if (empty($items)) {
             'age_min' => 11,
             'age_max' => 17,
             'nearest_date' => '28.06.2026',
+            'priority' => true,
         ],
         [
             'id' => 0,
@@ -344,27 +375,22 @@ if (empty($items)) {
             'age_max' => 17,
             'nearest_date' => '22.06.2026',
         ],
-        [
-            'id' => 0,
-            'url' => 'https://www.bsistudy.ru/scountry/cyp/school/36469/center/38452/?id=201534186&LANGUAGES=1&DURATION=15',
-            'image' => 'https://www.bsistudy.ru/upload/resize_cache/tour/3/e/0/640_410_2/3e0fd1a965b4ba16188364fd561738bf.jpg',
-            'title' => 'English in Cyprus (Ларнака)',
-            'flag' => 'http://webscape.beget.tech/bsi/wp-content/uploads/2025/11/cy.svg',
-            'country_title' => 'Кипр',
-            'price' => '211 190 ₽ / 2 недели',
-            'languages' => ['Английский'],
-            'programs' => ['Каникулярные программы'],
-            'country_id' => 0,
-            'country_slug' => '',
-            'show_price_from' => true,
-            'booking_url' => 'https://www.bsistudy.ru/scountry/cyp/school/36469/center/38452/?id=201534186&LANGUAGES=1&DURATION=15',
-            'age_min' => 12,
-            'age_max' => 17,
-            'nearest_date' => '28.06.2026',
-        ],
+
     ];
 
     usort($test_items, function ($a, $b) {
+        $priority_a = !empty($a['priority']) && $a['priority'] === true;
+        $priority_b = !empty($b['priority']) && $b['priority'] === true;
+
+        // Приоритетные элементы идут первыми
+        if ($priority_a && !$priority_b) {
+            return -1;
+        }
+        if (!$priority_a && $priority_b) {
+            return 1;
+        }
+
+        // Если оба приоритетные или оба не приоритетные - сортируем по цене
         $price_a = 0;
         $price_b = 0;
 
