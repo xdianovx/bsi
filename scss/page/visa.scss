@@ -5,7 +5,7 @@
 
 .visa-page__poster {
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .visa-page__info-section {
@@ -34,6 +34,21 @@
   }
 }
 
+.visa-info-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: $text-gray;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .visa-info-item__key {
 }
 .visa-info-item__value {
@@ -44,7 +59,7 @@
 .visa-info-item__wrap {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 8px;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(1, 1fr);
@@ -331,6 +346,62 @@
       cursor: pointer;
       user-select: none;
     }
+  }
+}
+
+.visa-embassy__section {
+  margin-top: 8px;
+  background: $bg-gray;
+  border-radius: 8px;
+  padding: 12px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 24px;
+  }
+}
+
+.visa-embassy__title {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.visa-embassy__contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.visa-embassy__contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px;
+  color: inherit;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: $text-gray;
+  }
+
+  span {
+    color: inherit;
+  }
+}
+
+// Hover эффект только для ссылок
+a.visa-embassy__contact-item {
+  transition: color 0.3s ease-in-out;
+
+  &:hover {
+    color: $red;
   }
 }
 

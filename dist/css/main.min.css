@@ -481,6 +481,65 @@ main {
 
 .callout-neutral {
   background: #f5f5f5;
+  border: 1px solid #bebebe;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+}
+.callout-neutral svg {
+  display: block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #5c5c5c;
+  margin-top: 2px;
+}
+.callout-neutral p {
+  margin: 0;
+  line-height: 1.5;
+}
+@media screen and (max-width: 768px) {
+  .callout-neutral {
+    padding: 12px;
+    font-size: 14px;
+  }
+  .callout-neutral svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.callout-success {
+  background: #d1fae5;
+  border: 1px solid #10b981;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+}
+.callout-success svg {
+  display: block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #10b981;
+  margin-top: 2px;
+}
+.callout-success p {
+  margin: 0;
+  color: #065f46;
+  line-height: 1.5;
+}
+@media screen and (max-width: 768px) {
+  .callout-success {
+    padding: 12px;
+    font-size: 14px;
+  }
+  .callout-success svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .callout__text-warn {
@@ -8304,7 +8363,7 @@ input.error {
 
 .visa-page__poster {
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .visa-page__info-section {
@@ -8332,6 +8391,20 @@ input.error {
   display: block;
 }
 
+.visa-info-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #5c5c5c;
+}
+.visa-info-item__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 .visa-info-item__value {
   margin-bottom: 0;
   margin-top: 8px;
@@ -8340,7 +8413,7 @@ input.error {
 .visa-info-item__wrap {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 8px;
 }
 @media screen and (max-width: 1200px) {
   .visa-info-item__wrap {
@@ -8631,6 +8704,59 @@ input.error {
 .visa-consultation-form .input-item label {
   cursor: pointer;
   user-select: none;
+}
+
+.visa-embassy__section {
+  margin-top: 8px;
+  background: #f4f4f6;
+  border-radius: 8px;
+  padding: 12px;
+}
+@media screen and (max-width: 768px) {
+  .visa-embassy__section {
+    margin-top: 24px;
+  }
+}
+
+.visa-embassy__title {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.visa-embassy__contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.visa-embassy__contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px;
+  color: inherit;
+}
+.visa-embassy__contact-item svg {
+  display: block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #5c5c5c;
+}
+.visa-embassy__contact-item span {
+  color: inherit;
+}
+
+a.visa-embassy__contact-item {
+  transition: color 0.3s ease-in-out;
+}
+a.visa-embassy__contact-item:hover {
+  color: #ee3145;
 }
 
 .visa-files__section {
