@@ -215,7 +215,7 @@ get_header();
           }
           ?>
           <div class="visa-files__section">
-            <h2 class="h2">Документы</h2>
+            <h2 class="h2">Файлы</h2>
             <div class="visa-files__list">
               <?php foreach ($visa_files as $file_item): ?>
                 <?php
