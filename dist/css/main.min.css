@@ -8366,6 +8366,57 @@ input.error {
   border-radius: 8px;
 }
 
+.visa-costs__section {
+  margin-top: 24px;
+}
+
+.visa-costs__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.visa-cost-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.visa-cost-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #5c5c5c;
+}
+.visa-cost-item__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.visa-cost-item__title {
+  color: inherit;
+  font-weight: 500;
+  line-height: 100%;
+}
+
+.visa-cost-item__separator {
+  flex-grow: 1;
+  height: 1px;
+  border-bottom: 1px dashed #bebebe;
+  margin: 0 8px;
+}
+
+.visa-cost-item__price {
+  flex-shrink: 0;
+  color: inherit;
+  line-height: 100%;
+}
+
 .visa-page__info-section {
   margin-top: 24px;
 }

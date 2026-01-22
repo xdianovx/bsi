@@ -65,27 +65,38 @@ add_action('acf/init', function () {
       ],
 
       [
-        'key' => 'field_visa_validity_period',
-        'label' => 'Срок действия',
-        'name' => 'visa_validity_period',
-        'type' => 'text',
-        'wrapper' => ['width' => '50'],
-      ],
-
-      [
-        'key' => 'field_visa_consular_fee',
-        'label' => 'Консульский и сервисный сборы',
-        'name' => 'visa_consular_fee',
-        'type' => 'text',
-        'wrapper' => ['width' => '50'],
-      ],
-
-      [
         'key' => 'field_visa_support_fee',
         'label' => 'Визовая поддержка и запись на подачу документов',
         'name' => 'visa_support_fee',
         'type' => 'text',
         'wrapper' => ['width' => '50'],
+      ],
+
+      [
+        'key' => 'field_visa_costs',
+        'label' => 'Стоимость виз',
+        'name' => 'visa_costs',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить визу',
+        'sub_fields' => [
+          [
+            'key' => 'field_visa_cost_title',
+            'label' => 'Название визы',
+            'name' => 'title',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_visa_cost_price',
+            'label' => 'Цена',
+            'name' => 'price',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
       ],
 
       [
