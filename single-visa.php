@@ -37,23 +37,7 @@ get_header();
           ?>
           <div class="visa-page__info-section">
             <div class="visa-info-item__wrap">
-              <?php if ($processing_time): ?>
-                <div class="visa-info-item">
-                  <div class="visa-info-item__title">
-                    <p class="visa-info-item__key">Срок оформления</p>
-                  </div>
-                  <p class="visa-info-item__value"><?= esc_html($processing_time); ?></p>
-                </div>
-              <?php endif; ?>
 
-              <?php if ($validity_period): ?>
-                <div class="visa-info-item">
-                  <div class="visa-info-item__title">
-                    <p class="visa-info-item__key">Срок действия</p>
-                  </div>
-                  <p class="visa-info-item__value"><?= esc_html($validity_period); ?></p>
-                </div>
-              <?php endif; ?>
 
               <?php if ($consular_fee): ?>
                 <div class="visa-info-item">
@@ -63,6 +47,31 @@ get_header();
                   <p class="visa-info-item__value"><?= esc_html($consular_fee); ?></p>
                 </div>
               <?php endif; ?>
+
+
+              <?php if ($validity_period): ?>
+                <div class="visa-info-item">
+                  <div class="visa-info-item__title">
+                    <p class="visa-info-item__key">Срок действия</p>
+                  </div>
+                  <p class="visa-info-item__value">
+                    <?= esc_html($validity_period); ?>
+                  </p>
+                </div>
+              <?php endif; ?>
+
+
+              <?php if ($processing_time): ?>
+                <div class="visa-info-item">
+                  <div class="visa-info-item__title">
+                    <p class="visa-info-item__key">Срок оформления</p>
+                  </div>
+                  <p class="visa-info-item__value"><?= esc_html($processing_time); ?></p>
+                </div>
+              <?php endif; ?>
+
+
+
 
               <?php if ($support_fee): ?>
                 <div class="visa-info-item">
