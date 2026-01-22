@@ -61,6 +61,17 @@ get_header();
               <?php endif; ?>
 
 
+              <?php if ($support_fee): ?>
+                <div class="visa-info-item">
+                  <div class="visa-info-item__title">
+                    <p class="visa-info-item__key">Визовая поддержка и запись на подачу документов</p>
+                  </div>
+                  <p class="visa-info-item__value">
+                    <?= esc_html($support_fee); ?>
+                  </p>
+                </div>
+              <?php endif; ?>
+
               <?php if ($processing_time): ?>
                 <div class="visa-info-item">
                   <div class="visa-info-item__title">
@@ -73,14 +84,7 @@ get_header();
 
 
 
-              <?php if ($support_fee): ?>
-                <div class="visa-info-item">
-                  <div class="visa-info-item__title">
-                    <p class="visa-info-item__key">Визовая поддержка и запись на подачу документов</p>
-                  </div>
-                  <p class="visa-info-item__value"><?= esc_html($support_fee); ?></p>
-                </div>
-              <?php endif; ?>
+
             </div>
           </div>
         <?php endif; ?>
