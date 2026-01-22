@@ -18,6 +18,35 @@ add_action('acf/init', function () {
         'wrapper' => ['width' => '50'],
       ],
 
+      [
+        'key' => 'field_visa_files',
+        'label' => 'Файлы',
+        'name' => 'visa_files',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить файл',
+        'sub_fields' => [
+          [
+            'key' => 'field_visa_file',
+            'label' => 'Файл',
+            'name' => 'file',
+            'type' => 'file',
+            'return_format' => 'array',
+            'library' => 'all',
+            'required' => 1,
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_visa_file_name',
+            'label' => 'Название файла',
+            'name' => 'name',
+            'type' => 'text',
+            'instructions' => 'Если не указано, будет использовано имя файла',
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
+      ],
+
     ],
     'location' => [
       [
