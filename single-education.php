@@ -121,6 +121,34 @@ if ($resort_term && !is_wp_error($resort_term)) {
   }
 }
 
+// Получаем регион через курорт (ACF поле resort_region у курорта)
+$region_id = 0;
+$region_name = '';
+$region_permalink = '';
+$region_term = null;
+
+if ($resort_term && function_exists('get_field')) {
+  $region_id_field = get_field('resort_region', 'term_' . $resort_term->term_id);
+  if ($region_id_field) {
+    if (is_array($region_id_field)) {
+      $region_id = (int) reset($region_id_field);
+    } else {
+      $region_id = (int) $region_id_field;
+    }
+  }
+}
+
+if ($region_id > 0) {
+  $region_term = get_term($region_id, 'region');
+  if ($region_term && !is_wp_error($region_term)) {
+    $region_name = $region_term->name;
+    $region_permalink = get_term_link($region_term);
+    if (is_wp_error($region_permalink)) {
+      $region_permalink = '';
+    }
+  }
+}
+
 // Получаем репитеры для стоимости
 $price_included = function_exists('get_field') ? get_field('education_price_included', $post_id) : [];
 $price_included = is_array($price_included) ? $price_included : [];
@@ -265,7 +293,7 @@ get_header();
         <div class="title-rating__wrap">
           <h1 class="h1 single-education__title"><?php the_title(); ?></h1>
 
-          <?php if ($country_title || $resort_name): ?>
+          <?php if ($country_title || $region_name || $resort_name): ?>
             <div class="single-education__country single-hotel__address">
               <?php if ($country_flag): ?>
                 <img src="<?php echo esc_url($country_flag); ?>" alt="<?php echo esc_attr($country_title); ?>"
@@ -275,18 +303,22 @@ get_header();
                 <?php if ($country_title): ?>
                   <?php if ($country_permalink): ?>
                     <a href="<?php echo esc_url($country_permalink); ?>"
-                      class="single-education__country-link"><?php echo esc_html($country_title); ?>,</a>
+                      class="single-education__country-link"><?php echo esc_html($country_title); ?></a>
                   <?php else: ?>
                     <span class="single-education__country-text"><?php echo esc_html($country_title); ?></span>
                   <?php endif; ?>
                 <?php endif; ?>
-                <?php if ($resort_name): ?>
-                  <?php if ($resort_permalink && !is_wp_error($resort_permalink)): ?>
-                    <a href="<?php echo esc_url($resort_permalink); ?>"
-                      class="single-education__resort-link"><?php echo esc_html($resort_name); ?></a>
-                  <?php else: ?>
-                    <span class="single-education__resort-text"><?php echo esc_html($resort_name); ?></span>
+                <?php if ($region_name): ?>
+                  <?php if ($country_title): ?>
+                    <span class="single-education__location-separator">,</span>
                   <?php endif; ?>
+                  <span class="single-education__region-text"><?php echo esc_html($region_name); ?></span>
+                <?php endif; ?>
+                <?php if ($resort_name): ?>
+                  <?php if ($country_title || $region_name): ?>
+                    <span class="single-education__location-separator">,</span>
+                  <?php endif; ?>
+                  <span class="single-education__resort-text"><?php echo esc_html($resort_name); ?></span>
                 <?php endif; ?>
               </div>
             </div>
