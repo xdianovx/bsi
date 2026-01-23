@@ -109,13 +109,7 @@ $initial_query = new WP_Query([
     <?php if (have_posts()): ?>
       <?php while (have_posts()):
         the_post(); ?>
-        <?php if (bsi_is_page_empty()): ?>
-          <div class="page-content">
-            <div class="page-empty-message">
-              Страница заполняется
-            </div>
-          </div>
-        <?php elseif (get_the_content()): ?>
+        <?php if (get_the_content()): ?>
           <div class="page-content">
             <?php the_content(); ?>
           </div>

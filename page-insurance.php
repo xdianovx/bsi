@@ -168,20 +168,10 @@ get_header();
 	/**
 	 * Контент страницы
 	 */
-	if (have_posts()):
+		if (have_posts()):
 		while (have_posts()):
 			the_post();
-			if (bsi_is_page_empty()): ?>
-				<section class="insurance-content-section">
-					<div class="container">
-						<div class="editor-content read-content">
-							<div class="page-empty-message">
-								Страница заполняется
-							</div>
-						</div>
-					</div>
-				</section>
-			<?php elseif (get_the_content()): ?>
+			if (get_the_content()): ?>
 				<section class="insurance-content-section">
 					<div class="container">
 						<div class="editor-content read-content">

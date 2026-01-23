@@ -248,24 +248,3 @@ function get_tour_excursion_params(int $tour_id): array
 
   return parse_excursion_url((string) $excursion_link);
 }
-
-function bsi_is_page_empty(?int $post_id = null): bool
-{
-  if (!$post_id) {
-    $post_id = get_the_ID();
-  }
-
-  if (!$post_id) {
-    return true;
-  }
-
-  $content = get_post_field('post_content', $post_id);
-  
-  if (empty($content)) {
-    return true;
-  }
-
-  $content = trim(strip_tags($content));
-  
-  return empty($content);
-}

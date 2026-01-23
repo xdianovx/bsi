@@ -21,22 +21,14 @@
 
   <div class="entry-content">
     <?php
-    if (bsi_is_page_empty()):
-      ?>
-      <div class="page-empty-message">
-        Страница заполняется
-      </div>
-      <?php
-    else:
-      the_content();
+    the_content();
 
-      wp_link_pages(
-        array(
-          'before' => '<div class="page-links">' . esc_html__('Pages:', 'bsi'),
-          'after' => '</div>',
-        )
-      );
-    endif;
+    wp_link_pages(
+      array(
+        'before' => '<div class="page-links">' . esc_html__('Pages:', 'bsi'),
+        'after' => '</div>',
+      )
+    );
     ?>
   </div><!-- .entry-content -->
 
