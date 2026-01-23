@@ -20,7 +20,16 @@ $duration = isset($program['program_duration']) ? (int) $program['program_durati
 $description = $program['program_description'] ?? '';
 $checkin_date_from = $program['program_checkin_date_from'] ?? '';
 $checkin_date_to = $program['program_checkin_date_to'] ?? '';
-$accommodation_options = $program['program_accommodation_options'] ?? [];
+$accommodation_options = isset($program['program_accommodation_options']) ? $program['program_accommodation_options'] : [];
+$meal_options = isset($program['program_meal_options']) ? $program['program_meal_options'] : [];
+
+// Нормализуем данные - ACF может вернуть разные форматы
+if (!is_array($accommodation_options)) {
+  $accommodation_options = $accommodation_options ? [$accommodation_options] : [];
+}
+if (!is_array($meal_options)) {
+  $meal_options = $meal_options ? [$meal_options] : [];
+}
 
 // Получаем URL бронирования: сначала из программы, если нет - из общего поля
 $program_booking_url = isset($program['program_booking_url']) ? trim((string) $program['program_booking_url']) : '';
@@ -41,7 +50,7 @@ if ($age_min > 0 && $age_max > 0) {
     $age_text = $age_min . '-' . $age_max . ' лет';
   }
 } elseif ($age_min > 0) {
-  $age_text = 'от ' . $age_min . ' лет';
+  $age_text = $age_min . '+' . ' лет';
 } elseif ($age_max > 0) {
   $age_text = 'до ' . $age_max . ' лет';
 }
@@ -51,28 +60,57 @@ if ($duration > 0) {
   $duration_text = $duration . ' ' . ($duration === 1 ? 'неделя' : ($duration < 5 ? 'недели' : 'недель'));
 }
 
-$nearest_date = '';
-$date_range_text = '';
+$nearest_date_formatted = '';
 if ($checkin_date_from) {
-  $nearest_date = $checkin_date_from;
   if ($checkin_date_to && $checkin_date_to !== $checkin_date_from) {
-    $date_range_text = format_date_russian($checkin_date_from) . ' - ' . format_date_russian($checkin_date_to);
+    $nearest_date_formatted = format_date_short($checkin_date_from, $checkin_date_to);
   } else {
-    $date_range_text = format_date_russian($checkin_date_from);
+    $nearest_date_formatted = format_date_short($checkin_date_from);
   }
 }
 
 $accommodation_names = [];
-if (!empty($accommodation_options)) {
-  if (!is_array($accommodation_options)) {
-    $accommodation_options = [$accommodation_options];
-  }
-  foreach ($accommodation_options as $acc_id) {
-    $term = get_term((int) $acc_id, 'education_accommodation_type');
+foreach ($accommodation_options as $acc_id) {
+  $acc_id = (int) $acc_id;
+  if ($acc_id > 0) {
+    $term = get_term($acc_id, 'education_accommodation_type');
     if ($term && !is_wp_error($term)) {
       $accommodation_names[] = $term->name;
     }
   }
+}
+
+$meal_names = [];
+foreach ($meal_options as $meal_id) {
+  $meal_id = (int) $meal_id;
+  if ($meal_id > 0) {
+    $term = get_term($meal_id, 'education_meal_type');
+    if ($term && !is_wp_error($term)) {
+      $meal_names[] = $term->name;
+    }
+  }
+}
+
+// Формируем текст о проживании/питании
+$accommodation_parts = [];
+
+if (!empty($accommodation_names)) {
+  $accommodation_parts = $accommodation_names;
+} else {
+  $accommodation_parts = ['Без проживания'];
+}
+
+// Добавляем питание только если оно выбрано
+if (!empty($meal_names)) {
+  $accommodation_parts = array_merge($accommodation_parts, $meal_names);
+}
+
+$accommodation_text = implode(', ', $accommodation_parts);
+
+// Форматируем цену
+$price_formatted = '';
+if (!empty($price_per_week)) {
+  $price_formatted = format_price_with_from($price_per_week, true);
 }
 ?>
 
@@ -84,71 +122,55 @@ if (!empty($accommodation_options)) {
           <h3 class="education-program-card__title"><?php echo esc_html($program_title); ?></h3>
         <?php endif; ?>
 
-        <div class="education-program-card__header-info">
+        <?php if ($accommodation_text): ?>
+          <div class="education-program-card__subtitle"><?php echo esc_html($accommodation_text); ?></div>
+        <?php endif; ?>
 
-
-          <div class="education-program-card__info">
+        <?php if ($age_text || $duration_text || $nearest_date_formatted): ?>
+          <div class="education-program-card__info-row">
             <?php if ($age_text): ?>
-              <div class="education-program-card__age">
-                <span class="education-program-card__label">Возраст:</span>
-                <span class="education-program-card__value"><?php echo esc_html($age_text); ?></span>
-              </div>
+              <span class="education-program-card__info-value"><?php echo esc_html($age_text); ?></span>
+              <?php if ($duration_text || $nearest_date_formatted): ?>
+                <span class="education-program-card__info-separator"></span>
+              <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($duration_text): ?>
-              <div class="education-program-card__duration">
-                <span class="education-program-card__label">Продолжительность:</span>
-                <span class="education-program-card__value"><?php echo esc_html($duration_text); ?></span>
-              </div>
+              <span class="education-program-card__info-value"><?php echo esc_html($duration_text); ?></span>
+              <?php if ($nearest_date_formatted): ?>
+                <span class="education-program-card__info-separator"></span>
+              <?php endif; ?>
             <?php endif; ?>
 
-            <?php if ($date_range_text): ?>
-              <div class="education-program-card__date">
-                <span class="education-program-card__label">Даты заселения:</span>
-                <span class="education-program-card__value"><?php echo esc_html($date_range_text); ?></span>
-              </div>
-            <?php endif; ?>
-
-            <?php if (!empty($accommodation_names)): ?>
-              <div class="education-program-card__accommodation">
-                <span class="education-program-card__label">Варианты проживания:</span>
-                <span
-                  class="education-program-card__value"><?php echo esc_html(implode(', ', $accommodation_names)); ?></span>
-              </div>
+            <?php if ($nearest_date_formatted): ?>
+              <span class="education-program-card__info-value">
+                <span class="education-program-card__date-label">Ближайшие даты:</span>
+                <?php echo esc_html($nearest_date_formatted); ?>
+              </span>
             <?php endif; ?>
           </div>
+        <?php endif; ?>
 
-          <div class="education-program-card__footer">
-            <?php if (!empty($description)): ?>
-              <button type="button" class="education-program-card__toggle js-education-program-toggle"
-                aria-expanded="false" aria-controls="program-content-<?php echo esc_attr($program_index); ?>">
-                <span class="education-program-card__toggle-text">Подробнее</span>
-                <span class="education-program-card__toggle-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                      stroke-linejoin="round" />
-                  </svg>
-                </span>
-              </button>
-            <?php endif; ?>
-            <div class="education-program-card__footer-right">
-              <?php if (!empty($price_per_week)): ?>
-                <div class="education-program-card__price">
-                  <?php echo esc_html($price_per_week); ?>
-                </div>
-              <?php endif; ?>
-              <?php if ($booking_url): ?>
-                <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent education-program-card__booking-btn"
-                  target="_blank" rel="noopener noreferrer">
-                  Забронировать
-                </a>
-              <?php endif; ?>
-            </div>
-          </div>
+        <div class="education-program-card__divider"></div>
+
+        <div class="education-program-card__footer">
+          <?php if (!empty($description)): ?>
+            <button type="button" class="education-program-card__toggle js-education-program-toggle"
+              aria-expanded="false" aria-controls="program-content-<?php echo esc_attr($program_index); ?>">
+              <span class="education-program-card__toggle-text">Подробнее</span>
+              <span class="education-program-card__toggle-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </span>
+            </button>
+          <?php endif; ?>
+          <?php if ($price_formatted): ?>
+            <div class="education-program-card__price"><?php echo esc_html($price_formatted); ?></div>
+          <?php endif; ?>
         </div>
       </div>
-
-
     </div>
 
     <?php if (!empty($description)): ?>
@@ -159,6 +181,5 @@ if (!empty($accommodation_options)) {
         </div>
       </div>
     <?php endif; ?>
-
   </div>
 </div>

@@ -1436,7 +1436,6 @@ input.error {
 }
 
 .single-education__title-wrap {
-  margin-bottom: 32px;
   margin-top: 40px;
 }
 
@@ -1484,28 +1483,36 @@ input.error {
   line-height: 1.6;
 }
 
-.single-education__programs {
-  margin-top: 40px;
-}
-
 .single-education__programs-title {
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28.8px;
+  color: #000000;
 }
 
 .single-education__programs-filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 18px;
   margin-bottom: 24px;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 8px;
+}
+@media screen and (max-width: 1024px) {
+  .single-education__programs-filters {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 768px) {
+  .single-education__programs-filters {
+    grid-template-columns: 1fr;
+  }
 }
 
 .single-education__programs-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 8px;
 }
 .single-education__programs-list.is-loading {
   opacity: 0.6;
@@ -1513,36 +1520,18 @@ input.error {
 }
 
 .single-education__info {
-  background: #f5f5f5;
-  padding: 24px;
-  border-radius: 8px;
-  margin-bottom: 24px;
+  margin-top: 16px;
+  text-align: right;
+  margin-bottom: 8px;
+  font-weight: 700;
 }
 
-.single-education__info-item {
-  margin-bottom: 16px;
-}
 .single-education__info-item:last-child {
   margin-bottom: 0;
 }
 
 .single-education__info-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #5c5c5c;
-  margin-bottom: 4px;
-}
-
-.single-education__info-value {
-  font-size: 14px;
-  line-height: 1.5;
-}
-.single-education__info-value a {
-  color: #ee3145;
-  text-decoration: none;
-}
-.single-education__info-value a:hover {
-  text-decoration: underline;
+  font-weight: 500;
 }
 
 .single-education__map {
@@ -1560,7 +1549,7 @@ input.error {
   background: #ee3145;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1609,33 +1598,75 @@ input.error {
 
 .education-program-card__header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  gap: 0;
 }
 
 .education-program-card__header-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .education-program-card__title {
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 0;
   color: #000000;
+  line-height: 1.2;
 }
 
-.education-program-card__header-info {
+.education-program-card__subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  margin-top: 16px;
+}
+
+.education-program-card__info-row {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 17px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.education-program-card__info-value {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.education-program-card__date-label {
+  font-weight: 500;
+  color: #373535;
+}
+
+.education-program-card__info-separator {
+  width: 1px;
+  height: 16px;
+  background-color: #d9d9d9;
+  flex-shrink: 0;
+}
+
+.education-program-card__divider {
+  width: 100%;
+  height: 1px;
+  background-color: #f4f4f6;
+  margin-top: 16px;
+  margin-bottom: 0;
 }
 
 .education-program-card__toggle {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: transparent;
+  background: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -1656,11 +1687,15 @@ input.error {
 
 .education-program-card__content {
   overflow: hidden;
+  margin-top: 12px;
 }
 
 .education-program-card__price {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
+  color: #000000;
+  margin-left: auto;
+  line-height: 1.2;
 }
 
 .education-program-card__info {
@@ -1689,11 +1724,13 @@ input.error {
 }
 
 .education-program-card__description {
-  color: #5c5c5c;
-  margin-top: 8px;
-  background: #fff;
+  color: #000000;
+  margin-top: 0;
+  background: #ffffff;
   padding: 12px;
   border-radius: 8px;
+  font-size: 16px;
+  line-height: 24px;
 }
 .education-program-card__description p {
   margin-bottom: 0;
@@ -1704,9 +1741,9 @@ input.error {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #eee;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
 }
 
 .education-program-card__footer-right {
@@ -1727,19 +1764,147 @@ input.error {
   flex-direction: column;
   gap: 8px;
 }
+.education-programs-filter__field .choices__inner {
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+}
+.education-programs-filter__field .flatpickr-input.altInput {
+  width: 100%;
+  height: 48px;
+  padding: 16px;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 16px;
+  background: #fff;
+  color: #000000;
+}
+.education-programs-filter__field .flatpickr-input.altInput::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+.education-programs-filter__field .flatpickr-input.altInput:placeholder-shown {
+  color: #999999;
+}
 
+.education-programs-filter__reset-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.education-programs-filter__reset-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #ee3145;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.education-programs-filter__reset-btn[style*=inline-flex] {
+  display: inline-flex;
+}
+.education-programs-filter__reset-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
 .education-programs-filter__label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #5c5c5c;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  line-height: 14px;
 }
 
 .education-programs-filter__input {
   width: 100%;
+  height: 48px;
+  padding: 16px;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 16px;
+  background: #fff;
+  color: #000000;
+}
+
+.education-programs-filter__select {
+  width: 100%;
+}
+.education-programs-filter__select .choices {
+  margin-bottom: 0;
+}
+.education-programs-filter__select .choices__inner {
+  background: #fff;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 48px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 16px;
+  color: #000000;
+}
+.education-programs-filter__select.js-education-language-select .choices__inner {
+  border-color: #e0e0e0;
+}
+.education-programs-filter__select .choices__list--single {
+  padding: 0;
+}
+.education-programs-filter__select .choices__placeholder {
+  color: #000000;
+  opacity: 1;
+}
+.education-programs-filter__select .choices__list--dropdown {
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.education-programs-filter__select .choices__item--selectable.is-highlighted {
+  background-color: #f5f5f5;
+}
+.education-programs-filter__select .choices__item--choice {
   padding: 8px 12px;
-  border: 1px solid #dbdbdb;
+  font-size: 16px;
+}
+.education-programs-filter__select .choices__list--multiple .choices__item {
+  background-color: #ee3145;
+  border: none;
   border-radius: 4px;
+  padding: 8px 12px;
+  margin: 2px;
   font-size: 14px;
+  font-weight: 400;
+  line-height: 14px;
+  color: #ffffff;
+}
+.education-programs-filter__select .choices__list--multiple .choices__item .choices__button {
+  border-left: none;
+  padding-left: 4px;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+.education-programs-filter__select .choices__list--multiple .choices__item .choices__button:hover {
+  opacity: 1;
+}
+.education-programs-filter__select .choices__arrow {
+  width: 16px;
+  height: 16px;
+  opacity: 1;
+  border: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.education-programs-filter__select .choices__button {
+  border-left: none;
+  padding-left: 4px;
 }
 
 .education-programs-filter__range {
@@ -2066,6 +2231,223 @@ input.error {
 .education-card__date {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.7);
+}
+
+.single-education__main-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.single-education__info-separator {
+  width: 1px;
+  height: 16px;
+  background-color: #999;
+  flex-shrink: 0;
+}
+
+.single-education__content-section {
+  margin-top: 32px;
+}
+
+.single-education__content__wrap {
+  gap: 16px;
+  display: grid;
+  grid-template-columns: 5fr 2fr;
+  align-items: flex-start;
+}
+@media screen and (max-width: 1024px) {
+  .single-education__content__wrap {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .single-education__programs-column {
+    width: 100%;
+  }
+}
+
+.single-education__aside-column {
+  top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media screen and (max-width: 1024px) {
+  .single-education__aside-column {
+    width: 100%;
+  }
+}
+
+.single-education__school-title {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 120%;
+}
+.single-education__school-title .h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.hotel-widget__contacts-item {
+  border-radius: 8px;
+  padding: 8px;
+  background: #fff;
+}
+
+.single-education__programs-title__wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+  gap: 16px;
+}
+@media screen and (max-width: 768px) {
+  .single-education__programs-title__wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.single-education__programs-sort {
+  flex-shrink: 0;
+  position: relative;
+}
+.single-education__programs-sort .js-dropdown-trigger::after {
+  display: none;
+}
+
+.single-education__programs-sort-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19.2px;
+  color: #000000;
+}
+.single-education__programs-sort-trigger svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.single-education__programs-sort.is-open .single-education__programs-sort-trigger svg {
+  transform: rotate(180deg);
+}
+
+.single-education__programs-sort-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 200px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: none;
+  z-index: 50;
+  width: max-content;
+}
+@media screen and (max-width: 768px) {
+  .single-education__programs-sort-panel {
+    right: auto;
+    left: 0;
+  }
+}
+
+.single-education__programs-sort.is-open .single-education__programs-sort-panel {
+  display: block;
+}
+
+.single-education__programs-sort-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #000000;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+.single-education__programs-sort-option:hover {
+  background-color: #f5f5f5;
+}
+.single-education__programs-sort-option:active {
+  background-color: #eeeeee;
+}
+
+.single-education__price-details-section {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.single-education__price-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media screen and (max-width: 768px) {
+  .single-education__price-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+.single-education__price-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+.single-education__price-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.single-education__price-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.single-education__price-item svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.single-education__price-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.single-education__price-icon--check {
+  color: #10b981;
+}
+
+.single-education__price-icon--warning {
+  color: #f59e0b;
 }
 
 .best-offers__section {
@@ -7310,9 +7692,12 @@ input.error {
 }
 .hotel-widget__contacts-item img {
   display: block;
-  margin-top: 2px;
   width: 18px;
   height: 18px;
+}
+
+.hotel-widget__address img {
+  margin-top: 2px;
 }
 
 .hotel-widget__distances {

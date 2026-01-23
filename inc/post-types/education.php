@@ -36,6 +36,14 @@ function bsi_register_education_post_type()
   register_post_type('education', $args);
 }
 
+add_action('init', 'bsi_attach_education_taxonomies');
+function bsi_attach_education_taxonomies(): void
+{
+  if (taxonomy_exists('resort')) {
+    register_taxonomy_for_object_type('resort', 'education');
+  }
+}
+
 add_action('init', function () {
 
   // Тип обучения
@@ -66,6 +74,21 @@ add_action('init', function () {
     'show_in_rest' => true,
     'hierarchical' => false,
     'rewrite' => ['slug' => 'accommodation-type'],
+  ]);
+
+  // Тип питания
+  register_taxonomy('education_meal_type', ['education'], [
+    'labels' => [
+      'name' => 'Типы питания',
+      'singular_name' => 'Тип питания',
+      'menu_name' => 'Питание',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'rewrite' => ['slug' => 'meal-type'],
   ]);
 
   // Языки

@@ -664,10 +664,48 @@ function bsi_ajax_education_programs_by_school(): void
     wp_send_json_error(['message' => 'no_education_id']);
   }
 
+  // Поддержка старого формата (для обратной совместимости)
   $age_min = isset($_POST['program_age_min']) ? absint(wp_unslash($_POST['program_age_min'])) : 0;
   $age_max = isset($_POST['program_age_max']) ? absint(wp_unslash($_POST['program_age_max'])) : 0;
+  
+  // Формат - конкретный возраст (например, "7")
+  $age = isset($_POST['program_age']) ? absint(wp_unslash($_POST['program_age'])) : 0;
+  if ($age > 0) {
+    $age_min = $age;
+    $age_max = $age;
+  }
+
   $duration = isset($_POST['program_duration']) ? absint(wp_unslash($_POST['program_duration'])) : 0;
+  
+  // Поддержка старого формата (одна дата) для обратной совместимости
   $date = isset($_POST['program_date']) ? sanitize_text_field(wp_unslash($_POST['program_date'])) : '';
+  
+  // Новый формат - диапазон дат
+  $date_from = isset($_POST['program_date_from']) ? sanitize_text_field(wp_unslash($_POST['program_date_from'])) : '';
+  $date_to = isset($_POST['program_date_to']) ? sanitize_text_field(wp_unslash($_POST['program_date_to'])) : '';
+  
+  // Если используется старый формат (program_date), используем его как date_from
+  if (!$date_from && $date) {
+    $date_from = $date;
+  }
+  
+  $sort = isset($_POST['program_sort']) ? sanitize_text_field(wp_unslash($_POST['program_sort'])) : '';
+
+  // Фильтр по языку (один язык)
+  $language_ids = [];
+  if (isset($_POST['program_language'])) {
+    // Поддержка старого формата (массив) для обратной совместимости
+    if (is_array($_POST['program_language'])) {
+      $language_ids = array_map('absint', wp_unslash($_POST['program_language']));
+      $language_ids = array_filter($language_ids);
+    } else {
+      // Новый формат - одно значение
+      $language_id = absint(wp_unslash($_POST['program_language']));
+      if ($language_id > 0) {
+        $language_ids = [$language_id];
+      }
+    }
+  }
 
   $programs = function_exists('get_field') ? get_field('education_programs', $education_id) : [];
   $programs = is_array($programs) ? $programs : [];
@@ -677,19 +715,26 @@ function bsi_ajax_education_programs_by_school(): void
 
   $filtered_programs = [];
 
-  foreach ($programs as $program) {
+  foreach ($programs as $index => $program) {
     $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
     $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
     $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
 
     $age_match = true;
-    if ($age_min > 0 || $age_max > 0) {
-      if ($age_min > 0 && $program_age_max > 0 && $age_min > $program_age_max) {
+    if ($age_min > 0 && $age_max > 0 && $age_min === $age_max) {
+      // Выбран конкретный возраст (например, 7 лет)
+      // Проверяем, попадает ли этот возраст в диапазон программы
+      $selected_age = $age_min;
+      
+      if ($program_age_min > 0 && $selected_age < $program_age_min) {
+        // Выбранный возраст меньше минимума программы
+        $age_match = false;
+      } elseif ($program_age_max > 0 && $selected_age > $program_age_max) {
+        // Выбранный возраст больше максимума программы
         $age_match = false;
       }
-      if ($age_max > 0 && $program_age_min > 0 && $age_max < $program_age_min) {
-        $age_match = false;
-      }
+      // Если у программы нет максимума, но есть минимум и выбранный возраст >= минимума - OK
+      // Если у программы нет минимума, но есть максимум и выбранный возраст <= максимума - OK
     }
 
     $duration_match = true;
@@ -700,27 +745,112 @@ function bsi_ajax_education_programs_by_school(): void
     }
 
     $date_match = true;
-    if ($date) {
-      $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-      $date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
+    if ($date_from || $date_to) {
+      $program_date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+      $program_date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
 
-      if (!$date_from) {
+      if (!$program_date_from) {
         $date_match = false;
       } else {
-        $date_ts = strtotime($date);
-        $from_ts = strtotime($date_from);
-        $to_ts = $date_to ? strtotime($date_to) : $from_ts;
+        $filter_from_ts = $date_from ? strtotime($date_from) : 0;
+        $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
+        $program_from_ts = strtotime($program_date_from);
+        $program_to_ts = $program_date_to ? strtotime($program_date_to) : $program_from_ts;
 
-        if ($date_ts < $from_ts || ($to_ts && $date_ts > $to_ts)) {
+        // Проверяем пересечение диапазонов:
+        // Фильтр должен пересекаться с диапазоном программы
+        // Фильтр попадает в программу, если:
+        // - начало фильтра <= конец программы И конец фильтра >= начало программы
+        if ($filter_from_ts > $program_to_ts || $filter_to_ts < $program_from_ts) {
           $date_match = false;
         }
       }
     }
 
-    if ($age_match && $duration_match && $date_match) {
+    // Фильтр по языку
+    $language_match = true;
+    if (!empty($language_ids)) {
+      $program_languages = [];
+      // Получаем языки программы из таксономии education
+      $education_languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'ids']);
+      if (!empty($education_languages) && !is_wp_error($education_languages)) {
+        $program_languages = $education_languages;
+      }
+      
+      if (empty($program_languages)) {
+        $language_match = false;
+      } else {
+        $language_match = !empty(array_intersect($language_ids, $program_languages));
+      }
+    }
+
+    if ($age_match && $duration_match && $date_match && $language_match) {
       $filtered_programs[] = $program;
     }
   }
+
+  // Сортировка
+  if (!empty($sort) && !empty($filtered_programs)) {
+    usort($filtered_programs, function ($a, $b) use ($sort) {
+      if ($sort === 'price_asc' || $sort === 'price_desc') {
+        $price_a = isset($a['program_price_per_week']) ? (string) $a['program_price_per_week'] : '';
+        $price_b = isset($b['program_price_per_week']) ? (string) $b['program_price_per_week'] : '';
+        
+        // Извлекаем числа из строки цены
+        preg_match('/[\d\s]+/', $price_a, $matches_a);
+        preg_match('/[\d\s]+/', $price_b, $matches_b);
+        
+        $num_a = !empty($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
+        $num_b = !empty($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
+        
+        if ($sort === 'price_asc') {
+          return $num_a <=> $num_b;
+        } else {
+          return $num_b <=> $num_a;
+        }
+      } elseif ($sort === 'age_asc' || $sort === 'age_desc') {
+        $age_a = isset($a['program_age_min']) ? (int) $a['program_age_min'] : 0;
+        $age_b = isset($b['program_age_min']) ? (int) $b['program_age_min'] : 0;
+        
+        if ($sort === 'age_asc') {
+          return $age_a <=> $age_b;
+        } else {
+          return $age_b <=> $age_a;
+        }
+      }
+      
+      return 0;
+    });
+  }
+
+  // Собираем опции для фильтров из всех программ (не только отфильтрованных)
+  $filter_options = [
+    'ages' => [],
+    'durations' => [],
+  ];
+
+  foreach ($programs as $program) {
+    $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
+    $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
+    $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
+
+    // Добавляем все возраста от min до max в список доступных
+    if ($program_age_min > 0) {
+      $max_age = $program_age_max > 0 ? $program_age_max : $program_age_min;
+      for ($age = $program_age_min; $age <= $max_age; $age++) {
+        if (!in_array($age, $filter_options['ages'], true)) {
+          $filter_options['ages'][] = $age;
+        }
+      }
+    }
+    
+    if ($program_duration > 0 && !in_array($program_duration, $filter_options['durations'], true)) {
+      $filter_options['durations'][] = $program_duration;
+    }
+  }
+
+  sort($filter_options['ages']);
+  sort($filter_options['durations']);
 
   ob_start();
   if (!empty($filtered_programs)) {
@@ -739,6 +869,51 @@ function bsi_ajax_education_programs_by_school(): void
   wp_send_json_success([
     'html' => $html,
     'total' => count($filtered_programs),
+    'filter_options' => $filter_options,
   ]);
+}
+
+add_action('wp_ajax_education_programs_filter_options', 'bsi_ajax_education_programs_filter_options');
+add_action('wp_ajax_nopriv_education_programs_filter_options', 'bsi_ajax_education_programs_filter_options');
+
+function bsi_ajax_education_programs_filter_options(): void
+{
+  $education_id = isset($_POST['education_id']) ? absint(wp_unslash($_POST['education_id'])) : 0;
+  if (!$education_id) {
+    wp_send_json_error(['message' => 'no_education_id']);
+  }
+
+  $programs = function_exists('get_field') ? get_field('education_programs', $education_id) : [];
+  $programs = is_array($programs) ? $programs : [];
+
+  $filter_options = [
+    'ages' => [],
+    'durations' => [],
+  ];
+
+  foreach ($programs as $program) {
+    $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
+    $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
+    $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
+
+    // Добавляем все возраста от min до max в список доступных
+    if ($program_age_min > 0) {
+      $max_age = $program_age_max > 0 ? $program_age_max : $program_age_min;
+      for ($age = $program_age_min; $age <= $max_age; $age++) {
+        if (!in_array($age, $filter_options['ages'], true)) {
+          $filter_options['ages'][] = $age;
+        }
+      }
+    }
+    
+    if ($program_duration > 0 && !in_array($program_duration, $filter_options['durations'], true)) {
+      $filter_options['durations'][] = $program_duration;
+    }
+  }
+
+  sort($filter_options['ages']);
+  sort($filter_options['durations']);
+
+  wp_send_json_success($filter_options);
 }
 

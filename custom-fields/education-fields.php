@@ -24,12 +24,51 @@ function bsi_register_education_acf_groups(): void
         'wrapper' => ['width' => '50'],
       ],
       [
+        'key' => 'field_education_resort',
+        'label' => 'Курорт',
+        'name' => 'education_resort',
+        'type' => 'taxonomy',
+        'taxonomy' => 'resort',
+        'field_type' => 'select',
+        'return_format' => 'id',
+        'add_term' => 0,
+        'save_terms' => 1,
+        'load_terms' => 1,
+        'multiple' => 0,
+        'allow_null' => 1,
+        'wrapper' => ['width' => '50'],
+      ],
+      [
         'key' => 'field_education_price',
         'label' => 'Стоимость',
         'name' => 'education_price',
         'type' => 'text',
         'instructions' => 'Например: "100 000 руб / 1 неделя" или "от 50 000 руб"',
         'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_education_age',
+        'label' => 'Возраст',
+        'name' => 'education_age',
+        'type' => 'text',
+        'instructions' => 'Например: "5+" или "от 12 лет"',
+        'wrapper' => ['width' => '33'],
+      ],
+      [
+        'key' => 'field_education_class_size',
+        'label' => 'В классе',
+        'name' => 'education_class_size',
+        'type' => 'text',
+        'instructions' => 'Например: "12 человек" или "до 15 студентов"',
+        'wrapper' => ['width' => '33'],
+      ],
+      [
+        'key' => 'field_education_lesson_duration',
+        'label' => 'Длительность урока',
+        'name' => 'education_lesson_duration',
+        'type' => 'text',
+        'instructions' => 'Например: "60 минут" или "45 мин"',
+        'wrapper' => ['width' => '34'],
       ],
     ],
     'location' => [
@@ -82,6 +121,8 @@ function bsi_register_education_acf_groups(): void
         'key' => 'field_education_map_lng',
         'label' => 'Долгота (lng)',
         'name' => 'education_map_lng',
+        'instructions' => 'Координаты для отображения на карте',
+
         'type' => 'number',
         'step' => 0.000001,
         'wrapper' => ['width' => '33'],
@@ -108,7 +149,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
-    'menu_order' => 2,
+    'menu_order' => 4,
   ]);
 
   acf_add_local_field_group([
@@ -136,7 +177,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
-    'menu_order' => 3,
+    'menu_order' => 5,
   ]);
 
   acf_add_local_field_group([
@@ -244,6 +285,19 @@ function bsi_register_education_acf_groups(): void
             'load_terms' => 0,
             'wrapper' => ['width' => '100'],
           ],
+          [
+            'key' => 'field_program_meal_options',
+            'label' => 'Питание',
+            'name' => 'program_meal_options',
+            'type' => 'taxonomy',
+            'taxonomy' => 'education_meal_type',
+            'field_type' => 'multi_select',
+            'return_format' => 'id',
+            'add_term' => 0,
+            'save_terms' => 0,
+            'load_terms' => 0,
+            'wrapper' => ['width' => '100'],
+          ],
         ],
       ],
     ],
@@ -256,7 +310,62 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
-    'menu_order' => 4,
+    'menu_order' => 10,
+  ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_education_price_details',
+    'title' => 'Стоимость',
+    'fields' => [
+      [
+        'key' => 'field_education_price_included',
+        'label' => 'В стоимость входит',
+        'name' => 'education_price_included',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить элемент',
+        'wrapper' => ['width' => '50'],
+        'sub_fields' => [
+          [
+            'key' => 'field_price_included_item',
+            'label' => 'Элемент',
+            'name' => 'item',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '100'],
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_education_price_extra',
+        'label' => 'Оплачивается дополнительно',
+        'name' => 'education_price_extra',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить элемент',
+        'wrapper' => ['width' => '50'],
+        'sub_fields' => [
+          [
+            'key' => 'field_price_extra_item',
+            'label' => 'Элемент',
+            'name' => 'item',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '100'],
+          ],
+        ],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'education',
+        ],
+      ],
+    ],
+    'menu_order' => 3,
   ]);
 
   acf_add_local_field_group([
@@ -280,7 +389,7 @@ function bsi_register_education_acf_groups(): void
         ],
       ],
     ],
-    'menu_order' => 5,
+    'menu_order' => 2,
   ]);
 }
 

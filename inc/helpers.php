@@ -87,6 +87,64 @@ function format_date_value($value)
   return format_date_russian($value);
 }
 
+function format_date_short($date_string, $date_to_string = '')
+{
+  if (!$date_string) {
+    return '';
+  }
+
+  $date_obj = null;
+  $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
+
+  foreach ($formats as $format) {
+    $date_obj = DateTime::createFromFormat($format, trim($date_string));
+    if ($date_obj instanceof DateTime) {
+      break;
+    }
+  }
+
+  if (!$date_obj) {
+    $timestamp = strtotime($date_string);
+    if ($timestamp) {
+      $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
+    }
+  }
+
+  if (!$date_obj instanceof DateTime) {
+    return $date_string;
+  }
+
+  $day = (int) $date_obj->format('j');
+  $month = (int) $date_obj->format('n');
+  $formatted = $day . '.' . str_pad($month, 2, '0', STR_PAD_LEFT);
+
+  // Если есть вторая дата, форматируем её тоже
+  if ($date_to_string) {
+    $date_to_obj = null;
+    foreach ($formats as $format) {
+      $date_to_obj = DateTime::createFromFormat($format, trim($date_to_string));
+      if ($date_to_obj instanceof DateTime) {
+        break;
+      }
+    }
+
+    if (!$date_to_obj) {
+      $timestamp_to = strtotime($date_to_string);
+      if ($timestamp_to) {
+        $date_to_obj = DateTime::createFromFormat('U', (string) $timestamp_to);
+      }
+    }
+
+    if ($date_to_obj instanceof DateTime) {
+      $day_to = (int) $date_to_obj->format('j');
+      $month_to = (int) $date_to_obj->format('n');
+      $formatted_to = $day_to . '.' . str_pad($month_to, 2, '0', STR_PAD_LEFT);
+      return $formatted . ' – ' . $formatted_to;
+    }
+  }
+
+  return $formatted;
+}
 
 function format_price_text(?string $text): string
 {

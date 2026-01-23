@@ -3,17 +3,16 @@ $post_id = get_the_ID();
 $gallery_raw = function_exists('get_field') ? get_field('education_gallery', $post_id) : [];
 $gallery_raw = is_array($gallery_raw) ? $gallery_raw : [];
 
-// Преобразуем галерею в формат для template-parts/sections/gallery.php
+
 $gallery = [];
 if (!empty($gallery_raw)) {
   foreach ($gallery_raw as $image) {
-    // Если элемент уже в правильном формате ACF (с 'url' и 'alt')
+
     if (is_array($image) && !empty($image['url'])) {
       $gallery[] = $image;
       continue;
     }
 
-    // Иначе преобразуем из ID
     $img_id = is_array($image) ? ($image['ID'] ?? 0) : (int) $image;
     if (!$img_id)
       continue;
@@ -64,6 +63,75 @@ if ($country_id) {
     }
   }
 }
+
+// Получаем курорт
+$resort_id = 0;
+$resort_name = '';
+$resort_permalink = '';
+$resort_term = null;
+
+// Сначала пробуем получить через ACF поле
+if (function_exists('get_field')) {
+  $resort_field = get_field('education_resort', $post_id);
+  if ($resort_field) {
+    // Если это объект WP_Term
+    if ($resort_field instanceof WP_Term) {
+      $resort_term = $resort_field;
+      $resort_id = (int) $resort_term->term_id;
+    }
+    // Если это массив ID или объектов
+    elseif (is_array($resort_field)) {
+      $first_item = reset($resort_field);
+      if ($first_item instanceof WP_Term) {
+        $resort_term = $first_item;
+        $resort_id = (int) $resort_term->term_id;
+      } else {
+        $resort_id = (int) $first_item;
+      }
+    }
+    // Если это просто ID
+    else {
+      $resort_id = (int) $resort_field;
+    }
+  }
+}
+
+// Если не получили через ACF, пробуем через таксономию
+if (!$resort_term && !$resort_id) {
+  $resort_terms = get_the_terms($post_id, 'resort');
+  if (!empty($resort_terms) && !is_wp_error($resort_terms)) {
+    $resort_term = $resort_terms[0];
+    $resort_id = (int) $resort_term->term_id;
+  }
+}
+
+// Если есть ID, но нет объекта термина, получаем его
+if ($resort_id && !$resort_term) {
+  $resort_term = get_term($resort_id, 'resort');
+  if (is_wp_error($resort_term)) {
+    $resort_term = null;
+  }
+}
+
+if ($resort_term && !is_wp_error($resort_term)) {
+  $resort_name = $resort_term->name;
+  $resort_permalink = get_term_link($resort_term);
+  if (is_wp_error($resort_permalink)) {
+    $resort_permalink = '';
+  }
+}
+
+// Получаем репитеры для стоимости
+$price_included = function_exists('get_field') ? get_field('education_price_included', $post_id) : [];
+$price_included = is_array($price_included) ? $price_included : [];
+
+$price_extra = function_exists('get_field') ? get_field('education_price_extra', $post_id) : [];
+$price_extra = is_array($price_extra) ? $price_extra : [];
+
+// Получаем общие значения
+$education_age = trim((string) (function_exists('get_field') ? get_field('education_age', $post_id) : ''));
+$education_class_size = trim((string) (function_exists('get_field') ? get_field('education_class_size', $post_id) : ''));
+$education_lesson_duration = trim((string) (function_exists('get_field') ? get_field('education_lesson_duration', $post_id) : ''));
 
 $address = trim((string) (function_exists('get_field') ? get_field('education_address', $post_id) : ''));
 $phone = trim((string) (function_exists('get_field') ? get_field('education_phone', $post_id) : ''));
@@ -196,22 +264,65 @@ get_header();
       <div class="single-education__title-wrap">
         <div class="title-rating__wrap">
           <h1 class="h1 single-education__title"><?php the_title(); ?></h1>
-          <?php if (has_excerpt()): ?>
-            <div class="single-education__excerpt">
-              <?php the_excerpt(); ?>
-            </div>
-          <?php endif; ?>
-          <?php if ($country_title): ?>
-            <div class="single-education__country">
+
+          <?php if ($country_title || $resort_name): ?>
+            <div class="single-education__country single-hotel__address">
               <?php if ($country_flag): ?>
                 <img src="<?php echo esc_url($country_flag); ?>" alt="<?php echo esc_attr($country_title); ?>"
                   class="single-education__flag">
               <?php endif; ?>
-              <?php if ($country_permalink): ?>
-                <a href="<?php echo esc_url($country_permalink); ?>"
-                  class="single-education__country-link"><?php echo esc_html($country_title); ?></a>
-              <?php else: ?>
-                <span class="single-education__country-text"><?php echo esc_html($country_title); ?></span>
+              <div class="single-education__location-text">
+                <?php if ($country_title): ?>
+                  <?php if ($country_permalink): ?>
+                    <a href="<?php echo esc_url($country_permalink); ?>"
+                      class="single-education__country-link"><?php echo esc_html($country_title); ?>,</a>
+                  <?php else: ?>
+                    <span class="single-education__country-text"><?php echo esc_html($country_title); ?></span>
+                  <?php endif; ?>
+                <?php endif; ?>
+                <?php if ($resort_name): ?>
+                  <?php if ($resort_permalink && !is_wp_error($resort_permalink)): ?>
+                    <a href="<?php echo esc_url($resort_permalink); ?>"
+                      class="single-education__resort-link"><?php echo esc_html($resort_name); ?></a>
+                  <?php else: ?>
+                    <span class="single-education__resort-text"><?php echo esc_html($resort_name); ?></span>
+                  <?php endif; ?>
+                <?php endif; ?>
+              </div>
+            </div>
+          <?php endif; ?>
+
+          <?php if (has_excerpt()): ?>
+            <div class="single-education__excerpt page-country__descr">
+              <?php the_excerpt(); ?>
+            </div>
+          <?php endif; ?>
+
+          <?php if ($education_age || $education_class_size || $education_lesson_duration): ?>
+            <div class="single-education__main-info">
+              <?php if ($education_age): ?>
+                <div class="single-education__info-item">
+                  <span class="single-education__info-label">Возраст:</span>
+                  <span class="single-education__info-value"><?php echo esc_html($education_age); ?></span>
+                </div>
+                <?php if ($education_class_size || $education_lesson_duration): ?>
+                  <span class="single-education__info-separator"></span>
+                <?php endif; ?>
+              <?php endif; ?>
+              <?php if ($education_class_size): ?>
+                <div class="single-education__info-item">
+                  <span class="single-education__info-label">В классе:</span>
+                  <span class="single-education__info-value"><?php echo esc_html($education_class_size); ?></span>
+                </div>
+                <?php if ($education_lesson_duration): ?>
+                  <span class="single-education__info-separator"></span>
+                <?php endif; ?>
+              <?php endif; ?>
+              <?php if ($education_lesson_duration): ?>
+                <div class="single-education__info-item">
+                  <span class="single-education__info-label">Длительность урока:</span>
+                  <span class="single-education__info-value"><?php echo esc_html($education_lesson_duration); ?></span>
+                </div>
               <?php endif; ?>
             </div>
           <?php endif; ?>
@@ -235,109 +346,149 @@ get_header();
     </section>
   <?php endif; ?>
 
-  <section>
+  <section class="single-education__content-section" data-education-id="<?php echo esc_attr($post_id); ?>">
     <div class="container">
-      <?php if (!empty($programs)): ?>
-        <div class="single-education__programs js-education-programs"
-          data-education-id="<?php echo esc_attr($post_id); ?>"
-          data-available-dates="<?php echo esc_attr(wp_json_encode($available_dates)); ?>"
-          data-nearest-date="<?php echo esc_attr($nearest_date); ?>">
-          <h2 class="h2 single-education__programs-title">Учебные программы</h2>
+      <div class="single-education__content__wrap">
+        <?php if (!empty($programs)): ?>
+          <div class="single-education__programs-column">
+            <div class="single-education__programs js-education-programs"
+              data-education-id="<?php echo esc_attr($post_id); ?>"
+              data-available-dates="<?php echo esc_attr(wp_json_encode($available_dates)); ?>"
+              data-nearest-date="<?php echo esc_attr($nearest_date); ?>">
 
-          <div class="single-education__programs-filters js-education-programs-filters">
-            <div class="education-programs-filter__field">
-              <div class="education-programs-filter__label">Возраст</div>
-              <div class="education-programs-filter__range">
-                <input type="number" class="education-programs-filter__input" name="program_age_min" placeholder="От"
-                  min="0" step="1">
-                <span class="education-programs-filter__range-separator">-</span>
-                <input type="number" class="education-programs-filter__input" name="program_age_max" placeholder="До"
-                  min="0" step="1">
+
+              <div class="single-education__programs-title__wrap">
+                <h2 class="h2 single-education__programs-title">Учебные программы</h2>
+
+                <button type="button" class="education-programs-filter__reset-btn js-education-programs-reset">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  Сбросить фильтры
+                </button>
+                <div class="single-education__programs-sort js-dropdown">
+                  <button type="button" class="js-dropdown-trigger single-education__programs-sort-trigger">
+                    <span class="single-education__programs-sort-text">Цена: по возрастанию</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
+                        stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                  <div class="js-dropdown-panel single-education__programs-sort-panel">
+                    <button type="button" class="single-education__programs-sort-option" data-value="price_asc">Цена: по
+                      возрастанию</button>
+                    <button type="button" class="single-education__programs-sort-option" data-value="price_desc">Цена: по
+                      убыванию</button>
+                    <button type="button" class="single-education__programs-sort-option" data-value="age_asc">Возраст: по
+                      возрастанию</button>
+                    <button type="button" class="single-education__programs-sort-option" data-value="age_desc">Возраст: по
+                      убыванию</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="single-education__programs-filters js-education-programs-filters">
+                <div class="education-programs-filter__field">
+                  <div class="education-programs-filter__label">Возраст</div>
+                  <select name="program_age" class="js-education-age-select education-programs-filter__select">
+                    <option value="">Показать все</option>
+                  </select>
+                </div>
+
+                <div class="education-programs-filter__field">
+                  <div class="education-programs-filter__label">Длительность</div>
+                  <select name="program_duration" class="js-education-duration-select education-programs-filter__select">
+                    <option value="">Показать все</option>
+                  </select>
+                </div>
+
+                <div class="education-programs-filter__field">
+                  <div class="education-programs-filter__label">Язык</div>
+                  <select name="program_language"
+                    class="js-education-language-select education-programs-filter__select">
+                    <option value="">Показать все</option>
+                    <?php
+                    $languages = get_terms([
+                      'taxonomy' => 'education_language',
+                      'hide_empty' => false,
+                    ]);
+                    if (!empty($languages) && !is_wp_error($languages)) {
+                      foreach ($languages as $lang) {
+                        echo '<option value="' . esc_attr($lang->term_id) . '">' . esc_html($lang->name) . '</option>';
+                      }
+                    }
+                    ?>
+                  </select>
+                </div>
+
+                <div class="education-programs-filter__field">
+                  <div class="education-programs-filter__label">Дата заселения</div>
+                  <input type="text" class="education-programs-filter__input js-education-program-date"
+                    name="program_date" placeholder="Выберите даты" readonly>
+                </div>
+              </div>
+
+
+
+              <div class="single-education__programs-list js-education-programs-list">
+                <?php foreach ($programs as $index => $program): ?>
+                  <?php
+                  set_query_var('program', $program);
+                  set_query_var('program_index', $index);
+                  set_query_var('booking_url', $booking_url);
+                  get_template_part('template-parts/education/program-card');
+                  ?>
+                <?php endforeach; ?>
               </div>
             </div>
-
-            <div class="education-programs-filter__field">
-              <div class="education-programs-filter__label">Длительность (недели)</div>
-              <input type="number" class="education-programs-filter__input" name="program_duration"
-                placeholder="Количество недель" min="1" step="1">
-            </div>
-
-            <div class="education-programs-filter__field">
-              <div class="education-programs-filter__label">Дата заселения</div>
-              <input type="text" class="education-programs-filter__input js-education-program-date" name="program_date"
-                readonly>
-            </div>
           </div>
+        <?php endif; ?>
 
-          <div class="single-education__programs-list js-education-programs-list">
-            <?php foreach ($programs as $index => $program): ?>
-              <?php
-              set_query_var('program', $program);
-              set_query_var('program_index', $index);
-              set_query_var('booking_url', $booking_url);
-              get_template_part('template-parts/education/program-card');
-              ?>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      <?php endif; ?>
-    </div>
-  </section>
-
-  <section class="single-education__content" data-education-id="<?php echo esc_attr($post_id); ?>">
-    <div class="container">
-      <div class="single-hotel__content__wrap">
-        <div class="hotel-content editor-content">
-          <?php if (have_posts()): ?>
-            <?php while (have_posts()):
-              the_post(); ?>
-              <div class="single-education__description">
-                <?php the_content(); ?>
-              </div>
-            <?php endwhile; ?>
-          <?php endif; ?>
-
-
-        </div>
-
-        <aside class="hotel-aside">
+        <aside class="single-education__aside-column">
           <div class="hotel-widget">
-            <div class="single-education__info">
-              <?php if ($price): ?>
+            <div class="single-education__school-title">
+              <?php the_title(); ?>
+            </div>
+
+            <?php if ($phone || $address || $website): ?>
+              <div class="hotel-widget__contacts">
+                <?php if ($phone): ?>
+                  <div class="hotel-widget__phone hotel-widget__contacts-item">
+                    <a href="tel:<?php echo esc_attr(preg_replace('/\s+/', '', $phone)); ?>">
+                      <img src="<?php echo esc_url(get_template_directory_uri() . '/img/icons/hotel/call.svg'); ?>" alt="">
+                      <span><?php echo esc_html($phone); ?></span>
+                    </a>
+                  </div>
+                <?php endif; ?>
+
+                <?php if ($address): ?>
+                  <div class="hotel-widget__address hotel-widget__contacts-item">
+                    <img src="<?php echo esc_url(get_template_directory_uri() . '/img/icons/hotel/home.svg'); ?>" alt="">
+                    <span><?php echo esc_html($address); ?></span>
+                  </div>
+                <?php endif; ?>
+
+                <?php if ($website): ?>
+                  <div class="hotel-widget__site hotel-widget__contacts-item">
+                    <a href="<?php echo esc_url($website); ?>" target="_blank" rel="nofollow noopener">
+                      <img src="<?php echo esc_url(get_template_directory_uri() . '/img/icons/hotel/url.svg'); ?>" alt="">
+                      <span>Сайт школы</span>
+                    </a>
+                  </div>
+                <?php endif; ?>
+              </div>
+            <?php endif; ?>
+
+            <?php if ($price): ?>
+              <div class="single-education__info">
                 <div class="single-education__info-item">
-                  <div class="single-education__info-label">Стоимость</div>
                   <div class="single-education__info-value"><?php echo esc_html(format_price_with_from($price, true)); ?>
                   </div>
                 </div>
-              <?php endif; ?>
-
-              <?php if ($address): ?>
-                <div class="single-education__info-item">
-                  <div class="single-education__info-label">Адрес</div>
-                  <div class="single-education__info-value"><?php echo esc_html($address); ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if ($phone): ?>
-                <div class="single-education__info-item">
-                  <div class="single-education__info-label">Телефон</div>
-                  <div class="single-education__info-value">
-                    <a
-                      href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $phone)); ?>"><?php echo esc_html($phone); ?></a>
-                  </div>
-                </div>
-              <?php endif; ?>
-
-              <?php if ($website): ?>
-                <div class="single-education__info-item">
-                  <div class="single-education__info-label">Сайт</div>
-                  <div class="single-education__info-value">
-                    <a href="<?php echo esc_url($website); ?>" target="_blank"
-                      rel="noopener noreferrer"><?php echo esc_html($website); ?></a>
-                  </div>
-                </div>
-              <?php endif; ?>
-            </div>
+              </div>
+            <?php endif; ?>
 
             <?php if ($map_lat && $map_lng): ?>
               <div class="single-education__map" id="education-map-container"></div>
@@ -368,6 +519,69 @@ get_header();
       </div>
     </div>
   </section>
+
+  <?php if (!empty($price_included) || !empty($price_extra)): ?>
+    <section class="single-education__price-details-section">
+      <div class="container">
+        <div class="single-education__price-details">
+          <?php if (!empty($price_included)): ?>
+            <div class="single-education__price-included">
+              <h3 class="single-education__price-title">В стоимость входит</h3>
+              <ul class="single-education__price-list">
+                <?php foreach ($price_included as $item): ?>
+                  <?php if (!empty($item['item'])): ?>
+                    <li class="single-education__price-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M9 12L11 14L15 10M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                          stroke="#4FAD50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <span><?php echo esc_html($item['item']); ?></span>
+                    </li>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          <?php endif; ?>
+
+          <?php if (!empty($price_extra)): ?>
+            <div class="single-education__price-extra">
+              <h3 class="single-education__price-title">Оплачивается дополнительно</h3>
+              <ul class="single-education__price-list">
+                <?php foreach ($price_extra as $item): ?>
+                  <?php if (!empty($item['item'])): ?>
+                    <li class="single-education__price-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M11.9999 8.99998V13M11.9999 17H12.0099M21.7299 18L13.7299 3.99998C13.5555 3.69218 13.3025 3.43617 12.9969 3.25805C12.6912 3.07993 12.3437 2.98608 11.9899 2.98608C11.6361 2.98608 11.2887 3.07993 10.983 3.25805C10.6773 3.43617 10.4244 3.69218 10.2499 3.99998L2.24993 18C2.07361 18.3053 1.98116 18.6519 1.98194 19.0045C1.98272 19.3571 2.07671 19.7032 2.25438 20.0078C2.43204 20.3124 2.68708 20.5646 2.99362 20.7388C3.30017 20.9131 3.64734 21.0032 3.99993 21H19.9999C20.3508 20.9996 20.6955 20.9069 20.9992 20.7313C21.303 20.5556 21.5551 20.3031 21.7304 19.9991C21.9057 19.6951 21.998 19.3504 21.9979 18.9995C21.9978 18.6486 21.9054 18.3039 21.7299 18Z"
+                          stroke="#F9B50B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <span><?php echo esc_html($item['item']); ?></span>
+                    </li>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
+
+  <?php if (have_posts()): ?>
+    <?php while (have_posts()):
+      the_post(); ?>
+      <?php if (get_the_content()): ?>
+        <section class="single-education__description-section">
+          <div class="container">
+            <div class="single-education__description editor-content">
+              <?php the_content(); ?>
+            </div>
+          </div>
+        </section>
+      <?php endif; ?>
+    <?php endwhile; ?>
+  <?php endif; ?>
 </main>
 
 <?php
