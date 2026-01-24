@@ -9,19 +9,16 @@ add_action('wp_ajax_nopriv_education_filter', 'bsi_ajax_education_filter');
 
 function bsi_ajax_education_filter(): void
 {
-  $programs = [];
+  $program_id = 0;
   if (isset($_POST['program'])) {
-    $raw = (array) wp_unslash($_POST['program']);
-    $programs = array_values(array_filter(array_map('absint', $raw)));
+    $program_id = absint(wp_unslash($_POST['program']));
   }
 
-  $age_min = isset($_POST['age_min']) ? absint(wp_unslash($_POST['age_min'])) : 0;
-  $age_max = isset($_POST['age_max']) ? absint(wp_unslash($_POST['age_max'])) : 0;
+  $age = isset($_POST['age']) ? absint(wp_unslash($_POST['age'])) : 0;
 
-  $languages = [];
+  $language_id = 0;
   if (isset($_POST['language'])) {
-    $raw = (array) wp_unslash($_POST['language']);
-    $languages = array_values(array_filter(array_map('absint', $raw)));
+    $language_id = absint(wp_unslash($_POST['language']));
   }
 
   $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
@@ -29,16 +26,14 @@ function bsi_ajax_education_filter(): void
   $duration_min = isset($_POST['duration_min']) ? absint(wp_unslash($_POST['duration_min'])) : 0;
   $duration_max = isset($_POST['duration_max']) ? absint(wp_unslash($_POST['duration_max'])) : 0;
 
-  $types = [];
+  $type_id = 0;
   if (isset($_POST['type'])) {
-    $raw = (array) wp_unslash($_POST['type']);
-    $types = array_values(array_filter(array_map('absint', $raw)));
+    $type_id = absint(wp_unslash($_POST['type']));
   }
 
-  $accommodations = [];
+  $accommodation_id = 0;
   if (isset($_POST['accommodation'])) {
-    $raw = (array) wp_unslash($_POST['accommodation']);
-    $accommodations = array_values(array_filter(array_map('absint', $raw)));
+    $accommodation_id = absint(wp_unslash($_POST['accommodation']));
   }
 
   $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
@@ -50,35 +45,35 @@ function bsi_ajax_education_filter(): void
 
   $tax_query = [];
 
-  if (!empty($programs)) {
+  if ($program_id > 0) {
     $tax_query[] = [
       'taxonomy' => 'education_program',
       'field' => 'term_id',
-      'terms' => $programs,
+      'terms' => [$program_id],
     ];
   }
 
-  if (!empty($languages)) {
+  if ($language_id > 0) {
     $tax_query[] = [
       'taxonomy' => 'education_language',
       'field' => 'term_id',
-      'terms' => $languages,
+      'terms' => [$language_id],
     ];
   }
 
-  if (!empty($types)) {
+  if ($type_id > 0) {
     $tax_query[] = [
       'taxonomy' => 'education_type',
       'field' => 'term_id',
-      'terms' => $types,
+      'terms' => [$type_id],
     ];
   }
 
-  if (!empty($accommodations)) {
+  if ($accommodation_id > 0) {
     $tax_query[] = [
       'taxonomy' => 'education_accommodation_type',
       'field' => 'term_id',
-      'terms' => $accommodations,
+      'terms' => [$accommodation_id],
     ];
   }
 
@@ -121,7 +116,7 @@ function bsi_ajax_education_filter(): void
 
       $has_matching_program = false;
 
-      if ($age_min > 0 || $age_max > 0 || $duration_min > 0 || $duration_max > 0 || $date_from || $date_to) {
+      if ($age > 0 || $duration_min > 0 || $duration_max > 0 || $date_from || $date_to) {
         $school_programs = function_exists('get_field') ? get_field('education_programs', $education_id) : [];
         $school_programs = is_array($school_programs) ? $school_programs : [];
 
@@ -131,12 +126,17 @@ function bsi_ajax_education_filter(): void
           $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
 
           $age_match = true;
-          if ($age_min > 0 || $age_max > 0) {
-            if ($age_min > 0 && $program_age_max > 0 && $age_min > $program_age_max) {
+          if ($age > 0) {
+            // Проверяем, попадает ли выбранный возраст в диапазон программы
+            if ($program_age_min > 0 && $age < $program_age_min) {
               $age_match = false;
             }
-            if ($age_max > 0 && $program_age_min > 0 && $age_max < $program_age_min) {
+            if ($program_age_max > 0 && $age > $program_age_max) {
               $age_match = false;
+            }
+            // Если у программы нет ограничений по возрасту, пропускаем проверку
+            if ($program_age_min === 0 && $program_age_max === 0) {
+              $age_match = true;
             }
           }
 
@@ -270,7 +270,212 @@ function bsi_ajax_education_filter(): void
   if ($final_query->have_posts()) {
     while ($final_query->have_posts()) {
       $final_query->the_post();
+      $education_id = (int) get_the_ID();
+
+      $country_id = 0;
+      if (function_exists('get_field')) {
+        $country_val = get_field('education_country', $education_id);
+        if ($country_val instanceof WP_Post) {
+          $country_id = (int) $country_val->ID;
+        } elseif (is_array($country_val)) {
+          $country_id = (int) reset($country_val);
+        } else {
+          $country_id = (int) $country_val;
+        }
+      }
+
+      $country_title = $country_id ? (string) get_the_title($country_id) : '';
+      $country_slug = $country_id ? (string) get_post_field('post_name', $country_id) : '';
+
+      $flag_url = '';
+      if ($country_id && function_exists('get_field')) {
+        $flag_field = get_field('flag', $country_id);
+        if ($flag_field) {
+          if (is_array($flag_field) && !empty($flag_field['url'])) {
+            $flag_url = (string) $flag_field['url'];
+          } elseif (is_string($flag_field)) {
+            $flag_url = (string) $flag_field;
+          }
+        }
+      }
+
+      $resort_title = '';
+      if (function_exists('get_field')) {
+        $resort_field = get_field('education_resort', $education_id);
+        if ($resort_field) {
+          if ($resort_field instanceof WP_Term) {
+            $resort_title = (string) $resort_field->name;
+          } elseif (is_array($resort_field)) {
+            $first_item = reset($resort_field);
+            if ($first_item instanceof WP_Term) {
+              $resort_title = (string) $first_item->name;
+            } else {
+              $resort_id = (int) $first_item;
+              $resort_term = get_term($resort_id, 'resort');
+              if ($resort_term && !is_wp_error($resort_term)) {
+                $resort_title = (string) $resort_term->name;
+              }
+            }
+          } else {
+            $resort_id = (int) $resort_field;
+            $resort_term = get_term($resort_id, 'resort');
+            if ($resort_term && !is_wp_error($resort_term)) {
+              $resort_title = (string) $resort_term->name;
+            }
+          }
+        }
+      }
+
+      $image_url = '';
+      $thumb = get_the_post_thumbnail_url($education_id, 'large');
+      if ($thumb) {
+        $image_url = (string) $thumb;
+      } else {
+        $gallery = function_exists('get_field') ? get_field('education_gallery', $education_id) : [];
+        $gallery = is_array($gallery) ? $gallery : [];
+        if (!empty($gallery[0])) {
+          if (is_array($gallery[0]) && !empty($gallery[0]['ID'])) {
+            $first_id = (int) $gallery[0]['ID'];
+          } elseif (is_numeric($gallery[0])) {
+            $first_id = (int) $gallery[0];
+          }
+          if ($first_id) {
+            $img = wp_get_attachment_image_url($first_id, 'large');
+            if ($img) {
+              $image_url = (string) $img;
+            }
+          }
+        }
+      }
+
+      $price = '';
+      if (function_exists('get_field')) {
+        $price_val = get_field('education_price', $education_id);
+
+        if (is_string($price_val) && $price_val !== '') {
+          $price = (string) $price_val;
+        }
+
+        $education_programs = get_field('education_programs', $education_id);
+        $education_programs = is_array($education_programs) ? $education_programs : [];
+
+        if (empty($price) && !empty($education_programs)) {
+          $prices = [];
+          foreach ($education_programs as $program) {
+            $program_price = '';
+            if (isset($program['program_price_per_week'])) {
+              $program_price = (string) $program['program_price_per_week'];
+            } elseif (isset($program['price_per_week'])) {
+              $program_price = (string) $program['price_per_week'];
+            }
+            if ($program_price) {
+              preg_match('/[\d\s]+/', $program_price, $matches);
+              if (!empty($matches[0])) {
+                $prices[] = (int) str_replace(' ', '', $matches[0]);
+              }
+            }
+          }
+
+          if (!empty($prices)) {
+            $min_price_value = min($prices);
+            $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+          }
+        }
+
+        if (!empty($price)) {
+          $price = format_price_text($price);
+        }
+      }
+
+      $languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'names']);
+      $languages = is_wp_error($languages) ? [] : $languages;
+
+      $programs = wp_get_post_terms($education_id, 'education_program', ['fields' => 'names']);
+      $programs = is_wp_error($programs) ? [] : $programs;
+
+      $booking_url = '';
+      if (function_exists('get_field')) {
+        $booking_url_val = get_field('education_booking_url', $education_id);
+        if ($booking_url_val) {
+          $booking_url = trim((string) $booking_url_val);
+        }
+      }
+
+      $age_min = 0;
+      $age_max = 0;
+      $nearest_date = '';
+
+      if (function_exists('get_field')) {
+        $education_programs = get_field('education_programs', $education_id);
+        $education_programs = is_array($education_programs) ? $education_programs : [];
+
+        if (!empty($education_programs)) {
+          $ages_min = [];
+          $ages_max = [];
+          $all_dates = [];
+
+          foreach ($education_programs as $program) {
+            $program_age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
+            $program_age_max = isset($program['program_age_max']) && $program['program_age_max'] !== '' ? (int) $program['program_age_max'] : 0;
+
+            if ($program_age_min > 0) {
+              $ages_min[] = $program_age_min;
+            }
+            if ($program_age_max > 0) {
+              $ages_max[] = $program_age_max;
+            }
+
+            $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
+            if ($date_from) {
+              $all_dates[] = $date_from;
+            }
+          }
+
+          if (!empty($ages_min)) {
+            $age_min = min($ages_min);
+          }
+          if (!empty($ages_max)) {
+            $age_max = max($ages_max);
+          }
+
+          if (!empty($all_dates)) {
+            $today = date('Y-m-d');
+            $future_dates = array_filter($all_dates, function ($date) use ($today) {
+              return $date >= $today;
+            });
+
+            if (!empty($future_dates)) {
+              sort($future_dates);
+              $nearest_date = $future_dates[0];
+            } elseif (!empty($all_dates)) {
+              sort($all_dates);
+              $nearest_date = $all_dates[0];
+            }
+          }
+        }
+      }
+
+      $item = [
+        'id' => $education_id,
+        'url' => get_permalink($education_id),
+        'image' => $image_url,
+        'title' => get_the_title($education_id),
+        'flag' => $flag_url,
+        'country_title' => $country_title,
+        'resort_title' => $resort_title,
+        'price' => $price,
+        'languages' => $languages,
+        'programs' => $programs,
+        'country_id' => $country_id,
+        'country_slug' => $country_slug,
+        'booking_url' => $booking_url,
+        'age_min' => $age_min,
+        'age_max' => $age_max,
+        'nearest_date' => $nearest_date,
+      ];
+
       echo '<div class="education-page__item">';
+      set_query_var('education', $item);
       get_template_part('template-parts/education/card');
       echo '</div>';
     }

@@ -7,6 +7,7 @@ $education_image = '';
 $education_title = '';
 $education_flag = '';
 $country_title = '';
+$resort_title = '';
 $price = '';
 $languages = [];
 $programs = [];
@@ -27,6 +28,7 @@ if ($education && is_array($education)) {
   $education_title = !empty($education['title']) ? (string) $education['title'] : '';
   $education_flag = !empty($education['flag']) ? (string) $education['flag'] : '';
   $country_title = !empty($education['country_title']) ? (string) $education['country_title'] : '';
+  $resort_title = !empty($education['resort_title']) ? (string) $education['resort_title'] : '';
   $price = !empty($education['price']) ? (string) $education['price'] : '';
   $languages = !empty($education['languages']) && is_array($education['languages']) ? $education['languages'] : [];
   $programs = !empty($education['programs']) && is_array($education['programs']) ? $education['programs'] : [];
@@ -104,6 +106,32 @@ if (!$education_flag && $education_id) {
         } elseif (is_string($flag_field)) {
           $education_flag = (string) $flag_field;
         }
+      }
+    }
+  }
+}
+
+if (empty($resort_title) && $education_id && function_exists('get_field')) {
+  $resort_field = get_field('education_resort', $education_id);
+  if ($resort_field) {
+    if ($resort_field instanceof WP_Term) {
+      $resort_title = (string) $resort_field->name;
+    } elseif (is_array($resort_field)) {
+      $first_item = reset($resort_field);
+      if ($first_item instanceof WP_Term) {
+        $resort_title = (string) $first_item->name;
+      } else {
+        $resort_id = (int) $first_item;
+        $resort_term = get_term($resort_id, 'resort');
+        if ($resort_term && !is_wp_error($resort_term)) {
+          $resort_title = (string) $resort_term->name;
+        }
+      }
+    } else {
+      $resort_id = (int) $resort_field;
+      $resort_term = get_term($resort_id, 'resort');
+      if ($resort_term && !is_wp_error($resort_term)) {
+        $resort_title = (string) $resort_term->name;
       }
     }
   }
@@ -240,9 +268,17 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
           <img src="<?php echo esc_url($education_flag); ?>" alt="">
         </div>
       <?php endif; ?>
-      <?php if ($country_title): ?>
+      <?php if ($country_title || $resort_title): ?>
         <div class="education-card__location-text">
-          <?php echo esc_html($country_title); ?>
+          <?php if ($country_title): ?>
+            <?php echo esc_html($country_title); ?>
+          <?php endif; ?>
+          <?php if ($country_title && $resort_title): ?>
+            <span>, </span>
+          <?php endif; ?>
+          <?php if ($resort_title): ?>
+            <span><?php echo esc_html($resort_title); ?></span>
+          <?php endif; ?>
         </div>
       <?php endif; ?>
     </div>
