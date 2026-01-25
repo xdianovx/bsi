@@ -160,6 +160,7 @@ $price_extra = is_array($price_extra) ? $price_extra : [];
 $education_age = trim((string) (function_exists('get_field') ? get_field('education_age', $post_id) : ''));
 $education_class_size = trim((string) (function_exists('get_field') ? get_field('education_class_size', $post_id) : ''));
 $education_lesson_duration = trim((string) (function_exists('get_field') ? get_field('education_lesson_duration', $post_id) : ''));
+$education_course_duration = trim((string) (function_exists('get_field') ? get_field('education_course_duration', $post_id) : ''));
 
 $address = trim((string) (function_exists('get_field') ? get_field('education_address', $post_id) : ''));
 $phone = trim((string) (function_exists('get_field') ? get_field('education_phone', $post_id) : ''));
@@ -330,14 +331,14 @@ get_header();
             </div>
           <?php endif; ?>
 
-          <?php if ($education_age || $education_class_size || $education_lesson_duration): ?>
+          <?php if ($education_age || $education_class_size || $education_lesson_duration || $education_course_duration): ?>
             <div class="single-education__main-info">
               <?php if ($education_age): ?>
                 <div class="single-education__info-item">
                   <span class="single-education__info-label">Возраст:</span>
                   <span class="single-education__info-value"><?php echo esc_html($education_age); ?></span>
                 </div>
-                <?php if ($education_class_size || $education_lesson_duration): ?>
+                <?php if ($education_class_size || $education_lesson_duration || $education_course_duration): ?>
                   <span class="single-education__info-separator"></span>
                 <?php endif; ?>
               <?php endif; ?>
@@ -346,7 +347,7 @@ get_header();
                   <span class="single-education__info-label">В классе:</span>
                   <span class="single-education__info-value"><?php echo esc_html($education_class_size); ?></span>
                 </div>
-                <?php if ($education_lesson_duration): ?>
+                <?php if ($education_lesson_duration || $education_course_duration): ?>
                   <span class="single-education__info-separator"></span>
                 <?php endif; ?>
               <?php endif; ?>
@@ -354,6 +355,15 @@ get_header();
                 <div class="single-education__info-item">
                   <span class="single-education__info-label">Длительность урока:</span>
                   <span class="single-education__info-value"><?php echo esc_html($education_lesson_duration); ?></span>
+                </div>
+                <?php if ($education_course_duration): ?>
+                  <span class="single-education__info-separator"></span>
+                <?php endif; ?>
+              <?php endif; ?>
+              <?php if ($education_course_duration): ?>
+                <div class="single-education__info-item">
+                  <span class="single-education__info-label">Продолжительность обучения:</span>
+                  <span class="single-education__info-value"><?php echo esc_html($education_course_duration); ?></span>
                 </div>
               <?php endif; ?>
             </div>
@@ -430,7 +440,7 @@ get_header();
                 </div>
 
                 <div class="education-programs-filter__field">
-                  <div class="education-programs-filter__label">Длительность</div>
+                  <div class="education-programs-filter__label">Продолжительность</div>
                   <select name="program_duration" class="js-education-duration-select education-programs-filter__select">
                     <option value="">Показать все</option>
                   </select>
@@ -438,8 +448,7 @@ get_header();
 
                 <div class="education-programs-filter__field">
                   <div class="education-programs-filter__label">Язык</div>
-                  <select name="program_language"
-                    class="js-education-language-select education-programs-filter__select">
+                  <select name="program_language" class="js-education-language-select education-programs-filter__select">
                     <option value="">Показать все</option>
                     <?php
                     $languages = get_terms([
@@ -456,7 +465,7 @@ get_header();
                 </div>
 
                 <div class="education-programs-filter__field">
-                  <div class="education-programs-filter__label">Дата заселения</div>
+                  <div class="education-programs-filter__label">Дата заезда</div>
                   <input type="text" class="education-programs-filter__input js-education-program-date"
                     name="program_date" placeholder="Выберите даты" readonly>
                 </div>
@@ -552,6 +561,24 @@ get_header();
     </div>
   </section>
 
+
+  <?php if (have_posts()): ?>
+    <?php while (have_posts()):
+      the_post(); ?>
+      <?php if (get_the_content()): ?>
+        <section class="single-education__description-section">
+          <div class="container">
+            <div class="single-education__description editor-content">
+              <?php the_content(); ?>
+            </div>
+          </div>
+        </section>
+      <?php endif; ?>
+    <?php endwhile; ?>
+  <?php endif; ?>
+
+
+
   <?php if (!empty($price_included) || !empty($price_extra)): ?>
     <section class="single-education__price-details-section">
       <div class="container">
@@ -568,7 +595,9 @@ get_header();
                           d="M9 12L11 14L15 10M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                           stroke="#4FAD50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                       </svg>
-                      <span><?php echo esc_html($item['item']); ?></span>
+                      <span>
+                        <?php echo esc_html($item['item']); ?>
+                      </span>
                     </li>
                   <?php endif; ?>
                 <?php endforeach; ?>
@@ -588,7 +617,9 @@ get_header();
                           d="M11.9999 8.99998V13M11.9999 17H12.0099M21.7299 18L13.7299 3.99998C13.5555 3.69218 13.3025 3.43617 12.9969 3.25805C12.6912 3.07993 12.3437 2.98608 11.9899 2.98608C11.6361 2.98608 11.2887 3.07993 10.983 3.25805C10.6773 3.43617 10.4244 3.69218 10.2499 3.99998L2.24993 18C2.07361 18.3053 1.98116 18.6519 1.98194 19.0045C1.98272 19.3571 2.07671 19.7032 2.25438 20.0078C2.43204 20.3124 2.68708 20.5646 2.99362 20.7388C3.30017 20.9131 3.64734 21.0032 3.99993 21H19.9999C20.3508 20.9996 20.6955 20.9069 20.9992 20.7313C21.303 20.5556 21.5551 20.3031 21.7304 19.9991C21.9057 19.6951 21.998 19.3504 21.9979 18.9995C21.9978 18.6486 21.9054 18.3039 21.7299 18Z"
                           stroke="#F9B50B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                       </svg>
-                      <span><?php echo esc_html($item['item']); ?></span>
+                      <span>
+                        <?php echo esc_html($item['item']); ?>
+                      </span>
                     </li>
                   <?php endif; ?>
                 <?php endforeach; ?>
@@ -598,21 +629,6 @@ get_header();
         </div>
       </div>
     </section>
-  <?php endif; ?>
-
-  <?php if (have_posts()): ?>
-    <?php while (have_posts()):
-      the_post(); ?>
-      <?php if (get_the_content()): ?>
-        <section class="single-education__description-section">
-          <div class="container">
-            <div class="single-education__description editor-content">
-              <?php the_content(); ?>
-            </div>
-          </div>
-        </section>
-      <?php endif; ?>
-    <?php endwhile; ?>
   <?php endif; ?>
 </main>
 

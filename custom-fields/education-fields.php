@@ -52,7 +52,7 @@ function bsi_register_education_acf_groups(): void
         'name' => 'education_age',
         'type' => 'text',
         'instructions' => 'Например: "5+" или "от 12 лет"',
-        'wrapper' => ['width' => '33'],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_education_class_size',
@@ -60,7 +60,7 @@ function bsi_register_education_acf_groups(): void
         'name' => 'education_class_size',
         'type' => 'text',
         'instructions' => 'Например: "12 человек" или "до 15 студентов"',
-        'wrapper' => ['width' => '33'],
+        'wrapper' => ['width' => '25'],
       ],
       [
         'key' => 'field_education_lesson_duration',
@@ -68,7 +68,15 @@ function bsi_register_education_acf_groups(): void
         'name' => 'education_lesson_duration',
         'type' => 'text',
         'instructions' => 'Например: "60 минут" или "45 мин"',
-        'wrapper' => ['width' => '34'],
+        'wrapper' => ['width' => '25'],
+      ],
+      [
+        'key' => 'field_education_course_duration',
+        'label' => 'Продолжительность обучения',
+        'name' => 'education_course_duration',
+        'type' => 'text',
+        'instructions' => 'Например: "2 недели" или "от 1 месяца"',
+        'wrapper' => ['width' => '25'],
       ],
     ],
     'location' => [
