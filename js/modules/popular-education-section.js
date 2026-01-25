@@ -86,22 +86,33 @@ export const initPopularEducationSlider = () => {
   const filterClient = (countryValue) => {
     const slides = wrapper.querySelectorAll(".swiper-slide");
     
+    if (slides.length === 0) return;
+    
+    let visibleCount = 0;
+    const countryValueTrimmed = String(countryValue || "").trim();
+    
     slides.forEach((slide) => {
-      const slideCountry = slide.getAttribute("data-country") || "";
+      const slideCountry = (slide.getAttribute("data-country") || "").trim();
       
-      if (!countryValue || countryValue === "") {
+      if (!countryValueTrimmed || countryValueTrimmed === "") {
         // Показываем все
         slide.style.display = "";
+        slide.classList.remove("swiper-slide-hidden");
+        visibleCount++;
       } else {
-        // Фильтруем по стране
-        if (slideCountry === countryValue) {
+        // Фильтруем по стране (сравниваем как строки, без учета регистра)
+        if (slideCountry.toLowerCase() === countryValueTrimmed.toLowerCase() || slideCountry === countryValueTrimmed) {
           slide.style.display = "";
+          slide.classList.remove("swiper-slide-hidden");
+          visibleCount++;
         } else {
           slide.style.display = "none";
+          slide.classList.add("swiper-slide-hidden");
         }
       }
     });
 
+    // Обновляем swiper
     swiper.update();
     swiper.slideTo(0, 0);
     swiper.update();
@@ -110,6 +121,15 @@ export const initPopularEducationSlider = () => {
 
   // AJAX загрузка для реальных данных
   const load = async (countryId) => {
+    // Проверяем, есть ли уже слайды на странице (тестовые данные)
+    const hasExistingSlides = wrapper.querySelectorAll(".swiper-slide").length > 0;
+    
+    // Если есть слайды на странице, используем клиентскую фильтрацию (тестовые данные)
+    if (hasExistingSlides) {
+      filterClient(countryId);
+      return;
+    }
+
     if (!ajaxUrl) {
       // Если нет AJAX URL, используем клиентскую фильтрацию
       filterClient(countryId);
@@ -160,7 +180,17 @@ export const initPopularEducationSlider = () => {
     setActive(btn);
 
     const countryId = btn.getAttribute("data-country") || "";
-    load(countryId);
+    
+    // Всегда проверяем наличие слайдов перед фильтрацией
+    const hasSlides = wrapper.querySelectorAll(".swiper-slide").length > 0;
+    
+    if (hasSlides) {
+      // Используем клиентскую фильтрацию для тестовых данных
+      filterClient(countryId);
+    } else {
+      // Используем AJAX для реальных данных
+      load(countryId);
+    }
   });
 };
 

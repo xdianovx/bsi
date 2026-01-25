@@ -421,7 +421,7 @@ if (!empty($items)) {
     $countries_map = [];
     
     foreach ($items as $item) {
-        $country_title = !empty($item['country_title']) ? (string) $item['country_title'] : '';
+        $country_title = !empty($item['country_title']) ? trim((string) $item['country_title']) : '';
         $flag_url = !empty($item['flag']) ? (string) $item['flag'] : '';
         
         if ($country_title && !isset($countries_map[$country_title])) {
@@ -514,7 +514,7 @@ $countries_for_filter = !empty($promo_countries) ? $promo_countries : $filter_co
                     <?php // Страны из тестовых данных ?>
                     <?php foreach ($filter_countries as $country): ?>
                         <?php
-                        $country_title = (string) $country['title'];
+                        $country_title = trim((string) $country['title']);
                         $country_slug = (string) $country['slug'];
                         $flag_url = !empty($country['flag']) ? (string) $country['flag'] : '';
                         ?>
@@ -540,7 +540,7 @@ $countries_for_filter = !empty($promo_countries) ? $promo_countries : $filter_co
                         <?php foreach ($items as $item): ?>
                             <?php
                             // Для фильтрации используем country_title и slug
-                            $filter_country = !empty($item['country_title']) ? (string) $item['country_title'] : '';
+                            $filter_country = !empty($item['country_title']) ? trim((string) $item['country_title']) : '';
                             $filter_country_slug = !empty($item['country_slug']) ? (string) $item['country_slug'] : '';
                             
                             // Если slug пустой, создаем из названия
