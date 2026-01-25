@@ -8,6 +8,9 @@ add_action('wp_ajax_nopriv_visa_form', 'handle_visa_form');
 
 function handle_visa_form()
 {
+  // Логируем входящие данные
+  error_log('Visa Form Data: ' . print_r($_POST, true));
+  
   $errors = [];
 
   // Валидация страны
@@ -77,7 +80,7 @@ function handle_visa_form()
   }
 
   // Формируем HTML сообщение для email
-  $recipient_email = get_bloginfo('admin_email');
+  $recipient_email = 'dianov.js@gmail.com';
 
   // Формируем HTML письмо
   $html_message = '<!DOCTYPE html>

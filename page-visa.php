@@ -107,25 +107,29 @@ $countries = get_posts([
 
         </div>
 
-        <div class="callout callout-neutral" style="margin-top: 24px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-info">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4" />
-            <path d="M12 8h.01" />
-          </svg>
-          <div>
-            <p style="font-weight: 700; margin-bottom: 4px;">
+        <div class="visa-info-item --warn">
+          <div class="visa-info-item__title">
+            <div class="visa-info-item__icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-info">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+              </svg>
+            </div>
+            <p class="visa-info-item__key">
               Правила Выдачи документов по путевке:
             </p>
-            <p>
-              Все документы по турам выдаются только при наличии: счет-подтверждения на тур, паспорта гражданина РФ
-            </p>
+
+
           </div>
+          <p class="visa-info-item__value">
+            Все документы по турам выдаются только при наличии: счет-подтверждения на тур, паспорта гражданина РФ
+          </p>
         </div>
       </div>
-    </div>
   </section>
 
 
@@ -482,7 +486,8 @@ $countries = get_posts([
         <div class="form-row form-row-2">
           <div class="education-programs-filter__field">
             <div class="education-programs-filter__label">Страна *</div>
-            <select name="country_id" class="visa-form__country-select education-programs-filter__select" id="visa-country">
+            <select name="country_id" class="visa-form__country-select education-programs-filter__select"
+              id="visa-country">
               <option value="">Выберите страну</option>
               <?php if (!empty($countries)): ?>
                 <?php foreach ($countries as $country_item): ?>
@@ -492,46 +497,40 @@ $countries = get_posts([
                 <?php endforeach; ?>
               <?php endif; ?>
             </select>
-            <div class="error-message" data-field="country_id"></div>
           </div>
 
           <div class="education-programs-filter__field">
             <div class="education-programs-filter__label">Тип визы</div>
-            <select name="visa_type" class="visa-form__visa-type-select education-programs-filter__select" id="visa-type">
+            <select name="visa_type" class="visa-form__visa-type-select education-programs-filter__select"
+              id="visa-type">
               <option value="">Выберите тип визы</option>
               <option value="tourist">Туристическая</option>
               <option value="educational">Образовательная</option>
             </select>
-            <div class="error-message" data-field="visa_type"></div>
           </div>
 
           <div class="input-item white">
             <label for="visa-name">Имя *</label>
             <input type="text" name="name" id="visa-name" placeholder="Введите ваше имя" required>
-            <div class="error-message" data-field="name"></div>
           </div>
 
           <div class="input-item white">
             <label for="visa-citizenship">Гражданство *</label>
             <input type="text" name="citizenship" id="visa-citizenship" placeholder="Введите ваше гражданство" required>
-            <div class="error-message" data-field="citizenship"></div>
           </div>
 
           <div class="input-item white">
             <label for="visa-phone">Телефон *</label>
             <input type="tel" name="phone" id="visa-phone" placeholder="+7 (___) ___-__-__" required>
-            <div class="error-message" data-field="phone"></div>
           </div>
 
           <div class="input-item white">
             <label for="visa-travel-dates">Даты поездки *</label>
             <input type="text" name="travel_dates" id="visa-travel-dates" placeholder="Укажите даты поездки" required>
-            <div class="error-message" data-field="travel_dates"></div>
           </div>
         </div>
 
         <div class="visa-consultation-form__bottom">
-          <div id="visa-form-status"></div>
 
           <button type="submit" class="btn btn-accent fit-form__btn-submit">
             Отправить
@@ -542,6 +541,9 @@ $countries = get_posts([
               нашей политикой обработки персональных данных
             </a>
           </p>
+
+          <div id="visa-form-status" class="form-status"></div>
+
         </div>
       </form>
     </div>

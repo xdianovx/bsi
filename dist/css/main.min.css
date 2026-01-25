@@ -826,6 +826,7 @@ input.error {
 .form-status {
   padding: 8px 12px;
   border-radius: 4px;
+  margin-top: 16px;
 }
 
 .form-policy {
@@ -8914,6 +8915,12 @@ input.error {
   background: #f4f4f6;
   border-radius: 8px;
 }
+.visa-info-item.--warn {
+  margin-top: 8px;
+}
+.visa-info-item.--warn p {
+  margin-bottom: 0;
+}
 
 .visa-info-item__title {
   display: flex;
@@ -9227,6 +9234,22 @@ input.error {
   display: flex;
   flex-direction: column;
   gap: 0;
+  margin-top: 16px;
+}
+.visa-consultation-form__bottom .fit-form__btn-submit {
+  margin-top: 0;
+}
+
+.visa-page-consultation__section .input-item label {
+  position: static;
+  background: none;
+  padding: 0;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.visa-page-consultation__section .input-item input {
+  border: 1px solid #dfdfdf;
+  padding: 12px 16px;
 }
 
 .visa-consultation-form .input-item input[type=checkbox] {
