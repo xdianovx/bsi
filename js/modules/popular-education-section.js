@@ -73,7 +73,7 @@ export const initPopularEducationSlider = () => {
   const onResize = () => toggleControls(swiper, swiperConfig);
   window.addEventListener("resize", onResize);
 
-  if (!filter || !ajaxUrl) return;
+  if (!filter) return;
 
   const setActive = (btn) => {
     filter.querySelectorAll(".js-promo-filter-btn").forEach((b) => b.classList.remove("active"));
@@ -82,7 +82,40 @@ export const initPopularEducationSlider = () => {
 
   const setLoading = (on) => root.classList.toggle("is-loading", !!on);
 
+  // Клиентская фильтрация для тестовых данных
+  const filterClient = (countryValue) => {
+    const slides = wrapper.querySelectorAll(".swiper-slide");
+    
+    slides.forEach((slide) => {
+      const slideCountry = slide.getAttribute("data-country") || "";
+      
+      if (!countryValue || countryValue === "") {
+        // Показываем все
+        slide.style.display = "";
+      } else {
+        // Фильтруем по стране
+        if (slideCountry === countryValue) {
+          slide.style.display = "";
+        } else {
+          slide.style.display = "none";
+        }
+      }
+    });
+
+    swiper.update();
+    swiper.slideTo(0, 0);
+    swiper.update();
+    toggleControls(swiper, swiperConfig);
+  };
+
+  // AJAX загрузка для реальных данных
   const load = async (countryId) => {
+    if (!ajaxUrl) {
+      // Если нет AJAX URL, используем клиентскую фильтрацию
+      filterClient(countryId);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -98,7 +131,11 @@ export const initPopularEducationSlider = () => {
       });
 
       const json = await res.json();
-      if (!json || !json.success) throw new Error("AJAX error");
+      if (!json || !json.success) {
+        // Если AJAX не сработал, используем клиентскую фильтрацию
+        filterClient(countryId);
+        return;
+      }
 
       wrapper.innerHTML = json.data.html || "";
 
@@ -108,6 +145,8 @@ export const initPopularEducationSlider = () => {
 
       toggleControls(swiper, swiperConfig);
     } catch (e) {
+      // При ошибке AJAX используем клиентскую фильтрацию
+      filterClient(countryId);
     } finally {
       setLoading(false);
     }

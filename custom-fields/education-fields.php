@@ -78,6 +78,16 @@ function bsi_register_education_acf_groups(): void
         'instructions' => 'Например: "2 недели" или "от 1 месяца"',
         'wrapper' => ['width' => '25'],
       ],
+      [
+        'key' => 'field_education_is_popular',
+        'label' => 'Популярная программа',
+        'name' => 'is_popular',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+        'instructions' => 'Покажет программу в блоке «Популярные программы образования» на главной странице. Порядок отображения можно настроить через поле «Порядок» (меняется перетаскиванием в списке постов).',
+        'wrapper' => ['width' => '50'],
+      ],
     ],
     'location' => [
       [

@@ -336,18 +336,16 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
         class="education-card__btn education-card__btn-details">
         Подробнее
       </a>
-      <?php if ($booking_url && $price): ?>
+      <?php if ($price): ?>
         <?php
-        $booking_rel = 'noopener noreferrer';
+        // Временно кнопка с ценой ведет на страницу обучения
+        $price_url = $education_url;
+        $price_rel = 'noopener noreferrer';
         ?>
-        <a href="<?php echo esc_url($booking_url); ?>" target="_blank" rel="<?php echo esc_attr($booking_rel); ?>"
+        <a href="<?php echo esc_url($price_url); ?>" target="_blank" rel="<?php echo esc_attr($price_rel); ?>"
           class="btn btn-accent education-card__btn education-card__btn-book">
           <?php echo esc_html($price); ?>
         </a>
-      <?php elseif ($price): ?>
-        <div class="education-card__price">
-          <?php echo esc_html($price); ?>
-        </div>
       <?php endif; ?>
     </div>
   </div>

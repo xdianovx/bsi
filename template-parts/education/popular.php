@@ -413,6 +413,46 @@ if (empty($items)) {
 
     $items = $test_items;
 }
+
+// Формируем список стран для фильтра из массива $items
+$filter_countries = [];
+
+if (!empty($items)) {
+    $countries_map = [];
+    
+    foreach ($items as $item) {
+        $country_title = !empty($item['country_title']) ? (string) $item['country_title'] : '';
+        $flag_url = !empty($item['flag']) ? (string) $item['flag'] : '';
+        
+        if ($country_title && !isset($countries_map[$country_title])) {
+            // Создаем slug из названия страны
+            $country_slug = sanitize_title($country_title);
+            
+            $countries_map[$country_title] = [
+                'title' => $country_title,
+                'slug' => $country_slug,
+                'flag' => $flag_url,
+            ];
+        }
+    }
+    
+    $filter_countries = array_values($countries_map);
+    
+    // Сортируем страны по названию
+    if (class_exists('Collator')) {
+        $collator = new Collator('ru_RU');
+        usort($filter_countries, function ($a, $b) use ($collator) {
+            return $collator->compare($a['title'], $b['title']);
+        });
+    } else {
+        usort($filter_countries, function ($a, $b) {
+            return mb_strcasecmp($a['title'], $b['title']);
+        });
+    }
+}
+
+// Если есть реальные страны из админки, используем их, иначе используем страны из массива
+$countries_for_filter = !empty($promo_countries) ? $promo_countries : $filter_countries;
 ?>
 
 <?php if (!empty($items)): ?>
@@ -433,12 +473,13 @@ if (empty($items)) {
                 </div>
             </div>
 
-            <?php if (!empty($promo_countries)): ?>
-                <div class="promo-filter popular-education-filter">
-                    <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">
-                        Все
-                    </button>
+            <div class="promo-filter popular-education-filter">
+                <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">
+                    Все
+                </button>
 
+                <?php if (!empty($promo_countries)): ?>
+                    <?php // Реальные страны из админки ?>
                     <?php foreach ($promo_countries as $country): ?>
                         <?php
                         $country_id = (int) $country->ID;
@@ -469,15 +510,51 @@ if (empty($items)) {
                             <span class="promo-filter__title"><?php echo esc_html($country_title); ?></span>
                         </button>
                     <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+                <?php elseif (!empty($filter_countries)): ?>
+                    <?php // Страны из тестовых данных ?>
+                    <?php foreach ($filter_countries as $country): ?>
+                        <?php
+                        $country_title = (string) $country['title'];
+                        $country_slug = (string) $country['slug'];
+                        $flag_url = !empty($country['flag']) ? (string) $country['flag'] : '';
+                        ?>
+
+                        <button class="promo-filter__btn js-promo-filter-btn" data-country="<?php echo esc_attr($country_title); ?>"
+                            data-country-slug="<?php echo esc_attr($country_slug); ?>">
+                            <?php if ($flag_url): ?>
+                                <span class="promo-filter__flag-wrap">
+                                    <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($country_title); ?>"
+                                        class="promo-filter__flag">
+                                </span>
+                            <?php endif; ?>
+
+                            <span class="promo-filter__title"><?php echo esc_html($country_title); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
 
             <div class="popular-education__content">
                 <div class="swiper popular-education-slider">
                     <div class="swiper-wrapper">
                         <?php foreach ($items as $item): ?>
-                            <div class="swiper-slide" data-country="<?php echo esc_attr($item['country_id']); ?>"
-                                data-country-slug="<?php echo esc_attr($item['country_slug']); ?>">
+                            <?php
+                            // Для фильтрации используем country_title и slug
+                            $filter_country = !empty($item['country_title']) ? (string) $item['country_title'] : '';
+                            $filter_country_slug = !empty($item['country_slug']) ? (string) $item['country_slug'] : '';
+                            
+                            // Если slug пустой, создаем из названия
+                            if (empty($filter_country_slug) && !empty($filter_country)) {
+                                $filter_country_slug = sanitize_title($filter_country);
+                            }
+                            
+                            // Для реальных данных используем country_id, для тестовых - country_title
+                            $data_country = !empty($item['country_id']) && $item['country_id'] > 0 
+                                ? (string) $item['country_id'] 
+                                : $filter_country;
+                            ?>
+                            <div class="swiper-slide" data-country="<?php echo esc_attr($data_country); ?>"
+                                data-country-slug="<?php echo esc_attr($filter_country_slug); ?>">
                                 <?php
                                 set_query_var('education', $item);
                                 get_template_part('template-parts/education/card');

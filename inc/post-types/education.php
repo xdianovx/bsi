@@ -27,7 +27,7 @@ function bsi_register_education_post_type()
     'public' => true,
     'has_archive' => true,
     'rewrite' => ['slug' => 'education'], // slug в URL
-    'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+    'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'page-attributes'],
     'menu_position' => 5,
     'menu_icon' => 'dashicons-welcome-learn-more', // иконка в меню
     'show_in_rest' => true, // поддержка Gutenberg/API
@@ -35,6 +35,16 @@ function bsi_register_education_post_type()
 
   register_post_type('education', $args);
 }
+
+add_action('pre_get_posts', function ($query) {
+  if (is_admin() && $query->is_main_query()) {
+    $screen = get_current_screen();
+    if ($screen && $screen->post_type === 'education' && $screen->id === 'edit-education') {
+      $query->set('orderby', 'menu_order');
+      $query->set('order', 'ASC');
+    }
+  }
+});
 
 add_action('init', 'bsi_attach_education_taxonomies');
 function bsi_attach_education_taxonomies(): void
