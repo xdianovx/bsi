@@ -1,92 +1,96 @@
 <?php
 
-$popular_education_ids = get_posts([
-    'post_type' => 'education',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'fields' => 'ids',
-    'no_found_rows' => true,
-    'update_post_meta_cache' => false,
-    'update_post_term_cache' => false,
-    'meta_query' => [
-        [
-            'key' => 'is_popular',
-            'value' => '1',
-            'compare' => '=',
-        ],
-    ],
-]);
-
-$country_ids = [];
-
-if (!empty($popular_education_ids) && function_exists('get_field')) {
-    foreach ($popular_education_ids as $education_id) {
-        $c = get_field('education_country', $education_id);
-
-        if ($c instanceof WP_Post) {
-            $c = (int) $c->ID;
-        } elseif (is_array($c)) {
-            $c = (int) reset($c);
-        } else {
-            $c = (int) $c;
-        }
-
-        if ($c > 0) {
-            $country_ids[] = $c;
-        }
-    }
-}
-
-$country_ids = array_values(array_unique(array_filter($country_ids)));
-
-$promo_countries = [];
-
-if (!empty($country_ids)) {
-    $promo_countries = get_posts([
-        'post_type' => 'country',
-        'posts_per_page' => -1,
-        'post_status' => 'publish',
-        'orderby' => 'title',
-        'order' => 'ASC',
-        'post_parent' => 0,
-        'post__in' => $country_ids,
-        'no_found_rows' => true,
-        'update_post_meta_cache' => false,
-        'update_post_term_cache' => false,
-    ]);
-
-    if (class_exists('Collator')) {
-        $collator = new Collator('ru_RU');
-        usort($promo_countries, function ($a, $b) use ($collator) {
-            return $collator->compare($a->post_title, $b->post_title);
-        });
-    } else {
-        usort($promo_countries, function ($a, $b) {
-            return mb_strcasecmp($a->post_title, $b->post_title);
-        });
-    }
-}
-
-$education_posts = [];
-
-if (!empty($popular_education_ids)) {
-    $education_posts = get_posts([
-        'post_type' => 'education',
-        'posts_per_page' => 12,
-        'post_status' => 'publish',
-        'orderby' => 'date',
-        'order' => 'DESC',
-        'post__in' => $popular_education_ids,
-        'ignore_sticky_posts' => true,
-        'no_found_rows' => true,
-        'update_post_meta_cache' => false,
-        'update_post_term_cache' => false,
-    ]);
-}
+// ВРЕМЕННО: Отключаем загрузку из админки, используем только тестовые данные
+$use_test_data = true; // Переключить на false для использования данных из админки
 
 $items = [];
+$promo_countries = [];
 
-foreach ($education_posts as $education_post) {
+if (!$use_test_data) {
+    // Загрузка данных из админки
+    $popular_education_ids = get_posts([
+        'post_type' => 'education',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'no_found_rows' => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
+        'meta_query' => [
+            [
+                'key' => 'is_popular',
+                'value' => '1',
+                'compare' => '=',
+            ],
+        ],
+    ]);
+
+    $country_ids = [];
+
+    if (!empty($popular_education_ids) && function_exists('get_field')) {
+        foreach ($popular_education_ids as $education_id) {
+            $c = get_field('education_country', $education_id);
+
+            if ($c instanceof WP_Post) {
+                $c = (int) $c->ID;
+            } elseif (is_array($c)) {
+                $c = (int) reset($c);
+            } else {
+                $c = (int) $c;
+            }
+
+            if ($c > 0) {
+                $country_ids[] = $c;
+            }
+        }
+    }
+
+    $country_ids = array_values(array_unique(array_filter($country_ids)));
+
+    if (!empty($country_ids)) {
+        $promo_countries = get_posts([
+            'post_type' => 'country',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'orderby' => 'title',
+            'order' => 'ASC',
+            'post_parent' => 0,
+            'post__in' => $country_ids,
+            'no_found_rows' => true,
+            'update_post_meta_cache' => false,
+            'update_post_term_cache' => false,
+        ]);
+
+        if (class_exists('Collator')) {
+            $collator = new Collator('ru_RU');
+            usort($promo_countries, function ($a, $b) use ($collator) {
+                return $collator->compare($a->post_title, $b->post_title);
+            });
+        } else {
+            usort($promo_countries, function ($a, $b) {
+                return mb_strcasecmp($a->post_title, $b->post_title);
+            });
+        }
+    }
+
+    $education_posts = [];
+
+    if (!empty($popular_education_ids)) {
+        $education_posts = get_posts([
+            'post_type' => 'education',
+            'posts_per_page' => 12,
+            'post_status' => 'publish',
+            'orderby' => 'date',
+            'order' => 'DESC',
+            'post__in' => $popular_education_ids,
+            'ignore_sticky_posts' => true,
+            'no_found_rows' => true,
+            'update_post_meta_cache' => false,
+            'update_post_term_cache' => false,
+        ]);
+    }
+
+    foreach ($education_posts as $education_post) {
     $education_id = (int) $education_post->ID;
 
     $country_id = 0;
@@ -298,8 +302,9 @@ if (!empty($items)) {
         return $price_a <=> $price_b;
     });
 }
+} // Конец блока if (!$use_test_data)
 
-if (empty($items)) {
+if ($use_test_data || empty($items)) {
     // Тестовые данные - URL будут преобразованы в SSO flow в education/card.php
     $test_items = [
         [
