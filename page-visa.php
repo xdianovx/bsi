@@ -93,7 +93,7 @@ get_header();
             </p>
           </div>
 
-          <div class="callout callout-neutral">
+          <!-- <div class="callout callout-neutral">
             <h3 class="callout__title">
               Правила Выдачи документов по путевке:
             </h3>
@@ -101,7 +101,7 @@ get_header();
             <p>
               Все документы по турам выдаются только при наличии: счет-подтверждения на тур, паспорта гражданина РФ
             </p>
-          </div>
+          </div> -->
 
         </div>
       </div>
