@@ -304,7 +304,7 @@ if (empty($items)) {
     $test_items = [
         [
             'id' => 0,
-            'url' => 'https://www.bsistudy.ru/scountry/cyp/school/36469/center/38452/?id=201534186&LANGUAGES=1&DURATION=15',
+            'url' => 'https://bsigroup.ru/education/english-in-cyprus/',
             'image' => 'https://www.bsistudy.ru/upload/resize_cache/tour/3/e/0/640_410_2/3e0fd1a965b4ba16188364fd561738bf.jpg',
             'title' => 'English in Cyprus (Ларнака)',
             'flag' => 'https://bsigroup.ru/wp-content/uploads/2025/11/cy.svg',
@@ -322,7 +322,7 @@ if (empty($items)) {
         ],
         [
             'id' => 0,
-            'url' => 'https://www.bsistudy.ru/scountry/gbr/school/36329/center/37188/?id=201575237',
+            'url' => 'https://bsigroup.ru/education/queen-mary-university-gruppovoj-zaezd',
             'image' => 'https://www.bsistudy.ru/upload/tour/1/8/b/18b8ba5ab26aaaaf7217341bf8f753bc.jpg',
             'title' => 'Queen Mary University (Лондон)',
             'flag' => 'https://bsigroup.ru/wp-content/uploads/2025/11/gb.svg',
@@ -341,7 +341,7 @@ if (empty($items)) {
         ],
         [
             'id' => 0,
-            'url' => 'https://www.bsistudy.ru/scountry/gbr/school/9991/center/13372/?id=201558434&LANGUAGES=1&DURATION=14,15',
+            'url' => 'https://bsigroup.ru/education/sir-george-kembridzh/',
             'image' => 'https://www.bsistudy.ru/upload/resize_cache/tour/b/8/4/640_410_2/b84cd42b2093a94c73cfb9513321f6bf.jpg',
             'title' => 'Sir George (Кембридж)',
             'flag' => 'https://bsigroup.ru/wp-content/uploads/2025/11/gb.svg',
@@ -359,7 +359,7 @@ if (empty($items)) {
         ],
         [
             'id' => 0,
-            'url' => 'https://www.bsistudy.ru/scountry/gbr/school/9981/center/11373/?id=201575244&LANGUAGES=1&DURATION=14,15',
+            'url' => 'https://bsigroup.ru/education/discovery-summer-kollingem',
             'image' => 'https://www.bsistudy.ru/upload/resize_cache/tour/2/c/e/640_410_2/2ce95308a6d57f51a1d43b02738c0431.JPG',
             'title' => 'Discovery Summer (Лондон)',
             'flag' => 'https://bsigroup.ru/wp-content/uploads/2025/11/gb.svg',

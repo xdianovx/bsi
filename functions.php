@@ -288,6 +288,8 @@ require get_template_directory() . '/custom-fields/currency-settings.php';
 
 require get_template_directory() . '/inc/requests/ajax.php';
 require get_template_directory() . '/inc/requests/ajax-fit.php';
+require get_template_directory() . '/inc/requests/ajax-visa-types.php';
+require get_template_directory() . '/inc/requests/ajax-visa-form.php';
 require get_template_directory() . '/inc/requests/samo.php';
 require get_template_directory() . '/inc/requests/ajax-cbr-rates.php';
 require get_template_directory() . '/inc/requests/news.php';

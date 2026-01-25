@@ -1,6 +1,7 @@
 import { Fancybox } from "@fancyapps/ui";
 import { gtmSearch } from "./modules/gtm-search";
 import { fitForm } from "./modules/forms/fit-form";
+import { visaForm } from "./modules/forms/visa-form";
 import { sliders } from "./modules/sliders";
 import { phoneMask } from "./modules/forms/phone-mask";
 import MicroModal from "micromodal";
@@ -36,6 +37,7 @@ window.addEventListener("DOMContentLoaded", () => {
   tabs(".tabs", ".tab-button", ".tab-content__item");
   sliders();
   fitForm();
+  visaForm();
   gtmSearch();
   phoneMask();
   initNewsFilter();

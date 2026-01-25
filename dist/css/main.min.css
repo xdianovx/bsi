@@ -9133,9 +9133,7 @@ input.error {
 }
 
 .visa-consultation-form {
-  padding: 24px 16px;
-  background: #f4f4f6;
-  margin-top: 12px;
+  margin-top: 32px;
   border-radius: 8px;
 }
 
@@ -9228,8 +9226,7 @@ input.error {
 .visa-consultation-form__bottom {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 0;
 }
 
 .visa-consultation-form .input-item input[type=checkbox] {

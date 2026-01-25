@@ -28,6 +28,16 @@ $steps = [
 ];
 
 get_header();
+
+// Загружаем список стран
+$countries = get_posts([
+  'post_type' => 'country',
+  'post_status' => 'publish',
+  'numberposts' => -1,
+  'orderby' => 'title',
+  'order' => 'ASC',
+  'post_parent' => 0, // только «родительские» страны
+]);
 ?>
 
 <main class="site-main">
@@ -97,14 +107,22 @@ get_header();
 
         </div>
 
-        <div class="callout callout-neutral">
-          <h3 class="callout__title">
-            Правила Выдачи документов по путевке:
-          </h3>
-
-          <p>
-            Все документы по турам выдаются только при наличии: счет-подтверждения на тур, паспорта гражданина РФ
-          </p>
+        <div class="callout callout-neutral" style="margin-top: 24px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-info">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4" />
+            <path d="M12 8h.01" />
+          </svg>
+          <div>
+            <p style="font-weight: 700; margin-bottom: 4px;">
+              Правила Выдачи документов по путевке:
+            </p>
+            <p>
+              Все документы по турам выдаются только при наличии: счет-подтверждения на тур, паспорта гражданина РФ
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -229,9 +247,9 @@ get_header();
 
   $country_ids = array_values(array_unique(array_filter($country_ids)));
 
-  $countries = [];
+  $countries_with_visas = [];
   if (!empty($country_ids)) {
-    $countries = get_posts([
+    $countries_with_visas = get_posts([
       'post_type' => 'country',
       'post_status' => 'publish',
       'posts_per_page' => -1,
@@ -242,13 +260,13 @@ get_header();
   }
   ?>
 
-  <?php if (!empty($countries)): ?>
+  <?php if (!empty($countries_with_visas)): ?>
     <section class="visa-page-countries-section">
       <div class="container">
         <h2 class="h2">Визы по странам</h2>
 
         <div class="visa-countries__list">
-          <?php foreach ($countries as $country): ?>
+          <?php foreach ($countries_with_visas as $country): ?>
             <?php
             $cid = (int) $country->ID;
             $country_slug = (string) $country->post_name;
@@ -459,71 +477,68 @@ get_header();
     <div class="container">
       <h2 class="h2">Бесплатная консультация</h2>
       <p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам получения виз</p>
-      <form action="" class="visa-consultation-form">
+      <form id="visa-form" class="visa-consultation-form">
 
         <div class="form-row form-row-2">
+          <div class="education-programs-filter__field">
+            <div class="education-programs-filter__label">Страна *</div>
+            <select name="country_id" class="visa-form__country-select education-programs-filter__select" id="visa-country">
+              <option value="">Выберите страну</option>
+              <?php if (!empty($countries)): ?>
+                <?php foreach ($countries as $country_item): ?>
+                  <option value="<?= esc_attr($country_item->ID); ?>">
+                    <?= esc_html($country_item->post_title); ?>
+                  </option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
+            <div class="error-message" data-field="country_id"></div>
+          </div>
 
-          <div class="input-item white">
-
-            <label for="name">Страна</label>
-            <input type="text" name="country" id="country" placeholder="Страна">
-
-            <div class="error-message" data-field="country">
-            </div>
+          <div class="education-programs-filter__field">
+            <div class="education-programs-filter__label">Тип визы</div>
+            <select name="visa_type" class="visa-form__visa-type-select education-programs-filter__select" id="visa-type">
+              <option value="">Выберите тип визы</option>
+              <option value="tourist">Туристическая</option>
+              <option value="educational">Образовательная</option>
+            </select>
+            <div class="error-message" data-field="visa_type"></div>
           </div>
 
           <div class="input-item white">
-            <label for="visatype">Тип визы</label>
-            <input type="text" name="visatype" id="visatype" placeholder="Страна">
-
-            <div class="error-message" data-field="visatype">
-            </div>
+            <label for="visa-name">Имя *</label>
+            <input type="text" name="name" id="visa-name" placeholder="Введите ваше имя" required>
+            <div class="error-message" data-field="name"></div>
           </div>
 
           <div class="input-item white">
-            <label for="name">Имя</label>
-            <input type="text" name="name" id="name" placeholder="Имя">
-
-            <div class="error-message" data-field="name">
-            </div>
+            <label for="visa-citizenship">Гражданство *</label>
+            <input type="text" name="citizenship" id="visa-citizenship" placeholder="Введите ваше гражданство" required>
+            <div class="error-message" data-field="citizenship"></div>
           </div>
 
           <div class="input-item white">
-            <label for="graz">Гражданство</label>
-            <input type="text" name="graz" id="graz" placeholder="Гражданство">
-
-            <div class="error-message" data-field="graz">
-            </div>
+            <label for="visa-phone">Телефон *</label>
+            <input type="tel" name="phone" id="visa-phone" placeholder="+7 (___) ___-__-__" required>
+            <div class="error-message" data-field="phone"></div>
           </div>
 
           <div class="input-item white">
-            <label for="tel">Телефон</label>
-            <input type="tel" name="tel" id="tel" placeholder="Имя">
-
-            <div class="error-message" data-field="tel">
-            </div>
-          </div>
-
-          <div class="input-item white">
-            <label for="graz">Дата поездки</label>
-            <input type="text" name="graz" id="graz" placeholder="Гражданство">
-
-            <div class="error-message" data-field="graz">
-            </div>
+            <label for="visa-travel-dates">Даты поездки *</label>
+            <input type="text" name="travel_dates" id="visa-travel-dates" placeholder="Укажите даты поездки" required>
+            <div class="error-message" data-field="travel_dates"></div>
           </div>
         </div>
 
         <div class="visa-consultation-form__bottom">
-          <div id="form-status"></div>
+          <div id="visa-form-status"></div>
 
           <button type="submit" class="btn btn-accent fit-form__btn-submit">
             Отправить
           </button>
 
           <p class="form-policy fit-form__policy">
-            Нажимая на кнопку "Отправить", вы соглашаетесь с <a
-              href="http://webscape.beget.tech/bsi/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
-              class="policy-link">
+            Нажимая на кнопку "Отправить", вы соглашаетесь с <a href="<?= get_permalink(47) ?>" class="policy-link">
               нашей политикой обработки персональных данных
             </a>
           </p>
