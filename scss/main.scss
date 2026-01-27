@@ -1,7 +1,7 @@
-@import "../../node_modules/swiper/swiper-bundle.css";
-@import "../../node_modules/@fancyapps/ui/dist/fancybox/fancybox.css";
-@import "../../node_modules/choices.js/public/assets/styles/choices.css";
-@import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+@import "../node_modules/swiper/swiper-bundle.css";
+@import "../node_modules/@fancyapps/ui/dist/fancybox/fancybox.css";
+@import "../node_modules/choices.js/public/assets/styles/choices.css";
+@import "../node_modules/flatpickr/dist/flatpickr.min.css";
 
 @import "config/vars";
 @import "config/fonts";
@@ -10,17 +10,55 @@
 
 * {
 }
-// ui
-@import "./ui/**/*.scss";
 
-// sections
-@import "./sections/**/*.scss";
+// ui
+@import "./ui/breadcrumbs.scss";
+@import "./ui/buttons.scss";
+@import "./ui/callout.scss";
+@import "./ui/counter.scss";
+@import "./ui/daypicker.scss";
+@import "./ui/dropdown.scss";
+@import "./ui/forms.scss";
+@import "./ui/preloader.scss";
+@import "./ui/slider.scss";
+@import "./ui/socials.scss";
+@import "./ui/titles.scss";
 
 // components
-@import "./components/**/*.scss";
+@import "./components/_education.scss";
+@import "./components/best-offers.scss";
+@import "./components/editor-styles.scss";
+@import "./components/features.scss";
+@import "./components/footer.scss";
+@import "./components/gtm-search.scss";
+@import "./components/header.scss";
+@import "./components/hotel.scss";
+@import "./components/main-banners.scss";
+@import "./components/main-pages-grid.scss";
+@import "./components/megamenu.scss";
+@import "./components/mobile-nav.scss";
+@import "./components/modal.scss";
+@import "./components/partners.scss";
+@import "./components/promo-banner.scss";
+@import "./components/subscruibe.scss";
 
 // pages
-@import "./page/**/*.scss";
+@import "./page/award.scss";
+@import "./page/best-offers-page.scss";
+@import "./page/countries.scss";
+@import "./page/country-hotels.scss";
+@import "./page/fit.scss";
+@import "./page/insurance.scss";
+@import "./page/mice.scss";
+@import "./page/news.scss";
+@import "./page/projects.scss";
+@import "./page/promo.scss";
+@import "./page/reviews.scss";
+@import "./page/services.scss";
+@import "./page/single-country.scss";
+@import "./page/single-hotel.scss";
+@import "./page/tour.scss";
+@import "./page/visa.scss";
 
 .phone-link {
   display: inline-block;

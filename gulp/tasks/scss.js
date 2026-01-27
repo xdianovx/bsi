@@ -9,7 +9,6 @@ import postcss from "gulp-postcss";
 import postcssPresetEnv from "postcss-preset-env";
 import postcssGroupMedia from "postcss-sort-media-queries";
 import sourcemaps from "gulp-sourcemaps";
-import sassGlob from "gulp-sass-glob";
 import { filePaths } from "../config/paths.js";
 import { plugins } from "../config/plugins.js";
 import { logger } from "../config/logger.js";
@@ -28,8 +27,7 @@ const scss = (isBuild, serverInstance) => {
 			.pipe(logger.handleError("SCSS"))
 
 			.pipe(plugins.if(!isBuild, sourcemaps.init()))
-			.pipe(sassGlob())
-			.pipe(sass({ outputStyle: "expanded" }, null))
+			.pipe(sass({ outputStyle: "expanded" }).on('error', sass.logError))
 			.pipe(plugins.replace(/@img\//g, "../images/"))
 
 			.pipe(plugins.if(isBuild, webpCss(webpConfig)))
