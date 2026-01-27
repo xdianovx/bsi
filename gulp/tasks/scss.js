@@ -6,6 +6,7 @@ import cleanCss from "gulp-clean-css";
 import webpCss from "gulp-webpcss";
 import autoprefixer from "autoprefixer";
 import postcss from "gulp-postcss";
+import postcssImport from "postcss-import";
 import postcssPresetEnv from "postcss-preset-env";
 import postcssGroupMedia from "postcss-sort-media-queries";
 import sourcemaps from "gulp-sourcemaps";
@@ -28,6 +29,7 @@ const scss = (isBuild, serverInstance) => {
 
 			.pipe(plugins.if(!isBuild, sourcemaps.init()))
 			.pipe(sass({ outputStyle: "expanded" }).on('error', sass.logError))
+			.pipe(postcss([postcssImport()]))
 			.pipe(plugins.replace(/@img\//g, "../images/"))
 
 			.pipe(plugins.if(isBuild, webpCss(webpConfig)))
