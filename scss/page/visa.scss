@@ -18,6 +18,18 @@
   gap: 12px;
 }
 
+.archive-page__top:has(.visa-disclaimer) {
+  border: none;
+  padding-bottom: 0;
+}
+
+.visa-disclaimer {
+  max-width: 50%;
+  margin-top: 16px;
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
 .visa-cost-item {
   display: flex;
   align-items: center;
@@ -61,13 +73,35 @@
 }
 
 .visa-page__info-section {
-  margin-top: 24px;
+  margin-top: 16px;
+}
+
+.visa-page__info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.visa-info-map {
+  border-radius: 8px;
+  overflow: hidden;
+  height: 337px;
+}
+
+.visa-page-anchor-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.visa-page-anchor-form span {
+  color: $red;
 }
 
 .visa-info-item {
   padding: 12px;
-  background: $bg-gray;
   border-radius: 8px;
+  max-width: 70%;
 
   &.--warn {
     margin-top: 8px;
@@ -113,17 +147,46 @@
 .visa-info-item__value {
   margin-bottom: 0;
   margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .visa-info-item__wrap {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(1, 1fr);
     gap: 8px;
   }
+}
+
+.visa-info-advantages__wrap {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.visa-info-advantage {
+  width: 100%;
+  padding: 16px;
+  background-color: $bg-gray;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+.visa-info-advantage__title {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.visa-info-advantage__text {
+  font-size: 18px;
+  font-weight: 400;
 }
 
 .visa-page-features__section {
@@ -147,6 +210,7 @@
     grid-template-columns: repeat(1, 1fr);
   }
 }
+
 
 .visa-page-features__item {
   border-radius: 8px;
@@ -184,7 +248,7 @@
 }
 
 .visa-page-steps-item {
-  border: 1px solid #dfdfdf;
+  border: 1px solid #bebebe;
   border-radius: 8px;
   padding: 12px;
 }
@@ -232,7 +296,7 @@
 }
 
 .visa-contact-item {
-  border: 1px solid #dfdfdf;
+  border: 1px solid #bebebe;
   padding: 12px;
   border-radius: 8px;
 }
@@ -258,7 +322,7 @@
 }
 
 .visa-contact-item__direction {
-  font-weight: 400;
+  font-weight: 500;
   font-size: 14px;
   line-height: 120%;
   margin-top: 4px;
