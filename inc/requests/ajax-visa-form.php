@@ -172,7 +172,9 @@ function handle_visa_form()
 
   // Отправка письма
   $subject = 'Новая заявка на визу';
+  error_log('Visa Form: Sending email to ' . $recipient_email);
   $sent = wp_mail($recipient_email, $subject, $html_message, $headers);
+  error_log('Visa Form: wp_mail result = ' . ($sent ? 'true' : 'false'));
 
   if ($sent) {
     wp_send_json_success([

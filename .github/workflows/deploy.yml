@@ -4,12 +4,25 @@ on:
   push:
     branches:
       - main
+
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
 
       - name: Upload to FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -19,3 +32,13 @@ jobs:
           password: hQ1nM0eK6vfW3aO9
           local-dir: ./
           server-dir: wp-content/themes/bsi/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/scss/**
+            **/gulp/**
+            package.json
+            package-lock.json
+            gulpfile.js
+            webpack.config.js
