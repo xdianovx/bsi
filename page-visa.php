@@ -86,9 +86,8 @@ $countries = get_posts([
 
               <p class="visa-info-item__key">Адрес</p>
             </div>
-            <p class="visa-info-item__value">
-              г. Москва, ул. Садовая-Кудринская д. 2/62/35, строение 1, этаж 3. м. Баррикадная
-            </p>
+            <p class="visa-info-item__value">г. Москва, ул. Садовая-Кудринская д. 2/62/35, строение 1, этаж 3. м.
+              Баррикадная</p>
           </div>
 
 
