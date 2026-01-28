@@ -479,6 +479,7 @@ get_header();
                   set_query_var('program', $program);
                   set_query_var('program_index', $index);
                   set_query_var('booking_url', $booking_url);
+                  set_query_var('school_name', get_the_title());
                   get_template_part('template-parts/education/program-card');
                   ?>
                 <?php endforeach; ?>
@@ -607,5 +608,8 @@ get_header();
 </main>
 
 <?php
+// Модальное окно бронирования программы
+get_template_part('template-parts/education/program-booking-modal');
+
 get_footer();
 

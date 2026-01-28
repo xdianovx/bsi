@@ -107,27 +107,30 @@ add_action('wp_enqueue_scripts', 'bsi_scripts');
 
 // Автоматически добавляем rel="noopener noreferrer" ко всем внешним ссылкам в контенте
 // ИСКЛЮЧЕНИЕ: для bsistudy.ru НЕ добавляем noreferrer, так как сайт требует referrer для обхода SSO
-function bsi_add_noreferrer_to_external_links($content) {
+function bsi_add_noreferrer_to_external_links($content)
+{
 	if (!is_admin()) {
 		$site_url = parse_url(home_url());
 		$site_host = !empty($site_url['host']) ? str_replace('www.', '', $site_url['host']) : '';
-		
+
 		$content = preg_replace_callback(
 			'/<a\s+([^>]*href=["\']([^"\']*)["\'][^>]*)>/i',
-			function($matches) use ($site_host) {
+			function ($matches) use ($site_host) {
 				$full_tag = $matches[0];
 				$attributes = $matches[1];
 				$href = $matches[2];
-				
+
 				// Пропускаем якорные ссылки, mailto, tel и javascript
-				if (empty($href) || 
-					strpos($href, '#') === 0 || 
-					strpos($href, 'mailto:') === 0 || 
+				if (
+					empty($href) ||
+					strpos($href, '#') === 0 ||
+					strpos($href, 'mailto:') === 0 ||
 					strpos($href, 'tel:') === 0 ||
-					strpos($href, 'javascript:') === 0) {
+					strpos($href, 'javascript:') === 0
+				) {
 					return $full_tag;
 				}
-				
+
 				// Проверяем, является ли ссылка внешней
 				$is_external = false;
 				$is_bsistudy = false;
@@ -142,13 +145,13 @@ function bsi_add_noreferrer_to_external_links($content) {
 						}
 					}
 				}
-				
+
 				if ($is_external) {
 					// Проверяем, есть ли уже rel атрибут
 					if (preg_match('/rel=["\']([^"\']*)["\']/i', $attributes, $rel_matches)) {
 						$existing_rel = $rel_matches[1];
 						$rel_parts = explode(' ', $existing_rel);
-						
+
 						if (!in_array('noopener', $rel_parts)) {
 							$rel_parts[] = 'noopener';
 						}
@@ -156,7 +159,7 @@ function bsi_add_noreferrer_to_external_links($content) {
 						if (!$is_bsistudy && !in_array('noreferrer', $rel_parts)) {
 							$rel_parts[] = 'noreferrer';
 						}
-						
+
 						$new_rel = implode(' ', $rel_parts);
 						$attributes = preg_replace('/rel=["\'][^"\']*["\']/i', 'rel="' . esc_attr($new_rel) . '"', $attributes);
 					} else {
@@ -167,10 +170,10 @@ function bsi_add_noreferrer_to_external_links($content) {
 							$attributes .= ' rel="noopener noreferrer"';
 						}
 					}
-					
+
 					return '<a ' . $attributes . '>';
 				}
-				
+
 				return $full_tag;
 			},
 			$content
@@ -182,23 +185,24 @@ add_filter('the_content', 'bsi_add_noreferrer_to_external_links', 99);
 add_filter('widget_text', 'bsi_add_noreferrer_to_external_links', 99);
 
 // Функция для преобразования URL bsistudy.ru в SSO flow через tokens_exchange.php
-function bsi_convert_bsistudy_url($url) {
+function bsi_convert_bsistudy_url($url)
+{
 	if (empty($url)) {
 		return $url;
 	}
-	
+
 	// Проверяем, является ли это ссылкой на bsistudy.ru
 	if (strpos($url, 'bsistudy.ru') !== false) {
 		// Преобразуем в SSO flow через tokens_exchange.php
 		$encoded_url = urlencode($url);
 		return 'https://bsigroup.ru/auth/tokens_exchange.php?ret_path=' . $encoded_url;
 	}
-	
+
 	return $url;
 }
 
 // Обработка прямого доступа к шаблону редиректа для bsistudy.ru
-add_action('template_redirect', function() {
+add_action('template_redirect', function () {
 	if (isset($_GET['url']) && basename($_SERVER['REQUEST_URI']) === 'redirect-bsistudy.php') {
 		load_template(get_template_directory() . '/redirect-bsistudy.php');
 		exit;
@@ -301,6 +305,7 @@ require get_template_directory() . '/inc/requests/popular-tours-section.php';
 require get_template_directory() . '/inc/requests/popular-education-section.php';
 require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
+require get_template_directory() . '/inc/requests/ajax-education-program-form.php';
 
 add_action('template_redirect', function () {
 	if (!is_page()) {

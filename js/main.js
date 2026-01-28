@@ -22,11 +22,13 @@ import { tourPrices } from "./modules/tour-prices";
 import { initEducationFilter } from "./modules/ajax/education-filter";
 import { initCountryEducationFilters } from "./modules/ajax/country-education";
 import { initSingleEducationPrograms } from "./modules/ajax/single-education-programs";
+import { initEducationProgramForm } from "./modules/forms/education-program-form";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
   mobileNavAccordion();
   MicroModal.init();
+
   Fancybox.bind("[data-fancybox]", {});
   const datepick = document.querySelector('input[name="daterange"]');
 
@@ -53,4 +55,5 @@ window.addEventListener("DOMContentLoaded", () => {
   initEducationFilter();
   initCountryEducationFilters();
   initSingleEducationPrograms();
+  initEducationProgramForm();
 });

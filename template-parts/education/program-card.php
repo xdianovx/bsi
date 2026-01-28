@@ -12,6 +12,12 @@ if ($program_index === 0 && isset($args['program_index'])) {
   $program_index = $args['program_index'];
 }
 
+// Название школы для формы
+$school_name = get_query_var('school_name', '');
+if (empty($school_name) && isset($args['school_name'])) {
+  $school_name = $args['school_name'];
+}
+
 $program_title = $program['program_title'] ?? '';
 $price_per_week = $program['program_price_per_week'] ?? '';
 $age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
@@ -22,6 +28,16 @@ $checkin_date_from = $program['program_checkin_date_from'] ?? '';
 $checkin_date_to = $program['program_checkin_date_to'] ?? '';
 $accommodation_options = isset($program['program_accommodation_options']) ? $program['program_accommodation_options'] : [];
 $meal_options = isset($program['program_meal_options']) ? $program['program_meal_options'] : [];
+
+// Данные о визе
+$visa_required = !empty($program['program_visa_required']);
+$visa_price = isset($program['program_visa_price']) ? (int) $program['program_visa_price'] : 0;
+
+// Дополнительные услуги
+$additional_services = isset($program['program_additional_services']) ? $program['program_additional_services'] : [];
+if (!is_array($additional_services)) {
+  $additional_services = [];
+}
 
 // Нормализуем данные - ACF может вернуть разные форматы
 if (!is_array($accommodation_options)) {
@@ -45,12 +61,12 @@ $booking_url = !empty($program_booking_url) ? $program_booking_url : $general_bo
 $age_text = '';
 if ($age_min > 0 && $age_max > 0) {
   if ($age_min === $age_max) {
-    $age_text = $age_min . ' лет';
+    $age_text = 'с ' . $age_min . ' лет';
   } else {
     $age_text = $age_min . '-' . $age_max . ' лет';
   }
 } elseif ($age_min > 0) {
-  $age_text = $age_min . '+' . ' лет';
+  $age_text = 'с ' . $age_min . ' лет';
 } elseif ($age_max > 0) {
   $age_text = 'до ' . $age_max . ' лет';
 }
@@ -61,7 +77,14 @@ if ($duration > 0) {
 }
 
 $nearest_date_formatted = '';
+$date_for_modal = '';
 if ($checkin_date_from) {
+  // Форматируем дату для модалки (с DD.MM.YYYY)
+  $date_obj = DateTime::createFromFormat('Y-m-d', $checkin_date_from);
+  if ($date_obj) {
+    $date_for_modal = 'с ' . $date_obj->format('d.m.Y');
+  }
+
   if ($checkin_date_to && $checkin_date_to !== $checkin_date_from) {
     $nearest_date_formatted = format_date_short($checkin_date_from, $checkin_date_to);
   } else {
@@ -100,17 +123,34 @@ if (!empty($accommodation_names)) {
   $accommodation_parts = ['Без проживания'];
 }
 
-// Добавляем питание только если оно выбрано
+// Добавляем питание или "Без питания"
 if (!empty($meal_names)) {
   $accommodation_parts = array_merge($accommodation_parts, $meal_names);
+} else {
+  $accommodation_parts[] = 'Без питания';
 }
 
 $accommodation_text = implode(', ', $accommodation_parts);
 
 // Форматируем цену
 $price_formatted = '';
+$price_numeric = 0;
 if (!empty($price_per_week)) {
   $price_formatted = format_price_with_from($price_per_week, true);
+  // Извлекаем числовое значение цены
+  $price_numeric = (int) preg_replace('/[^\d]/', '', $price_per_week);
+}
+
+// Подготавливаем данные дополнительных услуг для JSON
+$services_for_json = [];
+foreach ($additional_services as $service) {
+  if (!empty($service['service_title'])) {
+    $services_for_json[] = [
+      'title' => $service['service_title'],
+      'price' => (int) ($service['service_price'] ?? 0),
+      'note' => $service['service_note'] ?? '',
+    ];
+  }
 }
 ?>
 
@@ -155,8 +195,8 @@ if (!empty($price_per_week)) {
 
         <div class="education-program-card__footer">
           <?php if (!empty($description)): ?>
-            <button type="button" class="education-program-card__toggle js-education-program-toggle"
-              aria-expanded="false" aria-controls="program-content-<?php echo esc_attr($program_index); ?>">
+            <button type="button" class="education-program-card__toggle js-education-program-toggle" aria-expanded="false"
+              aria-controls="program-content-<?php echo esc_attr($program_index); ?>">
               <span class="education-program-card__toggle-text">Подробнее</span>
               <span class="education-program-card__toggle-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,9 +206,26 @@ if (!empty($price_per_week)) {
               </span>
             </button>
           <?php endif; ?>
-          <?php if ($price_formatted): ?>
-            <div class="education-program-card__price"><?php echo esc_html($price_formatted); ?></div>
-          <?php endif; ?>
+
+          <div class="education-program-card__actions">
+            <?php if ($price_formatted): ?>
+              <div class="education-program-card__price"><?php echo esc_html($price_formatted); ?></div>
+            <?php endif; ?>
+
+            <button type="button" class="education-program-card__book-btn btn btn--primary js-program-booking-btn"
+              data-program-title="<?php echo esc_attr($program_title); ?>"
+              data-program-date="<?php echo esc_attr($date_for_modal); ?>"
+              data-program-age="<?php echo esc_attr($age_text); ?>"
+              data-program-duration="<?php echo esc_attr($duration_text); ?>"
+              data-program-accommodation="<?php echo esc_attr($accommodation_text); ?>"
+              data-program-price="<?php echo esc_attr($price_numeric); ?>"
+              data-program-visa-required="<?php echo $visa_required ? '1' : '0'; ?>"
+              data-program-visa-price="<?php echo esc_attr($visa_price); ?>"
+              data-program-services="<?php echo esc_attr(wp_json_encode($services_for_json)); ?>"
+              data-school-name="<?php echo esc_attr($school_name); ?>">
+              Забронировать
+            </button>
+          </div>
         </div>
       </div>
     </div>
