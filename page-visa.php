@@ -778,7 +778,7 @@ $countries = get_posts([
           </button>
 
           <p class="form-policy fit-form__policy">
-            Нажимая на кнопку "Отправить", вы соглашаетесь с <a href="<?= get_permalink(47) ?>" class="policy-link">
+            Нажимая на кнопку “Отправить”, вы соглашаетесь с <a href="<?= get_permalink(47) ?>" class="policy-link">
               нашей политикой обработки персональных данных
             </a>
           </p>
