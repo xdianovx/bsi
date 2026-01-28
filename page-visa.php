@@ -612,7 +612,7 @@ $countries = get_posts([
               id="visa-type">
               <option value="">Выберите тип визы</option>
               <option value="tourist">Туристическая</option>
-              <option value="educational">Образовательная</option>
+              <option value="educational">Виза для образования</option>
             </select>
           </div>
 
