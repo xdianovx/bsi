@@ -27,6 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
   burger();
   mobileNavAccordion();
   MicroModal.init();
+
   Fancybox.bind("[data-fancybox]", {});
   const datepick = document.querySelector('input[name="daterange"]');
 
