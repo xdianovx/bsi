@@ -390,7 +390,7 @@ $countries = get_posts([
                 <?php endif; ?>
 
                 <div class="visa-country-card__title">
-                  <?php echo esc_html($country_title); ?>                  
+                  <?php echo esc_html($country_title); ?>
                 </div>
                 <!-- Цена от -->
                 <span class="visa-country-card__amount">от 16 дней</span>
@@ -644,7 +644,8 @@ $countries = get_posts([
           </button>
 
           <p class="form-policy fit-form__policy">
-            Нажимая на кнопку “Отправить”, вы соглашаетесь с нашей <a href="<?= get_permalink(47) ?>" class="policy-link">
+            Нажимая на кнопку “Отправить”, вы соглашаетесь с нашей <a href="<?= get_permalink(47) ?>"
+              class="policy-link">
               политикой конфиденциальности
             </a>
           </p>
