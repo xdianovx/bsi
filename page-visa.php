@@ -426,7 +426,16 @@ $countries = get_posts([
   <?php if (function_exists('have_rows') && have_rows('vizy_contacts')): ?>
     <section class="visa-page-contacts__section">
       <div class="container">
-        <h2 class="h2">Контакты</h2>
+        <div class="visa-page-contacts__top">
+          <h2 class="h2">Контакты</h2>
+          <a class="visa-page-anchor-form" href="#contact-form">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M9.99935 4.16675V15.8334M9.99935 15.8334L15.8327 10.0001M9.99935 15.8334L4.16602 10.0001"
+                stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>Заполнить форму</span>
+          </a>
+        </div>
 
         <div class="visa-page-contacts__wrap">
           <?php while (have_rows('vizy_contacts')):
