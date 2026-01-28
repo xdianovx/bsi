@@ -696,6 +696,32 @@
   font-size: 14px;
 }
 
+.education-program-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.education-program-card__book-btn {
+  white-space: nowrap;
+  padding: 12px 24px;
+  font-size: 14px;
+  border-radius: 50px;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .education-programs-filter__field {
   display: flex;
   flex-direction: column;
@@ -1412,7 +1438,8 @@
 
 .single-education__price-content {
   // Стили для содержимого WYSIWYG поля
-  ul, ol {
+  ul,
+  ol {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -1430,7 +1457,7 @@
   // Если пользователь вставил простой текст с переносами строк
   p {
     margin: 0 0 12px 0;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -1438,7 +1465,7 @@
 
   // Стили для маркированных списков (если пользователь создал их в редакторе)
   ul li::before {
-    content: '';
+    content: "";
     display: block;
     width: 24px;
     height: 24px;
