@@ -63,12 +63,8 @@ $countries = get_posts([
   <section class="visa-page__info-section">
     <div class="container">
       <div class="visa-page__info">
-        <div class="visa-info-map">
-          <div style="position:relative;overflow:hidden;">
-            <a href="https://yandex.ru/maps/213/moscow/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">Москва</a>
-            <a href="https://yandex.ru/maps/213/moscow/house/sadovaya_kudrinskaya_ulitsa_2_62_35s1/Z04Ycw9lT0cPQFtvfXt0eH5kYA==/?indoorLevel=1&ll=37.585628%2C55.759274&utm_medium=mapframe&utm_source=maps&z=17.05" style="color:#eee;font-size:12px;position:absolute;top:14px;">Садовая-Кудринская улица, 2/62/35с1 — Яндекс Карты</a>
-            <iframe src="https://yandex.ru/map-widget/v1/?indoorLevel=1&ll=37.585628%2C55.759274&mode=search&ol=geo&ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1NjcyMDI4NhJW0KDQvtGB0YHQuNGPLCDQnNC-0YHQutCy0LAsINCh0LDQtNC-0LLQsNGPLdCa0YPQtNGA0LjQvdGB0LrQsNGPINGD0LvQuNGG0LAsIDIvNjIvMzXRgTEiCg2wVxZCFX8JX0I%2C&z=17.05" width="631" height="337" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe>
-          </div>
+        <div class="visa-info-img">
+          <img src="<?php echo get_template_directory_uri() ?>/img/page-visa/9622845-1.webp" alt="">
         </div>
         <div class="visa-info-item__wrap">
 
@@ -123,12 +119,12 @@ $countries = get_posts([
                   <path d="M20.1673 11.9167V5.50008C20.1673 5.01385 19.9742 4.54754 19.6303 4.20372C19.2865 3.8599 18.8202 3.66675 18.334 3.66675H3.66732C3.18109 3.66675 2.71477 3.8599 2.37096 4.20372C2.02714 4.54754 1.83398 5.01385 1.83398 5.50008V16.5001C1.83398 17.5084 2.65898 18.3334 3.66732 18.3334H11.0007M20.1673 6.41675L11.9448 11.6417C11.6618 11.8191 11.3346 11.9131 11.0007 11.9131C10.6667 11.9131 10.3395 11.8191 10.0565 11.6417L1.83398 6.41675M14.6673 17.4167L16.5007 19.2501L20.1673 15.5834" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </div>
-              <a href="mailto: v.ivanova@bsigroup.ru">v.ivanova@bsigroup.ru</a>
+              <a class="visa-info-mail" href="mailto: v.ivanova@bsigroup.ru">v.ivanova@bsigroup.ru</a>
             </div>
           </div>
 
 
-          <a href="#contact-form" class="visa-page-anchor-form">
+          <a class="visa-page-anchor-form" href="#contact-form">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M9.99935 4.16675V15.8334M9.99935 15.8334L15.8327 10.0001M9.99935 15.8334L4.16602 10.0001" stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -405,6 +401,8 @@ if (!empty($country_ids)) {
                   ?>
                   <a class="visa-country-card__type" href="<?php echo esc_url($url); ?>">
                     <?php echo esc_html($t->name); ?>
+                    <!-- тут цены на визы -->
+                    <span class="visa-country-card__price">от 23 000 ₽</span>
                   </a>
                 <?php endforeach; ?>
               </div>
@@ -497,15 +495,24 @@ if (!empty($country_ids)) {
 
     <div class="visa-page-steps__wrap">
       <?php if (function_exists('have_rows') && have_rows('vizy_procedure')): ?>
-        <?php while (have_rows('vizy_procedure')):
-          the_row(); ?>
+        <?php
+        $index = 0;
+        $total_rows = count(get_field('vizy_procedure'));
+        ?>
+        <?php while (have_rows('vizy_procedure')): the_row(); ?>
           <?php
           $img = get_sub_field('image');
           $num = get_sub_field('order');
           $title = (string) get_sub_field('title');
           $descr = (string) get_sub_field('description');
+
+          // Определяем тип стрелки
+          $arrow_type = 'none';
+          if ($index < $total_rows - 1) {
+            $arrow_type = ($index === 1) ? 'top' : 'bottom';
+          }
           ?>
-          <div class="visa-page-steps-item">
+          <div class="visa-page-steps-item" data-arrow="<?php echo $arrow_type; ?>">
             <div class="visa-page-steps-item__top">
               <?php if (!empty($num) || $num === 0 || $num === '0'): ?>
                 <div class="visa-page-steps-item__num numfont">
@@ -532,11 +539,18 @@ if (!empty($country_ids)) {
               </div>
             <?php endif; ?>
           </div>
+          <?php $index++; ?>
         <?php endwhile; ?>
 
       <?php else: ?>
-        <?php foreach ($steps as $step): ?>
-          <div class="visa-page-steps-item">
+        <?php foreach ($steps as $index => $step): ?>
+          <?php
+          $arrow_type = 'none';
+          if ($index < count($steps) - 1) {
+            $arrow_type = ($index === 1) ? 'top' : 'bottom';
+          }
+          ?>
+          <div class="visa-page-steps-item" data-arrow="<?php echo $arrow_type; ?>">
             <div class="visa-page-steps-item__num">
               <?php echo esc_html($step['num']); ?>
             </div>
@@ -553,13 +567,143 @@ if (!empty($country_ids)) {
   </div>
 </section>
 
+<section class="visa-page-contacts__section">
+  <div class="container">
+    <div class="visa-page-contacts__top">
+      <h2 class="h2">Контакты</h2>
+      <a class="visa-page-anchor-form" href="#contact-form">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M9.99935 4.16675V15.8334M9.99935 15.8334L15.8327 10.0001M9.99935 15.8334L4.16602 10.0001" stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>Заполнить форму</span>
+          </a>
+    </div>
+    
+    
+    <div class="visa-page-contacts__wrap">
+      
+      <div class="visa-page-contacts__item">
+        <div class="visa-page-contacts__title">Виктория Иванова</div>
+        <div class="visa-page-contacts__text">Специалист визового центра</div>
+        <div class="visa-contacts-item__value">
+          <div class="visa-contacts-item__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <g clip-path="url(#clip0_713_1775)">
+                <path d="M10.8327 1.66675C12.8218 1.66675 14.7295 2.45692 16.136 3.86345C17.5425 5.26997 18.3327 7.17762 18.3327 9.16675M10.8327 5.00008C11.9378 5.00008 12.9976 5.43907 13.779 6.22047C14.5604 7.00187 14.9993 8.06168 14.9993 9.16675M11.526 13.8067C11.6981 13.8858 11.892 13.9038 12.0758 13.8579C12.2595 13.8121 12.4221 13.7049 12.5368 13.5542L12.8327 13.1667C12.9879 12.9598 13.1892 12.7917 13.4207 12.676C13.6521 12.5603 13.9073 12.5001 14.166 12.5001H16.666C17.108 12.5001 17.532 12.6757 17.8445 12.9882C18.1571 13.3008 18.3327 13.7247 18.3327 14.1667V16.6667C18.3327 17.1088 18.1571 17.5327 17.8445 17.8453C17.532 18.1578 17.108 18.3334 16.666 18.3334C12.6878 18.3334 8.87246 16.7531 6.05941 13.94C3.24637 11.127 1.66602 7.31166 1.66602 3.33341C1.66602 2.89139 1.84161 2.46746 2.15417 2.1549C2.46673 1.84234 2.89065 1.66675 3.33268 1.66675H5.83268C6.27471 1.66675 6.69863 1.84234 7.01119 2.1549C7.32375 2.46746 7.49935 2.89139 7.49935 3.33341V5.83341C7.49935 6.09216 7.43911 6.34734 7.32339 6.57877C7.20768 6.8102 7.03968 7.0115 6.83268 7.16675L6.44268 7.45925C6.2897 7.57606 6.18187 7.74224 6.13751 7.92954C6.09315 8.11684 6.115 8.31373 6.19935 8.48675C7.33825 10.8 9.21137 12.6707 11.526 13.8067Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_713_1775">
+                  <rect width="20" height="20" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <a href="tel:+7 (495) 785-55-35">+7 999 999 99 99 доб. 198</a>
+        </div>
+        <div class="visa-contacts-item__value">
+          <div class="visa-contacts-item__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M20.1673 11.9167V5.50008C20.1673 5.01385 19.9742 4.54754 19.6303 4.20372C19.2865 3.8599 18.8202 3.66675 18.334 3.66675H3.66732C3.18109 3.66675 2.71477 3.8599 2.37096 4.20372C2.02714 4.54754 1.83398 5.01385 1.83398 5.50008V16.5001C1.83398 17.5084 2.65898 18.3334 3.66732 18.3334H11.0007M20.1673 6.41675L11.9448 11.6417C11.6618 11.8191 11.3346 11.9131 11.0007 11.9131C10.6667 11.9131 10.3395 11.8191 10.0565 11.6417L1.83398 6.41675M14.6673 17.4167L16.5007 19.2501L20.1673 15.5834" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </div>
+          <a class="visa-contacts-mail" href="mailto: v.ivanova@bsigroup.ru">v.ivanova@bsigroup.ru</a>
+        </div>
+      </div>
+      <div class="visa-page-contacts__item">
+        <div class="visa-page-contacts__title">Виктория Иванова</div>
+        <div class="visa-page-contacts__text">Специалист визового центра</div>
+        <div class="visa-contacts-item__value">
+          <div class="visa-contacts-item__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <g clip-path="url(#clip0_713_1775)">
+                <path d="M10.8327 1.66675C12.8218 1.66675 14.7295 2.45692 16.136 3.86345C17.5425 5.26997 18.3327 7.17762 18.3327 9.16675M10.8327 5.00008C11.9378 5.00008 12.9976 5.43907 13.779 6.22047C14.5604 7.00187 14.9993 8.06168 14.9993 9.16675M11.526 13.8067C11.6981 13.8858 11.892 13.9038 12.0758 13.8579C12.2595 13.8121 12.4221 13.7049 12.5368 13.5542L12.8327 13.1667C12.9879 12.9598 13.1892 12.7917 13.4207 12.676C13.6521 12.5603 13.9073 12.5001 14.166 12.5001H16.666C17.108 12.5001 17.532 12.6757 17.8445 12.9882C18.1571 13.3008 18.3327 13.7247 18.3327 14.1667V16.6667C18.3327 17.1088 18.1571 17.5327 17.8445 17.8453C17.532 18.1578 17.108 18.3334 16.666 18.3334C12.6878 18.3334 8.87246 16.7531 6.05941 13.94C3.24637 11.127 1.66602 7.31166 1.66602 3.33341C1.66602 2.89139 1.84161 2.46746 2.15417 2.1549C2.46673 1.84234 2.89065 1.66675 3.33268 1.66675H5.83268C6.27471 1.66675 6.69863 1.84234 7.01119 2.1549C7.32375 2.46746 7.49935 2.89139 7.49935 3.33341V5.83341C7.49935 6.09216 7.43911 6.34734 7.32339 6.57877C7.20768 6.8102 7.03968 7.0115 6.83268 7.16675L6.44268 7.45925C6.2897 7.57606 6.18187 7.74224 6.13751 7.92954C6.09315 8.11684 6.115 8.31373 6.19935 8.48675C7.33825 10.8 9.21137 12.6707 11.526 13.8067Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_713_1775">
+                  <rect width="20" height="20" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <a href="tel:+7 (495) 785-55-35">+7 999 999 99 99 доб. 198</a>
+        </div>
+        <div class="visa-contacts-item__value">
+              <div class="visa-contacts-item__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M20.1673 11.9167V5.50008C20.1673 5.01385 19.9742 4.54754 19.6303 4.20372C19.2865 3.8599 18.8202 3.66675 18.334 3.66675H3.66732C3.18109 3.66675 2.71477 3.8599 2.37096 4.20372C2.02714 4.54754 1.83398 5.01385 1.83398 5.50008V16.5001C1.83398 17.5084 2.65898 18.3334 3.66732 18.3334H11.0007M20.1673 6.41675L11.9448 11.6417C11.6618 11.8191 11.3346 11.9131 11.0007 11.9131C10.6667 11.9131 10.3395 11.8191 10.0565 11.6417L1.83398 6.41675M14.6673 17.4167L16.5007 19.2501L20.1673 15.5834" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              <a class="visa-contacts-mail" href="mailto: v.ivanova@bsigroup.ru">v.ivanova@bsigroup.ru</a>
+            </div>
+    </div>
+    <div class="visa-page-contacts__item">
+        <div class="visa-page-contacts__title">Виктория Иванова</div>
+        <div class="visa-page-contacts__text">Специалист визового центра</div>
+        <div class="visa-contacts-item__value">
+          <div class="visa-contacts-item__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <g clip-path="url(#clip0_713_1775)">
+                <path d="M10.8327 1.66675C12.8218 1.66675 14.7295 2.45692 16.136 3.86345C17.5425 5.26997 18.3327 7.17762 18.3327 9.16675M10.8327 5.00008C11.9378 5.00008 12.9976 5.43907 13.779 6.22047C14.5604 7.00187 14.9993 8.06168 14.9993 9.16675M11.526 13.8067C11.6981 13.8858 11.892 13.9038 12.0758 13.8579C12.2595 13.8121 12.4221 13.7049 12.5368 13.5542L12.8327 13.1667C12.9879 12.9598 13.1892 12.7917 13.4207 12.676C13.6521 12.5603 13.9073 12.5001 14.166 12.5001H16.666C17.108 12.5001 17.532 12.6757 17.8445 12.9882C18.1571 13.3008 18.3327 13.7247 18.3327 14.1667V16.6667C18.3327 17.1088 18.1571 17.5327 17.8445 17.8453C17.532 18.1578 17.108 18.3334 16.666 18.3334C12.6878 18.3334 8.87246 16.7531 6.05941 13.94C3.24637 11.127 1.66602 7.31166 1.66602 3.33341C1.66602 2.89139 1.84161 2.46746 2.15417 2.1549C2.46673 1.84234 2.89065 1.66675 3.33268 1.66675H5.83268C6.27471 1.66675 6.69863 1.84234 7.01119 2.1549C7.32375 2.46746 7.49935 2.89139 7.49935 3.33341V5.83341C7.49935 6.09216 7.43911 6.34734 7.32339 6.57877C7.20768 6.8102 7.03968 7.0115 6.83268 7.16675L6.44268 7.45925C6.2897 7.57606 6.18187 7.74224 6.13751 7.92954C6.09315 8.11684 6.115 8.31373 6.19935 8.48675C7.33825 10.8 9.21137 12.6707 11.526 13.8067Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_713_1775">
+                  <rect width="20" height="20" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <a href="tel:+7 (495) 785-55-35">+7 999 999 99 99 доб. 198</a>
+        </div>
+        <div class="visa-contacts-item__value">
+              <div class="visa-contacts-item__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M20.1673 11.9167V5.50008C20.1673 5.01385 19.9742 4.54754 19.6303 4.20372C19.2865 3.8599 18.8202 3.66675 18.334 3.66675H3.66732C3.18109 3.66675 2.71477 3.8599 2.37096 4.20372C2.02714 4.54754 1.83398 5.01385 1.83398 5.50008V16.5001C1.83398 17.5084 2.65898 18.3334 3.66732 18.3334H11.0007M20.1673 6.41675L11.9448 11.6417C11.6618 11.8191 11.3346 11.9131 11.0007 11.9131C10.6667 11.9131 10.3395 11.8191 10.0565 11.6417L1.83398 6.41675M14.6673 17.4167L16.5007 19.2501L20.1673 15.5834" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              <a class="visa-contacts-mail" href="mailto: v.ivanova@bsigroup.ru">v.ivanova@bsigroup.ru</a>
+            </div>
+    </div>
+    <div class="visa-page-contacts__item">
+        <div class="visa-page-contacts__title">Виктория Иванова</div>
+        <div class="visa-page-contacts__text">Специалист визового центра</div>
+        <div class="visa-contacts-item__value">
+          <div class="visa-contacts-item__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <g clip-path="url(#clip0_713_1775)">
+                <path d="M10.8327 1.66675C12.8218 1.66675 14.7295 2.45692 16.136 3.86345C17.5425 5.26997 18.3327 7.17762 18.3327 9.16675M10.8327 5.00008C11.9378 5.00008 12.9976 5.43907 13.779 6.22047C14.5604 7.00187 14.9993 8.06168 14.9993 9.16675M11.526 13.8067C11.6981 13.8858 11.892 13.9038 12.0758 13.8579C12.2595 13.8121 12.4221 13.7049 12.5368 13.5542L12.8327 13.1667C12.9879 12.9598 13.1892 12.7917 13.4207 12.676C13.6521 12.5603 13.9073 12.5001 14.166 12.5001H16.666C17.108 12.5001 17.532 12.6757 17.8445 12.9882C18.1571 13.3008 18.3327 13.7247 18.3327 14.1667V16.6667C18.3327 17.1088 18.1571 17.5327 17.8445 17.8453C17.532 18.1578 17.108 18.3334 16.666 18.3334C12.6878 18.3334 8.87246 16.7531 6.05941 13.94C3.24637 11.127 1.66602 7.31166 1.66602 3.33341C1.66602 2.89139 1.84161 2.46746 2.15417 2.1549C2.46673 1.84234 2.89065 1.66675 3.33268 1.66675H5.83268C6.27471 1.66675 6.69863 1.84234 7.01119 2.1549C7.32375 2.46746 7.49935 2.89139 7.49935 3.33341V5.83341C7.49935 6.09216 7.43911 6.34734 7.32339 6.57877C7.20768 6.8102 7.03968 7.0115 6.83268 7.16675L6.44268 7.45925C6.2897 7.57606 6.18187 7.74224 6.13751 7.92954C6.09315 8.11684 6.115 8.31373 6.19935 8.48675C7.33825 10.8 9.21137 12.6707 11.526 13.8067Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+              <defs>
+                <clipPath id="clip0_713_1775">
+                  <rect width="20" height="20" fill="white"></rect>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <a href="tel:+7 (495) 785-55-35">+7 999 999 99 99 доб. 198</a>
+        </div>
+        <div class="visa-contacts-item__value">
+              <div class="visa-contacts-item__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M20.1673 11.9167V5.50008C20.1673 5.01385 19.9742 4.54754 19.6303 4.20372C19.2865 3.8599 18.8202 3.66675 18.334 3.66675H3.66732C3.18109 3.66675 2.71477 3.8599 2.37096 4.20372C2.02714 4.54754 1.83398 5.01385 1.83398 5.50008V16.5001C1.83398 17.5084 2.65898 18.3334 3.66732 18.3334H11.0007M20.1673 6.41675L11.9448 11.6417C11.6618 11.8191 11.3346 11.9131 11.0007 11.9131C10.6667 11.9131 10.3395 11.8191 10.0565 11.6417L1.83398 6.41675M14.6673 17.4167L16.5007 19.2501L20.1673 15.5834" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              <a class="visa-contacts-mail" href="mailto: v.ivanova@bsigroup.ru">v.ivanova@bsigroup.ru</a>
+            </div>
+    </div>
+    </div>
+
+
+  </div>
+</section>
+
+
 <section class="visa-page-consultation__section" id="contact-form">
   <div class="container">
     <h2 class="h2">Бесплатная консультация</h2>
     <p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам получения виз</p>
     <form id="visa-form" class="visa-consultation-form">
 
-      <div class="form-row form-row-2">
+      <div class="form-row form-row-3">
         <div class="education-programs-filter__field">
           <div class="education-programs-filter__label">Страна *</div>
           <select name="country_id" class="visa-form__country-select education-programs-filter__select"
