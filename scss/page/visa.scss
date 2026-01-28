@@ -21,6 +21,7 @@
 .archive-page__top:has(.visa-disclaimer) {
   border: none;
   padding-bottom: 0;
+  
 }
 
 .visa-disclaimer {
@@ -28,13 +29,16 @@
   margin-top: 16px;
   font-size: 18px;
   margin-bottom: 0;
+  line-height: 1.4;
 
   @media screen and (max-width: 1200px) {
     max-width: 80%;
   }
+
   @media screen and (max-width: 768px) {
     max-width: 100%;
   }
+
   @media screen and (max-width: 480px) {
     font-size: 16px;
   }
@@ -87,12 +91,13 @@
 }
 
 .visa-page__info {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   margin-bottom: 16px;
 
   @media screen and (max-width: 1200px) {
-    flex-direction: column;
+    grid-template-columns: repeat(1, 1fr);
     gap: 32px;
     margin-bottom: 32px;
   }
@@ -101,10 +106,11 @@
 .visa-info-img {
   border-radius: 8px;
   overflow: hidden;
-  max-width: 631px;
+  max-width: 100%;
+  width: 100%;
 
-  @media screen and (max-width: 1200px) {
-    max-width: 100%;
+  img {
+    object-fit: cover;
   }
 }
 
@@ -120,10 +126,11 @@
 
 .visa-info-item {
   border-radius: 8px;
-  max-width: 70%;
+  max-width: 82%;
 
   &.--warn {
     margin-top: 8px;
+
     p {
       margin-bottom: 0;
     }
@@ -138,6 +145,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
   p {
     margin-bottom: 0;
     font-size: 16px;
@@ -177,12 +185,16 @@
   gap: 8px;
 }
 
-.visa-info-item__value + .visa-info-item__value {
+.visa-info-item__value+.visa-info-item__value {
   margin-top: 8px;
 }
+
 .visa-info-item__value:hover {
   .visa-info-item__icon svg path {
     stroke: $red;
+  }
+  a {
+    color: $red;
   }
 }
 
@@ -190,6 +202,7 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  justify-content: center;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(1, 1fr);
@@ -230,6 +243,7 @@
 
 .visa-page-features__section {
   margin-top: 120px;
+
   @media screen and (max-width: 1200px) {
     margin-top: 80px;
   }
@@ -265,18 +279,19 @@
 
 .visa-page-steps__section {
   margin-top: 80px;
+
   @media screen and (max-width: 1200px) {
     margin-top: 80px;
   }
 }
 
 .visa-page-steps__wrap {
-  margin-top: 16px;
+  margin-top: 40px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 16px;
 
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -286,10 +301,11 @@
 }
 
 .visa-page-steps-item {
-  border: 1px solid #bebebe;
+  border: 1px solid #dfdfdf;
   border-radius: 8px;
   padding: 12px;
   position: relative;
+  background-color: #f9f9f9;
 }
 
 .visa-page-steps-item__top {
@@ -312,29 +328,37 @@
 }
 
 .visa-page-steps-item__title {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 18px;
 }
 
 .visa-page-steps-item__description {
   margin-top: 8px;
   line-height: 130%;
+  color: #484848;
 }
 
 /* Стрелки только на десктопе */
-@media screen and (min-width: 1025px) {
+@media screen and (min-width: 1201px) {
+
+  .visa-page-steps__wrap {
+    position: relative;
+  }
+
   /* Нижняя стрелка */
   .visa-page-steps-item[data-arrow="bottom"]::after {
     content: "";
     position: absolute;
     left: 100%;
     top: 50%;
-    transform: translate(-50%, 380%);
-    width: 325px;
+    transform: translate(-50%, 310%);
+    width: calc(100% + 80px);
+    /* 100% ширины блока + gap */
+    max-width: 110%;
     height: 13px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='330' height='13' viewBox='0 0 330 13' fill='none'%3E%3Cpath d='M1.9977 0.5C1.16564 0.5 0.5 1.19565 0.5 2.06522C0.5 2.93478 1.16564 3.63043 1.9977 3.63043C2.82975 3.63043 3.49539 2.93478 3.49539 2.06522C3.49539 1.19565 2.82975 0.5 1.9977 0.5Z' fill='white'/%3E%3Cpath d='M325.854 1.71166C325.658 1.5164 325.342 1.5164 325.146 1.71166L321.964 4.89364C321.769 5.08891 321.769 5.40549 321.964 5.60075C322.16 5.79601 322.476 5.79601 322.672 5.60075L325.5 2.77232L328.328 5.60075C328.524 5.79601 328.84 5.79601 329.036 5.60075C329.231 5.40549 329.231 5.08891 329.036 4.89364L325.854 1.71166ZM0.5 2.06522H1C1 1.45079 1.46234 1 1.9977 1V0.5V0C0.86895 0 0 0.940518 0 2.06522H0.5ZM1.9977 0.5V1C2.53306 1 2.99539 1.45079 2.99539 2.06522H3.49539H3.99539C3.99539 0.940518 3.12644 0 1.9977 0V0.5ZM3.49539 2.06522H2.99539C2.99539 2.67965 2.53306 3.13043 1.9977 3.13043V3.63043V4.13043C3.12644 4.13043 3.99539 3.18992 3.99539 2.06522H3.49539ZM1.9977 3.63043V3.13043C1.46234 3.13043 1 2.67965 1 2.06522H0.5H0C0 3.18992 0.86895 4.13043 1.9977 4.13043V3.63043ZM1.9977 3.63043H1.4977V8.5H1.9977H2.4977V3.63043H1.9977ZM5.9977 12.5V13H321.5V12.5V12H5.9977V12.5ZM325.5 8.5H326V2.06522H325.5H325V8.5H325.5ZM321.5 12.5V13C323.985 13 326 10.9853 326 8.5H325.5H325C325 10.433 323.433 12 321.5 12V12.5ZM1.9977 8.5H1.4977C1.4977 10.9853 3.51241 13 5.9977 13V12.5V12C4.0647 12 2.4977 10.433 2.4977 8.5H1.9977Z' fill='%23373535'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: 100% 100%;
     background-position: center;
   }
 
@@ -344,18 +368,21 @@
     position: absolute;
     left: 100%;
     top: 50%;
-    transform: translate(-50%, -470%);
-    width: 325px;
+    transform: translate(-50%, -385%);
+    width: calc(100% + 80px);
+    /* 100% ширины блока + gap */
+    max-width: 110%;
     height: 14px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='330' height='14' viewBox='0 0 330 14' fill='none'%3E%3Cpath d='M2 13.3491C1.16667 13.3491 0.5 12.6042 0.5 11.6731C0.5 10.742 1.16667 9.99717 2 9.99717C2.83333 9.99717 3.5 10.742 3.5 11.6731C3.5 12.6042 2.83333 13.3491 2 13.3491Z' fill='white'/%3E%3Cpath d='M326.354 12.0267C326.158 12.222 325.842 12.222 325.646 12.0267L322.464 8.84472C322.269 8.64945 322.269 8.33287 322.464 8.13761C322.66 7.94235 322.976 7.94235 323.172 8.13761L326 10.966L328.828 8.13761C329.024 7.94235 329.34 7.94235 329.536 8.13761C329.731 8.33287 329.731 8.64945 329.536 8.84472L326.354 12.0267ZM0.5 11.6731H1C1 12.3817 1.49353 12.8491 2 12.8491V13.3491V13.8491C0.839808 13.8491 0 12.8268 0 11.6731H0.5ZM2 13.3491V12.8491C2.50647 12.8491 3 12.3817 3 11.6731H3.5H4C4 12.8268 3.16019 13.8491 2 13.8491V13.3491ZM3.5 11.6731H3C3 10.9646 2.50647 10.4972 2 10.4972V9.99717V9.49717C3.16019 9.49717 4 10.5195 4 11.6731H3.5ZM2 9.99717V10.4972C1.49353 10.4972 1 10.9646 1 11.6731H0.5H0C0 10.5195 0.839808 9.49717 2 9.49717V9.99717ZM2 9.99717H1.5V4.49996H2H2.5V9.99717H2ZM6 0.49996V-4.00543e-05H322V0.49996V0.99996H6V0.49996ZM326 4.49996H326.5V11.6731H326H325.5V4.49996H326ZM322 0.49996V-4.00543e-05C324.485 -4.00543e-05 326.5 2.01468 326.5 4.49996H326H325.5C325.5 2.56696 323.933 0.99996 322 0.99996V0.49996ZM2 4.49996H1.5C1.5 2.01468 3.51472 -4.00543e-05 6 -4.00543e-05V0.49996V0.99996C4.067 0.99996 2.5 2.56696 2.5 4.49996H2Z' fill='%23373535'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: 100% 100%;
     background-position: center;
   }
 }
 
 .visa-page-consultation__section {
   margin-top: 80px;
+
   @media screen and (max-width: 1200px) {
     margin-top: 80px;
   }
@@ -363,15 +390,19 @@
 
 .visa-page-contacts__section {
   margin-top: 80px;
+
   @media screen and (max-width: 768px) {
     margin-top: 80px;
   }
 }
 
 .visa-contact-item {
-  border: 1px solid #bebebe;
+  display: flex;
+  flex-direction: column;
   padding: 12px;
   border-radius: 8px;
+  background-color: $bg-gray;
+  width: 100%;
 }
 
 .visa-page-contacts__wrap {
@@ -390,12 +421,13 @@
 }
 
 .visa-contact-item__name {
-  font-weight: 500;
   font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 2px;
 }
 
 .visa-contact-item__direction {
-  font-weight: 500;
+  font-weight: 400;
   font-size: 14px;
   line-height: 120%;
   margin-top: 4px;
@@ -403,17 +435,60 @@
 }
 
 .visa-contact-item__phone {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+
+  &:last-child {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    .visa-contacts-item__icon svg path {
+    stroke: $red;
+  }
+  a {
+    color: $red;
+  }
+  }
 }
 
 .visa-contact-item__email {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+
+  &:last-child {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    .visa-contacts-item__icon svg path {
+    stroke: $red;
+  }
+  a {
+    color: $red;
+  }
+  }
 }
 
 .visa-contact-item__links {
-  margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   line-height: 100%;
+  margin-top: 8px;
 }
 
 .visa-contact-item__link {
@@ -441,6 +516,7 @@
 
 .visa-page-countries-section {
   margin-top: 80px;
+
   @media screen and (max-width: 768px) {
     margin-top: 80px;
   }
@@ -450,7 +526,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   margin-top: 20px;
-  gap: 32px 8px;
+  gap: 40px 16px;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
@@ -469,8 +545,7 @@
   }
 }
 
-.visa-country-card {
-}
+.visa-country-card {}
 
 .visa-country-card__head {
   display: flex;
@@ -487,18 +562,29 @@
   height: 32px;
   overflow: hidden;
   object-fit: cover;
+  flex: 0 0 auto;
 }
 
 .visa-country-card__title {
   font-weight: 500;
   font-size: 16px;
+  white-space: nowrap;
 }
 
+.visa-country-card__amount {
+  font-size: 16px;
+  font-weight: 400;
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+
 .visa-country-card__types {
-  margin-top: 8px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   padding-left: 8px;
 }
 
@@ -506,19 +592,20 @@
   transition: all 0.3s ease-in-out;
   font-weight: 500;
   position: relative;
-  padding-left: 14px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 8px;
 
   &::before {
     content: "";
-    position: absolute;
-    top: 11px;
-    left: 0;
-    height: 2px;
-    width: 8px;
-    background: $red;
+    height: 18px;
+    width: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18' fill='none'%3E%3Cpath d='M5.25 5.25H12.75M12.75 5.25V12.75M12.75 5.25L5.25 12.75' stroke='%23EF0101' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
   }
+
   &:hover {
     color: $red;
   }
@@ -540,6 +627,7 @@
   .fit-form__btn-submit {
     margin-top: 0;
   }
+
   @media screen and (max-width: 1024px) {
     grid-template-columns: repeat(1, 1fr);
   }
@@ -699,6 +787,7 @@ a.visa-embassy__contact-item {
 .visa-page-contacts__section {
   margin-top: 80px;
 }
+
 .visa-page-contacts__wrap {
   display: grid;
   width: 100%;
@@ -710,6 +799,7 @@ a.visa-embassy__contact-item {
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
+
   @media screen and (max-width: 768px) {
     grid-template-columns: repeat(1, 1fr);
   }
@@ -749,6 +839,15 @@ a.visa-embassy__contact-item {
   &:last-child {
     margin-top: 0;
     margin-bottom: 0;
+  }
+
+  &:hover {
+    .visa-contacts-item__icon svg path {
+    stroke: $red;
+  }
+  a {
+    color: $red;
+  }
   }
 }
 
