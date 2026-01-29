@@ -305,6 +305,7 @@ require get_template_directory() . '/inc/requests/popular-tours-section.php';
 require get_template_directory() . '/inc/requests/popular-education-section.php';
 require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
+require get_template_directory() . '/inc/services/class-bsi-mailer.php';
 require get_template_directory() . '/inc/requests/ajax-education-program-form.php';
 
 add_action('template_redirect', function () {
