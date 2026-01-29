@@ -6,7 +6,7 @@
 ?>
 <div class="modal micromodal-slide" id="modal-program-booking" aria-hidden="true">
   <div class="modal__overlay" tabindex="-1">
-    <div class="modal__container modal-program-booking" role="dialog" aria-modal="true"
+    <div class="modal__container --xl modal-program-booking" role="dialog" aria-modal="true"
       aria-labelledby="modal-program-booking-title">
       <button class="modal__close modal-program-booking__close" aria-label="Закрыть" data-micromodal-close>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,7 +83,7 @@
           </div>
 
           <div class="modal-program-booking__form-footer">
-            <button type="submit" class="modal-program-booking__submit btn btn--primary">
+            <button type="submit" class="modal-program-booking__submit btn btn-accent">
               Отправить заявку
             </button>
             <p class="modal-program-booking__privacy">
@@ -92,19 +92,25 @@
             </p>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <!-- Сообщение об успехе -->
-        <div class="modal-program-booking__success js-form-success" style="display: none;">
-          <div class="modal-program-booking__success-icon">
-            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="32" cy="32" r="32" fill="#4CAF50" />
-              <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </div>
-          <h3 class="modal-program-booking__success-title">Заявка отправлена!</h3>
-          <p class="modal-program-booking__success-text">Мы свяжемся с вами в ближайшее время</p>
+<!-- Модалка успеха -->
+<div class="modal micromodal-slide" id="modal-program-booking-success" aria-hidden="true">
+  <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+    <div class="modal__container modal-program-booking-success" role="dialog" aria-modal="true">
+      <div class="modal__content modal-program-booking-success__content">
+        <div class="modal-program-booking-success__icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="32" fill="#4CAF50" />
+            <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
         </div>
+        <h3 class="modal-program-booking-success__title">Заявка отправлена!</h3>
+        <p class="modal-program-booking-success__text">Мы свяжемся с вами в ближайшее время</p>
       </div>
     </div>
   </div>

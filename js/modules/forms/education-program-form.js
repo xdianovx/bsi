@@ -34,22 +34,30 @@ function parsePrice(priceStr) {
 function calculateTotal() {
   if (!currentProgramData) return 0;
 
-  let total = parsePrice(currentProgramData.price);
+  const basePrice = parsePrice(currentProgramData.price);
+  let total = basePrice;
+
+  console.log("[Modal] Base price:", basePrice, "raw:", currentProgramData.price);
 
   // Проверяем чекбокс визы
   const visaCheckbox = document.querySelector('.js-modal-services-list input[data-service-type="visa"]');
   if (visaCheckbox && visaCheckbox.checked) {
-    total += parsePrice(currentProgramData.visaPrice);
+    const visaPrice = parsePrice(currentProgramData.visaPrice);
+    total += visaPrice;
+    console.log("[Modal] + Visa:", visaPrice);
   }
 
   // Проверяем дополнительные услуги
   const serviceCheckboxes = document.querySelectorAll('.js-modal-services-list input[data-service-type="additional"]');
   serviceCheckboxes.forEach((checkbox) => {
     if (checkbox.checked) {
-      total += parsePrice(checkbox.dataset.servicePrice);
+      const servicePrice = parsePrice(checkbox.dataset.servicePrice);
+      total += servicePrice;
+      console.log("[Modal] + Service:", checkbox.dataset.serviceTitle, servicePrice);
     }
   });
 
+  console.log("[Modal] Total:", total);
   return total;
 }
 
@@ -246,7 +254,6 @@ function populateModal(programData) {
  */
 function resetForm() {
   const form = document.querySelector(".js-program-booking-form");
-  const success = document.querySelector(".js-form-success");
 
   if (form) {
     form.reset();
@@ -258,10 +265,6 @@ function resetForm() {
     form.querySelectorAll(".modal-program-booking__input--error").forEach((el) => {
       el.classList.remove("modal-program-booking__input--error");
     });
-  }
-
-  if (success) {
-    success.style.display = "none";
   }
 }
 
@@ -360,12 +363,23 @@ async function submitForm(e) {
     const result = await response.json();
 
     if (result.success) {
-      // Показываем успех
-      form.style.display = "none";
-      const success = document.querySelector(".js-form-success");
-      if (success) {
-        success.style.display = "block";
-      }
+      // Закрываем модалку бронирования
+      MicroModal.close("modal-program-booking");
+
+      // Открываем модалку успеха с небольшой задержкой для плавности
+      setTimeout(() => {
+        MicroModal.show("modal-program-booking-success", {
+          awaitCloseAnimation: true,
+          onClose: () => {
+            resetForm();
+          },
+        });
+
+        // Авто-закрытие через 2 секунды
+        setTimeout(() => {
+          MicroModal.close("modal-program-booking-success");
+        }, 2000);
+      }, 300);
     } else {
       // Показываем ошибки с сервера
       if (result.data && result.data.errors) {
@@ -389,6 +403,7 @@ async function submitForm(e) {
  * Открытие модального окна с данными программы
  */
 export function openProgramModal(programData) {
+  console.log("[Modal] Opening with data:", programData);
   resetForm();
   populateModal(programData);
 

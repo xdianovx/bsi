@@ -212,7 +212,7 @@ foreach ($additional_services as $service) {
               <div class="education-program-card__price"><?php echo esc_html($price_formatted); ?></div>
             <?php endif; ?>
 
-            <button type="button" class="education-program-card__book-btn btn btn--primary js-program-booking-btn"
+            <button type="button" class="education-program-card__book-btn btn btn-accent js-program-booking-btn"
               data-program-title="<?php echo esc_attr($program_title); ?>"
               data-program-date="<?php echo esc_attr($date_for_modal); ?>"
               data-program-age="<?php echo esc_attr($age_text); ?>"
