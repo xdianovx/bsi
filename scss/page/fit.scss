@@ -11,6 +11,10 @@
   margin: 0 auto;
 }
 
+.fit-form__wrap .form-group {
+  margin-bottom: 60px;
+}
+
 .fit-form {
   .select-item .choices__inner {
     border: 1px solid #bebebe !important;
@@ -46,8 +50,8 @@
 }
 
 .fit-form__datepicker-wrapper {
-  overflow: scroll;
-  @media screen and (max-width: 768px) {
+
+  @media screen and (max-width: 1280px) {
     overflow-x: scroll;
   }
   &.error {
@@ -152,7 +156,6 @@
 }
 
 .form-group__title {
-  padding-bottom: 16px;
   margin-bottom: 24px;
 }
 
@@ -524,7 +527,7 @@
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 8px;
-  padding: 16px;
+  padding: 0;
   background: #fff;
 
   @media screen and (max-width: 768px) {
