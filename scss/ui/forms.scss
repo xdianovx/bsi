@@ -152,6 +152,10 @@ input.error {
     color: $red;
     text-decoration: underline;
   }
+
+  @media screen and (max-width: 1252px) {
+    font-size: 14px;
+  }
 }
 
 .form-status.loading {
@@ -191,7 +195,7 @@ input.error {
 
   &.form-row-3 {
     grid-template-columns: repeat(3, 1fr);
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 1200px) {
       grid-template-columns: repeat(1, 1fr);
     }
   }
