@@ -240,11 +240,13 @@ function populateModal(programData) {
   const formDateInput = document.querySelector(".js-form-program-date");
   const formPriceInput = document.querySelector(".js-form-program-price");
   const formSchoolInput = document.querySelector(".js-form-school-name");
+  const formPageUrlInput = document.querySelector(".js-form-page-url");
 
   if (formTitleInput) formTitleInput.value = programData.title || "";
   if (formDateInput) formDateInput.value = programData.date || "";
   if (formPriceInput) formPriceInput.value = parsePrice(programData.price);
   if (formSchoolInput) formSchoolInput.value = programData.schoolName || "";
+  if (formPageUrlInput) formPageUrlInput.value = window.location.href;
 
   updateSelectedServicesInput();
 }

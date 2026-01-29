@@ -52,6 +52,7 @@
           <input type="hidden" name="selected_services" class="js-form-selected-services">
           <input type="hidden" name="total_price" class="js-form-total-price">
           <input type="hidden" name="school_name" class="js-form-school-name">
+          <input type="hidden" name="page_url" class="js-form-page-url">
 
           <div class="modal-program-booking__form-row">
             <div class="modal-program-booking__form-group">

@@ -33,6 +33,7 @@ function bsi_handle_education_program_booking(): void
   $program_price = absint($_POST['program_price'] ?? 0);
   $total_price = absint($_POST['total_price'] ?? 0);
   $school_name = sanitize_text_field($_POST['school_name'] ?? '');
+  $page_url = esc_url_raw($_POST['page_url'] ?? '');
 
   // Выбранные услуги
   $selected_services = [];
@@ -64,6 +65,7 @@ function bsi_handle_education_program_booking(): void
       'total_price' => $total_price,
       'school_name' => $school_name,
       'selected_services' => $selected_services,
+      'page_url' => $page_url,
     ],
     'reply_to' => $email,
   ]);

@@ -64,7 +64,8 @@ $total_price_formatted = number_format((int) ($total_price ?? 0), 0, ',', ' ') .
     <tr style="background-color: #fff3e0;">
       <td style="padding: 10px; font-weight: bold; font-size: 16px;">Итого</td>
       <td style="padding: 10px; font-weight: bold; font-size: 16px; color: #e53935;">
-        <?php echo $total_price_formatted; ?></td>
+        <?php echo $total_price_formatted; ?>
+      </td>
     </tr>
   </table>
 
@@ -99,6 +100,11 @@ $total_price_formatted = number_format((int) ($total_price ?? 0), 0, ',', ' ') .
   <p style="font-size: 12px; color: #999;">
     IP: <?php echo esc_html($_SERVER['REMOTE_ADDR'] ?? 'Unknown'); ?><br>
     Дата: <?php echo esc_html(wp_date('d.m.Y H:i:s')); ?>
+    <?php if (!empty($page_url)): ?>
+      <br>
+      Страница: <a href="<?php echo esc_url($page_url); ?>"
+        style="color: #e53935; text-decoration: none;"><?php echo esc_html($page_url); ?></a>
+    <?php endif; ?>
   </p>
 </body>
 
