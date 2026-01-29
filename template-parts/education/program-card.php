@@ -132,12 +132,15 @@ if (!empty($meal_names)) {
 
 $accommodation_text = implode(', ', $accommodation_parts);
 
-// Форматируем цену
+// Форматируем цену используя функции из helpers.php
 $price_formatted = '';
 $price_numeric = 0;
 if (!empty($price_per_week)) {
-  $price_formatted = format_price_with_from($price_per_week, true);
-  // Извлекаем числовое значение цены
+  // Сначала форматируем числа в тексте цены
+  $price_formatted = format_price_text($price_per_week);
+  // Затем применяем форматирование с "от"
+  $price_formatted = format_price_with_from($price_formatted, true);
+  // Извлекаем числовое значение цены для передачи в модалку
   $price_numeric = (int) preg_replace('/[^\d]/', '', $price_per_week);
 }
 
