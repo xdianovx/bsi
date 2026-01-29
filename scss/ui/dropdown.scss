@@ -8,6 +8,7 @@
   width: 100%; // Кнопка занимает всю доступную ширину
 
   text-align: left;
+
   // Добавляем стрелку через псевдоэлемент
   &::after {
     content: "";
@@ -59,8 +60,9 @@
 
 .js-dropdown-panel {
   position: absolute;
-  inset-block-start: 100%;
-  inset-inline-start: 0;
+  right: 0;
+  left: unset;
+  top: 100%;
   margin-top: 8px;
   border-radius: 16px;
   background: #fff;
