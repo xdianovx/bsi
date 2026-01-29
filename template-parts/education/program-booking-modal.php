@@ -6,7 +6,7 @@
 ?>
 <div class="modal micromodal-slide" id="modal-program-booking" aria-hidden="true">
   <div class="modal__overlay" tabindex="-1">
-    <div class="modal__container modal-program-booking" role="dialog" aria-modal="true"
+    <div class="modal__container --xl modal-program-booking" role="dialog" aria-modal="true"
       aria-labelledby="modal-program-booking-title">
       <button class="modal__close modal-program-booking__close" aria-label="Закрыть" data-micromodal-close>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,7 +83,7 @@
           </div>
 
           <div class="modal-program-booking__form-footer">
-            <button type="submit" class="modal-program-booking__submit btn btn--primary">
+            <button type="submit" class="modal-program-booking__submit btn btn-accent">
               Отправить заявку
             </button>
             <p class="modal-program-booking__privacy">

@@ -623,10 +623,10 @@
 
 .education-program-card__price {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 500;
   color: #000000;
   margin-left: auto;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .education-program-card__info {
@@ -713,8 +713,6 @@
 .education-program-card__book-btn {
   white-space: nowrap;
   padding: 12px 24px;
-  font-size: 14px;
-  border-radius: 50px;
 
   @media screen and (max-width: 768px) {
     width: 100%;
@@ -1514,4 +1512,8 @@
 
 .single-education__price-icon--warning {
   color: #f59e0b;
+}
+
+.modal-program-booking__submit {
+  border-radius: 12px;
 }
