@@ -8,8 +8,6 @@
 }
 
 .fit-form__wrap {
-  border-top: 1px solid $red;
-  padding-top: 32px;
   margin: 0 auto;
 }
 
@@ -48,6 +46,7 @@
 }
 
 .fit-form__datepicker-wrapper {
+  overflow: scroll;
   @media screen and (max-width: 768px) {
     overflow-x: scroll;
   }
@@ -122,7 +121,6 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 32px;
-  border-bottom: 1px solid #bebebe;
   padding-bottom: 16px;
 }
 
@@ -151,21 +149,20 @@
 .fit-form__corporate-fields {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #bebebe;
 }
 
 .form-group__title {
   padding-bottom: 16px;
-  border-bottom: 1px solid #bebebe;
   margin-bottom: 24px;
 }
 
 .fit-form__bottom {
-  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .fit-form__btn-submit {
-  margin-top: 24px;
   width: 100%;
 }
 
@@ -403,14 +400,18 @@
   .flatpickr-month {
     left: 0 !important;
     text-align: left !important;
-    font-family: "Raleway", sans-serif !important;
+    font-family: "Inter", sans-serif !important;
 
     .flatpickr-current-month {
       left: 0 !important;
       text-align: left !important;
-      font-family: "Raleway", sans-serif !important;
+      font-family: "Inter", sans-serif !important;
     }
   }
+}
+
+.numInputWrapper {
+  pointer-events: none !important;
 }
 
 .fit-form__datepicker-inline {
@@ -525,8 +526,6 @@
   gap: 8px;
   padding: 16px;
   background: #fff;
-  border: 1px solid #bebebe;
-  border-radius: 8px;
 
   @media screen and (max-width: 768px) {
     grid-template-columns: repeat(5, 1fr);
