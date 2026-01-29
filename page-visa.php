@@ -649,10 +649,8 @@ $countries = get_posts([
               политикой конфиденциальности
             </a>
           </p>
-
-          <div id="visa-form-status" class="form-status"></div>
-
         </div>
+        <div id="visa-form-status" class="form-status"></div>
       </form>
     </div>
   </section>
