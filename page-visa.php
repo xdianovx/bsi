@@ -392,8 +392,8 @@ $countries = get_posts([
                 <div class="visa-country-card__title">
                   <?php echo esc_html($country_title); ?>
                 </div>
-                <!-- Цена от -->
-                <span class="visa-country-card__amount">от 16 дней</span>
+                <!-- Кол-во дней от -->
+                <span class="visa-country-card__amount"></span>
 
               </div>
 
