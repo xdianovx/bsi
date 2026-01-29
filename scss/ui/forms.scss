@@ -45,6 +45,13 @@
   padding: 14px 16px;
   border: 1px solid #bebebe;
   width: 100%;
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px white inset;
+    box-shadow: 0 0 0 1000px white inset;
+  }
 }
 
 input.error {
