@@ -102,10 +102,18 @@
 //   font-style: italic;
 // }
 
+// @font-face {
+//   font-family: "Nunito";
+//   font-display: swap;
+//   src: url("../../fonts/Nunito-Italic.ttf") format("truetype");
+//   font-weight: 400;
+//   unicode-range: U+0030-0039; /* только цифры */
+// }
 @font-face {
-  font-family: "Nunito";
+  font-family: "Inter";
   font-display: swap;
-  src: url("../../fonts/Nunito-Italic.ttf") format("truetype");
+  src: url("../../fonts/Inter-Regular.ttf") format("truetype");
   font-weight: 400;
+  font-style: normal;
   unicode-range: U+0030-0039; /* только цифры */
 }
