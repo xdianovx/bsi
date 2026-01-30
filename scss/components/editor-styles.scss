@@ -136,7 +136,6 @@
     li {
       margin-bottom: 0.5em;
       line-height: 1.6;
-      // list-style-type: circle;
     }
   }
 
@@ -150,11 +149,10 @@
   }
 
   ol {
-    list-style-type: decimal !important;
+    // list-style-type: latin !important;asd
 
-    ol {
-      list-style-type: lower-latin;
-      margin: 0.5em 0;
+    li {
+      list-style-type: latin !important;
     }
   }
 
