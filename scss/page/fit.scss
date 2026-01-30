@@ -50,7 +50,6 @@
 }
 
 .fit-form__datepicker-wrapper {
-
   @media screen and (max-width: 1280px) {
     overflow-x: scroll;
   }
@@ -134,7 +133,7 @@
   background: $bg-gray;
   cursor: pointer;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 16px;
   transition: $trans-text;
 
