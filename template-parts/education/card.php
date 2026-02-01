@@ -271,11 +271,9 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
       <?php if ($country_title || $resort_title): ?>
         <div class="education-card__location-text">
           <?php if ($country_title): ?>
-            <?php echo esc_html($country_title); ?>
+            <?php echo esc_html($country_title); ?>,
           <?php endif; ?>
-          <?php if ($country_title && $resort_title): ?>
-            <span>, </span>
-          <?php endif; ?>
+
           <?php if ($resort_title): ?>
             <span><?php echo esc_html($resort_title); ?></span>
           <?php endif; ?>
