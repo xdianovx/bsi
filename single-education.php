@@ -304,21 +304,17 @@ get_header();
                 <?php if ($country_title): ?>
                   <?php if ($country_permalink): ?>
                     <a href="<?php echo esc_url($country_permalink); ?>"
-                      class="single-education__country-link"><?php echo esc_html($country_title); ?></a>
+                      class="single-education__country-link"><?php echo esc_html($country_title); ?><?php if ($region_name || $resort_name): ?>,<?php endif; ?></a>
                   <?php else: ?>
-                    <span class="single-education__country-text"><?php echo esc_html($country_title); ?></span>
+                    <span
+                      class="single-education__country-text"><?php echo esc_html($country_title); ?><?php if ($region_name || $resort_name): ?>,<?php endif; ?></span>
                   <?php endif; ?>
                 <?php endif; ?>
                 <?php if ($region_name): ?>
-                  <?php if ($country_title): ?>
-                    <span class="single-education__location-separator">,</span>
-                  <?php endif; ?>
-                  <span class="single-education__region-text"><?php echo esc_html($region_name); ?></span>
+                  <span
+                    class="single-education__region-text"><?php echo esc_html($region_name); ?><?php if ($resort_name): ?>,<?php endif; ?></span>
                 <?php endif; ?>
                 <?php if ($resort_name): ?>
-                  <?php if ($country_title || $region_name): ?>
-                    <span class="single-education__location-separator">,</span>
-                  <?php endif; ?>
                   <span class="single-education__resort-text"><?php echo esc_html($resort_name); ?></span>
                 <?php endif; ?>
               </div>
