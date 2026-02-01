@@ -54,6 +54,7 @@
           <input type="hidden" name="school_name" class="js-form-school-name">
           <input type="hidden" name="page_url" class="js-form-page-url">
 
+          <!-- Первый ряд: Имя, Телефон -->
           <div class="modal-program-booking__form-row">
             <div class="modal-program-booking__form-group">
               <label for="booking-name" class="modal-program-booking__label">Имя</label>
@@ -63,6 +64,16 @@
             </div>
 
             <div class="modal-program-booking__form-group">
+              <label for="booking-phone" class="modal-program-booking__label">Телефон</label>
+              <input type="tel" id="booking-phone" name="phone" class="modal-program-booking__input js-phone-mask"
+                placeholder="+7" required data-field="phone">
+              <span class="modal-program-booking__error js-field-error" data-error-for="phone"></span>
+            </div>
+          </div>
+
+          <!-- Второй ряд: Почта, Дата заезда -->
+          <div class="modal-program-booking__form-row">
+            <div class="modal-program-booking__form-group">
               <label for="booking-email" class="modal-program-booking__label">Почта</label>
               <input type="email" id="booking-email" name="email" class="modal-program-booking__input" required
                 data-field="email">
@@ -70,10 +81,10 @@
             </div>
 
             <div class="modal-program-booking__form-group">
-              <label for="booking-phone" class="modal-program-booking__label">Телефон</label>
-              <input type="tel" id="booking-phone" name="phone" class="modal-program-booking__input js-phone-mask"
-                placeholder="+7" required data-field="phone">
-              <span class="modal-program-booking__error js-field-error" data-error-for="phone"></span>
+              <label for="booking-checkin-date" class="modal-program-booking__label">Дата заезда</label>
+              <input type="text" id="booking-checkin-date" name="checkin_date" class="modal-program-booking__input"
+                placeholder="дд.мм.гггг" data-field="checkin_date">
+              <span class="modal-program-booking__error js-field-error" data-error-for="checkin_date"></span>
             </div>
           </div>
 

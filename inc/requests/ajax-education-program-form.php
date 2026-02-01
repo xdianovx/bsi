@@ -25,6 +25,7 @@ function bsi_handle_education_program_booking(): void
   $name = sanitize_text_field(trim($_POST['name'] ?? ''));
   $email = sanitize_email(trim($_POST['email'] ?? ''));
   $phone = sanitize_text_field(trim($_POST['phone'] ?? ''));
+  $checkin_date = sanitize_text_field(trim($_POST['checkin_date'] ?? ''));
   $comment = sanitize_textarea_field(trim($_POST['comment'] ?? ''));
 
   // Данные программы
@@ -58,6 +59,7 @@ function bsi_handle_education_program_booking(): void
       'name' => $name,
       'email' => $email,
       'phone' => $phone,
+      'checkin_date' => $checkin_date,
       'comment' => $comment,
       'program_title' => $program_title,
       'program_date' => $program_date,

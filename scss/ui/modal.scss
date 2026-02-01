@@ -298,12 +298,11 @@
 
 .modal-program-booking__form-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   margin-bottom: 16px;
-}
-@media (max-width: 768px) {
-  .modal-program-booking__form-row {
+
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
 }

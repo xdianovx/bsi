@@ -88,6 +88,12 @@ $total_price_formatted = number_format((int) ($total_price ?? 0), 0, ',', ' ') .
           href="tel:<?php echo esc_attr(preg_replace('/\D/', '', $phone ?? '')); ?>"><?php echo esc_html($phone ?? ''); ?></a>
       </td>
     </tr>
+    <?php if (!empty($checkin_date)): ?>
+      <tr>
+        <td style="padding: 10px; font-weight: bold;">Дата заезда</td>
+        <td style="padding: 10px;"><?php echo esc_html($checkin_date); ?></td>
+      </tr>
+    <?php endif; ?>
     <?php if (!empty($comment)): ?>
       <tr>
         <td style="padding: 10px; font-weight: bold;">Комментарий</td>
