@@ -25,6 +25,11 @@
   cursor: pointer;
   background: #f4f4f6;
   border-radius: 8px;
+  
+  @media screen and (max-width: 375px) {
+    width: 32px;
+    height: 32px;    
+  }
 }
 
 .counter-item-value {
@@ -33,6 +38,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  @media screen and (max-width: 375px) {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .gtm-persons-dropdown {
