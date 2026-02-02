@@ -170,6 +170,10 @@
   gap: 16px;
   font-size: 14px;
   font-weight: 600;
+
+  @media screen and (max-width: 380px) {
+    flex-direction: column;
+  }
 }
 
 .footer__currencies .currency-item {

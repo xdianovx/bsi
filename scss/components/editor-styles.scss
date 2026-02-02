@@ -167,6 +167,9 @@
       color: $red;
       border-bottom-color: $red;
     }
+    @media screen and (max-width: 380px) {
+      overflow-wrap: break-word;
+    }
   }
 
   // Изображения

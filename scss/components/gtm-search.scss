@@ -18,8 +18,12 @@
 .gtm-item__button {
   padding: 16px 40px;
 
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1200px) {
     width: 100%;
+  }
+
+  @media screen and (max-width: 1024px) {
+    
     background: #000;
     color: #fff;
   }
@@ -33,7 +37,7 @@
 .gtm-datepicker {
   text-align: center;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     text-align: left;
     padding: 0 12px;
   }
@@ -54,7 +58,7 @@
 
   &.--hotels {
     grid-template-columns: 3fr 1fr 1fr 1fr;
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 1024px) {
       grid-template-columns: repeat(1, 1fr);
       width: 100%;
       gap: 8px;
@@ -69,7 +73,7 @@
   &.--excursions {
     grid-template-columns: 1fr 3fr 1fr 1fr;
 
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 1024px) {
       grid-template-columns: repeat(1, 1fr);
       width: 100%;
       gap: 8px;
@@ -84,7 +88,7 @@
       overflow: hidden;
     }
   }
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     grid-template-columns: repeat(1, 1fr);
     width: 100%;
     gap: 8px;
@@ -331,5 +335,27 @@
     &.active {
       display: flex;
     }
+  }
+}
+
+.gtm-persons-dropdown {
+  .child-age {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .child-age__label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+
+  .child-age__select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #bebebe;
+    border-radius: 8px;
+    font-size: 14px;
   }
 }
