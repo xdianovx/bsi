@@ -126,6 +126,9 @@ export const sliders = () => {
     breakpoints: {
       320: {
         spaceBetween: 64,
+        slidesPerView: 2,
+      },
+      480: {
         slidesPerView: 3,
       },
       769: {
