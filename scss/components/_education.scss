@@ -1450,6 +1450,10 @@
     display: flex;
     align-items: flex-start;
     gap: 12px;
+
+    b {
+      display: contents;
+    }
   }
 
   // Если пользователь вставил простой текст с переносами строк

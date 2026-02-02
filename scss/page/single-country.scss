@@ -235,6 +235,10 @@
     }
   }
 
+  > span {
+    font-weight: 500;
+  }
+
   @media screen and (max-width: 1200px) {
     padding: 8px 12px;
     width: auto;
