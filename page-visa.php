@@ -54,7 +54,7 @@ $countries = get_posts([
         </h1>
         <!-- 
         <p class="page-award__excerpt archive-page__excerpt"><?= get_the_excerpt(); ?></p> -->
-        <p class="visa-disclaimer">Визовое сопровождение и поддержка c 93% одобрением в более чем 48 направлений с 1990
+        <p class="visa-disclaimer">Визовое сопровождение и поддержка c 93% одобрением в более чем 12 направлений с 1990
           года</p>
       </div>
     </div>
@@ -188,7 +188,7 @@ $countries = get_posts([
 
         <div class="visa-info-advantage">
           <div class="visa-info-advantage__title">
-            48
+            > 12
           </div>
           <div class="visa-info-advantage__text">
             направлений
