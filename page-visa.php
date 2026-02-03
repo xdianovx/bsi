@@ -196,7 +196,7 @@ $countries = get_posts([
         </div>
         <div class="visa-info-advantage">
           <div class="visa-info-advantage__title">
-            > 1 000
+            > 100 000
           </div>
           <div class="visa-info-advantage__text">
             Оформленных виз
