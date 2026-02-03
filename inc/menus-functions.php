@@ -15,12 +15,20 @@ function theme_register_nav_menu()
 
 class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
 {
+    private $in_list_without_children = false;
 
     public function start_lvl(&$output, $depth = 0, $args = array())
     {
         if ($depth === 0) {
             $output .= "\n<div class=\"mega-menu\"><div class=\"mega-menu__inner\">\n";
+            $this->in_list_without_children = false;
         } elseif ($depth === 1) {
+            // start_lvl вызывается только для элементов с дочерними элементами
+            // Если мы были в списке элементов без детей, закрываем его
+            if ($this->in_list_without_children) {
+                $output .= "</ul></div>\n";
+                $this->in_list_without_children = false;
+            }
             $output .= "<ul class=\"mega-menu__list \">\n";
         }
     }
@@ -28,6 +36,11 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
     public function end_lvl(&$output, $depth = 0, $args = array())
     {
         if ($depth === 0) {
+            // Закрываем список элементов без детей, если он был открыт
+            if ($this->in_list_without_children) {
+                $output .= "</ul></div>\n";
+                $this->in_list_without_children = false;
+            }
             $output .= "</div></div>\n";
         } elseif ($depth === 1) {
             $output .= "</ul>\n";
@@ -41,6 +54,7 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
         $title = esc_html($item->title);
         $url = esc_url($item->url);
 
+        $has_children = in_array('menu-item-has-children', $classes, true);
 
         $is_active = false;
         $active_classes = [
@@ -174,10 +188,30 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
                 ($is_active ? ' is-active' : '') . '">' . $title . '</a>';
 
         } elseif ($depth === 1) {
-
-            $output .= '<div class="mega-menu__col">';
-            $output .= '<div class="mega-menu__title' .
-                ($is_active ? ' is-active' : '') . '">' . $title . '</div>';
+            
+            if ($has_children) {
+                // Если есть дочерние элементы - рендерим как заголовок колонки
+                // Если мы были в списке элементов без детей, закрываем его
+                if ($this->in_list_without_children) {
+                    $output .= "</ul></div>\n";
+                    $this->in_list_without_children = false;
+                }
+                $output .= '<div class="mega-menu__col">';
+                $output .= '<div class="mega-menu__title' .
+                    ($is_active ? ' is-active' : '') . '">' . $title . '</div>';
+            } else {
+                // Если нет дочерних элементов - группируем в один список
+                if (!$this->in_list_without_children) {
+                    // Открываем новую колонку и список для элементов без детей
+                    $output .= '<div class="mega-menu__col">';
+                    $output .= '<ul class="mega-menu__list">';
+                    $this->in_list_without_children = true;
+                }
+                // Добавляем элемент в список
+                $output .= '<li class="mega-menu__item">';
+                $output .= '<a href="' . $url . '" class="mega-menu__link' .
+                    ($is_active ? ' is-active' : '') . '">' . $title . '</a>';
+            }
 
         } elseif ($depth === 2) {
 
@@ -192,7 +226,15 @@ class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
         if ($depth === 0) {
             $output .= "</li>\n";
         } elseif ($depth === 1) {
-            $output .= "</div>\n";
+            $classes = empty($item->classes) ? [] : (array) $item->classes;
+            $has_children = in_array('menu-item-has-children', $classes, true);
+            
+            if ($has_children) {
+                $output .= "</div>\n";
+            } else {
+                // Закрываем элемент списка
+                $output .= "</li>\n";
+            }
         } elseif ($depth === 2) {
             $output .= "</li>\n";
         }
