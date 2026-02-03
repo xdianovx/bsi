@@ -54,7 +54,8 @@ $countries = get_posts([
         </h1>
         <!-- 
         <p class="page-award__excerpt archive-page__excerpt"><?= get_the_excerpt(); ?></p> -->
-        <p class="visa-disclaimer">Визовое сопровождение и поддержка c 93% одобрением в более чем 12 направлений с 1990
+        <p class="visa-disclaimer">Визовое сопровождение и поддержка c 93% одобрением <br /> в более чем 12 направлений
+          с 1990
           года</p>
       </div>
     </div>
