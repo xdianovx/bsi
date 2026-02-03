@@ -22,7 +22,7 @@ $steps = [
   ],
   [
     'num' => '4',
-    'title' => 'Получение паспорта',
+    'title' => 'Получение визы',
     'descr' => 'Лично или через нашего представителя'
   ],
 ];
@@ -113,7 +113,7 @@ $countries = get_posts([
                   </defs>
                 </svg>
               </div>
-              <a href="tel:+7 (495) 785-55-35">+7 999 999 99 99 доб. 198</a>
+              <a href="tel:+7 (495) 785-55-35">+7(495) 785-55-35 доб. 208</a>
             </div>
             <div class="visa-info-item__value">
               <div class="visa-info-item__icon">
