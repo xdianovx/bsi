@@ -80,7 +80,7 @@ function handle_visa_form()
   }
 
   // Формируем HTML сообщение для email
-  $recipient_email = 'dianov.js@gmail.com';
+  $recipient_email = 'v.ivanova@bsigroup.ru';
 
   // Формируем HTML письмо
   $html_message = '<!DOCTYPE html>
