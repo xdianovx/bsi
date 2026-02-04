@@ -494,7 +494,7 @@ $initial_query = new WP_Query([
 
     <div class="education-page__load-more js-education-load-more"
       style="<?php echo ($initial_query->max_num_pages > 1) ? 'display: block;' : 'display: none;'; ?>">
-      <button type="button" class="education-page__load-more-btn">
+      <button type="button" class="education-page__load-more-btn btn btn-accent">
         Показать еще
       </button>
     </div>

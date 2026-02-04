@@ -256,10 +256,10 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 ?>
 <div class="education-card">
 
-  <div class="education-card__media">
+  <a href="<?php echo esc_url($education_url); ?>" class="education-card__media">
     <img src="<?php echo esc_url($education_image); ?>" alt="<?php echo esc_attr($education_title); ?>"
       class="education-card__image">
-  </div>
+  </a>
 
   <div class="education-card__body">
     <div class="education-card__location">
