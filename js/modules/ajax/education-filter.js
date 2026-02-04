@@ -559,6 +559,28 @@ export const initEducationFilter = () => {
           accommodationChoice.setChoiceByValue(currentValue);
         }
       }
+
+      // Обновляем длительность
+      if (data.durations && durationChoice && durationSelect) {
+        const currentValue = durationSelect.value;
+        durationChoice.clearStore();
+        const durationOptions = [
+          { value: '', label: 'Показать все' },
+          ...(data.durations || []).map((dur) => ({
+            value: String(dur),
+            label: `${dur} ${dur === 1 ? 'неделя' : dur < 5 ? 'недели' : 'недель'}`,
+          }))
+        ];
+        durationChoice.setChoices(durationOptions, "value", "label", true);
+        const currentDurationExists = data.durations.includes(Number(currentValue));
+        if (currentValue && currentDurationExists) {
+          durationSelect.value = currentValue;
+          durationChoice.setChoiceByValue(currentValue);
+        } else {
+          durationSelect.value = '';
+          durationChoice.setChoiceByValue('');
+        }
+      }
     } catch (e) {}
   };
 

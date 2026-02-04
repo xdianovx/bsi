@@ -156,11 +156,19 @@ function bsi_ajax_education_filter(): void
             if ($program_duration <= 0) {
               $duration_match = false;
             } else {
-              if ($duration_min > 0 && $program_duration < $duration_min) {
-                $duration_match = false;
-              }
-              if ($duration_max > 0 && $program_duration > $duration_max) {
-                $duration_match = false;
+              // Если выбрано конкретное значение (duration_min === duration_max), проверяем точное совпадение
+              if ($duration_min > 0 && $duration_max > 0 && $duration_min === $duration_max) {
+                if ($program_duration !== $duration_min) {
+                  $duration_match = false;
+                }
+              } else {
+                // Иначе проверяем диапазон
+                if ($duration_min > 0 && $program_duration < $duration_min) {
+                  $duration_match = false;
+                }
+                if ($duration_max > 0 && $program_duration > $duration_max) {
+                  $duration_match = false;
+                }
               }
             }
           }
@@ -852,11 +860,19 @@ function bsi_ajax_country_education_filter(): void
             if ($program_duration <= 0) {
               $duration_match = false;
             } else {
-              if ($duration_min > 0 && $program_duration < $duration_min) {
-                $duration_match = false;
-              }
-              if ($duration_max > 0 && $program_duration > $duration_max) {
-                $duration_match = false;
+              // Если выбрано конкретное значение (duration_min === duration_max), проверяем точное совпадение
+              if ($duration_min > 0 && $duration_max > 0 && $duration_min === $duration_max) {
+                if ($program_duration !== $duration_min) {
+                  $duration_match = false;
+                }
+              } else {
+                // Иначе проверяем диапазон
+                if ($duration_min > 0 && $program_duration < $duration_min) {
+                  $duration_match = false;
+                }
+                if ($duration_max > 0 && $program_duration > $duration_max) {
+                  $duration_match = false;
+                }
               }
             }
           }
@@ -970,6 +986,7 @@ function bsi_ajax_education_filter_options(): void
       'languages' => [],
       'types' => [],
       'accommodations' => [],
+      'durations' => [],
     ]);
   }
 
@@ -977,6 +994,7 @@ function bsi_ajax_education_filter_options(): void
   $language_ids = [];
   $type_ids = [];
   $accommodation_ids = [];
+  $duration_values = [];
 
   foreach ($education_ids as $education_id) {
     $program_terms = wp_get_post_terms($education_id, 'education_program', ['fields' => 'ids']);
@@ -997,6 +1015,19 @@ function bsi_ajax_education_filter_options(): void
     $accommodation_terms = wp_get_post_terms($education_id, 'education_accommodation_type', ['fields' => 'ids']);
     if (!is_wp_error($accommodation_terms) && !empty($accommodation_terms)) {
       $accommodation_ids = array_merge($accommodation_ids, $accommodation_terms);
+    }
+
+    // Собираем длительности из программ
+    if (function_exists('get_field')) {
+      $education_programs = get_field('education_programs', $education_id);
+      $education_programs = is_array($education_programs) ? $education_programs : [];
+
+      foreach ($education_programs as $program) {
+        $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
+        if ($program_duration > 0 && !in_array($program_duration, $duration_values, true)) {
+          $duration_values[] = $program_duration;
+        }
+      }
     }
   }
 
@@ -1081,11 +1112,15 @@ function bsi_ajax_education_filter_options(): void
     }
   }
 
+  // Сортируем длительности
+  sort($duration_values);
+
   wp_send_json_success([
     'programs' => $programs,
     'languages' => $languages,
     'types' => $types,
     'accommodations' => $accommodations,
+    'durations' => $duration_values,
   ]);
 }
 
