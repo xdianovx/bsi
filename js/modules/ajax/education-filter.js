@@ -449,29 +449,7 @@ export const initEducationFilter = () => {
       }
     }
 
-    // Обновляем страны (если нужно)
-    if (options.countries && countryChoice && countrySelect) {
-      const currentValue = countrySelect.value;
-      countryChoice.clearStore();
-      const countryOptions = [
-        { value: '', label: 'Все страны' },
-        ...(options.countries || []).map((c) => ({
-          value: String(c.id),
-          label: c.name,
-        }))
-      ];
-      countryChoice.setChoices(countryOptions, "value", "label", true);
-      const currentCountryExists = options.countries.some(
-        (c) => String(c.id) === currentValue
-      );
-      if (currentValue && currentCountryExists) {
-        countrySelect.value = currentValue;
-        countryChoice.setChoiceByValue(currentValue);
-      } else {
-        countrySelect.value = '';
-        countryChoice.setChoiceByValue('');
-      }
-    }
+    // Страны не обновляем динамически - они всегда должны показывать все доступные страны
   };
 
   const updateFilterOptions = async (countryId) => {
