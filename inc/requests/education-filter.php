@@ -92,11 +92,12 @@ function bsi_ajax_education_filter(): void
     ];
   }
 
+  // Сначала получаем ВСЕ школы, соответствующие базовым фильтрам (без ограничения по количеству)
+  // Это нужно для правильной фильтрации по программам и расчета пагинации
   $args = [
     'post_type' => 'education',
     'post_status' => 'publish',
-    'posts_per_page' => $per_page,
-    'paged' => $paged,
+    'posts_per_page' => -1, // Получаем все школы для фильтрации
     'orderby' => 'title',
     'order' => 'ASC',
   ];
@@ -269,8 +270,15 @@ function bsi_ajax_education_filter(): void
     $total_posts = count($posts);
     $final_query->posts = array_slice($posts, ($paged - 1) * $per_page, $per_page);
     $final_query->post_count = count($final_query->posts);
-    $final_query->found_posts = $total_posts;
-    $final_query->max_num_pages = (int) ceil($total_posts / $per_page);
+    // Используем общее количество отфильтрованных школ для расчета страниц
+    $total_filtered = count($filtered_ids);
+    $final_query->found_posts = $total_filtered;
+    $final_query->max_num_pages = (int) ceil($total_filtered / $per_page);
+  } else {
+    // Для других типов сортировки также обновляем found_posts и max_num_pages
+    $total_filtered = count($filtered_ids);
+    $final_query->found_posts = $total_filtered;
+    $final_query->max_num_pages = (int) ceil($total_filtered / $per_page);
   }
 
   ob_start();
@@ -491,6 +499,7 @@ function bsi_ajax_education_filter(): void
 
   $html = ob_get_clean();
 
+  // Используем значения из $final_query, которые уже обновлены выше
   wp_send_json_success([
     'html' => $html,
     'total' => (int) $final_query->found_posts,
