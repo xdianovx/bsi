@@ -364,9 +364,14 @@ export const initSingleEducationPrograms = () => {
         }))
       ];
       ageChoice.setChoices(ageOptions, "value", "label", true);
-      if (currentValue) {
+      // Проверяем, существует ли текущее значение в новых опциях
+      if (currentValue && options.ages.includes(Number(currentValue))) {
         ageSelect.value = currentValue;
         ageChoice.setChoiceByValue(currentValue);
+      } else {
+        // Если текущее значение отсутствует в новых опциях, сбрасываем
+        ageSelect.value = '';
+        ageChoice.setChoiceByValue('');
       }
     }
 
@@ -382,9 +387,41 @@ export const initSingleEducationPrograms = () => {
         }))
       ];
       durationChoice.setChoices(durationOptions, "value", "label", true);
-      if (currentValue) {
+      // Проверяем, существует ли текущее значение в новых опциях
+      if (currentValue && options.durations.includes(Number(currentValue))) {
         durationSelect.value = currentValue;
         durationChoice.setChoiceByValue(currentValue);
+      } else {
+        // Если текущее значение отсутствует в новых опциях, сбрасываем
+        durationSelect.value = '';
+        durationChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем опции языков
+    if (options.languages && languageChoice) {
+      const currentValue = languageSelect.value;
+      languageChoice.clearStore();
+      // Добавляем опцию "Показать все" в начало списка
+      const languageOptions = [
+        { value: '', label: 'Показать все' },
+        ...options.languages.map((lang) => ({
+          value: String(lang.term_id),
+          label: lang.name,
+        }))
+      ];
+      languageChoice.setChoices(languageOptions, "value", "label", true);
+      // Проверяем, существует ли текущее значение в новых опциях
+      const currentLangExists = options.languages.some(
+        (lang) => String(lang.term_id) === currentValue
+      );
+      if (currentValue && currentLangExists) {
+        languageSelect.value = currentValue;
+        languageChoice.setChoiceByValue(currentValue);
+      } else {
+        // Если текущее значение отсутствует в новых опциях, сбрасываем
+        languageSelect.value = '';
+        languageChoice.setChoiceByValue('');
       }
     }
   };

@@ -976,10 +976,21 @@ function bsi_ajax_education_programs_by_school(): void
     $language_match = true;
     if (!empty($language_ids)) {
       $program_languages = [];
-      // Получаем языки программы из таксономии education
-      $education_languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'ids']);
-      if (!empty($education_languages) && !is_wp_error($education_languages)) {
-        $program_languages = $education_languages;
+      
+      // Получаем языки программы из поля program_languages
+      if (isset($program['program_languages']) && !empty($program['program_languages'])) {
+        $program_languages = (array) $program['program_languages'];
+        // Преобразуем в массив целых чисел
+        $program_languages = array_map('intval', $program_languages);
+        $program_languages = array_filter($program_languages);
+      }
+      
+      // Если языки не указаны в программе, используем языки школы как fallback
+      if (empty($program_languages)) {
+        $education_languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'ids']);
+        if (!empty($education_languages) && !is_wp_error($education_languages)) {
+          $program_languages = $education_languages;
+        }
       }
       
       if (empty($program_languages)) {
@@ -1028,13 +1039,15 @@ function bsi_ajax_education_programs_by_school(): void
     });
   }
 
-  // Собираем опции для фильтров из всех программ (не только отфильтрованных)
+  // Собираем опции для фильтров из отфильтрованных программ
   $filter_options = [
     'ages' => [],
     'durations' => [],
+    'languages' => [],
   ];
 
-  foreach ($programs as $program) {
+  // Используем отфильтрованные программы для генерации опций фильтров
+  foreach ($filtered_programs as $program) {
     $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
     $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
     $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
@@ -1054,8 +1067,58 @@ function bsi_ajax_education_programs_by_school(): void
     }
   }
 
+  // Собираем языки из отфильтрованных программ
+  // Показываем языки только если есть отфильтрованные программы
+  if (!empty($filtered_programs)) {
+    $language_ids_collected = [];
+    
+    // Собираем уникальные ID языков из отфильтрованных программ
+    foreach ($filtered_programs as $program) {
+      if (isset($program['program_languages']) && !empty($program['program_languages'])) {
+        $program_languages = (array) $program['program_languages'];
+        foreach ($program_languages as $lang_id) {
+          $lang_id = (int) $lang_id;
+          if ($lang_id > 0 && !in_array($lang_id, $language_ids_collected, true)) {
+            $language_ids_collected[] = $lang_id;
+          }
+        }
+      }
+    }
+    
+    // Если в программах не указаны языки, используем языки школы как fallback
+    if (empty($language_ids_collected)) {
+      $education_languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'ids']);
+      if (!empty($education_languages) && !is_wp_error($education_languages)) {
+        $language_ids_collected = $education_languages;
+      }
+    }
+    
+    // Получаем объекты языков для отображения
+    if (!empty($language_ids_collected)) {
+      $language_terms = get_terms([
+        'taxonomy' => 'education_language',
+        'include' => $language_ids_collected,
+        'hide_empty' => false,
+      ]);
+      
+      if (!empty($language_terms) && !is_wp_error($language_terms)) {
+        foreach ($language_terms as $lang_term) {
+          $filter_options['languages'][] = [
+            'term_id' => (int) $lang_term->term_id,
+            'name' => $lang_term->name,
+          ];
+        }
+      }
+    }
+  }
+
   sort($filter_options['ages']);
   sort($filter_options['durations']);
+  
+  // Сортируем языки по названию
+  usort($filter_options['languages'], function ($a, $b) {
+    return strcmp($a['name'], $b['name']);
+  });
 
   ob_start();
   if (!empty($filtered_programs)) {
@@ -1094,6 +1157,7 @@ function bsi_ajax_education_programs_filter_options(): void
   $filter_options = [
     'ages' => [],
     'durations' => [],
+    'languages' => [],
   ];
 
   foreach ($programs as $program) {
@@ -1116,8 +1180,55 @@ function bsi_ajax_education_programs_filter_options(): void
     }
   }
 
+  // Собираем языки из всех программ школы (для начальной загрузки)
+  $language_ids_collected = [];
+  
+  // Собираем уникальные ID языков из всех программ школы
+  foreach ($programs as $program) {
+    if (isset($program['program_languages']) && !empty($program['program_languages'])) {
+      $program_languages = (array) $program['program_languages'];
+      foreach ($program_languages as $lang_id) {
+        $lang_id = (int) $lang_id;
+        if ($lang_id > 0 && !in_array($lang_id, $language_ids_collected, true)) {
+          $language_ids_collected[] = $lang_id;
+        }
+      }
+    }
+  }
+  
+  // Если в программах не указаны языки, используем языки школы как fallback
+  if (empty($language_ids_collected)) {
+    $education_languages = wp_get_post_terms($education_id, 'education_language', ['fields' => 'ids']);
+    if (!empty($education_languages) && !is_wp_error($education_languages)) {
+      $language_ids_collected = $education_languages;
+    }
+  }
+  
+  // Получаем объекты языков для отображения
+  if (!empty($language_ids_collected)) {
+    $language_terms = get_terms([
+      'taxonomy' => 'education_language',
+      'include' => $language_ids_collected,
+      'hide_empty' => false,
+    ]);
+    
+    if (!empty($language_terms) && !is_wp_error($language_terms)) {
+      foreach ($language_terms as $lang_term) {
+        $filter_options['languages'][] = [
+          'term_id' => (int) $lang_term->term_id,
+          'name' => $lang_term->name,
+        ];
+      }
+    }
+  }
+
   sort($filter_options['ages']);
   sort($filter_options['durations']);
+  
+  // Сортируем языки по названию
+  usort($filter_options['languages'], function ($a, $b) {
+    return strcmp($a['name'], $b['name']);
+  });
 
   wp_send_json_success($filter_options);
 }
