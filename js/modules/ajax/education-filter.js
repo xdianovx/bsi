@@ -209,14 +209,7 @@ export const initEducationFilter = () => {
       loadMoreButton.textContent = "Показать еще";
     }
 
-    const items = list.querySelectorAll(".education-page__item");
-    if (items.length > 0) {
-      const scrollOffset = totalPages > currentPage ? currentPerPage : items.length;
-      const firstNewItem = items[items.length - scrollOffset];
-      if (firstNewItem) {
-        firstNewItem.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
+    // Убираем автоматический скролл - пользователь сам решит, нужно ли прокручивать страницу
   };
 
   const programChoice = programSelect
