@@ -93,7 +93,8 @@ $initial_query = new WP_Query([
   <?php yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>'); ?>
 <?php endif; ?>
 
-<section class="education-page js-education-page">
+<section class="education-page js-education-page"
+  data-total-pages="<?php echo esc_attr($initial_query->max_num_pages); ?>" data-current-page="1">
   <div class="container">
     <div class="title-wrap">
       <div class="">
@@ -491,7 +492,8 @@ $initial_query = new WP_Query([
       <?php endif; ?>
     </div>
 
-    <div class="education-page__load-more js-education-load-more" style="display: none;">
+    <div class="education-page__load-more js-education-load-more"
+      style="<?php echo ($initial_query->max_num_pages > 1) ? 'display: block;' : 'display: none;'; ?>">
       <button type="button" class="education-page__load-more-btn">
         Показать еще
       </button>

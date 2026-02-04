@@ -50,8 +50,8 @@ export const initEducationFilter = () => {
   let perPageDropdown = null;
   let currentSortValue = 'title_asc';
   let currentPerPage = 12;
-  let currentPage = 1;
-  let totalPages = 1;
+  let currentPage = parseInt(root.getAttribute('data-current-page') || '1', 10);
+  let totalPages = parseInt(root.getAttribute('data-total-pages') || '1', 10);
   let isLoadingMore = false;
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
@@ -694,6 +694,15 @@ export const initEducationFilter = () => {
   // При загрузке страницы обновляем опции фильтров (для всех школ, если страна не выбрана)
   updateFilterOptions("");
   updateResetButton();
+
+  // Обновляем видимость кнопки "Загрузить еще" при инициализации
+  if (loadMoreWrap) {
+    if (currentPage < totalPages) {
+      loadMoreWrap.style.display = "block";
+    } else {
+      loadMoreWrap.style.display = "none";
+    }
+  }
 
   // Обработчик кнопки "Показать еще"
   if (loadMoreButton) {
