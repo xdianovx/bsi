@@ -21,7 +21,6 @@
 .archive-page__top:has(.visa-disclaimer) {
   border: none;
   padding-bottom: 0;
-  
 }
 
 .visa-disclaimer {
@@ -185,7 +184,7 @@
   gap: 8px;
 }
 
-.visa-info-item__value+.visa-info-item__value {
+.visa-info-item__value + .visa-info-item__value {
   margin-top: 8px;
 }
 
@@ -199,10 +198,9 @@
 }
 
 .visa-info-item__wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(1, 1fr);
@@ -340,7 +338,6 @@
 
 /* Стрелки только на десктопе */
 @media screen and (min-width: 1201px) {
-
   .visa-page-steps__wrap {
     position: relative;
   }
@@ -379,7 +376,6 @@
     z-index: 5;
   }
 }
-
 
 .visa-page-consultation__section {
   margin-top: 80px;
@@ -452,11 +448,11 @@
 
   &:hover {
     .visa-contacts-item__icon svg path {
-    stroke: $red;
-  }
-  a {
-    color: $red;
-  }
+      stroke: $red;
+    }
+    a {
+      color: $red;
+    }
   }
 }
 
@@ -477,11 +473,11 @@
 
   &:hover {
     .visa-contacts-item__icon svg path {
-    stroke: $red;
-  }
-  a {
-    color: $red;
-  }
+      stroke: $red;
+    }
+    a {
+      color: $red;
+    }
   }
 }
 
@@ -537,13 +533,13 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-
   @media screen and (max-width: 640px) {
     grid-template-columns: repeat(1, 1fr);
   }
 }
 
-.visa-country-card {}
+.visa-country-card {
+}
 
 .visa-country-card__head {
   display: flex;
@@ -576,7 +572,6 @@
   width: 100%;
   justify-content: flex-end;
 }
-
 
 .visa-country-card__types {
   margin-top: 16px;
@@ -665,7 +660,7 @@
 }
 
 .visa-embassy__section {
-  margin-top: 8px;
+  margin-top: 20px;
   background: $bg-gray;
   border-radius: 8px;
   padding: 12px;
@@ -841,11 +836,11 @@ a.visa-embassy__contact-item {
 
   &:hover {
     .visa-contacts-item__icon svg path {
-    stroke: $red;
-  }
-  a {
-    color: $red;
-  }
+      stroke: $red;
+    }
+    a {
+      color: $red;
+    }
   }
 }
 
