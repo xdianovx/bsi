@@ -40,7 +40,11 @@ function bsi_ajax_education_filter(): void
   $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
 
   $paged = isset($_POST['paged']) ? absint(wp_unslash($_POST['paged'])) : 1;
-  $per_page = 12;
+  $per_page = isset($_POST['per_page']) ? absint(wp_unslash($_POST['per_page'])) : 12;
+  // Валидация: только разрешенные значения
+  if (!in_array($per_page, [12, 24, 48], true)) {
+    $per_page = 12;
+  }
   $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'title_asc';
 
   $tax_query = [];
@@ -262,8 +266,11 @@ function bsi_ajax_education_filter(): void
     });
 
     // Пересоздаем запрос с отсортированными постами
+    $total_posts = count($posts);
     $final_query->posts = array_slice($posts, ($paged - 1) * $per_page, $per_page);
     $final_query->post_count = count($final_query->posts);
+    $final_query->found_posts = $total_posts;
+    $final_query->max_num_pages = (int) ceil($total_posts / $per_page);
   }
 
   ob_start();

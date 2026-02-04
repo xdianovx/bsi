@@ -38,6 +38,7 @@ export const initEducationFilter = () => {
   const dateFromInput = form.querySelector('input[name="date_from"]');
   const dateToInput = form.querySelector('input[name="date_to"]');
   const sortContainer = root.querySelector(".education-page__sort");
+  const perPageContainer = root.querySelector(".education-page__per-page");
   const resetBtn = root.querySelector(".js-education-reset");
   const activeFiltersEl = root.querySelector(".js-education-active-filters");
   const activeFiltersCount = activeFiltersEl?.querySelector(".education-page__active-filters-count");
@@ -46,7 +47,9 @@ export const initEducationFilter = () => {
 
   let datePickerInstance = null;
   let sortDropdown = null;
+  let perPageDropdown = null;
   let currentSortValue = 'title_asc';
+  let currentPerPage = 12;
   let currentPage = 1;
   let totalPages = 1;
   let isLoadingMore = false;
@@ -106,6 +109,7 @@ export const initEducationFilter = () => {
       const body = new URLSearchParams();
       body.set("action", "education_filter");
       body.set("paged", String(page));
+      body.set("per_page", String(currentPerPage));
 
       if (currentSortValue) {
         body.set("sort", currentSortValue);
@@ -207,7 +211,8 @@ export const initEducationFilter = () => {
 
     const items = list.querySelectorAll(".education-page__item");
     if (items.length > 0) {
-      const firstNewItem = items[items.length - (totalPages > currentPage ? 12 : items.length)];
+      const scrollOffset = totalPages > currentPage ? currentPerPage : items.length;
+      const firstNewItem = items[items.length - scrollOffset];
       if (firstNewItem) {
         firstNewItem.scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -587,6 +592,45 @@ export const initEducationFilter = () => {
     const defaultOption = sortContainer.querySelector('.education-page__sort-option[data-value="title_asc"]');
     if (defaultOption) {
       defaultOption.classList.add('is-active');
+    }
+  }
+
+  // Инициализация dropdown для выбора количества элементов
+  if (perPageContainer) {
+    perPageDropdown = dropdown(perPageContainer);
+    const perPageTrigger = perPageContainer.querySelector('.education-page__per-page-trigger');
+    const perPageText = perPageContainer.querySelector('.education-page__per-page-text');
+    const perPageOptions = perPageContainer.querySelectorAll('.education-page__per-page-option');
+
+    perPageOptions.forEach((option) => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        const value = parseInt(option.getAttribute('data-value'), 10);
+        const text = `Показать: ${value}`;
+        
+        currentPerPage = value;
+        if (perPageText) {
+          perPageText.textContent = text;
+        }
+        
+        // Убираем активное состояние со всех опций
+        perPageOptions.forEach((opt) => opt.classList.remove('is-active'));
+        // Добавляем активное состояние выбранной опции
+        option.classList.add('is-active');
+        
+        if (perPageDropdown && perPageDropdown.close) {
+          perPageDropdown.close();
+        }
+        
+        currentPage = 1;
+        loadEducation(1);
+      });
+    });
+
+    // Устанавливаем активное состояние для дефолтной опции (12)
+    const defaultPerPageOption = perPageContainer.querySelector('.education-page__per-page-option[data-value="12"]');
+    if (defaultPerPageOption) {
+      defaultPerPageOption.classList.add('is-active');
     }
   }
 

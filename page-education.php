@@ -220,6 +220,24 @@ $initial_query = new WP_Query([
       </div>
 
       <div class="education-page__controls-right">
+        <div class="education-page__per-page js-dropdown" style="display: none;">
+          <button type="button" class="js-dropdown-trigger education-page__per-page-trigger">
+            <span class="education-page__per-page-text">Показать: 12</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
+                stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="js-dropdown-panel education-page__per-page-panel">
+            <div class="education-page__per-page-options">
+              <button type="button" class="education-page__per-page-option" data-value="12">12</button>
+              <button type="button" class="education-page__per-page-option" data-value="24">24</button>
+              <button type="button" class="education-page__per-page-option" data-value="48">48</button>
+            </div>
+          </div>
+        </div>
+
         <div class="education-page__sort js-dropdown">
           <button type="button" class="js-dropdown-trigger education-page__sort-trigger">
             <span class="education-page__sort-text">По названию (А-Я)</span>
@@ -242,8 +260,6 @@ $initial_query = new WP_Query([
             </div>
           </div>
         </div>
-
-
       </div>
     </div>
 
