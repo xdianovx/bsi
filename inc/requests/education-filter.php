@@ -23,8 +23,14 @@ function bsi_ajax_education_filter(): void
 
   $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
 
+  $duration = isset($_POST['duration']) ? absint(wp_unslash($_POST['duration'])) : 0;
+  // Поддержка старого формата для обратной совместимости
   $duration_min = isset($_POST['duration_min']) ? absint(wp_unslash($_POST['duration_min'])) : 0;
   $duration_max = isset($_POST['duration_max']) ? absint(wp_unslash($_POST['duration_max'])) : 0;
+  if ($duration > 0) {
+    $duration_min = $duration;
+    $duration_max = $duration;
+  }
 
   $type_id = 0;
   if (isset($_POST['type'])) {
@@ -205,6 +211,15 @@ function bsi_ajax_education_filter(): void
       'html' => '<div class="education-page__empty">Школы не найдены.</div>',
       'total' => 0,
       'pages' => 0,
+      'filter_options' => [
+        'programs' => [],
+        'languages' => [],
+        'types' => [],
+        'accommodations' => [],
+        'ages' => [],
+        'durations' => [],
+        'countries' => [],
+      ],
     ]);
   }
 
@@ -499,11 +514,210 @@ function bsi_ajax_education_filter(): void
 
   $html = ob_get_clean();
 
+  // Собираем опции фильтров из отфильтрованных школ
+  $filter_options = [
+    'programs' => [],
+    'languages' => [],
+    'types' => [],
+    'accommodations' => [],
+    'ages' => [],
+    'durations' => [],
+    'countries' => [],
+  ];
+
+  if (!empty($filtered_ids)) {
+    $program_ids = [];
+    $language_ids = [];
+    $type_ids = [];
+    $accommodation_ids = [];
+    $country_ids = [];
+    $age_values = [];
+    $duration_values = [];
+
+    foreach ($filtered_ids as $education_id) {
+      // Собираем таксономии
+      $program_terms = wp_get_post_terms($education_id, 'education_program', ['fields' => 'ids']);
+      if (!is_wp_error($program_terms) && !empty($program_terms)) {
+        $program_ids = array_merge($program_ids, $program_terms);
+      }
+
+      $language_terms = wp_get_post_terms($education_id, 'education_language', ['fields' => 'ids']);
+      if (!is_wp_error($language_terms) && !empty($language_terms)) {
+        $language_ids = array_merge($language_ids, $language_terms);
+      }
+
+      $type_terms = wp_get_post_terms($education_id, 'education_type', ['fields' => 'ids']);
+      if (!is_wp_error($type_terms) && !empty($type_terms)) {
+        $type_ids = array_merge($type_ids, $type_terms);
+      }
+
+      $accommodation_terms = wp_get_post_terms($education_id, 'education_accommodation_type', ['fields' => 'ids']);
+      if (!is_wp_error($accommodation_terms) && !empty($accommodation_terms)) {
+        $accommodation_ids = array_merge($accommodation_ids, $accommodation_terms);
+      }
+
+      // Собираем страну
+      if (function_exists('get_field')) {
+        $c = get_field('education_country', $education_id);
+        if ($c instanceof WP_Post) {
+          $country_ids[] = (int) $c->ID;
+        } elseif (is_array($c)) {
+          $country_ids[] = (int) reset($c);
+        } elseif ($c) {
+          $country_ids[] = (int) $c;
+        }
+      }
+
+      // Собираем возраста и длительности из программ
+      if (function_exists('get_field')) {
+        $education_programs = get_field('education_programs', $education_id);
+        $education_programs = is_array($education_programs) ? $education_programs : [];
+
+        foreach ($education_programs as $program) {
+          $program_age_min = isset($program['program_age_min']) ? (int) $program['program_age_min'] : 0;
+          $program_age_max = isset($program['program_age_max']) ? (int) $program['program_age_max'] : 0;
+          $program_duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
+
+          // Добавляем все возраста от min до max
+          if ($program_age_min > 0) {
+            $max_age = $program_age_max > 0 ? $program_age_max : $program_age_min;
+            for ($age = $program_age_min; $age <= $max_age; $age++) {
+              if (!in_array($age, $age_values, true)) {
+                $age_values[] = $age;
+              }
+            }
+          }
+
+          if ($program_duration > 0 && !in_array($program_duration, $duration_values, true)) {
+            $duration_values[] = $program_duration;
+          }
+
+          // Собираем языки из программ
+          if (isset($program['program_languages']) && !empty($program['program_languages'])) {
+            $program_languages = (array) $program['program_languages'];
+            foreach ($program_languages as $lang_id) {
+              $lang_id = (int) $lang_id;
+              if ($lang_id > 0 && !in_array($lang_id, $language_ids, true)) {
+                $language_ids[] = $lang_id;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Получаем объекты терминов для программ
+    $program_ids = array_values(array_unique($program_ids));
+    if (!empty($program_ids)) {
+      $program_terms = get_terms([
+        'taxonomy' => 'education_program',
+        'include' => $program_ids,
+        'hide_empty' => false,
+        'orderby' => 'name',
+        'order' => 'ASC',
+      ]);
+      if (!is_wp_error($program_terms) && !empty($program_terms)) {
+        foreach ($program_terms as $term) {
+          $filter_options['programs'][] = [
+            'id' => (int) $term->term_id,
+            'name' => $term->name,
+          ];
+        }
+      }
+    }
+
+    // Получаем объекты терминов для языков
+    $language_ids = array_values(array_unique($language_ids));
+    if (!empty($language_ids)) {
+      $language_terms = get_terms([
+        'taxonomy' => 'education_language',
+        'include' => $language_ids,
+        'hide_empty' => false,
+        'orderby' => 'name',
+        'order' => 'ASC',
+      ]);
+      if (!is_wp_error($language_terms) && !empty($language_terms)) {
+        foreach ($language_terms as $term) {
+          $filter_options['languages'][] = [
+            'id' => (int) $term->term_id,
+            'name' => $term->name,
+          ];
+        }
+      }
+    }
+
+    // Получаем объекты терминов для типов
+    $type_ids = array_values(array_unique($type_ids));
+    if (!empty($type_ids)) {
+      $type_terms = get_terms([
+        'taxonomy' => 'education_type',
+        'include' => $type_ids,
+        'hide_empty' => false,
+        'orderby' => 'name',
+        'order' => 'ASC',
+      ]);
+      if (!is_wp_error($type_terms) && !empty($type_terms)) {
+        foreach ($type_terms as $term) {
+          $filter_options['types'][] = [
+            'id' => (int) $term->term_id,
+            'name' => $term->name,
+          ];
+        }
+      }
+    }
+
+    // Получаем объекты терминов для размещения
+    $accommodation_ids = array_values(array_unique($accommodation_ids));
+    if (!empty($accommodation_ids)) {
+      $accommodation_terms = get_terms([
+        'taxonomy' => 'education_accommodation_type',
+        'include' => $accommodation_ids,
+        'hide_empty' => false,
+        'orderby' => 'name',
+        'order' => 'ASC',
+      ]);
+      if (!is_wp_error($accommodation_terms) && !empty($accommodation_terms)) {
+        foreach ($accommodation_terms as $term) {
+          $filter_options['accommodations'][] = [
+            'id' => (int) $term->term_id,
+            'name' => $term->name,
+          ];
+        }
+      }
+    }
+
+    // Сортируем возраста и длительности
+    sort($age_values);
+    sort($duration_values);
+    $filter_options['ages'] = $age_values;
+    $filter_options['durations'] = $duration_values;
+
+    // Получаем страны
+    $country_ids = array_values(array_unique(array_filter($country_ids)));
+    if (!empty($country_ids)) {
+      $countries = get_posts([
+        'post_type' => 'country',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'post__in' => $country_ids,
+        'orderby' => 'title',
+        'order' => 'ASC',
+      ]);
+      foreach ($countries as $country) {
+        $filter_options['countries'][] = [
+          'id' => (int) $country->ID,
+          'name' => $country->post_title,
+        ];
+      }
+    }
+  }
+
   // Используем значения из $final_query, которые уже обновлены выше
   wp_send_json_success([
     'html' => $html,
     'total' => (int) $final_query->found_posts,
     'pages' => (int) $final_query->max_num_pages,
+    'filter_options' => $filter_options,
   ]);
 }
 

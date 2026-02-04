@@ -191,12 +191,10 @@ $initial_query = new WP_Query([
         </div>
 
         <div class="education-filter__field">
-          <div class="education-filter__label">Длительность (недели)</div>
-          <div class="education-filter__range">
-            <input type="number" class="education-filter__input" name="duration_min" placeholder="От" min="1" step="1">
-            <span class="education-filter__range-separator">-</span>
-            <input type="number" class="education-filter__input" name="duration_max" placeholder="До" min="1" step="1">
-          </div>
+          <div class="education-filter__label">Продолжительность</div>
+          <select class="education-filter__select" name="duration" data-choice="single">
+            <option value="">Показать все</option>
+          </select>
         </div>
 
         <div class="education-filter__field">

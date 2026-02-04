@@ -32,8 +32,7 @@ export const initEducationFilter = () => {
   const typeSelect = form.querySelector('select[name="type"]');
   const accommodationSelect = form.querySelector('select[name="accommodation"]');
   const ageSelect = form.querySelector('select[name="age"]');
-  const durationMinInput = form.querySelector('input[name="duration_min"]');
-  const durationMaxInput = form.querySelector('input[name="duration_max"]');
+  const durationSelect = form.querySelector('select[name="duration"]');
   const dateRangeInput = form.querySelector('input[name="date_range"]');
   const dateFromInput = form.querySelector('input[name="date_from"]');
   const dateToInput = form.querySelector('input[name="date_to"]');
@@ -65,8 +64,7 @@ export const initEducationFilter = () => {
     if (typeSelect?.value) count++;
     if (accommodationSelect?.value) count++;
     if (ageSelect?.value) count++;
-    if (durationMinInput?.value) count++;
-    if (durationMaxInput?.value) count++;
+    if (durationSelect?.value) count++;
     if (dateFromInput?.value) count++;
     if (dateToInput?.value) count++;
 
@@ -136,11 +134,8 @@ export const initEducationFilter = () => {
         body.set("age", ageSelect.value);
       }
 
-      if (durationMinInput && durationMinInput.value) {
-        body.set("duration_min", durationMinInput.value);
-      }
-      if (durationMaxInput && durationMaxInput.value) {
-        body.set("duration_max", durationMaxInput.value);
+      if (durationSelect && durationSelect.value) {
+        body.set("duration", durationSelect.value);
       }
 
       if (dateFromInput && dateFromInput.value) {
@@ -184,6 +179,11 @@ export const initEducationFilter = () => {
         } else {
           loadMoreWrap.style.display = "none";
         }
+      }
+
+      // Обновляем опции фильтров из отфильтрованных результатов
+      if (json.data.filter_options && page === 1) {
+        updateFilterOptionsFromResults(json.data.filter_options);
       }
 
       updateResetButton();
@@ -234,6 +234,16 @@ export const initEducationFilter = () => {
 
   const ageChoice = ageSelect
     ? new Choices(ageSelect, {
+        ...CHOICES_RU,
+        searchEnabled: false,
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: "Показать все",
+      })
+    : null;
+
+  const durationChoice = durationSelect
+    ? new Choices(durationSelect, {
         ...CHOICES_RU,
         searchEnabled: false,
         shouldSort: false,
@@ -295,6 +305,174 @@ export const initEducationFilter = () => {
       },
     });
   }
+
+  // Обновление опций фильтров на основе отфильтрованных результатов
+  const updateFilterOptionsFromResults = (options) => {
+    // Обновляем программы
+    if (options.programs && programChoice && programSelect) {
+      const currentValue = programSelect.value;
+      programChoice.clearStore();
+      const programOptions = [
+        { value: '', label: 'Показать все' },
+        ...(options.programs || []).map((p) => ({
+          value: String(p.id),
+          label: p.name,
+        }))
+      ];
+      programChoice.setChoices(programOptions, "value", "label", true);
+      // Проверяем, существует ли текущее значение в новых опциях
+      const currentProgramExists = options.programs.some(
+        (p) => String(p.id) === currentValue
+      );
+      if (currentValue && currentProgramExists) {
+        programSelect.value = currentValue;
+        programChoice.setChoiceByValue(currentValue);
+      } else {
+        programSelect.value = '';
+        programChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем языки
+    if (options.languages && languageChoice && languageSelect) {
+      const currentValue = languageSelect.value;
+      languageChoice.clearStore();
+      const languageOptions = [
+        { value: '', label: 'Все языки' },
+        ...(options.languages || []).map((l) => ({
+          value: String(l.id),
+          label: l.name,
+        }))
+      ];
+      languageChoice.setChoices(languageOptions, "value", "label", true);
+      const currentLangExists = options.languages.some(
+        (l) => String(l.id) === currentValue
+      );
+      if (currentValue && currentLangExists) {
+        languageSelect.value = currentValue;
+        languageChoice.setChoiceByValue(currentValue);
+      } else {
+        languageSelect.value = '';
+        languageChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем типы
+    if (options.types && typeChoice && typeSelect) {
+      const currentValue = typeSelect.value;
+      typeChoice.clearStore();
+      const typeOptions = [
+        { value: '', label: 'Показать все' },
+        ...(options.types || []).map((t) => ({
+          value: String(t.id),
+          label: t.name,
+        }))
+      ];
+      typeChoice.setChoices(typeOptions, "value", "label", true);
+      const currentTypeExists = options.types.some(
+        (t) => String(t.id) === currentValue
+      );
+      if (currentValue && currentTypeExists) {
+        typeSelect.value = currentValue;
+        typeChoice.setChoiceByValue(currentValue);
+      } else {
+        typeSelect.value = '';
+        typeChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем размещение
+    if (options.accommodations && accommodationChoice && accommodationSelect) {
+      const currentValue = accommodationSelect.value;
+      accommodationChoice.clearStore();
+      const accommodationOptions = [
+        { value: '', label: 'Показать все' },
+        ...(options.accommodations || []).map((a) => ({
+          value: String(a.id),
+          label: a.name,
+        }))
+      ];
+      accommodationChoice.setChoices(accommodationOptions, "value", "label", true);
+      const currentAccommodationExists = options.accommodations.some(
+        (a) => String(a.id) === currentValue
+      );
+      if (currentValue && currentAccommodationExists) {
+        accommodationSelect.value = currentValue;
+        accommodationChoice.setChoiceByValue(currentValue);
+      } else {
+        accommodationSelect.value = '';
+        accommodationChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем возраста
+    if (options.ages && ageChoice && ageSelect) {
+      const currentValue = ageSelect.value;
+      ageChoice.clearStore();
+      const ageOptions = [
+        { value: '', label: 'Показать все' },
+        ...(options.ages || []).map((age) => ({
+          value: String(age),
+          label: `${age} лет`,
+        }))
+      ];
+      ageChoice.setChoices(ageOptions, "value", "label", true);
+      const currentAgeExists = options.ages.includes(Number(currentValue));
+      if (currentValue && currentAgeExists) {
+        ageSelect.value = currentValue;
+        ageChoice.setChoiceByValue(currentValue);
+      } else {
+        ageSelect.value = '';
+        ageChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем длительность
+    if (options.durations && durationChoice && durationSelect) {
+      const currentValue = durationSelect.value;
+      durationChoice.clearStore();
+      const durationOptions = [
+        { value: '', label: 'Показать все' },
+        ...(options.durations || []).map((dur) => ({
+          value: String(dur),
+          label: `${dur} ${dur === 1 ? 'неделя' : dur < 5 ? 'недели' : 'недель'}`,
+        }))
+      ];
+      durationChoice.setChoices(durationOptions, "value", "label", true);
+      const currentDurationExists = options.durations.includes(Number(currentValue));
+      if (currentValue && currentDurationExists) {
+        durationSelect.value = currentValue;
+        durationChoice.setChoiceByValue(currentValue);
+      } else {
+        durationSelect.value = '';
+        durationChoice.setChoiceByValue('');
+      }
+    }
+
+    // Обновляем страны (если нужно)
+    if (options.countries && countryChoice && countrySelect) {
+      const currentValue = countrySelect.value;
+      countryChoice.clearStore();
+      const countryOptions = [
+        { value: '', label: 'Все страны' },
+        ...(options.countries || []).map((c) => ({
+          value: String(c.id),
+          label: c.name,
+        }))
+      ];
+      countryChoice.setChoices(countryOptions, "value", "label", true);
+      const currentCountryExists = options.countries.some(
+        (c) => String(c.id) === currentValue
+      );
+      if (currentValue && currentCountryExists) {
+        countrySelect.value = currentValue;
+        countryChoice.setChoiceByValue(currentValue);
+      } else {
+        countrySelect.value = '';
+        countryChoice.setChoiceByValue('');
+      }
+    }
+  };
 
   const updateFilterOptions = async (countryId) => {
     try {
@@ -393,8 +571,7 @@ export const initEducationFilter = () => {
     const accommodation = params.get("accommodation");
     const country = params.get("country");
     const age = params.get("age");
-    const durationMin = params.get("duration_min");
-    const durationMax = params.get("duration_max");
+    const duration = params.get("duration");
     const dateFrom = params.get("date_from");
     const dateTo = params.get("date_to");
     const sort = params.get("sort");
@@ -421,6 +598,11 @@ export const initEducationFilter = () => {
       ageChoice.setChoiceByValue(age);
     }
 
+    if (duration && durationChoice) {
+      durationSelect.value = duration;
+      durationChoice.setChoiceByValue(duration);
+    }
+
     if (type && typeChoice) {
       typeSelect.value = type;
       typeChoice.setChoiceByValue(type);
@@ -429,14 +611,6 @@ export const initEducationFilter = () => {
     if (accommodation && accommodationChoice) {
       accommodationSelect.value = accommodation;
       accommodationChoice.setChoiceByValue(accommodation);
-    }
-
-
-    if (durationMin && durationMinInput) {
-      durationMinInput.value = durationMin;
-    }
-    if (durationMax && durationMaxInput) {
-      durationMaxInput.value = durationMax;
     }
 
     if (dateFrom && dateTo && dateFromInput && dateToInput && datePickerInstance) {
@@ -473,8 +647,7 @@ export const initEducationFilter = () => {
       accommodation ||
       country ||
       age ||
-      durationMin ||
-      durationMax ||
+      duration ||
       dateFrom ||
       dateTo ||
       sort;
@@ -502,6 +675,13 @@ export const initEducationFilter = () => {
   }
   if (ageChoice) {
     ageSelect.addEventListener("change", () => {
+      currentPage = 1;
+      updateResetButton();
+      loadEducation(1);
+    });
+  }
+  if (durationChoice) {
+    durationSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
       loadEducation(1);
@@ -654,8 +834,10 @@ export const initEducationFilter = () => {
         ageChoice.setChoiceByValue("");
       }
 
-      if (durationMinInput) durationMinInput.value = "";
-      if (durationMaxInput) durationMaxInput.value = "";
+      if (durationChoice) {
+        durationSelect.value = "";
+        durationChoice.setChoiceByValue("");
+      }
 
       if (datePickerInstance) {
         datePickerInstance.clear();
@@ -703,20 +885,6 @@ export const initEducationFilter = () => {
   }
 
 
-  if (durationMinInput) {
-    durationMinInput.addEventListener("change", () => {
-      currentPage = 1;
-      updateResetButton();
-      loadEducation(1);
-    });
-  }
-  if (durationMaxInput) {
-    durationMaxInput.addEventListener("change", () => {
-      currentPage = 1;
-      updateResetButton();
-      loadEducation(1);
-    });
-  }
 
   applyFromUrl();
 };
