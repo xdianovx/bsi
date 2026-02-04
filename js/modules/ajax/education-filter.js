@@ -100,6 +100,49 @@ export const initEducationFilter = () => {
       .filter((v) => v !== ''); // Исключаем пустое значение "Показать все"
   };
 
+  // Функция для обновления URL с параметрами фильтров
+  const updateUrl = () => {
+    const params = new URLSearchParams();
+
+    if (countrySelect && countrySelect.value) {
+      params.set("country", countrySelect.value);
+    }
+    if (programSelect && programSelect.value) {
+      params.set("program", programSelect.value);
+    }
+    if (languageSelect && languageSelect.value) {
+      params.set("language", languageSelect.value);
+    }
+    if (typeSelect && typeSelect.value) {
+      params.set("type", typeSelect.value);
+    }
+    if (accommodationSelect && accommodationSelect.value) {
+      params.set("accommodation", accommodationSelect.value);
+    }
+    if (ageSelect && ageSelect.value) {
+      params.set("age", ageSelect.value);
+    }
+    if (durationSelect && durationSelect.value) {
+      params.set("duration", durationSelect.value);
+    }
+    if (dateFromInput && dateFromInput.value) {
+      params.set("date_from", dateFromInput.value);
+    }
+    if (dateToInput && dateToInput.value) {
+      params.set("date_to", dateToInput.value);
+    }
+    if (currentSortValue && currentSortValue !== 'title_asc') {
+      params.set("sort", currentSortValue);
+    }
+
+    const newUrl = params.toString() 
+      ? `${window.location.pathname}?${params.toString()}`
+      : window.location.pathname;
+
+    // Используем replaceState чтобы не создавать новую запись в истории
+    window.history.replaceState({}, '', newUrl);
+  };
+
   const loadEducation = async (page = 1) => {
     setLoading(true);
 
@@ -184,6 +227,11 @@ export const initEducationFilter = () => {
       // Обновляем опции фильтров из отфильтрованных результатов
       if (json.data.filter_options && page === 1) {
         updateFilterOptionsFromResults(json.data.filter_options);
+      }
+
+      // Обновляем URL только для первой страницы
+      if (page === 1) {
+        updateUrl();
       }
 
       updateResetButton();
@@ -295,11 +343,13 @@ export const initEducationFilter = () => {
           if (dateFromInput) dateFromInput.value = startDate;
           if (dateToInput) dateToInput.value = endDate;
           updateResetButton();
+          updateUrl();
           loadEducation(1);
         } else if (selectedDates.length === 0) {
           if (dateFromInput) dateFromInput.value = "";
           if (dateToInput) dateToInput.value = "";
           updateResetButton();
+          updateUrl();
           loadEducation(1);
         }
       },
@@ -663,6 +713,7 @@ export const initEducationFilter = () => {
     programSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -670,6 +721,7 @@ export const initEducationFilter = () => {
     languageSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -677,6 +729,7 @@ export const initEducationFilter = () => {
     ageSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -684,6 +737,7 @@ export const initEducationFilter = () => {
     durationSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -691,6 +745,7 @@ export const initEducationFilter = () => {
     typeSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -698,6 +753,7 @@ export const initEducationFilter = () => {
     accommodationSelect.addEventListener("change", () => {
       currentPage = 1;
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -724,6 +780,7 @@ export const initEducationFilter = () => {
 
       await updateFilterOptions(countryId);
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }
@@ -757,6 +814,7 @@ export const initEducationFilter = () => {
         
         currentPage = 1;
         updateResetButton();
+        updateUrl();
         loadEducation(1);
       });
     });
@@ -862,6 +920,7 @@ export const initEducationFilter = () => {
 
       updateFilterOptions("");
       updateResetButton();
+      updateUrl();
       loadEducation(1);
     });
   }

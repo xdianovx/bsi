@@ -308,32 +308,93 @@ require get_template_directory() . '/inc/requests/education-filter.php';
 require get_template_directory() . '/inc/services/class-bsi-mailer.php';
 require get_template_directory() . '/inc/requests/ajax-education-program-form.php';
 
+// Обработка параметров фильтров для страницы образования
 add_action('template_redirect', function () {
-	if (!is_page()) {
-		return;
-	}
-
-	global $post;
-	if (!$post) {
-		return;
-	}
-
-	$template = get_page_template_slug($post->ID);
-	if ($template !== 'page-education.php') {
-		return;
-	}
-
+	global $wp_query;
+	
+	// Проверяем, есть ли параметры фильтров образования
 	$has_education_params = !empty($_GET['program']) || !empty($_GET['language']) ||
 		!empty($_GET['type']) || !empty($_GET['accommodation']) ||
-		!empty($_GET['country']) || !empty($_GET['age_min']) ||
-		!empty($_GET['age_max']) || !empty($_GET['duration_min']) ||
+		!empty($_GET['country']) || !empty($_GET['age']) ||
+		!empty($_GET['age_min']) || !empty($_GET['age_max']) ||
+		!empty($_GET['duration']) || !empty($_GET['duration_min']) ||
 		!empty($_GET['duration_max']) || !empty($_GET['date_from']) ||
 		!empty($_GET['date_to']) || !empty($_GET['sort']);
 
-	if ($has_education_params) {
-		global $wp_query;
+	if (!$has_education_params) {
+		return;
+	}
+
+	// Получаем текущий путь запроса
+	$request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+	$request_path = parse_url($request_uri, PHP_URL_PATH);
+	$request_path = trim($request_path, '/');
+	$request_path = trim($request_path, '/bsinew/');
+
+	// Ищем страницу с шаблоном образования
+	$education_page = get_posts([
+		'post_type' => 'page',
+		'post_status' => 'publish',
+		'meta_query' => [
+			[
+				'key' => '_wp_page_template',
+				'value' => 'page-education.php',
+				'compare' => '=',
+			],
+		],
+		'posts_per_page' => 1,
+		'fields' => 'ids',
+	]);
+
+	if (empty($education_page)) {
+		return;
+	}
+
+	$education_page_id = $education_page[0];
+	$education_page_obj = get_post($education_page_id);
+	$education_page_slug = $education_page_obj->post_name;
+	
+	// Проверяем, соответствует ли путь slug страницы образования
+	$path_matches = false;
+	if ($request_path) {
+		// Проверяем точное совпадение или что путь содержит slug
+		if ($request_path === $education_page_slug || strpos($request_path, $education_page_slug . '/') === 0) {
+			$path_matches = true;
+		}
+	}
+
+	// Если это 404 или путь не соответствует, но есть параметры фильтров - загружаем страницу
+	if ($wp_query->is_404 || !$path_matches) {
+		// Устанавливаем правильный post объект
+		$wp_query->queried_object = $education_page_obj;
+		$wp_query->queried_object_id = $education_page_id;
+		$wp_query->post = $education_page_obj;
+		$wp_query->posts = [$education_page_obj];
+		$wp_query->post_count = 1;
 		$wp_query->is_404 = false;
-		status_header(200);
+		$wp_query->is_page = true;
+		$wp_query->is_singular = true;
+		
+		// Устанавливаем глобальную переменную $post
+		global $post;
+		$post = $education_page_obj;
+		setup_postdata($post);
+		
+		// Загружаем шаблон
+		$template = locate_template('page-education.php');
+		if ($template) {
+			status_header(200);
+			include $template;
+			exit;
+		}
+	}
+	
+	// Если это уже правильная страница, просто убеждаемся что не 404
+	if (is_page() && get_page_template_slug() === 'page-education.php') {
+		if ($wp_query->is_404) {
+			$wp_query->is_404 = false;
+			status_header(200);
+		}
 	}
 }, 1);
 
