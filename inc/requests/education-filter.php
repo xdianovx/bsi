@@ -250,55 +250,85 @@ function bsi_ajax_education_filter(): void
       $order = 'ASC';
   }
 
-  $query_args = [
-    'post_type' => 'education',
-    'post_status' => 'publish',
-    'post__in' => $filtered_ids,
-    'posts_per_page' => $per_page,
-    'paged' => $paged,
-    'orderby' => $orderby,
-    'order' => $order,
-  ];
-
-  // Если сортировка по цене - добавляем meta_key
+  // Если сортировка по цене, нужно получить все посты для правильной сортировки
   if ($sort === 'price_asc' || $sort === 'price_desc') {
-    $query_args['meta_key'] = 'education_price';
-    $query_args['orderby'] = 'meta_value_num';
-  }
+    // Получаем все отфильтрованные посты без пагинации
+    $all_posts_query = new WP_Query([
+      'post_type' => 'education',
+      'post_status' => 'publish',
+      'post__in' => $filtered_ids,
+      'posts_per_page' => -1,
+      'orderby' => 'post__in', // Сохраняем порядок из filtered_ids
+    ]);
 
-  $final_query = new WP_Query($query_args);
+    if ($all_posts_query->have_posts()) {
+      $all_posts = $all_posts_query->posts;
+      
+      // Сортируем все посты по цене
+      usort($all_posts, function ($a, $b) use ($sort) {
+        $price_a = function_exists('get_field') ? get_field('education_price', $a->ID) : '';
+        $price_b = function_exists('get_field') ? get_field('education_price', $b->ID) : '';
 
-  // Если сортировка по цене, но не все посты имеют цену, нужно отсортировать вручную
-  if (($sort === 'price_asc' || $sort === 'price_desc') && $final_query->have_posts()) {
-    $posts = $final_query->posts;
-    usort($posts, function ($a, $b) use ($sort) {
-      $price_a = function_exists('get_field') ? get_field('education_price', $a->ID) : '';
-      $price_b = function_exists('get_field') ? get_field('education_price', $b->ID) : '';
+        // Извлекаем числа из строк цен
+        preg_match('/[\d\s]+/', (string) $price_a, $matches_a);
+        preg_match('/[\d\s]+/', (string) $price_b, $matches_b);
 
-      // Извлекаем числа из строк цен
-      preg_match('/[\d\s]+/', (string) $price_a, $matches_a);
-      preg_match('/[\d\s]+/', (string) $price_b, $matches_b);
+        $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
+        $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
 
-      $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
-      $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
+        if ($sort === 'price_asc') {
+          return $num_a <=> $num_b;
+        } else {
+          return $num_b <=> $num_a;
+        }
+      });
 
-      if ($sort === 'price_asc') {
-        return $num_a <=> $num_b;
-      } else {
-        return $num_b <=> $num_a;
-      }
-    });
+      // Применяем пагинацию к отсортированным постам
+      $total_filtered = count($all_posts);
+      $offset = ($paged - 1) * $per_page;
+      $paginated_posts = array_slice($all_posts, $offset, $per_page);
 
-    // Пересоздаем запрос с отсортированными постами
-    $total_posts = count($posts);
-    $final_query->posts = array_slice($posts, ($paged - 1) * $per_page, $per_page);
-    $final_query->post_count = count($final_query->posts);
-    // Используем общее количество отфильтрованных школ для расчета страниц
-    $total_filtered = count($filtered_ids);
-    $final_query->found_posts = $total_filtered;
-    $final_query->max_num_pages = (int) ceil($total_filtered / $per_page);
+      // Создаем финальный запрос с правильными данными
+      $final_query = new WP_Query([
+        'post_type' => 'education',
+        'post_status' => 'publish',
+        'posts_per_page' => $per_page,
+        'paged' => $paged,
+      ]);
+      
+      $final_query->posts = $paginated_posts;
+      $final_query->post_count = count($paginated_posts);
+      $final_query->found_posts = $total_filtered;
+      $final_query->max_num_pages = (int) ceil($total_filtered / $per_page);
+      
+      wp_reset_postdata();
+    } else {
+      // Если постов нет, создаем пустой запрос
+      $final_query = new WP_Query([
+        'post_type' => 'education',
+        'post_status' => 'publish',
+        'posts_per_page' => $per_page,
+        'paged' => $paged,
+        'post__in' => [],
+      ]);
+      $final_query->found_posts = 0;
+      $final_query->max_num_pages = 0;
+    }
   } else {
-    // Для других типов сортировки также обновляем found_posts и max_num_pages
+    // Для других типов сортировки используем стандартный подход
+    $query_args = [
+      'post_type' => 'education',
+      'post_status' => 'publish',
+      'post__in' => $filtered_ids,
+      'posts_per_page' => $per_page,
+      'paged' => $paged,
+      'orderby' => $orderby,
+      'order' => $order,
+    ];
+
+    $final_query = new WP_Query($query_args);
+    
+    // Обновляем found_posts и max_num_pages на основе всех отфильтрованных ID
     $total_filtered = count($filtered_ids);
     $final_query->found_posts = $total_filtered;
     $final_query->max_num_pages = (int) ceil($total_filtered / $per_page);
