@@ -55,15 +55,13 @@ $news_query = new WP_Query([
     <div class="container">
 
       <div class="news-filter">
-        <button class="news-filter__btn js-news-filter-btn is-active"
-                data-term="">
+        <button class="news-filter__btn js-news-filter-btn is-active" data-term="">
           Все
         </button>
 
         <?php if (!empty($news_terms) && !is_wp_error($news_terms)): ?>
           <?php foreach ($news_terms as $term): ?>
-            <button class="news-filter__btn js-news-filter-btn"
-                    data-term="<?php echo esc_attr($term->slug); ?>">
+            <button class="news-filter__btn js-news-filter-btn" data-term="<?php echo esc_attr($term->slug); ?>">
               <?php echo esc_html($term->name); ?>
             </button>
           <?php endforeach; ?>

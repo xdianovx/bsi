@@ -66,7 +66,7 @@ $countries = get_posts([
     <div class="container">
       <div class="visa-page__info">
         <div class="visa-info-img">
-          <img src="<?php echo get_template_directory_uri() ?>/img/page-visa/9622845-1.webp" alt="">
+          <img src="<?php echo get_template_directory_uri() ?>/img/visa/visa.png" alt="Оформление визы BSI">
         </div>
         <div class="visa-info-item__wrap">
 
