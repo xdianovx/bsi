@@ -10,7 +10,12 @@ $news_terms = get_terms([
   'hide_empty' => true,
 ]);
 
-$paged = max(1, get_query_var('paged'));
+// Получаем номер страницы для пагинации
+$paged = get_query_var('paged') ? (int) get_query_var('paged') : 1;
+if (!$paged) {
+  $paged = get_query_var('page') ? (int) get_query_var('page') : 1;
+}
+
 $news_query = new WP_Query([
   'post_type' => 'news',
   'posts_per_page' => 9,
@@ -73,21 +78,24 @@ $news_query = new WP_Query([
           <?php endwhile; ?>
         </div>
 
-        <div class="news-pagination">
-          <?php
-          echo paginate_links([
-            'total' => $news_query->max_num_pages,
-            'current' => $paged,
-            'prev_text' => '&larr; Назад',
-            'next_text' => 'Вперед &rarr;',
-            'mid_size' => 2,
-          ]);
-          ?>
+        <div class="news-pagination js-news-pagination">
+          <?php if ($news_query->max_num_pages > 1): ?>
+            <?php
+            echo paginate_links([
+              'total' => $news_query->max_num_pages,
+              'current' => $paged,
+              'prev_text' => '&larr; Назад',
+              'next_text' => 'Вперед &rarr;',
+              'mid_size' => 2,
+            ]);
+            ?>
+          <?php endif; ?>
         </div>
       <?php else: ?>
         <div class="no-news">
           <p>Новостей пока нет.</p>
         </div>
+        <div class="news-pagination js-news-pagination" style="display: none;"></div>
       <?php endif; ?>
 
       <?php wp_reset_postdata(); ?>
