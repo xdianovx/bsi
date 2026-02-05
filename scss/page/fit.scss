@@ -174,9 +174,9 @@
 
 // Чекбоксы услуг (grid layout)
 .fit-form__services-row {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
 
   .checkbox-item {
     margin: 0;
