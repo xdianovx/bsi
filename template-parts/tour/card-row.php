@@ -53,19 +53,19 @@ $country_title = $country_id ? get_the_title($country_id) : '';
 <article class="tour-card-row">
 
   <?php if (!empty($types) && !is_wp_error($types)): ?>
-    <div class="tour-card-row__tags">
-      <?php foreach ($types as $t): ?>
-        <span class="tour-card-row__tag"><?= esc_html($t->name); ?></span>
-      <?php endforeach; ?>
-    </div>
+
   <?php endif; ?>
 
   <div class="tour-card-row__poster">
+    <div class="tour-card-row__tags">
+      <?php foreach ($types as $t): ?>
+        <span class="tour-card-row__tag">
+          <?= esc_html($t->name); ?>
+        </span>
+      <?php endforeach; ?>
+    </div>
     <?php if ($img): ?>
-      <img class="tour-card-row__img"
-           src="<?= esc_url($img); ?>"
-           alt="<?= esc_attr($title); ?>"
-           loading="lazy">
+      <img class="tour-card-row__img" src="<?= esc_url($img); ?>" alt="<?= esc_attr($title); ?>" loading="lazy">
     <?php else: ?>
       <div class="tour-card-row__img-placeholder"></div>
     <?php endif; ?>
@@ -110,8 +110,7 @@ $country_title = $country_id ? get_the_title($country_id) : '';
       <?php if ($duration): ?>
         <div class="tour-card-row__duration">
           <span class="tour-card-row__duration-label">
-            <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/tour/cal.svg'); ?>"
-                 alt="">
+            <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/tour/cal.svg'); ?>" alt="">
           </span>
           <span class="tour-card-row__duration-value numfont"><?= esc_html($duration); ?></span>
         </div>
@@ -122,8 +121,7 @@ $country_title = $country_id ? get_the_title($country_id) : '';
     <?php if ($route): ?>
       <div class="tour-card-row__route numfont">
         <span class="tour-card-row__route-label">
-          <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/tour/route.svg'); ?>"
-               alt="">
+          <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/tour/route.svg'); ?>" alt="">
         </span>
         <span class="tour-card-row__route-value"><?= esc_html($route); ?></span>
       </div>
@@ -146,10 +144,7 @@ $country_title = $country_id ? get_the_title($country_id) : '';
           ?>
           <span class="tour-tag">
             <?php if ($icon_url): ?>
-              <img class="tour-tag__icon"
-                   src="<?= esc_url($icon_url); ?>"
-                   alt=""
-                   loading="lazy">
+              <img class="tour-tag__icon" src="<?= esc_url($icon_url); ?>" alt="" loading="lazy">
             <?php endif; ?>
             <span class="tour-tag__text"><?= esc_html($t->name); ?></span>
           </span>
@@ -158,14 +153,11 @@ $country_title = $country_id ? get_the_title($country_id) : '';
     <?php endif; ?>
 
     <div class="tour-card-row__btns">
-      <a class="tour-card-row__more sm btn btn-gray"
-         href="<?= esc_url($link); ?>">Подробнее</a>
+      <a class="tour-card-row__more sm btn btn-gray" href="<?= esc_url($link); ?>">Подробнее</a>
 
       <?php if ($booking_url): ?>
-        <a class="tour-card-row__book sm btn btn-accent"
-           href="<?= esc_url($booking_url); ?>"
-           target="_blank"
-           rel="nofollow noopener">Забронировать</a>
+        <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($booking_url); ?>" target="_blank"
+          rel="nofollow noopener" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>">Загрузка...</a>
       <?php endif; ?>
     </div>
   </div>

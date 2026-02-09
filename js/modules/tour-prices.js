@@ -772,9 +772,43 @@ export const tourPrices = () => {
       allPricesData = prices;
       updateStarFilter(prices);
       displayPrices(prices);
+      updateWidgetPrice(prices);
     } catch (error) {
       pricesList.classList.remove("is-loading");
       pricesList.innerHTML = '<div class="tour-prices__error">Ошибка загрузки цен</div>';
+    }
+  }
+
+  function updateWidgetPrice(prices) {
+    const widgetPrice = document.querySelector('.hotel-widget__price[data-tour-price]');
+    if (!widgetPrice || !prices || prices.length === 0) {
+      return;
+    }
+
+    // Находим минимальную цену среди всех отелей (используем ту же логику, что в displayPrices)
+    let minPrice = null;
+    prices.forEach(priceItem => {
+      // Используем приоритетную логику получения цены
+      const priceValue = priceItem.convertedPriceNumber || priceItem.convertedPrice || priceItem.price || 0;
+      let numPrice = 0;
+      
+      if (typeof priceValue === "number") {
+        numPrice = priceValue;
+      } else if (typeof priceValue === "string") {
+        const match = priceValue.match(/[\d.]+/);
+        if (match) {
+          numPrice = parseFloat(match[0]);
+        }
+      }
+
+      if (!isNaN(numPrice) && numPrice > 0 && (minPrice === null || numPrice < minPrice)) {
+        minPrice = numPrice;
+      }
+    });
+
+    if (minPrice !== null) {
+      const formattedPrice = new Intl.NumberFormat('ru-RU').format(minPrice);
+      widgetPrice.textContent = `от ${formattedPrice} ₽`;
     }
   }
 

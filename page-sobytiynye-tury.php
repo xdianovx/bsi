@@ -135,7 +135,7 @@ $region_terms = get_terms([
               <div class="country-tours__filters-row">
 
                 <div class="tours-filter__field">
-                  <div class="tours-filter__label">Направление (страна)</div>
+                  <div class="tours-filter__label">Направление</div>
                   <select class="tours-filter__select" name="country" data-choice="single">
                     <option value="">Все страны</option>
                     <?php if (!empty($countries)): ?>

@@ -206,11 +206,13 @@ if (function_exists('get_field')) {
       <a href="<?php echo esc_url($tour_url); ?>" class="hotel-card__btn hotel-card__btn-details">
         Подробнее
       </a>
-      <?php if ($booking_url && $price_value): ?>
-        <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
-          target="_blank" rel="noopener nofollow">
-          <?php echo esc_html(format_price_with_from($price_value, $show_from)); ?>
-        </a>
+      <?php if ($booking_url): ?>
+        <a href="<?php echo esc_url($booking_url); ?>" 
+           class="btn btn-accent hotel-card__btn hotel-card__btn-book"
+           target="_blank" 
+           rel="noopener nofollow"
+           data-tour-price
+           data-tour-id="<?php echo esc_attr($tour_id); ?>">Загрузка...</a>
       <?php endif; ?>
     </div>
   </div>

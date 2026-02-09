@@ -1,4 +1,5 @@
 import Swiper from "swiper";
+import { displayTourPrices } from "./services/priceLoader.js";
 
 export const initPopularToursSlider = () => {
   const root = document.querySelector(".popular-tours__section");
@@ -73,6 +74,9 @@ export const initPopularToursSlider = () => {
   const onResize = () => toggleControls(swiper, swiperConfig);
   window.addEventListener("resize", onResize);
 
+  // Загружаем цены для начальных туров
+  displayTourPrices(wrapper);
+
   if (!filter || !ajaxUrl) return;
 
   const setActive = (btn) => {
@@ -107,6 +111,10 @@ export const initPopularToursSlider = () => {
       swiper.update();
 
       toggleControls(swiper, swiperConfig);
+
+      // Загружаем цены для туров
+      await displayTourPrices(wrapper);
+      
     } catch (e) {
     } finally {
       setLoading(false);

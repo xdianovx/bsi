@@ -1,4 +1,5 @@
 import Choices from "choices.js";
+import { displayTourPrices } from "../services/priceLoader.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -66,6 +67,10 @@ export const initCountryToursFilters = () => {
 
       list.innerHTML = json.data.html || "";
       if (count) count.textContent = `Найдено туров: ${json.data.total || 0}`;
+
+      // Загружаем цены для туров после отображения карточек
+      await displayTourPrices(list);
+      
     } catch (e) {
       // Error handling without console output
     } finally {

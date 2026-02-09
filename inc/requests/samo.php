@@ -1,4 +1,6 @@
 <?php
+require_once get_template_directory() . '/inc/services/CacheService.php';
+
 add_action('wp_ajax_bsi_samo', 'samo_ajax');
 add_action('wp_ajax_nopriv_bsi_samo', 'samo_ajax');
 
@@ -76,11 +78,26 @@ function samo_ajax()
         wp_send_json_error(['message' => 'TOWNFROMINC, STATEINC and TOURS required'], 400);
       }
 
-      return $send(SamoService::endpoints()->searchExcursionHotels([
+      $params = [
         'TOWNFROMINC' => $townFromInc,
         'STATEINC' => $stateInc,
         'TOURS' => $tours,
-      ]));
+      ];
+      
+      // Строим ключ кеша на основе параметров
+      $cache_key = 'excursion_hotels_' . md5(json_encode($params));
+      
+      // Кешируем запрос
+      $result = CacheService::remember(
+        $cache_key,
+        function() use ($params) {
+          return SamoService::endpoints()->searchExcursionHotels($params);
+        },
+        3 * HOUR_IN_SECONDS,
+        'samotour'
+      );
+      
+      return $send($result);
 
     case 'excursion_nights':
       $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
@@ -98,11 +115,26 @@ function samo_ajax()
       ];
 
       $forceRefresh = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+      
+      // Строим ключ кеша на основе параметров
+      $cache_key = 'excursion_nights_' . md5(json_encode($params));
+      
       if ($forceRefresh) {
-        $params['_force_refresh'] = true;
+        // Очищаем кеш при force_refresh
+        CacheService::forget($cache_key, 'samotour');
       }
-
-      return $send(SamoService::endpoints()->searchExcursionNights($params));
+      
+      // Кешируем запрос
+      $result = CacheService::remember(
+        $cache_key,
+        function() use ($params) {
+          return SamoService::endpoints()->searchExcursionNights($params);
+        },
+        3 * HOUR_IN_SECONDS,
+        'samotour'
+      );
+      
+      return $send($result);
 
     case 'excursion_prices':
       $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
@@ -143,11 +175,35 @@ function samo_ajax()
       }
 
       $forceRefresh = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+      
+      // Строим ключ кеша на основе параметров
+      $cache_key = 'excursion_prices_' . md5(json_encode($params));
+      
       if ($forceRefresh) {
-        $params['_force_refresh'] = true;
+        // Очищаем кеш при force_refresh
+        error_log("samo.php: excursion_prices - force_refresh, clearing cache key: {$cache_key}");
+        CacheService::forget($cache_key, 'samotour');
       }
-
-      return $send(SamoService::endpoints()->searchExcursionPrices($params));
+      
+      // Проверяем есть ли в кеше
+      $cached = CacheService::get($cache_key, 'samotour');
+      if ($cached !== false) {
+        error_log("samo.php: excursion_prices - Cache HIT for key: {$cache_key}");
+      } else {
+        error_log("samo.php: excursion_prices - Cache MISS for key: {$cache_key}, fetching from Samotour API");
+      }
+      
+      // Кешируем запрос
+      $result = CacheService::remember(
+        $cache_key,
+        function() use ($params) {
+          return SamoService::endpoints()->searchExcursionPrices($params);
+        },
+        3 * HOUR_IN_SECONDS,
+        'samotour'
+      );
+      
+      return $send($result);
 
     case 'excursion_all':
       $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : 0;
@@ -163,10 +219,26 @@ function samo_ajax()
         'STATEINC' => $stateInc,
         'TOURS' => $tours,
       ];
+      
+      // Строим ключ кеша на основе параметров
+      $cache_key = 'excursion_all_' . md5(json_encode($params));
+      
       if ($forceRefresh) {
-        $params['_force_refresh'] = true;
+        // Очищаем кеш при force_refresh
+        CacheService::forget($cache_key, 'samotour');
       }
-      return $send(SamoService::endpoints()->searchExcursionAll($params));
+      
+      // Кешируем запрос
+      $result = CacheService::remember(
+        $cache_key,
+        function() use ($params) {
+          return SamoService::endpoints()->searchExcursionAll($params);
+        },
+        3 * HOUR_IN_SECONDS,
+        'samotour'
+      );
+      
+      return $send($result);
 
     case 'tickets_transporttypes':
       $params = [];

@@ -398,11 +398,15 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <?php if ($tour_price_from): ?>
-              <div class="hotel-widget__price numfont">
+            <div class="hotel-widget__price numfont" 
+                 data-tour-price 
+                 data-tour-id="<?= esc_attr($post_id); ?>">
+              <?php if ($tour_price_from): ?>
                 <?= esc_html($tour_price_from); ?>
-              </div>
-            <?php endif; ?>
+              <?php else: ?>
+                Загрузка цены...
+              <?php endif; ?>
+            </div>
 
 
             <?php if ($tour_booking_url): ?>

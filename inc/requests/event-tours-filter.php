@@ -394,3 +394,128 @@ function event_tours_countries()
 
   wp_send_json_success(['items' => $items]);
 }
+
+
+add_action('wp_ajax_event_tours_available_dates', 'event_tours_available_dates');
+add_action('wp_ajax_nopriv_event_tours_available_dates', 'event_tours_available_dates');
+
+function event_tours_available_dates()
+{
+  $event_tours_term_id = isset($_POST['event_tours_term_id']) ? absint(wp_unslash($_POST['event_tours_term_id'])) : 0;
+  if (!$event_tours_term_id) {
+    wp_send_json_success(['dates' => []]);
+  }
+
+  $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
+  $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
+
+  // Базовый запрос туров с типом "Событийные туры"
+  $tax_query = [
+    [
+      'taxonomy' => 'tour_type',
+      'field' => 'term_id',
+      'terms' => [$event_tours_term_id],
+    ],
+  ];
+
+  if ($region_id) {
+    $tax_query[] = [
+      'taxonomy' => 'region',
+      'field' => 'term_id',
+      'terms' => [$region_id],
+      'include_children' => true,
+    ];
+  }
+
+  $meta_query = [];
+  if ($country_id) {
+    $meta_query[] = [
+      'key' => 'tour_country',
+      'value' => $country_id,
+      'compare' => '=',
+    ];
+  }
+
+  $args = [
+    'post_type' => 'tour',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+    'tax_query' => array_merge([['relation' => 'AND']], $tax_query),
+  ];
+
+  if (!empty($meta_query)) {
+    $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
+  }
+
+  $tours_query = new WP_Query($args);
+  $tour_ids = $tours_query->posts;
+  wp_reset_postdata();
+
+  if (empty($tour_ids)) {
+    wp_send_json_success(['dates' => []]);
+  }
+
+  // Получаем доступные даты для всех туров
+  $all_available_dates = [];
+  
+  require_once get_template_directory() . '/inc/helpers.php';
+  
+  if (!class_exists('SamoService')) {
+    require_once get_template_directory() . '/inc/samo/SamoService.php';
+  }
+
+  foreach ($tour_ids as $tour_id) {
+    $excursion_params = get_tour_excursion_params((int) $tour_id);
+    
+    if (empty($excursion_params['TOWNFROMINC']) || empty($excursion_params['STATEINC']) || empty($excursion_params['TOURS'])) {
+      continue;
+    }
+
+    try {
+      $result = SamoService::endpoints()->searchExcursionAll([
+        'TOWNFROMINC' => $excursion_params['TOWNFROMINC'],
+        'STATEINC' => $excursion_params['STATEINC'],
+        'TOURS' => $excursion_params['TOURS'],
+      ]);
+
+      if (isset($result['data']['SearchExcursion_ALL']['CHECKIN_BEG'])) {
+        $checkInBeg = $result['data']['SearchExcursion_ALL']['CHECKIN_BEG'];
+        
+        if (!empty($checkInBeg['validDates']) && !empty($checkInBeg['startDate'])) {
+          // Парсим доступные даты
+          $validDates = $checkInBeg['validDates'];
+          $startDate = $checkInBeg['startDate'];
+          
+          // Формат startDate: YYYYMMDD
+          if (strlen($startDate) === 8) {
+            $startTimestamp = strtotime(
+              substr($startDate, 0, 4) . '-' . 
+              substr($startDate, 4, 2) . '-' . 
+              substr($startDate, 6, 2)
+            );
+            
+            if ($startTimestamp) {
+              for ($i = 0; $i < strlen($validDates); $i++) {
+                if ($validDates[$i] === '1') {
+                  $date = $startTimestamp + ($i * 86400); // добавляем дни
+                  $dateStr = date('Y-m-d', $date);
+                  $all_available_dates[$dateStr] = true; // используем ключи для уникальности
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (Exception $e) {
+      // Пропускаем туры с ошибками
+      continue;
+    }
+  }
+
+  // Преобразуем в массив и сортируем
+  $dates = array_keys($all_available_dates);
+  sort($dates);
+
+  wp_send_json_success(['dates' => $dates]);
+}
