@@ -24,7 +24,6 @@
 }
 
 .visa-disclaimer {
-  max-width: 50%;
   margin-top: 16px;
   font-size: 18px;
   margin-bottom: 0;
@@ -199,7 +198,7 @@
 
 .visa-info-item__wrap {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 16px;
 
   @media screen and (max-width: 1200px) {
