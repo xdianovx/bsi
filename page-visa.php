@@ -337,6 +337,20 @@ $countries = get_posts([
       'order' => 'ASC',
       'post__in' => $country_ids,
     ]);
+
+    // Ручная сортировка по алфавиту (post__in может игнорировать orderby)
+    if (!empty($countries_with_visas)) {
+      if (class_exists('Collator')) {
+        $collator = new Collator('ru_RU');
+        usort($countries_with_visas, function ($a, $b) use ($collator) {
+          return $collator->compare($a->post_title, $b->post_title);
+        });
+      } else {
+        usort($countries_with_visas, function ($a, $b) {
+          return mb_strcasecmp($a->post_title, $b->post_title, 'UTF-8');
+        });
+      }
+    }
   }
   ?>
 
