@@ -9,74 +9,64 @@ get_header('mice');
   <section class="mice-hero-section">
     <div class="container">
       <div class="mice-hero__wrap">
-        <div class="mice-hero-item">
-          <h3 class="mice-hero-item__title">Бизнес тревел</h3>
+        <?php
+        $current_page_id = get_the_ID();
+        $child_pages = get_posts([
+          'post_type' => 'page',
+          'post_parent' => $current_page_id,
+          'numberposts' => -1,
+          'orderby' => 'menu_order',
+          'order' => 'ASC',
+          'post_status' => 'publish',
+        ]);
 
-          <div class="mice-hero-item__descr">Тут короткое описание с преимущствами! В админку не вижу смысла выводить,
-            так как 1 раз напишете этот текст и забудете</div>
+        if (!empty($child_pages)):
+          foreach ($child_pages as $child):
+            $child_id = (int) $child->ID;
+            $child_title = get_the_title($child_id);
+            $child_url = get_permalink($child_id);
+            $child_excerpt = get_the_excerpt($child_id);
+            $child_image = '';
 
+            // Получаем Featured Image
+            if (has_post_thumbnail($child_id)) {
+              $child_image = get_the_post_thumbnail_url($child_id, 'full');
+            }
+            ?>
+            <div class="mice-hero-item">
+              <h3 class="mice-hero-item__title"><?php echo esc_html($child_title); ?></h3>
 
-          <a href="http://localhost:8888/bsinew/novosti/"
-             class="mice-hero-item__link link-arrow">
-            <span>Подробнее</span>
-            <div class="link-arrow__icon">
+              <?php if ($child_excerpt): ?>
+                <div class="mice-hero-item__descr"><?php echo wp_kses_post($child_excerpt); ?></div>
+              <?php endif; ?>
 
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   width="24"
-                   height="24"
-                   viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="currentColor"
-                   stroke-width="1.5"
-                   stroke-linecap="round"
-                   stroke-linejoin="round"
-                   class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
-                <path d="M7 7h10v10"></path>
-                <path d="M7 17 17 7"></path>
-              </svg>
+              <a href="<?php echo esc_url($child_url); ?>" class="mice-hero-item__link link-arrow">
+                <span>Подробнее</span>
+                <div class="link-arrow__icon">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       width="24"
+                       height="24"
+                       viewBox="0 0 24 24"
+                       fill="none"
+                       stroke="currentColor"
+                       stroke-width="1.5"
+                       stroke-linecap="round"
+                       stroke-linejoin="round"
+                       class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+                    <path d="M7 7h10v10"></path>
+                    <path d="M7 17 17 7"></path>
+                  </svg>
+                </div>
+              </a>
 
+              <?php if ($child_image): ?>
+                <img src="<?php echo esc_url($child_image); ?>"
+                     class="mice-hero-item__bg"
+                     alt="<?php echo esc_attr($child_title); ?>">
+              <?php endif; ?>
             </div>
-          </a>
-
-
-          <img src="<?= get_template_directory_uri() ?>/img/mice/1.png"
-               class="mice-hero-item__bg"
-               alt="">
-        </div>
-
-        <div class="mice-hero-item">
-          <h3 class="mice-hero-item__title">MICE</h3>
-          <div class="mice-hero-item__descr">Тут короткое описание с преимущствами! В админку не вижу смысла выводить,
-            так как 1 раз напишете этот текст и забудете</div>
-
-
-          <a href="http://localhost:8888/bsinew/novosti/"
-             class="mice-hero-item__link link-arrow">
-            <span>Подробнее</span>
-            <div class="link-arrow__icon">
-
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   width="24"
-                   height="24"
-                   viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="currentColor"
-                   stroke-width="1.5"
-                   stroke-linecap="round"
-                   stroke-linejoin="round"
-                   class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
-                <path d="M7 7h10v10"></path>
-                <path d="M7 17 17 7"></path>
-              </svg>
-
-            </div>
-          </a>
-
-          <img src="<?= get_template_directory_uri() ?>/img/mice/2.png"
-               class="mice-hero-item__bg"
-               alt="">
-        </div>
-
+          <?php endforeach; ?>
+        <?php endif; ?>
       </div>
     </div>
   </section>
