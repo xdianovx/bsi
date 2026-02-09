@@ -5,6 +5,7 @@
  */
 
 $awards = new WP_Query([
+  'post_type' => 'award',
   'post_status' => 'publish',
   'posts_per_page' => 12,
   'orderby' => 'date',
