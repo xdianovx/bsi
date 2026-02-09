@@ -17,7 +17,7 @@ if (!$archive_url) {
 }
 ?>
 
-<section class="projects-slider-section">
+<section class="projects-slider-section" id="projects">
   <div class="container">
     <div class="title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">
