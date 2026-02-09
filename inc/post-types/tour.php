@@ -132,6 +132,16 @@ add_action('init', function () {
   }
 }, 31);
 
+add_action('init', function () {
+  if (!taxonomy_exists('tour_type'))
+    return;
+
+  // Создаем термин "Событийные туры" если его нет
+  if (!term_exists('Событийные туры', 'tour_type')) {
+    wp_insert_term('Событийные туры', 'tour_type');
+  }
+}, 32);
+
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group'))
     return;

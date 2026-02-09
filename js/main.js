@@ -13,6 +13,7 @@ import { burger, mobileNavAccordion } from "./modules/burger";
 import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
+import { initEventToursFilters } from "./modules/ajax/event-tours";
 import { initCountryAside } from "./modules/country-aside";
 import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
 import { initPopularToursSlider } from "./modules/popular-tours-section";
@@ -46,6 +47,7 @@ window.addEventListener("DOMContentLoaded", () => {
   promoPageAjax();
   initResortHotelsAjax();
   initCountryToursFilters();
+  initEventToursFilters();
   initCountryAside();
   initPopularHotelsSlider();
   initPopularToursSlider();

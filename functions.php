@@ -266,6 +266,7 @@ require get_template_directory() . '/inc/post-types/tourist-memo.php';
 require get_template_directory() . '/inc/post-types/entry-rules.php';
 require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
+require get_template_directory() . '/inc/requests/event-tours-filter.php';
 
 require_once get_template_directory() . '/inc/samo/config.php';
 require_once get_template_directory() . '/inc/samo/SamoClient.php';
