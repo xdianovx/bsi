@@ -17,10 +17,9 @@
 
 .error-404__title {
   font-size: 120px;
-  font-weight: 700;
+  font-weight: 900;
   line-height: 1;
-  margin-bottom: 24px;
-  color: $red;
+  margin-bottom: 8px;
 
   @media screen and (max-width: 768px) {
     font-size: 80px;
@@ -42,11 +41,7 @@
   font-size: 16px;
   line-height: 150%;
   color: $text-gray;
-  margin-bottom: 40px;
-
-  @media screen and (max-width: 768px) {
-    margin-bottom: 32px;
-  }
+  margin-bottom: 16px;
 }
 
 .error-404__buttons {

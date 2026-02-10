@@ -18,18 +18,15 @@ get_header();
         <h1 class="h1 archive-page__title">
           <?php the_title(); ?>
         </h1>
+
+        <div class="page-country__descr"><?php the_excerpt() ?></div>
       </div>
     </div>
   </section>
 
   <section class="gde-kupit-page__content-section">
     <div class="container">
-      <div class="gde-kupit-intro">
-        <p class="gde-kupit-intro__text">
-          Вы можете забронировать тур в онлайн-системе бронирования на нашем сайте<br>
-          или обратиться в уполномоченное туристическое агентство
-        </p>
-      </div>
+
 
       <?php if (function_exists('have_rows') && have_rows('travel_agencies')): ?>
         <?php
