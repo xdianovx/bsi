@@ -32,14 +32,34 @@ get_header();
       </div>
 
       <?php if (function_exists('have_rows') && have_rows('travel_agencies')): ?>
+        <?php
+        // Собираем все турагентства в массив
+        $agencies = [];
+        while (have_rows('travel_agencies')):
+          the_row();
+          $agencies[] = [
+            'city' => get_sub_field('city'),
+            'agency_name' => get_sub_field('agency_name'),
+            'phone' => get_sub_field('phone'),
+            'email' => get_sub_field('email'),
+            'address' => get_sub_field('address'),
+          ];
+        endwhile;
+
+        // Сортируем по названию компании (по алфавиту)
+        usort($agencies, function ($a, $b) {
+          $name_a = mb_strtolower($a['agency_name'] ?? '');
+          $name_b = mb_strtolower($b['agency_name'] ?? '');
+          return strcmp($name_a, $name_b);
+        });
+        ?>
         <div class="gde-kupit-agencies__wrap">
-          <?php while (have_rows('travel_agencies')):
-            the_row();
-            $city = get_sub_field('city');
-            $agency_name = get_sub_field('agency_name');
-            $phone = get_sub_field('phone');
-            $email = get_sub_field('email');
-            $address = get_sub_field('address');
+          <?php foreach ($agencies as $agency):
+            $city = $agency['city'];
+            $agency_name = $agency['agency_name'];
+            $phone = $agency['phone'];
+            $email = $agency['email'];
+            $address = $agency['address'];
 
             $phone_clean = $phone ? preg_replace('/[^0-9\+]/', '', $phone) : '';
             ?>
@@ -96,7 +116,7 @@ get_header();
                 </div>
               </div>
             </div>
-          <?php endwhile; ?>
+          <?php endforeach; ?>
         </div>
       <?php else: ?>
         <div class="gde-kupit-empty">
