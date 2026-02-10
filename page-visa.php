@@ -170,7 +170,7 @@ $countries = get_posts([
 
         <div class="visa-info-advantage">
           <div class="visa-info-advantage__title">
-            35 лет
+            c 1990 года
           </div>
           <div class="visa-info-advantage__text">
             на рынке
