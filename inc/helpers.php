@@ -241,10 +241,11 @@ function get_tour_excursion_params(int $tour_id): array
     return [];
   }
 
-  $excursion_link = get_field('tour_excursion_link', $tour_id);
-  if (empty($excursion_link)) {
+  // Используем tour_booking_url - это поле с URL Samotour
+  $booking_url = get_field('tour_booking_url', $tour_id);
+  if (empty($booking_url)) {
     return [];
   }
 
-  return parse_excursion_url((string) $excursion_link);
+  return parse_excursion_url((string) $booking_url);
 }

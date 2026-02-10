@@ -19,11 +19,15 @@
  * @returns {Promise<Object>} Объект с ценами { tour_id: price_data }
  */
 export const loadBatchTourPrices = async (tourIds, params = {}) => {
+  console.log('loadBatchTourPrices: вызвана с tourIds:', tourIds, 'params:', params);
+  
   if (!tourIds || !Array.isArray(tourIds) || tourIds.length === 0) {
+    console.log('loadBatchTourPrices: tourIds пуст или не массив');
     return {};
   }
 
   const ajaxUrl = window.ajax?.url || window.ajaxurl || '/wp-admin/admin-ajax.php';
+  console.log('loadBatchTourPrices: ajaxUrl =', ajaxUrl);
 
   try {
     const body = new URLSearchParams();
@@ -48,6 +52,8 @@ export const loadBatchTourPrices = async (tourIds, params = {}) => {
       body.set('children', params.children);
     }
 
+    console.log('loadBatchTourPrices: отправляем запрос, body:', body.toString());
+    
     const response = await fetch(ajaxUrl, {
       method: 'POST',
       headers: {
@@ -57,16 +63,38 @@ export const loadBatchTourPrices = async (tourIds, params = {}) => {
       credentials: 'same-origin',
     });
 
+    console.log('loadBatchTourPrices: получен ответ, status:', response.status);
+    
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('loadBatchTourPrices: HTTP error', response.status, 'response:', text);
+      throw new Error(`HTTP ${response.status}: ${text.substring(0, 200)}`);
+    }
+
     const json = await response.json();
+    
+    console.log('=== ОТВЕТ ОТ PHP get_batch_tour_prices ===');
+    console.log('Success:', json.success);
+    console.log('Data:', json.data);
+    console.log('Prices:', json.data?.prices);
+    
+    // Детально по каждому туру
+    if (json.data?.prices) {
+      Object.entries(json.data.prices).forEach(([tourId, priceData]) => {
+        console.log(`Tour ${tourId}:`, priceData);
+      });
+    }
+    console.log('==========================================');
 
     if (!json || !json.success) {
+      console.error('loadBatchTourPrices: запрос неуспешен:', json);
       throw new Error(json?.data?.message || 'Failed to load prices');
     }
 
     return json.data.prices || {};
 
   } catch (error) {
-    console.error('Error loading batch tour prices:', error);
+    console.error('loadBatchTourPrices: ERROR:', error);
     return {};
   }
 };
@@ -133,13 +161,19 @@ export const loadTourPrice = async (tourId, params = {}) => {
  * @param {Object} params - Параметры для загрузки цен
  */
 export const displayTourPrices = async (container, params = {}) => {
+  console.log('displayTourPrices: вызвана, container:', container);
+  
   if (!container) {
+    console.log('displayTourPrices: контейнер не найден');
     return;
   }
 
   // Находим все элементы с ценами
   const priceElements = container.querySelectorAll('[data-tour-price]');
+  console.log('displayTourPrices: найдено элементов с [data-tour-price]:', priceElements.length);
+  
   if (priceElements.length === 0) {
+    console.log('displayTourPrices: нет элементов для загрузки цен');
     return;
   }
 
@@ -149,13 +183,17 @@ export const displayTourPrices = async (container, params = {}) => {
 
   priceElements.forEach(el => {
     const tourId = parseInt(el.dataset.tourId);
+    console.log('displayTourPrices: элемент', el, 'tour ID:', tourId);
     if (tourId && !tourIds.includes(tourId)) {
       tourIds.push(tourId);
       elementMap.set(tourId, el);
     }
   });
 
+  console.log('displayTourPrices: собрано уникальных tour IDs:', tourIds);
+
   if (tourIds.length === 0) {
+    console.log('displayTourPrices: нет валидных tour IDs');
     return;
   }
 
@@ -165,7 +203,9 @@ export const displayTourPrices = async (container, params = {}) => {
   });
 
   // Загружаем цены
+  console.log('displayTourPrices: отправляем запрос на загрузку цен для:', tourIds);
   const prices = await loadBatchTourPrices(tourIds, params);
+  console.log('displayTourPrices: получены цены:', prices);
 
   // Обновляем элементы с ценами
   tourIds.forEach(tourId => {

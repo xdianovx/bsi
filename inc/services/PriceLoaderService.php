@@ -46,10 +46,10 @@ class PriceLoaderService
       return null;
     }
 
-    // Получаем параметры экскурсии из ACF поля tour_excursion_link
+    // Получаем параметры экскурсии из ACF поля tour_booking_url
     $excursion_params = get_tour_excursion_params($tour_id);
     if (empty($excursion_params) || empty($excursion_params['TOURS'])) {
-      error_log("PriceLoaderService: tour {$tour_id} has no tour_excursion_link, trying static price_from field");
+      error_log("PriceLoaderService: tour {$tour_id} has no tour_booking_url or invalid URL, trying static price_from field");
       
       // Fallback: проверяем статичное поле price_from
       if (function_exists('get_field')) {
@@ -162,30 +162,46 @@ class PriceLoaderService
         'ADULT' => $params['adults'] ?? 2,
         'CHILD' => $params['children'] ?? 0,
         'CURRENCY' => 1, // RUB
+        'NIGHTS_FROM' => 1,  // Минимум 1 ночь
+        'NIGHTS_TILL' => 30, // Максимум 30 ночей
       ];
 
-      // Если даты не указаны, получаем ближайшие доступные
-      if (empty($params['date_from']) || empty($params['date_to'])) {
-        $dates = self::getAvailableDates($excursion_params);
-        if (!empty($dates)) {
-          $api_params['CHECKIN_BEG'] = $dates['date_from'];
-          $api_params['CHECKIN_END'] = $dates['date_to'];
-        }
-      } else {
+      // Если даты указаны явно, используем их
+      if (!empty($params['date_from']) && !empty($params['date_to'])) {
         $api_params['CHECKIN_BEG'] = $params['date_from'];
         $api_params['CHECKIN_END'] = $params['date_to'];
+      } else {
+        // Иначе используем диапазон 3 месяца вперед
+        $api_params['CHECKIN_BEG'] = date('Ymd');  // Сегодня
+        $api_params['CHECKIN_END'] = date('Ymd', strtotime('+3 months'));  // +3 месяца
       }
 
       // Запрашиваем цены из Samotour
+      error_log("PriceLoaderService: Запрос к Samotour для tour {$tour_id}, params: " . print_r($api_params, true));
+      
       $result = SamoService::endpoints()->searchExcursionPrices($api_params);
 
+      error_log("PriceLoaderService: Samotour ПОЛНЫЙ ответ для tour {$tour_id}: " . print_r($result, true));
+
       if (!isset($result['data']['SearchExcursion_PRICES']['prices'])) {
+        error_log("PriceLoaderService: No prices in response for tour {$tour_id}");
+        
+        // Проверяем есть ли ошибка от Samotour
+        if (isset($result['data']['SearchExcursion_PRICES']['error'])) {
+          error_log("PriceLoaderService: Samotour error code: " . $result['data']['SearchExcursion_PRICES']['error']);
+        }
+        
         return null;
       }
 
       $prices = $result['data']['SearchExcursion_PRICES']['prices'];
       if (!is_array($prices)) {
         $prices = [$prices];
+      }
+
+      error_log("PriceLoaderService: Found " . count($prices) . " prices for tour {$tour_id}");
+      if (!empty($prices)) {
+        error_log("PriceLoaderService: First price item: " . print_r($prices[0], true));
       }
 
       // Находим минимальную цену с приоритетной логикой парсинга
@@ -197,6 +213,11 @@ class PriceLoaderService
           ?? $price_item['price'] 
           ?? null;
         
+        error_log("PriceLoaderService: Price item - convertedPriceNumber: " . ($price_item['convertedPriceNumber'] ?? 'NULL') . 
+                  ", convertedPrice: " . ($price_item['convertedPrice'] ?? 'NULL') . 
+                  ", price: " . ($price_item['price'] ?? 'NULL') . 
+                  ", chosen: " . ($price_value ?? 'NULL'));
+        
         if ($price_value === null) {
           continue;
         }
@@ -206,6 +227,8 @@ class PriceLoaderService
           $min_price = $price;
         }
       }
+      
+      error_log("PriceLoaderService: Minimum price for tour {$tour_id}: " . ($min_price ?? 'NULL'));
 
       if ($min_price === null) {
         return null;

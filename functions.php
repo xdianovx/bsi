@@ -4,6 +4,15 @@ if (!defined('_S_VERSION')) {
 	define('_S_VERSION', '1.0.0');
 }
 
+// Временно: очистка кеша через URL
+add_action('init', function() {
+	if (isset($_GET['clear_price_cache']) && current_user_can('manage_options')) {
+		global $wpdb;
+		$deleted = $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_bsi_cache_tour%'");
+		wp_die("Очищено транзиентов: $deleted. <a href='" . home_url() . "'>На главную</a>");
+	}
+});
+
 function bsi_setup()
 {
 	load_theme_textdomain('bsi', get_template_directory() . '/languages');

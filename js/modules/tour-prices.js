@@ -755,6 +755,10 @@ export const tourPrices = () => {
         CURRENCY: searchParams.currency,
       };
 
+      console.log('=== ПАРАМЕТРЫ ЗАПРОСА К SAMOTOUR (страница тура) ===');
+      console.log(params);
+      console.log('====================================================');
+
       if (forceRefresh) {
         params._force_refresh = true;
       }
@@ -768,6 +772,12 @@ export const tourPrices = () => {
           ? data.SearchExcursion_PRICES.prices
           : [data.SearchExcursion_PRICES.prices];
       }
+
+      console.log('=== МАССИВ ОТЕЛЕЙ С САМОТУРА ===');
+      console.log('Всего отелей:', prices.length);
+      console.log('Полный массив:', prices);
+      console.log('Первый отель (пример структуры):', prices[0]);
+      console.log('=================================');
 
       allPricesData = prices;
       updateStarFilter(prices);
