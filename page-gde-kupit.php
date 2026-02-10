@@ -46,11 +46,11 @@ get_header();
           ];
         endwhile;
 
-        // Сортируем по названию компании (по алфавиту)
+        // Сортируем по городу (по алфавиту)
         usort($agencies, function ($a, $b) {
-          $name_a = mb_strtolower($a['agency_name'] ?? '');
-          $name_b = mb_strtolower($b['agency_name'] ?? '');
-          return strcmp($name_a, $name_b);
+          $city_a = mb_strtolower($a['city'] ?? '');
+          $city_b = mb_strtolower($b['city'] ?? '');
+          return strcmp($city_a, $city_b);
         });
         ?>
         <div class="gde-kupit-agencies__wrap">
