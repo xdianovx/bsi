@@ -85,6 +85,15 @@ add_action('acf/init', function () {
         'library' => 'all',
         'wrapper' => ['width' => '50'],
       ],
+      [
+        'key' => 'field_review_show_on_mice',
+        'label' => 'Показать на странице MICE',
+        'name' => 'show_on_mice_page',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+        'wrapper' => ['width' => '50'],
+      ],
 
     ],
     'location' => [

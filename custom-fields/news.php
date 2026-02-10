@@ -43,6 +43,14 @@ add_action('acf/init', function () {
         'ui' => 1,
         'default_value' => 0,
       ],
+      [
+        'key' => 'field_news_show_on_mice',
+        'label' => 'Показать на странице MICE',
+        'name' => 'show_on_mice_page',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+      ],
     ],
     'location' => [
       [

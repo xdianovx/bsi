@@ -3,13 +3,32 @@
  * template-parts/reviews/slider.php
  */
 
-$reviews = get_posts([
+// Проверяем, нужно ли фильтровать по MICE (передается через get_template_part)
+$filter_mice = isset($args['filter_mice']) ? $args['filter_mice'] : false;
+
+// Если на странице MICE, фильтруем по ACF полю
+$meta_query = [];
+if ($filter_mice) {
+  $meta_query[] = [
+    'key' => 'show_on_mice_page',
+    'value' => '1',
+    'compare' => '='
+  ];
+}
+
+$reviews_args = [
   'post_type' => 'review',
   'post_status' => 'publish',
   'posts_per_page' => 12,
   'orderby' => 'date',
   'order' => 'DESC',
-]);
+];
+
+if (!empty($meta_query)) {
+  $reviews_args['meta_query'] = $meta_query;
+}
+
+$reviews = get_posts($reviews_args);
 
 if (empty($reviews)) {
   return;

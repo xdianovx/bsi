@@ -105,10 +105,10 @@ get_header('mice');
   <?= get_template_part('template-parts/projects/slider') ?>
 
 
-  <?= get_template_part('template-parts/news/news-slider') ?>
-  <?= get_template_part('template-parts/awards/slider') ?>
-  <?= get_template_part('template-parts/reviews/slider') ?>
-  <?= get_template_part('template-parts/partners/partners-slider') ?>
+  <?php get_template_part('template-parts/news/news-slider', null, ['filter_mice' => true]); ?>
+  <?php get_template_part('template-parts/awards/slider', null, ['filter_mice' => true]); ?>
+  <?php get_template_part('template-parts/reviews/slider', null, ['filter_mice' => true]); ?>
+  <?php get_template_part('template-parts/partners/partners-slider', null, ['filter_mice' => true]); ?>
 
 
 

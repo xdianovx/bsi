@@ -4,13 +4,32 @@
  * Template: template-parts/awards/slider.php
  */
 
-$awards = new WP_Query([
+// Проверяем, нужно ли фильтровать по MICE (передается через get_template_part)
+$filter_mice = isset($args['filter_mice']) ? $args['filter_mice'] : false;
+
+// Если на странице MICE, фильтруем по ACF полю
+$meta_query = [];
+if ($filter_mice) {
+  $meta_query[] = [
+    'key' => 'show_on_mice_page',
+    'value' => '1',
+    'compare' => '='
+  ];
+}
+
+$awards_args = [
   'post_type' => 'award',
   'post_status' => 'publish',
   'posts_per_page' => 12,
   'orderby' => 'date',
   'order' => 'DESC',
-]);
+];
+
+if (!empty($meta_query)) {
+  $awards_args['meta_query'] = $meta_query;
+}
+
+$awards = new WP_Query($awards_args);
 
 if (!$awards->have_posts()) {
   wp_reset_postdata();

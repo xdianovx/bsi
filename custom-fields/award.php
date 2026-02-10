@@ -49,6 +49,17 @@ add_action('acf/init', function () {
           'width' => '25',
         ],
       ],
+      [
+        'key' => 'field_award_show_on_mice',
+        'label' => 'Показать на странице MICE',
+        'name' => 'show_on_mice_page',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+        'wrapper' => [
+          'width' => '25',
+        ],
+      ],
 
 
     ],

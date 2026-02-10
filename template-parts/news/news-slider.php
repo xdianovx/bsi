@@ -1,11 +1,30 @@
 <?php
-$news_page_link = get_post_type_archive_link('news');
-$news_query = new WP_Query([
+// Проверяем, нужно ли фильтровать по MICE (передается через get_template_part)
+$filter_mice = isset($args['filter_mice']) ? $args['filter_mice'] : false;
+
+// Если на странице MICE, фильтруем по ACF полю
+$meta_query = [];
+if ($filter_mice) {
+  $meta_query[] = [
+    'key' => 'show_on_mice_page',
+    'value' => '1',
+    'compare' => '='
+  ];
+}
+
+$news_args = [
   'post_type' => 'news',
   'posts_per_page' => 6,
   'orderby' => 'date',
   'order' => 'DESC'
-]);
+];
+
+if (!empty($meta_query)) {
+  $news_args['meta_query'] = $meta_query;
+}
+
+$news_page_link = get_post_type_archive_link('news');
+$news_query = new WP_Query($news_args);
 ?>
 
 <section class="news-slider__section">
