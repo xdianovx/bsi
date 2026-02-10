@@ -168,7 +168,7 @@ get_header();
 	/**
 	 * Контент страницы
 	 */
-		if (have_posts()):
+	if (have_posts()):
 		while (have_posts()):
 			the_post();
 			if (get_the_content()): ?>
@@ -260,7 +260,8 @@ get_header();
 	<section class="visa-page-consultation__section">
 		<div class="container">
 			<h2 class="h2">Бесплатная консультация</h2>
-			<p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам страхования</p>
+			<p class="visa-consultation-form__descr">Оставьте заявку и мы проконсультируем вас по вопросам страхования
+			</p>
 			<form action="" class="visa-consultation-form">
 
 				<div class="form-row form-row-2">
@@ -268,38 +269,25 @@ get_header();
 					<div class="input-item white">
 						<label for="insurance_type">Тип страхования</label>
 						<input type="text" name="insurance_type" id="insurance_type" placeholder="Тип страхования">
-
-						<div class="error-message" data-field="insurance_type">
-						</div>
 					</div>
 
 					<div class="input-item white">
-						<label for="insurance_name">Имя</label>
+						<label for="insurance_name">Имя *</label>
 						<input type="text" name="name" id="insurance_name" placeholder="Имя">
-
-						<div class="error-message" data-field="name">
-						</div>
 					</div>
 
 					<div class="input-item white">
-						<label for="insurance_phone">Телефон</label>
+						<label for="insurance_phone">Телефон *</label>
 						<input type="tel" name="tel" id="insurance_phone" placeholder="+7 (___) ___-__-__">
-
-						<div class="error-message" data-field="tel">
-						</div>
 					</div>
 
 					<div class="input-item white">
 						<label for="insurance_date">Дата поездки</label>
 						<input type="text" name="date" id="insurance_date" placeholder="Дата поездки">
-
-						<div class="error-message" data-field="date">
-						</div>
 					</div>
 				</div>
 
 				<div class="visa-consultation-form__bottom">
-					<div id="form-status"></div>
 
 					<button type="submit" class="btn btn-accent fit-form__btn-submit">
 						Отправить
@@ -313,9 +301,31 @@ get_header();
 						</a>
 					</p>
 				</div>
+
+				<div id="form-status"></div>
+
 			</form>
 		</div>
 	</section>
+
+	<!-- Модалка успеха -->
+	<div class="modal micromodal-slide" id="modal-insurance-success" aria-hidden="true">
+		<div class="modal__overlay" tabindex="-1" data-micromodal-close>
+			<div class="modal__container modal-program-booking-success" role="dialog" aria-modal="true">
+				<div class="modal__content modal-program-booking-success__content">
+					<div class="modal-program-booking-success__icon">
+						<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="32" cy="32" r="32" fill="#4CAF50" />
+							<path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round"
+								stroke-linejoin="round" />
+						</svg>
+					</div>
+					<h3 class="modal-program-booking-success__title">Заявка отправлена!</h3>
+					<p class="modal-program-booking-success__text">Мы свяжемся с вами в ближайшее время</p>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </main>
 

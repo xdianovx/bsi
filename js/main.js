@@ -2,6 +2,7 @@ import { Fancybox } from "@fancyapps/ui";
 import { gtmSearch } from "./modules/gtm-search";
 import { fitForm } from "./modules/forms/fit-form";
 import { visaForm } from "./modules/forms/visa-form";
+import { initInsuranceForm } from "./modules/forms/insurance-form";
 import { sliders } from "./modules/sliders";
 import { phoneMask } from "./modules/forms/phone-mask";
 import MicroModal from "micromodal";
@@ -41,6 +42,7 @@ window.addEventListener("DOMContentLoaded", () => {
   sliders();
   fitForm();
   visaForm();
+  initInsuranceForm();
   gtmSearch();
   phoneMask();
   initNewsFilter();
