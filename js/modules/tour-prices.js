@@ -819,6 +819,19 @@ export const tourPrices = () => {
     if (minPrice !== null) {
       const formattedPrice = new Intl.NumberFormat('ru-RU').format(minPrice);
       widgetPrice.textContent = `от ${formattedPrice} ₽`;
+
+      // Сохраняем минимальную цену в серверный кэш для карточек
+      const ajaxUrl = window.ajax?.url || window.ajaxurl || '/wp-admin/admin-ajax.php';
+      fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: new URLSearchParams({
+          action: 'save_tour_min_price',
+          tour_id: tourId,
+          min_price: minPrice,
+        }),
+        credentials: 'same-origin',
+      }).catch(() => {});
     }
   }
 

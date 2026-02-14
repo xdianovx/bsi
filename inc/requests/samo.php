@@ -180,19 +180,9 @@ function samo_ajax()
       $cache_key = 'excursion_prices_' . md5(json_encode($params));
       
       if ($forceRefresh) {
-        // Очищаем кеш при force_refresh
-        error_log("samo.php: excursion_prices - force_refresh, clearing cache key: {$cache_key}");
         CacheService::forget($cache_key, 'samotour');
       }
-      
-      // Проверяем есть ли в кеше
-      $cached = CacheService::get($cache_key, 'samotour');
-      if ($cached !== false) {
-        error_log("samo.php: excursion_prices - Cache HIT for key: {$cache_key}");
-      } else {
-        error_log("samo.php: excursion_prices - Cache MISS for key: {$cache_key}, fetching from Samotour API");
-      }
-      
+
       // Кешируем запрос
       $result = CacheService::remember(
         $cache_key,

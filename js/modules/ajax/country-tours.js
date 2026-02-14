@@ -34,6 +34,9 @@ export const initCountryToursFilters = () => {
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
+  // Загружаем цены для карточек, отрендеренных сервером при начальной загрузке
+  displayTourPrices(list);
+
   const getValues = (sel) => {
     if (!sel) return [];
     return Array.from(sel.selectedOptions)

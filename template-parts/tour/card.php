@@ -207,12 +207,17 @@ if (function_exists('get_field')) {
         Подробнее
       </a>
       <?php if ($booking_url): ?>
+        <?php
+          $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($tour_id) : null;
+          $price_text = $cached_price ? 'от ' . $cached_price['price_formatted'] . ' ₽' : '';
+          $is_price_loaded = !empty($price_text);
+        ?>
         <a href="<?php echo esc_url($booking_url); ?>" 
            class="btn btn-accent hotel-card__btn hotel-card__btn-book"
            target="_blank" 
            rel="noopener nofollow"
            data-tour-price
-           data-tour-id="<?php echo esc_attr($tour_id); ?>">Загрузка...</a>
+           data-tour-id="<?php echo esc_attr($tour_id); ?>"<?= $is_price_loaded ? ' data-price-loaded' : ''; ?>><?= $is_price_loaded ? esc_html($price_text) : 'Загрузка...'; ?></a>
       <?php endif; ?>
     </div>
   </div>

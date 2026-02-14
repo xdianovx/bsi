@@ -34,6 +34,26 @@ class PriceLoaderService
   const CACHE_EXPIRATION = 3 * HOUR_IN_SECONDS;
 
   /**
+   * Получить цену тура только из кэша (без запроса к API).
+   * Безопасно для использования в шаблонах — не блокирует рендер.
+   * 
+   * @param int $tour_id ID тура
+   * @param array $params Дополнительные параметры
+   * @return array|null Массив с ценой или null, если кэш пуст
+   */
+  public static function getCachedTourPrice(int $tour_id, array $params = []): ?array
+  {
+    if (!$tour_id) {
+      return null;
+    }
+
+    $cache_key = self::buildTourCacheKey($tour_id, $params);
+    $cached = CacheService::get($cache_key, self::CACHE_GROUP_TOURS);
+
+    return $cached !== false ? $cached : null;
+  }
+
+  /**
    * Получить цену тура с кэшированием
    * 
    * @param int $tour_id ID тура
@@ -46,11 +66,8 @@ class PriceLoaderService
       return null;
     }
 
-    // Получаем параметры экскурсии из ACF поля tour_booking_url
     $excursion_params = get_tour_excursion_params($tour_id);
     if (empty($excursion_params) || empty($excursion_params['TOURS'])) {
-      error_log("PriceLoaderService: tour {$tour_id} has no tour_booking_url or invalid URL, trying static price_from field");
-      
       // Fallback: проверяем статичное поле price_from
       if (function_exists('get_field')) {
         $static_price = get_field('price_from', $tour_id);
@@ -58,10 +75,8 @@ class PriceLoaderService
         $show_from = $show_from_field !== false;
         
         if (!empty($static_price)) {
-          // Парсим статичную цену (может быть в формате "от 45 000 ₽" или просто "45000")
           $price_numeric = preg_replace('/[^\d]/', '', $static_price);
           if (!empty($price_numeric)) {
-            error_log("PriceLoaderService: tour {$tour_id} using static price: {$price_numeric}");
             return [
               'price' => (float) $price_numeric,
               'price_formatted' => number_format((float) $price_numeric, 0, '.', ' '),
@@ -75,23 +90,17 @@ class PriceLoaderService
       return null;
     }
 
-    // Строим ключ кэша на основе параметров
     $cache_key = self::buildTourCacheKey($tour_id, $params);
 
-    // Пытаемся получить из кэша
-    error_log("PriceLoaderService: getTourPrice - tour_id: {$tour_id}, cache_key: {$cache_key}");
-    
     $result = CacheService::remember(
       $cache_key,
       function () use ($tour_id, $excursion_params, $params) {
-        error_log("PriceLoaderService: Cache MISS - fetching from API for tour {$tour_id}");
         return self::fetchTourPrice($tour_id, $excursion_params, $params);
       },
       self::CACHE_EXPIRATION,
       self::CACHE_GROUP_TOURS
     );
-    
-    error_log("PriceLoaderService: getTourPrice result: " . ($result ? json_encode($result) : 'NULL'));
+
     return $result;
   }
 
@@ -176,48 +185,32 @@ class PriceLoaderService
         $api_params['CHECKIN_END'] = date('Ymd', strtotime('+3 months'));  // +3 месяца
       }
 
-      // Запрашиваем цены из Samotour
-      error_log("PriceLoaderService: Запрос к Samotour для tour {$tour_id}, params: " . print_r($api_params, true));
-      
       $result = SamoService::endpoints()->searchExcursionPrices($api_params);
 
-      error_log("PriceLoaderService: Samotour ПОЛНЫЙ ответ для tour {$tour_id}: " . print_r($result, true));
-
-      if (!isset($result['data']['SearchExcursion_PRICES']['prices'])) {
-        error_log("PriceLoaderService: No prices in response for tour {$tour_id}");
-        
-        // Проверяем есть ли ошибка от Samotour
-        if (isset($result['data']['SearchExcursion_PRICES']['error'])) {
-          error_log("PriceLoaderService: Samotour error code: " . $result['data']['SearchExcursion_PRICES']['error']);
-        }
-        
+      $samo_data = $result['data']['SearchExcursion_PRICES'] ?? null;
+      if (!$samo_data || !is_array($samo_data)) {
         return null;
       }
 
-      $prices = $result['data']['SearchExcursion_PRICES']['prices'];
-      if (!is_array($prices)) {
-        $prices = [$prices];
+      // Обрабатываем оба формата ответа SAMO:
+      // 1) {"SearchExcursion_PRICES": {"prices": [...]}}  — вложенный ключ prices
+      // 2) {"SearchExcursion_PRICES": [{...}, {...}]}      — массив напрямую
+      if (isset($samo_data['prices'])) {
+        $prices = is_array($samo_data['prices']) ? $samo_data['prices'] : [$samo_data['prices']];
+      } elseif (isset($samo_data[0])) {
+        $prices = $samo_data;
+      } else {
+        return null;
       }
 
-      error_log("PriceLoaderService: Found " . count($prices) . " prices for tour {$tour_id}");
-      if (!empty($prices)) {
-        error_log("PriceLoaderService: First price item: " . print_r($prices[0], true));
-      }
-
-      // Находим минимальную цену с приоритетной логикой парсинга
+      // Находим минимальную цену: convertedPriceNumber > convertedPrice > price
       $min_price = null;
       foreach ($prices as $price_item) {
-        // Приоритетная логика: convertedPriceNumber > convertedPrice > price
         $price_value = $price_item['convertedPriceNumber'] 
           ?? $price_item['convertedPrice'] 
           ?? $price_item['price'] 
           ?? null;
-        
-        error_log("PriceLoaderService: Price item - convertedPriceNumber: " . ($price_item['convertedPriceNumber'] ?? 'NULL') . 
-                  ", convertedPrice: " . ($price_item['convertedPrice'] ?? 'NULL') . 
-                  ", price: " . ($price_item['price'] ?? 'NULL') . 
-                  ", chosen: " . ($price_value ?? 'NULL'));
-        
+
         if ($price_value === null) {
           continue;
         }
@@ -227,8 +220,6 @@ class PriceLoaderService
           $min_price = $price;
         }
       }
-      
-      error_log("PriceLoaderService: Minimum price for tour {$tour_id}: " . ($min_price ?? 'NULL'));
 
       if ($min_price === null) {
         return null;

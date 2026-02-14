@@ -156,8 +156,13 @@ $country_title = $country_id ? get_the_title($country_id) : '';
       <a class="tour-card-row__more sm btn btn-gray" href="<?= esc_url($link); ?>">Подробнее</a>
 
       <?php if ($booking_url): ?>
+        <?php
+          $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($post_id) : null;
+          $price_text = $cached_price ? 'от ' . $cached_price['price_formatted'] . ' ₽' : '';
+          $is_price_loaded = !empty($price_text);
+        ?>
         <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($booking_url); ?>" target="_blank"
-          rel="nofollow noopener" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>">Загрузка...</a>
+          rel="nofollow noopener" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>"<?= $is_price_loaded ? ' data-price-loaded' : ''; ?>><?= $is_price_loaded ? esc_html($price_text) : 'Загрузка...'; ?></a>
       <?php endif; ?>
     </div>
   </div>
