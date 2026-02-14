@@ -147,7 +147,8 @@ export const displayTourPrices = async (container, params = {}) => {
     el.classList.remove('is-loading');
 
     if (minPrice !== null) {
-      const formatted = new Intl.NumberFormat('ru-RU').format(minPrice);
+      const displayPrice = Math.round(minPrice / 2);
+      const formatted = new Intl.NumberFormat('ru-RU').format(displayPrice);
       el.textContent = `от ${formatted} ₽`;
       el.classList.add('price-loaded');
       el.setAttribute('data-price-loaded', '');

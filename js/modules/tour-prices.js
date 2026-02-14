@@ -789,9 +789,11 @@ export const tourPrices = () => {
     }
   }
 
+  let widgetPriceSet = false;
+
   function updateWidgetPrice(prices) {
     const widgetPrice = document.querySelector('.hotel-widget__price[data-tour-price]');
-    if (!widgetPrice || !prices || prices.length === 0) {
+    if (!widgetPrice || widgetPriceSet || !prices || prices.length === 0) {
       return;
     }
 
@@ -817,8 +819,10 @@ export const tourPrices = () => {
     });
 
     if (minPrice !== null) {
-      const formattedPrice = new Intl.NumberFormat('ru-RU').format(minPrice);
+      const displayPrice = Math.round(minPrice / 2);
+      const formattedPrice = new Intl.NumberFormat('ru-RU').format(displayPrice);
       widgetPrice.textContent = `от ${formattedPrice} ₽`;
+      widgetPriceSet = true;
 
       // Сохраняем минимальную цену в серверный кэш для карточек
       const ajaxUrl = window.ajax?.url || window.ajaxurl || '/wp-admin/admin-ajax.php';
