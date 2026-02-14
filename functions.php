@@ -321,6 +321,7 @@ require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
 require get_template_directory() . '/inc/services/class-bsi-mailer.php';
 require get_template_directory() . '/inc/requests/ajax-education-program-form.php';
+require get_template_directory() . '/inc/requests/ajax-event-ticket-form.php';
 
 // Обработка параметров фильтров для страницы образования
 add_action('template_redirect', function () {

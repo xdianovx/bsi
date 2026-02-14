@@ -5,23 +5,13 @@ add_action('wp_ajax_nopriv_event_tours_filter', 'event_tours_filter');
 
 function event_tours_filter()
 {
-  $event_tours_term_id = isset($_POST['event_tours_term_id']) ? absint(wp_unslash($_POST['event_tours_term_id'])) : 0;
-  if (!$event_tours_term_id) {
-    wp_send_json_error(['message' => 'no_term_id']);
-  }
-
   $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
   $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
+  $tour_type_id = isset($_POST['tour_type']) ? absint(wp_unslash($_POST['tour_type'])) : 0;
   $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
   $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
 
-  $tax_query = [
-    [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$event_tours_term_id],
-    ],
-  ];
+  $tax_query = [];
 
   // Фильтр по региону
   if ($region_id) {
@@ -30,6 +20,15 @@ function event_tours_filter()
       'field' => 'term_id',
       'terms' => [$region_id],
       'include_children' => true,
+    ];
+  }
+
+  // Фильтр по типу тура
+  if ($tour_type_id) {
+    $tax_query[] = [
+      'taxonomy' => 'tour_type',
+      'field' => 'term_id',
+      'terms' => [$tour_type_id],
     ];
   }
 
@@ -45,13 +44,16 @@ function event_tours_filter()
   }
 
   $args = [
-    'post_type' => 'tour',
+    'post_type' => 'event',
     'post_status' => 'publish',
     'posts_per_page' => -1, // Получаем все для фильтрации по датам
     'orderby' => 'title',
     'order' => 'ASC',
-    'tax_query' => array_merge([['relation' => 'AND']], $tax_query),
   ];
+
+  if (!empty($tax_query)) {
+    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+  }
 
   if (!empty($meta_query)) {
     $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
@@ -59,101 +61,49 @@ function event_tours_filter()
 
   $q = new WP_Query($args);
 
-  // Фильтрация по диапазону дат (если указан)
+  // Фильтрация по диапазону дат через ACF repeater event_dates
   $filtered_posts = [];
   $date_from_timestamp = $date_from ? strtotime($date_from) : 0;
   $date_to_timestamp = $date_to ? strtotime($date_to) : 0;
-  
-  if ($q->have_posts()) {
-    while ($q->have_posts()) {
-      $q->the_post();
-      $post_id = get_the_ID();
-      
-      // Если диапазон дат не указан, показываем все туры
-      if (!$date_from || !$date_to) {
-        $filtered_posts[] = $post_id;
-        continue;
-      }
-      
-      $checkin_dates = function_exists('get_field') ? get_field('tour_checkin_dates', $post_id) : '';
-      
-      // Если поле пустое, показываем тур (без фильтрации по датам)
-      if (empty($checkin_dates)) {
-        $filtered_posts[] = $post_id;
-        continue;
-      }
-      
-      // Пытаемся найти даты в тексте и проверить, попадает ли хотя бы одна в диапазон
-      $dates_found = false;
-      
-      $month_names = [
-        'января' => 1, 'февраля' => 2, 'марта' => 3, 'апреля' => 4,
-        'мая' => 5, 'июня' => 6, 'июля' => 7, 'августа' => 8,
-        'сентября' => 9, 'октября' => 10, 'ноября' => 11, 'декабря' => 12
-      ];
-      
-      $current_year = date('Y');
-      
-      // Парсим даты в формате "15 марта, 22 марта"
-      preg_match_all('/(\d{1,2})\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)/ui', $checkin_dates, $matches);
-      if (!empty($matches[0])) {
-        foreach ($matches[1] as $idx => $day) {
-          $month_name = mb_strtolower($matches[2][$idx]);
-          if (isset($month_names[$month_name])) {
-            $month = $month_names[$month_name];
-            $year = $current_year;
-            $date_str = sprintf('%04d-%02d-%02d', $year, $month, (int)$day);
-            $date_timestamp = strtotime($date_str);
-            
-            if ($date_timestamp >= $date_from_timestamp && $date_timestamp <= $date_to_timestamp) {
-              $dates_found = true;
-              break;
-            }
+  $has_date_filter = ($date_from && $date_to);
+
+  if ($has_date_filter) {
+    // Получаем все посты для ручной фильтрации по датам
+    if ($q->have_posts()) {
+      while ($q->have_posts()) {
+        $q->the_post();
+        $post_id = get_the_ID();
+
+        $event_dates = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
+
+        // Если дат нет — не показываем при фильтрации по дате
+        if (empty($event_dates) || !is_array($event_dates)) {
+          continue;
+        }
+
+        foreach ($event_dates as $row) {
+          $d = isset($row['date_value']) ? $row['date_value'] : '';
+          if (!$d) continue;
+          $ts = strtotime($d);
+          if ($ts >= $date_from_timestamp && $ts <= $date_to_timestamp) {
+            $filtered_posts[] = $post_id;
+            break;
           }
         }
       }
-      
-      // Парсим даты в формате DD.MM.YYYY или DD.MM
-      if (!$dates_found) {
-        preg_match_all('/(\d{1,2})\.(\d{1,2})(?:\.(\d{4}))?/', $checkin_dates, $date_matches);
-        if (!empty($date_matches[0])) {
-          foreach ($date_matches[0] as $match_idx => $match) {
-            $day = (int)$date_matches[1][$match_idx];
-            $month = (int)$date_matches[2][$match_idx];
-            $year = !empty($date_matches[3][$match_idx]) ? (int)$date_matches[3][$match_idx] : $current_year;
-            
-            $date_str = sprintf('%04d-%02d-%02d', $year, $month, $day);
-            $date_timestamp = strtotime($date_str);
-            
-            if ($date_timestamp >= $date_from_timestamp && $date_timestamp <= $date_to_timestamp) {
-              $dates_found = true;
-              break;
-            }
-          }
-        }
-      }
-      
-      // Показываем тур, если даты не указаны в поле или хотя бы одна дата попадает в диапазон
-      if ($dates_found) {
-        $filtered_posts[] = $post_id;
-      }
+      wp_reset_postdata();
     }
-    wp_reset_postdata();
-  }
-  
-  // Если есть фильтрация по датам, перезапрашиваем только отфильтрованные посты
-  if ($date_from && $date_to && !empty($filtered_posts)) {
-    $args['post__in'] = $filtered_posts;
-    $args['posts_per_page'] = 12;
-    $args['orderby'] = 'title';
-    $q = new WP_Query($args);
-  } elseif ($date_from && $date_to && empty($filtered_posts)) {
-    // Если ничего не найдено после фильтрации
-    $q->posts = [];
-    $q->post_count = 0;
-    $q->found_posts = 0;
+
+    if (!empty($filtered_posts)) {
+      $args['post__in'] = $filtered_posts;
+      $args['posts_per_page'] = 12;
+      $q = new WP_Query($args);
+    } else {
+      $q->posts = [];
+      $q->post_count = 0;
+      $q->found_posts = 0;
+    }
   } else {
-    // Если фильтрация по датам не применялась, ограничиваем количество
     $args['posts_per_page'] = 12;
     $q = new WP_Query($args);
   }
@@ -162,10 +112,10 @@ function event_tours_filter()
   if ($q->have_posts()) {
     while ($q->have_posts()) {
       $q->the_post();
-      get_template_part('template-parts/tour/card-row', null, ['post_id' => get_the_ID()]);
+      get_template_part('template-parts/event/card-row', null, ['post_id' => get_the_ID()]);
     }
   } else {
-    echo '<div class="country-tours__empty">Туры не найдены.</div>';
+    echo '<div class="country-tours__empty">События не найдены.</div>';
   }
   wp_reset_postdata();
 
@@ -245,23 +195,12 @@ add_action('wp_ajax_nopriv_event_tours_countries', 'event_tours_countries');
 
 function event_tours_countries()
 {
-  $event_tours_term_id = isset($_POST['event_tours_term_id']) ? absint(wp_unslash($_POST['event_tours_term_id'])) : 0;
-  if (!$event_tours_term_id) {
-    wp_send_json_success(['items' => []]);
-  }
-
   $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
   $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
   $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
 
-  // Базовый запрос туров с типом "Событийные туры"
-  $tax_query = [
-    [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$event_tours_term_id],
-    ],
-  ];
+  // Базовый запрос событийных туров
+  $tax_query = [];
 
   if ($region_id) {
     $tax_query[] = [
@@ -273,78 +212,45 @@ function event_tours_countries()
   }
 
   $args = [
-    'post_type' => 'tour',
+    'post_type' => 'event',
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
-    'tax_query' => array_merge([['relation' => 'AND']], $tax_query),
   ];
+
+  if (!empty($tax_query)) {
+    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+  }
 
   $q = new WP_Query($args);
 
-  // Фильтрация по диапазону дат (если указан)
+  // Фильтрация по диапазону дат
   $filtered_tour_ids = [];
+  $has_date_filter = ($date_from && $date_to);
+
   if ($q->have_posts()) {
     $date_from_timestamp = $date_from ? strtotime($date_from) : 0;
     $date_to_timestamp = $date_to ? strtotime($date_to) : 0;
 
     foreach ($q->posts as $tour_id) {
-      // Если диапазон дат не указан, добавляем все туры
-      if (!$date_from || !$date_to) {
+      if (!$has_date_filter) {
         $filtered_tour_ids[] = $tour_id;
         continue;
       }
 
-      $checkin_dates = function_exists('get_field') ? get_field('tour_checkin_dates', $tour_id) : '';
-      if (empty($checkin_dates)) {
-        $filtered_tour_ids[] = $tour_id;
+      $event_dates = function_exists('get_field') ? get_field('event_dates', $tour_id) : [];
+      if (empty($event_dates) || !is_array($event_dates)) {
         continue;
       }
 
-      // Проверяем наличие дат в диапазоне (упрощенная версия)
-      $month_names = [
-        'января' => 1, 'февраля' => 2, 'марта' => 3, 'апреля' => 4,
-        'мая' => 5, 'июня' => 6, 'июля' => 7, 'августа' => 8,
-        'сентября' => 9, 'октября' => 10, 'ноября' => 11, 'декабря' => 12
-      ];
-      $current_year = date('Y');
-      $dates_found = false;
-
-      preg_match_all('/(\d{1,2})\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)/ui', $checkin_dates, $matches);
-      if (!empty($matches[0])) {
-        foreach ($matches[1] as $idx => $day) {
-          $month_name = mb_strtolower($matches[2][$idx]);
-          if (isset($month_names[$month_name])) {
-            $month = $month_names[$month_name];
-            $date_str = sprintf('%04d-%02d-%02d', $current_year, $month, (int)$day);
-            $date_timestamp = strtotime($date_str);
-            if ($date_timestamp >= $date_from_timestamp && $date_timestamp <= $date_to_timestamp) {
-              $dates_found = true;
-              break;
-            }
-          }
+      foreach ($event_dates as $row) {
+        $d = isset($row['date_value']) ? $row['date_value'] : '';
+        if (!$d) continue;
+        $ts = strtotime($d);
+        if ($ts >= $date_from_timestamp && $ts <= $date_to_timestamp) {
+          $filtered_tour_ids[] = $tour_id;
+          break;
         }
-      }
-
-      if (!$dates_found) {
-        preg_match_all('/(\d{1,2})\.(\d{1,2})(?:\.(\d{4}))?/', $checkin_dates, $date_matches);
-        if (!empty($date_matches[0])) {
-          foreach ($date_matches[0] as $match_idx => $match) {
-            $day = (int)$date_matches[1][$match_idx];
-            $month = (int)$date_matches[2][$match_idx];
-            $year = !empty($date_matches[3][$match_idx]) ? (int)$date_matches[3][$match_idx] : $current_year;
-            $date_str = sprintf('%04d-%02d-%02d', $year, $month, $day);
-            $date_timestamp = strtotime($date_str);
-            if ($date_timestamp >= $date_from_timestamp && $date_timestamp <= $date_to_timestamp) {
-              $dates_found = true;
-              break;
-            }
-          }
-        }
-      }
-
-      if ($dates_found || empty($checkin_dates)) {
-        $filtered_tour_ids[] = $tour_id;
       }
     }
     wp_reset_postdata();
@@ -401,22 +307,11 @@ add_action('wp_ajax_nopriv_event_tours_available_dates', 'event_tours_available_
 
 function event_tours_available_dates()
 {
-  $event_tours_term_id = isset($_POST['event_tours_term_id']) ? absint(wp_unslash($_POST['event_tours_term_id'])) : 0;
-  if (!$event_tours_term_id) {
-    wp_send_json_success(['dates' => []]);
-  }
-
   $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
   $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
+  $tour_type_id = isset($_POST['tour_type']) ? absint(wp_unslash($_POST['tour_type'])) : 0;
 
-  // Базовый запрос туров с типом "Событийные туры"
-  $tax_query = [
-    [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$event_tours_term_id],
-    ],
-  ];
+  $tax_query = [];
 
   if ($region_id) {
     $tax_query[] = [
@@ -424,6 +319,14 @@ function event_tours_available_dates()
       'field' => 'term_id',
       'terms' => [$region_id],
       'include_children' => true,
+    ];
+  }
+
+  if ($tour_type_id) {
+    $tax_query[] = [
+      'taxonomy' => 'tour_type',
+      'field' => 'term_id',
+      'terms' => [$tour_type_id],
     ];
   }
 
@@ -437,12 +340,15 @@ function event_tours_available_dates()
   }
 
   $args = [
-    'post_type' => 'tour',
+    'post_type' => 'event',
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
-    'tax_query' => array_merge([['relation' => 'AND']], $tax_query),
   ];
+
+  if (!empty($tax_query)) {
+    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+  }
 
   if (!empty($meta_query)) {
     $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
@@ -456,65 +362,20 @@ function event_tours_available_dates()
     wp_send_json_success(['dates' => []]);
   }
 
-  // Получаем доступные даты для всех туров
-  $all_available_dates = [];
-  
-  require_once get_template_directory() . '/inc/helpers.php';
-  
-  if (!class_exists('SamoService')) {
-    require_once get_template_directory() . '/inc/samo/SamoService.php';
-  }
-
+  $all_dates = [];
   foreach ($tour_ids as $tour_id) {
-    $excursion_params = get_tour_excursion_params((int) $tour_id);
-    
-    if (empty($excursion_params['TOWNFROMINC']) || empty($excursion_params['STATEINC']) || empty($excursion_params['TOURS'])) {
-      continue;
-    }
-
-    try {
-      $result = SamoService::endpoints()->searchExcursionAll([
-        'TOWNFROMINC' => $excursion_params['TOWNFROMINC'],
-        'STATEINC' => $excursion_params['STATEINC'],
-        'TOURS' => $excursion_params['TOURS'],
-      ]);
-
-      if (isset($result['data']['SearchExcursion_ALL']['CHECKIN_BEG'])) {
-        $checkInBeg = $result['data']['SearchExcursion_ALL']['CHECKIN_BEG'];
-        
-        if (!empty($checkInBeg['validDates']) && !empty($checkInBeg['startDate'])) {
-          // Парсим доступные даты
-          $validDates = $checkInBeg['validDates'];
-          $startDate = $checkInBeg['startDate'];
-          
-          // Формат startDate: YYYYMMDD
-          if (strlen($startDate) === 8) {
-            $startTimestamp = strtotime(
-              substr($startDate, 0, 4) . '-' . 
-              substr($startDate, 4, 2) . '-' . 
-              substr($startDate, 6, 2)
-            );
-            
-            if ($startTimestamp) {
-              for ($i = 0; $i < strlen($validDates); $i++) {
-                if ($validDates[$i] === '1') {
-                  $date = $startTimestamp + ($i * 86400); // добавляем дни
-                  $dateStr = date('Y-m-d', $date);
-                  $all_available_dates[$dateStr] = true; // используем ключи для уникальности
-                }
-              }
-            }
-          }
+    $event_dates = function_exists('get_field') ? get_field('event_dates', $tour_id) : [];
+    if (!empty($event_dates) && is_array($event_dates)) {
+      foreach ($event_dates as $row) {
+        $d = isset($row['date_value']) ? $row['date_value'] : '';
+        if ($d) {
+          $all_dates[$d] = true;
         }
       }
-    } catch (Exception $e) {
-      // Пропускаем туры с ошибками
-      continue;
     }
   }
 
-  // Преобразуем в массив и сортируем
-  $dates = array_keys($all_available_dates);
+  $dates = array_keys($all_dates);
   sort($dates);
 
   wp_send_json_success(['dates' => $dates]);

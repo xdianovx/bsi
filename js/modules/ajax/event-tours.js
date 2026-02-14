@@ -1,7 +1,6 @@
 import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
-import { displayTourPrices } from "../services/priceLoader.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -21,57 +20,55 @@ export const initEventToursFilters = async () => {
   const count = document.querySelector("[data-tours-count]");
   if (!list) return;
 
-  const eventToursTermId = parseInt(
-    root.getAttribute("data-event-tours-term-id") || "0",
-    10
-  );
-  if (!eventToursTermId) return;
-
   const ajaxUrl = window.ajax?.url || window.ajaxurl;
   if (!ajaxUrl) return;
 
   const countrySelect = root.querySelector('select[name="country"]');
   const regionSelect = root.querySelector('select[name="region"]');
-  const departureDateInput = root.querySelector('input[name="departure_date"]');
+  const tourTypeSelect = root.querySelector('select[name="tour_type"]');
+  const departureDateInput = root.querySelector(
+    'input[name="departure_date"]'
+  );
   const resetBtn = root.querySelector(".js-tours-reset");
 
   let datePickerInstance = null;
-  let availableDates = [];
+  let availableDateStrings = []; // YYYY-MM-DD strings for enable
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
-  // Функции для работы с датами (из tour-prices.js)
-  function formatDateYYYYMMDD(date) {
-    if (!date) return "";
-    const d = date instanceof Date ? date : new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}${month}${day}`;
-  }
+  // Подсчет активных фильтров
+  const countActiveFilters = () => {
+    let c = 0;
+    if (countrySelect && countrySelect.value) c++;
+    if (regionSelect && regionSelect.value) c++;
+    if (tourTypeSelect && tourTypeSelect.value) c++;
+    if (
+      datePickerInstance &&
+      datePickerInstance.selectedDates &&
+      datePickerInstance.selectedDates.length > 0
+    )
+      c++;
+    return c;
+  };
 
-  function parseDateFromYYYYMMDD(dateStr) {
-    if (!dateStr || dateStr.length !== 8) return null;
-    const year = parseInt(dateStr.substring(0, 4));
-    const month = parseInt(dateStr.substring(4, 6)) - 1;
-    const day = parseInt(dateStr.substring(6, 8));
-    return new Date(year, month, day);
-  }
+  const updateResetButton = () => {
+    if (resetBtn) {
+      resetBtn.style.display = countActiveFilters() > 0 ? "block" : "none";
+    }
+  };
 
-  // Загрузка доступных дат из самотура
+  // --- Загрузка доступных дат ---
   const loadAvailableDates = async () => {
     try {
       const body = new URLSearchParams();
       body.set("action", "event_tours_available_dates");
-      body.set("event_tours_term_id", String(eventToursTermId));
 
-      if (countrySelect && countrySelect.value) {
+      if (countrySelect && countrySelect.value)
         body.set("country", countrySelect.value);
-      }
-
-      if (regionSelect && regionSelect.value) {
+      if (regionSelect && regionSelect.value)
         body.set("region", regionSelect.value);
-      }
+      if (tourTypeSelect && tourTypeSelect.value)
+        body.set("tour_type", tourTypeSelect.value);
 
       const res = await fetch(ajaxUrl, {
         method: "POST",
@@ -85,83 +82,45 @@ export const initEventToursFilters = async () => {
       const json = await res.json();
       if (!json || !json.success) throw new Error("AJAX error");
 
-      // Сохраняем даты в формате YYYY-MM-DD (строки) для использования в enable
-      const dateStrings = json.data.dates || [];
-      availableDates = dateStrings;
+      availableDateStrings = json.data.dates || [];
 
-      // Преобразуем также в Date объекты для других операций
-      const dateObjects = dateStrings.map((dateStr) => {
-        const parts = dateStr.split("-");
-        if (parts.length === 3) {
-          return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-        }
-        return null;
-      }).filter(Boolean);
-
-      // Обновляем flatpickr с доступными датами
-      // Согласно документации Flatpickr, используем enable с массивом дат
-      // ISO Date Strings (формат YYYY-MM-DD) всегда принимаются
       if (datePickerInstance) {
-        if (dateStrings.length > 0) {
-          // Используем enable с массивом строк дат в формате YYYY-MM-DD
-          // Все остальные даты автоматически будут отключены
-          datePickerInstance.set("enable", dateStrings);
-        } else {
-          // Если нет доступных дат, очищаем enable (все даты будут отключены)
-          datePickerInstance.set("enable", []);
-        }
-        // Принудительно обновляем календарь
+        datePickerInstance.set(
+          "enable",
+          availableDateStrings.length > 0 ? availableDateStrings : []
+        );
         datePickerInstance.redraw();
       }
     } catch (e) {
-      // Error handling without console output
-      availableDates = [];
+      availableDateStrings = [];
     }
   };
 
-  // Подсчет активных фильтров
-  const countActiveFilters = () => {
-    let count = 0;
-    if (countrySelect && countrySelect.value) count++;
-    if (regionSelect && regionSelect.value) count++;
-    // Проверяем, выбраны ли даты в flatpickr
-    if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length > 0) {
-      count++;
-    }
-    return count;
-  };
-
-  // Обновление видимости кнопки сброса
-  const updateResetButton = () => {
-    const count = countActiveFilters();
-    if (resetBtn) {
-      resetBtn.style.display = count > 0 ? "block" : "none";
-    }
-  };
-
+  // --- Загрузка туров ---
   const loadTours = async () => {
     setLoading(true);
 
     try {
       const body = new URLSearchParams();
       body.set("action", "event_tours_filter");
-      body.set("event_tours_term_id", String(eventToursTermId));
 
-      if (countrySelect && countrySelect.value) {
+      if (countrySelect && countrySelect.value)
         body.set("country", countrySelect.value);
-      }
-
-      if (regionSelect && regionSelect.value) {
+      if (regionSelect && regionSelect.value)
         body.set("region", regionSelect.value);
-      }
+      if (tourTypeSelect && tourTypeSelect.value)
+        body.set("tour_type", tourTypeSelect.value);
 
-      // Отправляем выбранные даты (используем минимальную и максимальную из выбранных)
-      if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length > 0) {
-        const dates = datePickerInstance.selectedDates.map(d => d.toISOString().split("T")[0]).sort();
-        const startDate = dates[0];
-        const endDate = dates[dates.length - 1];
-        body.set("date_from", startDate);
-        body.set("date_to", endDate);
+      if (
+        datePickerInstance &&
+        datePickerInstance.selectedDates &&
+        datePickerInstance.selectedDates.length === 2
+      ) {
+        const dates = datePickerInstance.selectedDates
+          .map((d) => d.toISOString().split("T")[0])
+          .sort();
+        body.set("date_from", dates[0]);
+        body.set("date_to", dates[1]);
       }
 
       const res = await fetch(ajaxUrl, {
@@ -177,28 +136,17 @@ export const initEventToursFilters = async () => {
       if (!json || !json.success) throw new Error("AJAX error");
 
       list.innerHTML = json.data.html || "";
-      if (count)
-        count.textContent = `Найдено туров: ${json.data.total || 0}`;
-      
-      updateResetButton();
+      if (count) count.textContent = `Найдено туров: ${json.data.total || 0}`;
 
-      // Загружаем цены для туров после отображения карточек
-      const priceParams = {};
-      if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length > 0) {
-        const dates = datePickerInstance.selectedDates.map(d => d.toISOString().split("T")[0]).sort();
-        priceParams.dateFrom = dates[0];
-        priceParams.dateTo = dates[dates.length - 1];
-      }
-      await displayTourPrices(list, priceParams);
-      
+      updateResetButton();
     } catch (e) {
-      // Error handling without console output
+      // Error handling
     } finally {
       setLoading(false);
     }
   };
 
-  // Инициализация Choices.js
+  // --- Choices.js ---
   const countryChoice = countrySelect
     ? new Choices(countrySelect, {
         ...CHOICES_RU,
@@ -215,41 +163,40 @@ export const initEventToursFilters = async () => {
       })
     : null;
 
-  // Инициализация flatpickr для выбора конкретных дат (не диапазон)
+  const tourTypeChoice = tourTypeSelect
+    ? new Choices(tourTypeSelect, {
+        ...CHOICES_RU,
+        searchEnabled: false,
+        shouldSort: false,
+      })
+    : null;
+
+  // --- Flatpickr (range, только доступные даты) ---
   if (departureDateInput) {
     datePickerInstance = flatpickr(departureDateInput, {
-      mode: "multiple", // Множественный выбор конкретных дат
+      mode: "range",
       locale: Russian,
       dateFormat: "d.m.Y",
       minDate: "today",
       disableMobile: true,
-      enable: [], // Пустой массив отключит все даты до загрузки доступных
+      enable: [], // пусто до загрузки
       onChange: async (selectedDates) => {
-        if (selectedDates.length > 0) {
-          await loadCountries();
+        if (selectedDates.length === 2) {
           await loadTours();
-          updateResetButton();
-        } else if (selectedDates.length === 0) {
-          await loadCountries();
-          await loadTours();
-          updateResetButton();
         }
+        updateResetButton();
       },
     });
-
-    // Загружаем доступные даты после инициализации (асинхронно)
-    loadAvailableDates();
   }
 
+  // --- Загрузка регионов ---
   const loadRegions = async () => {
     if (!regionSelect || !countrySelect) return;
-
-    const countryId = countrySelect.value || "";
 
     try {
       const body = new URLSearchParams();
       body.set("action", "event_tours_regions");
-      body.set("country_id", String(countryId));
+      body.set("country_id", countrySelect.value || "");
 
       const res = await fetch(ajaxUrl, {
         method: "POST",
@@ -275,41 +222,33 @@ export const initEventToursFilters = async () => {
           );
         }
         regionChoice.setChoices(choices, "value", "label", true);
-      } else if (regionSelect) {
-        // Если Choices.js не инициализирован, обновляем напрямую
-        regionSelect.innerHTML = '<option value="">Все регионы</option>';
-        if (json.data.items && json.data.items.length > 0) {
-          json.data.items.forEach((it) => {
-            const option = document.createElement("option");
-            option.value = String(it.id);
-            option.textContent = it.text;
-            regionSelect.appendChild(option);
-          });
-        }
       }
     } catch (e) {
-      // Error handling without console output
+      // Error handling
     }
   };
 
+  // --- Загрузка стран ---
   const loadCountries = async () => {
     if (!countrySelect) return;
 
     try {
       const body = new URLSearchParams();
       body.set("action", "event_tours_countries");
-      body.set("event_tours_term_id", String(eventToursTermId));
 
       const regionId = regionSelect ? regionSelect.value || "" : "";
       if (regionId) body.set("region", regionId);
 
-      // Отправляем выбранные даты (используем минимальную и максимальную из выбранных)
-      if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length > 0) {
-        const dates = datePickerInstance.selectedDates.map(d => d.toISOString().split("T")[0]).sort();
-        const startDate = dates[0];
-        const endDate = dates[dates.length - 1];
-        body.set("date_from", startDate);
-        body.set("date_to", endDate);
+      if (
+        datePickerInstance &&
+        datePickerInstance.selectedDates &&
+        datePickerInstance.selectedDates.length === 2
+      ) {
+        const dates = datePickerInstance.selectedDates
+          .map((d) => d.toISOString().split("T")[0])
+          .sort();
+        body.set("date_from", dates[0]);
+        body.set("date_to", dates[1]);
       }
 
       const res = await fetch(ajaxUrl, {
@@ -327,7 +266,9 @@ export const initEventToursFilters = async () => {
       if (countryChoice) {
         const currentValue = countrySelect.value || "";
         countryChoice.clearStore();
-        const choices = [{ value: "", label: "Все страны", selected: !currentValue }];
+        const choices = [
+          { value: "", label: "Все страны", selected: !currentValue },
+        ];
         if (json.data.items && json.data.items.length > 0) {
           choices.push(
             ...json.data.items.map((it) => ({
@@ -338,74 +279,39 @@ export const initEventToursFilters = async () => {
           );
         }
         countryChoice.setChoices(choices, "value", "label", true);
-      } else if (countrySelect) {
-        const currentValue = countrySelect.value || "";
-        countrySelect.innerHTML = '<option value="">Все страны</option>';
-        if (json.data.items && json.data.items.length > 0) {
-          json.data.items.forEach((it) => {
-            const option = document.createElement("option");
-            option.value = String(it.id);
-            option.textContent = it.text;
-            option.selected = currentValue === String(it.id);
-            countrySelect.appendChild(option);
-          });
-        }
       }
     } catch (e) {
-      // Error handling without console output
+      // Error handling
     }
   };
 
-  // Функция сброса фильтров
+  // --- Сброс ---
   const resetFilters = async () => {
-    // Сбрасываем все фильтры
-    if (countryChoice) {
-      countryChoice.setChoiceByValue("");
-    } else if (countrySelect) {
-      countrySelect.value = "";
-    }
+    if (countryChoice) countryChoice.setChoiceByValue("");
+    else if (countrySelect) countrySelect.value = "";
 
-    if (regionChoice) {
-      regionChoice.setChoiceByValue("");
-    } else if (regionSelect) {
-      regionSelect.value = "";
-    }
+    if (regionChoice) regionChoice.setChoiceByValue("");
+    else if (regionSelect) regionSelect.value = "";
 
-    if (datePickerInstance) {
-      datePickerInstance.clear();
-    } else if (departureDateInput) {
-      departureDateInput.value = "";
-    }
+    if (tourTypeChoice) tourTypeChoice.setChoiceByValue("");
+    else if (tourTypeSelect) tourTypeSelect.value = "";
 
-    // Очищаем URL параметры
-    const url = new URL(window.location.href);
-    url.searchParams.delete("country");
-    url.searchParams.delete("region");
-    url.searchParams.delete("date_from");
-    url.searchParams.delete("date_to");
-    window.history.pushState({}, "", url);
+    if (datePickerInstance) datePickerInstance.clear();
+    else if (departureDateInput) departureDateInput.value = "";
 
-    // Загружаем все регионы и страны (без фильтров)
-    if (regionChoice && countrySelect) {
-      await loadRegions();
-    }
+    if (regionChoice && countrySelect) await loadRegions();
     await loadAvailableDates();
     await loadCountries();
-
-    // Перезагружаем туры
     await loadTours();
   };
 
-  // Обработчик кнопки сброса
-  if (resetBtn) {
-    resetBtn.addEventListener("click", resetFilters);
-  }
+  if (resetBtn) resetBtn.addEventListener("click", resetFilters);
 
-  // Обработчики событий
+  // --- Обработчики ---
   if (countrySelect) {
     countrySelect.addEventListener("change", async () => {
-      await loadAvailableDates();
       await loadRegions();
+      await loadAvailableDates();
       await loadTours();
       updateResetButton();
     });
@@ -420,58 +326,34 @@ export const initEventToursFilters = async () => {
     });
   }
 
-  // Обработчик для flatpickr уже настроен в onChange при инициализации
+  if (tourTypeSelect) {
+    tourTypeSelect.addEventListener("change", async () => {
+      await loadAvailableDates();
+      await loadTours();
+      updateResetButton();
+    });
+  }
 
-  // Применение фильтров из URL
+  // --- URL фильтры ---
   const applyFromUrl = async () => {
     const params = new URLSearchParams(window.location.search);
 
-    const country = params.get("country") ? String(params.get("country")) : "";
-    const region = params.get("region") ? String(params.get("region")) : "";
-    const dateFrom = params.get("date_from") ? String(params.get("date_from")) : "";
-    const dateTo = params.get("date_to") ? String(params.get("date_to")) : "";
+    const country = params.get("country") || "";
+    const region = params.get("region") || "";
+    const tourType = params.get("tour_type") || "";
 
-    if (country && countryChoice) {
-      countryChoice.setChoiceByValue(country);
-    } else if (country && countrySelect) {
-      countrySelect.value = country;
-    }
+    if (country && countryChoice) countryChoice.setChoiceByValue(country);
+    if (country) await loadRegions();
+    if (region && regionChoice) regionChoice.setChoiceByValue(region);
+    if (tourType && tourTypeChoice) tourTypeChoice.setChoiceByValue(tourType);
 
-    if (country) {
-      await loadRegions();
-    }
+    if (country || region || tourType) await loadTours();
 
-    if (region && regionChoice) {
-      regionChoice.setChoiceByValue(region);
-    } else if (region && regionSelect) {
-      regionSelect.value = region;
-    }
-
-    // Применяем даты из URL (если указан диапазон, выбираем обе даты)
-    if (dateFrom && dateTo && datePickerInstance) {
-      const startDate = new Date(dateFrom);
-      const endDate = new Date(dateTo);
-      // В режиме multiple выбираем обе даты, если они доступны
-      datePickerInstance.setDate([startDate, endDate], false);
-    }
-
-    // Если в URL есть фильтры — применяем их сразу
-    if (country || region || (dateFrom && dateTo)) {
-      await loadTours();
-    }
-    
     updateResetButton();
   };
 
-  // Загружаем доступные даты при инициализации (асинхронно, не блокируем)
-  loadAvailableDates();
-  
+  // Загружаем доступные даты при инициализации
+  await loadAvailableDates();
   await applyFromUrl();
   updateResetButton();
-
-  // Загружаем цены для начальных туров на странице (до AJAX)
-  if (list) {
-    console.log('Загрузка цен для начальных туров...');
-    await displayTourPrices(list);
-  }
 };

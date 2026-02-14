@@ -1,0 +1,172 @@
+// Event Tours - Билеты
+.event-tickets {
+  margin-top: 48px;
+
+  .h2 {
+    margin-bottom: 24px;
+  }
+}
+
+.event-tickets__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+// Event Tours - Детали в aside
+.event-aside-details {
+  display: flex;
+  margin-top: 8px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-aside-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border-radius: 4px;
+  padding: 8px 8px;
+}
+
+.event-aside-detail__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 100%;
+}
+
+.event-aside-detail__value {
+  line-height: 100%;
+}
+
+.event-ticket {
+  position: relative;
+  display: flex;
+  background: #f4f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  @media screen and (max-width: 640px) {
+    flex-direction: column;
+  }
+}
+
+.event-ticket__main {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-right: 2px dashed #e0e0e0;
+  position: relative;
+
+  @media screen and (max-width: 640px) {
+    border-right: none;
+    border-bottom: 2px dashed #e0e0e0;
+  }
+
+  // Круглые вырезы для эффекта перфорации
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+
+    @media screen and (max-width: 640px) {
+      display: none;
+    }
+  }
+
+  &::before {
+    top: -12px;
+  }
+
+  &::after {
+    bottom: -12px;
+  }
+}
+
+.event-ticket__type {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 130%;
+  color: #1a1a1a;
+}
+
+.event-ticket__desc {
+  font-size: 14px;
+  line-height: 150%;
+  color: #666;
+  flex: 1;
+}
+
+.event-ticket__sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 16px;
+
+  @media screen and (max-width: 640px) {
+    width: 100%;
+    padding: 20px;
+  }
+}
+
+.event-ticket__price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.event-ticket__price-value {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.event-ticket__price-currency {
+}
+
+.event-ticket__btn {
+  padding: 12px 24px;
+  background: $red;
+  color: #fff;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 100%;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: darken($red, 8%);
+    transform: scale(1.02);
+    color: #fff;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Декоративная перфорация (опционально, если нужна дополнительная стилизация)
+.event-ticket__perforation {
+  display: none;
+
+  // Можно использовать для дополнительных эффектов
+}

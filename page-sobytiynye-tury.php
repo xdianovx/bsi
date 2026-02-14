@@ -4,56 +4,25 @@
  */
 get_header();
 
-// Получаем term_id термина "Событийные туры"
-$event_tours_term = get_term_by('name', 'Событийные туры', 'tour_type');
-$event_tours_term_id = $event_tours_term ? (int) $event_tours_term->term_id : 0;
-
-if (!$event_tours_term_id) {
-  // Если термин не найден, показываем сообщение
-  ?>
-  <main class="site-main">
-    <div class="container">
-      <p>Категория "Событийные туры" не найдена. Пожалуйста, создайте её в админке.</p>
-    </div>
-  </main>
-  <?php
-  get_footer();
-  return;
-}
-
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = 12;
 
-// Начальный запрос туров с типом "Событийные туры"
+// Начальный запрос событийных туров
 $tours_query = new WP_Query([
-  'post_type' => 'tour',
+  'post_type' => 'event',
   'post_status' => 'publish',
   'posts_per_page' => $per_page,
   'paged' => $paged,
-  'tax_query' => [
-    [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$event_tours_term_id],
-    ],
-  ],
   'orderby' => 'title',
   'order' => 'ASC',
 ]);
 
 // Получаем страны, у которых есть событийные туры
 $event_tours_countries_query = new WP_Query([
-  'post_type' => 'tour',
+  'post_type' => 'event',
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'fields' => 'ids',
-  'tax_query' => [
-    [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$event_tours_term_id],
-    ],
-  ],
 ]);
 
 $country_ids = [];
@@ -96,6 +65,15 @@ $region_terms = get_terms([
   'orderby' => 'name',
   'order' => 'ASC',
 ]);
+
+// Получаем доступные типы туров, привязанные к event
+$tour_type_terms = get_terms([
+  'taxonomy' => 'tour_type',
+  'hide_empty' => true,
+  'object_ids' => $event_tours_countries_query->posts,
+  'orderby' => 'name',
+  'order' => 'ASC',
+]);
 ?>
 
 <main class="site-main">
@@ -115,8 +93,7 @@ $region_terms = get_terms([
 
         <div class="page-country__content">
 
-          <div class="country-tours" data-event-tours-filter
-            data-event-tours-term-id="<?= (int) $event_tours_term_id; ?>">
+          <div class="country-tours" data-event-tours-filter>
 
             <div class="country-tours__head">
               <h1 class="h1 country-tours__title">
@@ -159,9 +136,21 @@ $region_terms = get_terms([
                 </div>
 
                 <div class="tours-filter__field">
-                  <div class="tours-filter__label">Дата вылета</div>
+                  <div class="tours-filter__label">Тип</div>
+                  <select class="tours-filter__select" name="tour_type" data-choice="single">
+                    <option value="">Все типы</option>
+                    <?php if (!is_wp_error($tour_type_terms) && !empty($tour_type_terms)): ?>
+                      <?php foreach ($tour_type_terms as $t): ?>
+                        <option value="<?= (int) $t->term_id; ?>"><?= esc_html($t->name); ?></option>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </select>
+                </div>
+
+                <div class="tours-filter__field">
+                  <div class="tours-filter__label">Даты проведения</div>
                   <input type="text" class="tours-filter__input" name="departure_date" data-departure-date
-                    placeholder="Выберите даты">
+                    placeholder="Выберите диапазон дат" readonly>
                 </div>
 
               </div>
@@ -183,7 +172,7 @@ $region_terms = get_terms([
               <?php if ($tours_query->have_posts()): ?>
                 <?php while ($tours_query->have_posts()):
                   $tours_query->the_post(); ?>
-                  <?php get_template_part('template-parts/tour/card-row', null, ['post_id' => get_the_ID()]); ?>
+                  <?php get_template_part('template-parts/event/card-row', null, ['post_id' => get_the_ID()]); ?>
                 <?php endwhile; ?>
               <?php else: ?>
                 <div class="country-tours__empty">

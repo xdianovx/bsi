@@ -25,6 +25,7 @@ import { initEducationFilter } from "./modules/ajax/education-filter";
 import { initCountryEducationFilters } from "./modules/ajax/country-education";
 import { initSingleEducationPrograms } from "./modules/ajax/single-education-programs";
 import { initEducationProgramForm } from "./modules/forms/education-program-form";
+import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -60,4 +61,5 @@ window.addEventListener("DOMContentLoaded", () => {
   initCountryEducationFilters();
   initSingleEducationPrograms();
   initEducationProgramForm();
+  initEventTicketForm();
 });
