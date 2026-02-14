@@ -273,6 +273,12 @@ add_action('init', function () {
   );
 
   add_rewrite_rule(
+    '^country/([^/]+)/visa/([^/]+)/?$',
+    'index.php?country_visa=$matches[1]&visa_type_slug=$matches[2]',
+    'top'
+  );
+
+  add_rewrite_rule(
     '^country/([^/]+)/visa/?$',
     'index.php?country_visa=$matches[1]',
     'top'
@@ -541,7 +547,15 @@ add_action('pre_get_posts', function ($q) {
   }
 
   $visa_type_ids = [];
-  if (!empty($_GET['visa_type'])) {
+  $visa_type_slug = (string) get_query_var('visa_type_slug');
+  if ($visa_type_slug) {
+    $term = get_term_by('slug', $visa_type_slug, 'visa_type');
+    if ($term && !is_wp_error($term)) {
+      $visa_type_ids = [(int) $term->term_id];
+    }
+  }
+  // Fallback: support old ?visa_type[]=ID format for backward compat
+  if (empty($visa_type_ids) && !empty($_GET['visa_type'])) {
     $raw = $_GET['visa_type'];
     $raw = is_array($raw) ? $raw : [$raw];
     $visa_type_ids = array_values(array_filter(array_map('intval', $raw)));

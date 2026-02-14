@@ -316,7 +316,15 @@ if (!empty($has_tours)) {
 }
 
 $active_visa_types = [];
-if (!empty($_GET['visa_type'])) {
+$visa_type_slug_qv = (string) get_query_var('visa_type_slug');
+if ($visa_type_slug_qv) {
+  $term = get_term_by('slug', $visa_type_slug_qv, 'visa_type');
+  if ($term && !is_wp_error($term)) {
+    $active_visa_types = [(int) $term->term_id];
+  }
+}
+// Fallback for old URL format
+if (empty($active_visa_types) && !empty($_GET['visa_type'])) {
   $raw = $_GET['visa_type'];
   $raw = is_array($raw) ? $raw : [$raw];
   $active_visa_types = array_values(array_filter(array_map('intval', $raw)));
@@ -424,7 +432,7 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
               <?php
               $vt_id = (int) $vt->term_id;
               $is_active_vt = in_array($vt_id, $active_visa_types, true);
-              $url = add_query_arg(['visa_type[]' => $vt_id], $visas_list_url);
+              $url = home_url("/country/{$country_slug}/visa/{$vt->slug}/");
               ?>
               <a class="child-page-subitem <?= $is_active_vt ? 'active' : ''; ?>"
                 href="<?= esc_url($url); ?>"><?= esc_html($vt->name); ?></a>

@@ -306,32 +306,6 @@ get_header();
             </section>
           <?php endif; ?>
 
-          <?php if (!empty($tour_included)): ?>
-            <div class="tour-included">
-              <h2 class="h2">В стоимость включено</h2>
-              <div class="editor-content">
-                <?= wp_kses_post($tour_included); ?>
-              </div>
-            </div>
-          <?php endif; ?>
-
-          <?php if (!empty($tour_not_inc)): ?>
-            <div class="tour-not-included">
-              <h2 class="h2">В стоимость не включено</h2>
-              <div class="editor-content">
-                <?= wp_kses_post($tour_not_inc); ?>
-              </div>
-            </div>
-          <?php endif; ?>
-
-          <?php if (!empty($tour_extra)): ?>
-            <div class="tour-extra">
-              <h2 class="h2">Дополнительно</h2>
-              <div class="editor-content">
-                <?= wp_kses_post($tour_extra); ?>
-              </div>
-            </div>
-          <?php endif; ?>
 
         </div>
 
@@ -398,9 +372,7 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <div class="hotel-widget__price numfont" 
-                 data-tour-price 
-                 data-tour-id="<?= esc_attr($post_id); ?>">
+            <div class="hotel-widget__price numfont" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>">
               <?php if ($tour_price_from): ?>
                 <?= esc_html($tour_price_from); ?>
               <?php else: ?>
@@ -424,6 +396,43 @@ get_header();
       </div>
     </div>
   </section>
+
+  <?php if (!empty($tour_included) || !empty($tour_not_inc)): ?>
+    <section class="single-education__price-details-section">
+      <div class="container">
+        <div class="single-education__price-details">
+          <?php if (!empty($tour_included)): ?>
+            <div class="single-education__price-included">
+              <h3 class="single-education__price-title">В стоимость входит</h3>
+              <div class="single-education__price-content">
+                <?= wp_kses_post($tour_included); ?>
+              </div>
+            </div>
+          <?php endif; ?>
+
+          <?php if (!empty($tour_not_inc)): ?>
+            <div class="single-education__price-extra">
+              <h3 class="single-education__price-title">Оплачивается дополнительно</h3>
+              <div class="single-education__price-content">
+                <?= wp_kses_post($tour_not_inc); ?>
+              </div>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
+
+  <?php if (!empty($tour_extra)): ?>
+    <section class="tour-extra-section">
+      <div class="container">
+        <h3 class="h3 tour-extra-section__title">Дополнительно</h3>
+        <div class="tour-extra-section__content editor-content">
+          <?= wp_kses_post($tour_extra); ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
 
 </main>
 

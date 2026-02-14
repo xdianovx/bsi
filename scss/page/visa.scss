@@ -45,6 +45,7 @@
 .visa-cost-item {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   font-size: 16px;
   line-height: 1.5;
@@ -62,6 +63,17 @@
   svg {
     width: 24px;
     height: 24px;
+  }
+}
+
+.visa-cost-item__included {
+  flex-basis: 100%;
+  font-size: 14px;
+  color: $text-gray;
+  padding-left: 32px;
+
+  p {
+    margin: 0;
   }
 }
 

@@ -61,6 +61,15 @@ get_header();
                   <span class="visa-cost-item__title"><?= esc_html($title); ?></span>
                   <span class="visa-cost-item__separator"></span>
                   <span class="visa-cost-item__price"><?= esc_html($price); ?></span>
+
+                  <?php
+                  $included = $cost_item['included'] ?? '';
+                  if (!empty($included)):
+                  ?>
+                    <div class="visa-cost-item__included">
+                      <p><?= nl2br(esc_html($included)); ?></p>
+                    </div>
+                  <?php endif; ?>
                 </div>
               <?php endforeach; ?>
             </div>
@@ -70,9 +79,8 @@ get_header();
         <?php /* Секция информации о визе */ ?>
         <?php
         $processing_time = get_field('visa_processing_time');
-        $support_fee = get_field('visa_support_fee');
 
-        if ($processing_time || $support_fee):
+        if ($processing_time):
           ?>
           <div class="visa-page__info-section">
             <div class="visa-info-item__wrap">
@@ -87,16 +95,6 @@ get_header();
                 </div>
               <?php endif; ?>
 
-              <?php if ($support_fee): ?>
-                <div class="visa-info-item">
-                  <div class="visa-info-item__title">
-                    <p class="visa-info-item__key">Визовая поддержка и запись на подачу документов</p>
-                  </div>
-                  <p class="visa-info-item__value">
-                    <?= esc_html($support_fee); ?>
-                  </p>
-                </div>
-              <?php endif; ?>
 
 
 

@@ -184,6 +184,10 @@
   position: relative;
   font-size: 14px;
   font-weight: 500;
+
+  &.active {
+    color: $red;
+  }
   &::before {
     content: "";
     position: absolute;

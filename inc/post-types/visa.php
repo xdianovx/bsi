@@ -35,6 +35,11 @@ function register_post_type_visa()
   ]);
 }
 
+add_filter('query_vars', function ($vars) {
+  $vars[] = 'visa_type_slug';
+  return $vars;
+});
+
 add_action('init', function () {
   register_taxonomy('visa_type', ['visa'], [
     'labels' => [

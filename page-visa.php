@@ -416,7 +416,7 @@ $countries = get_posts([
                 <div class="visa-country-card__types">
                   <?php foreach ($types as $t): ?>
                     <?php
-                    $url = add_query_arg(['visa_type[]' => (int) $t->term_id], $country_visa_url);
+                    $url = home_url('/country/' . $country_slug . '/visa/' . $t->slug . '/');
                     ?>
                     <a class="visa-country-card__type" href="<?php echo esc_url($url); ?>">
                       <?php echo esc_html($t->name); ?>

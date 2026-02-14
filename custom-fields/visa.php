@@ -65,14 +65,6 @@ add_action('acf/init', function () {
       ],
 
       [
-        'key' => 'field_visa_support_fee',
-        'label' => 'Визовая поддержка и запись на подачу документов',
-        'name' => 'visa_support_fee',
-        'type' => 'text',
-        'wrapper' => ['width' => '50'],
-      ],
-
-      [
         'key' => 'field_visa_costs',
         'label' => 'Стоимость виз',
         'name' => 'visa_costs',
@@ -95,6 +87,15 @@ add_action('acf/init', function () {
             'type' => 'text',
             'required' => 1,
             'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_visa_cost_included',
+            'label' => 'В стоимость включено',
+            'name' => 'included',
+            'type' => 'textarea',
+            'rows' => 3,
+            'wrapper' => ['width' => '100'],
+            'instructions' => 'Если поле пустое — блок не отображается',
           ],
         ],
       ],
