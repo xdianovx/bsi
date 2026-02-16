@@ -231,22 +231,22 @@
 
 .visa-info-advantage {
   width: 100%;
-  padding: 16px;
+  padding: 12px 16px;
   background-color: $bg-gray;
-  border-radius: 8px;
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   justify-content: center;
 }
 
 .visa-info-advantage__title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 500;
 }
 
 .visa-info-advantage__text {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
 }
 
