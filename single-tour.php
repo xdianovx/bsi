@@ -374,7 +374,8 @@ get_header();
 
             <div class="hotel-widget__price numfont" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>">
               <?php if ($tour_price_from): ?>
-                <?= esc_html($tour_price_from); ?>
+
+                <?= esc_html($tour_price_from); ?> / за 1 чел
               <?php else: ?>
                 Загрузка цены...
               <?php endif; ?>
