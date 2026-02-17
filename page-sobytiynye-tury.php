@@ -109,7 +109,7 @@ $tour_type_terms = get_terms([
             </div>
 
             <form class="country-tours__filters" data-tours-form>
-              <div class="country-tours__filters-row">
+              <div class="country-tours__filters-row --events">
 
                 <div class="tours-filter__field">
                   <div class="tours-filter__label">Направление</div>

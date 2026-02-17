@@ -293,8 +293,12 @@
 
 .country-tours__filters-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+
+  &.--events {
+    grid-template-columns: repeat(4, 1fr);
+  }
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
