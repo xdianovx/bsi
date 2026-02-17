@@ -186,7 +186,7 @@ foreach ($hotel_posts as $hotel_post) {
     <div class="container">
       <div class="title-wrap news-slider__title-wrap">
         <div class="news-slider__title-wrap-left">
-          <h2 class="h2 news-slider__title">Популярные отели</h2>
+          <h2 class="h2 news-slider__title">Спецпредложения</h2>
           <div class="slider-arrow-wrap news-slider__arrows-wrap">
             <div class="slider-arrow slider-arrow-prev popular-hotels-arrow-prev" tabindex="-1" role="button"
               aria-label="Previous slide" aria-controls="swiper-wrapper-6afd786aee0e5cee" aria-disabled="true">
