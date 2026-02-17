@@ -1062,6 +1062,8 @@
 
 .popular-education-filter {
   margin-top: 16px;
+  // ВРЕМЕННО: скрываем табы фильтра
+  display: none !important;
 
   @media screen and (max-width: 1200px) {
     flex-wrap: nowrap;
