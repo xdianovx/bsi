@@ -70,12 +70,12 @@ export function initNewsFilter() {
         // Проверяем формат ?paged=2
         var pageMatch = href.match(/[?&]paged=(\d+)/);
         if (pageMatch) {
-          page = parseInt(pageMatch[1], 10);
+          page = parseInt(pageMatch[1], 12);
         } else {
           // Проверяем формат /page/2/
           var pageMatch2 = href.match(/\/page\/(\d+)\//);
           if (pageMatch2) {
-            page = parseInt(pageMatch2[1], 10);
+            page = parseInt(pageMatch2[1], 12);
           }
         }
 
