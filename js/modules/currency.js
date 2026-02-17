@@ -10,7 +10,6 @@ const currencySymbols = {
   CNY: "¥",
   JPY: "¥",
   KZT: "₸",
-  BYN: "Br",
 };
 
 let ratesData = null;
@@ -123,7 +122,7 @@ function updateHeaderPrices() {
 }
 
 function populateCurrencyDropdown(panel, rates) {
-  const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT", "BYN"];
+  const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT"];
 
   panel.innerHTML = "";
 
@@ -200,7 +199,7 @@ export async function initCurrency() {
     if (!ratesData || !ratesData.rates) return;
 
     baseISO = getStoredCurrency();
-    const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT", "BYN"];
+    const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT"];
     if (!allowedCurrencies.includes(baseISO) || (baseISO !== "RUB" && !ratesData.rates[baseISO])) {
       baseISO = "RUB";
     }

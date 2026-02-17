@@ -141,7 +141,7 @@
 	</div>
 </footer>
 
-<div class="footer-logos">
+<!-- <div class="footer-logos">
 	<div class="container">
 		<div class="footer-logos__wrap">
 			<img class="footer-partner" src="<?= get_template_directory_uri() ?>/img/footer/3.png" alt="">
@@ -165,7 +165,7 @@
 
 		</div>
 	</div>
-</div>
+</div> -->
 
 <?= get_template_part('template-parts/modals') ?>
 

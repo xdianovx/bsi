@@ -23,7 +23,7 @@ get_header();
 
   <?= get_template_part('template-parts/pages/main/banners') ?>
   <?= get_template_part('template-parts/main-pages-grid') ?>
-  <?= get_template_part('template-parts/best-offers/best-offers') ?>
+  <!-- <?= get_template_part('template-parts/best-offers/best-offers') ?> -->
   <?= get_template_part('template-parts/promo-banner/slider') ?>
   <?= get_template_part('template-parts/education/popular') ?>
   <?= get_template_part('template-parts/hotels/popular') ?>

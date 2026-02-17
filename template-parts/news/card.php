@@ -2,10 +2,8 @@
 $views = (int) get_post_meta(get_the_ID(), 'news_views', true);
 ?>
 
-<div id="post-<?php the_ID(); ?>"
-     <?php post_class('news-card'); ?>>
-  <a href="<?php the_permalink(); ?>"
-     class="news-card__link">
+<div id="post-<?php the_ID(); ?>" <?php post_class('news-card'); ?>>
+  <a href="<?php the_permalink(); ?>" class="news-card__link">
     <?php if (has_post_thumbnail()): ?>
       <div class="news-card__image">
         <?php the_post_thumbnail('medium_large'); ?>
@@ -14,7 +12,7 @@ $views = (int) get_post_meta(get_the_ID(), 'news_views', true);
 
     <div class="news-card__content">
       <div class="news-card__meta numfont">
-        <div class="news-card__views">
+        <!-- <div class="news-card__views">
           <svg xmlns="http://www.w3.org/2000/svg"
                width="18"
                height="18"
@@ -37,26 +35,14 @@ $views = (int) get_post_meta(get_the_ID(), 'news_views', true);
           </svg>
 
           <p><?= format_number($views) ?></p>
-        </div>
-        <time class="news-card__date"
-              datetime="<?php echo get_the_date('c'); ?>">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="18"
-               height="18"
-               viewBox="0 0 24 24"
-               fill="none"
-               stroke="currentColor"
-               stroke-width="1.5"
-               stroke-linecap="round"
-               stroke-linejoin="round"
-               class="lucide lucide-calendar-days-icon lucide-calendar-days">
+        </div> -->
+        <time class="news-card__date" datetime="<?php echo get_the_date('c'); ?>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-calendar-days-icon lucide-calendar-days">
             <path d="M8 2v4" />
             <path d="M16 2v4" />
-            <rect width="18"
-                  height="18"
-                  x="3"
-                  y="4"
-                  rx="2" />
+            <rect width="18" height="18" x="3" y="4" rx="2" />
             <path d="M3 10h18" />
             <path d="M8 14h.01" />
             <path d="M12 14h.01" />

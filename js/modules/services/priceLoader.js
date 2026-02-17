@@ -138,7 +138,7 @@ export const displayTourPrices = async (container, params = {}) => {
 
     if (!tourId || !bookingParams) {
       el.classList.remove('is-loading');
-      el.textContent = 'Забронировать';
+      el.textContent = 'По запросу';
       el.classList.add('price-unavailable');
       return;
     }
@@ -154,13 +154,13 @@ export const displayTourPrices = async (container, params = {}) => {
       el.setAttribute('data-price-loaded', '');
       savePriceToCache(tourId, minPrice);
     } else {
-      el.textContent = 'Забронировать';
+      el.textContent = 'По запросу';
       el.classList.add('price-unavailable');
     }
   }));
 
   toLoad.slice(MAX_TOURS).forEach(el => {
-    el.textContent = 'Забронировать';
+    el.textContent = 'По запросу';
     el.classList.add('price-unavailable');
   });
 };
