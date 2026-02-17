@@ -99,6 +99,9 @@
 .mega-menu--countries .mega-menu__inner {
   max-width: 100% !important;
   width: 100% !important;
+  height: 80vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .header-menu__item:hover .mega-menu--countries {
