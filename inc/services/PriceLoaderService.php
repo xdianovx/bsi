@@ -225,6 +225,9 @@ class PriceLoaderService
         return null;
       }
 
+      // Сохраняем цену за 1 чел (цена из API обычно за 2 чел)
+      $price_per_person = round($min_price / 2);
+
       // Получаем настройку show_price_from из ACF
       $show_from = true;
       if (function_exists('get_field')) {
@@ -233,8 +236,8 @@ class PriceLoaderService
       }
 
       return [
-        'price' => $min_price,
-        'price_formatted' => number_format($min_price, 0, '.', ' '),
+        'price' => $price_per_person,
+        'price_formatted' => number_format($price_per_person, 0, '.', ' '),
         'show_from' => $show_from,
         'currency' => '₽',
       ];
