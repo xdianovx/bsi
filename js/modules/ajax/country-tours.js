@@ -20,6 +20,7 @@ export const initCountryToursFilters = () => {
 
   const list = document.querySelector("[data-tours-list]");
   const count = document.querySelector("[data-tours-count]");
+  const pagination = document.querySelector("[data-tours-pagination]");
   if (!list) return;
 
   const countryId = parseInt(root.getAttribute("data-country-id") || "0", 10);
@@ -37,6 +38,8 @@ export const initCountryToursFilters = () => {
   // Загружаем цены для карточек, отрендеренных сервером при начальной загрузке
   displayTourPrices(list);
 
+  let currentPage = 1;
+
   const getValues = (sel) => {
     if (!sel) return [];
     return Array.from(sel.selectedOptions)
@@ -44,13 +47,15 @@ export const initCountryToursFilters = () => {
       .filter(Boolean);
   };
 
-  const loadTours = async () => {
+  const loadTours = async (page = 1) => {
     setLoading(true);
+    currentPage = page;
 
     try {
       const body = new URLSearchParams();
       body.set("action", "country_tours_filter");
       body.set("country_id", String(countryId));
+      body.set("paged", String(page));
 
       const regionId = regionSelect ? regionSelect.value || "" : "";
       if (regionId) body.set("region", regionId);
@@ -71,6 +76,18 @@ export const initCountryToursFilters = () => {
       list.innerHTML = json.data.html || "";
       if (count) count.textContent = `Найдено туров: ${json.data.total || 0}`;
 
+      // Обновляем пагинацию
+      if (pagination) {
+        if (json.data.pagination) {
+          pagination.innerHTML = json.data.pagination;
+          pagination.style.display = "";
+          initPaginationHandlers();
+        } else {
+          pagination.innerHTML = "";
+          pagination.style.display = "none";
+        }
+      }
+
       // Загружаем цены для туров после отображения карточек
       await displayTourPrices(list);
       
@@ -79,6 +96,45 @@ export const initCountryToursFilters = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const initPaginationHandlers = () => {
+    if (!pagination) return;
+
+    const paginationLinks = pagination.querySelectorAll("a");
+    paginationLinks.forEach((link) => {
+      // Удаляем старые обработчики, если они есть
+      const newLink = link.cloneNode(true);
+      link.parentNode.replaceChild(newLink, link);
+
+      newLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        const href = newLink.getAttribute("href");
+        if (!href) return;
+
+        let page = 1;
+        // Проверяем формат ?paged=2
+        const pageMatch = href.match(/[?&]paged=(\d+)/);
+        if (pageMatch) {
+          page = parseInt(pageMatch[1], 10);
+        } else {
+          // Проверяем формат /page/2/
+          const pageMatch2 = href.match(/\/page\/(\d+)\//);
+          if (pageMatch2) {
+            page = parseInt(pageMatch2[1], 10);
+          }
+        }
+
+        if (page > 0) {
+          loadTours(page);
+
+          // Прокрутка к началу списка туров
+          if (list) {
+            list.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+      });
+    });
   };
 
   // region (single)
@@ -159,6 +215,8 @@ export const initCountryToursFilters = () => {
     const region = params.get("region") ? String(params.get("region")) : "";
     const resorts = getAllParams(params, "resort[]");
     const types = getAllParams(params, "tour_type[]");
+    const urlPage = params.get("paged") ? parseInt(params.get("paged"), 10) : 1;
+    const pageFromUrl = urlPage > 0 ? urlPage : 1;
 
     if (region && regionChoice) {
       regionChoice.setChoiceByValue(region);
@@ -181,20 +239,25 @@ export const initCountryToursFilters = () => {
       typeChoice.setChoiceByValue(types);
     }
 
-    // если в URL есть фильтры — применяем их сразу
+    // если в URL есть фильтры — применяем их сразу с учетом пагинации
     if (region || resorts.length || types.length) {
-      await loadTours();
+      await loadTours(pageFromUrl);
     }
   };
 
   if (regionSelect) {
     regionSelect.addEventListener("change", async () => {
       await loadResorts();
-      await loadTours();
+      await loadTours(1);
     });
   }
-  if (resortSelect) resortSelect.addEventListener("change", loadTours);
-  if (typeSelect) typeSelect.addEventListener("change", loadTours);
+  if (resortSelect) resortSelect.addEventListener("change", () => loadTours(1));
+  if (typeSelect) typeSelect.addEventListener("change", () => loadTours(1));
+
+  // Инициализируем обработчики пагинации при загрузке страницы
+  if (pagination) {
+    initPaginationHandlers();
+  }
 
   // ✅ самое важное: проставляем значения из URL (например, tour_type[])
   applyFromUrl();

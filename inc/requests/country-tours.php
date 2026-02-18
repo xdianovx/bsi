@@ -26,6 +26,8 @@ function country_tours_filter()
     $types = array_values(array_filter(array_map('absint', $raw)));
   }
 
+  $paged = isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1;
+
   $tax_query = [];
 
   if ($region) {
@@ -57,6 +59,7 @@ function country_tours_filter()
     'post_type' => 'tour',
     'post_status' => 'publish',
     'posts_per_page' => 12,
+    'paged' => $paged,
     'orderby' => 'title',
     'order' => 'ASC',
     'meta_query' => [
@@ -84,10 +87,25 @@ function country_tours_filter()
     }
   }
   wp_reset_postdata();
+  $html = ob_get_clean();
+
+  // Генерируем пагинацию
+  ob_start();
+  if ($q->max_num_pages > 1) {
+    echo paginate_links([
+      'total'   => $q->max_num_pages,
+      'current' => $paged,
+      'prev_text' => '&larr; Назад',
+      'next_text' => 'Вперед &rarr;',
+      'mid_size' => 2,
+    ]);
+  }
+  $pagination = ob_get_clean();
 
   wp_send_json_success([
-    'html' => ob_get_clean(),
+    'html' => $html,
     'total' => (int) $q->found_posts,
+    'pagination' => $pagination,
   ]);
 }
 
