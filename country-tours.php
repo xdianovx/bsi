@@ -186,7 +186,7 @@ get_header(); ?>
               <?php wp_reset_postdata(); ?>
             </div>
 
-            <div class="news-pagination js-news-pagination">
+            <div class="country-tours__pagination news-pagination">
               <?php if ($tours_query->max_num_pages > 1): ?>
                 <?php
                 echo paginate_links([
