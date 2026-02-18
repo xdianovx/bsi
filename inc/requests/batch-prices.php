@@ -147,7 +147,8 @@ function clear_tour_prices_cache()
 }
 
 /**
- * Сохранить минимальную цену тура в кэш (вызывается со страницы тура после загрузки цен)
+ * Сохранить минимальную цену тура в кэш (вызывается с карточек туров после загрузки цен).
+ * Ключ кэша должен совпадать с PriceLoaderService::getCachedTourPrice($tour_id, []) — «tour_{id}».
  */
 add_action('wp_ajax_save_tour_min_price', 'save_tour_min_price');
 add_action('wp_ajax_nopriv_save_tour_min_price', 'save_tour_min_price');
@@ -174,6 +175,7 @@ function save_tour_min_price()
     'currency' => '₽',
   ];
 
+  // Ключ как в PriceLoaderService::buildTourCacheKey($tour_id, [])
   $cache_key = 'tour_' . $tour_id;
   CacheService::set($cache_key, $price_data, PriceLoaderService::CACHE_EXPIRATION, PriceLoaderService::CACHE_GROUP_TOURS);
 

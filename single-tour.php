@@ -372,10 +372,19 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <div class="hotel-widget__price numfont" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>">
-              <?php if ($tour_price_from): ?>
-
-                <?= esc_html($tour_price_from); ?> / за 1 чел
+            <?php
+            $cached_tour_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($post_id) : null;
+            $tour_price_display = '';
+            if ($cached_tour_price) {
+              $tour_price_display = $cached_tour_price['price_formatted'] . ' ₽ / чел';
+            } elseif ($tour_price_from) {
+              $price_num = preg_replace('/[^\d]/', '', $tour_price_from);
+              $tour_price_display = $price_num !== '' ? number_format((int) $price_num, 0, '.', ' ') . ' ₽ / чел' : trim($tour_price_from) . ' ₽ / чел';
+            }
+            ?>
+            <div class="hotel-widget__price numfont" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>"<?= $tour_price_display ? ' data-price-loaded' : ''; ?>>
+              <?php if ($tour_price_display): ?>
+                <?= esc_html($tour_price_display); ?>
               <?php else: ?>
                 Загрузка цены...
               <?php endif; ?>

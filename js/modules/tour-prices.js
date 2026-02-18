@@ -821,10 +821,10 @@ export const tourPrices = () => {
     if (minPrice !== null) {
       const displayPrice = Math.round(minPrice / 2);
       const formattedPrice = new Intl.NumberFormat('ru-RU').format(displayPrice);
-      widgetPrice.textContent = `от ${formattedPrice} ₽`;
+      widgetPrice.textContent = `${formattedPrice} ₽ / чел`;
       widgetPriceSet = true;
 
-      // Сохраняем минимальную цену в серверный кэш для карточек
+      // Сохраняем цену за 1 чел в серверный кэш для карточек
       const ajaxUrl = window.ajax?.url || window.ajaxurl || '/wp-admin/admin-ajax.php';
       fetch(ajaxUrl, {
         method: 'POST',
@@ -832,7 +832,7 @@ export const tourPrices = () => {
         body: new URLSearchParams({
           action: 'save_tour_min_price',
           tour_id: tourId,
-          min_price: minPrice,
+          min_price: displayPrice,
         }),
         credentials: 'same-origin',
       }).catch(() => {});

@@ -209,7 +209,7 @@ if (function_exists('get_field')) {
       <?php if ($booking_url): ?>
         <?php
           $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($tour_id) : null;
-          $price_text = $cached_price ? 'от ' . $cached_price['price_formatted'] . ' ₽' : '';
+          $price_text = $cached_price ? $cached_price['price_formatted'] . ' ₽ / чел' : '';
           $is_price_loaded = !empty($price_text);
         ?>
         <a href="<?php echo esc_url($booking_url); ?>" 

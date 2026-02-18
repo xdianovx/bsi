@@ -89,16 +89,17 @@ async function fetchTourMinPrice(params) {
 }
 
 /**
- * Сохраняет min цену в серверный кэш
+ * Сохраняет отображаемую цену в серверный кэш (та же величина, что показываем пользователю)
  */
-function savePriceToCache(tourId, minPrice) {
+function savePriceToCache(tourId, displayPrice) {
+  if (displayPrice <= 0) return;
   fetch(AJAX_URL(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
     body: new URLSearchParams({
       action: 'save_tour_min_price',
       tour_id: tourId,
-      min_price: minPrice,
+      min_price: displayPrice,
     }),
     credentials: 'same-origin',
   }).catch(() => {});
@@ -149,10 +150,10 @@ export const displayTourPrices = async (container, params = {}) => {
     if (minPrice !== null) {
       const displayPrice = Math.round(minPrice / 2);
       const formatted = new Intl.NumberFormat('ru-RU').format(displayPrice);
-      el.textContent = `от ${formatted} ₽`;
+      el.textContent = `${formatted} ₽ / чел`;
       el.classList.add('price-loaded');
       el.setAttribute('data-price-loaded', '');
-      savePriceToCache(tourId, minPrice);
+      savePriceToCache(tourId, displayPrice);
     } else {
       el.textContent = 'По запросу';
       el.classList.add('price-unavailable');
