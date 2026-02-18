@@ -171,7 +171,7 @@ export const sliders = () => {
   const promoBannerSectionSlider = new Swiper(".promo-banner-slider", {
     slidesPerView: 1,
     spaceBetween: 32,
-    autoplay: { delay: 2000 },
+    autoplay: { delay: 3000 },
     loop: true,
     freeMode: true,
     speed: 300,

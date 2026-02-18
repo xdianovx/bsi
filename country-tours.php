@@ -186,6 +186,20 @@ get_header(); ?>
               <?php wp_reset_postdata(); ?>
             </div>
 
+            <div class="news-pagination js-news-pagination">
+              <?php if ($tours_query->max_num_pages > 1): ?>
+                <?php
+                echo paginate_links([
+                  'total'   => $tours_query->max_num_pages,
+                  'current' => $paged,
+                  'prev_text' => '&larr; Назад',
+                  'next_text' => 'Вперед &rarr;',
+                  'mid_size' => 2,
+                ]);
+                ?>
+              <?php endif; ?>
+            </div>
+
           </div>
 
         </div>
