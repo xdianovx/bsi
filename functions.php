@@ -103,6 +103,14 @@ function bsi_scripts()
 	wp_localize_script('main', 'ajax', array(
 		'url' => admin_url('admin-ajax.php'),
 	));
+	
+	// Передаем данные модального окна предупреждения
+	$maintenance_modal_enabled = get_field('maintenance_modal_enabled', 'option') ? true : false;
+	$maintenance_modal_message = get_field('maintenance_modal_message', 'option') ?: '';
+	wp_localize_script('main', 'maintenanceModal', array(
+		'enabled' => $maintenance_modal_enabled,
+		'message' => $maintenance_modal_message,
+	));
 
 	wp_enqueue_script('bsi-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true);
 
@@ -302,6 +310,7 @@ require get_template_directory() . '/custom-fields/pages/main-banners.php';
 require get_template_directory() . '/custom-fields/pages/gde-kupit.php';
 require get_template_directory() . '/custom-fields/education-fields.php';
 require get_template_directory() . '/custom-fields/currency-settings.php';
+require get_template_directory() . '/custom-fields/maintenance-modal.php';
 
 require get_template_directory() . '/inc/requests/ajax.php';
 require get_template_directory() . '/inc/requests/ajax-fit.php';

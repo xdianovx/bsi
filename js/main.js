@@ -26,6 +26,7 @@ import { initCountryEducationFilters } from "./modules/ajax/country-education";
 import { initSingleEducationPrograms } from "./modules/ajax/single-education-programs";
 import { initEducationProgramForm } from "./modules/forms/education-program-form";
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
+import { initMaintenanceModal } from "./modules/maintenance-modal";
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -62,4 +63,9 @@ window.addEventListener("DOMContentLoaded", () => {
   initSingleEducationPrograms();
   initEducationProgramForm();
   initEventTicketForm();
+  
+  // Инициализация модального окна предупреждения
+  if (window.maintenanceModal) {
+    initMaintenanceModal(window.maintenanceModal);
+  }
 });
