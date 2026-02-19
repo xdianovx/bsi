@@ -1034,6 +1034,7 @@
   flex-direction: column;
   gap: 4px;
   position: relative;
+  height: 100%;
 
   &:hover {
     color: inherit;
@@ -1150,11 +1151,12 @@
 .education-card__actions {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: auto;
   flex-direction: column;
   font-weight: 500;
   font-size: 14px;
   align-items: center;
+  padding-top: 8px;
 
   * {
     width: 100%;
