@@ -14,7 +14,10 @@
     flex-direction: column;
   }
 }
-
+.tour-card__checkin-dates {
+  font-size: 14px;
+  color: #5c5c5c;
+}
 .tour-card-row__tags {
   position: absolute;
   top: 8px;

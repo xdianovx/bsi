@@ -86,8 +86,25 @@ if (function_exists('get_field')) {
   }
 
   $checkin_dates_val = get_field('tour_checkin_dates', $tour_id);
+  $checkin_dates = '';
+  $checkin_dates_formatted = '';
+  $checkin_dates_remaining = 0;
   if (is_string($checkin_dates_val) && $checkin_dates_val !== '') {
-    $checkin_dates = format_dates_string_russian($checkin_dates_val);
+    $dates_array = array_map('trim', explode(',', $checkin_dates_val));
+    $dates_array = array_filter($dates_array);
+    $total_dates = count($dates_array);
+    
+    if ($total_dates > 0) {
+      $first_two_dates = array_slice($dates_array, 0, 2);
+      $formatted_dates = [];
+      foreach ($first_two_dates as $date) {
+        $formatted = format_date_russian($date);
+        $formatted_dates[] = $formatted;
+      }
+      $checkin_dates_formatted = implode(', ', $formatted_dates);
+      $checkin_dates_remaining = max(0, $total_dates - 2);
+      $checkin_dates = $checkin_dates_val; // Сохраняем для проверки наличия дат
+    }
   }
 
   $excursions_count_val = get_field('tour_excursions_count', $tour_id);
@@ -168,11 +185,11 @@ if (function_exists('get_field')) {
 
 
 
-    <?php if ($nights > 0 || $checkin_dates || $excursions_count > 0): ?>
+    <?php if ($nights > 0 || $excursions_count > 0): ?>
       <div class="tour-card__booking-info">
         <?php if ($nights > 0): ?>
           <span class="hotel-card__nights"><?php echo esc_html($nights); ?>
-            <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?>,</span>
+            <?php echo $nights === 1 ? 'ночь' : ($nights < 5 ? 'ночи' : 'ночей'); ?><?php if ($excursions_count > 0): ?>,<?php endif; ?></span>
         <?php endif; ?>
         <?php if ($excursions_count > 0): ?>
           <?php if ($nights > 0): ?>     <?php endif; ?>
@@ -192,13 +209,22 @@ if (function_exists('get_field')) {
               $excursions_text = 'экскурсий';
             }
             echo esc_html($excursions_text);
-            ?>,
+            ?>
           </span>
         <?php endif; ?>
-        <?php if ($checkin_dates): ?>
-          <?php if ($nights > 0 || $excursions_count > 0): ?>     <?php endif; ?>
-          <span class="hotel-card__checkin-date"><?php echo esc_html($checkin_dates); ?></span>
-        <?php endif; ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($checkin_dates_formatted): ?>
+      <div class="tour-card__checkin-dates">
+        <span class="tour-card__checkin-label">Ближ. заезды:</span>
+        <span class="tour-card__checkin-list">
+          <?php echo esc_html($checkin_dates_formatted); ?>
+          <?php if ($checkin_dates_remaining > 0): ?>
+            <span class="tour-card__checkin-ellipsis">...</span>
+            <span class="tour-card__checkin-more">еще <?php echo esc_html($checkin_dates_remaining); ?></span>
+          <?php endif; ?>
+        </span>
       </div>
     <?php endif; ?>
 

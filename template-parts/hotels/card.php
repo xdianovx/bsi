@@ -281,7 +281,7 @@ if (function_exists('get_field')) {
       <?php if ($booking_url && $price_value): ?>
         <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
           target="_blank" rel="noopener nofollow">
-          <?php echo esc_html(format_price_with_from($price_value, $show_from)); ?> / 1 человек
+          <?php echo esc_html(format_price_with_from($price_value, $show_from)); ?> / чел
         </a>
       <?php endif; ?>
     </div>
