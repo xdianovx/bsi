@@ -168,17 +168,24 @@ export const sliders = () => {
   hotelGalleryMainSlider.controller.control = hotelGalleryMainSliderThumb;
   hotelGalleryMainSliderThumb.controller.control = hotelGalleryMainSlider;
 
-  const promoBannerSectionSlider = new Swiper(".promo-banner-slider", {
-    slidesPerView: 1,
-    spaceBetween: 32,
-    autoplay: { delay: 3000 },
-    loop: true,
-    freeMode: true,
-    speed: 300,
-    pagination: {
-      el: ".promo-banner-slider-pag",
-    },
-  });
+  // Инициализация промо-баннеров (может быть несколько экземпляров на странице)
+  const promoBannerSliders = document.querySelectorAll(".promo-banner-slider");
+  if (promoBannerSliders.length > 0) {
+    promoBannerSliders.forEach((sliderEl) => {
+      const paginationEl = sliderEl.parentElement.querySelector(".promo-banner-slider-pag");
+      new Swiper(sliderEl, {
+        slidesPerView: 1,
+        spaceBetween: 32,
+        autoplay: { delay: 3000 },
+        loop: true,
+        freeMode: true,
+        speed: 300,
+        pagination: paginationEl ? {
+          el: paginationEl,
+        } : false,
+      });
+    });
+  }
 
   const bestOffersSlider = new Swiper(".best-offers-slider", {
     spaceBetween: 16,

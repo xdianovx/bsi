@@ -27,6 +27,12 @@ get_header();
   <?= get_template_part('template-parts/education/popular') ?>
   <?= get_template_part('template-parts/promo-banner/slider') ?>
   <?= get_template_part('template-parts/hotels/popular') ?>
+  <?php 
+  // Промо баннеры 2 после секции отелей
+  // Управление: Секции -> Промо баннеры 2
+  set_query_var('promo_banner_post_type', 'banner_second');
+  get_template_part('template-parts/promo-banner/slider'); 
+  ?>
   <?= get_template_part('template-parts/tour/popular') ?>
   <!-- <?= get_template_part('template-parts/sections/features') ?> -->
   <?= get_template_part('template-parts/news/news-slider') ?>

@@ -1,14 +1,22 @@
 <?php
 
 $section_id = isset($args['section_id']) ? (int) $args['section_id'] : 0;
+$post_type = isset($args['post_type']) ? $args['post_type'] : null;
 
+// Поддержка передачи section_id и post_type через query var
+if (!$section_id) {
+  $section_id = (int) get_query_var('promo_banner_section_id', 0);
+}
+if (!$post_type) {
+  $post_type = get_query_var('promo_banner_post_type', 'banner');
+}
 
 if (!$section_id && is_singular('banner_section')) {
   $section_id = get_the_ID();
 }
 
 $query_args = [
-  'post_type' => 'banner',
+  'post_type' => $post_type,
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'orderby' => [
