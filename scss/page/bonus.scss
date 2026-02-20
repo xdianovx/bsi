@@ -27,8 +27,9 @@
 }
 
 .bonus-marquee__item {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 100%;
   white-space: nowrap;
   color: #1a1a1a;
   background-color: #f4f4f6;
@@ -43,20 +44,20 @@
 }
 
 .bonus-levels {
-  margin-top: 7.5rem;
+  margin-top: 120px;
 
-  @media screen and (max-width: 768px) {
-    margin-top: 3rem;
+  @media screen and (max-width: 1024px) {
+    margin-top: 80px;
   }
 }
 
 .bonus-levels__items {
   display: flex;
   flex-direction: column;
-  gap: 7.5rem;
+  gap: 80px;
 
-  @media screen and (max-width: 768px) {
-    gap: 3rem;
+  @media screen and (max-width: 1024px) {
+    gap: 64px;
   }
 }
 
@@ -79,7 +80,7 @@
 
 .bonus-level__star {
   display: flex;
-  gap: 1rem;
+  gap: 24px 16px;
   align-items: center;
 
   @media screen and (max-width: 530px) {
@@ -144,6 +145,10 @@
     display: flex;
     gap: 8px;
 
+    svg {
+      flex-shrink: 0;
+    }
+
     .__item_title {
       font-size: 16px;
       font-weight: 500;
@@ -154,7 +159,7 @@
   .bot {
     color: #474747;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     padding-left: 32px;
     line-height: 130%;
   }
@@ -163,8 +168,8 @@
 .bonus-info {
   margin-top: 7.5rem;
 
-  @media screen and (max-width: 768px) {
-    margin-top: 3rem;
+  @media screen and (max-width: 1024px) {
+    margin-top: 80px;
   }
 }
 
@@ -206,8 +211,8 @@
 .bonus-event {
   margin-top: 7.5rem;
 
-  @media screen and (max-width: 768px) {
-    margin-top: 3rem;
+  @media screen and (max-width: 1024px) {
+    margin-top: 80px;
   }
 }
 
