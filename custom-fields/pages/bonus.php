@@ -120,6 +120,23 @@ add_action('acf/init', function () {
           ],
         ],
       ],
+      // Ежегодная премия
+      [
+        'key' => 'field_bonus_event_title',
+        'label' => 'Заголовок секции "Ежегодная премия"',
+        'name' => 'bonus_event_title',
+        'type' => 'text',
+        'placeholder' => 'Например: Ежегодная премия BSI Group',
+        'default_value' => 'Ежегодная премия BSI Group',
+      ],
+      [
+        'key' => 'field_bonus_event_text',
+        'label' => 'Текст секции "Ежегодная премия"',
+        'name' => 'bonus_event_text',
+        'type' => 'textarea',
+        'rows' => 3,
+        'placeholder' => 'Введите текст о премии',
+      ],
       // Важная информация
       [
         'key' => 'field_bonus_info',

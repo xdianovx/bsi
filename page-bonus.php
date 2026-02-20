@@ -150,18 +150,23 @@ get_header();
             </div>
         </section>
     <?php endif; ?>
+    <!-- Ежегодная премия -->
+    <?php 
+    $bonus_event_title = get_field('bonus_event_title');
+    $bonus_event_text = get_field('bonus_event_text');
+    ?>
+    <?php if ($bonus_event_title || $bonus_event_text): ?>
     <section class="bonus-event">
         <div class="container">
-            <h2 class="h2">
-                Ежегодная премия BSI Group
-            </h2>
-            <p>
-                Турагентства — лидеры продаж по итогам 2026 года приглашаются на декабрьское закрытое мероприятие —
-                премию «Вселенная BSI Group» в Москве, где им вручаются именные дипломы, авторские звездные статуэтки и
-                индивидуальные ценные подарки
-            </p>
+            <?php if ($bonus_event_title): ?>
+                <h2 class="h2"><?php echo esc_html($bonus_event_title); ?></h2>
+            <?php endif; ?>
+            <?php if ($bonus_event_text): ?>
+                <p><?php echo esc_html($bonus_event_text); ?></p>
+            <?php endif; ?>
         </div>
     </section>
+    <?php endif; ?>
     <!-- Важная информация -->
     <?php $bonus_info = get_field('bonus_info'); ?>
     <?php if ($bonus_info): ?>
