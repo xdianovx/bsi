@@ -22,10 +22,17 @@ $main_page_items = [
      //      'img' => 'cruise.png',
 
      // ],
+     // [
+     //      'title' => 'Событийные <br> туры',
+     //      'url' => 'https://past.bsigroup.ru/tip-tura/event-tours/',
+     //      'target' => '_blank',
+     //      'img' => 'event.png',
+
+     // ],
      [
           'title' => 'Событийные <br> туры',
-          'url' => 'https://past.bsigroup.ru/tip-tura/event-tours/',
-          'target' => '_blank',
+          'url' => '#',
+          'target' => '',
           'img' => 'event.png',
 
      ],
