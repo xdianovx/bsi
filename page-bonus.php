@@ -161,7 +161,7 @@ get_header();
     <section class="bonus-info">
         <div class="container">
             <h2 class="bonus-info__title">Важная информация:</h2>
-            <div class="bonus-info__content">
+            <div class="bonus-info__content editor-content">
                 <?php echo wp_kses_post($bonus_info); ?>
             </div>
         </div>

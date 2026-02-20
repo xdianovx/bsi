@@ -114,7 +114,6 @@ add_action('acf/init', function () {
                 'type' => 'textarea',
                 'placeholder' => 'Например: с экскурсионных туров и образования за рубежом',
                 'rows' => 2,
-                'required' => 1,
                 'wrapper' => ['width' => '50'],
               ],
             ],
