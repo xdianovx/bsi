@@ -27,6 +27,8 @@ import { initSingleEducationPrograms } from "./modules/ajax/single-education-pro
 import { initEducationProgramForm } from "./modules/forms/education-program-form";
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
+import { initBonusMarquee } from "./modules/bonus-marquee";
+
 
 window.addEventListener("DOMContentLoaded", () => {
   burger();
@@ -63,6 +65,8 @@ window.addEventListener("DOMContentLoaded", () => {
   initSingleEducationPrograms();
   initEducationProgramForm();
   initEventTicketForm();
+  initBonusMarquee();
+  
   
   // Инициализация модального окна предупреждения
   if (window.maintenanceModal) {
