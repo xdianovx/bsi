@@ -300,6 +300,7 @@ require get_template_directory() . '/custom-fields/review.php';
 require get_template_directory() . '/custom-fields/news.php';
 require get_template_directory() . '/custom-fields/promo.php';
 require get_template_directory() . '/custom-fields/pages/contacts.php';
+require get_template_directory() . '/custom-fields/pages/bonus.php';
 require get_template_directory() . '/custom-fields/award.php';
 require get_template_directory() . '/custom-fields/partner.php';
 require get_template_directory() . '/custom-fields/banner.php';
