@@ -31,7 +31,7 @@
   font-weight: 500;
   white-space: nowrap;
   color: #1a1a1a;
-  background-color: #F4F4F6;
+  background-color: #f4f4f6;
   padding: 8px 20px;
   border-radius: 100px;
   margin: 0 12px;
@@ -43,118 +43,118 @@
 }
 
 .bonus-levels {
-    margin-top: 7.5rem;
+  margin-top: 7.5rem;
 
-    @media screen and (max-width: 768px) {
-        margin-top: 3rem;
-    }
+  @media screen and (max-width: 768px) {
+    margin-top: 3rem;
+  }
 }
 
 .bonus-levels__items {
-    display: flex;
-    flex-direction: column;
-    gap: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 7.5rem;
 
-    @media screen and (max-width: 768px) {
-        gap: 3rem;
-    }
+  @media screen and (max-width: 768px) {
+    gap: 3rem;
+  }
 }
 
 .bonus-levels__item {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .bonus-level__top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 
-    @media screen and (max-width: 530px) {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  @media screen and (max-width: 530px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .bonus-level__star {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 
-    @media screen and (max-width: 530px) {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  @media screen and (max-width: 530px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .bonus-level__img img {
-    width: 92px;
-    height: 92px;
+  width: 92px;
+  height: 92px;
 }
 
 .bonus-level__title {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 
-    h3 {
-        font-size: 18px;
-        font-weight: 700;
-    }
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
 }
 
 .bonus-level__info {
-    color: #EE3145;
-    font-weight: 500;
+  color: #ee3145;
+  font-weight: 500;
 }
 
 .bonus-level__link a {
-    color: #FF0000;
-    font-size: 16px;
-    font-weight: 500;    
+  color: #ff0000;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 @media screen and (max-width: 530px) {
-    .bonus-level__link {
-        margin-top: 1rem;
-    }
+  .bonus-level__link {
+    margin-top: 1rem;
+  }
 }
 
 .bonus-level__description-list {
-    display: grid;
-    grid-template-rows: auto;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    width: 100%;
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
 
-    @media screen and (max-width: 1280px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    @media screen and (max-width: 900px) {
-        grid-template-columns: repeat(1, 1fr);
-    }
+  @media screen and (max-width: 1280px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media screen and (max-width: 900px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .bonus-level__description-item {
-    width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .top {
     display: flex;
-    flex-direction: column;
+    gap: 8px;
 
-    .top {
-        display: flex;
-        gap: 8px;
-
-        .__item_title {
-            font-size: 16px;
-            font-weight: 500;
-        }
+    .__item_title {
+      font-size: 16px;
+      font-weight: 500;
     }
+  }
 
-    .bot {
-        color: #474747;
-        font-size: 16px;
-        font-weight: 500;
-    }
+  .bot {
+    color: #474747;
+    font-size: 14px;
+    font-weight: 500;
+  }
 }
 
 .bonus-info {
@@ -190,27 +190,27 @@
 }
 
 .bonus-info__item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 10px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #EE3145;
+  background-color: #ee3145;
 }
 
 .bonus-event {
-    margin-top: 7.5rem;
+  margin-top: 7.5rem;
 
-    @media screen and (max-width: 768px) {
-        margin-top: 3rem;
-    }
+  @media screen and (max-width: 768px) {
+    margin-top: 3rem;
+  }
 }
 
 .bonus-event h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    line-height: 110%;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 110%;
 }
