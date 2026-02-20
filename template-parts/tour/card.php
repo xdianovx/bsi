@@ -217,7 +217,7 @@ if (function_exists('get_field')) {
 
     <?php if ($checkin_dates_formatted): ?>
       <div class="tour-card__checkin-dates">
-        <span class="tour-card__checkin-label">Ближ. заезды:</span>
+        <span class="tour-card__checkin-label">Заезды:</span>
         <span class="tour-card__checkin-list">
           <?php echo esc_html($checkin_dates_formatted); ?>
           <?php if ($checkin_dates_remaining > 0): ?>
