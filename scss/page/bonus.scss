@@ -111,7 +111,13 @@
 .bonus-level__link a {
     color: #FF0000;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 500;    
+}
+
+@media screen and (max-width: 530px) {
+    .bonus-level__link {
+        margin-top: 1rem;
+    }
 }
 
 .bonus-level__description-list {
@@ -153,6 +159,10 @@
 
 .bonus-info {
   margin-top: 7.5rem;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 3rem;
+  }
 }
 
 .bonus-info__title {
@@ -188,4 +198,19 @@
   height: 6px;
   border-radius: 50%;
   background-color: #EE3145;
+}
+
+.bonus-event {
+    margin-top: 7.5rem;
+
+    @media screen and (max-width: 768px) {
+        margin-top: 3rem;
+    }
+}
+
+.bonus-event h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 110%;
 }
