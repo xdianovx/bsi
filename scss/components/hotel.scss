@@ -9,6 +9,21 @@
   margin-top: 20px;
 }
 
+.popular-tours-slider {
+  .swiper-slide {
+    align-self: stretch;
+    height: auto !important;
+  }
+  .hotel-card {
+    height: 100%;
+  }
+  .hotel-card__body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
 .hotel-card {
   display: flex;
   flex-direction: column;
@@ -26,6 +41,7 @@
 .hotel-card__media {
   aspect-ratio: 16/9;
   border-radius: 8px;
+  flex-shrink: 0;
   overflow: hidden;
   display: block;
   text-decoration: none;
@@ -109,7 +125,8 @@
   display: flex;
   gap: 8px;
   flex-direction: column;
-  margin-top: 16px;
+  margin-top: auto;
+  padding-top: 16px;
   font-weight: 500;
   font-size: 14px;
   align-items: center;
