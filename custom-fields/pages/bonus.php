@@ -123,23 +123,14 @@ add_action('acf/init', function () {
       ],
       // Важная информация
       [
-        'key' => 'field_bonus_info_items',
+        'key' => 'field_bonus_info',
         'label' => 'Важная информация',
-        'name' => 'bonus_info_items',
-        'type' => 'repeater',
-        'layout' => 'row',
-        'button_label' => 'Добавить пункт',
-        'sub_fields' => [
-          [
-            'key' => 'field_info_text',
-            'label' => 'Текст пункта',
-            'name' => 'text',
-            'type' => 'textarea',
-            'rows' => 3,
-            'required' => 1,
-            'new_lines' => 'br',
-          ],
-        ],
+        'name' => 'bonus_info',
+        'type' => 'wysiwyg',
+        'instructions' => 'Введите текст важной информации',
+        'toolbar' => 'full',
+        'media_upload' => 1,
+        'delay' => 0,
       ],
     ],
     'location' => [
