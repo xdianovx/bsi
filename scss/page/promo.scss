@@ -19,7 +19,23 @@
 }
 
 .archive-page__content-section.promo-page__content-section {
-  margin-top: 20px;
+  margin-top: 32px;
+}
+
+.promo-archive__empty {
+  margin-top: 32px;
+  text-align: center;
+  color: $text-gray;
+
+  p {
+    margin: 0;
+  }
+}
+
+.promo-grid.js-promo-list {
+  &.is-loading {
+    min-height: 200px;
+  }
 }
 
 .promo-filter__btn {
@@ -145,5 +161,39 @@
 
   @media screen and (max-width: 768px) {
     margin-top: 4px;
+  }
+}
+
+// Single promo
+.single-promo__title {
+  margin-bottom: 0;
+}
+
+.single-promo__dates {
+  margin-top: 8px;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.single-promo__excerpt {
+  margin-top: 16px;
+  margin-bottom: 0;
+  color: $text-gray;
+}
+
+.single-promo__poster {
+  margin-top: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .single-promo__poster-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  @media screen and (max-width: 768px) {
+    margin-top: 16px;
   }
 }

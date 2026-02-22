@@ -20,6 +20,12 @@ get_header();
         </h1>
 
         <p class="page-award__excerpt archive-page__excerpt"><?= get_the_excerpt() ?></p>
+
+        <?php if (trim((string) get_the_content()) !== ''): ?>
+          <div class="editor-content archive-page__content">
+            <?php the_content(); ?>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </section>
@@ -92,6 +98,10 @@ get_header();
               <?php get_template_part('template-parts/promo/card'); ?>
 
             <?php endwhile; ?>
+          </div>
+        <?php else: ?>
+          <div class="promo-archive__empty">
+            <p>Акций пока нет.</p>
           </div>
         <?php endif; ?>
 
