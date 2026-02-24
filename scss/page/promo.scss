@@ -196,3 +196,13 @@
     margin-top: 16px;
   }
 }
+
+.single-promo__content {
+  &.post-content-section {
+    margin: 32px auto 0;
+  }
+  .page-country__descr {
+    margin-top: 0;
+    margin-bottom: 24px;
+  }
+}

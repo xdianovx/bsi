@@ -31,7 +31,8 @@ $formatted_to = function_exists('format_date_value') ? format_date_value($raw_to
       <?php if ($formatted_from || $formatted_to): ?>
         <div class="single-promo__dates">
           <?php if ($formatted_from && $formatted_to): ?>
-            <span class="single-promo__date-range"><?= esc_html($formatted_from); ?> – <?= esc_html($formatted_to); ?></span>
+            <span class="single-promo__date-range"><?= esc_html($formatted_from); ?> –
+              <?= esc_html($formatted_to); ?></span>
           <?php elseif ($formatted_from): ?>
             <span class="single-promo__date-from"><?= esc_html($formatted_from); ?></span>
           <?php else: ?>
@@ -46,14 +47,17 @@ $formatted_to = function_exists('format_date_value') ? format_date_value($raw_to
         </div>
       <?php endif; ?>
 
-      <?php if (get_the_excerpt()): ?>
-        <p class="single-promo__excerpt"><?= get_the_excerpt(); ?></p>
-      <?php endif; ?>
+
     </div>
   </section>
 
-  <section class="post-content-section">
+  <section class="post-content-section single-promo__content">
     <div class="container">
+      <?php if (get_the_excerpt()): ?>
+        <div class="page-country__descr">
+          <?= get_the_excerpt(); ?>
+        </div>
+      <?php endif; ?>
       <div class="editor-content">
         <?php the_content(); ?>
       </div>
