@@ -55,6 +55,7 @@ if ($hotel && is_array($hotel) && !empty($hotel['tags']) && is_array($hotel['tag
 $country_title = '';
 $region_title = '';
 $resort_title = '';
+$meal_plan_titles = [];
 $rating = 0;
 
 if ($hotel && is_array($hotel) && !empty($hotel['country_title'])) {
@@ -89,6 +90,13 @@ if ($hotel && is_array($hotel) && !empty($hotel['resort_title'])) {
   if (!is_wp_error($resort_terms) && !empty($resort_terms)) {
     $resort_title = (string) $resort_terms[0]->name;
   }
+}
+
+$meal_plan_terms = wp_get_post_terms($hotel_id, 'meal_plan', ['orderby' => 'name', 'order' => 'ASC']);
+if (!is_wp_error($meal_plan_terms) && !empty($meal_plan_terms)) {
+  $meal_plan_titles = array_map(function ($t) {
+    return $t->name;
+  }, $meal_plan_terms);
 }
 
 if (function_exists('get_field')) {
@@ -168,6 +176,34 @@ if (function_exists('get_field')) {
 
   <div class="hotel-card__body">
 
+    <div class="hotel-card__location">
+      <?php if ($hotel_flag): ?>
+        <div class="hotel-card__flag">
+          <img src="<?php echo esc_url($hotel_flag); ?>" alt="">
+        </div>
+      <?php endif; ?>
+      <div class="hotel-card__location-text">
+        <?php if ($country_title): ?>
+          <span class="hotel-card__country">
+            <?php echo esc_html($country_title); ?>,
+          </span>
+        <?php endif; ?>
+        <?php if ($region_title): ?>
+          <?php if ($country_title): ?>
+          <?php endif; ?>
+          <span class="hotel-card__region">
+            <?php echo esc_html($region_title); ?>,
+          </span>
+        <?php endif; ?>
+        <?php if ($resort_title): ?>
+          <?php if ($country_title || $region_title): ?>
+          <?php endif; ?>
+          <span class="hotel-card__resort">
+            <?php echo esc_html($resort_title); ?>
+          </span>
+        <?php endif; ?>
+      </div>
+    </div>
 
     <div class="hotel-card__title-wrap">
       <?php if ($rating > 0): ?>
@@ -200,27 +236,9 @@ if (function_exists('get_field')) {
     </div>
     <h3 class="hotel-card__title"><?php echo esc_html($hotel_title); ?></h3>
 
-    <div class="hotel-card__location">
-      <?php if ($hotel_flag): ?>
-        <div class="hotel-card__flag">
-          <img src="<?php echo esc_url($hotel_flag); ?>" alt="">
-        </div>
-      <?php endif; ?>
-      <div class="hotel-card__location-text">
-        <?php if ($country_title): ?>
-          <span class="hotel-card__country"><?php echo esc_html($country_title); ?>,</span>
-        <?php endif; ?>
-        <?php if ($region_title): ?>
-          <?php if ($country_title): ?>   <?php endif; ?>
-          <span class="hotel-card__region"><?php echo esc_html($region_title); ?>,</span>
-        <?php endif; ?>
-        <?php if ($resort_title): ?>
-          <?php if ($country_title || $region_title): ?>
-          <?php endif; ?>
-          <span class="hotel-card__resort"><?php echo esc_html($resort_title); ?></span>
-        <?php endif; ?>
-      </div>
-    </div>
+    <?php if (!empty($meal_plan_titles)): ?>
+      <p class="hotel-card__meal-plan">Питание: <?php echo esc_html(implode(', ', $meal_plan_titles)); ?></p>
+    <?php endif; ?>
 
     <div class="hotel-card__anemeties">
       <?php if (!empty($amenities)): ?>

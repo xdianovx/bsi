@@ -102,6 +102,28 @@ function bsi_register_hotel_taxonomies(): void
     'rewrite' => false,
     'query_var' => true,
   ]);
+
+  register_taxonomy('meal_plan', ['hotel'], [
+    'labels' => [
+      'name' => 'Питание',
+      'singular_name' => 'Питание',
+      'search_items' => 'Найти тип питания',
+      'all_items' => 'Все типы питания',
+      'edit_item' => 'Редактировать',
+      'update_item' => 'Обновить',
+      'add_new_item' => 'Добавить тип питания',
+      'new_item_name' => 'Новый тип питания',
+      'menu_name' => 'Питание',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => false,
+    'meta_box_cb' => 'post_tags_meta_box',
+    'rewrite' => false,
+    'query_var' => true,
+  ]);
 }
 
 add_action('init', 'bsi_hotels_rewrite_rules');
