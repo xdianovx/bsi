@@ -561,20 +561,7 @@ get_header();
     </div>
   </section>
 
-  <?php if ($map_lat && $map_lng): ?>
-    <?php
-    $map_zoom_safe = max(1, min(17, (int) $map_zoom));
-    $yandex_map_url = 'https://yandex.ru/maps/?ll=' . rawurlencode((string) $map_lng) . '%2C' . rawurlencode((string) $map_lat) . '&z=' . $map_zoom_safe . '&pt=' . rawurlencode((string) $map_lng) . ',' . rawurlencode((string) $map_lat);
-    $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg';
-    ?>
-    <section class="single-education__map-section map-section" id="education-map">
-      <div class="container">
-        <div class="hotel-map map-wrap" id="education-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
-          data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
-          data-marker-icon="<?php echo esc_url($marker_icon_url); ?>" style="width: 100%; height: 400px;"></div>
-      </div>
-    </section>
-  <?php endif; ?>
+
 
   <?php if (have_posts()): ?>
     <?php while (have_posts()):
@@ -615,6 +602,21 @@ get_header();
             </div>
           <?php endif; ?>
         </div>
+      </div>
+    </section>
+  <?php endif; ?>
+
+  <?php if ($map_lat && $map_lng): ?>
+    <?php
+    $map_zoom_safe = max(1, min(17, (int) $map_zoom));
+    $yandex_map_url = 'https://yandex.ru/maps/?ll=' . rawurlencode((string) $map_lng) . '%2C' . rawurlencode((string) $map_lat) . '&z=' . $map_zoom_safe . '&pt=' . rawurlencode((string) $map_lng) . ',' . rawurlencode((string) $map_lat);
+    $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg';
+    ?>
+    <section class="single-education__map-section map-section" id="education-map">
+      <div class="container">
+        <div class="hotel-map map-wrap" id="education-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
+          data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
+          data-marker-icon="<?php echo esc_url($marker_icon_url); ?>" style="width: 100%; height: 400px;"></div>
       </div>
     </section>
   <?php endif; ?>
