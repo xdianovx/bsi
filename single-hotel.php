@@ -353,31 +353,19 @@ get_header();
   </section>
 
   <?php if ($map_lat && $map_lng): ?>
-    <section class="single-hotel__map-section" id="hotel-map">
+    <?php
+    $map_zoom_safe = max(1, min(17, (int) $map_zoom));
+    $yandex_map_url = 'https://yandex.ru/maps/?ll=' . rawurlencode((string) $map_lng) . '%2C' . rawurlencode((string) $map_lat) . '&z=' . $map_zoom_safe . '&pt=' . rawurlencode((string) $map_lng) . ',' . rawurlencode((string) $map_lat);
+    ?>
+    <section class="single-hotel__map-section map-section" id="hotel-map">
       <div class="container">
-        <div class="hotel-map" id="hotel-map-container"></div>
+        <?php $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg'; ?>
+        <div class="hotel-map map-wrap" id="hotel-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
+          data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
+          data-marker-icon="<?php echo esc_url($marker_icon_url); ?>" style="width: 100%; height: 400px;"></div>
+
       </div>
     </section>
-    <script>
-      function initHotelMap() {
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-          setTimeout(initHotelMap, 100);
-          return;
-        }
-        var location = { lat: <?php echo esc_js($map_lat); ?>, lng: <?php echo esc_js($map_lng); ?> };
-        var map = new google.maps.Map(document.getElementById('hotel-map-container'), {
-          zoom: <?php echo esc_js($map_zoom); ?>,
-          center: location
-        });
-        var marker = new google.maps.Marker({
-          position: location,
-          map: map
-        });
-      }
-      window.addEventListener('load', function () {
-        initHotelMap();
-      });
-    </script>
   <?php endif; ?>
 
   <section>

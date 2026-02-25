@@ -172,6 +172,7 @@
 
 
 <?php wp_footer(); ?>
+<script src="https://api-maps.yandex.ru/v3/?apikey=e2acacad-47ea-4ef2-8273-61a3a5f50c5b&lang=ru_RU"></script>
 
 </body>
 

@@ -116,29 +116,8 @@ get_header();
 
 
         <div class="hotel-content">
-          <!-- <?php if ($event_venue || $event_time): ?>
-            <div class="event-aside-details">
-              <?php if ($event_venue): ?>
-                <div class="event-aside-detail">
-                  <div class="event-aside-detail__label">Место проведения:</div>
-                  <div class="event-aside-detail__value"><?= esc_html($event_venue); ?></div>
-                </div>
-              <?php endif; ?>
-              <?php if ($event_time): ?>
-                <div class="event-aside-detail">
-                  <div class="event-aside-detail__label">Время проведения:</div>
-                  <div class="event-aside-detail__value numfont"><?= esc_html($event_time); ?></div>
-                </div>
-              <?php endif; ?>
-            </div> -->
-            <!-- <?php endif; ?> -->
-
-
-
-
-
           <div class="single-tour-content editor-content">
-            <?php the_content() ?>
+            <?php the_content(); ?>
           </div>
 
           <?php if (!empty($event_tickets) && is_array($event_tickets)): ?>
@@ -347,7 +326,12 @@ get_header();
     </div>
   </section>
 
+
+
+
   <?php if (!empty($tour_included) || !empty($tour_not_inc)): ?>
+
+
     <section class="single-education__price-details-section">
       <div class="container">
         <div class="single-education__price-details">
@@ -370,6 +354,7 @@ get_header();
           <?php endif; ?>
         </div>
       </div>
+
     </section>
   <?php endif; ?>
 

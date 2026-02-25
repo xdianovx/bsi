@@ -529,14 +529,12 @@ get_header();
             <?php endif; ?>
 
             <?php if ($map_lat && $map_lng): ?>
-              <div class="single-education__map" id="education-map-container"></div>
-              <script>               function initEducationMap() {
-                  if (typeof google === 'undefined' || typeof google.maps === 'undefined') { setTimeout(initEducationMap, 100); return; }
-                  var location = { lat: <?php echo esc_js($map_lat); ?>, lng: <?php echo esc_js($map_lng); ?> }; var map = new google.maps.Map(document.getElementById('education-map-container'), { zoom: <?php echo esc_js($map_zoom); ?>, center: location });
-                  var marker = new google.maps.Marker({ position: location, map: map });
-                }
-                window.addEventListener('load', function () { initEducationMap(); });
-              </script>
+              <div class="single-education__map hotel-map"
+                   id="education-map-container"
+                   data-lat="<?php echo esc_attr($map_lat); ?>"
+                   data-lng="<?php echo esc_attr($map_lng); ?>"
+                   data-zoom="<?php echo esc_attr($map_zoom ?? 14); ?>"
+                   style="width: 100%; height: 400px;"></div>
             <?php endif; ?>
 
             <div class="single-education__booking">

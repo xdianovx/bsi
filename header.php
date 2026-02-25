@@ -25,16 +25,6 @@
     rel="stylesheet">
 
 
-  <?php if (is_singular(['hotel', 'education']) || is_front_page()): ?>
-    <?php
-    $google_maps_key = defined('GOOGLE_MAPS_API_KEY') ? GOOGLE_MAPS_API_KEY : '';
-    if ($google_maps_key): ?>
-      <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo esc_attr($google_maps_key); ?>" async
-        defer></script>
-    <?php endif; ?>
-  <?php endif; ?>
-
-
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
     (function (m, e, t, r, i, k, a) {
