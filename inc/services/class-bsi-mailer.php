@@ -78,11 +78,10 @@ class BSI_Mailer
       ];
     }
 
-    // Логируем ошибку
+    // Логируем ошибку (смотреть в wp-content/debug.log при WP_DEBUG_LOG)
     global $phpmailer;
-    if (isset($phpmailer) && is_object($phpmailer)) {
-      error_log('BSI_Mailer error: ' . $phpmailer->ErrorInfo);
-    }
+    $error_info = (isset($phpmailer) && is_object($phpmailer)) ? $phpmailer->ErrorInfo : 'unknown';
+    error_log("BSI_Mailer: send failed to {$to}, subject: {$subject}, phpmailer: {$error_info}. На localhost нужен SMTP (плагин WP Mail SMTP).");
 
     // На localhost возвращаем успех для тестирования UI
     if (self::is_localhost()) {
@@ -191,6 +190,40 @@ class BSI_Mailer
       strpos($url, '127.0.0.1') !== false ||
       strpos($url, '.local') !== false
     );
+  }
+
+  /**
+   * Настройка PHPMailer на SMTP, если в wp-config.php заданы BSI_SMTP_*.
+   * Вызывается по хуку phpmailer_init.
+   *
+   * В wp-config.php (перед "That's all, stop editing!"):
+   *   define('BSI_SMTP_HOST', 'smtp.gmail.com');
+   *   define('BSI_SMTP_PORT', 587);
+   *   define('BSI_SMTP_USER', 'your@gmail.com');
+   *   define('BSI_SMTP_PASS', 'app-password');
+   *   define('BSI_SMTP_SECURE', 'tls'); // tls или ssl
+   */
+  /** @param \PHPMailer\PHPMailer\PHPMailer $phpmailer */
+  public static function configure_smtp($phpmailer): void
+  {
+    if (!defined('BSI_SMTP_HOST') || BSI_SMTP_HOST === '') {
+      return;
+    }
+
+    if (method_exists($phpmailer, 'isSMTP')) {
+      $phpmailer->isSMTP();
+    } elseif (method_exists($phpmailer, 'IsSMTP')) {
+      $phpmailer->IsSMTP();
+    }
+    $phpmailer->Host = BSI_SMTP_HOST;
+    $phpmailer->Port = defined('BSI_SMTP_PORT') ? (int) BSI_SMTP_PORT : 587;
+    $phpmailer->SMTPSecure = defined('BSI_SMTP_SECURE') ? BSI_SMTP_SECURE : 'tls';
+
+    if (defined('BSI_SMTP_USER') && BSI_SMTP_USER !== '') {
+      $phpmailer->SMTPAuth = true;
+      $phpmailer->Username = BSI_SMTP_USER;
+      $phpmailer->Password = defined('BSI_SMTP_PASS') ? BSI_SMTP_PASS : '';
+    }
   }
 
   /**

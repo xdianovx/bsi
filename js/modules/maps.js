@@ -58,6 +58,11 @@ export const initMaps = async () => {
 
   const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker } = ymaps3;
 
+  const BEHAVIORS_NO_SCROLL = ["drag", "dblClick"];
+  const BEHAVIORS_WITH_SCROLL = ["drag", "dblClick", "scrollZoom"];
+
+  const mapInstances = [];
+
   let YMapDefaultMarker;
   try {
     if (typeof ymaps3.import.registerCdn === "function") {
@@ -99,8 +104,7 @@ export const initMaps = async () => {
     try {
       const map = new YMap(el, {
         location: { center: [lng, lat], zoom },
-        // Без scrollZoom — при скролле страницы карта не зумируется
-        behaviors: ["drag", "dblClick"],
+        behaviors: BEHAVIORS_NO_SCROLL,
       });
 
       map.addChild(new YMapDefaultSchemeLayer());
@@ -115,9 +119,31 @@ export const initMaps = async () => {
         });
         map.addChild(marker);
       }
+
+      mapInstances.push({ map, container: el });
     } catch (err) {
       console.warn("Hotel map init failed", err);
       showMapFallback(el, lat, lng, el.dataset.zoom || "14");
+    }
+  });
+
+  // Зум колёсиком включается после клика по карте, отключается при клике вне карты
+  mapInstances.forEach(({ map, container }) => {
+    container.addEventListener("mousedown", () => {
+      if (typeof map.setBehaviors === "function") {
+        map.setBehaviors(BEHAVIORS_WITH_SCROLL);
+      }
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    const isInsideMap = mapInstances.some(({ container }) => container.contains(e.target));
+    if (!isInsideMap) {
+      mapInstances.forEach(({ map }) => {
+        if (typeof map.setBehaviors === "function") {
+          map.setBehaviors(BEHAVIORS_NO_SCROLL);
+        }
+      });
     }
   });
 
