@@ -83,9 +83,7 @@
 }
 
 .promo-card__info {
-  padding: 24px 16px 16px;
-  background: $bg-gray;
-  margin-top: -8px;
+  margin-top: 8px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -137,8 +135,6 @@
   }
 }
 .promo-card__dates {
-  background: #fff;
-  padding: 2px 4px;
   line-height: 100%;
   width: auto;
   font-size: 14px;
@@ -147,7 +143,7 @@
 }
 
 .promo-card__item-title {
-  margin-top: 12px;
+  margin-top: 8px;
 
   @media screen and (max-width: 768px) {
     margin-top: 8px;
