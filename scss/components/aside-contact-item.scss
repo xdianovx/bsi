@@ -1,0 +1,46 @@
+// Переиспользуемый блок контактов в сайдбаре (телефон, email и т.д.)
+.aside-contact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.aside-contact-item__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: $text-black;
+  transition: all 0.3s ease-in-out;
+  font-size: 15px;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  span {
+    flex: 1;
+    transition: color 0.3s ease-in-out;
+  }
+
+  &:hover {
+    color: $red;
+    background-color: #fff5f5;
+
+    svg {
+      color: $red;
+    }
+
+    span {
+      color: $red;
+    }
+  }
+}

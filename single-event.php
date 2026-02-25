@@ -116,7 +116,22 @@ get_header();
 
 
         <div class="hotel-content">
-
+          <!-- <?php if ($event_venue || $event_time): ?>
+            <div class="event-aside-details">
+              <?php if ($event_venue): ?>
+                <div class="event-aside-detail">
+                  <div class="event-aside-detail__label">Место проведения:</div>
+                  <div class="event-aside-detail__value"><?= esc_html($event_venue); ?></div>
+                </div>
+              <?php endif; ?>
+              <?php if ($event_time): ?>
+                <div class="event-aside-detail">
+                  <div class="event-aside-detail__label">Время проведения:</div>
+                  <div class="event-aside-detail__value numfont"><?= esc_html($event_time); ?></div>
+                </div>
+              <?php endif; ?>
+            </div> -->
+          <?php endif; ?>
 
 
 
@@ -248,6 +263,33 @@ get_header();
                   </div>
                 </div>
               </div>
+
+              <div class="aside-contact-item">
+                <a class="aside-contact-item__link numfont" href="tel:84957855535">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-phone-call">
+                    <path d="M13 2a9 9 0 0 1 9 9"></path>
+                    <path d="M13 6a5 5 0 0 1 5 5"></path>
+                    <path
+                      d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
+                    </path>
+                  </svg>
+                  <span>8 (495) 785-55-35</span>
+                </a>
+                <a class="aside-contact-item__link numfont" href="tel:88002005535">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-phone-call">
+                    <path d="M13 2a9 9 0 0 1 9 9"></path>
+                    <path d="M13 6a5 5 0 0 1 5 5"></path>
+                    <path
+                      d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
+                    </path>
+                  </svg>
+                  <span>8 (800) 200-55-35 (из регионов)</span>
+                </a>
+              </div>
             <?php endif; ?>
 
 
@@ -268,22 +310,7 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <?php if ($event_venue || $event_time): ?>
-              <div class="event-aside-details">
-                <?php if ($event_venue): ?>
-                  <div class="event-aside-detail">
-                    <div class="event-aside-detail__label">Место проведения:</div>
-                    <div class="event-aside-detail__value"><?= esc_html($event_venue); ?></div>
-                  </div>
-                <?php endif; ?>
-                <?php if ($event_time): ?>
-                  <div class="event-aside-detail">
-                    <div class="event-aside-detail__label">Время проведения:</div>
-                    <div class="event-aside-detail__value numfont"><?= esc_html($event_time); ?></div>
-                  </div>
-                <?php endif; ?>
-              </div>
-            <?php endif; ?>
+
 
             <div class="hotel-widget__price numfont">
               <?php if ($min_ticket_price !== null): ?>
@@ -291,7 +318,7 @@ get_header();
               <?php elseif ($tour_price_from): ?>
                 <?= esc_html($tour_price_from); ?>
               <?php else: ?>
-                Цена уточняется
+                Запросить
               <?php endif; ?>
             </div>
 

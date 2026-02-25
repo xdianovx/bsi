@@ -17,22 +17,18 @@
 // Event Tours - Детали в aside
 .event-aside-details {
   display: flex;
-  margin-top: 8px;
-  flex-direction: column;
-  gap: 8px;
+  margin-bottom: 16px;
+  gap: 16px;
 }
 
 .event-aside-detail {
   display: flex;
-  flex-direction: column;
+  line-height: 120%;
+  align-items: center;
   gap: 8px;
-  background: #fff;
-  border-radius: 4px;
-  padding: 8px 8px;
 }
 
 .event-aside-detail__label {
-  font-size: 14px;
   font-weight: 500;
   line-height: 100%;
 }
@@ -173,6 +169,7 @@
 
 .event-poster-section {
   width: 100%;
+  margin-top: 8px;
   img {
     display: block;
     width: 100%;
@@ -182,5 +179,5 @@
 
 .single-event__thumbnail {
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 12px;
 }
