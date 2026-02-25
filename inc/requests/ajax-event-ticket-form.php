@@ -6,11 +6,16 @@ declare(strict_types=1);
  * AJAX обработчик формы бронирования билета на событийный тур
  */
 
+// Почта для заявок на билеты — сменить при необходимости
+$event_ticket_booking_email = 'dianov.js@gmail.com';
+
 add_action('wp_ajax_event_ticket_booking', 'bsi_handle_event_ticket_booking');
 add_action('wp_ajax_nopriv_event_ticket_booking', 'bsi_handle_event_ticket_booking');
 
 function bsi_handle_event_ticket_booking(): void
 {
+  global $event_ticket_booking_email;
+
   // Валидация контактных данных через BSI_Mailer
   $errors = BSI_Mailer::validate_contact_fields($_POST);
 
@@ -40,6 +45,7 @@ function bsi_handle_event_ticket_booking(): void
 
   // Отправка через BSI_Mailer
   $result = BSI_Mailer::send([
+    'to' => $event_ticket_booking_email,
     'subject' => 'Заявка на билет: ' . $event_title,
     'template' => 'event-ticket-booking',
     'data' => [

@@ -99,6 +99,8 @@ export const initMaps = async () => {
     try {
       const map = new YMap(el, {
         location: { center: [lng, lat], zoom },
+        // Без scrollZoom — при скролле страницы карта не зумируется
+        behaviors: ["drag", "dblClick"],
       });
 
       map.addChild(new YMapDefaultSchemeLayer());
