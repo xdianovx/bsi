@@ -13,6 +13,27 @@ add_action('init', function() {
 	}
 });
 
+/**
+ * Парсит строку координат "широта, долгота" (например "3.607725, 72.900417").
+ * Возвращает ['lat' => float, 'lng' => float] или null при ошибке.
+ */
+function bsi_parse_map_coordinates($str) {
+	$str = trim((string) $str);
+	if ($str === '') {
+		return null;
+	}
+	$parts = preg_split('/\s*,\s*/', $str, 2);
+	if (count($parts) < 2) {
+		return null;
+	}
+	$lat = filter_var(trim($parts[0]), FILTER_VALIDATE_FLOAT);
+	$lng = filter_var(trim($parts[1]), FILTER_VALIDATE_FLOAT);
+	if ($lat === false || $lng === false || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+		return null;
+	}
+	return ['lat' => (float) $lat, 'lng' => (float) $lng];
+}
+
 function bsi_setup()
 {
 	load_theme_textdomain('bsi', get_template_directory() . '/languages');

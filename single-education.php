@@ -167,8 +167,14 @@ $phone = trim((string) (function_exists('get_field') ? get_field('education_phon
 $website = trim((string) (function_exists('get_field') ? get_field('education_website', $post_id) : ''));
 $price = trim((string) (function_exists('get_field') ? get_field('education_price', $post_id) : ''));
 
-$map_lat = function_exists('get_field') ? get_field('education_map_lat', $post_id) : '';
-$map_lng = function_exists('get_field') ? get_field('education_map_lng', $post_id) : '';
+$map_coords = function_exists('get_field') ? bsi_parse_map_coordinates(get_field('education_map_coordinates', $post_id)) : null;
+if ($map_coords) {
+  $map_lat = (string) $map_coords['lat'];
+  $map_lng = (string) $map_coords['lng'];
+} else {
+  $map_lat = function_exists('get_field') ? get_field('education_map_lat', $post_id) : '';
+  $map_lng = function_exists('get_field') ? get_field('education_map_lng', $post_id) : '';
+}
 $map_zoom = function_exists('get_field') ? get_field('education_map_zoom', $post_id) : 14;
 
 $programs = function_exists('get_field') ? get_field('education_programs', $post_id) : [];
@@ -528,14 +534,7 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <?php if ($map_lat && $map_lng): ?>
-              <div class="single-education__map hotel-map"
-                   id="education-map-container"
-                   data-lat="<?php echo esc_attr($map_lat); ?>"
-                   data-lng="<?php echo esc_attr($map_lng); ?>"
-                   data-zoom="<?php echo esc_attr($map_zoom ?? 14); ?>"
-                   style="width: 100%; height: 400px;"></div>
-            <?php endif; ?>
+
 
             <div class="single-education__booking">
               <?php if ($booking_url): ?>
@@ -550,12 +549,32 @@ get_header();
                 </button>
               <?php endif; ?>
             </div>
+
           </div>
+          <?php if ($map_lat && $map_lng): ?>
+            <div class="hotel-widget">
+              <a href="#education-map" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
+            </div>
+          <?php endif; ?>
         </aside>
       </div>
     </div>
   </section>
 
+  <?php if ($map_lat && $map_lng): ?>
+    <?php
+    $map_zoom_safe = max(1, min(17, (int) $map_zoom));
+    $yandex_map_url = 'https://yandex.ru/maps/?ll=' . rawurlencode((string) $map_lng) . '%2C' . rawurlencode((string) $map_lat) . '&z=' . $map_zoom_safe . '&pt=' . rawurlencode((string) $map_lng) . ',' . rawurlencode((string) $map_lat);
+    $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg';
+    ?>
+    <section class="single-education__map-section map-section" id="education-map">
+      <div class="container">
+        <div class="hotel-map map-wrap" id="education-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
+          data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
+          data-marker-icon="<?php echo esc_url($marker_icon_url); ?>" style="width: 100%; height: 400px;"></div>
+      </div>
+    </section>
+  <?php endif; ?>
 
   <?php if (have_posts()): ?>
     <?php while (have_posts()):

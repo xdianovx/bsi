@@ -39,8 +39,14 @@ $address = trim((string) get_field('address', get_the_ID()));
 $website = trim((string) get_field('website', get_the_ID()));
 $excerpt = get_the_excerpt($post_id);
 
-$map_lat = function_exists('get_field') ? get_field('map_lat', $post_id) : '';
-$map_lng = function_exists('get_field') ? get_field('map_lng', $post_id) : '';
+$map_coords = function_exists('get_field') ? bsi_parse_map_coordinates(get_field('map_coordinates', $post_id)) : null;
+if ($map_coords) {
+  $map_lat = (string) $map_coords['lat'];
+  $map_lng = (string) $map_coords['lng'];
+} else {
+  $map_lat = function_exists('get_field') ? get_field('map_lat', $post_id) : '';
+  $map_lng = function_exists('get_field') ? get_field('map_lng', $post_id) : '';
+}
 $map_zoom = function_exists('get_field') ? get_field('map_zoom', $post_id) : 14;
 
 get_header();

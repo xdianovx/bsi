@@ -449,13 +449,15 @@
 .single-education__info-value {
 }
 
-.single-education__map {
-  width: 100%;
-  min-height: 300px;
-  height: 300px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 24px;
+// Секция карты (как на странице отеля — общие стили в map.scss)
+.single-education__map-section {
+  padding-top: 64px;
+  margin-bottom: 64px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
 }
 
 .single-education__booking {
