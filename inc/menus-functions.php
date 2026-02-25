@@ -316,7 +316,8 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
 }
 
 add_filter('nav_menu_link_attributes', function ($atts, $item, $args) {
-    if (!isset($args->theme_location) || $args->theme_location !== 'footer_nav') {
+    $footer_locations = ['footer_nav', 'mice_footer_nav'];
+    if (!isset($args->theme_location) || !in_array($args->theme_location, $footer_locations, true)) {
         return $atts;
     }
 

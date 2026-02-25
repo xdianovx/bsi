@@ -13,28 +13,26 @@ export function initMaintenanceModal(config) {
 
   const modalId = "modal-maintenance-warning";
   const storageKey = "bsi_maintenance_modal_closed";
+  const HIDE_DURATION_MS = 15 * 60 * 1000; // 15 минут
 
-  // Проверяем, была ли модалка уже закрыта пользователем
-  const wasClosed = localStorage.getItem(storageKey) === "true";
+  // Проверяем, закрывал ли пользователь модалку недавно (в течение 15 минут)
+  const closedAt = Number(localStorage.getItem(storageKey));
+  const isWithinCooldown =
+    Number.isFinite(closedAt) && Date.now() - closedAt < HIDE_DURATION_MS;
 
-  if (wasClosed) {
+  if (isWithinCooldown) {
     return;
   }
 
-  // Обработчик закрытия модалки
+  // Обработчик закрытия модалки — сохраняем время закрытия (Micromodal не диспатчит событие, только onClose)
   const handleClose = () => {
-    localStorage.setItem(storageKey, "true");
+    localStorage.setItem(storageKey, String(Date.now()));
   };
 
-  // Слушаем событие закрытия модалки от Micromodal
-  document.addEventListener("micromodal:close", (event) => {
-    if (event.detail && event.detail.id === modalId) {
-      handleClose();
-    }
-  });
-
-  // Показываем модалку после небольшой задержки для лучшего UX
+  // Показываем модалку после небольшой задержки для лучшего UX; onClose вызывается при закрытии
   setTimeout(() => {
-    MicroModal.show(modalId);
+    MicroModal.show(modalId, {
+      onClose: handleClose,
+    });
   }, 500);
 }
