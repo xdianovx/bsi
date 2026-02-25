@@ -92,26 +92,23 @@ get_header();
     </div>
   </section>
 
-  <?php if (!empty($tour_gallery) && is_array($tour_gallery)): ?>
-    <section class="tour-gallery-section">
-      <div class="container">
-        <div class="country-page__gallery">
-          <?php
-          get_template_part('template-parts/sections/gallery', null, [
-            'gallery' => $tour_gallery,
-            'id' => 'event_' . $post_id,
-          ]);
-          ?>
-
-          <?php if (!empty($excerpt)): ?>
-            <div class="page-country__descr">
-              <?= wp_kses_post(wpautop($excerpt)); ?>
-            </div>
-          <?php endif; ?>
+  <div class="event-poster-section">
+    <div class="container">
+      <?php
+      // Получить миниатюру события (thumbnail)
+      if (has_post_thumbnail($post_id)):
+        $thumbnail_url = get_the_post_thumbnail_url($post_id, 'large');
+        ?>
+        <div class="single-event__thumbnail">
+          <img src="<?= esc_url($thumbnail_url); ?>" alt="<?= esc_attr(get_the_title($post_id)); ?>" loading="lazy">
         </div>
-      </div>
-    </section>
-  <?php endif; ?>
+      <?php endif; ?>
+    </div>
+  </div>
+
+
+
+
 
   <section class="single-tour__content">
     <div class="container">
@@ -119,41 +116,7 @@ get_header();
 
 
         <div class="hotel-content">
-          <?php if ($tour_duration || $tour_route || $tour_checkin_dates): ?>
-            <div class="tour-page__details">
-              <?php if ($tour_checkin_dates): ?>
-                <div class="tour-page-detail">
-                  <div class="tour-page-detail__key">Даты заездов: </div>
-                  <div class="tour-page-detail__value">
-                    <?= esc_html($tour_checkin_dates); ?>
-                  </div>
-                </div>
-              <?php endif; ?>
 
-              <?php if ($tour_duration): ?>
-                <div class="tour-page-detail">
-
-                  <div class="tour-page-detail__key">
-
-                    <span>Продолжительность: </span>
-                  </div>
-
-                  <div class="tour-page-detail__value numfont">
-                    <span><?= esc_html($tour_duration); ?></span>
-                  </div>
-                </div>
-              <?php endif; ?>
-
-              <?php if ($tour_route): ?>
-                <div class="tour-page-detail">
-
-                  <div class="tour-page-detail__key">Маршрут: </div>
-
-                  <div class="tour-page-detail__value"><?= esc_html($tour_route); ?></div>
-                </div>
-              <?php endif; ?>
-            </div>
-          <?php endif; ?>
 
 
 
