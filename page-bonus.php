@@ -6,7 +6,11 @@
 get_header();
 ?>
 
-
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#EE3145" stroke="#EE3145"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin">
+    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+    <circle cx="12" cy="10" r="3" />
+</svg>
 
 <main class="bonus-page">
     <?php if (function_exists('yoast_breadcrumb')): ?>
@@ -24,8 +28,10 @@ get_header();
     $marquee_icon = get_field('bonus_marquee_icon');
     // Если иконка не задана, используем иконку по умолчанию
     if (!$marquee_icon) {
-        $marquee_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7.94 8.945H16.56M7.94 8.945H3M7.94 8.945L11.59 18.996M7.94 8.945L10.34 5.012L10.89 4M16.56 8.945H21.5M16.56 8.945L12.91 18.996M16.56 8.945L14.16 5.012L13.594 4M3 8.945C3 9.365 3.079 9.785 3.236 10.181C3.448 10.716 3.878 11.209 4.736 12.194L8.203 16.17C9.6 17.772 10.298 18.574 11.126 18.868C11.2787 18.922 11.4333 18.9647 11.59 18.996M3 8.945C3 8.525 3.079 8.105 3.236 7.708C3.448 7.173 3.878 6.681 4.736 5.695C5.203 5.161 5.436 4.894 5.706 4.687C6.10742 4.38107 6.5726 4.1695 7.067 4.068C7.401 4 7.755 4 8.464 4H10.89M11.59 18.996C12.0258 19.0822 12.4742 19.0822 12.91 18.996M10.89 4H13.594M21.5 8.945C21.5 9.365 21.421 9.785 21.264 10.181C21.052 10.716 20.622 11.209 19.764 12.194L16.297 16.17C14.9 17.772 14.202 18.574 13.374 18.868C13.2226 18.9216 13.0675 18.9643 12.91 18.996M21.5 8.945C21.5 8.525 21.421 8.105 21.264 7.708C21.052 7.173 20.622 6.681 19.764 5.695C19.297 5.161 19.064 4.894 18.794 4.687C18.3926 4.38107 17.9274 4.1695 17.433 4.068C17.099 4 16.745 4 16.036 4H13.594" stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>';
+        $marquee_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EE3145" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-check-icon lucide-map-pin-check"><path d="M19.43 12.935c.357-.967.57-1.955.57-2.935a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32.197 32.197 0 0 0 .813-.728"/><circle cx="12" cy="10" r="3"/><path d="m16 18 2 2 4-4"/></svg>';
     }
+
+
     if (have_rows('bonus_marquee_items')): ?>
         <section class="bonus-marquee" style="--marquee-speed: 30s;">
             <div class="bonus-marquee__row bonus-marquee__row--left">
@@ -73,7 +79,7 @@ get_header();
     $level_description_icon = get_field('bonus_level_description_icon');
     // Если иконка не задана, используем иконку по умолчанию
     if (!$level_description_icon) {
-        $level_description_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7.94 8.945H16.56M7.94 8.945H3M7.94 8.945L11.59 18.996M7.94 8.945L10.34 5.012L10.89 4M16.56 8.945H21.5M16.56 8.945L12.91 18.996M16.56 8.945L14.16 5.012L13.594 4M3 8.945C3 9.365 3.079 9.785 3.236 10.181C3.448 10.716 3.878 11.209 4.736 12.194L8.203 16.17C9.6 17.772 10.298 18.574 11.126 18.868C11.2787 18.922 11.4333 18.9647 11.59 18.996M3 8.945C3 8.525 3.079 8.105 3.236 7.708C3.448 7.173 3.878 6.681 4.736 5.695C5.203 5.161 5.436 4.894 5.706 4.687C6.10742 4.38107 6.5726 4.1695 7.067 4.068C7.401 4 7.755 4 8.464 4H10.89M11.59 18.996C12.0258 19.0822 12.4742 19.0822 12.91 18.996M10.89 4H13.594M21.5 8.945C21.5 9.365 21.421 9.785 21.264 10.181C21.052 10.716 20.622 11.209 19.764 12.194L16.297 16.17C14.9 17.772 14.202 18.574 13.374 18.868C13.2226 18.9216 13.0675 18.9643 12.91 18.996M21.5 8.945C21.5 8.525 21.421 8.105 21.264 7.708C21.052 7.173 20.622 6.681 19.764 5.695C19.297 5.161 19.064 4.894 18.794 4.687C18.3926 4.38107 17.9274 4.1695 17.433 4.068C17.099 4 16.745 4 16.036 4H13.594" stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>';
+        $level_description_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
     }
     if (have_rows('bonus_levels')): ?>
         <section class="bonus-levels">
@@ -151,21 +157,21 @@ get_header();
         </section>
     <?php endif; ?>
     <!-- Ежегодная премия -->
-    <?php 
+    <?php
     $bonus_event_title = get_field('bonus_event_title');
     $bonus_event_text = get_field('bonus_event_text');
     ?>
     <?php if ($bonus_event_title || $bonus_event_text): ?>
-    <section class="bonus-event">
-        <div class="container">
-            <?php if ($bonus_event_title): ?>
-                <h2 class="h2"><?php echo esc_html($bonus_event_title); ?></h2>
-            <?php endif; ?>
-            <?php if ($bonus_event_text): ?>
-                <p><?php echo esc_html($bonus_event_text); ?></p>
-            <?php endif; ?>
-        </div>
-    </section>
+        <section class="bonus-event">
+            <div class="container">
+                <?php if ($bonus_event_title): ?>
+                    <h2 class="h2"><?php echo esc_html($bonus_event_title); ?></h2>
+                <?php endif; ?>
+                <?php if ($bonus_event_text): ?>
+                    <p><?php echo esc_html($bonus_event_text); ?></p>
+                <?php endif; ?>
+            </div>
+        </section>
     <?php endif; ?>
     <!-- Важная информация -->
     <?php $bonus_info = get_field('bonus_info'); ?>
