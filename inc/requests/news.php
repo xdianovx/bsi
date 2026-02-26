@@ -11,7 +11,7 @@ function bsi_filter_news()
   $args = [
     'post_type' => 'news',
     'post_status' => 'publish',
-    'posts_per_page' => 9,
+    'posts_per_page' => 12,
     'paged' => $paged,
     'orderby' => 'date',
     'order' => 'DESC',
