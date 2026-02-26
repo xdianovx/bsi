@@ -215,3 +215,9 @@
   margin: 0 auto;
   max-width: 900px;
 }
+
+.cruise-page {
+  iframe {
+    max-width: none;
+  }
+}
