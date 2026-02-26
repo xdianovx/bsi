@@ -141,7 +141,7 @@
 
       <?php
 
-      $cruise_url = $cruise_page ? get_permalink($cruise_page->ID) : home_url('/kruizy/');
+      $cruise_url = home_url('/kruizy/');
       ?>
       <a href="<?php echo esc_url($cruise_url); ?>" class="gtm-search__tab-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
