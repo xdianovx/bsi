@@ -614,6 +614,7 @@ get_header();
     ?>
     <section class="single-education__map-section map-section" id="education-map">
       <div class="container">
+        <h2 class="h2 map-section__title">Расположение</h2>
         <div class="hotel-map map-wrap" id="education-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
           data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
           data-marker-icon="<?php echo esc_url($marker_icon_url); ?>" style="width: 100%; height: 400px;"></div>

@@ -348,6 +348,7 @@ get_header();
 
 
           <?php if ($map_lat && $map_lng): ?>
+
             <div class="hotel-widget">
               <a href="#hotel-map" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
             </div>
@@ -365,6 +366,7 @@ get_header();
     ?>
     <section class="single-hotel__map-section map-section" id="hotel-map">
       <div class="container">
+        <h2 class="h2 map-section__title">Расположение</h2>
         <?php $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg'; ?>
         <div class="hotel-map map-wrap" id="hotel-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
           data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
