@@ -22,6 +22,16 @@ class BSI_Mailer
   const DEFAULT_RECIPIENT = 'dianov.js@gmail.com'; // TODO: поменять на рабочий
 
   /**
+   * SMTP (используется, если в wp-config.php не заданы BSI_SMTP_*)
+   * TODO: на продакшене вынести в wp-config или переменные окружения
+   */
+  const SMTP_HOST = 'smtp.gmail.com';
+  const SMTP_PORT = 587;
+  const SMTP_USER = 'dianov.js@gmail.com';
+  const SMTP_PASS = 'jjkn edss cltd idgg';
+  const SMTP_SECURE = 'tls'; // tls для 587; для порта 465 — 'ssl'
+
+  /**
    * Отправить письмо
    *
    * @param array $args {
@@ -193,20 +203,15 @@ class BSI_Mailer
   }
 
   /**
-   * Настройка PHPMailer на SMTP, если в wp-config.php заданы BSI_SMTP_*.
+   * Настройка PHPMailer на SMTP.
+   * Данные берутся из констант класса (SMTP_*) или из wp-config.php (BSI_SMTP_*), если заданы.
    * Вызывается по хуку phpmailer_init.
-   *
-   * В wp-config.php (перед "That's all, stop editing!"):
-   *   define('BSI_SMTP_HOST', 'smtp.gmail.com');
-   *   define('BSI_SMTP_PORT', 587);
-   *   define('BSI_SMTP_USER', 'your@gmail.com');
-   *   define('BSI_SMTP_PASS', 'app-password');
-   *   define('BSI_SMTP_SECURE', 'tls'); // tls или ssl
    */
   /** @param \PHPMailer\PHPMailer\PHPMailer $phpmailer */
   public static function configure_smtp($phpmailer): void
   {
-    if (!defined('BSI_SMTP_HOST') || BSI_SMTP_HOST === '') {
+    $host = defined('BSI_SMTP_HOST') && BSI_SMTP_HOST !== '' ? BSI_SMTP_HOST : self::SMTP_HOST;
+    if ($host === '') {
       return;
     }
 
@@ -215,14 +220,15 @@ class BSI_Mailer
     } elseif (method_exists($phpmailer, 'IsSMTP')) {
       $phpmailer->IsSMTP();
     }
-    $phpmailer->Host = BSI_SMTP_HOST;
-    $phpmailer->Port = defined('BSI_SMTP_PORT') ? (int) BSI_SMTP_PORT : 587;
-    $phpmailer->SMTPSecure = defined('BSI_SMTP_SECURE') ? BSI_SMTP_SECURE : 'tls';
+    $phpmailer->Host = $host;
+    $phpmailer->Port = defined('BSI_SMTP_PORT') ? (int) BSI_SMTP_PORT : self::SMTP_PORT;
+    $phpmailer->SMTPSecure = defined('BSI_SMTP_SECURE') ? BSI_SMTP_SECURE : self::SMTP_SECURE;
 
-    if (defined('BSI_SMTP_USER') && BSI_SMTP_USER !== '') {
+    $user = defined('BSI_SMTP_USER') && BSI_SMTP_USER !== '' ? BSI_SMTP_USER : self::SMTP_USER;
+    if ($user !== '') {
       $phpmailer->SMTPAuth = true;
-      $phpmailer->Username = BSI_SMTP_USER;
-      $phpmailer->Password = defined('BSI_SMTP_PASS') ? BSI_SMTP_PASS : '';
+      $phpmailer->Username = $user;
+      $phpmailer->Password = defined('BSI_SMTP_PASS') ? BSI_SMTP_PASS : self::SMTP_PASS;
     }
   }
 
