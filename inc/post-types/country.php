@@ -236,6 +236,7 @@ add_filter('query_vars', function ($vars) {
 
   $vars[] = 'country_visa';
   $vars[] = 'country_education';
+  $vars[] = 'country_news';
 
   return $vars;
 });
@@ -287,6 +288,12 @@ add_action('init', function () {
   add_rewrite_rule(
     '^country/([^/]+)/obuchenie/?$',
     'index.php?post_type=country&name=$matches[1]&country_education=$matches[1]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/novosti/?$',
+    'index.php?country_news=$matches[1]',
     'top'
   );
 
@@ -529,6 +536,38 @@ add_action('template_redirect', function () {
   exit;
 });
 
+add_action('template_redirect', function () {
+  $country_slug = (string) get_query_var('country_news');
+  if (empty($country_slug)) {
+    return;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    return;
+  }
+
+  global $country_news_data;
+  $country_news_data = [
+    'country' => $country,
+    'country_slug' => $country_slug,
+  ];
+
+  $template = locate_template('country-news.php');
+  if ($template) {
+    include $template;
+    exit;
+  }
+
+  global $wp_query;
+  $wp_query->set_404();
+  status_header(404);
+  exit;
+});
+
 add_action('pre_get_posts', function ($q) {
   if (is_admin() || !$q->is_main_query()) {
     return;
@@ -607,6 +646,18 @@ add_action('pre_get_posts', function ($q) {
 }, 0);
 
 add_filter('wpseo_breadcrumb_links', function ($links) {
+
+  $country_news_slug = (string) get_query_var('country_news');
+  if ($country_news_slug !== '') {
+    $country = get_page_by_path($country_news_slug, OBJECT, 'country');
+    if ($country) {
+      $new_links = [];
+      $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
+      $new_links[] = ['url' => get_permalink($country->ID), 'text' => get_the_title($country->ID)];
+      $new_links[] = ['text' => 'Новости'];
+      return $new_links;
+    }
+  }
 
   if (is_tax('resort')) {
     $term = get_queried_object();

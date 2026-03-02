@@ -72,6 +72,35 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
     return $links;
   }
 
+  $post_id = get_queried_object_id();
+  $country_ids = function_exists('get_field') ? get_field('news_countries', $post_id) : null;
+  if (!empty($country_ids) && is_array($country_ids)) {
+    $country_id = (int) reset($country_ids);
+  } elseif (!empty($country_ids)) {
+    $country_id = (int) $country_ids;
+  } else {
+    $country_id = 0;
+  }
+
+  $new_links = [];
+  $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
+
+  if ($country_id) {
+    $country = get_post($country_id);
+    if ($country && $country->post_type === 'country') {
+      $countries_page = get_page_by_path('strany');
+      if ($countries_page) {
+        $new_links[] = ['url' => get_permalink($countries_page->ID), 'text' => $countries_page->post_title ?: 'Страны'];
+      } else {
+        $new_links[] = ['url' => get_post_type_archive_link('country'), 'text' => 'Страны'];
+      }
+      $new_links[] = ['url' => get_permalink($country_id), 'text' => get_the_title($country_id)];
+      $new_links[] = ['url' => home_url('/country/' . $country->post_name . '/novosti/'), 'text' => 'Новости'];
+      $new_links[] = ['text' => get_the_title()];
+      return $new_links;
+    }
+  }
+
   $news_page_id = 2223; // сюда подставь ID страницы "Новости"
   $news_page = get_post($news_page_id);
 
@@ -79,11 +108,6 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
     return $links;
   }
 
-  $new_links = [];
-  $new_links[] = [
-    'url' => home_url('/'),
-    'text' => 'Главная',
-  ];
   $new_links[] = [
     'url' => get_permalink($news_page->ID),
     'text' => get_the_title($news_page->ID),

@@ -13,6 +13,7 @@ $is_resorts_page = false;
 $is_tours_page = false;
 $is_memo_page = false;
 $is_entry_rules_page = false;
+$is_news_page = false;
 
 $country_slug = '';
 $country_title = '';
@@ -176,6 +177,15 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_entry_rules_page = true;
 
+} elseif (get_query_var('country_news')) {
+
+  $country_slug = (string) get_query_var('country_news');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_news_page = true;
+
 } elseif (is_tax('resort')) {
 
   $term = get_queried_object();
@@ -266,6 +276,16 @@ $has_entry_rules = get_posts([
   ],
 ]);
 
+$has_news = get_posts([
+  'post_type' => 'news',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'fields' => 'ids',
+  'meta_query' => [
+    ['key' => 'news_countries', 'value' => '"' . $main_parent_id . '"', 'compare' => 'LIKE'],
+  ],
+]);
+
 $has_regions = get_terms([
   'taxonomy' => 'region',
   'hide_empty' => false,
@@ -280,7 +300,7 @@ $is_country_overview = (
   (int) $current_id === (int) $main_parent_id &&
   !$is_hotels_page && !$is_promos_page && !$is_visas_page &&
   !$is_resorts_page && !$is_tours_page &&
-  !$is_memo_page && !$is_entry_rules_page
+  !$is_memo_page && !$is_entry_rules_page && !$is_news_page
 );
 
 $active_tour_types = [];
@@ -474,6 +494,23 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
           </svg>
         </span>
         <span>Акции</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if (!empty($has_news)): ?>
+      <a href="<?= esc_url(home_url("/country/{$country_slug}/novosti/")); ?>"
+        class="child-page-item <?= $is_news_page ? 'active' : ''; ?>">
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-newspaper-icon lucide-newspaper">
+            <path d="M15 18h-5"/>
+            <path d="M18 14h-8"/>
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2"/>
+            <rect width="8" height="4" x="10" y="6" rx="1"/>
+          </svg>
+        </span>
+        <span>Новости</span>
       </a>
     <?php endif; ?>
 
