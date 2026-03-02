@@ -42,15 +42,25 @@
   }
 }
 
-.footer .social-item {
-  width: 32px;
-  height: 32px;
-  color: $red;
-  background: rgba(255, 255, 255, 0.05);
+.footer .socials {
+  gap: 16px;
+}
 
+.footer .social-item {
+  background: none;
+  width: auto;
+  height: auto;
+
+  &.--tg {
+    svg {
+      width: auto;
+      height: 36px;
+      margin-bottom: 2px;
+    }
+  }
   svg {
-    width: 18px;
-    height: 18px;
+    width: 40px;
+    height: 40px;
   }
 }
 

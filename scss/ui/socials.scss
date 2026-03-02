@@ -5,9 +5,8 @@
 }
 
 .social-item {
-  width: 40px;
-  height: 40px;
-  border-radius: 100px;
+  width: 64px;
+  height: 64px;
   background: $bg-gray-light;
   display: flex;
   align-items: center;
@@ -15,15 +14,15 @@
   transition: $trans-text;
 
   &.--tg {
-    background: #0088cc;
+    // background: #0088cc;
   }
 
   &.--vk {
-    background: #0077ff;
+    // background: #0077ff;
   }
 
   &:hover {
-    color: $red;
+    // color: $red;
   }
 }
 

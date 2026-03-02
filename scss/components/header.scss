@@ -19,21 +19,24 @@
   }
 
   .social-item {
-    width: 28px;
-    background: $red;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #fff;
+    &:hover {
+      svg {
+        transform: scale(1.1);
+      }
+    }
     &.--tg {
-      background: #0088cc;
     }
     &.--vk {
-      background: #0077ff;
     }
-    height: 28px;
-    color: #fff;
     svg {
-      margin-top: 2px;
-      width: 18px;
-      height: 18px;
+      // margin-top: 2px;
+      transition: $trans-text;
       display: block;
+      width: 28px;
     }
   }
 }
