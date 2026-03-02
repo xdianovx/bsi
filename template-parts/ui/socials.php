@@ -1,3 +1,7 @@
+<?php
+// Уникальные ID градиентов для каждого включения шаблона (избегаем конфликта при нескольких блоках соцсетей на странице).
+$socials_gradient_id = 's' . uniqid();
+?>
 <div class="socials">
     <a target="_blank" href="<?php the_field('telegram', 'option'); ?>" class="social-item --tg">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,21 +26,21 @@
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M22.0077 4H9.99234C6.68286 4 4 6.68286 4 9.99234V22.0077C4 25.3171 6.68286 28 9.99234 28H22.0077C25.3171 28 28 25.3171 28 22.0077V9.99234C28 6.68286 25.3171 4 22.0077 4Z"
-                fill="url(#paint0_linear_1333_882)" />
+                fill="url(#paint0_linear_<?php echo esc_attr($socials_gradient_id); ?>)" />
             <path
                 d="M22.0077 4H9.99234C6.68286 4 4 6.68286 4 9.99234V22.0077C4 25.3171 6.68286 28 9.99234 28H22.0077C25.3171 28 28 25.3171 28 22.0077V9.99234C28 6.68286 25.3171 4 22.0077 4Z"
-                fill="url(#paint1_radial_1333_882)" />
+                fill="url(#paint1_radial_<?php echo esc_attr($socials_gradient_id); ?>)" />
             <path fill-rule="evenodd" clip-rule="evenodd"
                 d="M16.1969 25.0791C14.3967 25.0791 13.5601 24.8163 12.106 23.7651C11.1862 24.9477 8.27353 25.8719 8.14649 24.2907C8.14649 23.1037 7.88369 22.1007 7.58585 21.0057C7.23109 19.6567 6.82812 18.1543 6.82812 15.9775C6.82812 10.7785 11.0942 6.86719 16.1487 6.86719C21.2075 6.86719 25.1714 10.9712 25.1714 16.0257C25.1884 21.002 21.1731 25.0525 16.1969 25.0791ZM16.2713 11.361C13.8098 11.234 11.8914 12.9378 11.4665 15.6096C11.1161 17.8215 11.7381 20.5151 12.268 20.6553C12.5221 20.7166 13.1616 20.1998 13.5601 19.8012C14.2192 20.2565 14.9867 20.53 15.7852 20.594C18.3357 20.7167 20.5151 18.7749 20.6863 16.2272C20.786 13.674 18.8222 11.5115 16.2713 11.3654V11.361Z"
                 fill="white" />
             <defs>
-                <linearGradient id="paint0_linear_1333_882" x1="6.82833" y1="22.2529" x2="28" y2="16"
+                <linearGradient id="paint0_linear_<?php echo esc_attr($socials_gradient_id); ?>" x1="6.82833" y1="22.2529" x2="28" y2="16"
                     gradientUnits="userSpaceOnUse">
                     <stop stop-color="#44CCFF" />
                     <stop offset="0.662" stop-color="#5533EE" />
                     <stop offset="1" stop-color="#9933DD" />
                 </linearGradient>
-                <radialGradient id="paint1_radial_1333_882" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+                <radialGradient id="paint1_radial_<?php echo esc_attr($socials_gradient_id); ?>" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
                     gradientTransform="translate(3.42902 -6.54045) rotate(51.356) scale(29.1244 12)">
                     <stop stop-color="#0000FF" />
                     <stop offset="1" stop-opacity="0" />
