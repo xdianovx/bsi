@@ -1,5 +1,9 @@
 import IMask from "imask";
 import MicroModal from "micromodal";
+import {
+  submitFormWithRecaptcha,
+  RECAPTCHA_NOT_LOADED,
+} from "./form-ajax.js";
 
 /**
  * Модуль для работы с формой консультации по страхованию
@@ -145,38 +149,10 @@ export const initInsuranceForm = () => {
     // Добавляем action для AJAX
     formData.append("action", "insurance_form");
 
-    // reCAPTCHA v3
-    if (typeof ajax !== "undefined" && ajax.recaptchaSiteKey) {
-      if (typeof grecaptcha === "undefined") {
-        showStatus("Подождите, загрузка проверки…", "loading");
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalBtnText;
-        }
-        return;
-      }
-      try {
-        const token = await grecaptcha.execute(ajax.recaptchaSiteKey, {
-          action: "submit",
-        });
-        formData.append("recaptcha_token", token);
-      } catch (err) {
-        showStatus("Ошибка проверки. Попробуйте ещё раз.", "error");
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalBtnText;
-        }
-        return;
-      }
-    }
-
     try {
-      const response = await fetch(ajax.url, {
-        method: "POST",
-        body: formData,
+      const result = await submitFormWithRecaptcha(formData, {
+        debug: false,
       });
-
-      const result = await response.json();
 
       if (result.success) {
         // Очищаем форму
@@ -217,6 +193,10 @@ export const initInsuranceForm = () => {
         }, 200);
       }
     } catch (error) {
+      if (error.message === RECAPTCHA_NOT_LOADED) {
+        showStatus("Подождите, загрузка проверки…", "loading");
+        return;
+      }
       console.error("Insurance form error:", error);
       showStatus("Ошибка сети", "error");
     } finally {

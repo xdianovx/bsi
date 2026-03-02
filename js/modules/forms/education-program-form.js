@@ -1,5 +1,9 @@
 import MicroModal from "micromodal";
 import IMask from "imask";
+import {
+  submitFormWithRecaptcha,
+  RECAPTCHA_NOT_LOADED,
+} from "./form-ajax.js";
 
 /**
  * Модуль для работы с формой бронирования образовательной программы
@@ -357,26 +361,9 @@ async function submitForm(e) {
   try {
     const formData = new FormData(form);
 
-    // reCAPTCHA v3
-    if (typeof ajax !== "undefined" && ajax.recaptchaSiteKey) {
-      if (typeof grecaptcha === "undefined") {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Отправить заявку";
-        alert("Подождите, загрузка проверки…");
-        return;
-      }
-      const token = await grecaptcha.execute(ajax.recaptchaSiteKey, {
-        action: "submit",
-      });
-      formData.append("recaptcha_token", token);
-    }
-
-    const response = await fetch(ajax.url, {
-      method: "POST",
-      body: formData,
+    const result = await submitFormWithRecaptcha(formData, {
+      debug: true,
     });
-
-    const result = await response.json();
 
     if (result.success) {
       // Закрываем модалку бронирования
@@ -410,8 +397,12 @@ async function submitForm(e) {
       );
     }
   } catch (error) {
-    console.error("Form submit error:", error);
-    alert("Произошла ошибка при отправке. Попробуйте позже.");
+    if (error.message === RECAPTCHA_NOT_LOADED) {
+      alert("Подождите, загрузка проверки…");
+    } else {
+      console.error("Form submit error:", error);
+      alert("Произошла ошибка при отправке. Попробуйте позже.");
+    }
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Отправить заявку";
