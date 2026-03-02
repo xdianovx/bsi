@@ -16,6 +16,9 @@ function bsi_handle_event_ticket_booking(): void
 {
   global $event_ticket_booking_email;
 
+  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
+  bsi_recaptcha_verify_or_die($token);
+
   // Валидация контактных данных через BSI_Mailer
   $errors = BSI_Mailer::validate_contact_fields($_POST);
 

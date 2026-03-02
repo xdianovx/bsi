@@ -8,6 +8,9 @@ add_action('wp_ajax_nopriv_visa_form', 'handle_visa_form');
 
 function handle_visa_form()
 {
+  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
+  bsi_recaptcha_verify_or_die($token);
+
   // Логируем входящие данные
   error_log('Visa Form Data: ' . print_r($_POST, true));
   

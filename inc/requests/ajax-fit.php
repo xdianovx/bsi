@@ -8,6 +8,9 @@ add_action('wp_ajax_nopriv_fit_form', 'handle_fit_form');
 
 function handle_fit_form()
 {
+  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
+  bsi_recaptcha_verify_or_die($token);
+
   // Логируем все входящие данные для отладки
   // error_log('FIT Form Data: ' . print_r($_POST, true));
 

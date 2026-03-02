@@ -11,6 +11,9 @@ add_action('wp_ajax_nopriv_education_program_booking', 'bsi_handle_education_pro
 
 function bsi_handle_education_program_booking(): void
 {
+  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
+  bsi_recaptcha_verify_or_die($token);
+
   // Валидация контактных данных через BSI_Mailer
   $errors = BSI_Mailer::validate_contact_fields($_POST);
 

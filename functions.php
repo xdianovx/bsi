@@ -121,9 +121,20 @@ function bsi_scripts()
 	wp_style_add_data('bsi-style', 'rtl', 'replace');
 
 	wp_enqueue_script('main', get_template_directory_uri() . '/dist/js/main.min.js', array(), time(), true);
+	$recaptcha_site_key = function_exists('bsi_recaptcha_site_key') ? bsi_recaptcha_site_key() : '';
 	wp_localize_script('main', 'ajax', array(
 		'url' => admin_url('admin-ajax.php'),
+		'recaptchaSiteKey' => $recaptcha_site_key,
 	));
+	if ($recaptcha_site_key !== '') {
+		wp_enqueue_script(
+			'google-recaptcha',
+			'https://www.google.com/recaptcha/api.js?render=' . esc_attr($recaptcha_site_key),
+			array(),
+			null,
+			true
+		);
+	}
 	
 	// Передаем данные модального окна предупреждения
 	$maintenance_modal_enabled = get_field('maintenance_modal_enabled', 'option') ? true : false;
@@ -355,6 +366,7 @@ require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
 require get_template_directory() . '/inc/services/class-bsi-mailer.php';
 add_action('phpmailer_init', ['BSI_Mailer', 'configure_smtp']);
+require get_template_directory() . '/inc/recaptcha.php';
 require get_template_directory() . '/inc/requests/ajax-education-program-form.php';
 require get_template_directory() . '/inc/requests/ajax-event-ticket-form.php';
 

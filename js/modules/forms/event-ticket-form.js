@@ -194,6 +194,20 @@ async function submitForm(e) {
   try {
     const formData = new FormData(form);
 
+    // reCAPTCHA v3
+    if (typeof ajax !== "undefined" && ajax.recaptchaSiteKey) {
+      if (typeof grecaptcha === "undefined") {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Отправить заявку";
+        alert("Подождите, загрузка проверки…");
+        return;
+      }
+      const token = await grecaptcha.execute(ajax.recaptchaSiteKey, {
+        action: "submit",
+      });
+      formData.append("recaptcha_token", token);
+    }
+
     const response = await fetch(ajax.url, {
       method: "POST",
       body: formData,
@@ -221,9 +235,12 @@ async function submitForm(e) {
         Object.entries(result.data.errors).forEach(([field, message]) => {
           showFieldError(field, message);
         });
-      } else {
-        alert(result.data?.message || "Произошла ошибка при отправке");
       }
+      alert(
+        result.data?.errors?.recaptcha ||
+          result.data?.message ||
+          "Произошла ошибка при отправке"
+      );
     }
   } catch (error) {
     console.error("Form submit error:", error);

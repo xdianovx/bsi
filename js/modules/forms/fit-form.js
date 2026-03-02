@@ -654,6 +654,23 @@ export const fitForm = () => {
     // Добавляем action для AJAX
     formData.append("action", "fit_form");
 
+    // reCAPTCHA v3
+    if (typeof ajax !== "undefined" && ajax.recaptchaSiteKey) {
+      if (typeof grecaptcha === "undefined") {
+        showStatus("Подождите, загрузка проверки…", "loading");
+        return;
+      }
+      try {
+        const token = await grecaptcha.execute(ajax.recaptchaSiteKey, {
+          action: "submit",
+        });
+        formData.append("recaptcha_token", token);
+      } catch (err) {
+        showStatus("Ошибка проверки. Попробуйте ещё раз.", "error");
+        return;
+      }
+    }
+
     try {
       const response = await fetch(ajax.url, {
         method: "POST",
@@ -706,7 +723,12 @@ export const fitForm = () => {
             showFieldError(field, result.data.errors[field]);
           });
         }
-        showStatus(result.data?.message || "Ошибка отправки", "error");
+        showStatus(
+          result.data?.errors?.recaptcha ||
+            result.data?.message ||
+            "Ошибка отправки",
+          "error"
+        );
 
         // Скролл к первому полю с ошибкой
         setTimeout(() => {

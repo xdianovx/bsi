@@ -4,6 +4,9 @@ add_action('wp_ajax_nopriv_simple_contact_form', 'handle_simple_form');
 
 function handle_simple_form()
 {
+  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
+  bsi_recaptcha_verify_or_die($token);
+
   $errors = [];
   $client_type = sanitize_text_field($_POST['client_type'] ?? 'private');
 
