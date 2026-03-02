@@ -1,0 +1,79 @@
+.agency-page__section {
+  margin-top: 8px;
+}
+
+.agency-page__layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  align-items: flex-start;
+
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.agency-page__aside {
+  position: sticky;
+  top: 24px;
+
+  @media screen and (max-width: 1024px) {
+    position: static;
+  }
+}
+
+.agency-sidebar {
+  background: #f3f3f4;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.agency-sidebar__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agency-sidebar__link {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+    background: #ececee;
+  }
+
+  &.is-active {
+    color: $red;
+    background: #ececee;
+    position: relative;
+    padding-left: 28px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 1px;
+      background: $red;
+    }
+  }
+}
+
+.agency-page__title {
+  margin-bottom: 24px;
+}
+
+.agency-page__editor {
+  max-width: 900px;
+}
