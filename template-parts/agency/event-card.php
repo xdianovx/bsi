@@ -33,6 +33,12 @@ $kind_terms = get_the_terms($post_id, 'agency_event_kind');
 $kind = (!empty($kind_terms) && !is_wp_error($kind_terms)) ? $kind_terms[0] : null;
 $kind_label = $kind ? $kind->name : 'Событие';
 $kind_slug = $kind ? $kind->slug : '';
+$content_raw = trim((string) get_post_field('post_content', $post_id));
+$excerpt = '';
+if ($content_raw !== '') {
+  $excerpt = wp_trim_words(wp_strip_all_tags($content_raw), 25, '…');
+}
+
 $kind_class = 'is-default';
 if ('webinar' === $kind_slug) {
   $kind_class = 'is-webinar';
@@ -85,6 +91,10 @@ if ('webinar' === $kind_slug) {
       </span>
     <?php endif; ?>
   </div>
+
+  <?php if ($excerpt !== ''): ?>
+    <p class="agency-education-card__excerpt"><?php echo esc_html($excerpt); ?></p>
+  <?php endif; ?>
 
   <div class="agency-education-card__bottom">
     <a href="<?php echo esc_url($permalink); ?>" class="btn sm btn-white agency-education-card__link">Подробнее</a>

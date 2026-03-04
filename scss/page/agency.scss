@@ -231,6 +231,10 @@
   padding: 4px 8px;
   font-size: 12px;
   line-height: 120%;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   svg {
     flex-shrink: 0;
@@ -395,6 +399,17 @@
       height: 18px;
     }
   }
+}
+
+.agency-education-card__excerpt {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: $text-gray;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .agency-education-card__bottom {
