@@ -1,50 +1,43 @@
 <?php
 /**
- * The template for displaying all pages
- *
- * This is the template that displays all pages by default.
- * Please note that this is the WordPress construct of pages
- * and that other 'pages' on your WordPress site may use a
- * different template.
- *
- * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
- *
- * @package asd
+ * Single template for the "Агентствам" section CPT.
  */
 
 get_header();
 ?>
 
-<main id="primary"
-			class="site-main">
+<main class="site-main agency-page">
+  <?php
+  if (function_exists('yoast_breadcrumb')) {
+    yoast_breadcrumb(
+      '<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
+      '</p></div></div>'
+    );
+  }
+  ?>
 
-	<?php
-	if (function_exists('yoast_breadcrumb')) {
-		yoast_breadcrumb(
-			'<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
-			'</p></div></div>'
-		);
-	}
-	?>
+  <section class="agency-page__section">
+    <div class="container">
+      <div class="agency-page__layout">
+        <aside class="agency-page__aside">
+          <?php get_template_part('template-parts/pages/agency/sidebar'); ?>
+        </aside>
 
-	<section>
-		<div class="container">
-			<?php the_title('<h1 class="h1">', '</h1>'); ?>
-		</div>
-	</section>
+        <div class="agency-page__content">
+          <?php while (have_posts()): ?>
+            <?php the_post(); ?>
+            <h1 class="h1 agency-page__title"><?php the_title(); ?></h1>
 
-	<section>
-		<div class="container">
+            <div class="editor-content agency-page__editor">
+              <?php the_content(); ?>
+            </div>
+          <?php endwhile; ?>
+        </div>
+      </div>
+    </div>
+  </section>
 
-			<div class="editor-content">
-				<?php the_content(); ?>
-			</div>
-		</div>
-	</section>
+  <?php get_template_part('template-parts/sections/subscribe'); ?>
+</main>
 
-
-</main><!-- #main -->
-
-<?php
-// get_sidebar();
-get_footer();
+<?php get_footer();

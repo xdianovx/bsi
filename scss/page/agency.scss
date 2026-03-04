@@ -48,12 +48,13 @@
 
   &:hover {
     color: $red;
-    background: #ececee;
+    background: #fff;
   }
 
-  &.is-active {
+  &.active {
     color: $red;
-    background: #ececee;
+    background: #fff;
+
     position: relative;
     padding-left: 28px;
 
@@ -72,6 +73,43 @@
 
 .agency-page__title {
   margin-bottom: 24px;
+}
+
+.agency-docs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 28px;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.agency-docs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+
+  svg {
+    transition: stroke 0.3s ease-in-out;
+  }
+
+  &:hover {
+    color: $red;
+    svg {
+      stroke: $red;
+    }
+  }
+}
+
+.agency-docs__icon {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.agency-page__empty {
+  color: $text-gray;
 }
 
 .agency-page__editor {
