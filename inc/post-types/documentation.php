@@ -88,7 +88,7 @@ function bsi_ensure_agency_document_term()
   }
 }
 
-add_filter('wpseo_breadcrumb_links', 'bsi_agency_documentation_breadcrumbs', 20);
+add_filter('wpseo_breadcrumb_links', 'bsi_agency_documentation_breadcrumbs', 999);
 function bsi_agency_documentation_breadcrumbs($links)
 {
   if (!is_singular('documentation')) {
@@ -101,6 +101,9 @@ function bsi_agency_documentation_breadcrumbs($links)
   }
 
   $agency_page = get_page_by_path('turagenstvam');
+  if (!$agency_page) {
+    $agency_page = get_page_by_path('agentstvam');
+  }
   $agency_url = $agency_page ? get_permalink($agency_page->ID) : home_url('/agentstvam/');
 
   return [
