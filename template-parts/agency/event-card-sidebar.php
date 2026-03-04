@@ -5,6 +5,12 @@ if (!$post_id) {
 }
 
 $title = get_the_title($post_id);
+$permalink = get_permalink($post_id);
+$content_raw = trim((string) get_post_field('post_content', $post_id));
+$excerpt = '';
+if ($content_raw !== '') {
+  $excerpt = wp_trim_words(wp_strip_all_tags($content_raw), 20, '…');
+}
 $start_date = function_exists('get_field') ? trim((string) get_field('event_start_date', $post_id)) : '';
 $start_time = function_exists('get_field') ? trim((string) get_field('event_start_time', $post_id)) : '';
 $place = function_exists('get_field') ? trim((string) get_field('event_place', $post_id)) : '';
@@ -31,7 +37,7 @@ if ('webinar' === $kind_slug) {
 }
 ?>
 
-<article class="agency-sidebar-event">
+<a href="<?php echo esc_url($permalink); ?>" class="agency-sidebar-event">
   <div class="agency-sidebar-event__head">
     <span class="agency-sidebar-event__kind <?php echo esc_attr($kind_class); ?>"><?php echo esc_html($kind_label); ?></span>
     <h4 class="agency-sidebar-event__title"><?php echo esc_html($title); ?></h4>
@@ -48,4 +54,8 @@ if ('webinar' === $kind_slug) {
       <span class="agency-sidebar-event__meta-item"><?php echo esc_html($place); ?></span>
     <?php endif; ?>
   </div>
-</article>
+
+  <?php if ($excerpt !== ''): ?>
+    <p class="agency-sidebar-event__excerpt"><?php echo esc_html($excerpt); ?></p>
+  <?php endif; ?>
+</a>

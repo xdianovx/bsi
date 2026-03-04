@@ -58,34 +58,6 @@
   }
 }
 
-.agency-sidebar__children {
-  margin: 0;
-
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.agency-sidebar__child-link {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 400;
-  font-size: 14px;
-  transition: $trans-text;
-
-  &:hover {
-    color: $red;
-  }
-
-  &.is-active {
-    color: $red;
-    font-weight: 500;
-  }
-}
-
 .agency-page__title {
   margin-bottom: 24px;
 }
@@ -151,26 +123,28 @@
 
 .agency-sidebar-education__more {
   display: block;
-  margin-top: 10px;
+  margin-top: 8px;
   text-align: center;
-  padding: 8px;
   border-radius: 8px;
   font-weight: 500;
-  font-size: 14px;
-  color: $red;
-  transition: $trans-text;
 
   &:hover {
-    background: #f3f3f4;
+    background: $text-black;
   }
 }
 
 // --- Sidebar event card ---
 
 .agency-sidebar-event {
+  display: block;
   background: #f3f3f4;
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 8px;
+  padding: 8px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: darken(#f3f3f4, 4%);
+  }
 }
 
 .agency-sidebar-event__head {
@@ -213,10 +187,13 @@
 
 .agency-sidebar-event__title {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
 }
-
+.agency-sidebar-event__meta-item {
+  line-height: 100%;
+  font-size: 14px;
+}
 .agency-sidebar-event__meta {
   margin-top: 6px;
   display: flex;
@@ -226,9 +203,18 @@
 
 .agency-sidebar-event__meta-item {
   background: #fff;
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 4px 8px;
-  font-size: 12px;
+}
+
+.agency-sidebar-event__excerpt {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: $text-gray;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .agency-education {
@@ -296,9 +282,9 @@
 }
 
 .agency-education-card {
-  background: #ececee;
-  border-radius: 10px;
-  padding: 14px;
+  background: $;
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .agency-education-card__top {

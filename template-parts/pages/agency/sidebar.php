@@ -97,25 +97,31 @@ if ($current_document_id && taxonomy_exists('agency_item_type')) {
       }
 
       $has_children = !empty($item['children']);
+      $any_child_active = false;
+      if ($has_children && $is_education_page && $current_kind !== '') {
+        foreach ($item['children'] as $child) {
+          if ($current_kind === $child['kind_slug']) {
+            $any_child_active = true;
+            break;
+          }
+        }
+      }
+      $show_parent_active = $is_active && !$any_child_active;
       ?>
       <li class="agency-sidebar__item">
         <a href="<?php echo esc_url($item['url']); ?>"
-          class="agency-sidebar__link <?php echo $is_active ? 'is-active' : ''; ?>">
+          class="agency-sidebar__link <?php echo $show_parent_active ? 'is-active' : ''; ?>">
           <?php echo esc_html($item['label']); ?>
         </a>
 
         <?php if ($has_children && $is_active): ?>
-          <ul class="agency-sidebar__children">
-            <?php foreach ($item['children'] as $child): ?>
-              <?php $child_is_active = $is_education_page && $current_kind === $child['kind_slug']; ?>
-              <li class="agency-sidebar__child-item">
-                <a href="<?php echo esc_url($child['url']); ?>"
-                  class="agency-sidebar__child-link <?php echo $child_is_active ? 'is-active' : ''; ?>">
-                  <?php echo esc_html($child['label']); ?>
-                </a>
-              </li>
-            <?php endforeach; ?>
-          </ul>
+          <?php foreach ($item['children'] as $child): ?>
+            <?php $child_is_active = $is_education_page && $current_kind === $child['kind_slug']; ?>
+            <a href="<?php echo esc_url($child['url']); ?>"
+              class="agency-sidebar__link <?php echo $child_is_active ? 'is-active' : ''; ?>">
+              <?php echo esc_html($child['label']); ?>
+            </a>
+          <?php endforeach; ?>
         <?php endif; ?>
       </li>
     <?php endforeach; ?>
@@ -157,7 +163,7 @@ if ($current_document_id && taxonomy_exists('agency_item_type')) {
         <?php wp_reset_postdata(); ?>
       </div>
 
-      <a href="<?php echo esc_url($education_url); ?>" class="agency-sidebar-education__more">
+      <a href="<?php echo esc_url($education_url); ?>" class="agency-sidebar-education__more btn btn-gray">
         Смотреть все
       </a>
     </div>
