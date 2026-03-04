@@ -50,6 +50,7 @@ get_header();
 		</div>
 	</section>
 
+	<?= get_template_part('template-parts/sections/subscribe') ?>
 
 </main><!-- #main -->
 

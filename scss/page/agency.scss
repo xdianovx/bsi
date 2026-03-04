@@ -4,7 +4,7 @@
 
 .agency-page__layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 320px 1fr;
   gap: 32px;
   align-items: flex-start;
 
@@ -58,6 +58,34 @@
   }
 }
 
+.agency-sidebar__children {
+  margin: 0;
+
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.agency-sidebar__child-link {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+
+  &.is-active {
+    color: $red;
+    font-weight: 500;
+  }
+}
+
 .agency-page__title {
   margin-bottom: 24px;
 }
@@ -101,4 +129,260 @@
 
 .agency-page__editor {
   max-width: 900px;
+}
+
+// --- Sidebar education block ---
+
+.agency-sidebar-education {
+  margin-top: 16px;
+}
+
+.agency-sidebar-education__title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.agency-sidebar-education__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agency-sidebar-education__more {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: $red;
+  transition: $trans-text;
+
+  &:hover {
+    background: #f3f3f4;
+  }
+}
+
+// --- Sidebar event card ---
+
+.agency-sidebar-event {
+  background: #f3f3f4;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.agency-sidebar-event__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.agency-sidebar-event__kind {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 100px;
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 8px;
+  font-weight: 600;
+  flex-shrink: 0;
+
+  &.is-webinar {
+    background: #bbe9bb;
+    color: #176b20;
+  }
+
+  &.is-event {
+    background: #f5dfaf;
+    color: #6d4f00;
+  }
+
+  &.is-promo {
+    background: #ffc8c8;
+    color: #9b1010;
+  }
+
+  &.is-default {
+    background: #d9d9de;
+    color: #1f1f1f;
+  }
+}
+
+.agency-sidebar-event__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.agency-sidebar-event__meta {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.agency-sidebar-event__meta-item {
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.agency-education {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agency-education__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.agency-education-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.agency-education-tabs__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #ececee;
+  color: $text-black;
+  font-weight: 500;
+  font-size: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: $trans-text;
+
+  &:hover {
+    background: darken(#ececee, 6%);
+  }
+
+  &.is-active {
+    background: $red;
+    color: #fff;
+  }
+}
+
+.agency-education__direction-select {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ececee;
+}
+
+.agency-education__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.25s ease;
+
+  &.is-loading {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+}
+
+.agency-education-card {
+  background: #ececee;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.agency-education-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.agency-education-card__kind {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 100px;
+  font-size: 13px;
+  line-height: 1;
+  padding: 5px 10px;
+  font-weight: 600;
+
+  &.is-webinar {
+    background: #bbe9bb;
+    color: #176b20;
+  }
+
+  &.is-event {
+    background: #f5dfaf;
+    color: #6d4f00;
+  }
+
+  &.is-promo {
+    background: #ffc8c8;
+    color: #9b1010;
+  }
+
+  &.is-default {
+    background: #d9d9de;
+    color: #1f1f1f;
+  }
+}
+
+.agency-education-card__title {
+  margin: 0;
+  font-size: 24px;
+}
+
+.agency-education-card__meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.agency-education-card__meta-item {
+  background: #fff;
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.agency-education-card__bottom {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+}
+
+.agency-education-card__price {
+  color: $red;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.agency-education-card__cta[disabled] {
+  pointer-events: none;
+}
+
+.agency-education-card__details {
+  margin-top: 10px;
+}
+
+.agency-education-card__details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.agency-education-card__details-content {
+  margin-top: 8px;
 }

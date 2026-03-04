@@ -303,6 +303,7 @@ require get_template_directory() . '/inc/post-types/custom-post-event.php';
 require get_template_directory() . '/inc/post-types/custom-post-service.php';
 require get_template_directory() . '/inc/post-types/custom-post-partner.php';
 require get_template_directory() . '/inc/post-types/documentation.php';
+require get_template_directory() . '/inc/post-types/agency-events.php';
 require get_template_directory() . '/inc/post-types/custom-post-types-hotel.php';
 require get_template_directory() . '/inc/post-types/education.php';
 require get_template_directory() . '/inc/post-types/review.php';
@@ -318,6 +319,7 @@ require get_template_directory() . '/inc/post-types/entry-rules.php';
 require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
+require get_template_directory() . '/inc/requests/agency-events-filter.php';
 require get_template_directory() . '/inc/requests/batch-prices.php';
 
 require_once get_template_directory() . '/inc/samo/config.php';

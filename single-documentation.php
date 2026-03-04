@@ -4,6 +4,8 @@
  */
 
 get_header();
+
+$is_education_page = (get_post_field('post_name', get_queried_object_id()) === 'obuchenie');
 ?>
 
 <main class="site-main agency-page">
@@ -24,14 +26,18 @@ get_header();
         </aside>
 
         <div class="agency-page__content">
-          <?php while (have_posts()): ?>
-            <?php the_post(); ?>
-            <h1 class="h1 agency-page__title"><?php the_title(); ?></h1>
-
-            <div class="editor-content agency-page__editor">
-              <?php the_content(); ?>
-            </div>
-          <?php endwhile; ?>
+          <?php if ($is_education_page): ?>
+            <h1 class="h1 agency-page__title">Обучение</h1>
+            <?php get_template_part('template-parts/agency/education-events'); ?>
+          <?php else: ?>
+            <?php while (have_posts()): ?>
+              <?php the_post(); ?>
+              <h1 class="h1 agency-page__title"><?php the_title(); ?></h1>
+              <div class="editor-content agency-page__editor">
+                <?php the_content(); ?>
+              </div>
+            <?php endwhile; ?>
+          <?php endif; ?>
         </div>
       </div>
     </div>
