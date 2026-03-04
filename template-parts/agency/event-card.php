@@ -11,7 +11,8 @@ $start_date = function_exists('get_field') ? trim((string) get_field('event_star
 $start_time = function_exists('get_field') ? trim((string) get_field('event_start_time', $post_id)) : '';
 $place = function_exists('get_field') ? trim((string) get_field('event_place', $post_id)) : '';
 $registration_closed = function_exists('get_field') ? (bool) get_field('event_registration_closed', $post_id) : false;
-$price = function_exists('get_field') ? trim((string) get_field('event_price', $post_id)) : '';
+$price_raw = function_exists('get_field') ? trim((string) get_field('event_price', $post_id)) : '';
+$price = function_exists('format_price_with_from') ? format_price_with_from($price_raw, false) : $price_raw;
 
 $start_date_label = '';
 if ($start_date !== '') {
