@@ -27,6 +27,7 @@ import { initSingleEducationPrograms } from "./modules/ajax/single-education-pro
 import { initEducationProgramForm } from "./modules/forms/education-program-form";
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initAgencyEventsFilter } from "./modules/ajax/agency-events";
+import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
 import { initMaps } from "./modules/maps";
@@ -68,6 +69,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initEducationProgramForm();
   initEventTicketForm();
   initAgencyEventsFilter();
+  initAgencyEventRegForm();
   initBonusMarquee();
   // Карта инициализируется после загрузки API Яндекс.Карт (скрипт в footer)
   window.addEventListener("load", () => initMaps());

@@ -155,6 +155,24 @@ function bsi_register_agency_event_fields()
         'placeholder' => 'Например: 198 888 ₽',
         'wrapper' => ['width' => '50'],
       ],
+      [
+        'key' => 'field_agency_event_registration_url',
+        'label' => 'Внешняя ссылка регистрации',
+        'name' => 'event_registration_url',
+        'type' => 'url',
+        'instructions' => 'Если заполнено — кнопка «Регистрация» откроет эту ссылку в новой вкладке вместо формы.',
+        'placeholder' => 'https://',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_agency_event_notify_email',
+        'label' => 'Email для заявок',
+        'name' => 'event_notify_email',
+        'type' => 'email',
+        'instructions' => 'Дополнительный email для получения заявок на это мероприятие. Основной (agent@bsigroup.ru) получает всегда.',
+        'placeholder' => 'email@example.com',
+        'wrapper' => ['width' => '50'],
+      ],
     ],
     'location' => [
       [

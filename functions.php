@@ -320,6 +320,7 @@ require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
 require get_template_directory() . '/inc/requests/agency-events-filter.php';
+require get_template_directory() . '/inc/requests/agency-event-registration.php';
 require get_template_directory() . '/inc/requests/batch-prices.php';
 
 require_once get_template_directory() . '/inc/samo/config.php';

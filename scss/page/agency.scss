@@ -59,7 +59,27 @@
 }
 
 .agency-page__title {
-  margin-bottom: 24px;
+  margin-top: 16px;
+}
+
+// --- Single event meta (no card bg) ---
+
+.agency-event-single__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.agency-event-single__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .agency-docs {
@@ -140,10 +160,13 @@
   background: #f3f3f4;
   border-radius: 8px;
   padding: 8px;
+  cursor: pointer;
+  color: inherit;
   transition: background 0.2s ease;
 
   &:hover {
     background: darken(#f3f3f4, 4%);
+    color: inherit;
   }
 }
 
@@ -158,9 +181,9 @@
   display: inline-flex;
   align-items: center;
   border-radius: 100px;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
-  text-transform: uppercase;
+
   padding: 4px 8px;
   font-weight: 700;
   flex-shrink: 0;
@@ -190,10 +213,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 500;
-}
-.agency-sidebar-event__meta-item {
-  line-height: 100%;
-  font-size: 14px;
+  line-height: 120%;
 }
 .agency-sidebar-event__meta {
   margin-top: 6px;
@@ -203,15 +223,25 @@
 }
 
 .agency-sidebar-event__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: #fff;
   border-radius: 4px;
   padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1;
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .agency-sidebar-event__excerpt {
   margin: 6px 0 0;
   font-size: 14px;
   color: $text-gray;
+  line-height: 130%;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -329,6 +359,10 @@
   margin: 0;
   font-size: 20px;
   font-weight: 500;
+
+  @media screen and (max-width: 1024px) {
+    font-size: 18px;
+  }
 }
 
 .agency-education-card__meta {
@@ -339,10 +373,26 @@
 }
 
 .agency-education-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: #fff;
   border-radius: 8px;
   line-height: 100%;
   padding: 6px 10px;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  @media screen and (max-width: 1024px) {
+    font-size: 14px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
 }
 
 .agency-education-card__bottom {
@@ -351,6 +401,32 @@
   justify-content: flex-end;
   align-items: center;
   gap: 14px;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+
+    * {
+      width: 100%;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .agency-education-card__price {
+    order: 1;
+    text-align: right;
+  }
+
+  .agency-education-card__link {
+    order: 2;
+  }
+
+  .agency-education-card__cta {
+    order: 3;
+  }
 }
 
 .agency-education-card__price {
@@ -363,15 +439,14 @@
   pointer-events: none;
 }
 
-.agency-education-card__details {
-  margin-top: 10px;
+.agency-education-card__link {
+  margin-right: auto;
 }
 
-.agency-education-card__details summary {
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.agency-education-card__details-content {
-  margin-top: 8px;
+.agency-reg-form {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }

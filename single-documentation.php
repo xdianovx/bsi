@@ -46,4 +46,7 @@ $is_education_page = (get_post_field('post_name', get_queried_object_id()) === '
   <?php get_template_part('template-parts/sections/subscribe'); ?>
 </main>
 
+<?php if ($is_education_page): ?>
+  <?php get_template_part('template-parts/agency/event-registration-modal'); ?>
+<?php endif; ?>
 <?php get_footer();

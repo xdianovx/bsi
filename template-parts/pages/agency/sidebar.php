@@ -10,13 +10,41 @@ $section_path = untrailingslashit((string) wp_parse_url($section_url, PHP_URL_PA
 $is_education_page = is_singular('documentation')
   && get_post_field('post_name', get_queried_object_id()) === 'obuchenie';
 
-$current_kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
+$is_single_event = is_singular('agency_event');
 
-$education_kinds = [
-  ['slug' => 'webinar', 'label' => 'Вебинары'],
-  ['slug' => 'event', 'label' => 'Мероприятия'],
-  ['slug' => 'promo-tour', 'label' => 'Рекламные туры'],
+$current_kind = '';
+if ($is_education_page) {
+  $current_kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
+} elseif ($is_single_event) {
+  $event_kind_terms = get_the_terms(get_queried_object_id(), 'agency_event_kind');
+  if (!empty($event_kind_terms) && !is_wp_error($event_kind_terms)) {
+    $current_kind = $event_kind_terms[0]->slug;
+  }
+}
+
+$is_education_context = $is_education_page || $is_single_event;
+
+$all_education_kinds = [
+  'webinar' => 'Вебинары',
+  'event' => 'Мероприятия',
+  'promo-tour' => 'Рекламные туры',
 ];
+
+$existing_kind_terms = get_terms([
+  'taxonomy' => 'agency_event_kind',
+  'hide_empty' => true,
+  'fields' => 'slugs',
+]);
+$existing_kind_slugs = (!is_wp_error($existing_kind_terms) && is_array($existing_kind_terms))
+  ? $existing_kind_terms
+  : [];
+
+$education_kinds = [];
+foreach ($all_education_kinds as $slug => $label) {
+  if (in_array($slug, $existing_kind_slugs, true)) {
+    $education_kinds[] = ['slug' => $slug, 'label' => $label];
+  }
+}
 
 $items = [
   [
@@ -98,13 +126,16 @@ if ($current_document_id && taxonomy_exists('agency_item_type')) {
 
       $has_children = !empty($item['children']);
       $any_child_active = false;
-      if ($has_children && $is_education_page && $current_kind !== '') {
+      if ($has_children && $is_education_context && $current_kind !== '') {
         foreach ($item['children'] as $child) {
           if ($current_kind === $child['kind_slug']) {
             $any_child_active = true;
             break;
           }
         }
+      }
+      if ($is_single_event && $has_children) {
+        $is_active = true;
       }
       $show_parent_active = $is_active && !$any_child_active;
       ?>
@@ -114,9 +145,9 @@ if ($current_document_id && taxonomy_exists('agency_item_type')) {
           <?php echo esc_html($item['label']); ?>
         </a>
 
-        <?php if ($has_children && $is_active): ?>
+        <?php if ($has_children): ?>
           <?php foreach ($item['children'] as $child): ?>
-            <?php $child_is_active = $is_education_page && $current_kind === $child['kind_slug']; ?>
+            <?php $child_is_active = $is_education_context && $current_kind === $child['kind_slug']; ?>
             <a href="<?php echo esc_url($child['url']); ?>"
               class="agency-sidebar__link <?php echo $child_is_active ? 'is-active' : ''; ?>">
               <?php echo esc_html($child['label']); ?>

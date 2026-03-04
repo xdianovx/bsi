@@ -36,31 +36,35 @@ $direction_terms = get_terms([
   'orderby' => 'name',
   'order' => 'ASC',
 ]);
+
+$all_kind_tabs = [
+  '' => 'Все',
+  'webinar' => 'Вебинары',
+  'event' => 'Мероприятия',
+  'promo-tour' => 'Рекламные туры',
+];
+
+$existing_kind_terms = get_terms([
+  'taxonomy' => 'agency_event_kind',
+  'hide_empty' => true,
+  'fields' => 'slugs',
+]);
+$existing_kind_slugs = (!is_wp_error($existing_kind_terms) && is_array($existing_kind_terms))
+  ? $existing_kind_terms
+  : [];
 ?>
 
 <section class="agency-education" data-agency-education>
   <div class="agency-education__head">
     <div class="agency-education-tabs">
-      <button type="button"
-              class="agency-education-tabs__btn <?php echo $kind === '' ? 'is-active' : ''; ?>"
-              data-agency-kind="">
-        Все
-      </button>
-      <button type="button"
-              class="agency-education-tabs__btn <?php echo $kind === 'webinar' ? 'is-active' : ''; ?>"
-              data-agency-kind="webinar">
-        Вебинары
-      </button>
-      <button type="button"
-              class="agency-education-tabs__btn <?php echo $kind === 'event' ? 'is-active' : ''; ?>"
-              data-agency-kind="event">
-        Мероприятия
-      </button>
-      <button type="button"
-              class="agency-education-tabs__btn <?php echo $kind === 'promo-tour' ? 'is-active' : ''; ?>"
-              data-agency-kind="promo-tour">
-        Рекламные туры
-      </button>
+      <?php foreach ($all_kind_tabs as $tab_slug => $tab_label): ?>
+        <?php if ($tab_slug !== '' && !in_array($tab_slug, $existing_kind_slugs, true)) continue; ?>
+        <button type="button"
+                class="agency-education-tabs__btn <?php echo $kind === $tab_slug ? 'is-active' : ''; ?>"
+                data-agency-kind="<?php echo esc_attr($tab_slug); ?>">
+          <?php echo esc_html($tab_label); ?>
+        </button>
+      <?php endforeach; ?>
     </div>
 
     <?php if (!is_wp_error($direction_terms) && !empty($direction_terms)): ?>
