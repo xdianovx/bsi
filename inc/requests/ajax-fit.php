@@ -131,8 +131,8 @@ function handle_fit_form()
   }
 
   // Формируем HTML сообщение для email
-  // Укажите здесь email получателя заявок (или оставьте пустым для использования email администратора)
-  $recipient_email = 'dianov.js@gmail.com'; // Например: 'your-email@example.com'
+  // Email получателя заявок FIT
+  $recipient_email = 'e.klimova@bsigroup.ru';
 
   // Если email не указан, используем email администратора WordPress
   if (empty($recipient_email) || !is_email($recipient_email)) {
