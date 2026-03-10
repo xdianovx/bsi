@@ -78,26 +78,15 @@ $country_title = $country_id ? get_the_title($country_id) : '';
       <?php if ($country_title || (!empty($regions) && !is_wp_error($regions)) || (!empty($resorts) && !is_wp_error($resorts))): ?>
         <div class="tour-card-row__location">
 
-          <?php if ($country_title): ?>
-            <div class="tour-card-row__location-link">
-              <?= esc_html($country_title); ?>
-              <?= (!empty($regions) && !is_wp_error($regions)) || (!empty($resorts) && !is_wp_error($resorts)) ? ',' : ''; ?>
-            </div>
-          <?php endif; ?>
-
-          <?php if (!empty($regions) && !is_wp_error($regions)): ?>
-            <?php $r = $regions[0]; ?>
-            <div class="tour-card-row__location-link">
-              <?= esc_html($r->name); ?>     <?= (!empty($resorts) && !is_wp_error($resorts)) ? ',' : ''; ?>
-            </div>
-          <?php endif; ?>
-
-          <?php if (!empty($resorts) && !is_wp_error($resorts)): ?>
-            <?php $s = $resorts[0]; ?>
-            <div class="tour-card-row__location-link">
-              <?= esc_html($s->name); ?>
-            </div>
-          <?php endif; ?>
+          <?php
+            $location_parts = [];
+            if ($country_title) $location_parts[] = esc_html($country_title);
+            if (!empty($regions) && !is_wp_error($regions)) $location_parts[] = esc_html(implode(', ', wp_list_pluck($regions, 'name')));
+            if (!empty($resorts) && !is_wp_error($resorts)) $location_parts[] = esc_html(implode(', ', wp_list_pluck($resorts, 'name')));
+          ?>
+          <div class="tour-card-row__location-link">
+            <?= implode(' / ', $location_parts); ?>
+          </div>
 
         </div>
       <?php endif; ?>
