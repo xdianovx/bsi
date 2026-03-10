@@ -65,6 +65,7 @@
               <div class="currency-item__title">EUR</div>
               <div class="currency-item__value numfont"></div>
             </div>
+
             <div class="currency-select js-dropdown">
               <button class="js-dropdown-trigger currency-select-trigger__wrap">
                 <span class="currency-current">RUB</span>
@@ -182,6 +183,7 @@
             <div class="currency-item__title">EUR</div>
             <div class="currency-item__value numfont"></div>
           </div>
+
           <div class="currency-select js-dropdown">
             <button class="js-dropdown-trigger currency-select-trigger__wrap">
               <span class="currency-current">RUB</span>

@@ -149,8 +149,7 @@ function calculateRateInBaseCurrency(baseISO, targetISO) {
   if (targetISO === "RUB") {
     const baseRate = ratesData.rates[baseISO];
     if (!baseRate) return null;
-    const baseValue = baseRate.value / baseRate.nominal;
-    return 1 / baseValue;
+    return baseRate.value / baseRate.nominal;
   }
 
   const baseRate = ratesData.rates[baseISO];
@@ -161,7 +160,7 @@ function calculateRateInBaseCurrency(baseISO, targetISO) {
   const baseValue = baseRate.value / baseRate.nominal;
   const targetValue = targetRate.value / targetRate.nominal;
 
-  return targetValue / baseValue;
+  return baseValue / targetValue;
 }
 
 async function loadCurrencyRates(baseISO) {
@@ -170,12 +169,8 @@ async function loadCurrencyRates(baseISO) {
   const usdRate = calculateRateInBaseCurrency(baseISO, "USD");
   const eurRate = calculateRateInBaseCurrency(baseISO, "EUR");
 
-  if (usdRate !== null) {
-    currentRates.USD = usdRate;
-  }
-  if (eurRate !== null) {
-    currentRates.EUR = eurRate;
-  }
+  if (usdRate !== null) currentRates.USD = usdRate;
+  if (eurRate !== null) currentRates.EUR = eurRate;
 
   if (baseISO !== "RUB") {
     const rubRate = calculateRateInBaseCurrency(baseISO, "RUB");
