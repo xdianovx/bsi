@@ -31,24 +31,7 @@ $tours_query = new WP_Query([
 ]);
 
 /**
- * Регионы страны (через meta region_country = country_id)
- */
-$region_terms = get_terms([
-  'taxonomy' => 'region',
-  'hide_empty' => false,
-  'meta_query' => [
-    [
-      'key' => 'region_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ],
-  ],
-  'orderby' => 'name',
-  'order' => 'ASC',
-]);
-
-/**
- * Типы туров: только те, что есть у туров этой страны
+ * ID всех туров страны (используется для фильтрации регионов и типов)
  */
 $country_tour_ids = get_posts([
   'post_type'      => 'tour',
@@ -64,6 +47,20 @@ $country_tour_ids = get_posts([
   ],
 ]);
 
+/**
+ * Регионы: только те, в которых есть туры этой страны
+ */
+$region_terms = [];
+if (!empty($country_tour_ids)) {
+  $region_terms = wp_get_object_terms($country_tour_ids, 'region', [
+    'orderby' => 'name',
+    'order'   => 'ASC',
+  ]);
+}
+
+/**
+ * Типы туров: только те, что есть у туров этой страны (только родительские)
+ */
 $tour_type_terms = [];
 if (!empty($country_tour_ids)) {
   $tour_type_terms = wp_get_object_terms($country_tour_ids, 'tour_type', [
@@ -159,9 +156,9 @@ get_header(); ?>
                 <div class="tours-filter__field">
                   <div class="tours-filter__label">Курорты</div>
                   <select class="tours-filter__select"
-                          name="resort[]"
-                          multiple
-                          data-choice="multiple">
+                          name="resort"
+                          data-choice="single">
+                    <option value="">Все курорты</option>
                     <?php if (!is_wp_error($resort_terms) && !empty($resort_terms)): ?>
                       <?php foreach ($resort_terms as $t): ?>
                         <option value="<?= (int) $t->term_id; ?>"><?= esc_html($t->name); ?></option>

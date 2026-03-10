@@ -30,7 +30,7 @@ export const initCountryToursFilters = () => {
   if (!ajaxUrl) return;
 
   const regionSelect = root.querySelector('select[name="region"]');
-  const resortSelect = root.querySelector('select[name="resort[]"]');
+  const resortSelect = root.querySelector('select[name="resort"]');
   const typeSelect = root.querySelector('select[name="tour_type"]');
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
@@ -39,13 +39,6 @@ export const initCountryToursFilters = () => {
   displayTourPrices(list);
 
   let currentPage = 1;
-
-  const getValues = (sel) => {
-    if (!sel) return [];
-    return Array.from(sel.selectedOptions)
-      .map((o) => o.value)
-      .filter(Boolean);
-  };
 
   const loadTours = async (page = 1) => {
     setLoading(true);
@@ -60,7 +53,8 @@ export const initCountryToursFilters = () => {
       const regionId = regionSelect ? regionSelect.value || "" : "";
       if (regionId) body.set("region", regionId);
 
-      getValues(resortSelect).forEach((v) => body.append("resort[]", v));
+      const resortVal = resortSelect ? resortSelect.value || "" : "";
+      if (resortVal) body.set("resort", resortVal);
       const typeVal = typeSelect ? typeSelect.value || "" : "";
       if (typeVal) body.set("tour_type", typeVal);
 
@@ -147,25 +141,21 @@ export const initCountryToursFilters = () => {
       })
     : null;
 
-  // resorts (multiple)
+  // resorts (single)
   const resortChoice = resortSelect
     ? new Choices(resortSelect, {
         ...CHOICES_RU,
-        removeItemButton: true,
         searchEnabled: true,
         shouldSort: false,
-        placeholder: true,
       })
     : null;
 
-  // types (multiple)
+  // types (single)
   const typeChoice = typeSelect
     ? new Choices(typeSelect, {
         ...CHOICES_RU,
-        removeItemButton: true,
         searchEnabled: true,
         shouldSort: false,
-        placeholder: true,
       })
     : null;
 
@@ -204,18 +194,12 @@ export const initCountryToursFilters = () => {
     }
   };
 
-  const getAllParams = (params, key) => {
-    const a = params.getAll(key) || [];
-    const b = params.getAll(key.replace("[]", "")) || [];
-    return [...a, ...b].map((v) => String(v)).filter(Boolean);
-  };
-
   const applyFromUrl = async () => {
     const params = new URLSearchParams(window.location.search);
 
     const region = params.get("region") ? String(params.get("region")) : "";
-    const resorts = getAllParams(params, "resort[]");
-    const types = getAllParams(params, "tour_type[]");
+    const resort = params.get("resort") ? String(params.get("resort")) : "";
+    const type = params.get("tour_type") ? String(params.get("tour_type")) : "";
     const urlPage = params.get("paged") ? parseInt(params.get("paged"), 10) : 1;
     const pageFromUrl = urlPage > 0 ? urlPage : 1;
 
@@ -230,18 +214,20 @@ export const initCountryToursFilters = () => {
       await loadResorts();
     }
 
-    if (resorts.length && resortChoice) {
-      resortChoice.removeActiveItems();
-      resortChoice.setChoiceByValue(resorts);
+    if (resort && resortChoice) {
+      resortChoice.setChoiceByValue(resort);
+    } else if (resort && resortSelect) {
+      resortSelect.value = resort;
     }
 
-    if (types.length && typeChoice) {
-      typeChoice.removeActiveItems();
-      typeChoice.setChoiceByValue(types);
+    if (type && typeChoice) {
+      typeChoice.setChoiceByValue(type);
+    } else if (type && typeSelect) {
+      typeSelect.value = type;
     }
 
     // если в URL есть фильтры — применяем их сразу с учетом пагинации
-    if (region || resorts.length || types.length) {
+    if (region || resort || type) {
       await loadTours(pageFromUrl);
     }
   };
