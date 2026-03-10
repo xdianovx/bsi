@@ -52,6 +52,18 @@ get_header();
 
 	<?= get_template_part('template-parts/sections/subscribe') ?>
 
+	<?php
+	$news_countries = get_field('news_countries');
+	if (!empty($news_countries)):
+		$country_ids = array_map('intval', (array) $news_countries);
+		get_template_part('template-parts/news/news-slider', null, [
+			'filter_countries' => $country_ids,
+			'exclude_post'     => get_the_ID(),
+			'title'            => 'Похожие новости',
+		]);
+	endif;
+	?>
+
 </main><!-- #main -->
 
 <?php

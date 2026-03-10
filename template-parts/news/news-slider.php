@@ -2,6 +2,12 @@
 // Проверяем, нужно ли фильтровать по MICE (передается через get_template_part)
 $filter_mice = isset($args['filter_mice']) ? $args['filter_mice'] : false;
 
+// Фильтрация по странам (массив ID стран)
+$filter_countries = isset($args['filter_countries']) ? $args['filter_countries'] : [];
+
+// Исключить текущий пост
+$exclude_post = isset($args['exclude_post']) ? (int) $args['exclude_post'] : 0;
+
 // Если на странице MICE, фильтруем по ACF полю
 $meta_query = [];
 if ($filter_mice) {
@@ -12,12 +18,29 @@ if ($filter_mice) {
   ];
 }
 
+// Фильтрация по странам через LIKE (ACF хранит массив сериализованно)
+if (!empty($filter_countries)) {
+  $country_meta_query = ['relation' => 'OR'];
+  foreach ($filter_countries as $country_id) {
+    $country_meta_query[] = [
+      'key'     => 'news_countries',
+      'value'   => '"' . (int) $country_id . '"',
+      'compare' => 'LIKE',
+    ];
+  }
+  $meta_query[] = $country_meta_query;
+}
+
 $news_args = [
-  'post_type' => 'news',
+  'post_type'      => 'news',
   'posts_per_page' => 6,
-  'orderby' => 'date',
-  'order' => 'DESC'
+  'orderby'        => 'date',
+  'order'          => 'DESC',
 ];
+
+if ($exclude_post) {
+  $news_args['post__not_in'] = [$exclude_post];
+}
 
 if (!empty($meta_query)) {
   $news_args['meta_query'] = $meta_query;
@@ -32,7 +55,7 @@ $news_query = new WP_Query($news_args);
 
     <div class="title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">
-        <h2 class="h2 news-slider__title">Последние новости</h2>
+        <h2 class="h2 news-slider__title"><?= isset($args['title']) ? esc_html($args['title']) : 'Последние новости' ?></h2>
         <div class="slider-arrow-wrap news-slider__arrows-wrap">
           <div class="slider-arrow slider-arrow-prev news-slider-arrow-prev">
           </div>
