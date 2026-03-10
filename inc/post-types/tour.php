@@ -572,6 +572,22 @@ add_action('manage_tour_posts_custom_column', function ($column, $post_id) {
   }
 }, 10, 2);
 
+add_filter('manage_edit-tour_sortable_columns', function ($columns) {
+  $columns['tour_samo_col'] = 'tour_samo_code';
+  return $columns;
+});
+
+add_action('pre_get_posts', function ($query) {
+  if (!is_admin() || !$query->is_main_query()) return;
+  $screen = get_current_screen();
+  if (!$screen || $screen->id !== 'edit-tour') return;
+
+  if ($query->get('orderby') === 'tour_samo_code') {
+    $query->set('meta_key', 'tour_samo_code');
+    $query->set('orderby', 'meta_value');
+  }
+}, 10);
+
 // Фильтр по стране
 add_action('restrict_manage_posts', function ($post_type) {
   if ($post_type !== 'tour') return;
@@ -585,10 +601,17 @@ add_action('restrict_manage_posts', function ($post_type) {
 
   $selected = isset($_GET['tour_country_filter']) ? (int) $_GET['tour_country_filter'] : 0;
 
-  $samo_search = isset($_GET['tour_samo_search']) ? sanitize_text_field($_GET['tour_samo_search']) : '';
+  $samo_search    = isset($_GET['tour_samo_search']) ? sanitize_text_field($_GET['tour_samo_search']) : '';
+  $no_samo        = !empty($_GET['tour_no_samo']);
+
   printf(
     '<input type="text" name="tour_samo_search" value="%s" placeholder="Код само..." style="float:none;margin-right:6px;">',
     esc_attr($samo_search)
+  );
+
+  printf(
+    '<label style="margin-right:10px;"><input type="checkbox" name="tour_no_samo" value="1"%s style="margin-right:4px;">Без кода само</label>',
+    checked($no_samo, true, false)
   );
 
   echo '<select name="tour_country_filter">';
@@ -627,6 +650,12 @@ add_action('pre_get_posts', function ($query) {
       'key'     => 'tour_samo_code',
       'value'   => $samo_search,
       'compare' => 'LIKE',
+    ];
+  } elseif (!empty($_GET['tour_no_samo'])) {
+    $meta_query[] = [
+      'relation' => 'OR',
+      ['key' => 'tour_samo_code', 'compare' => 'NOT EXISTS'],
+      ['key' => 'tour_samo_code', 'value' => '', 'compare' => '='],
     ];
   }
 
