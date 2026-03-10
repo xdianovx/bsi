@@ -53,7 +53,7 @@ if (!empty($tour_booking_url)) {
   }
 }
 
-$excerpt = get_the_excerpt($post_id);
+$excerpt = has_excerpt($post_id) ? get_the_excerpt($post_id) : '';
 
 get_header();
 ?>
