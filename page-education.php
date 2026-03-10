@@ -79,6 +79,11 @@ if (!empty($country_ids)) {
   usort($countries, fn($a, $b) => strcmp($a->post_title, $b->post_title));
 }
 
+$paged = get_query_var('paged') ? (int) get_query_var('paged') : 1;
+if (!$paged) {
+  $paged = get_query_var('page') ? (int) get_query_var('page') : 1;
+}
+
 // Начальный запрос - показываем все школы (если страна не выбрана)
 $initial_query = new WP_Query([
   'post_type' => 'education',
@@ -86,6 +91,7 @@ $initial_query = new WP_Query([
   'posts_per_page' => 12,
   'orderby' => 'title',
   'order' => 'ASC',
+  'paged' => $paged,
 ]);
 ?>
 
@@ -493,11 +499,18 @@ $initial_query = new WP_Query([
       <?php endif; ?>
     </div>
 
-    <div class="education-page__load-more js-education-load-more"
-      style="<?php echo ($initial_query->max_num_pages > 1) ? 'display: block;' : 'display: none;'; ?>">
-      <button type="button" class="education-page__load-more-btn btn btn-accent">
-        Показать еще
-      </button>
+    <div class="news-pagination js-education-pagination">
+      <?php if ($initial_query->max_num_pages > 1): ?>
+        <?php
+        echo paginate_links([
+          'total' => $initial_query->max_num_pages,
+          'current' => $paged,
+          'prev_text' => '&larr; Назад',
+          'next_text' => 'Вперед &rarr;',
+          'mid_size' => 2,
+        ]);
+        ?>
+      <?php endif; ?>
     </div>
   </div>
 </section>
