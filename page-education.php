@@ -347,6 +347,7 @@ $initial_query = new WP_Query([
           }
 
           $price = '';
+          $show_price_from = false;
           if (function_exists('get_field')) {
             $price_val = get_field('education_price', $education_id);
 
@@ -377,6 +378,7 @@ $initial_query = new WP_Query([
               if (!empty($prices)) {
                 $min_price_value = min($prices);
                 $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+                $show_price_from = true;
               }
             }
 
@@ -462,6 +464,7 @@ $initial_query = new WP_Query([
             'country_title' => $country_title,
             'resort_title' => $resort_title,
             'price' => $price,
+            'show_price_from' => $show_price_from,
             'languages' => $languages,
             'programs' => $programs,
             'country_id' => $country_id,

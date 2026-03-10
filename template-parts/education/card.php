@@ -15,6 +15,7 @@ $booking_url = '';
 $age_min = 0;
 $age_max = 0;
 $nearest_date = '';
+$show_price_from = false;
 
 if ($education && is_array($education)) {
   if (!empty($education['id'])) {
@@ -36,6 +37,7 @@ if ($education && is_array($education)) {
   $age_min = !empty($education['age_min']) && $education['age_min'] !== '' ? (int) $education['age_min'] : 0;
   $age_max = !empty($education['age_max']) && $education['age_max'] !== '' ? (int) $education['age_max'] : 0;
   $nearest_date = !empty($education['nearest_date']) ? (string) $education['nearest_date'] : '';
+  $show_price_from = !empty($education['show_price_from']) ? (bool) $education['show_price_from'] : false;
 } else {
   $education_id = (int) get_the_ID();
   if (!$education_id) {
@@ -256,16 +258,19 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 ?>
 <div class="education-card">
 
-  <a href="<?php echo esc_url($education_url); ?>" class="education-card__media">
-    <img src="<?php echo esc_url($education_image); ?>" alt="<?php echo esc_attr($education_title); ?>"
-      class="education-card__image">
+  <a href="<?php echo esc_url($education_url); ?>"
+     class="education-card__media">
+    <img src="<?php echo esc_url($education_image); ?>"
+         alt="<?php echo esc_attr($education_title); ?>"
+         class="education-card__image">
   </a>
 
   <div class="education-card__body">
     <div class="education-card__location">
       <?php if ($education_flag): ?>
         <div class="education-card__flag">
-          <img src="<?php echo esc_url($education_flag); ?>" alt="">
+          <img src="<?php echo esc_url($education_flag); ?>"
+               alt="">
         </div>
       <?php endif; ?>
       <?php if ($country_title || $resort_title): ?>
@@ -287,7 +292,7 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
       <div class="education-card__programs">
         <?php foreach (array_slice($programs, 0, 4) as $program): ?>
           <span
-            class="education-card__program-tag <?php echo ($program === 'Групповой заезд') ? '--group-arrival' : ''; ?>"><?php echo esc_html($program); ?></span>
+                class="education-card__program-tag <?php echo ($program === 'Групповой заезд') ? '--group-arrival' : ''; ?>"><?php echo esc_html($program); ?></span>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
@@ -330,8 +335,10 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
       <?php
       $education_rel = 'noopener noreferrer';
       ?>
-      <a href="<?php echo esc_url($education_url); ?>" target="_blank" rel="<?php echo esc_attr($education_rel); ?>"
-        class="education-card__btn education-card__btn-details">
+      <a href="<?php echo esc_url($education_url); ?>"
+         target="_blank"
+         rel="<?php echo esc_attr($education_rel); ?>"
+         class="education-card__btn education-card__btn-details">
         Подробнее
       </a>
       <?php if ($price): ?>
@@ -340,9 +347,11 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
         $price_url = $education_url;
         $price_rel = 'noopener noreferrer';
         ?>
-        <a href="<?php echo esc_url($price_url); ?>" target="_blank" rel="<?php echo esc_attr($price_rel); ?>"
-          class="btn btn-accent education-card__btn education-card__btn-book">
-          <?php echo esc_html($price); ?>
+        <a href="<?php echo esc_url($price_url); ?>"
+           target="_blank"
+           rel="<?php echo esc_attr($price_rel); ?>"
+           class="btn btn-accent education-card__btn education-card__btn-book">
+          <?php echo esc_html(($show_price_from ? 'от ' : '') . $price); ?>
         </a>
       <?php endif; ?>
     </div>
