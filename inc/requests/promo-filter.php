@@ -7,16 +7,28 @@ function bsi_filter_promos()
 {
   $country_id = isset($_POST['country']) ? (int) $_POST['country'] : 0;
 
+  $today = date('Ymd');
+
+  $active_meta = [
+    'relation' => 'OR',
+    ['key' => 'promo_date_to', 'compare' => 'NOT EXISTS'],
+    ['key' => 'promo_date_to', 'value' => '', 'compare' => '='],
+    ['key' => 'promo_date_to', 'value' => $today, 'compare' => '>='],
+  ];
+
   $query_args = [
     'post_type' => 'promo',
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'orderby' => 'date',
     'order' => 'DESC',
+    'meta_query' => $active_meta,
   ];
 
   if ($country_id) {
     $query_args['meta_query'] = [
+      'relation' => 'AND',
+      $active_meta,
       [
         'key' => 'promo_countries',
         'value' => '"' . $country_id . '"',

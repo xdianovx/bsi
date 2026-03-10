@@ -50,11 +50,19 @@ function bsi_get_promo_countries()
 {
   $result = [];
 
+  $today = date('Ymd');
+
   $promos = get_posts([
     'post_type' => 'promo',
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
+    'meta_query' => [
+      'relation' => 'OR',
+      ['key' => 'promo_date_to', 'compare' => 'NOT EXISTS'],
+      ['key' => 'promo_date_to', 'value' => '', 'compare' => '='],
+      ['key' => 'promo_date_to', 'value' => $today, 'compare' => '>='],
+    ],
   ]);
 
   if (empty($promos)) {

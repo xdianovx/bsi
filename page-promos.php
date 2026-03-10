@@ -19,7 +19,26 @@ get_header();
           <?php the_title(); ?>
         </h1>
 
-        <p class="page-award__excerpt archive-page__excerpt"><?= get_the_excerpt() ?></p>
+        <?php
+        $archive_page = get_posts([
+          'post_type' => 'page',
+          'posts_per_page' => 1,
+          'meta_key' => '_wp_page_template',
+          'meta_value' => 'page-promo-archive.php',
+          'fields' => 'ids',
+        ]);
+        if (!empty($archive_page)):
+          $archive_url = get_permalink($archive_page[0]);
+          ?>
+          <div class="promo-page__archive-link">
+            <a href="<?= esc_url($archive_url); ?>"
+               class="underline">
+              Архив акций
+            </a>
+          </div>
+        <?php endif; ?>
+
+
 
         <?php if (trim((string) get_the_content()) !== ''): ?>
           <div class="editor-content archive-page__content">
@@ -81,12 +100,22 @@ get_header();
       <div class="promo-page__list">
 
         <?php
+        $today = date('Ymd');
+
+        $active_meta = [
+          'relation' => 'OR',
+          ['key' => 'promo_date_to', 'compare' => 'NOT EXISTS'],
+          ['key' => 'promo_date_to', 'value' => '', 'compare' => '='],
+          ['key' => 'promo_date_to', 'value' => $today, 'compare' => '>='],
+        ];
+
         $promo_query = new WP_Query([
           'post_type' => 'promo',
           'post_status' => 'publish',
           'posts_per_page' => -1,
           'orderby' => 'date',
           'order' => 'DESC',
+          'meta_query' => $active_meta,
         ]);
         ?>
 
@@ -106,6 +135,8 @@ get_header();
         <?php endif; ?>
 
         <?php wp_reset_postdata(); ?>
+
+
 
       </div>
     </div>
