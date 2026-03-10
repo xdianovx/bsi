@@ -288,6 +288,12 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 
     <h3 class="education-card__title"><?php echo esc_html($education_title); ?></h3>
 
+    <?php if ($nearest_date): ?>
+      <div class="education-card__date">
+        Ближайший заезд: <?php echo esc_html(format_date_russian($nearest_date)); ?>
+      </div>
+    <?php endif; ?>
+
     <?php if (!empty($programs)): ?>
       <div class="education-card__programs">
         <?php foreach (array_slice($programs, 0, 4) as $program): ?>
@@ -301,35 +307,24 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
       <div class="education-card__info-row">
         <?php if (!empty($languages)): ?>
           <span class="education-card__language">
-            <?php echo esc_html(implode(', ', array_slice($languages, 0, 2))); ?>
+            <?php echo esc_html(implode(', ', $languages)); ?>
           </span>
         <?php endif; ?>
         <?php if ($age_min > 0 || $age_max > 0): ?>
-          <?php if (!empty($languages)): ?>
-            <span class="education-card__separator">•</span>
-          <?php endif; ?>
           <span class="education-card__age">
             <?php
             if ($age_min > 0 && $age_max > 0) {
-              echo esc_html($age_min . '-' . $age_max . ' лет');
+              echo esc_html('Возраст: ' . $age_min . '-' . $age_max . ' лет');
             } elseif ($age_min > 0) {
-              echo esc_html('от ' . $age_min . ' лет');
+              echo esc_html('Возраст: от ' . $age_min . ' лет');
             } elseif ($age_max > 0) {
-              echo esc_html('до ' . $age_max . ' лет');
+              echo esc_html('Возраст: до ' . $age_max . ' лет');
             }
             ?>
           </span>
         <?php endif; ?>
       </div>
     <?php endif; ?>
-
-    <?php if ($nearest_date): ?>
-      <div class="education-card__date">
-        Ближайший заезд: <?php echo esc_html(format_date_russian($nearest_date)); ?>
-      </div>
-    <?php endif; ?>
-
-
 
     <div class="education-card__actions">
       <?php
@@ -351,7 +346,7 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
            target="_blank"
            rel="<?php echo esc_attr($price_rel); ?>"
            class="btn btn-accent education-card__btn education-card__btn-book">
-          <?php echo esc_html(($show_price_from ? 'от ' : '') . $price); ?>
+          <?php echo esc_html(($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price)); ?>
         </a>
       <?php endif; ?>
     </div>

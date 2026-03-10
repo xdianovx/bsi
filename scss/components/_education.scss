@@ -1136,14 +1136,19 @@
 .education-card__programs {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 4px;
   gap: 4px;
+  position: absolute;
+  top: 8px;
+  left: 8px;
 }
 
 .education-card__program-tag {
   font-size: 14px;
   line-height: 100%;
   color: $text-black;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
 
   &.--group-arrival {
     color: $red;
@@ -1212,16 +1217,16 @@
 
 .education-card__info-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
   margin-top: 4px;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.7);
-  flex-wrap: wrap;
 }
 
 .education-card__language {
   font-size: 14px;
+  line-height: 140%;
 }
 
 .education-card__separator {
