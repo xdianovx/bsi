@@ -579,6 +579,12 @@ add_action('restrict_manage_posts', function ($post_type) {
 
   $selected = isset($_GET['tour_country_filter']) ? (int) $_GET['tour_country_filter'] : 0;
 
+  $samo_search = isset($_GET['tour_samo_search']) ? sanitize_text_field($_GET['tour_samo_search']) : '';
+  printf(
+    '<input type="text" name="tour_samo_search" value="%s" placeholder="Код само..." style="float:none;margin-right:6px;">',
+    esc_attr($samo_search)
+  );
+
   echo '<select name="tour_country_filter">';
   echo '<option value="">Все страны</option>';
   foreach ($countries as $country) {
@@ -598,12 +604,29 @@ add_action('pre_get_posts', function ($query) {
   if (!$screen || $screen->post_type !== 'tour' || $screen->id !== 'edit-tour') return;
 
   $country_filter = isset($_GET['tour_country_filter']) ? (int) $_GET['tour_country_filter'] : 0;
+  $samo_search    = isset($_GET['tour_samo_search']) ? sanitize_text_field($_GET['tour_samo_search']) : '';
+
+  $meta_query = [];
+
   if ($country_filter) {
-    $query->set('meta_query', [[
+    $meta_query[] = [
       'key'     => 'tour_country',
       'value'   => $country_filter,
       'compare' => '=',
-    ]]);
+    ];
+  }
+
+  if ($samo_search !== '') {
+    $meta_query[] = [
+      'key'     => 'tour_samo_code',
+      'value'   => $samo_search,
+      'compare' => 'LIKE',
+    ];
+  }
+
+  if (!empty($meta_query)) {
+    $meta_query['relation'] = 'AND';
+    $query->set('meta_query', $meta_query);
   }
 }, 15);
 
