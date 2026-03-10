@@ -539,6 +539,65 @@ add_action('acf/init', function () {
 });
 
 
+// Колонка "Страна" в списке туров
+add_filter('manage_tour_posts_columns', function ($columns) {
+  $new = [];
+  foreach ($columns as $key => $value) {
+    $new[$key] = $value;
+    if ($key === 'title') {
+      $new['tour_country_col'] = 'Страна';
+    }
+  }
+  return $new;
+});
+
+add_action('manage_tour_posts_custom_column', function ($column, $post_id) {
+  if ($column !== 'tour_country_col') return;
+  $country_id = get_field('tour_country', $post_id);
+  echo $country_id ? esc_html(get_the_title($country_id)) : '—';
+}, 10, 2);
+
+// Фильтр по стране
+add_action('restrict_manage_posts', function ($post_type) {
+  if ($post_type !== 'tour') return;
+
+  $countries = get_posts([
+    'post_type'      => 'country',
+    'posts_per_page' => -1,
+    'orderby'        => 'title',
+    'order'          => 'ASC',
+  ]);
+
+  $selected = isset($_GET['tour_country_filter']) ? (int) $_GET['tour_country_filter'] : 0;
+
+  echo '<select name="tour_country_filter">';
+  echo '<option value="">Все страны</option>';
+  foreach ($countries as $country) {
+    printf(
+      '<option value="%d"%s>%s</option>',
+      $country->ID,
+      selected($selected, $country->ID, false),
+      esc_html($country->post_title)
+    );
+  }
+  echo '</select>';
+});
+
+add_action('pre_get_posts', function ($query) {
+  if (!is_admin() || !$query->is_main_query()) return;
+  $screen = get_current_screen();
+  if (!$screen || $screen->post_type !== 'tour' || $screen->id !== 'edit-tour') return;
+
+  $country_filter = isset($_GET['tour_country_filter']) ? (int) $_GET['tour_country_filter'] : 0;
+  if ($country_filter) {
+    $query->set('meta_query', [[
+      'key'     => 'tour_country',
+      'value'   => $country_filter,
+      'compare' => '=',
+    ]]);
+  }
+}, 15);
+
 add_filter('acf/fields/post_object/query/key=field_tour_country', function ($args) {
   $args['post_parent'] = 0;
   return $args;
