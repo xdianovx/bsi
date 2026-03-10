@@ -48,14 +48,30 @@ $region_terms = get_terms([
 ]);
 
 /**
- * Типы туров (общая такса)
+ * Типы туров: только те, что есть у туров этой страны
  */
-$tour_type_terms = get_terms([
-  'taxonomy' => 'tour_type',
-  'hide_empty' => false,
-  'orderby' => 'name',
-  'order' => 'ASC',
+$country_tour_ids = get_posts([
+  'post_type'      => 'tour',
+  'post_status'    => 'publish',
+  'posts_per_page' => -1,
+  'fields'         => 'ids',
+  'meta_query'     => [
+    [
+      'key'     => 'tour_country',
+      'value'   => $country_id,
+      'compare' => '=',
+    ],
+  ],
 ]);
+
+$tour_type_terms = [];
+if (!empty($country_tour_ids)) {
+  $tour_type_terms = wp_get_object_terms($country_tour_ids, 'tour_type', [
+    'orderby' => 'name',
+    'order'   => 'ASC',
+    'parent'  => 0,
+  ]);
+}
 
 /**
  * Курорты страны: все регионы страны -> все курорты этих регионов
@@ -157,9 +173,9 @@ get_header(); ?>
                 <div class="tours-filter__field">
                   <div class="tours-filter__label">Типы туров</div>
                   <select class="tours-filter__select"
-                          name="tour_type[]"
-                          multiple
-                          data-choice="multiple">
+                          name="tour_type"
+                          data-choice="single">
+                    <option value="">Все типы</option>
                     <?php if (!is_wp_error($tour_type_terms) && !empty($tour_type_terms)): ?>
                       <?php foreach ($tour_type_terms as $t): ?>
                         <option value="<?= (int) $t->term_id; ?>"><?= esc_html($t->name); ?></option>

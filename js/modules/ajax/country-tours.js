@@ -31,7 +31,7 @@ export const initCountryToursFilters = () => {
 
   const regionSelect = root.querySelector('select[name="region"]');
   const resortSelect = root.querySelector('select[name="resort[]"]');
-  const typeSelect = root.querySelector('select[name="tour_type[]"]');
+  const typeSelect = root.querySelector('select[name="tour_type"]');
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
@@ -61,7 +61,8 @@ export const initCountryToursFilters = () => {
       if (regionId) body.set("region", regionId);
 
       getValues(resortSelect).forEach((v) => body.append("resort[]", v));
-      getValues(typeSelect).forEach((v) => body.append("tour_type[]", v));
+      const typeVal = typeSelect ? typeSelect.value || "" : "";
+      if (typeVal) body.set("tour_type", typeVal);
 
       const res = await fetch(ajaxUrl, {
         method: "POST",
