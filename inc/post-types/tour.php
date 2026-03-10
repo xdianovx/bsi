@@ -554,6 +554,7 @@ add_filter('manage_tour_posts_columns', function ($columns) {
   foreach ($columns as $key => $value) {
     $new[$key] = $value;
     if ($key === 'title') {
+      $new['tour_samo_col']    = 'Код само';
       $new['tour_country_col'] = 'Страна';
     }
   }
@@ -561,9 +562,14 @@ add_filter('manage_tour_posts_columns', function ($columns) {
 });
 
 add_action('manage_tour_posts_custom_column', function ($column, $post_id) {
-  if ($column !== 'tour_country_col') return;
-  $country_id = get_field('tour_country', $post_id);
-  echo $country_id ? esc_html(get_the_title($country_id)) : '—';
+  if ($column === 'tour_samo_col') {
+    $code = get_field('tour_samo_code', $post_id);
+    echo $code ? esc_html($code) : '—';
+  }
+  if ($column === 'tour_country_col') {
+    $country_id = get_field('tour_country', $post_id);
+    echo $country_id ? esc_html(get_the_title($country_id)) : '—';
+  }
 }, 10, 2);
 
 // Фильтр по стране
