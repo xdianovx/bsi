@@ -305,6 +305,15 @@ add_action('acf/init', function () {
     'menu_order' => 10,
     'fields' => [
       [
+        'key' => 'field_tour_samo_code',
+        'label' => 'Код само',
+        'name' => 'tour_samo_code',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'Например: 12345',
+        'instructions' => 'Код тура в системе SamoTour',
+      ],
+      [
         'key' => 'field_tour_is_popular',
         'label' => 'Популярный',
         'name' => 'is_popular',
