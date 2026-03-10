@@ -40,7 +40,7 @@ $news_query = new WP_Query([
           Новости BSI Group
         </h1>
 
-        <div class="archive-page__excerpt --row">
+        <div class="archive-page__excerpt">
           <p>Здесь мы делимся важными событиями компании, обновлениями по направлениям и свежими предложениями для
             партнёров и туристов. Следите за новостями, чтобы не пропускать выгодные акции и изменения на рынке туризма.
           </p>
@@ -55,13 +55,15 @@ $news_query = new WP_Query([
     <div class="container">
 
       <div class="news-filter">
-        <button class="news-filter__btn js-news-filter-btn is-active" data-term="">
+        <button class="news-filter__btn js-news-filter-btn is-active"
+                data-term="">
           Все
         </button>
 
         <?php if (!empty($news_terms) && !is_wp_error($news_terms)): ?>
           <?php foreach ($news_terms as $term): ?>
-            <button class="news-filter__btn js-news-filter-btn" data-term="<?php echo esc_attr($term->slug); ?>">
+            <button class="news-filter__btn js-news-filter-btn"
+                    data-term="<?php echo esc_attr($term->slug); ?>">
               <?php echo esc_html($term->name); ?>
             </button>
           <?php endforeach; ?>
@@ -93,7 +95,8 @@ $news_query = new WP_Query([
         <div class="no-news">
           <p>Новостей пока нет.</p>
         </div>
-        <div class="news-pagination js-news-pagination" style="display: none;"></div>
+        <div class="news-pagination js-news-pagination"
+             style="display: none;"></div>
       <?php endif; ?>
 
       <?php wp_reset_postdata(); ?>

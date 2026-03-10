@@ -73,10 +73,10 @@ if (!empty($country_ids)) {
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'post_parent' => 0,
-    'orderby' => 'title',
-    'order' => 'ASC',
     'post__in' => $country_ids,
+    'orderby' => 'post__in',
   ]);
+  usort($countries, fn($a, $b) => strcmp($a->post_title, $b->post_title));
 }
 
 // Начальный запрос - показываем все школы (если страна не выбрана)
