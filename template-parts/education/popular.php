@@ -1,29 +1,24 @@
 <?php
 
-// ВРЕМЕННО: Отключаем загрузку из админки, используем только тестовые данные
-$use_test_data = true; // Переключить на false для использования данных из админки
-
 $items = [];
 $promo_countries = [];
 
+// Загружаем вручную выбранные записи с главной страницы (ACF поле)
+$front_page_id = (int) get_option('page_on_front');
+$acf_education_ids = [];
+
+if ($front_page_id && function_exists('get_field')) {
+    $acf_ids = get_field('homepage_education_items', $front_page_id);
+    if (!empty($acf_ids) && is_array($acf_ids)) {
+        $acf_education_ids = array_map('intval', $acf_ids);
+    }
+}
+
+$use_test_data = empty($acf_education_ids);
+
 if (!$use_test_data) {
-    // Загрузка данных из админки
-    $popular_education_ids = get_posts([
-        'post_type' => 'education',
-        'post_status' => 'publish',
-        'posts_per_page' => -1,
-        'fields' => 'ids',
-        'no_found_rows' => true,
-        'update_post_meta_cache' => false,
-        'update_post_term_cache' => false,
-        'meta_query' => [
-            [
-                'key' => 'is_popular',
-                'value' => '1',
-                'compare' => '=',
-            ],
-        ],
-    ]);
+    // Загрузка данных из ACF поля главной страницы
+    $popular_education_ids = $acf_education_ids;
 
     $country_ids = [];
 
@@ -78,10 +73,9 @@ if (!$use_test_data) {
     if (!empty($popular_education_ids)) {
         $education_posts = get_posts([
             'post_type' => 'education',
-            'posts_per_page' => 12,
+            'posts_per_page' => -1,
             'post_status' => 'publish',
-            'orderby' => 'date',
-            'order' => 'DESC',
+            'orderby' => 'post__in',
             'post__in' => $popular_education_ids,
             'ignore_sticky_posts' => true,
             'no_found_rows' => true,
@@ -268,40 +262,6 @@ if (!$use_test_data) {
         ];
     }
 
-    if (!empty($items)) {
-        usort($items, function ($a, $b) {
-            $priority_a = !empty($a['priority']) && $a['priority'] === true;
-            $priority_b = !empty($b['priority']) && $b['priority'] === true;
-
-            // Приоритетные элементы идут первыми
-            if ($priority_a && !$priority_b) {
-                return -1;
-            }
-            if (!$priority_a && $priority_b) {
-                return 1;
-            }
-
-            // Если оба приоритетные или оба не приоритетные - сортируем по цене
-            $price_a = 0;
-            $price_b = 0;
-
-            if (!empty($a['price'])) {
-                preg_match('/[\d\s]+/', $a['price'], $matches_a);
-                if (!empty($matches_a[0])) {
-                    $price_a = (int) str_replace(' ', '', $matches_a[0]);
-                }
-            }
-
-            if (!empty($b['price'])) {
-                preg_match('/[\d\s]+/', $b['price'], $matches_b);
-                if (!empty($matches_b[0])) {
-                    $price_b = (int) str_replace(' ', '', $matches_b[0]);
-                }
-            }
-
-            return $price_a <=> $price_b;
-        });
-    }
 } // Конец блока if (!$use_test_data)
 
 if ($use_test_data || empty($items)) {

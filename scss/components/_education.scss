@@ -1142,6 +1142,12 @@
   left: 8px;
 }
 
+.popular-education-slider {
+  .swiper-slide {
+    height: auto;
+  }
+}
+
 .education-card__program-tag {
   font-size: 14px;
   line-height: 100%;
