@@ -249,6 +249,19 @@ if (empty($price) && $education_id && function_exists('get_field')) {
   }
 }
 
+// Подставляем продолжительность обучения в цену
+if (!empty($price) && $education_id && function_exists('get_field')) {
+  $course_duration = trim((string) get_field('education_course_duration', $education_id));
+  if ($course_duration !== '') {
+    if (strpos($price, '/') !== false) {
+      // Заменяем всё после "/" на продолжительность из поля
+      $price = trim(preg_replace('~/.*$~u', '', $price)) . ' / ' . $course_duration;
+    } else {
+      $price = $price . ' / ' . $course_duration;
+    }
+  }
+}
+
 if (empty($booking_url) && $education_id && function_exists('get_field')) {
   $booking_url_val = get_field('education_booking_url', $education_id);
   if ($booking_url_val) {
