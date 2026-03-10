@@ -26,6 +26,8 @@ export const tourPrices = () => {
   const tours = wrap.getAttribute("data-tours");
   const showPriceFromAttr = wrap.getAttribute("data-show-price-from");
   const showPriceFrom = showPriceFromAttr === null || showPriceFromAttr === "1";
+  const urlNightsFrom = parseInt(wrap.getAttribute("data-nights-from") || "", 10) || null;
+  const urlNightsTill = parseInt(wrap.getAttribute("data-nights-till") || "", 10) || null;
 
   if (!tourId || !townFromInc || !stateInc || !tours) {
     return;
@@ -88,8 +90,8 @@ export const tourPrices = () => {
   }
 
   const searchParams = {
-    nightsFrom: 7,
-    nightsTill: 7,
+    nightsFrom: urlNightsFrom || 7,
+    nightsTill: urlNightsTill || 7,
     checkInBeg: "",
     checkInEnd: "",
     adult: 2,
@@ -597,7 +599,7 @@ export const tourPrices = () => {
 
             searchParams.checkInBeg = nearestDate;
 
-            const nightsCount = nightsData?.from || searchParams.nightsFrom || 7;
+            const nightsCount = searchParams.nightsFrom || nightsData?.from || 7;
             const startDateObj = parseDateFromYYYYMMDD(nearestDate);
             if (startDateObj) {
               const endDateObj = new Date(startDateObj);
@@ -929,15 +931,15 @@ export const tourPrices = () => {
     await loadAvailableDates();
 
     if (nightsData) {
-      searchParams.nightsFrom = nightsData.from;
-      searchParams.nightsTill = nightsData.till;
+      if (!urlNightsFrom) searchParams.nightsFrom = nightsData.from;
+      if (!urlNightsTill) searchParams.nightsTill = nightsData.till;
 
       const nightsValue = nightsSelect?.querySelector(".gtm-nights-select-value");
       if (nightsValue) {
-        if (nightsData.from === nightsData.till) {
-          nightsValue.textContent = `${nightsData.from} ночей`;
+        if (searchParams.nightsFrom === searchParams.nightsTill) {
+          nightsValue.textContent = `${searchParams.nightsFrom} ночей`;
         } else {
-          nightsValue.textContent = `${nightsData.from} - ${nightsData.till} ночей`;
+          nightsValue.textContent = `${searchParams.nightsFrom} - ${searchParams.nightsTill} ночей`;
         }
       }
     }

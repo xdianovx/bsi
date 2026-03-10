@@ -232,6 +232,14 @@ function parse_excursion_url(string $url): array
     $result['TOURS'] = (int) $params['TOURINC'];
   }
 
+  if (!empty($params['NIGHTS_FROM'])) {
+    $result['NIGHTS_FROM'] = (int) $params['NIGHTS_FROM'];
+  }
+
+  if (!empty($params['NIGHTS_TILL'])) {
+    $result['NIGHTS_TILL'] = (int) $params['NIGHTS_TILL'];
+  }
+
   return $result;
 }
 
