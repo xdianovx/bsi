@@ -1,7 +1,8 @@
 .DS_Store
 Thumbs.db
 .cursor/
-
+.claude/
+CLAUDE.md
 dist/
 node_modules/
 npm-debug.log*
