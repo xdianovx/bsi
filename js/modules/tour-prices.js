@@ -473,10 +473,8 @@ export const tourPrices = () => {
           const meal = Array.from(item.meals)[0];
           if (meal) commonData.push({ label: "Питание", value: meal });
         }
-        if (item.rooms.size === 1) {
-          const room = Array.from(item.rooms)[0];
-          if (room) commonData.push({ label: "Номер", value: room });
-        }
+        const minRoom = item.minPriceItem?.room || item.minPriceItem?.roomAlt || "";
+        if (minRoom) commonData.push({ label: "Номер", value: minRoom });
         if (item.nights.size === 1) {
           const nights = Array.from(item.nights)[0];
           if (nights) commonData.push({ label: "Ночей", value: nights });
