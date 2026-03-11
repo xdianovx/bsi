@@ -236,6 +236,12 @@ function populateModal(programData) {
   // Услуги
   renderServices(programData);
 
+  // Показываем/скрываем блок итого
+  const totalContainer = document.querySelector(".modal-program-booking__total");
+  if (totalContainer) {
+    totalContainer.style.display = parsePrice(programData.price) > 0 ? "" : "none";
+  }
+
   // Обновляем итого
   updateTotalDisplay();
 
@@ -462,6 +468,27 @@ export function initEducationProgramForm() {
       });
     });
   }
+
+  // Обработчик общей кнопки бронирования школы (без программы)
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".js-education-booking-btn");
+    if (!btn) return;
+
+    e.preventDefault();
+
+    openProgramModal({
+      title: btn.dataset.schoolName || "",
+      schoolName: btn.dataset.schoolName || "",
+      date: "",
+      age: "",
+      duration: "",
+      accommodation: "",
+      price: "0",
+      visaRequired: false,
+      visaPrice: "0",
+      services: [],
+    });
+  });
 
   // Обработчики кнопок бронирования
   document.addEventListener("click", (e) => {

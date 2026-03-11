@@ -544,7 +544,8 @@ get_header();
                 </a>
               <?php else: ?>
                 <button class="btn btn-accent single-education__booking-btn js-education-booking-btn"
-                  data-education-id="<?php echo esc_attr($post_id); ?>">
+                  data-education-id="<?php echo esc_attr($post_id); ?>"
+                  data-school-name="<?php echo esc_attr(get_the_title()); ?>">
                   Забронировать
                 </button>
               <?php endif; ?>
