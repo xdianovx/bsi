@@ -135,12 +135,68 @@ export const initEducationFilter = () => {
       params.set("sort", currentSortValue);
     }
 
-    const newUrl = params.toString() 
+    if (currentPage > 1) {
+      params.set("page", String(currentPage));
+    }
+
+    const newUrl = params.toString()
       ? `${window.location.pathname}?${params.toString()}`
       : window.location.pathname;
 
     // Используем replaceState чтобы не создавать новую запись в истории
     window.history.replaceState({}, '', newUrl);
+  };
+
+  const renderPagination = () => {
+    if (!pagination) return;
+
+    if (totalPages <= 1) {
+      pagination.innerHTML = '';
+      return;
+    }
+
+    const range = 2;
+    const startPage = Math.max(1, currentPage - range);
+    const endPage = Math.min(totalPages, currentPage + range);
+
+    let html = '';
+
+    if (currentPage > 1) {
+      html += `<a href="#" class="page-numbers prev" data-page="${currentPage - 1}">&larr; Назад</a>`;
+    }
+
+    if (startPage > 1) {
+      html += `<a href="#" class="page-numbers" data-page="1">1</a>`;
+      if (startPage > 2) html += `<span class="page-numbers dots">&hellip;</span>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      if (i === currentPage) {
+        html += `<span class="page-numbers current">${i}</span>`;
+      } else {
+        html += `<a href="#" class="page-numbers" data-page="${i}">${i}</a>`;
+      }
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) html += `<span class="page-numbers dots">&hellip;</span>`;
+      html += `<a href="#" class="page-numbers" data-page="${totalPages}">${totalPages}</a>`;
+    }
+
+    if (currentPage < totalPages) {
+      html += `<a href="#" class="page-numbers next" data-page="${currentPage + 1}">Вперед &rarr;</a>`;
+    }
+
+    pagination.innerHTML = html;
+
+    pagination.querySelectorAll('a[data-page]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const page = parseInt(link.getAttribute('data-page'), 10);
+        loadEducation(page);
+        window.scrollTo({ top: root.offsetTop - 100, behavior: 'smooth' });
+      });
+    });
   };
 
   const loadEducation = async (page = 1) => {
@@ -229,11 +285,8 @@ export const initEducationFilter = () => {
         updateFilterOptionsFromResults(json.data.filter_options);
       }
 
-      // Обновляем URL только для первой страницы
-      if (page === 1) {
-        updateUrl();
-      }
-
+      updateUrl();
+      renderPagination();
       updateResetButton();
     } catch (e) {
     } finally {
@@ -625,6 +678,11 @@ export const initEducationFilter = () => {
     const dateFrom = params.get("date_from");
     const dateTo = params.get("date_to");
     const sort = params.get("sort");
+    const pageParam = params.get("page");
+
+    if (pageParam) {
+      currentPage = parseInt(pageParam, 10) || 1;
+    }
 
     const countryId = country || "";
     await updateFilterOptions(countryId);
@@ -705,7 +763,7 @@ export const initEducationFilter = () => {
     updateResetButton();
 
     if (hasFilters) {
-      await loadEducation(1);
+      await loadEducation(currentPage);
     }
   };
 
@@ -922,6 +980,25 @@ export const initEducationFilter = () => {
       updateResetButton();
       updateUrl();
       loadEducation(1);
+    });
+  }
+
+  // Перехватываем клики по статическим ссылкам пагинации (до первого AJAX)
+  if (pagination) {
+    pagination.querySelectorAll('a.page-numbers').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = link.href;
+        const pathMatch = href.match(/\/page\/(\d+)\/?/);
+        const queryMatch = href.match(/[?&]paged=(\d+)/);
+        const page = pathMatch
+          ? parseInt(pathMatch[1], 10)
+          : queryMatch
+          ? parseInt(queryMatch[1], 10)
+          : 1;
+        loadEducation(page);
+        window.scrollTo({ top: root.offsetTop - 100, behavior: 'smooth' });
+      });
     });
   }
 
