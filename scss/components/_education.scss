@@ -1000,6 +1000,10 @@
   margin-top: 32px;
   display: flex;
   align-items: center;
+
+  @media screen and (max-width: 768px) {
+    align-items: flex-start;
+  }
 }
 
 .education-page__controls-right {
