@@ -2,15 +2,20 @@
 
 /**
  * Парсит строку дат вида "21.07.2026, 30.08.2026" и возвращает массив в формате Y-m-d.
- * Поддерживает форматы: d.m.Y, Y-m-d.
+ * Поддерживает разделители: запятая, точка с запятой, перенос строки.
+ * Поддерживает форматы: d.m.Y, d/m/Y, d-m-Y, Y-m-d.
  */
 function parse_program_dates_string(string $dates_str): array
 {
   if (!$dates_str) return [];
   $result = [];
-  foreach (array_map('trim', explode(',', $dates_str)) as $raw) {
+  // Нормализуем разделители: ; и переносы строк заменяем на запятую
+  $normalized = preg_replace('/[;\r\n]+/', ',', $dates_str);
+  foreach (array_map('trim', explode(',', $normalized)) as $raw) {
     if (!$raw) continue;
     $obj = DateTime::createFromFormat('d.m.Y', $raw)
+      ?: DateTime::createFromFormat('d/m/Y', $raw)
+      ?: DateTime::createFromFormat('d-m-Y', $raw)
       ?: DateTime::createFromFormat('Y-m-d', $raw);
     if ($obj) {
       $result[] = $obj->format('Y-m-d');

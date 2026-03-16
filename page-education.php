@@ -84,30 +84,35 @@ if (!$paged) {
   $paged = get_query_var('page') ? (int) get_query_var('page') : 1;
 }
 
-// Собираем все будущие даты из всех школ для flatpickr
-$all_education_dates = [];
-$all_education_posts = get_posts([
-  'post_type' => 'education',
-  'post_status' => 'publish',
-  'posts_per_page' => -1,
-  'fields' => 'ids',
-]);
-if (!empty($all_education_posts) && function_exists('get_field')) {
-  $today_str = date('Y-m-d');
-  foreach ($all_education_posts as $edu_id) {
-    $edu_programs = get_field('education_programs', $edu_id);
-    if (!is_array($edu_programs))
-      continue;
-    foreach ($edu_programs as $prog) {
-      foreach (parse_program_dates_string(isset($prog['program_dates']) ? (string) $prog['program_dates'] : '') as $d) {
-        if ($d >= $today_str) {
-          $all_education_dates[] = $d;
+// Собираем все будущие даты из всех школ для flatpickr (кешируем на 12 часов)
+$cache_key = 'bsi_education_available_dates_' . date('Y-m-d');
+$all_education_dates = get_transient($cache_key);
+if ($all_education_dates === false) {
+  $all_education_dates = [];
+  $all_education_posts = get_posts([
+    'post_type' => 'education',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+  ]);
+  if (!empty($all_education_posts) && function_exists('get_field')) {
+    $today_str = date('Y-m-d');
+    foreach ($all_education_posts as $edu_id) {
+      $edu_programs = get_field('education_programs', $edu_id);
+      if (!is_array($edu_programs))
+        continue;
+      foreach ($edu_programs as $prog) {
+        foreach (parse_program_dates_string(isset($prog['program_dates']) ? (string) $prog['program_dates'] : '') as $d) {
+          if ($d >= $today_str) {
+            $all_education_dates[] = $d;
+          }
         }
       }
     }
+    $all_education_dates = array_values(array_unique($all_education_dates));
+    sort($all_education_dates);
   }
-  $all_education_dates = array_values(array_unique($all_education_dates));
-  sort($all_education_dates);
+  set_transient($cache_key, $all_education_dates, 12 * HOUR_IN_SECONDS);
 }
 
 // Начальный запрос - показываем все школы (если страна не выбрана)

@@ -180,3 +180,9 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
 
   return $new_links;
 }, 20);
+
+// Сброс кеша доступных дат при сохранении/обновлении школы
+add_action('save_post_education', function ($post_id) {
+  if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+  delete_transient('bsi_education_available_dates_' . date('Y-m-d'));
+});

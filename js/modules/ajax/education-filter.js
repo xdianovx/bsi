@@ -390,24 +390,23 @@ export const initEducationFilter = () => {
     : null;
 
   if (dateRangeInput) {
-    const availableDatesRaw = root.getAttribute("data-available-dates");
-    let availableDates = [];
-    try {
-      availableDates = availableDatesRaw ? JSON.parse(availableDatesRaw) : [];
-    } catch (e) {
-      availableDates = [];
-    }
-
     const flatpickrOptions = {
       mode: "range",
       locale: Russian,
       dateFormat: "d.m.Y",
       disableMobile: true,
+      minDate: "today",
       onChange: (selectedDates) => {
         currentPage = 1;
         if (selectedDates.length === 2) {
-          const startDate = selectedDates[0].toISOString().split("T")[0];
-          const endDate = selectedDates[1].toISOString().split("T")[0];
+          const toLocalIso = (d) => {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          };
+          const startDate = toLocalIso(selectedDates[0]);
+          const endDate = toLocalIso(selectedDates[1]);
           if (dateFromInput) dateFromInput.value = startDate;
           if (dateToInput) dateToInput.value = endDate;
           updateResetButton();
@@ -422,10 +421,6 @@ export const initEducationFilter = () => {
         }
       },
     };
-
-    if (availableDates.length > 0) {
-      flatpickrOptions.enable = availableDates;
-    }
 
     datePickerInstance = flatpickr(dateRangeInput, flatpickrOptions);
   }
