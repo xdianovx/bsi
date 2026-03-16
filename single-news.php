@@ -34,6 +34,11 @@ get_header();
 				<?= get_the_excerpt() ?>
 			</p> -->
 
+			<?php if (get_field('news_use_poster')): ?>
+				<div class="single-news__poster">
+					<?php the_post_thumbnail() ?>
+				</div>
+			<?php endif; ?>
 		</div>
 	</section>
 

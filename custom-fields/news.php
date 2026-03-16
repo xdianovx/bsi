@@ -36,6 +36,14 @@ add_action('acf/init', function () {
     'title' => 'Настройки отображения новости',
     'fields' => [
       [
+        'key' => 'field_news_use_poster',
+        'label' => 'Использовать изображение в качестве постера на странице',
+        'name' => 'news_use_poster',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+      ],
+      [
         'key' => 'field_news_show_on_mice',
         'label' => 'Показать на странице MICE',
         'name' => 'show_on_mice_page',
