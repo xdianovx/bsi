@@ -24,8 +24,6 @@ $age_min = isset($program['program_age_min']) && $program['program_age_min'] !==
 $age_max = isset($program['program_age_max']) && $program['program_age_max'] !== '' ? (int) $program['program_age_max'] : 0;
 $duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
 $description = $program['program_description'] ?? '';
-$checkin_date_from = $program['program_checkin_date_from'] ?? '';
-$checkin_date_to = $program['program_checkin_date_to'] ?? '';
 $accommodation_options = isset($program['program_accommodation_options']) ? $program['program_accommodation_options'] : [];
 $meal_options = isset($program['program_meal_options']) ? $program['program_meal_options'] : [];
 
@@ -77,18 +75,27 @@ if ($duration > 0) {
 }
 
 $nearest_date_formatted = '';
+$dates_remaining = 0;
 $date_for_modal = '';
-if ($checkin_date_from) {
-  // Форматируем дату для модалки (с DD.MM.YYYY)
-  $date_obj = DateTime::createFromFormat('Y-m-d', $checkin_date_from);
+
+$all_program_dates = parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '');
+
+$today = date('Y-m-d');
+$future_dates = array_values(array_filter($all_program_dates, function ($d) use ($today) {
+  return $d >= $today;
+}));
+sort($future_dates);
+
+if (!empty($future_dates)) {
+  $total = count($future_dates);
+  $first_two = array_slice($future_dates, 0, 2);
+  $formatted_arr = array_map('format_date_russian', $first_two);
+  $nearest_date_formatted = implode(', ', $formatted_arr);
+  $dates_remaining = max(0, $total - 2);
+
+  $date_obj = DateTime::createFromFormat('Y-m-d', $future_dates[0]);
   if ($date_obj) {
     $date_for_modal = 'с ' . $date_obj->format('d.m.Y');
-  }
-
-  if ($checkin_date_to && $checkin_date_to !== $checkin_date_from) {
-    $nearest_date_formatted = format_date_short($checkin_date_from, $checkin_date_to);
-  } else {
-    $nearest_date_formatted = format_date_short($checkin_date_from);
   }
 }
 
@@ -187,8 +194,11 @@ foreach ($additional_services as $service) {
 
             <?php if ($nearest_date_formatted): ?>
               <span class="education-program-card__info-value">
-                <span class="education-program-card__date-label">Ближайшие даты:</span>
+                <span class="education-program-card__date-label">Заезды:</span>
                 <?php echo esc_html($nearest_date_formatted); ?>
+                <?php if ($dates_remaining > 0): ?>
+                  <span class="education-program-card__date-more">... еще <?php echo esc_html($dates_remaining); ?></span>
+                <?php endif; ?>
               </span>
             <?php endif; ?>
           </div>

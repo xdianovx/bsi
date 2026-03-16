@@ -191,7 +191,8 @@ if (!$use_test_data) {
 
         $age_min = 0;
         $age_max = 0;
-        $nearest_date = '';
+        $checkin_dates_formatted = '';
+        $checkin_dates_remaining = 0;
 
         if (function_exists('get_field')) {
             $education_programs = get_field('education_programs', $education_id);
@@ -213,10 +214,7 @@ if (!$use_test_data) {
                         $ages_max[] = $program_age_max;
                     }
 
-                    $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-                    if ($date_from) {
-                        $all_dates[] = $date_from;
-                    }
+                    $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
                 }
 
                 if (!empty($ages_min)) {
@@ -228,16 +226,17 @@ if (!$use_test_data) {
 
                 if (!empty($all_dates)) {
                     $today = date('Y-m-d');
-                    $future_dates = array_filter($all_dates, function ($date) use ($today) {
+                    $future_dates = array_values(array_filter($all_dates, function ($date) use ($today) {
                         return $date >= $today;
-                    });
+                    }));
+                    sort($future_dates);
 
                     if (!empty($future_dates)) {
-                        sort($future_dates);
-                        $nearest_date = $future_dates[0];
-                    } elseif (!empty($all_dates)) {
-                        sort($all_dates);
-                        $nearest_date = $all_dates[0];
+                        $total = count($future_dates);
+                        $first_two = array_slice($future_dates, 0, 2);
+                        $formatted_arr = array_map('format_date_russian', $first_two);
+                        $checkin_dates_formatted = implode(', ', $formatted_arr);
+                        $checkin_dates_remaining = max(0, $total - 2);
                     }
                 }
             }
@@ -258,7 +257,8 @@ if (!$use_test_data) {
             'booking_url' => $booking_url,
             'age_min' => $age_min,
             'age_max' => $age_max,
-            'nearest_date' => $nearest_date,
+            'checkin_dates_formatted' => $checkin_dates_formatted,
+            'checkin_dates_remaining' => $checkin_dates_remaining,
         ];
     }
 
@@ -283,7 +283,8 @@ if ($use_test_data || empty($items)) {
             'booking_url' => 'https://bsigroup.ru/education/english-in-cyprus/',
             'age_min' => 12,
             'age_max' => 17,
-            'nearest_date' => '28.06.2026',
+            'checkin_dates_formatted' => '28 июня',
+            'checkin_dates_remaining' => 0,
         ],
         [
             'id' => 0,
@@ -301,7 +302,8 @@ if ($use_test_data || empty($items)) {
             'booking_url' => 'https://bsigroup.ru/education/queen-mary-university-gruppovoj-zaezd',
             'age_min' => 11,
             'age_max' => 17,
-            'nearest_date' => '28.06.2026',
+            'checkin_dates_formatted' => '28 июня',
+            'checkin_dates_remaining' => 0,
             'priority' => true,
         ],
         [
@@ -320,7 +322,8 @@ if ($use_test_data || empty($items)) {
             'booking_url' => 'https://bsigroup.ru/education/sir-george-kembridzh/',
             'age_min' => 14,
             'age_max' => 17,
-            'nearest_date' => '08.02.2026',
+            'checkin_dates_formatted' => '8 февраля',
+            'checkin_dates_remaining' => 0,
         ],
         [
             'id' => 0,
@@ -338,7 +341,8 @@ if ($use_test_data || empty($items)) {
             'booking_url' => 'https://bsigroup.ru/education/discovery-summer-kollingem',
             'age_min' => 5,
             'age_max' => 17,
-            'nearest_date' => '22.06.2026',
+            'checkin_dates_formatted' => '22 июня',
+            'checkin_dates_remaining' => 0,
         ],
 
     ];

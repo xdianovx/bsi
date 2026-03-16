@@ -44,6 +44,7 @@ function bsi_ajax_education_filter(): void
 
   $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
   $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
+  $group_arrival = isset($_POST['group_arrival']) && $_POST['group_arrival'] === '1';
 
   $paged = isset($_POST['paged']) ? absint(wp_unslash($_POST['paged'])) : 1;
   $per_page = isset($_POST['per_page']) ? absint(wp_unslash($_POST['per_page'])) : 12;
@@ -94,6 +95,15 @@ function bsi_ajax_education_filter(): void
     $meta_query[] = [
       'key' => 'education_country',
       'value' => $country_id,
+      'compare' => '=',
+    ];
+  }
+
+  // Фильтр по групповому заезду
+  if ($group_arrival) {
+    $meta_query[] = [
+      'key' => 'is_group_arrival',
+      'value' => '1',
       'compare' => '=',
     ];
   }
@@ -175,21 +185,14 @@ function bsi_ajax_education_filter(): void
 
           $date_match = true;
           if ($date_from || $date_to) {
-            $program_date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-            $program_date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
-
-            if (!$program_date_from) {
-              $date_match = false;
-            } else {
-              $program_from_ts = strtotime($program_date_from);
-              $program_to_ts = $program_date_to ? strtotime($program_date_to) : $program_from_ts;
-              $filter_from_ts = $date_from ? strtotime($date_from) : 0;
-              $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
-
-              if ($filter_from_ts && $program_to_ts < $filter_from_ts) {
-                $date_match = false;
-              } elseif ($filter_to_ts && $program_from_ts > $filter_to_ts) {
-                $date_match = false;
+            $filter_from_ts = $date_from ? strtotime($date_from) : 0;
+            $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
+            $date_match = false;
+            foreach (parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '') as $pd) {
+              $pd_ts = strtotime($pd);
+              if ((!$filter_from_ts || $pd_ts >= $filter_from_ts) && $pd_ts <= $filter_to_ts) {
+                $date_match = true;
+                break;
               }
             }
           }
@@ -471,7 +474,8 @@ function bsi_ajax_education_filter(): void
 
       $age_min = 0;
       $age_max = 0;
-      $nearest_date = '';
+      $checkin_dates_formatted = '';
+      $checkin_dates_remaining = 0;
 
       if (function_exists('get_field')) {
         $education_programs = get_field('education_programs', $education_id);
@@ -493,10 +497,7 @@ function bsi_ajax_education_filter(): void
               $ages_max[] = $program_age_max;
             }
 
-            $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-            if ($date_from) {
-              $all_dates[] = $date_from;
-            }
+            $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
           }
 
           if (!empty($ages_min)) {
@@ -508,16 +509,17 @@ function bsi_ajax_education_filter(): void
 
           if (!empty($all_dates)) {
             $today = date('Y-m-d');
-            $future_dates = array_filter($all_dates, function ($date) use ($today) {
+            $future_dates = array_values(array_filter($all_dates, function ($date) use ($today) {
               return $date >= $today;
-            });
+            }));
+            sort($future_dates);
 
             if (!empty($future_dates)) {
-              sort($future_dates);
-              $nearest_date = $future_dates[0];
-            } elseif (!empty($all_dates)) {
-              sort($all_dates);
-              $nearest_date = $all_dates[0];
+              $total = count($future_dates);
+              $first_two = array_slice($future_dates, 0, 2);
+              $formatted_arr = array_map('format_date_russian', $first_two);
+              $checkin_dates_formatted = implode(', ', $formatted_arr);
+              $checkin_dates_remaining = max(0, $total - 2);
             }
           }
         }
@@ -539,7 +541,8 @@ function bsi_ajax_education_filter(): void
         'booking_url' => $booking_url,
         'age_min' => $age_min,
         'age_max' => $age_max,
-        'nearest_date' => $nearest_date,
+        'checkin_dates_formatted' => $checkin_dates_formatted,
+        'checkin_dates_remaining' => $checkin_dates_remaining,
       ];
 
       echo '<div class="education-page__item">';
@@ -909,21 +912,14 @@ function bsi_ajax_country_education_filter(): void
 
           $date_match = true;
           if ($date_from || $date_to) {
-            $program_date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-            $program_date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
-
-            if (!$program_date_from) {
-              $date_match = false;
-            } else {
-              $program_from_ts = strtotime($program_date_from);
-              $program_to_ts = $program_date_to ? strtotime($program_date_to) : $program_from_ts;
-              $filter_from_ts = $date_from ? strtotime($date_from) : 0;
-              $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
-
-              if ($filter_from_ts && $program_to_ts < $filter_from_ts) {
-                $date_match = false;
-              } elseif ($filter_to_ts && $program_from_ts > $filter_to_ts) {
-                $date_match = false;
+            $filter_from_ts = $date_from ? strtotime($date_from) : 0;
+            $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
+            $date_match = false;
+            foreach (parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '') as $pd) {
+              $pd_ts = strtotime($pd);
+              if ((!$filter_from_ts || $pd_ts >= $filter_from_ts) && $pd_ts <= $filter_to_ts) {
+                $date_match = true;
+                break;
               }
             }
           }
@@ -1246,23 +1242,14 @@ function bsi_ajax_education_programs_by_school(): void
 
     $date_match = true;
     if ($date_from || $date_to) {
-      $program_date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-      $program_date_to = isset($program['program_checkin_date_to']) ? (string) $program['program_checkin_date_to'] : '';
-
-      if (!$program_date_from) {
-        $date_match = false;
-      } else {
-        $filter_from_ts = $date_from ? strtotime($date_from) : 0;
-        $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
-        $program_from_ts = strtotime($program_date_from);
-        $program_to_ts = $program_date_to ? strtotime($program_date_to) : $program_from_ts;
-
-        // Проверяем пересечение диапазонов:
-        // Фильтр должен пересекаться с диапазоном программы
-        // Фильтр попадает в программу, если:
-        // - начало фильтра <= конец программы И конец фильтра >= начало программы
-        if ($filter_from_ts > $program_to_ts || $filter_to_ts < $program_from_ts) {
-          $date_match = false;
+      $filter_from_ts = $date_from ? strtotime($date_from) : 0;
+      $filter_to_ts = $date_to ? strtotime($date_to) : PHP_INT_MAX;
+      $date_match = false;
+      foreach (parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '') as $pd) {
+        $pd_ts = strtotime($pd);
+        if ((!$filter_from_ts || $pd_ts >= $filter_from_ts) && $pd_ts <= $filter_to_ts) {
+          $date_match = true;
+          break;
         }
       }
     }

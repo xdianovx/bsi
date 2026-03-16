@@ -84,6 +84,32 @@ if (!$paged) {
   $paged = get_query_var('page') ? (int) get_query_var('page') : 1;
 }
 
+// Собираем все будущие даты из всех школ для flatpickr
+$all_education_dates = [];
+$all_education_posts = get_posts([
+  'post_type' => 'education',
+  'post_status' => 'publish',
+  'posts_per_page' => -1,
+  'fields' => 'ids',
+]);
+if (!empty($all_education_posts) && function_exists('get_field')) {
+  $today_str = date('Y-m-d');
+  foreach ($all_education_posts as $edu_id) {
+    $edu_programs = get_field('education_programs', $edu_id);
+    if (!is_array($edu_programs))
+      continue;
+    foreach ($edu_programs as $prog) {
+      foreach (parse_program_dates_string(isset($prog['program_dates']) ? (string) $prog['program_dates'] : '') as $d) {
+        if ($d >= $today_str) {
+          $all_education_dates[] = $d;
+        }
+      }
+    }
+  }
+  $all_education_dates = array_values(array_unique($all_education_dates));
+  sort($all_education_dates);
+}
+
 // Начальный запрос - показываем все школы (если страна не выбрана)
 $initial_query = new WP_Query([
   'post_type' => 'education',
@@ -100,7 +126,9 @@ $initial_query = new WP_Query([
 <?php endif; ?>
 
 <section class="education-page js-education-page"
-  data-total-pages="<?php echo esc_attr($initial_query->max_num_pages); ?>" data-current-page="1">
+         data-total-pages="<?php echo esc_attr($initial_query->max_num_pages); ?>"
+         data-current-page="1"
+         data-available-dates="<?php echo esc_attr(wp_json_encode($all_education_dates)); ?>">
   <div class="container">
     <div class="title-wrap">
       <div class="">
@@ -124,11 +152,14 @@ $initial_query = new WP_Query([
       <?php endwhile; ?>
     <?php endif; ?>
 
-    <form class="education-filter js-education-filter" data-education-form>
+    <form class="education-filter js-education-filter"
+          data-education-form>
       <div class="education-filter__row">
         <div class="education-filter__field">
           <div class="education-filter__label">Страна</div>
-          <select class="education-filter__select" name="country" data-choice="single">
+          <select class="education-filter__select"
+                  name="country"
+                  data-choice="single">
             <option value="">Все страны</option>
             <?php if (!empty($countries)): ?>
               <?php foreach ($countries as $country): ?>
@@ -140,7 +171,9 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Язык</div>
-          <select class="education-filter__select" name="language" data-choice="single">
+          <select class="education-filter__select"
+                  name="language"
+                  data-choice="single">
             <option value="">Все языки</option>
             <?php if (!is_wp_error($language_terms) && !empty($language_terms)): ?>
               <?php foreach ($language_terms as $term): ?>
@@ -152,7 +185,9 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Программа</div>
-          <select class="education-filter__select" name="program" data-choice="single">
+          <select class="education-filter__select"
+                  name="program"
+                  data-choice="single">
             <option value="">Показать все</option>
             <?php if (!is_wp_error($program_terms) && !empty($program_terms)): ?>
               <?php foreach ($program_terms as $term): ?>
@@ -164,7 +199,9 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Тип обучения</div>
-          <select class="education-filter__select" name="type" data-choice="single">
+          <select class="education-filter__select"
+                  name="type"
+                  data-choice="single">
             <option value="">Показать все</option>
             <?php if (!is_wp_error($type_terms) && !empty($type_terms)): ?>
               <?php foreach ($type_terms as $term): ?>
@@ -176,7 +213,9 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Размещение</div>
-          <select class="education-filter__select" name="accommodation" data-choice="single">
+          <select class="education-filter__select"
+                  name="accommodation"
+                  data-choice="single">
             <option value="">Показать все</option>
             <?php if (!is_wp_error($accommodation_terms) && !empty($accommodation_terms)): ?>
               <?php foreach ($accommodation_terms as $term): ?>
@@ -188,7 +227,9 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Возраст</div>
-          <select class="education-filter__select" name="age" data-choice="single">
+          <select class="education-filter__select"
+                  name="age"
+                  data-choice="single">
             <option value="">Показать все</option>
             <?php for ($age = 5; $age <= 25; $age++): ?>
               <option value="<?php echo esc_attr($age); ?>"><?php echo esc_html($age . ' лет'); ?></option>
@@ -198,18 +239,29 @@ $initial_query = new WP_Query([
 
         <div class="education-filter__field">
           <div class="education-filter__label">Продолжительность</div>
-          <select class="education-filter__select" name="duration" data-choice="single">
+          <select class="education-filter__select"
+                  name="duration"
+                  data-choice="single">
             <option value="">Показать все</option>
           </select>
         </div>
 
         <div class="education-filter__field">
           <div class="education-filter__label">Даты заезда</div>
-          <input type="text" class="education-filter__input education-filter__datepicker" name="date_range"
-            placeholder="Выберите даты" readonly>
-          <input type="hidden" name="date_from" value="">
-          <input type="hidden" name="date_to" value="">
+          <input type="text"
+                 class="education-filter__input education-filter__datepicker"
+                 name="date_range"
+                 placeholder="Выберите даты"
+                 readonly>
+          <input type="hidden"
+                 name="date_from"
+                 value="">
+          <input type="hidden"
+                 name="date_to"
+                 value="">
         </div>
+
+
       </div>
     </form>
 
@@ -219,48 +271,90 @@ $initial_query = new WP_Query([
           Найдено: <?php echo (int) $initial_query->found_posts; ?>
         </div>
 
-        <button type="button" class="education-page__reset-btn js-education-reset" style="display: none;">
+        <div class="education-filter__field education-filter__field--checkbox">
+          <label class="ui-checkbox">
+            <input type="checkbox"
+                   class="ui-checkbox__input"
+                   name="group_arrival"
+                   value="1">
+            <span class="ui-checkbox__mark"></span>
+            <span class="ui-checkbox__text">Групповой заезд</span>
+          </label>
+        </div>
+
+        <button type="button"
+                class="education-page__reset-btn js-education-reset"
+                style="display: none;">
           Сбросить фильтры
         </button>
       </div>
 
       <div class="education-page__controls-right">
-        <div class="education-page__per-page js-dropdown" style="display: none;">
-          <button type="button" class="js-dropdown-trigger education-page__per-page-trigger">
+        <div class="education-page__per-page js-dropdown"
+             style="display: none;">
+          <button type="button"
+                  class="js-dropdown-trigger education-page__per-page-trigger">
             <span class="education-page__per-page-text">Показать: 12</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
-                stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 20 20"
+                 fill="none">
+              <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
+                    stroke="black"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
             </svg>
           </button>
           <div class="js-dropdown-panel education-page__per-page-panel">
             <div class="education-page__per-page-options">
-              <button type="button" class="education-page__per-page-option" data-value="12">12</button>
-              <button type="button" class="education-page__per-page-option" data-value="24">24</button>
-              <button type="button" class="education-page__per-page-option" data-value="48">48</button>
+              <button type="button"
+                      class="education-page__per-page-option"
+                      data-value="12">12</button>
+              <button type="button"
+                      class="education-page__per-page-option"
+                      data-value="24">24</button>
+              <button type="button"
+                      class="education-page__per-page-option"
+                      data-value="48">48</button>
             </div>
           </div>
         </div>
 
         <div class="education-page__sort js-dropdown">
-          <button type="button" class="js-dropdown-trigger education-page__sort-trigger">
+          <button type="button"
+                  class="js-dropdown-trigger education-page__sort-trigger">
             <span class="education-page__sort-text">По названию (А-Я)</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
-                stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 20 20"
+                 fill="none">
+              <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
+                    stroke="black"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
             </svg>
           </button>
           <div class="js-dropdown-panel education-page__sort-panel">
             <div class="education-page__sort-options">
-              <button type="button" class="education-page__sort-option" data-value="title_asc">По названию
+              <button type="button"
+                      class="education-page__sort-option"
+                      data-value="title_asc">По названию
                 (А-Я)</button>
-              <button type="button" class="education-page__sort-option" data-value="title_desc">По названию
+              <button type="button"
+                      class="education-page__sort-option"
+                      data-value="title_desc">По названию
                 (Я-А)</button>
-              <button type="button" class="education-page__sort-option" data-value="price_asc">По цене
+              <button type="button"
+                      class="education-page__sort-option"
+                      data-value="price_asc">По цене
                 (возрастание)</button>
-              <button type="button" class="education-page__sort-option" data-value="price_desc">По цене
+              <button type="button"
+                      class="education-page__sort-option"
+                      data-value="price_desc">По цене
                 (убывание)</button>
             </div>
           </div>
@@ -431,10 +525,7 @@ $initial_query = new WP_Query([
                   $ages_max[] = $program_age_max;
                 }
 
-                $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-                if ($date_from) {
-                  $all_dates[] = $date_from;
-                }
+                $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
               }
 
               if (!empty($ages_min)) {

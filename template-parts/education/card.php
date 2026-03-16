@@ -14,7 +14,8 @@ $programs = [];
 $booking_url = '';
 $age_min = 0;
 $age_max = 0;
-$nearest_date = '';
+$checkin_dates_formatted = '';
+$checkin_dates_remaining = 0;
 $show_price_from = false;
 
 if ($education && is_array($education)) {
@@ -36,7 +37,8 @@ if ($education && is_array($education)) {
   $booking_url = !empty($education['booking_url']) ? (string) $education['booking_url'] : '';
   $age_min = !empty($education['age_min']) && $education['age_min'] !== '' ? (int) $education['age_min'] : 0;
   $age_max = !empty($education['age_max']) && $education['age_max'] !== '' ? (int) $education['age_max'] : 0;
-  $nearest_date = !empty($education['nearest_date']) ? (string) $education['nearest_date'] : '';
+  $checkin_dates_formatted = !empty($education['checkin_dates_formatted']) ? (string) $education['checkin_dates_formatted'] : '';
+  $checkin_dates_remaining = isset($education['checkin_dates_remaining']) ? (int) $education['checkin_dates_remaining'] : 0;
   $show_price_from = !empty($education['show_price_from']) ? (bool) $education['show_price_from'] : false;
 } else {
   $education_id = (int) get_the_ID();
@@ -178,7 +180,7 @@ if (($age_min === 0 && $age_max === 0) && $education_id && function_exists('get_
   }
 }
 
-if (empty($nearest_date) && $education_id && function_exists('get_field')) {
+if (empty($checkin_dates_formatted) && $education_id && function_exists('get_field')) {
   $education_programs = get_field('education_programs', $education_id);
   $education_programs = is_array($education_programs) ? $education_programs : [];
 
@@ -186,24 +188,22 @@ if (empty($nearest_date) && $education_id && function_exists('get_field')) {
     $all_dates = [];
 
     foreach ($education_programs as $program) {
-      $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-      if ($date_from) {
-        $all_dates[] = $date_from;
-      }
+      $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
     }
 
     if (!empty($all_dates)) {
       $today = date('Y-m-d');
-      $future_dates = array_filter($all_dates, function ($date) use ($today) {
+      $future_dates = array_values(array_filter($all_dates, function ($date) use ($today) {
         return $date >= $today;
-      });
+      }));
+      sort($future_dates);
 
       if (!empty($future_dates)) {
-        sort($future_dates);
-        $nearest_date = $future_dates[0];
-      } elseif (!empty($all_dates)) {
-        sort($all_dates);
-        $nearest_date = $all_dates[0];
+        $total = count($future_dates);
+        $first_two = array_slice($future_dates, 0, 2);
+        $formatted_arr = array_map('format_date_russian', $first_two);
+        $checkin_dates_formatted = implode(', ', $formatted_arr);
+        $checkin_dates_remaining = max(0, $total - 2);
       }
     }
   }
@@ -301,9 +301,13 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 
     <h3 class="education-card__title"><?php echo esc_html($education_title); ?></h3>
 
-    <?php if ($nearest_date): ?>
+    <?php if ($checkin_dates_formatted): ?>
       <div class="education-card__date">
-        Ближайший заезд: <?php echo esc_html(format_date_russian($nearest_date)); ?>
+        <span class="education-card__date-label">Заезды:</span>
+        <?php echo esc_html($checkin_dates_formatted); ?>
+        <?php if ($checkin_dates_remaining > 0): ?>
+          <span class="education-card__date-more">... еще <?php echo esc_html($checkin_dates_remaining); ?></span>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
 

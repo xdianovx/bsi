@@ -36,6 +36,7 @@ export const initEducationFilter = () => {
   const dateRangeInput = form.querySelector('input[name="date_range"]');
   const dateFromInput = form.querySelector('input[name="date_from"]');
   const dateToInput = form.querySelector('input[name="date_to"]');
+  const groupArrivalCheckbox = root.querySelector('input[name="group_arrival"]');
   const sortContainer = root.querySelector(".education-page__sort");
   const perPageContainer = root.querySelector(".education-page__per-page");
   const resetBtn = root.querySelector(".js-education-reset");
@@ -67,6 +68,7 @@ export const initEducationFilter = () => {
     if (durationSelect?.value) count++;
     if (dateFromInput?.value) count++;
     if (dateToInput?.value) count++;
+    if (groupArrivalCheckbox?.checked) count++;
 
     return count;
   };
@@ -130,6 +132,9 @@ export const initEducationFilter = () => {
     }
     if (dateToInput && dateToInput.value) {
       params.set("date_to", dateToInput.value);
+    }
+    if (groupArrivalCheckbox?.checked) {
+      params.set("group_arrival", "1");
     }
     if (currentSortValue && currentSortValue !== 'title_asc') {
       params.set("sort", currentSortValue);
@@ -242,6 +247,9 @@ export const initEducationFilter = () => {
       }
       if (dateToInput && dateToInput.value) {
         body.set("date_to", dateToInput.value);
+      }
+      if (groupArrivalCheckbox?.checked) {
+        body.set("group_arrival", "1");
       }
 
       const res = await fetch(ajaxUrl, {
@@ -382,11 +390,18 @@ export const initEducationFilter = () => {
     : null;
 
   if (dateRangeInput) {
-    datePickerInstance = flatpickr(dateRangeInput, {
+    const availableDatesRaw = root.getAttribute("data-available-dates");
+    let availableDates = [];
+    try {
+      availableDates = availableDatesRaw ? JSON.parse(availableDatesRaw) : [];
+    } catch (e) {
+      availableDates = [];
+    }
+
+    const flatpickrOptions = {
       mode: "range",
       locale: Russian,
       dateFormat: "d.m.Y",
-      minDate: "today",
       disableMobile: true,
       onChange: (selectedDates) => {
         currentPage = 1;
@@ -406,7 +421,13 @@ export const initEducationFilter = () => {
           loadEducation(1);
         }
       },
-    });
+    };
+
+    if (availableDates.length > 0) {
+      flatpickrOptions.enable = availableDates;
+    }
+
+    datePickerInstance = flatpickr(dateRangeInput, flatpickrOptions);
   }
 
   // Обновление опций фильтров на основе отфильтрованных результатов
@@ -677,6 +698,7 @@ export const initEducationFilter = () => {
     const duration = params.get("duration");
     const dateFrom = params.get("date_from");
     const dateTo = params.get("date_to");
+    const groupArrival = params.get("group_arrival");
     const sort = params.get("sort");
     const pageParam = params.get("page");
 
@@ -721,6 +743,10 @@ export const initEducationFilter = () => {
       accommodationChoice.setChoiceByValue(accommodation);
     }
 
+    if (groupArrival && groupArrivalCheckbox) {
+      groupArrivalCheckbox.checked = true;
+    }
+
     if (dateFrom && dateTo && dateFromInput && dateToInput && datePickerInstance) {
       dateFromInput.value = dateFrom;
       dateToInput.value = dateTo;
@@ -758,6 +784,7 @@ export const initEducationFilter = () => {
       duration ||
       dateFrom ||
       dateTo ||
+      groupArrival ||
       sort;
 
     updateResetButton();
@@ -837,6 +864,15 @@ export const initEducationFilter = () => {
       }
 
       await updateFilterOptions(countryId);
+      updateResetButton();
+      updateUrl();
+      loadEducation(1);
+    });
+  }
+
+  if (groupArrivalCheckbox) {
+    groupArrivalCheckbox.addEventListener("change", () => {
+      currentPage = 1;
       updateResetButton();
       updateUrl();
       loadEducation(1);
@@ -960,6 +996,7 @@ export const initEducationFilter = () => {
       }
       if (dateFromInput) dateFromInput.value = "";
       if (dateToInput) dateToInput.value = "";
+      if (groupArrivalCheckbox) groupArrivalCheckbox.checked = false;
 
       // Сбрасываем сортировку
       currentSortValue = 'title_asc';

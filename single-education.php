@@ -189,48 +189,17 @@ if (!empty($programs)) {
   $nearest_date_obj = null;
 
   foreach ($programs as $program) {
-    $date_from = isset($program['program_checkin_date_from']) ? trim($program['program_checkin_date_from']) : '';
-    $date_to = isset($program['program_checkin_date_to']) ? trim($program['program_checkin_date_to']) : '';
+    foreach (parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '') as $date_val) {
+      $date_obj = DateTime::createFromFormat('Y-m-d', $date_val);
+      if (!$date_obj) continue;
+      $date_obj->setTime(0, 0, 0);
 
-    if ($date_from) {
-      $date_from_obj = DateTime::createFromFormat('Y-m-d', $date_from);
-      if ($date_from_obj) {
-        $date_from_obj->setTime(0, 0, 0);
+      $available_dates[] = $date_val;
 
-        // Добавляем дату начала в массив доступных дат
-        $available_dates[] = $date_from;
-
-        // Если есть диапазон, добавляем все даты в диапазоне
-        if ($date_to) {
-          $date_to_obj = DateTime::createFromFormat('Y-m-d', $date_to);
-          if ($date_to_obj) {
-            $date_to_obj->setTime(0, 0, 0);
-            $current_date = clone $date_from_obj;
-
-            while ($current_date <= $date_to_obj) {
-              $date_str = $current_date->format('Y-m-d');
-              if (!in_array($date_str, $available_dates)) {
-                $available_dates[] = $date_str;
-              }
-              $current_date->modify('+1 day');
-            }
-
-            // Проверяем ближайшую дату
-            if ($date_from_obj >= $today) {
-              if (!$nearest_date_obj || $date_from_obj < $nearest_date_obj) {
-                $nearest_date_obj = clone $date_from_obj;
-                $nearest_date = $date_from;
-              }
-            }
-          }
-        } else {
-          // Если только одна дата, проверяем её как ближайшую
-          if ($date_from_obj >= $today) {
-            if (!$nearest_date_obj || $date_from_obj < $nearest_date_obj) {
-              $nearest_date_obj = clone $date_from_obj;
-              $nearest_date = $date_from;
-            }
-          }
+      if ($date_obj >= $today) {
+        if (!$nearest_date_obj || $date_obj < $nearest_date_obj) {
+          $nearest_date_obj = clone $date_obj;
+          $nearest_date = $date_val;
         }
       }
     }

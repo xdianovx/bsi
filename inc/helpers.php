@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * Парсит строку дат вида "21.07.2026, 30.08.2026" и возвращает массив в формате Y-m-d.
+ * Поддерживает форматы: d.m.Y, Y-m-d.
+ */
+function parse_program_dates_string(string $dates_str): array
+{
+  if (!$dates_str) return [];
+  $result = [];
+  foreach (array_map('trim', explode(',', $dates_str)) as $raw) {
+    if (!$raw) continue;
+    $obj = DateTime::createFromFormat('d.m.Y', $raw)
+      ?: DateTime::createFromFormat('Y-m-d', $raw);
+    if ($obj) {
+      $result[] = $obj->format('Y-m-d');
+    }
+  }
+  return $result;
+}
+
 function format_number($number, $decimals = 0)
 {
   if (!is_numeric($number)) {

@@ -186,10 +186,7 @@ function bsi_ajax_popular_education_by_country()
               $ages_max[] = $program_age_max;
             }
 
-            $date_from = isset($program['program_checkin_date_from']) ? (string) $program['program_checkin_date_from'] : '';
-            if ($date_from) {
-              $all_dates[] = $date_from;
-            }
+            $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
           }
 
           if (!empty($ages_min)) {
