@@ -6,7 +6,9 @@ $query_args = [
   'post_type' => 'agency_event',
   'post_status' => 'publish',
   'posts_per_page' => 24,
-  'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
+  'meta_key' => 'event_start_date',
+  'orderby' => 'meta_value',
+  'order' => 'ASC',
 ];
 
 $tax_query = [];
