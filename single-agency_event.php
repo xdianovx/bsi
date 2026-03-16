@@ -10,7 +10,9 @@ $title = get_the_title($post_id);
 
 $start_date = function_exists('get_field') ? trim((string) get_field('event_start_date', $post_id)) : '';
 $start_time = function_exists('get_field') ? trim((string) get_field('event_start_time', $post_id)) : '';
+$city = function_exists('get_field') ? trim((string) get_field('event_city', $post_id)) : '';
 $place = function_exists('get_field') ? trim((string) get_field('event_place', $post_id)) : '';
+$place_display = implode(', ', array_filter([$city, $place]));
 $registration_closed = function_exists('get_field') ? (bool) get_field('event_registration_closed', $post_id) : false;
 $registration_url = function_exists('get_field') ? trim((string) get_field('event_registration_url', $post_id)) : '';
 $price_raw = function_exists('get_field') ? trim((string) get_field('event_price', $post_id)) : '';
@@ -96,10 +98,10 @@ $kind_url = $kind_slug ? add_query_arg('kind', $kind_slug, $education_url) : $ed
                 <?php echo esc_html($start_time); ?>
               </span>
             <?php endif; ?>
-            <?php if ($place !== ''): ?>
+            <?php if ($place_display !== ''): ?>
               <span class="agency-event-single__meta-item">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.6663 8.33464C16.6663 12.4955 12.0505 16.8288 10.5005 18.1671C10.3561 18.2757 10.1803 18.3344 9.99967 18.3344C9.81901 18.3344 9.64324 18.2757 9.49884 18.1671C7.94884 16.8288 3.33301 12.4955 3.33301 8.33464C3.33301 6.56653 4.03539 4.87083 5.28563 3.62059C6.53587 2.37035 8.23156 1.66797 9.99967 1.66797C11.7678 1.66797 13.4635 2.37035 14.7137 3.62059C15.964 4.87083 16.6663 6.56653 16.6663 8.33464Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.99967 10.8346C11.3804 10.8346 12.4997 9.71535 12.4997 8.33464C12.4997 6.95392 11.3804 5.83464 9.99967 5.83464C8.61896 5.83464 7.49967 6.95392 7.49967 8.33464C7.49967 9.71535 8.61896 10.8346 9.99967 10.8346Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <?php echo esc_html($place); ?>
+                <?php echo esc_html($place_display); ?>
               </span>
             <?php endif; ?>
           </div>

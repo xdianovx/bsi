@@ -9,7 +9,9 @@ $permalink = get_permalink($post_id);
 
 $start_date = function_exists('get_field') ? trim((string) get_field('event_start_date', $post_id)) : '';
 $start_time = function_exists('get_field') ? trim((string) get_field('event_start_time', $post_id)) : '';
+$city = function_exists('get_field') ? trim((string) get_field('event_city', $post_id)) : '';
 $place = function_exists('get_field') ? trim((string) get_field('event_place', $post_id)) : '';
+$place_display = implode(', ', array_filter([$city, $place]));
 $registration_closed = function_exists('get_field') ? (bool) get_field('event_registration_closed', $post_id) : false;
 $registration_url = function_exists('get_field') ? trim((string) get_field('event_registration_url', $post_id)) : '';
 $price_raw = function_exists('get_field') ? trim((string) get_field('event_price', $post_id)) : '';
@@ -77,7 +79,7 @@ if ('webinar' === $kind_slug) {
         <?php echo esc_html($start_time); ?>
       </span>
     <?php endif; ?>
-    <?php if ($place !== ''): ?>
+    <?php if ($place_display !== ''): ?>
       <span class="agency-education-card__meta-item">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -87,7 +89,7 @@ if ('webinar' === $kind_slug) {
             d="M9.99967 10.8346C11.3804 10.8346 12.4997 9.71535 12.4997 8.33464C12.4997 6.95392 11.3804 5.83464 9.99967 5.83464C8.61896 5.83464 7.49967 6.95392 7.49967 8.33464C7.49967 9.71535 8.61896 10.8346 9.99967 10.8346Z"
             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <?php echo esc_html($place); ?>
+        <?php echo esc_html($place_display); ?>
       </span>
     <?php endif; ?>
   </div>
