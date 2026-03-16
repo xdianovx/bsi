@@ -34,11 +34,6 @@ get_header();
 				<?= get_the_excerpt() ?>
 			</p> -->
 
-			<?php if (get_field('news_use_poster')): ?>
-				<div class="single-news__poster">
-					<?php the_post_thumbnail() ?>
-				</div>
-			<?php endif; ?>
 		</div>
 	</section>
 
@@ -49,6 +44,20 @@ get_header();
 			</div>
 		</div>
 	</section>
+
+	<?php
+	$news_gallery = get_field('news_gallery');
+	if (!empty($news_gallery)):
+	?>
+	<section class="single-news__gallery-section">
+		<div class="container">
+			<?php get_template_part('template-parts/sections/gallery', null, [
+				'gallery' => $news_gallery,
+				'id'      => 'news_gallery_' . get_the_ID(),
+			]); ?>
+		</div>
+	</section>
+	<?php endif; ?>
 
 	<?= get_template_part('template-parts/sections/subscribe') ?>
 
