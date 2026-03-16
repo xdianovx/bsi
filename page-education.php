@@ -152,6 +152,61 @@ $initial_query = new WP_Query([
       <?php endwhile; ?>
     <?php endif; ?>
 
+    <?php
+    $edu_banners = function_exists('get_field') ? get_field('education_page_banners') : [];
+    $edu_banners_active = [];
+    if (!empty($edu_banners)) {
+      foreach ($edu_banners as $b) {
+        if (!empty($b['edu_banner_is_active'])) {
+          $edu_banners_active[] = $b;
+        }
+      }
+    }
+    ?>
+    <?php if (!empty($edu_banners_active)): ?>
+      <?php $edu_is_slider = count($edu_banners_active) > 1; ?>
+      <div class="promo-banner__wrap promo-banner__wrap--education">
+        <div class="<?php echo $edu_is_slider ? 'swiper promo-banner-slider' : ''; ?>">
+          <div class="<?php echo $edu_is_slider ? 'swiper-wrapper' : ''; ?>">
+            <?php foreach ($edu_banners_active as $banner): ?>
+              <?php
+              $img_desktop = $banner['edu_banner_image_desktop'];
+              $img_mobile  = $banner['edu_banner_image_mobile'];
+              if (!$img_mobile && $img_desktop) $img_mobile = $img_desktop;
+              $link   = $banner['edu_banner_link'];
+              $target = !empty($banner['edu_banner_target']) ? '_blank' : '_self';
+              ?>
+              <div class="<?php echo $edu_is_slider ? 'swiper-slide' : ''; ?>">
+                <div class="promo-banner-card">
+                  <?php if ($link): ?>
+                    <a href="<?php echo esc_url($link); ?>"
+                       target="<?php echo esc_attr($target); ?>"
+                       class="promo-banner-card__link">
+                  <?php endif; ?>
+                    <picture class="promo-banner-card__picture">
+                      <?php if (!empty($img_mobile['url'])): ?>
+                        <source srcset="<?php echo esc_url($img_mobile['url']); ?>"
+                                media="(max-width: 767px)">
+                      <?php endif; ?>
+                      <img src="<?php echo esc_url($img_desktop['url'] ?? ''); ?>"
+                           alt="<?php echo esc_attr($img_desktop['alt'] ?? ''); ?>"
+                           class="promo-banner-card__img"
+                           loading="lazy">
+                    </picture>
+                  <?php if ($link): ?>
+                    </a>
+                  <?php endif; ?>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+          <?php if ($edu_is_slider): ?>
+            <div class="swiper-pagination promo-banner-slider-pag"></div>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
     <form class="education-filter js-education-filter"
           data-education-form>
       <div class="education-filter__row">
