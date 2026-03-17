@@ -79,13 +79,32 @@ const initEducationProgramAccordion = () => {
     toggle.addEventListener("click", (e) => {
       e.preventDefault();
       const isExpanded = toggle.getAttribute("aria-expanded") === "true";
-      
+
       if (isExpanded) {
         close();
       } else {
         open();
       }
     });
+
+    const datesToggle = accordion.querySelector(".js-dates-toggle");
+    const datesAll = accordion.querySelector(".education-program-card__dates-all");
+
+    if (datesToggle && datesAll) {
+      datesToggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isOpen = !datesAll.hidden;
+        if (isOpen) {
+          datesAll.hidden = true;
+          accordion.querySelector(".education-program-card__dates-visible").hidden = false;
+          datesToggle.classList.remove("is-active");
+        } else {
+          datesAll.hidden = false;
+          accordion.querySelector(".education-program-card__dates-visible").hidden = true;
+          datesToggle.classList.add("is-active");
+        }
+      });
+    }
   });
 };
 

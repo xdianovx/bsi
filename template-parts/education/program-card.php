@@ -195,11 +195,22 @@ foreach ($additional_services as $service) {
             <?php if ($nearest_date_formatted): ?>
               <span class="education-program-card__info-value">
                 <span class="education-program-card__date-label">Заезды:</span>
-                <?php echo esc_html($nearest_date_formatted); ?>
+                <span class="education-program-card__dates-visible"><?php echo esc_html($nearest_date_formatted); ?></span>
                 <?php if ($dates_remaining > 0): ?>
-                  <span class="education-program-card__date-more">... еще <?php echo esc_html($dates_remaining); ?></span>
+                  <button type="button" class="education-program-card__date-more js-dates-toggle">
+                    ... еще <?php echo esc_html($dates_remaining); ?>
+                  </button>
                 <?php endif; ?>
               </span>
+              <?php if ($dates_remaining > 0): ?>
+                <span class="education-program-card__dates-all" hidden>
+                  <?php
+                  foreach ($future_dates as $d) {
+                    echo '<span class="education-program-card__dates-all-item">' . esc_html(format_date_russian($d)) . '</span>';
+                  }
+                  ?>
+                </span>
+              <?php endif; ?>
             <?php endif; ?>
           </div>
         <?php endif; ?>
