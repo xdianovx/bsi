@@ -172,24 +172,24 @@ foreach ($additional_services as $service) {
           <h3 class="education-program-card__title"><?php echo esc_html($program_title); ?></h3>
         <?php endif; ?>
 
-        <?php if ($accommodation_text): ?>
-          <div class="education-program-card__subtitle"><?php echo esc_html($accommodation_text); ?></div>
-        <?php endif; ?>
-
-        <?php if ($age_text || $duration_text || $nearest_date_formatted): ?>
+        <?php if ($accommodation_text || $age_text || $duration_text || $nearest_date_formatted): ?>
           <div class="education-program-card__info-row">
             <?php if ($age_text): ?>
               <span class="education-program-card__info-value"><?php echo esc_html($age_text); ?></span>
-              <?php if ($duration_text || $nearest_date_formatted): ?>
+              <?php if ($duration_text || $accommodation_text): ?>
                 <span class="education-program-card__info-separator"></span>
               <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($duration_text): ?>
               <span class="education-program-card__info-value"><?php echo esc_html($duration_text); ?></span>
-              <?php if ($nearest_date_formatted): ?>
+              <?php if ($accommodation_text): ?>
                 <span class="education-program-card__info-separator"></span>
               <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if ($accommodation_text): ?>
+              <span class="education-program-card__info-value"><?php echo esc_html($accommodation_text); ?></span>
             <?php endif; ?>
 
             <?php if ($nearest_date_formatted): ?>
