@@ -35,7 +35,7 @@ $news_query = new WP_Query([
 
   <section class="archive-page-head">
     <div class="container">
-      <div class="archive-page__top">
+      <div class="archive-page__top news-page__top">
         <h1 class="h1 archive-page__title">
           Новости BSI Group
         </h1>

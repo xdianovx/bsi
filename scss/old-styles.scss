@@ -5697,6 +5697,10 @@ select.country_noactive {
   .submenu_col li {
     padding: 7.5px 0;
   }
+
+  .news-page__top {
+    flex-direction: column;
+  }
   .header_right {
     display: -webkit-box;
     display: -ms-flexbox;

@@ -30,7 +30,14 @@
 .archive-page__content-section.news-page__content-section {
   margin-top: 32px;
 }
+.news-page__top {
+  flex-direction: column;
+  align-items: flex-start !important;
 
+  .h1 {
+    margin-bottom: 8px;
+  }
+}
 .news-card {
   display: flex;
   flex-direction: column;
