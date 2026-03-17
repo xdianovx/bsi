@@ -88,10 +88,10 @@ sort($future_dates);
 
 if (!empty($future_dates)) {
   $total = count($future_dates);
-  $first_two = array_slice($future_dates, 0, 2);
-  $formatted_arr = array_map('format_date_russian', $first_two);
+  $first_three = array_slice($future_dates, 0, 3);
+  $formatted_arr = array_map('format_date_russian', $first_three);
   $nearest_date_formatted = implode(', ', $formatted_arr);
-  $dates_remaining = max(0, $total - 2);
+  $dates_remaining = max(0, $total - 3);
 
   $date_obj = DateTime::createFromFormat('Y-m-d', $future_dates[0]);
   if ($date_obj) {
@@ -193,24 +193,21 @@ foreach ($additional_services as $service) {
             <?php endif; ?>
 
             <?php if ($nearest_date_formatted): ?>
-              <span class="education-program-card__info-value">
+              <span class="education-program-card__info-value education-program-card__dates-wrap">
                 <span class="education-program-card__date-label">Заезды:</span>
                 <span class="education-program-card__dates-visible"><?php echo esc_html($nearest_date_formatted); ?></span>
                 <?php if ($dates_remaining > 0): ?>
+                  <span class="education-program-card__dates-extra" hidden>
+                    <?php
+                    $extra_dates = array_slice($future_dates, 3);
+                    echo ', ' . esc_html(implode(', ', array_map('format_date_russian', $extra_dates)));
+                    ?>
+                  </span>
                   <button type="button" class="education-program-card__date-more js-dates-toggle">
-                    ... еще <?php echo esc_html($dates_remaining); ?>
+                    еще <?php echo esc_html($dates_remaining); ?>
                   </button>
                 <?php endif; ?>
               </span>
-              <?php if ($dates_remaining > 0): ?>
-                <span class="education-program-card__dates-all" hidden>
-                  <?php
-                  foreach ($future_dates as $d) {
-                    echo '<span class="education-program-card__dates-all-item">' . esc_html(format_date_russian($d)) . '</span>';
-                  }
-                  ?>
-                </span>
-              <?php endif; ?>
             <?php endif; ?>
           </div>
         <?php endif; ?>

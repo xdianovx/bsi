@@ -87,21 +87,23 @@ const initEducationProgramAccordion = () => {
       }
     });
 
-    const datesToggle = accordion.querySelector(".js-dates-toggle");
-    const datesAll = accordion.querySelector(".education-program-card__dates-all");
+    const datesBtn = accordion.querySelector(".js-dates-toggle");
+    const datesExtra = accordion.querySelector(".education-program-card__dates-extra");
 
-    if (datesToggle && datesAll) {
-      datesToggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        const isOpen = !datesAll.hidden;
+    if (datesBtn && datesExtra) {
+      const labelMore = datesBtn.textContent.trim();
+
+      datesBtn.addEventListener("click", () => {
+        const isOpen = datesBtn.classList.contains("is-open");
+
         if (isOpen) {
-          datesAll.hidden = true;
-          accordion.querySelector(".education-program-card__dates-visible").hidden = false;
-          datesToggle.classList.remove("is-active");
+          datesExtra.classList.remove("is-visible");
+          datesBtn.classList.remove("is-open");
+          datesBtn.textContent = labelMore;
         } else {
-          datesAll.hidden = false;
-          accordion.querySelector(".education-program-card__dates-visible").hidden = true;
-          datesToggle.classList.add("is-active");
+          datesExtra.classList.add("is-visible");
+          datesBtn.classList.add("is-open");
+          datesBtn.textContent = "скрыть";
         }
       });
     }

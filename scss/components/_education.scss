@@ -576,21 +576,42 @@
 .education-program-card__date-more {
   background: none;
   border: none;
+  padding: 0 2px;
+  cursor: pointer;
+  color: $red;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.education-program-card__dates-extra {
+  display: none;
+
+  line-height: 140%;
+  &.is-visible {
+    display: inline;
+    animation: datesExtraFadeIn 0.3s ease;
+  }
+}
+
+@keyframes datesExtraFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.education-program-card__date-more {
+  background: none;
+  border: none;
   padding: 0;
   cursor: pointer;
-  font-size: 14px;
-  color: #007bff;
   text-decoration: underline;
   text-underline-offset: 2px;
   white-space: nowrap;
-
-  &:hover {
-    color: #0056b3;
-  }
-
-  &.is-active {
-    color: #0056b3;
-  }
 }
 
 .education-program-card__dates-all {
@@ -606,7 +627,7 @@
   white-space: nowrap;
 
   &:not(:last-child)::after {
-    content: ',';
+    content: ",";
   }
 }
 
