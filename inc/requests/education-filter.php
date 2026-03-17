@@ -499,6 +499,7 @@ function bsi_ajax_education_filter(): void
 
             $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
           }
+          $all_dates = array_values(array_unique($all_dates));
 
           if (!empty($ages_min)) {
             $age_min = min($ages_min);

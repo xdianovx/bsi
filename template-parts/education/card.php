@@ -190,6 +190,7 @@ if (empty($checkin_dates_formatted) && $education_id && function_exists('get_fie
     foreach ($education_programs as $program) {
       $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
     }
+    $all_dates = array_values(array_unique($all_dates));
 
     if (!empty($all_dates)) {
       $today = date('Y-m-d');
