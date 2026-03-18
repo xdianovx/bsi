@@ -397,8 +397,8 @@ if (empty($promo_countries) && !empty($items)) {
         if ($country_title && !isset($countries_map[$country_title])) {
             $countries_map[$country_title] = [
                 'title' => $country_title,
-                'slug'  => sanitize_title($country_title),
-                'flag'  => $flag_url,
+                'slug' => sanitize_title($country_title),
+                'flag' => $flag_url,
             ];
         }
     }
@@ -425,31 +425,61 @@ if (empty($promo_countries) && !empty($items)) {
                 <div class="news-slider__title-wrap-left">
                     <h2 class="h2 news-slider__title">Популярные программы образования</h2>
                     <div class="slider-arrow-wrap news-slider__arrows-wrap">
-                        <div class="slider-arrow slider-arrow-prev popular-education-arrow-prev" tabindex="-1" role="button"
-                            aria-label="Previous slide" aria-controls="swiper-wrapper-popular-education"
-                            aria-disabled="true">
+                        <div class="slider-arrow slider-arrow-prev popular-education-arrow-prev"
+                             tabindex="-1"
+                             role="button"
+                             aria-label="Previous slide"
+                             aria-controls="swiper-wrapper-popular-education"
+                             aria-disabled="true">
                         </div>
-                        <div class="slider-arrow slider-arrow-next popular-education-arrow-next" tabindex="0" role="button"
-                            aria-label="Next slide" aria-controls="swiper-wrapper-popular-education" aria-disabled="false">
+                        <div class="slider-arrow slider-arrow-next popular-education-arrow-next"
+                             tabindex="0"
+                             role="button"
+                             aria-label="Next slide"
+                             aria-controls="swiper-wrapper-popular-education"
+                             aria-disabled="false">
                         </div>
                     </div>
+
+                    <a href="<?php echo esc_url(home_url('/obrazovanie-za-rubezhom/')); ?>"
+                       class="title-wrap__link link-arrow title-wrap__link-education">
+                        <span>Все программы </span>
+                        <div class="link-arrow__icon">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="24"
+                                 height="24"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.5"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+                                <path d="M7 7h10v10"></path>
+                                <path d="M7 17 17 7"></path>
+                            </svg>
+
+                        </div>
+                    </a>
                 </div>
             </div>
 
             <div class="promo-filter popular-education-filter">
-                <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">
+                <button class="promo-filter__btn --all active js-promo-filter-btn"
+                        data-country="">
                     Все
                 </button>
 
                 <?php if (!empty($promo_countries)): ?>
                     <?php foreach ($promo_countries as $country): ?>
                         <?php
-                        $country_id    = (int) $country->ID;
+                        $country_id = (int) $country->ID;
                         $country_title = (string) get_the_title($country_id);
-                        $country_slug  = (string) $country->post_name;
+                        $country_slug = (string) $country->post_name;
 
                         $flag_field = function_exists('get_field') ? get_field('flag', $country_id) : '';
-                        $flag_url   = '';
+                        $flag_url = '';
 
                         if ($flag_field) {
                             if (is_array($flag_field) && !empty($flag_field['url'])) {
@@ -460,12 +490,14 @@ if (empty($promo_countries) && !empty($items)) {
                         }
                         ?>
 
-                        <button class="promo-filter__btn js-promo-filter-btn" data-country="<?php echo esc_attr($country_id); ?>"
-                            data-country-slug="<?php echo esc_attr($country_slug); ?>">
+                        <button class="promo-filter__btn js-promo-filter-btn"
+                                data-country="<?php echo esc_attr($country_id); ?>"
+                                data-country-slug="<?php echo esc_attr($country_slug); ?>">
                             <?php if ($flag_url): ?>
                                 <span class="promo-filter__flag-wrap">
-                                    <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($country_title); ?>"
-                                        class="promo-filter__flag">
+                                    <img src="<?php echo esc_url($flag_url); ?>"
+                                         alt="<?php echo esc_attr($country_title); ?>"
+                                         class="promo-filter__flag">
                                 </span>
                             <?php endif; ?>
 
@@ -476,16 +508,18 @@ if (empty($promo_countries) && !empty($items)) {
                     <?php foreach ($filter_countries as $country): ?>
                         <?php
                         $country_title = (string) $country['title'];
-                        $country_slug  = (string) $country['slug'];
-                        $flag_url      = !empty($country['flag']) ? (string) $country['flag'] : '';
+                        $country_slug = (string) $country['slug'];
+                        $flag_url = !empty($country['flag']) ? (string) $country['flag'] : '';
                         ?>
 
-                        <button class="promo-filter__btn js-promo-filter-btn" data-country="<?php echo esc_attr($country_title); ?>"
-                            data-country-slug="<?php echo esc_attr($country_slug); ?>">
+                        <button class="promo-filter__btn js-promo-filter-btn"
+                                data-country="<?php echo esc_attr($country_title); ?>"
+                                data-country-slug="<?php echo esc_attr($country_slug); ?>">
                             <?php if ($flag_url): ?>
                                 <span class="promo-filter__flag-wrap">
-                                    <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($country_title); ?>"
-                                        class="promo-filter__flag">
+                                    <img src="<?php echo esc_url($flag_url); ?>"
+                                         alt="<?php echo esc_attr($country_title); ?>"
+                                         class="promo-filter__flag">
                                 </span>
                             <?php endif; ?>
 
@@ -507,8 +541,9 @@ if (empty($promo_countries) && !empty($items)) {
                                 ? (string) $item['country_slug']
                                 : sanitize_title((string) $item['country_title']);
                             ?>
-                            <div class="swiper-slide" data-country="<?php echo esc_attr($data_country); ?>"
-                                data-country-slug="<?php echo esc_attr($data_country_slug); ?>">
+                            <div class="swiper-slide"
+                                 data-country="<?php echo esc_attr($data_country); ?>"
+                                 data-country-slug="<?php echo esc_attr($data_country_slug); ?>">
                                 <?php
                                 set_query_var('education', $item);
                                 get_template_part('template-parts/education/card');

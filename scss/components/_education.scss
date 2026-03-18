@@ -1134,6 +1134,14 @@
   }
 }
 
+.title-wrap__link-education {
+  margin-left: auto;
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+}
+
 .popular-education-filter {
   margin-top: 16px;
   // ВРЕМЕННО: скрываем табы фильтра
