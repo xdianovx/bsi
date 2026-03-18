@@ -52,9 +52,10 @@
       </a>
 
       <?php
-
-      $bsistudy_url = 'https://bsistudy.ru'; ?>
-      <a href="<?php echo esc_url($bsistudy_url); ?>" target="_blank" rel="noopener noreferrer"
+      $education_page = get_page_by_path('obrazovanie-za-rubezhom');
+      $education_url = $education_page ? get_permalink($education_page->ID) : '#';
+      ?>
+      <a href="<?php echo esc_url($education_url); ?>"
         class="gtm-search__tab-btn">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
           xmlns="http://www.w3.org/2000/svg">
