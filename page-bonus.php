@@ -6,11 +6,6 @@
 get_header();
 ?>
 
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#EE3145" stroke="#EE3145"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin">
-    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-    <circle cx="12" cy="10" r="3" />
-</svg>
 
 <main class="bonus-page">
     <?php if (function_exists('yoast_breadcrumb')): ?>
@@ -33,7 +28,8 @@ get_header();
 
 
     if (have_rows('bonus_marquee_items')): ?>
-        <section class="bonus-marquee" style="--marquee-speed: 30s;">
+        <section class="bonus-marquee"
+                 style="--marquee-speed: 30s;">
             <div class="bonus-marquee__row bonus-marquee__row--left">
                 <div class="bonus-marquee__track">
                     <div class="bonus-marquee__content">
@@ -99,7 +95,7 @@ get_header();
                                     <div class="bonus-level__img">
                                         <?php if ($star_image): ?>
                                             <img src="<?php echo esc_url($star_image['url']); ?>"
-                                                alt="<?php echo esc_attr($star_image['alt'] ?: 'Звезда'); ?>">
+                                                 alt="<?php echo esc_attr($star_image['alt'] ?: 'Звезда'); ?>">
                                         <?php endif; ?>
                                     </div>
                                     <div class="bonus-level__name">
