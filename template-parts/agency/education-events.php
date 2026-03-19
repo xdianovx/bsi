@@ -1,6 +1,5 @@
 <?php
 $kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
-$direction = isset($_GET['direction']) ? sanitize_key(wp_unslash($_GET['direction'])) : '';
 
 $query_args = [
   'post_type' => 'agency_event',
@@ -19,25 +18,11 @@ if ($kind !== '') {
     'terms' => [$kind],
   ];
 }
-if ($direction !== '') {
-  $tax_query[] = [
-    'taxonomy' => 'agency_event_direction',
-    'field' => 'slug',
-    'terms' => [$direction],
-  ];
-}
 if (!empty($tax_query)) {
   $query_args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
 }
 
 $events_query = new WP_Query($query_args);
-
-$direction_terms = get_terms([
-  'taxonomy' => 'agency_event_direction',
-  'hide_empty' => true,
-  'orderby' => 'name',
-  'order' => 'ASC',
-]);
 
 $kind_terms = get_terms([
   'taxonomy' => 'agency_event_kind',
@@ -65,16 +50,6 @@ $kind_terms = (!is_wp_error($kind_terms) && is_array($kind_terms)) ? $kind_terms
       <?php endforeach; ?>
     </div>
 
-    <?php if (!is_wp_error($direction_terms) && !empty($direction_terms)): ?>
-      <select class="agency-education__direction-select" data-agency-direction>
-        <option value="">Направление: все</option>
-        <?php foreach ($direction_terms as $term): ?>
-          <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($direction, $term->slug); ?>>
-            <?php echo esc_html($term->name); ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-    <?php endif; ?>
   </div>
 
   <div class="agency-education__list" data-agency-education-list>
