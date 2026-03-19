@@ -39,32 +39,28 @@ $direction_terms = get_terms([
   'order' => 'ASC',
 ]);
 
-$all_kind_tabs = [
-  '' => 'Все',
-  'webinar' => 'Вебинары',
-  'event' => 'Мероприятия',
-  'promo-tour' => 'Рекламные туры',
-];
-
-$existing_kind_terms = get_terms([
+$kind_terms = get_terms([
   'taxonomy' => 'agency_event_kind',
   'hide_empty' => true,
-  'fields' => 'slugs',
+  'orderby' => 'name',
+  'order' => 'ASC',
 ]);
-$existing_kind_slugs = (!is_wp_error($existing_kind_terms) && is_array($existing_kind_terms))
-  ? $existing_kind_terms
-  : [];
+$kind_terms = (!is_wp_error($kind_terms) && is_array($kind_terms)) ? $kind_terms : [];
 ?>
 
 <section class="agency-education" data-agency-education>
   <div class="agency-education__head">
     <div class="agency-education-tabs">
-      <?php foreach ($all_kind_tabs as $tab_slug => $tab_label): ?>
-        <?php if ($tab_slug !== '' && !in_array($tab_slug, $existing_kind_slugs, true)) continue; ?>
+      <button type="button"
+              class="agency-education-tabs__btn <?php echo $kind === '' ? 'is-active' : ''; ?>"
+              data-agency-kind="">
+        Все
+      </button>
+      <?php foreach ($kind_terms as $kind_term): ?>
         <button type="button"
-                class="agency-education-tabs__btn <?php echo $kind === $tab_slug ? 'is-active' : ''; ?>"
-                data-agency-kind="<?php echo esc_attr($tab_slug); ?>">
-          <?php echo esc_html($tab_label); ?>
+                class="agency-education-tabs__btn <?php echo $kind === $kind_term->slug ? 'is-active' : ''; ?>"
+                data-agency-kind="<?php echo esc_attr($kind_term->slug); ?>">
+          <?php echo esc_html($kind_term->name); ?>
         </button>
       <?php endforeach; ?>
     </div>

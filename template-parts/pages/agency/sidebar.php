@@ -24,25 +24,16 @@ if ($is_education_page) {
 
 $is_education_context = $is_education_page || $is_single_event;
 
-$all_education_kinds = [
-  'webinar' => 'Вебинары',
-  'event' => 'Мероприятия',
-  'promo-tour' => 'Рекламные туры',
-];
-
-$existing_kind_terms = get_terms([
+$kind_terms_raw = get_terms([
   'taxonomy' => 'agency_event_kind',
   'hide_empty' => true,
-  'fields' => 'slugs',
+  'orderby' => 'name',
+  'order' => 'ASC',
 ]);
-$existing_kind_slugs = (!is_wp_error($existing_kind_terms) && is_array($existing_kind_terms))
-  ? $existing_kind_terms
-  : [];
-
 $education_kinds = [];
-foreach ($all_education_kinds as $slug => $label) {
-  if (in_array($slug, $existing_kind_slugs, true)) {
-    $education_kinds[] = ['slug' => $slug, 'label' => $label];
+if (!is_wp_error($kind_terms_raw) && is_array($kind_terms_raw)) {
+  foreach ($kind_terms_raw as $kt) {
+    $education_kinds[] = ['slug' => $kt->slug, 'label' => $kt->name];
   }
 }
 
