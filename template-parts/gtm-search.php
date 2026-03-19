@@ -121,8 +121,7 @@
       $mice_page = get_page_by_path('mice');
       $mice_url = $mice_page ? get_permalink($mice_page->ID) : '#';
       ?>
-      <a href="https://past.bsigroup.ru/business/" target="_blank" rel="noopener noreferrer"
-        class="gtm-search__tab-btn">
+      <div class="gtm-search__tab-btn gtm-search__tab-btn--disabled">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor">
           <path
@@ -138,13 +137,9 @@
         </svg>
 
         <span>Деловой туризм</span>
-      </a>
+      </div>
 
-      <?php
-
-      $cruise_url = home_url('/kruizy/');
-      ?>
-      <a href="<?php echo esc_url($cruise_url); ?>" class="gtm-search__tab-btn">
+      <div class="gtm-search__tab-btn gtm-search__tab-btn--disabled">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
           class="lucide lucide-ship-icon lucide-ship">
@@ -156,7 +151,7 @@
             d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1s1.2 1 2.5 1c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
         </svg>
         <span>Круизы</span>
-      </a>
+      </div>
 
     </div>
 

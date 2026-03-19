@@ -115,15 +115,50 @@ if ($all_education_dates === false) {
   set_transient($cache_key, $all_education_dates, 12 * HOUR_IN_SECONDS);
 }
 
-// Начальный запрос - показываем все школы (если страна не выбрана)
-$initial_query = new WP_Query([
+// Начальный запрос - показываем все школы с сортировкой по цене (возрастание)
+$per_page_initial = 12;
+$all_edu_for_sort = new WP_Query([
   'post_type' => 'education',
   'post_status' => 'publish',
-  'posts_per_page' => 12,
-  'orderby' => 'title',
-  'order' => 'ASC',
-  'paged' => $paged,
+  'posts_per_page' => -1,
 ]);
+
+if ($all_edu_for_sort->have_posts()) {
+  $all_sorted_posts = $all_edu_for_sort->posts;
+
+  usort($all_sorted_posts, function ($a, $b) {
+    $price_a = function_exists('get_field') ? get_field('education_price', $a->ID) : '';
+    $price_b = function_exists('get_field') ? get_field('education_price', $b->ID) : '';
+    preg_match('/[\d\s]+/', (string) $price_a, $matches_a);
+    preg_match('/[\d\s]+/', (string) $price_b, $matches_b);
+    $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
+    $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
+    return $num_a <=> $num_b;
+  });
+
+  $total_initial = count($all_sorted_posts);
+  $max_pages_initial = (int) ceil($total_initial / $per_page_initial);
+  $offset_initial = ($paged - 1) * $per_page_initial;
+  $paginated_initial = array_slice($all_sorted_posts, $offset_initial, $per_page_initial);
+  $paginated_ids_initial = !empty($paginated_initial) ? array_map(fn($p) => $p->ID, $paginated_initial) : [0];
+
+  $initial_query = new WP_Query([
+    'post_type' => 'education',
+    'post_status' => 'publish',
+    'posts_per_page' => $per_page_initial,
+    'post__in' => $paginated_ids_initial,
+    'orderby' => 'post__in',
+  ]);
+  $initial_query->found_posts = $total_initial;
+  $initial_query->max_num_pages = $max_pages_initial;
+} else {
+  $initial_query = new WP_Query([
+    'post_type' => 'education',
+    'post_status' => 'publish',
+    'posts_per_page' => $per_page_initial,
+    'paged' => $paged,
+  ]);
+}
 ?>
 
 <?php if (function_exists('yoast_breadcrumb')): ?>
@@ -385,7 +420,7 @@ $initial_query = new WP_Query([
         <div class="education-page__sort js-dropdown">
           <button type="button"
                   class="js-dropdown-trigger education-page__sort-trigger">
-            <span class="education-page__sort-text">По названию (А-Я)</span>
+            <span class="education-page__sort-text">По цене (возрастание)</span>
             <svg xmlns="http://www.w3.org/2000/svg"
                  width="20"
                  height="20"

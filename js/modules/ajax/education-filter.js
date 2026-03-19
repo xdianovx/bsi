@@ -48,7 +48,7 @@ export const initEducationFilter = () => {
   let datePickerInstance = null;
   let sortDropdown = null;
   let perPageDropdown = null;
-  let currentSortValue = 'title_asc';
+  let currentSortValue = 'price_asc';
   let currentPerPage = 12;
   let currentPage = parseInt(root.getAttribute('data-current-page') || '1', 10);
   let totalPages = parseInt(root.getAttribute('data-total-pages') || '1', 10);
@@ -136,7 +136,7 @@ export const initEducationFilter = () => {
     if (groupArrivalCheckbox?.checked) {
       params.set("group_arrival", "1");
     }
-    if (currentSortValue && currentSortValue !== 'title_asc') {
+    if (currentSortValue && currentSortValue !== 'price_asc') {
       params.set("sort", currentSortValue);
     }
 
@@ -909,7 +909,7 @@ export const initEducationFilter = () => {
     });
 
     // Устанавливаем активное состояние для дефолтной опции
-    const defaultOption = sortContainer.querySelector('.education-page__sort-option[data-value="title_asc"]');
+    const defaultOption = sortContainer.querySelector('.education-page__sort-option[data-value="price_asc"]');
     if (defaultOption) {
       defaultOption.classList.add('is-active');
     }
@@ -994,15 +994,15 @@ export const initEducationFilter = () => {
       if (groupArrivalCheckbox) groupArrivalCheckbox.checked = false;
 
       // Сбрасываем сортировку
-      currentSortValue = 'title_asc';
+      currentSortValue = 'price_asc';
       if (sortContainer) {
         const sortText = sortContainer.querySelector('.education-page__sort-text');
         const sortOptions = sortContainer.querySelectorAll('.education-page__sort-option');
         if (sortText) {
-          sortText.textContent = 'По названию (А-Я)';
+          sortText.textContent = 'По цене (возрастание)';
         }
         sortOptions.forEach((opt) => opt.classList.remove('is-active'));
-        const defaultOption = sortContainer.querySelector('.education-page__sort-option[data-value="title_asc"]');
+        const defaultOption = sortContainer.querySelector('.education-page__sort-option[data-value="price_asc"]');
         if (defaultOption) {
           defaultOption.classList.add('is-active');
         }

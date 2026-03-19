@@ -11,6 +11,11 @@
 .bonus-marquee__row {
   overflow: hidden;
   width: 100%;
+
+  &--right {
+    margin-left: -10%;
+    width: calc(100% + 10%);
+  }
 }
 
 .bonus-marquee__track {
@@ -96,7 +101,8 @@
 
 .bonus-level__title {
   display: flex;
-  gap: 1rem;
+  flex-direction: column-reverse;
+  gap: 2px;
 
   h3 {
     font-size: 18px;
@@ -124,7 +130,7 @@
 .bonus-level__description-list {
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   width: 100%;
 

@@ -55,13 +55,26 @@ if (!empty($country_ids)) {
     'update_post_term_cache' => false,
   ]);
 
+  $priority_order = ['Турция', 'Мальдивы', 'Китай', 'Вьетнам'];
+
+  $get_priority = function ($title) use ($priority_order) {
+    $idx = array_search($title, $priority_order);
+    return $idx !== false ? $idx : count($priority_order);
+  };
+
   if (class_exists('Collator')) {
     $collator = new Collator('ru_RU');
-    usort($promo_countries, function ($a, $b) use ($collator) {
+    usort($promo_countries, function ($a, $b) use ($collator, $get_priority) {
+      $pa = $get_priority($a->post_title);
+      $pb = $get_priority($b->post_title);
+      if ($pa !== $pb) return $pa - $pb;
       return $collator->compare($a->post_title, $b->post_title);
     });
   } else {
-    usort($promo_countries, function ($a, $b) {
+    usort($promo_countries, function ($a, $b) use ($get_priority) {
+      $pa = $get_priority($a->post_title);
+      $pb = $get_priority($b->post_title);
+      if ($pa !== $pb) return $pa - $pb;
       return mb_strcasecmp($a->post_title, $b->post_title);
     });
   }

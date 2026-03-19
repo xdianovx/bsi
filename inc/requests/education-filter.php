@@ -52,7 +52,7 @@ function bsi_ajax_education_filter(): void
   if (!in_array($per_page, [12, 24, 48], true)) {
     $per_page = 12;
   }
-  $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'title_asc';
+  $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'price_asc';
 
   $tax_query = [];
 

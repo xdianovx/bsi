@@ -27,7 +27,8 @@ export const initBonusMarquee = () => {
     const speed = getComputedStyle(row.closest('.bonus-marquee'))
       .getPropertyValue('--marquee-speed')
       .trim();
-    const duration = parseFloat(speed) || 35;
+    const duration = parseFloat(speed);
+    if (!duration) return;
 
     const from = isRight ? -exactWidth : 0;
     const to = isRight ? 0 : -exactWidth;
@@ -40,7 +41,8 @@ export const initBonusMarquee = () => {
     track.animate(keyframes, {
       duration: duration * 1000,
       iterations: Infinity,
-      easing: 'linear'
+      easing: 'linear',
+      delay: 0
     });
   });
 };
