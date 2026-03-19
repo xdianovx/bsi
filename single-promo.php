@@ -26,20 +26,7 @@ $formatted_to = function_exists('format_date_value') ? format_date_value($raw_to
 
   <section class="single-promo__head">
     <div class="container">
-      <h1 class="h1 single-promo__title"><?php the_title(); ?></h1>
 
-      <?php if ($formatted_from || $formatted_to): ?>
-        <div class="single-promo__dates">
-          <?php if ($formatted_from && $formatted_to): ?>
-            <span class="single-promo__date-range"><?= esc_html($formatted_from); ?> –
-              <?= esc_html($formatted_to); ?></span>
-          <?php elseif ($formatted_from): ?>
-            <span class="single-promo__date-from"><?= esc_html($formatted_from); ?></span>
-          <?php else: ?>
-            <span class="single-promo__date-to"><?= esc_html($formatted_to); ?></span>
-          <?php endif; ?>
-        </div>
-      <?php endif; ?>
 
       <?php if (has_post_thumbnail()): ?>
         <div class="single-promo__poster">
@@ -53,6 +40,29 @@ $formatted_to = function_exists('format_date_value') ? format_date_value($raw_to
 
   <section class="post-content-section single-promo__content">
     <div class="container">
+      <h1 class="h1 single-promo__title">
+        <?php the_title(); ?>
+      </h1>
+
+      <?php if ($formatted_from || $formatted_to): ?>
+        <div class="single-promo__dates">
+          <?php if ($formatted_from && $formatted_to): ?>
+            <span class="single-promo__date-range">
+              <?= esc_html($formatted_from); ?> –
+              <?= esc_html($formatted_to); ?>
+            </span>
+          <?php elseif ($formatted_from): ?>
+            <span class="single-promo__date-from">
+              <?= esc_html($formatted_from); ?>
+            </span>
+          <?php else: ?>
+            <span class="single-promo__date-to">
+              <?= esc_html($formatted_to); ?>
+            </span>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
+
       <?php if (get_the_excerpt()): ?>
         <div class="page-country__descr">
           <?= get_the_excerpt(); ?>
