@@ -206,6 +206,6 @@
 
 .archive-page__top {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   justify-content: space-between;
 }
