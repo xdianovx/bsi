@@ -60,6 +60,7 @@
 
 .agency-page__title {
   margin-top: 16px;
+  margin-bottom: 12px;
 }
 
 // --- Single event meta (no card bg) ---
@@ -408,7 +409,6 @@
 .agency-education-card__bottom {
   margin-top: 10px;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   gap: 14px;
 
