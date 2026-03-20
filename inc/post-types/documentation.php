@@ -41,6 +41,7 @@ function bsi_register_documentation_cpt()
     ],
     'has_archive' => true,
     'publicly_queryable' => true,
+    'show_in_nav_menus' => true,
     'show_in_rest' => true,
   ];
 
