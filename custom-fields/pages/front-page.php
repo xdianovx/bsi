@@ -19,7 +19,7 @@ add_action('acf/init', function () {
         'filters' => ['search'],
         'return_format' => 'id',
         'min' => 0,
-        'max' => 20,
+        'max' => 0,
       ],
     ],
     'location' => [
@@ -32,4 +32,9 @@ add_action('acf/init', function () {
       ],
     ],
   ]);
+});
+
+add_filter('acf/fields/relationship/query/key=field_homepage_education_items', function (array $args): array {
+    $args['posts_per_page'] = -1;
+    return $args;
 });
