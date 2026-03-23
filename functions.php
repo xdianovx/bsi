@@ -161,10 +161,23 @@ function bsi_add_noreferrer_to_external_links($content)
 	if (!is_admin()) {
 		$site_url = parse_url(home_url());
 		$site_host = !empty($site_url['host']) ? str_replace('www.', '', $site_url['host']) : '';
+		$file_extensions_for_download = [
+			'pdf',
+			'doc',
+			'docx',
+			'xls',
+			'xlsx',
+			'ppt',
+			'pptx',
+			'rtf',
+			'txt',
+			'zip',
+			'rar',
+		];
 
 		$content = preg_replace_callback(
 			'/<a\s+([^>]*href=["\']([^"\']*)["\'][^>]*)>/i',
-			function ($matches) use ($site_host) {
+			function ($matches) use ($site_host, $file_extensions_for_download) {
 				$full_tag = $matches[0];
 				$attributes = $matches[1];
 				$href = $matches[2];
@@ -178,6 +191,17 @@ function bsi_add_noreferrer_to_external_links($content)
 					strpos($href, 'javascript:') === 0
 				) {
 					return $full_tag;
+				}
+
+				// Для ссылок на документы добавляем атрибут download,
+				// чтобы браузер всегда запускал скачивание (актуально для docx и др. офисных форматов).
+				$path = (string) parse_url($href, PHP_URL_PATH);
+				$path = rawurldecode($path);
+				$ext = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+				if ($ext !== '' && in_array($ext, $file_extensions_for_download, true)) {
+					if (!preg_match('/\sdownload(\s*=\s*["\'][^"\']*["\'])?/i', $attributes)) {
+						$attributes .= ' download';
+					}
 				}
 
 				// Проверяем, является ли ссылка внешней
@@ -223,7 +247,7 @@ function bsi_add_noreferrer_to_external_links($content)
 					return '<a ' . $attributes . '>';
 				}
 
-				return $full_tag;
+				return '<a ' . $attributes . '>';
 			},
 			$content
 		);
