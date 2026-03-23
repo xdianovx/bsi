@@ -193,6 +193,17 @@ function bsi_add_noreferrer_to_external_links($content)
 					return $full_tag;
 				}
 
+				// Автофикс: переводим ссылки bsigroup.ru с http на https,
+				// чтобы браузер не блокировал mixed content/mixed download.
+				if (preg_match('#^http://(www\.)?bsigroup\.ru/#i', $href)) {
+					$href = preg_replace('#^http://#i', 'https://', $href);
+					$attributes = preg_replace(
+						'/href=["\'][^"\']*["\']/i',
+						'href="' . esc_attr($href) . '"',
+						$attributes
+					);
+				}
+
 				// Для ссылок на документы добавляем атрибут download,
 				// чтобы браузер всегда запускал скачивание (актуально для docx и др. офисных форматов).
 				$path = (string) parse_url($href, PHP_URL_PATH);
