@@ -12,6 +12,20 @@ const AJAX_URL = () => window.ajax?.url || window.ajaxurl || '/wp-admin/admin-aj
 const MAX_TOURS = 10;
 
 /**
+ * Как в PriceLoaderService::fetchTourPrice — без дат Само отдаёт другой набор строк;
+ * минимум по полю price тогда часто ловит мусор (сотни рублей вместо реальной цены).
+ */
+function defaultExcursionCheckinRange() {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setMonth(end.getMonth() + 3);
+  const ymd = (d) =>
+    `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  return { CHECKIN_BEG: ymd(start), CHECKIN_END: ymd(end) };
+}
+
+/**
  * Парсит ВСЕ нужные параметры из booking URL
  */
 function parseBookingParams(href) {
@@ -59,10 +73,19 @@ function findMinPrice(prices) {
  */
 async function fetchTourMinPrice(params) {
   try {
+    const defaults = defaultExcursionCheckinRange();
+    const merged = {
+      ...params,
+      CHECKIN_BEG: params.CHECKIN_BEG || defaults.CHECKIN_BEG,
+      CHECKIN_END: params.CHECKIN_END || defaults.CHECKIN_END,
+      NIGHTS_FROM: params.NIGHTS_FROM || "1",
+      NIGHTS_TILL: params.NIGHTS_TILL || "30",
+    };
+
     const body = new URLSearchParams({
       action: 'bsi_samo',
       method: 'excursion_prices',
-      ...params,
+      ...merged,
     });
 
     const res = await fetch(AJAX_URL(), {
