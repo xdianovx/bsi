@@ -32,6 +32,15 @@ if ($start_date !== '') {
   }
 }
 
+$event_start_ts = (int) get_post_meta($post_id, 'event_start_ts', true);
+if (!$event_start_ts && $start_date !== '' && $start_time !== '') {
+  $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i', $start_date . ' ' . $start_time, wp_timezone());
+  $event_start_ts = $dt ? $dt->getTimestamp() : 0;
+}
+$now_ts = (int) current_time('timestamp');
+$is_past = ($event_start_ts > 0 && $event_start_ts < $now_ts);
+$is_registration_closed = ($registration_closed || $is_past);
+
 $kind_terms = get_the_terms($post_id, 'agency_event_kind');
 $kind = (!empty($kind_terms) && !is_wp_error($kind_terms)) ? $kind_terms[0] : null;
 $kind_label = $kind ? $kind->name : 'Событие';
@@ -110,8 +119,8 @@ $kind_url = $kind_slug ? add_query_arg('kind', $kind_slug, $education_url) : $ed
             <?php if ($price !== ''): ?>
               <div class="agency-education-card__price numfont"><?php echo esc_html($price); ?></div>
             <?php endif; ?>
-            <?php if ($registration_closed): ?>
-              <button type="button" class="btn sm btn-gray agency-education-card__cta" disabled>Запись недоступна</button>
+            <?php if ($is_registration_closed): ?>
+              <button type="button" class="btn sm btn-gray agency-education-card__cta" disabled>Запись закрыта</button>
             <?php elseif ($registration_url !== ''): ?>
               <a href="<?php echo esc_url($registration_url); ?>" target="_blank" rel="noopener" class="btn sm btn-accent agency-education-card__cta">Регистрация</a>
             <?php else: ?>

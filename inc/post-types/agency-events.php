@@ -193,3 +193,63 @@ function bsi_register_agency_event_fields()
     ],
   ]);
 }
+
+add_action('save_post_agency_event', 'bsi_agency_event_sync_start_ts', 20, 3);
+function bsi_agency_event_sync_start_ts($post_id, $post, $update)
+{
+  if (wp_is_post_revision($post_id) || wp_is_post_autosave($post_id)) {
+    return;
+  }
+  if (!($post instanceof WP_Post) || $post->post_type !== 'agency_event') {
+    return;
+  }
+
+  $start_date = function_exists('get_field') ? trim((string) get_field('event_start_date', $post_id)) : '';
+  $start_time = function_exists('get_field') ? trim((string) get_field('event_start_time', $post_id)) : '';
+
+  if ($start_date === '' || $start_time === '') {
+    delete_post_meta($post_id, 'event_start_ts');
+    return;
+  }
+
+  $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i', $start_date . ' ' . $start_time, wp_timezone());
+  if (!$dt) {
+    delete_post_meta($post_id, 'event_start_ts');
+    return;
+  }
+
+  update_post_meta($post_id, 'event_start_ts', (string) $dt->getTimestamp());
+}
+
+add_action('init', 'bsi_agency_events_backfill_start_ts');
+function bsi_agency_events_backfill_start_ts()
+{
+  if (!is_user_logged_in() || !current_user_can('edit_posts')) {
+    return;
+  }
+  if (get_option('bsi_agency_events_start_ts_backfilled')) {
+    return;
+  }
+
+  $q = new WP_Query([
+    'post_type' => 'agency_event',
+    'post_status' => 'any',
+    'posts_per_page' => 200,
+    'fields' => 'ids',
+    'no_found_rows' => true,
+    'meta_query' => [
+      [
+        'key' => 'event_start_ts',
+        'compare' => 'NOT EXISTS',
+      ],
+    ],
+  ]);
+
+  if (!empty($q->posts)) {
+    foreach ($q->posts as $event_id) {
+      bsi_agency_event_sync_start_ts((int) $event_id, get_post((int) $event_id), true);
+    }
+  }
+
+  update_option('bsi_agency_events_start_ts_backfilled', 1, false);
+}
