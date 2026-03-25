@@ -74,12 +74,15 @@ function findMinPrice(prices) {
 async function fetchTourMinPrice(params) {
   try {
     const defaults = defaultExcursionCheckinRange();
+    // Всегда RUB для цены на сайте: в ссылке с Само часто CURRENCY=3 (EUR) —
+    // иначе min даёт «евро-числа», а мы подписываем «₽ / чел» (как PriceLoaderService и tour-prices.js).
     const merged = {
       ...params,
       CHECKIN_BEG: params.CHECKIN_BEG || defaults.CHECKIN_BEG,
       CHECKIN_END: params.CHECKIN_END || defaults.CHECKIN_END,
       NIGHTS_FROM: params.NIGHTS_FROM || "1",
       NIGHTS_TILL: params.NIGHTS_TILL || "30",
+      CURRENCY: "1",
     };
 
     const body = new URLSearchParams({
