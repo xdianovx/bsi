@@ -201,14 +201,24 @@ export const gtmSearch = async () => {
       const states = resp?.SearchTour_STATES || resp;
 
       if (states && states.length) {
+        const DEFAULT_STATE_ID = "31"; // Китай
+        const defaultState =
+          states.find((s) => String(s?.id) === DEFAULT_STATE_ID) ||
+          states.find((s) => String(s?.stateISO3) === "CHN") ||
+          states.find((s) => String(s?.nameAlt).toLowerCase() === "china") ||
+          states.find((s) => String(s?.name).toLowerCase() === "китай");
+
+        const fallbackState = states[0];
+        const pickedState = defaultState || fallbackState;
+
         stateSelect.setChoices(
           states.map((s) => ({ value: String(s.id), label: s.name })),
           "value",
           "label",
           true
         );
-        stateSelect.setChoiceByValue(String(states[0].id));
-        updateLink({ activeState: String(states[0].id) });
+        stateSelect.setChoiceByValue(String(pickedState.id));
+        updateLink({ activeState: String(pickedState.id) });
       }
     }
 
@@ -407,6 +417,16 @@ export const gtmSearch = async () => {
       const states = resp?.SearchHotel_STATES || resp;
 
       if (states && states.length) {
+        const DEFAULT_STATE_ID = "31"; // Китай
+        const defaultState =
+          states.find((s) => String(s?.id) === DEFAULT_STATE_ID) ||
+          states.find((s) => String(s?.stateISO3) === "CHN") ||
+          states.find((s) => String(s?.nameAlt).toLowerCase() === "china") ||
+          states.find((s) => String(s?.name).toLowerCase() === "китай");
+
+        const fallbackState = states[0];
+        const pickedState = defaultState || fallbackState;
+
         stateSelect.setChoices(
           states.map((s) => ({ value: String(s.id), label: s.name })),
           "value",
@@ -414,8 +434,8 @@ export const gtmSearch = async () => {
           true
         );
 
-        stateSelect.setChoiceByValue(String(states[0].id));
-        updateLink({ activeState: String(states[0].id) });
+        stateSelect.setChoiceByValue(String(pickedState.id));
+        updateLink({ activeState: String(pickedState.id) });
       }
     }
 
@@ -620,15 +640,26 @@ export const gtmSearch = async () => {
       const states = resp?.SearchExcursion_STATES || resp;
 
       if (states && states.length) {
+        const DEFAULT_STATE_ID = "31"; // Китай
+        const defaultState =
+          states.find((s) => String(s?.id) === DEFAULT_STATE_ID) ||
+          states.find((s) => String(s?.stateISO3) === "CHN") ||
+          states.find((s) => String(s?.nameAlt).toLowerCase() === "china") ||
+          states.find((s) => String(s?.name).toLowerCase() === "китай");
+
+        const fallbackState = states[0];
+        const pickedState = defaultState || fallbackState;
+
         stateSelect.setChoices(
           states.map((s) => ({ value: String(s.id), label: s.name })),
           "value",
           "label",
           true
         );
-        stateSelect.setChoiceByValue(String(states[0].id));
-        updateLink({ activeState: String(states[0].id), tours: "" });
-        await loadTours(String(states[0].id));
+
+        stateSelect.setChoiceByValue(String(pickedState.id));
+        updateLink({ activeState: String(pickedState.id), tours: "" });
+        await loadTours(String(pickedState.id));
       }
     }
 
