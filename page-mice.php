@@ -12,11 +12,11 @@ get_header('mice');
         <?php
         $current_page_id = get_the_ID();
         $child_pages = get_posts([
-          'post_type' => 'page',
+          'post_type'   => 'page',
           'post_parent' => $current_page_id,
           'numberposts' => -1,
-          'orderby' => 'menu_order',
-          'order' => 'ASC',
+          'orderby'     => 'menu_order',
+          'order'       => 'ASC',
           'post_status' => 'publish',
         ]);
 
@@ -72,7 +72,7 @@ get_header('mice');
   </section>
 
   <?php
-  $rows = function_exists('get_field') ? get_field('mice_benefits') : [];
+  $rows = function_exists('get_field') ? get_field('mice_benefits', 'option') : [];
   if (!empty($rows) && is_array($rows)): ?>
     <section class="mice-benefits-section">
       <div class="container">
@@ -115,8 +115,8 @@ get_header('mice');
 
   <section class="page-mice-cta">
     <div class="container">
-      <h2 class="h2">Оставьте заявку</h2>
-      <p class="page-mice-cta__description">И мы проконсультируем вас по всем вопросам</p>
+      <h2 class="h2"><?php echo esc_html(get_field('mice_cta_title', 'option') ?: 'Оставьте заявку'); ?></h2>
+      <p class="page-mice-cta__description"><?php echo esc_html(get_field('mice_cta_description', 'option') ?: 'И мы проконсультируем вас по всем вопросам'); ?></p>
       <div class="page-mice-cta__wrap">
 
         <form action="">
