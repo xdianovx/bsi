@@ -230,6 +230,13 @@ class BSI_Mailer
     $phpmailer->Host = $host;
     $phpmailer->Port = defined('BSI_SMTP_PORT') ? (int) BSI_SMTP_PORT : self::SMTP_PORT;
     $phpmailer->SMTPSecure = defined('BSI_SMTP_SECURE') ? BSI_SMTP_SECURE : self::SMTP_SECURE;
+    $phpmailer->SMTPOptions = [
+      'ssl' => [
+        'verify_peer'       => false,
+        'verify_peer_name'  => false,
+        'allow_self_signed' => true,
+      ],
+    ];
 
     $user = defined('BSI_SMTP_USER') && BSI_SMTP_USER !== '' ? BSI_SMTP_USER : self::SMTP_USER;
     if ($user !== '') {
