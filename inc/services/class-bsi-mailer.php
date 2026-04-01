@@ -25,10 +25,17 @@ class BSI_Mailer
    * SMTP (используется, если в wp-config.php не заданы BSI_SMTP_*)
    * TODO: на продакшене вынести в wp-config или переменные окружения
    */
-  const SMTP_HOST = 'smtp.gmail.com';
+  // Старые Gmail-настройки (откат):
+  // const SMTP_HOST = 'smtp.gmail.com';
+  // const SMTP_PORT = 587;
+  // const SMTP_USER = 'dianov.js@gmail.com';
+  // const SMTP_PASS = 'jjkn edss cltd idgg';
+  // const SMTP_SECURE = 'tls';
+
+  const SMTP_HOST = 'mail3.bsigroup.ru';
   const SMTP_PORT = 587;
-  const SMTP_USER = 'dianov.js@gmail.com';
-  const SMTP_PASS = 'jjkn edss cltd idgg';
+  const SMTP_USER = 'webmail@bsigroup.ru';
+  const SMTP_PASS = '222111';
   const SMTP_SECURE = 'tls'; // tls для 587; для порта 465 — 'ssl'
 
   /**
