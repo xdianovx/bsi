@@ -32,10 +32,17 @@ class BSI_Mailer
   // const SMTP_PASS = 'jjkn edss cltd idgg';
   // const SMTP_SECURE = 'tls';
 
-  const SMTP_HOST = 'mail3.bsigroup.ru';
+  // Новые настройки BSI (временно отключены — ожидаем whitelist IP на mail3.bsigroup.ru):
+  // const SMTP_HOST = 'mail3.bsigroup.ru';
+  // const SMTP_PORT = 587;
+  // const SMTP_USER = 'webmail@bsigroup.ru';
+  // const SMTP_PASS = '222111';
+  // const SMTP_SECURE = 'tls';
+
+  const SMTP_HOST = 'smtp.gmail.com';
   const SMTP_PORT = 587;
-  const SMTP_USER = 'webmail@bsigroup.ru';
-  const SMTP_PASS = '222111';
+  const SMTP_USER = 'dianov.js@gmail.com';
+  const SMTP_PASS = 'jjkn edss cltd idgg';
   const SMTP_SECURE = 'tls'; // tls для 587; для порта 465 — 'ssl'
 
   /**
