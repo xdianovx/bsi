@@ -33,10 +33,10 @@ class BSI_Mailer
   // const SMTP_SECURE = 'tls';
 
   const SMTP_HOST = 'mail3.bsigroup.ru';
-  const SMTP_PORT = 25;
+  const SMTP_PORT = 587;
   const SMTP_USER = 'webmail@bsigroup.ru';
   const SMTP_PASS = '222111';
-  const SMTP_SECURE = ''; // '' = без шифрования (порт 25); 'tls' для 587; 'ssl' для 465
+  const SMTP_SECURE = 'tls'; // tls для 587; для порта 465 — 'ssl'
 
   /**
    * Отправить письмо
