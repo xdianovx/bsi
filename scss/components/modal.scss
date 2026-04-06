@@ -122,3 +122,43 @@
 .micromodal-slide .modal__overlay {
   will-change: transform;
 }
+
+.currency-history-modal {
+  margin-top: 18px;
+}
+
+.currency-history-modal__date {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.currency-history-modal__body {
+  margin-top: 16px;
+}
+
+.currency-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid #ececec;
+  margin: 0;
+}
+
+.currency-history-table thead th {
+  text-align: left;
+  background: #f7f7f7;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.currency-history-table tbody td {
+  padding: 12px 14px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 15px;
+}

@@ -406,10 +406,12 @@ require get_template_directory() . '/inc/requests/popular-education-section.php'
 require get_template_directory() . '/inc/requests/projects.php';
 require get_template_directory() . '/inc/requests/education-filter.php';
 require get_template_directory() . '/inc/services/class-bsi-mailer.php';
+require get_template_directory() . '/inc/services/currency-history.php';
 add_action('phpmailer_init', ['BSI_Mailer', 'configure_smtp']);
 require get_template_directory() . '/inc/recaptcha.php';
 require get_template_directory() . '/inc/requests/ajax-education-program-form.php';
 require get_template_directory() . '/inc/requests/ajax-event-ticket-form.php';
+require get_template_directory() . '/inc/requests/ajax-cbr-rates-history.php';
 
 // Обработка параметров фильтров для страницы образования
 add_action('template_redirect', function () {

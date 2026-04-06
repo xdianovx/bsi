@@ -75,6 +75,10 @@
               </button>
 
               <div class="js-dropdown-panel">
+                <button
+                  type="button"
+                  class="currency-option currency-history-trigger"
+                  data-micromodal-trigger="modal-currency-history">История</button>
               </div>
 
             </div>
@@ -193,6 +197,10 @@
             </button>
 
             <div class="js-dropdown-panel">
+              <button
+                type="button"
+                class="currency-option currency-history-trigger"
+                data-micromodal-trigger="modal-currency-history">История</button>
             </div>
 
           </div>
@@ -232,5 +240,27 @@
       </div>
     </div>
   </section>
+
+  <div class="modal micromodal-slide" id="modal-currency-history" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-currency-history-title">
+        <div class="modal__close-btn" data-micromodal-close>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-x-icon lucide-x">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </div>
+
+        <div class="modal__title" id="modal-currency-history-title">История курсов</div>
+        <div class="currency-history-modal">
+          <label for="currency-history-date">Выберите дату</label>
+          <input type="text" id="currency-history-date" class="currency-history-modal__date">
+          <div class="currency-history-modal__body" data-currency-history-body>Выберите дату для загрузки курсов.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <?= get_template_part('template-parts/gtm-search') ?>

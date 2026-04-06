@@ -2,6 +2,26 @@
 add_action('wp_ajax_bsi_cbr_rates', 'handle_cbr_rates');
 add_action('wp_ajax_nopriv_bsi_cbr_rates', 'handle_cbr_rates');
 
+function bsi_send_cbr_rates_success(array $result, float $markup)
+{
+	if (empty($result['rates']) || !is_array($result['rates'])) {
+		wp_send_json_success($result);
+		return;
+	}
+
+	$result['rates'] = bsi_currency_apply_markup_to_rates($result['rates'], $markup);
+	$rate_date = current_time('Y-m-d');
+
+	bsi_currency_history_upsert_snapshot([
+		'rate_date' => $rate_date,
+		'source_date' => !empty($result['date']) ? $result['date'] : null,
+		'markup_percent' => $markup,
+		'rates' => $result['rates'],
+	]);
+
+	wp_send_json_success($result);
+}
+
 function handle_cbr_rates()
 {
   $cacheKey = 'bsi_cbr_rates';
@@ -11,21 +31,10 @@ function handle_cbr_rates()
 
   $cached = get_transient($cacheKey);
   if ($cached !== false && is_array($cached) && isset($cached['rates'])) {
-    $result = $cached;
-    if ($markup > 0) {
-      foreach ($result['rates'] as $code => &$rate) {
-        if (!isset($rate['value']) || !isset($rate['nominal'])) {
-          continue;
-        }
-        $rate['value'] = $rate['value'] * (1 + $markup / 100);
-      }
-      unset($rate);
-    }
-    wp_send_json_success($result);
+    bsi_send_cbr_rates_success($cached, $markup);
     return;
   }
 
-  $oldCached = $cached;
   $url = 'https://www.cbr-xml-daily.ru/daily_json.js';
 
   $response = wp_remote_get($url, [
@@ -36,20 +45,6 @@ function handle_cbr_rates()
   ]);
 
   if (is_wp_error($response)) {
-    if ($oldCached !== false && is_array($oldCached) && isset($oldCached['rates'])) {
-      $result = $oldCached;
-      if ($markup > 0) {
-        foreach ($result['rates'] as $code => &$rate) {
-          if (!isset($rate['value']) || !isset($rate['nominal'])) {
-            continue;
-          }
-          $rate['value'] = $rate['value'] * (1 + $markup / 100);
-        }
-        unset($rate);
-      }
-      wp_send_json_success($result);
-      return;
-    }
     wp_send_json_error([
       'message' => 'Ошибка получения курсов валют',
       'error' => $response->get_error_message(),
@@ -59,20 +54,6 @@ function handle_cbr_rates()
 
   $code = wp_remote_retrieve_response_code($response);
   if ($code >= 400) {
-    if ($oldCached !== false && is_array($oldCached) && isset($oldCached['rates'])) {
-      $result = $oldCached;
-      if ($markup > 0) {
-        foreach ($result['rates'] as $code => &$rate) {
-          if (!isset($rate['value']) || !isset($rate['nominal'])) {
-            continue;
-          }
-          $rate['value'] = $rate['value'] * (1 + $markup / 100);
-        }
-        unset($rate);
-      }
-      wp_send_json_success($result);
-      return;
-    }
     wp_send_json_error([
       'message' => 'Ошибка получения курсов валют',
       'code' => $code,
@@ -84,20 +65,6 @@ function handle_cbr_rates()
   $data = json_decode($body, true);
 
   if (!is_array($data) || !isset($data['Valute'])) {
-    if ($oldCached !== false && is_array($oldCached) && isset($oldCached['rates'])) {
-      $result = $oldCached;
-      if ($markup > 0) {
-        foreach ($result['rates'] as $code => &$rate) {
-          if (!isset($rate['value']) || !isset($rate['nominal'])) {
-            continue;
-          }
-          $rate['value'] = $rate['value'] * (1 + $markup / 100);
-        }
-        unset($rate);
-      }
-      wp_send_json_success($result);
-      return;
-    }
     wp_send_json_error([
       'message' => 'Неверный формат данных',
     ]);
@@ -125,14 +92,6 @@ function handle_cbr_rates()
   }
 
   set_transient($cacheKey, $result, $cacheExpiration);
-
-  if ($markup > 0) {
-    foreach ($result['rates'] as $code => &$rate) {
-      $rate['value'] = $rate['value'] * (1 + $markup / 100);
-    }
-    unset($rate);
-  }
-
-  wp_send_json_success($result);
+  bsi_send_cbr_rates_success($result, $markup);
 }
 

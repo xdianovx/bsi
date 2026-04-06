@@ -1,5 +1,8 @@
 import { APIService } from "./api-service";
 import { dropdown } from "./forms/dropdown.js";
+import MicroModal from "micromodal";
+import flatpickr from "flatpickr";
+import { Russian } from "flatpickr/dist/l10n/ru.js";
 
 const currencySymbols = {
   RUB: "₽",
@@ -17,6 +20,7 @@ let currentRates = { USD: null, EUR: null, RUB: null };
 let baseISO = "RUB";
 let dropdownInstances = [];
 let currencySelectEls = [];
+const historyCurrenciesOrder = ["USD", "EUR", "RUB", "GBP", "CHF", "CNY", "JPY", "KZT"];
 
 function formatRate(num) {
   return num.toFixed(2).replace(".", ",");
@@ -37,8 +41,7 @@ function getStoredCurrency() {
 function setStoredCurrency(iso) {
   try {
     localStorage.setItem("selectedCurrency", iso);
-  } catch {
-  }
+  } catch {}
 }
 
 function updateCurrencyPrices(container) {
@@ -121,8 +124,135 @@ function updateHeaderPrices() {
   }
 }
 
+function toInputDateValue(dateString) {
+  if (!dateString) return new Date().toISOString().slice(0, 10);
+
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+function getTodayInputDateValue() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function renderHistoryState(bodyEl, text) {
+  if (!bodyEl) return;
+  bodyEl.textContent = text;
+}
+
+function renderHistoryRates(bodyEl, rates) {
+  if (!bodyEl) return;
+
+  const availableCodes = historyCurrenciesOrder.filter((code) => rates && rates[code]);
+  if (!availableCodes.length) {
+    renderHistoryState(bodyEl, "Нет данных за выбранную дату.");
+    return;
+  }
+
+  const rows = availableCodes
+    .map((code) => {
+      const rate = rates[code];
+      const value = typeof rate.value === "number" ? rate.value : Number(rate.value);
+      if (!Number.isFinite(value)) return "";
+
+      const nominal = typeof rate.nominal === "number" ? rate.nominal : Number(rate.nominal || 1);
+      const nominalSafe = Number.isFinite(nominal) && nominal > 0 ? nominal : 1;
+      const perOneValue = value / nominalSafe;
+
+      return `
+        <tr>
+          <td>${code}</td>
+          <td class="numfont">${formatRate(perOneValue)} ₽</td>
+        </tr>
+      `;
+    })
+    .filter(Boolean)
+    .join("");
+
+  bodyEl.innerHTML = rows
+    ? `
+      <table class="currency-history-table"> <tbody>${rows}</tbody>
+      </table>
+    `
+    : "Нет данных за выбранную дату.";
+}
+
+async function loadHistoryByDate(dateValue, bodyEl) {
+  if (!dateValue || !bodyEl) return;
+
+  renderHistoryState(bodyEl, "Загрузка...");
+
+  try {
+    const data = await APIService.getCBRRateHistoryByDate(dateValue);
+    const snapshot = data?.snapshot || null;
+
+    if (!snapshot) {
+      renderHistoryState(bodyEl, "Нет данных за выбранную дату.");
+      return;
+    }
+
+    renderHistoryRates(bodyEl, snapshot.rates || {});
+  } catch (error) {
+    renderHistoryState(bodyEl, "Не удалось загрузить историю курсов.");
+  }
+}
+
+function initCurrencyHistoryModal() {
+  const triggers = document.querySelectorAll(".currency-history-trigger");
+  const dateInput = document.querySelector("#currency-history-date");
+  const bodyEl = document.querySelector("[data-currency-history-body]");
+
+  if (!triggers.length || !dateInput || !bodyEl) return;
+
+  const historyPicker = flatpickr(dateInput, {
+    locale: Russian,
+    dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "d.m.Y",
+    clickOpens: false,
+    defaultDate: getTodayInputDateValue(),
+  });
+
+  const openPicker = () => historyPicker.open();
+  dateInput.addEventListener("click", openPicker);
+  if (historyPicker.altInput) {
+    historyPicker.altInput.addEventListener("click", openPicker);
+  }
+
+  const setDefaultDate = () => {
+    const defaultDate = getTodayInputDateValue();
+    historyPicker.setDate(defaultDate, false);
+    return defaultDate;
+  };
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const defaultDate = setDefaultDate();
+      MicroModal.show("modal-currency-history", {
+        disableScroll: true,
+      });
+      // MicroModal переносит фокус в модалку, из-за чего flatpickr может открыться автоматически.
+      // Принудительно закрываем календарь и открываем его только по явному клику в поле.
+      setTimeout(() => historyPicker.close(), 0);
+      loadHistoryByDate(defaultDate, bodyEl);
+    });
+  });
+
+  historyPicker.config.onChange.push((selectedDates, dateStr) => {
+    if (!dateStr) return;
+    loadHistoryByDate(dateStr, bodyEl);
+  });
+}
+
 function populateCurrencyDropdown(panel, rates) {
   const allowedCurrencies = ["RUB", "GBP", "CHF", "CNY", "JPY", "KZT"];
+  const historyButton = panel.querySelector(".currency-history-trigger")
+    ? panel.querySelector(".currency-history-trigger").cloneNode(true)
+    : null;
 
   panel.innerHTML = "";
 
@@ -135,6 +265,10 @@ function populateCurrencyDropdown(panel, rates) {
       panel.appendChild(button);
     }
   });
+
+  if (historyButton) {
+    panel.appendChild(historyButton);
+  }
 }
 
 function calculateRateInBaseCurrency(baseISO, targetISO) {
@@ -227,6 +361,7 @@ export async function initCurrency() {
         });
       });
     });
-  } catch (err) {
-  }
+
+    initCurrencyHistoryModal();
+  } catch (err) {}
 }

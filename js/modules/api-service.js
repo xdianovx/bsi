@@ -94,12 +94,44 @@ async function getCBRRates() {
   return data.data;
 }
 
+async function getCBRRateHistoryByDate(date) {
+  if (typeof ajax === "undefined" || !ajax.url) {
+    throw new Error("AJAX URL is not defined");
+  }
+
+  const body = new URLSearchParams({
+    action: "bsi_cbr_rates_history",
+    date,
+  });
+
+  const response = await fetch(ajax.url, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
+    body,
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP Error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.data?.message || "AJAX error");
+  }
+
+  return data.data;
+}
+
 export const APIService = {
   getTownFroms,
   getStates,
   getAllTours,
   getCurrencyRate,
   getCBRRates,
+  getCBRRateHistoryByDate,
   getHotelTownFroms,
   getExcursionTownFrom,
 };

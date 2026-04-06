@@ -48,7 +48,7 @@ add_action('acf/init', function () {
 });
 
 add_action('acf/save_post', function ($post_id) {
-  if ($post_id !== 'options') {
+  if (!is_string($post_id) || strpos($post_id, 'options') !== 0) {
     return;
   }
 
@@ -58,6 +58,7 @@ add_action('acf/save_post', function ($post_id) {
 
   if (isset($_POST['acf']['field_currency_markup'])) {
     delete_transient('bsi_cbr_rates');
+    bsi_currency_refresh_daily_snapshot(true);
   }
 }, 20);
 
