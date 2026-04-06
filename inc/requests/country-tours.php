@@ -62,13 +62,7 @@ function country_tours_filter()
     'paged' => $paged,
     'orderby' => 'title',
     'order' => 'ASC',
-    'meta_query' => [
-      [
-        'key' => 'tour_country',
-        'value' => $country_id,
-        'compare' => '=',
-      ],
-    ],
+    'meta_query' => bsi_build_tour_country_meta_query((int) $country_id),
   ];
 
   // НЕ ставим tax_query => null (это частая причина “странных” поломок)

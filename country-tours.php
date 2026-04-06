@@ -19,13 +19,7 @@ $tours_query = new WP_Query([
   'post_status' => 'publish',
   'posts_per_page' => $per_page,
   'paged' => $paged,
-  'meta_query' => [
-    [
-      'key' => 'tour_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ],
-  ],
+  'meta_query' => bsi_build_tour_country_meta_query((int) $country_id),
   'orderby' => 'title',
   'order' => 'ASC',
 ]);
@@ -38,13 +32,7 @@ $country_tour_ids = get_posts([
   'post_status'    => 'publish',
   'posts_per_page' => -1,
   'fields'         => 'ids',
-  'meta_query'     => [
-    [
-      'key'     => 'tour_country',
-      'value'   => $country_id,
-      'compare' => '=',
-    ],
-  ],
+  'meta_query'     => bsi_build_tour_country_meta_query((int) $country_id),
 ]);
 
 /**

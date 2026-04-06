@@ -20,15 +20,7 @@ $country_title = '';
 $main_parent_id = 0;
 
 if (is_singular('tour')) {
-  $tour_country_id = function_exists('get_field') ? get_field('tour_country', $current_id) : 0;
-
-  if ($tour_country_id instanceof WP_Post) {
-    $tour_country_id = (int) $tour_country_id->ID;
-  } elseif (is_array($tour_country_id)) {
-    $tour_country_id = (int) reset($tour_country_id);
-  } else {
-    $tour_country_id = (int) $tour_country_id;
-  }
+  $tour_country_id = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id((int) $current_id) : 0;
 
   if ($tour_country_id) {
     $main_parent_id = $tour_country_id;
@@ -253,9 +245,7 @@ $has_tours = get_posts([
   'post_type' => 'tour',
   'posts_per_page' => 1,
   'fields' => 'ids',
-  'meta_query' => [
-    ['key' => 'tour_country', 'value' => $main_parent_id, 'compare' => '='],
-  ],
+  'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query((int) $main_parent_id) : [],
 ]);
 
 $has_memo = get_posts([
@@ -319,9 +309,7 @@ if (!empty($has_tours)) {
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
-    'meta_query' => [
-      ['key' => 'tour_country', 'value' => $main_parent_id, 'compare' => '='],
-    ],
+    'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query((int) $main_parent_id) : [],
   ]);
 
   if (!empty($tour_ids)) {

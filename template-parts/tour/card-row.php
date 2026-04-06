@@ -10,7 +10,7 @@ if (!$post_id)
   return;
 
 // ACF
-$country_id = function_exists('get_field') ? (int) get_field('tour_country', $post_id) : 0;
+$country_id = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id((int) $post_id) : 0;
 $tour_gallery = function_exists('get_field') ? (array) get_field('tour_gallery', $post_id) : [];
 $duration = function_exists('get_field') ? trim((string) get_field('tour_duration', $post_id)) : '';
 $route = function_exists('get_field') ? trim((string) get_field('tour_route', $post_id)) : '';

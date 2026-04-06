@@ -22,11 +22,7 @@ function bsi_ajax_popular_tours_by_country()
   ];
 
   if ($country_id > 0) {
-    $args['meta_query'][] = [
-      'key' => 'tour_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ];
+    $args['meta_query'][] = bsi_build_tour_country_meta_query((int) $country_id);
   }
 
   $q = new WP_Query($args);
@@ -38,10 +34,7 @@ function bsi_ajax_popular_tours_by_country()
       $q->the_post();
 
       $tour_id = get_the_ID();
-      $country = function_exists('get_field') ? get_field('tour_country', $tour_id) : 0;
-      if ($country instanceof WP_Post)
-        $country = (int) $country->ID;
-      $country = (int) $country;
+      $country = bsi_get_tour_primary_country_id((int) $tour_id);
 
       $flag_url = '';
       if ($country && function_exists('get_field')) {

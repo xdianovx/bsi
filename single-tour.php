@@ -1,12 +1,7 @@
 <?php
 $post_id = get_the_ID();
 
-$country_id = function_exists('get_field') ? get_field('tour_country', $post_id) : 0;
-if ($country_id instanceof WP_Post)
-  $country_id = $country_id->ID;
-if (is_array($country_id))
-  $country_id = (int) reset($country_id);
-$country_id = (int) $country_id;
+$country_id = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id((int) $post_id) : 0;
 
 $country_title = '';
 $country_permalink = '';

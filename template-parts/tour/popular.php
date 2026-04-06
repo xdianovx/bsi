@@ -26,15 +26,7 @@ $country_ids = [];
 if (!empty($tour_posts) && function_exists('get_field')) {
   foreach ($tour_posts as $tour_post) {
     $tour_id = (int) $tour_post->ID;
-    $c = get_field('tour_country', $tour_id);
-
-    if ($c instanceof WP_Post) {
-      $c = (int) $c->ID;
-    } elseif (is_array($c)) {
-      $c = (int) reset($c);
-    } else {
-      $c = (int) $c;
-    }
+    $c = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id((int) $tour_id) : 0;
 
     if ($c > 0) {
       $country_ids[] = $c;
@@ -78,15 +70,8 @@ foreach ($tour_posts as $tour_post) {
   $tour_id = (int) $tour_post->ID;
 
   $country_id = 0;
-  if (function_exists('get_field')) {
-    $country_val = get_field('tour_country', $tour_id);
-    if ($country_val instanceof WP_Post) {
-      $country_id = (int) $country_val->ID;
-    } elseif (is_array($country_val)) {
-      $country_id = (int) reset($country_val);
-    } else {
-      $country_id = (int) $country_val;
-    }
+  if (function_exists('bsi_get_tour_primary_country_id')) {
+    $country_id = bsi_get_tour_primary_country_id((int) $tour_id);
   }
 
   $country_title = $country_id ? (string) get_the_title($country_id) : '';

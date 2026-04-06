@@ -87,14 +87,7 @@ function bsi_prepare_offer_item( $row ) {
 			$country_id = (int) $country_val;
 		}
 	} elseif ( $post_type === 'tour' && function_exists( 'get_field' ) ) {
-		$country_val = get_field( 'tour_country', $post_id );
-		if ( $country_val instanceof WP_Post ) {
-			$country_id = (int) $country_val->ID;
-		} elseif ( is_array( $country_val ) ) {
-			$country_id = (int) reset( $country_val );
-		} else {
-			$country_id = (int) $country_val;
-		}
+		$country_id = function_exists( 'bsi_get_tour_primary_country_id' ) ? bsi_get_tour_primary_country_id( (int) $post_id ) : 0;
 	}
 
 	if ( $country_id ) {

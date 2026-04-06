@@ -171,6 +171,82 @@ add_filter('query_vars', function ($vars) {
   return $vars;
 });
 
+if (!function_exists('bsi_normalize_country_ids')) {
+  function bsi_normalize_country_ids($value): array
+  {
+    if ($value instanceof WP_Post) {
+      $id = (int) $value->ID;
+      return $id > 0 ? [$id] : [];
+    }
+
+    if (is_numeric($value)) {
+      $id = (int) $value;
+      return $id > 0 ? [$id] : [];
+    }
+
+    if (!is_array($value)) {
+      return [];
+    }
+
+    $ids = [];
+    foreach ($value as $item) {
+      if ($item instanceof WP_Post) {
+        $ids[] = (int) $item->ID;
+      } elseif (is_numeric($item)) {
+        $ids[] = (int) $item;
+      }
+    }
+
+    $ids = array_values(array_unique(array_filter($ids, static function ($id) {
+      return $id > 0;
+    })));
+
+    return $ids;
+  }
+}
+
+if (!function_exists('bsi_get_tour_country_ids')) {
+  function bsi_get_tour_country_ids(int $post_id): array
+  {
+    if (!function_exists('get_field') || $post_id <= 0) {
+      return [];
+    }
+    return bsi_normalize_country_ids(get_field('tour_country', $post_id));
+  }
+}
+
+if (!function_exists('bsi_get_tour_primary_country_id')) {
+  function bsi_get_tour_primary_country_id(int $post_id): int
+  {
+    $ids = bsi_get_tour_country_ids($post_id);
+    return !empty($ids) ? (int) $ids[0] : 0;
+  }
+}
+
+if (!function_exists('bsi_build_tour_country_meta_query')) {
+  function bsi_build_tour_country_meta_query(int $country_id): array
+  {
+    $country_id = (int) $country_id;
+    if ($country_id <= 0) {
+      return [];
+    }
+
+    return [
+      'relation' => 'OR',
+      [
+        'key'     => 'tour_country',
+        'value'   => $country_id,
+        'compare' => '=',
+      ],
+      [
+        'key'     => 'tour_country',
+        'value'   => '"' . $country_id . '"',
+        'compare' => 'LIKE',
+      ],
+    ];
+  }
+}
+
 add_action('init', function () {
 
   add_rewrite_rule(
@@ -191,8 +267,7 @@ add_filter('post_type_link', function ($post_link, $post) {
   if ($post->post_type !== 'tour')
     return $post_link;
 
-  $country_id = function_exists('get_field') ? get_field('tour_country', $post->ID) : 0;
-  $country_id = is_array($country_id) ? (int) reset($country_id) : (int) $country_id;
+  $country_id = bsi_get_tour_primary_country_id((int) $post->ID);
 
   if (!$country_id)
     return $post_link;
@@ -216,8 +291,8 @@ add_action('template_redirect', function () {
   if (!$tour_id)
     return;
 
-  $country_id = function_exists('get_field') ? get_field('tour_country', $tour_id) : 0;
-  $country_id = is_array($country_id) ? (int) reset($country_id) : (int) $country_id;
+  $country_ids = bsi_get_tour_country_ids((int) $tour_id);
+  $country_id = !empty($country_ids) ? (int) $country_ids[0] : 0;
 
   if (!$country_id)
     return;
@@ -225,6 +300,13 @@ add_action('template_redirect', function () {
   $real_country_slug = get_post_field('post_name', $country_id);
 
   if ($real_country_slug && $real_country_slug !== $country_in_path) {
+    $requested_country = get_page_by_path($country_in_path, OBJECT, 'country');
+    $requested_country_id = ($requested_country instanceof WP_Post) ? (int) $requested_country->ID : 0;
+
+    if ($requested_country_id && in_array($requested_country_id, $country_ids, true)) {
+      return;
+    }
+
     global $wp_query;
     $wp_query->set_404();
     status_header(404);
@@ -280,11 +362,12 @@ add_action('acf/init', function () {
         'type' => 'post_object',
         'post_type' => ['country'],
         'return_format' => 'id',
+        'multiple' => 1,
         'ui' => 1,
         'ajax' => 1,
         'required' => 1,
         'wrapper' => ['width' => '100'],
-        'instructions' => 'Выберите страну тура. Курорты выбираются через таксономию "Курорты" справа.',
+        'instructions' => 'Выберите одну или несколько стран тура. Первая выбранная страна используется как главная для канонического URL.',
       ],
     ],
     'location' => [
@@ -567,8 +650,21 @@ add_action('manage_tour_posts_custom_column', function ($column, $post_id) {
     echo $code ? esc_html($code) : '—';
   }
   if ($column === 'tour_country_col') {
-    $country_id = get_field('tour_country', $post_id);
-    echo $country_id ? esc_html(get_the_title($country_id)) : '—';
+    $country_ids = bsi_get_tour_country_ids((int) $post_id);
+    if (empty($country_ids)) {
+      echo '—';
+      return;
+    }
+
+    $titles = [];
+    foreach ($country_ids as $country_id) {
+      $title = get_the_title($country_id);
+      if ($title) {
+        $titles[] = $title;
+      }
+    }
+
+    echo !empty($titles) ? esc_html(implode(', ', $titles)) : '—';
   }
 }, 10, 2);
 
@@ -638,11 +734,7 @@ add_action('pre_get_posts', function ($query) {
   $meta_query = [];
 
   if ($country_filter) {
-    $meta_query[] = [
-      'key'     => 'tour_country',
-      'value'   => $country_filter,
-      'compare' => '=',
-    ];
+    $meta_query[] = bsi_build_tour_country_meta_query((int) $country_filter);
   }
 
   if ($samo_search !== '') {
@@ -700,8 +792,7 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
     if (!$tour_id)
       return $links;
 
-    $country_id = function_exists('get_field') ? get_field('tour_country', $tour_id) : 0;
-    $country_id = is_array($country_id) ? (int) reset($country_id) : (int) $country_id;
+    $country_id = bsi_get_tour_primary_country_id((int) $tour_id);
 
     if (!$country_id)
       return $links;
@@ -731,4 +822,28 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
   }
 
   return $links;
+});
+
+add_filter('wpseo_canonical', function ($canonical) {
+  if (!is_singular('tour')) {
+    return $canonical;
+  }
+
+  $tour_id = get_queried_object_id();
+  if (!$tour_id) {
+    return $canonical;
+  }
+
+  $primary_country_id = bsi_get_tour_primary_country_id((int) $tour_id);
+  if (!$primary_country_id) {
+    return $canonical;
+  }
+
+  $country_slug = get_post_field('post_name', $primary_country_id);
+  $tour_slug = get_post_field('post_name', $tour_id);
+  if (!$country_slug || !$tour_slug) {
+    return $canonical;
+  }
+
+  return trailingslashit(home_url('/country/' . $country_slug . '/tours/' . $tour_slug));
 });
