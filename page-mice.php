@@ -12,11 +12,11 @@ get_header('mice');
         <?php
         $current_page_id = get_the_ID();
         $child_pages = get_posts([
-          'post_type'   => 'page',
+          'post_type' => 'page',
           'post_parent' => $current_page_id,
           'numberposts' => -1,
-          'orderby'     => 'menu_order',
-          'order'       => 'ASC',
+          'orderby' => 'menu_order',
+          'order' => 'ASC',
           'post_status' => 'publish',
         ]);
 
@@ -43,16 +43,9 @@ get_header('mice');
               <a href="<?php echo esc_url($child_url); ?>" class="mice-hero-item__link link-arrow">
                 <span>Подробнее</span>
                 <div class="link-arrow__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="1.5"
-                       stroke-linecap="round"
-                       stroke-linejoin="round"
-                       class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
                     <path d="M7 7h10v10"></path>
                     <path d="M7 17 17 7"></path>
                   </svg>
@@ -60,9 +53,8 @@ get_header('mice');
               </a>
 
               <?php if ($child_image): ?>
-                <img src="<?php echo esc_url($child_image); ?>"
-                     class="mice-hero-item__bg"
-                     alt="<?php echo esc_attr($child_title); ?>">
+                <img src="<?php echo esc_url($child_image); ?>" class="mice-hero-item__bg"
+                  alt="<?php echo esc_attr($child_title); ?>">
               <?php endif; ?>
             </div>
           <?php endforeach; ?>
@@ -105,7 +97,7 @@ get_header('mice');
   <?= get_template_part('template-parts/projects/slider') ?>
 
 
-  <?php get_template_part('template-parts/news/news-slider', null, ['filter_mice' => true]); ?>
+  <?php get_template_part('template-parts/news/news-slider'); ?>
   <?php get_template_part('template-parts/awards/slider', null, ['filter_mice' => true]); ?>
   <?php get_template_part('template-parts/reviews/slider', null, ['filter_mice' => true]); ?>
   <?php get_template_part('template-parts/partners/partners-slider', null, ['filter_mice' => true]); ?>
@@ -116,70 +108,55 @@ get_header('mice');
   <section class="page-mice-cta">
     <div class="container">
       <h2 class="h2"><?php echo esc_html(get_field('mice_cta_title', 'option') ?: 'Оставьте заявку'); ?></h2>
-      <p class="page-mice-cta__description"><?php echo esc_html(get_field('mice_cta_description', 'option') ?: 'И мы проконсультируем вас по всем вопросам'); ?></p>
+      <p class="page-mice-cta__description">
+        <?php echo esc_html(get_field('mice_cta_description', 'option') ?: 'И мы проконсультируем вас по всем вопросам'); ?>
+      </p>
       <div class="page-mice-cta__wrap">
 
         <form action="">
           <div class="form-row form-row-2">
             <div class="input-item white ">
               <label for="name">Имя *</label>
-              <input type="text"
-                     name="name"
-                     id="name"
-                     placeholder="Ваше имя">
+              <input type="text" name="name" id="name" placeholder="Ваше имя">
 
-              <div class="error-message"
-                   data-field="phone">
+              <div class="error-message" data-field="phone">
               </div>
             </div>
 
             <div class="input-item white">
               <label for="company">Компания</label>
-              <input type="text"
-                     name="company"
-                     id="company"
-                     placeholder="Название">
+              <input type="text" name="company" id="company" placeholder="Название">
 
-              <div class="error-message"
-                   data-field="phone">
+              <div class="error-message" data-field="phone">
               </div>
             </div>
 
             <div class="input-item white">
               <label for="phone">Телефон *</label>
-              <input type="tel"
-                     name="phone"
-                     id="phone"
-                     placeholder="+7 (___) ___-__-__">
+              <input type="tel" name="phone" id="phone" placeholder="+7 (___) ___-__-__">
 
-              <div class="error-message"
-                   data-field="phone">
+              <div class="error-message" data-field="phone">
               </div>
             </div>
             <div class="input-item white">
               <label for="email">Email</label>
-              <input type="email"
-                     name="email"
-                     id="email"
-                     placeholder="Почта">
+              <input type="email" name="email" id="email" placeholder="Почта">
 
-              <div class="error-message"
-                   data-field="phone">
+              <div class="error-message" data-field="phone">
               </div>
             </div>
           </div>
 
           <div class="">
             <div id="form-status"></div>
-            <button type="submit"
-                    class="btn btn-accent page-mice-cta-submit">
+            <button type="submit" class="btn btn-accent page-mice-cta-submit">
               Отправить
             </button>
 
             <p class="form-policy fit-form__policy">
               Нажимая на кнопку "Отправить", вы соглашаетесь с <a
-                 href="http://localhost:8888/bsinew/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
-                 class="policy-link">
+                href="http://localhost:8888/bsinew/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
+                class="policy-link">
                 нашей политикой обработки персональных данных
               </a>
             </p>
