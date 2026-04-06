@@ -40,17 +40,39 @@ if ($country_id) {
   }
 }
 
-// project date: ACF project_date -> fallback WP date
-$project_date_raw = function_exists('get_field') ? (string) get_field('project_date', $project_id) : '';
-$project_date_ts = $project_date_raw ? strtotime($project_date_raw) : 0;
+// Дата события: ACF project_event_date (месяц + год на экране) -> project_date -> дата публикации
+$project_event_raw = function_exists('get_field') ? get_field('project_event_date', $project_id) : '';
+$project_event_raw = $project_event_raw !== null && $project_event_raw !== false
+  ? (string) $project_event_raw
+  : '';
 
-$project_date_human = $project_date_ts
-  ? format_date_russian($project_date_raw)
-  : format_date_russian(get_the_date('Y-m-d', $project_id));
+$project_date_human = '';
+$project_date_attr = '';
 
-$project_date_attr = $project_date_ts
-  ? date('Y-m-d', $project_date_ts)
-  : get_the_date('Y-m-d', $project_id);
+if ($project_event_raw !== '') {
+  $project_date_human = format_month_year_russian($project_event_raw);
+  $event_ts = strtotime($project_event_raw);
+  if (!$event_ts && preg_match('/^\d{8}$/', $project_event_raw)) {
+    $d = DateTime::createFromFormat('Ymd', $project_event_raw);
+    $event_ts = $d ? (int) $d->format('U') : 0;
+  }
+  if ($event_ts) {
+    $project_date_attr = date('Y-m-d', $event_ts);
+  }
+}
+
+if ($project_date_human === '') {
+  $project_date_raw = function_exists('get_field') ? (string) get_field('project_date', $project_id) : '';
+  $project_date_ts = $project_date_raw ? strtotime($project_date_raw) : 0;
+
+  $project_date_human = $project_date_ts
+    ? format_date_russian($project_date_raw)
+    : format_date_russian(get_the_date('Y-m-d', $project_id));
+
+  $project_date_attr = $project_date_ts
+    ? date('Y-m-d', $project_date_ts)
+    : get_the_date('Y-m-d', $project_id);
+}
 ?>
 
 <?php if (function_exists('yoast_breadcrumb')): ?>

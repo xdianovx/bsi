@@ -47,6 +47,7 @@ function bsi_register_project_cpt(): void
 /**
  * ACF поля для Project:
  * - project_country (Страна)
+ * - project_event_date (Дата проведения события)
  * - project_gallery (Галерея)
  */
 add_action('acf/init', function () {
@@ -67,6 +68,18 @@ add_action('acf/init', function () {
         'return_format' => 'id',
         'ui' => 1,
         'required' => 1,
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_project_event_date',
+        'label' => 'Дата проведения события',
+        'name' => 'project_event_date',
+        'type' => 'date_picker',
+        'display_format' => 'd.m.Y',
+        'return_format' => 'Y-m-d',
+        'first_day' => 1,
+        'instructions' => 'Выберите дату в календаре (день нужен для точности). На сайте показываются только месяц и год.',
+        'required' => 0,
         'wrapper' => ['width' => '50'],
       ],
       [

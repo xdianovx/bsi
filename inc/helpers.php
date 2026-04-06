@@ -85,6 +85,56 @@ function format_date_russian($value)
   return $value;
 }
 
+/**
+ * Дата события без числа: «февраль 2025», «март 2012» (месяц в именительном падеже).
+ */
+function format_month_year_russian($value)
+{
+  if (!$value) {
+    return '';
+  }
+
+  $date_obj = null;
+  $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
+
+  foreach ($formats as $format) {
+    $date_obj = DateTime::createFromFormat($format, trim((string) $value));
+    if ($date_obj instanceof DateTime) {
+      break;
+    }
+  }
+
+  if (!$date_obj) {
+    $timestamp = strtotime((string) $value);
+    if ($timestamp) {
+      $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
+    }
+  }
+
+  if (!$date_obj instanceof DateTime) {
+    return '';
+  }
+
+  $months = [
+    1 => 'январь',
+    2 => 'февраль',
+    3 => 'март',
+    4 => 'апрель',
+    5 => 'май',
+    6 => 'июнь',
+    7 => 'июль',
+    8 => 'август',
+    9 => 'сентябрь',
+    10 => 'октябрь',
+    11 => 'ноябрь',
+    12 => 'декабрь',
+  ];
+  $month_num = (int) $date_obj->format('n');
+  $month_str = $months[$month_num] ?? $date_obj->format('F');
+
+  return $month_str . ' ' . $date_obj->format('Y');
+}
+
 function format_dates_string_russian($dates_string)
 {
   if (!$dates_string || !is_string($dates_string)) {
