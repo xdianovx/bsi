@@ -26,7 +26,7 @@ function bsi_register_review_cpt()
     'public' => true,
     'hierarchical' => false,
     'show_ui' => true,
-    'show_in_menu' => 'sections',
+    'show_in_menu' => true,
     'menu_position' => 19,
     'menu_icon' => 'dashicons-testimonial',
     'supports' => [

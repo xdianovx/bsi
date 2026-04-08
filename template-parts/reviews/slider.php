@@ -30,6 +30,13 @@ if (!empty($meta_query)) {
 
 $reviews = get_posts($reviews_args);
 
+// Для MICE: если включен фильтр и он не дал результатов,
+// показываем общий список отзывов, чтобы секция не оставалась пустой.
+if ($filter_mice && empty($reviews)) {
+  unset($reviews_args['meta_query']);
+  $reviews = get_posts($reviews_args);
+}
+
 if (empty($reviews)) {
   return;
 }
