@@ -111,8 +111,11 @@ window.addEventListener("DOMContentLoaded", () => {
       : "other";
 
     ym(108341897, "reachGoal", "social_click", {
-      network: network,
-      location: location,
+      network: {
+        [network]: {
+          location: location,
+        },
+      },
     });
   });
 });
