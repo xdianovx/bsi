@@ -372,7 +372,9 @@ async function submitForm(e) {
     });
 
     if (result.success) {
-      // Закрываем модалку бронирования
+      if (typeof ym !== "undefined") {
+        ym(108341897, "reachGoal", "education_booking_submitted");
+      }
       MicroModal.close("modal-program-booking");
 
       // Открываем модалку успеха с небольшой задержкой для плавности

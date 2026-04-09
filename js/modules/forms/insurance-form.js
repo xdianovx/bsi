@@ -155,7 +155,9 @@ export const initInsuranceForm = () => {
       });
 
       if (result.success) {
-        // Очищаем форму
+        if (typeof ym !== "undefined") {
+          ym(108341897, "reachGoal", "insurance_form_submitted");
+        }
         form.reset();
         clearErrors();
 

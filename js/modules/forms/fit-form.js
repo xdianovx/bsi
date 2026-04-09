@@ -664,6 +664,9 @@ export const fitForm = () => {
       });
 
       if (result.success) {
+        if (typeof ym !== "undefined") {
+          ym(108341897, "reachGoal", "fit_form_submitted");
+        }
         showStatus("Успешно отправлено!", "success");
         form.reset();
 

@@ -78,4 +78,14 @@ window.addEventListener("DOMContentLoaded", () => {
   if (window.maintenanceModal) {
     initMaintenanceModal(window.maintenanceModal);
   }
+
+  // Метрика: подписка на рассылку (Unisender — внешний POST, перехватываем до навигации)
+  const subscribeForm = document.querySelector(".subscribe-section__form");
+  if (subscribeForm) {
+    subscribeForm.addEventListener("submit", () => {
+      if (typeof ym !== "undefined") {
+        ym(108341897, "reachGoal", "newsletter_subscribed");
+      }
+    });
+  }
 });
