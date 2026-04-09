@@ -275,3 +275,116 @@ add_action('wp_head', function (): void {
     }
 }, 1);
 
+// ── robots.txt: блокировка фильтров и служебных URL ─────────
+
+add_filter('robots_txt', function ($output, $public) {
+    if (!$public) {
+        return $output;
+    }
+
+    $lines = [
+        'User-agent: *',
+        'Disallow: /wp-admin/',
+        'Allow: /wp-admin/admin-ajax.php',
+        'Disallow: /wp-includes/',
+        'Disallow: /wp-json/',
+        '',
+        '# Фильтры, сортировка, пагинация — дубли контента',
+        'Disallow: /*?sort=',
+        'Disallow: /*?region=',
+        'Disallow: /*?resort=',
+        'Disallow: /*?tour_type=',
+        'Disallow: /*?country=',
+        'Disallow: /*?program=',
+        'Disallow: /*?language=',
+        'Disallow: /*?type=',
+        'Disallow: /*?accommodation=',
+        'Disallow: /*?age=',
+        'Disallow: /*?age_min=',
+        'Disallow: /*?age_max=',
+        'Disallow: /*?duration=',
+        'Disallow: /*?duration_min=',
+        'Disallow: /*?duration_max=',
+        'Disallow: /*?date_from=',
+        'Disallow: /*?date_to=',
+        'Disallow: /*?group_arrival=',
+        'Disallow: /*?archive=',
+        'Disallow: /*?kind=',
+        'Disallow: /*?direction=',
+        'Disallow: /*?orderby=',
+        'Disallow: /*?order=',
+        'Disallow: /*?page=',
+        'Disallow: /*?paged=',
+        'Disallow: /*?s=',
+        '',
+        'Sitemap: https://bsigroup.ru/sitemap_index.xml',
+    ];
+
+    return implode("\n", $lines) . "\n";
+}, 999, 2);
+
+// ── Sitemap: виртуальные подстраницы стран ───────────────────
+
+add_filter('wpseo_sitemap_index', function ($index) {
+    $index .= '  <sitemap>' . "\n";
+    $index .= '    <loc>' . esc_url(home_url('/country-sections-sitemap.xml')) . '</loc>' . "\n";
+    $index .= '    <lastmod>' . gmdate('c') . '</lastmod>' . "\n";
+    $index .= '  </sitemap>' . "\n";
+
+    return $index;
+});
+
+add_action('init', function () {
+    if (!class_exists('WPSEO_Sitemaps')) {
+        return;
+    }
+
+    global $wpseo_sitemaps;
+    if (!isset($wpseo_sitemaps) || !method_exists($wpseo_sitemaps, 'register_sitemap')) {
+        return;
+    }
+
+    $wpseo_sitemaps->register_sitemap('country-sections', 'bsi_sitemap_country_sections');
+});
+
+function bsi_sitemap_country_sections() {
+    $sections = bsi_seo_virtual_sections();
+
+    $countries = get_posts([
+        'post_type'      => 'country',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ]);
+
+    if (empty($countries)) {
+        return;
+    }
+
+    $xml = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+    foreach ($countries as $country) {
+        foreach ($sections as $info) {
+            $url = trailingslashit(
+                home_url('/country/' . $country->post_name . '/' . $info['slug'])
+            );
+            $mod = get_the_modified_date('c', $country);
+
+            $xml .= '  <url>' . "\n";
+            $xml .= '    <loc>' . esc_url($url) . '</loc>' . "\n";
+            $xml .= '    <lastmod>' . $mod . '</lastmod>' . "\n";
+            $xml .= '    <changefreq>weekly</changefreq>' . "\n";
+            $xml .= '    <priority>0.6</priority>' . "\n";
+            $xml .= '  </url>' . "\n";
+        }
+    }
+
+    $xml .= '</urlset>';
+
+    global $wpseo_sitemaps;
+    if (isset($wpseo_sitemaps)) {
+        $wpseo_sitemaps->set_sitemap($xml);
+    }
+}
+
