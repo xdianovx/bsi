@@ -70,8 +70,8 @@ if (class_exists('Collator')) {
 
 
 										<?php if (get_field('flag', $country->ID)): ?>
-											<img src="<?php echo get_field('flag', $country->ID); ?>"
-													 alt="<?php echo $country->post_title; ?>"
+											<img src="<?php echo esc_url(get_field('flag', $country->ID)); ?>"
+													 alt="<?php echo esc_attr($country->post_title); ?>"
 													 class="countries-letter__flag">
 										<?php endif; ?>
 

@@ -50,7 +50,7 @@ $partners_query = new WP_Query($partners_args);
             <div class="swiper-slide">
               <div class="partner-card">
 
-                <img src="<?= get_the_post_thumbnail_url() ?>" alt="<?php the_title() ?>">
+                <img src="<?= esc_url(get_the_post_thumbnail_url()) ?>" alt="<?php the_title_attribute(); ?>">
               </div>
             </div>
 

@@ -23,7 +23,7 @@ get_header();
         </div>
 
         <div class="visa-page__poster">
-          <img src="<?= get_the_post_thumbnail_url() ?>" alt="">
+          <img src="<?= get_the_post_thumbnail_url() ?>" alt="<?php the_title_attribute(); ?>">
         </div>
 
         <?php /* Секция стоимости виз */ ?>

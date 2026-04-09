@@ -16,7 +16,7 @@
           <div class="features-item__subtitle">клиентов</div>
 
           <img class="features-item__img" src="<?php echo get_template_directory_uri(); ?>/img/features/2.png"
-            alt="2 000 000 клиентов">
+            alt="3 000 000 клиентов">
         </div>
 
         <div class="features-row">
@@ -32,7 +32,7 @@
             <div class="features-item__subtitle">стран и направлений</div>
 
             <img class="features-item__img" src="<?php echo get_template_directory_uri(); ?>/img/features/4.png"
-              alt="30 стран и направлений">
+              alt="50+ стран и направлений">
           </div>
         </div>
       </div>
