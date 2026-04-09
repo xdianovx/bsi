@@ -294,6 +294,7 @@ add_action('template_redirect', function () {
 });
 
 require get_template_directory() . '/inc/seo.php';
+require get_template_directory() . '/inc/schema.php';
 require get_template_directory() . '/inc/custom-header.php';
 
 require get_template_directory() . '/inc/template-tags.php';
