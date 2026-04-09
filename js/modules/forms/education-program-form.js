@@ -374,8 +374,11 @@ async function submitForm(e) {
     if (result.success) {
       if (typeof ym !== "undefined") {
         ym(108341897, "reachGoal", "education_booking_submitted", {
-          school: currentProgramData?.schoolName || "",
-          program: currentProgramData?.title || "",
+          school: {
+            [currentProgramData?.schoolName || "unknown"]: {
+              program: currentProgramData?.title || "unknown",
+            },
+          },
         });
       }
       MicroModal.close("modal-program-booking");
