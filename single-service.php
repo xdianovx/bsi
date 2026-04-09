@@ -24,6 +24,7 @@ get_header();
 
 	<section>
 		<div class="container">
+			<?php the_title('<h1 class="h1">', '</h1>'); ?>
 			<div class="editor-content">
 				<?php the_content() ?>
 			</div>

@@ -20,9 +20,9 @@ get_header();
 
     <div class="container">
         <div class="content">
-            <h1><span style="color: #9d0a0f; font-size: large; ">
+            <div class="cruise-page__subtitle"><span style="color: #9d0a0f; font-size: large; ">
                     <?= $title ?>
-                </span></h1>
+                </span></div>
             <div class="infoflotWidget"
                 data-id="YTo0OntzOjI6IklEIjtzOjQ6IjM3MTIiO3M6NDoiVVNFUiI7czoyODoiWlM1cmJHbHRiM1poUUdKemFXZHliM1Z3TG5KMSI7czo2OiJSQU5ET00iO3M6ODoid2JkMnRhaGgiO3M6MTU6IklORk9GTE9ULUFQSUtFWSI7czo0MDoiMWNjM2Q1ZjkyY2Y1NDZlOWMyNzUyYjE2NjU3ZjJmM2ZjMzhlZmJlNCI7fQ=="
                 data-index="1"></div>

@@ -8,6 +8,7 @@ get_header('mice');
 <main class="mice-page">
   <section class="mice-hero-section">
     <div class="container">
+      <h1 class="h1 mice-page__title"><?php the_title(); ?></h1>
       <div class="mice-hero__wrap">
         <?php
         $current_page_id = get_the_ID();

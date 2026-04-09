@@ -53,6 +53,7 @@ if (class_exists('Collator')) {
 
 
 	<div class="container">
+		<h1 class="h1 archive-page__title">Страны</h1>
 		<div class="countries-letter__wrap">
 			<?php foreach ($alphabet as $letter): ?>
 				<?php if (isset($grouped_countries[$letter]) && !empty($grouped_countries[$letter])): ?>

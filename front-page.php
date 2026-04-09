@@ -17,8 +17,7 @@ get_header();
 
 <main>
 
-
-
+  <h1 class="screen-reader-text"><?php echo esc_html(get_bloginfo('name')); ?> — туроператор</h1>
 
 
   <?= get_template_part('template-parts/pages/main/banners') ?>

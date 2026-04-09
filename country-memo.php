@@ -56,6 +56,8 @@ get_header(); ?>
         </aside>
 
         <div class="page-country__content">
+          <h1 class="h1"><?php echo esc_html($country->post_title); ?> — Памятка туристу</h1>
+
           <?php if ($memo_q->have_posts()): ?>
             <?php $memo_q->the_post(); ?>
 

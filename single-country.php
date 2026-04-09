@@ -127,7 +127,7 @@ get_header();
                      alt="флаг <?= esc_attr(get_the_title($country_id)); ?>">
               <?php endif; ?>
 
-              <h1 class="h1 h1-country"><?php the_title(); ?></h1>
+              <h1 class="h1 h1-country">Туры в <?php the_title(); ?></h1>
             </div>
 
             <p class="page-country__descr"><?= get_the_excerpt(); ?></p>
