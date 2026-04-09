@@ -275,6 +275,46 @@ add_action('wp_head', function (): void {
     }
 }, 1);
 
+// ── 301: редиректы со старых URL с числовыми ID ─────────────
+// Миграция: старый сайт использовал /country/{slug}/tours/{ID}/
+// и аналогичные паттерны. Ловим 404 → ищем пост по ID → 301.
+
+add_action('template_redirect', function () {
+    if (!is_404()) {
+        return;
+    }
+
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    $path = trim((string) parse_url($request_uri, PHP_URL_PATH), '/');
+
+    if (!preg_match('#/(\d+)/?$#', $path, $m)) {
+        return;
+    }
+
+    $post_id = (int) $m[1];
+    if ($post_id < 1 || $post_id > 9999999) {
+        return;
+    }
+
+    $post = get_post($post_id);
+    if (!$post || $post->post_status !== 'publish') {
+        return;
+    }
+
+    $public_types = get_post_types(['public' => true]);
+    if (!isset($public_types[$post->post_type])) {
+        return;
+    }
+
+    $canonical = get_permalink($post->ID);
+    if (!$canonical) {
+        return;
+    }
+
+    wp_redirect($canonical, 301);
+    exit;
+}, 1);
+
 // ── robots.txt: блокировка фильтров и служебных URL ─────────
 
 add_filter('robots_txt', function ($output, $public) {
