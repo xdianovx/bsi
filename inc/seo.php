@@ -172,6 +172,34 @@ add_filter('wpseo_canonical', function (string $canonical): string {
     return $custom !== '' ? $custom : $canonical;
 }, 5);
 
+// ── Canonical: очистка GET-параметров фильтрации ────────────
+// AJAX-фильтры (education, tours, events) добавляют ?sort=, ?region=
+// и т.д. через replaceState — каждый вариант URL выглядит как
+// отдельная страница. Canonical всегда должен указывать на чистый URL.
+// Приоритет 20 — после всех остальных canonical-хэндлеров (virtual: 5, tour: 10).
+
+add_filter('wpseo_canonical', function (string $canonical): string {
+    if ($canonical === '') {
+        return $canonical;
+    }
+
+    $clean = strtok($canonical, '?');
+
+    return ($clean !== false) ? trailingslashit($clean) : $canonical;
+}, 20);
+
+// ── Yoast: Open Graph URL — аналогичная очистка ─────────────
+
+add_filter('wpseo_opengraph_url', function (string $url): string {
+    if ($url === '') {
+        return $url;
+    }
+
+    $clean = strtok($url, '?');
+
+    return ($clean !== false) ? trailingslashit($clean) : $url;
+});
+
 // ── Yoast: Open Graph title ─────────────────────────────────
 
 add_filter('wpseo_opengraph_title', function (string $title): string {
@@ -226,6 +254,19 @@ add_action('wp_head', function (): void {
         printf(
             '<link rel="canonical" href="%s">' . "\n",
             esc_url($canonical)
+        );
+        return;
+    }
+
+    if (empty($_SERVER['QUERY_STRING'])) {
+        return;
+    }
+
+    $clean = strtok(home_url(add_query_arg([])), '?');
+    if ($clean !== false) {
+        printf(
+            '<link rel="canonical" href="%s">' . "\n",
+            esc_url(trailingslashit($clean))
         );
     }
 }, 1);
