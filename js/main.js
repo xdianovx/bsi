@@ -88,4 +88,31 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Метрика: клики по соцсетям
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a.social-item");
+    if (!link || typeof ym !== "function") return;
+
+    let network = "unknown";
+    const href = link.getAttribute("href") || "";
+
+    if (link.classList.contains("--tg") || href.includes("t.me")) {
+      network = "telegram";
+    } else if (link.classList.contains("--vk") || href.includes("vk.com")) {
+      network = "vk";
+    } else if (link.classList.contains("--max") || href.includes("max.ru")) {
+      network = "max";
+    }
+
+    const location = link.closest("header") ? "header"
+      : link.closest("footer") ? "footer"
+      : link.closest(".subscribe-section") ? "subscribe"
+      : "other";
+
+    ym(108341897, "reachGoal", "social_click", {
+      network: network,
+      location: location,
+    });
+  });
 });

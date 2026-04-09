@@ -141,6 +141,9 @@ export const initAgencyEventRegForm = () => {
       const result = await response.json();
 
       if (result.success) {
+        if (typeof ym !== "undefined") {
+          ym(108341897, "reachGoal", "agency_event_registered");
+        }
         form.reset();
         clearErrors();
         MicroModal.close("modal-agency-event-reg");
