@@ -14,6 +14,7 @@
 <html <?php language_attributes(); ?>>
 
 <head>
+  <meta name="yandex-verification" content="e8e2ebd18d4f8bdf" />
   <meta charset="<?php bloginfo('charset'); ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="profile" href="https://gmpg.org/xfn/11">
@@ -75,9 +76,7 @@
               </button>
 
               <div class="js-dropdown-panel">
-                <button
-                  type="button"
-                  class="currency-option currency-history-trigger"
+                <button type="button" class="currency-option currency-history-trigger"
                   data-micromodal-trigger="modal-currency-history">История</button>
               </div>
 
@@ -197,9 +196,7 @@
             </button>
 
             <div class="js-dropdown-panel">
-              <button
-                type="button"
-                class="currency-option currency-history-trigger"
+              <button type="button" class="currency-option currency-history-trigger"
                 data-micromodal-trigger="modal-currency-history">История</button>
             </div>
 
