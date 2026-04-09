@@ -12,8 +12,6 @@
  * деактивации Yoast.
  */
 
-declare(strict_types=1);
-
 function bsi_seo_virtual_sections(): array
 {
     return [
@@ -112,7 +110,8 @@ function bsi_seo_virtual_canonical(?array $vp): string
 
 // ── Yoast: <title> ──────────────────────────────────────────
 
-add_filter('wpseo_title', function (string $title): string {
+add_filter('wpseo_title', function ($title): string {
+    $title = (string) $title;
     $vp = bsi_seo_detect_virtual_page();
     $custom = bsi_seo_virtual_title($vp);
 
@@ -121,7 +120,8 @@ add_filter('wpseo_title', function (string $title): string {
 
 // ── Yoast: <meta name="description"> ───────────────────────
 
-add_filter('wpseo_metadesc', function (string $desc): string {
+add_filter('wpseo_metadesc', function ($desc): string {
+    $desc = (string) $desc;
     $vp = bsi_seo_detect_virtual_page();
     $custom = bsi_seo_virtual_description($vp);
     if ($custom !== '') {
@@ -132,7 +132,6 @@ add_filter('wpseo_metadesc', function (string $desc): string {
         return $desc;
     }
 
-    // Fallback: автогенерация description из excerpt/content для CPT singles
     if (is_singular()) {
         $post = get_queried_object();
         if (!($post instanceof WP_Post)) {
@@ -165,7 +164,8 @@ add_filter('wpseo_metadesc', function (string $desc): string {
 // ── Yoast: <link rel="canonical"> ──────────────────────────
 // Приоритет 5 — до фильтра canonical в tour.php (приоритет 10)
 
-add_filter('wpseo_canonical', function (string $canonical): string {
+add_filter('wpseo_canonical', function ($canonical): string {
+    $canonical = (string) $canonical;
     $vp = bsi_seo_detect_virtual_page();
     $custom = bsi_seo_virtual_canonical($vp);
 
@@ -178,7 +178,8 @@ add_filter('wpseo_canonical', function (string $canonical): string {
 // отдельная страница. Canonical всегда должен указывать на чистый URL.
 // Приоритет 20 — после всех остальных canonical-хэндлеров (virtual: 5, tour: 10).
 
-add_filter('wpseo_canonical', function (string $canonical): string {
+add_filter('wpseo_canonical', function ($canonical): string {
+    $canonical = (string) $canonical;
     if ($canonical === '') {
         return $canonical;
     }
@@ -190,7 +191,8 @@ add_filter('wpseo_canonical', function (string $canonical): string {
 
 // ── Yoast: Open Graph URL — аналогичная очистка ─────────────
 
-add_filter('wpseo_opengraph_url', function (string $url): string {
+add_filter('wpseo_opengraph_url', function ($url): string {
+    $url = (string) $url;
     if ($url === '') {
         return $url;
     }
@@ -202,7 +204,8 @@ add_filter('wpseo_opengraph_url', function (string $url): string {
 
 // ── Yoast: Open Graph title ─────────────────────────────────
 
-add_filter('wpseo_opengraph_title', function (string $title): string {
+add_filter('wpseo_opengraph_title', function ($title): string {
+    $title = (string) $title;
     $vp = bsi_seo_detect_virtual_page();
     $custom = bsi_seo_virtual_title($vp);
 
@@ -211,7 +214,8 @@ add_filter('wpseo_opengraph_title', function (string $title): string {
 
 // ── Yoast: Open Graph description ───────────────────────────
 
-add_filter('wpseo_opengraph_desc', function (string $desc): string {
+add_filter('wpseo_opengraph_desc', function ($desc): string {
+    $desc = (string) $desc;
     $vp = bsi_seo_detect_virtual_page();
     $custom = bsi_seo_virtual_description($vp);
 
