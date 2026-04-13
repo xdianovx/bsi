@@ -14,6 +14,13 @@ const CHOICES_RU = {
   searchPlaceholderValue: "Поиск...",
 };
 
+// Форматирует число с разделителем разрядов (1000 -> "1 000")
+const formatNumberInput = (value) => {
+  if (!value) return '';
+  const num = value.replace(/\s/g, '');
+  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
 export const initToursFilter = () => {
   const root = document.querySelector(".js-tours-page");
   if (!root) return;
@@ -315,10 +322,10 @@ export const initToursFilter = () => {
         body.set("search", searchInput.value);
       }
       if (priceMinInput?.value) {
-        body.set("price_min", priceMinInput.value);
+        body.set("price_min", priceMinInput.value.replace(/\s/g, ''));
       }
       if (priceMaxInput?.value) {
-        body.set("price_max", priceMaxInput.value);
+        body.set("price_max", priceMaxInput.value.replace(/\s/g, ''));
       }
       if (dateFromInput?.value) {
         body.set("date_from", dateFromInput.value);
@@ -372,10 +379,10 @@ export const initToursFilter = () => {
         body.set("search", searchInput.value);
       }
       if (priceMinInput?.value) {
-        body.set("price_min", priceMinInput.value);
+        body.set("price_min", priceMinInput.value.replace(/\s/g, ''));
       }
       if (priceMaxInput?.value) {
-        body.set("price_max", priceMaxInput.value);
+        body.set("price_max", priceMaxInput.value.replace(/\s/g, ''));
       }
       if (dateFromInput?.value) {
         body.set("date_from", dateFromInput.value);
@@ -602,9 +609,17 @@ export const initToursFilter = () => {
 
   // Обработчик для цены
   if (priceMinInput) {
+    priceMinInput.addEventListener('input', (e) => {
+      const value = e.target.value.replace(/\s/g, '');
+      e.target.value = formatNumberInput(value);
+    });
     priceMinInput.addEventListener('change', onFilterChange);
   }
   if (priceMaxInput) {
+    priceMaxInput.addEventListener('input', (e) => {
+      const value = e.target.value.replace(/\s/g, '');
+      e.target.value = formatNumberInput(value);
+    });
     priceMaxInput.addEventListener('change', onFilterChange);
   }
 
@@ -622,15 +637,15 @@ export const initToursFilter = () => {
         viewBtns.forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
 
-        // Обновляем класс списка туров
+        // Обновляем класс списка туров и всех карточек
+        const items = list.querySelectorAll('.tours-page__item');
         if (view === 'list') {
           list.classList.add('is-list-view');
+          items.forEach((item) => item.classList.add('is-list-view'));
         } else {
           list.classList.remove('is-list-view');
+          items.forEach((item) => item.classList.remove('is-list-view'));
         }
-
-        // Обновляем URL с новым видом
-        updateUrl();
       });
     });
   }
@@ -784,6 +799,8 @@ export const initToursFilter = () => {
             btn.classList.add('is-active');
             if (view === 'list') {
               list.classList.add('is-list-view');
+              const items = list.querySelectorAll('.tours-page__item');
+              items.forEach((item) => item.classList.add('is-list-view'));
             }
           } else {
             btn.classList.remove('is-active');
