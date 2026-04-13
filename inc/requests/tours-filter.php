@@ -97,12 +97,13 @@ function bsi_ajax_tours_filter()
     $search_term = '%' . $wpdb->esc_like($search) . '%';
 
     // Запрос с подзапросом для поиска по title или meta (tour_route)
-    // Используем LOWER() для case-insensitive поиска
+    // Используем utf8mb4_unicode_ci для правильной case-insensitive работы с кириллицей
     $args['post__in'] = $wpdb->get_col($wpdb->prepare(
       "SELECT DISTINCT p.ID FROM {$wpdb->posts} p
        LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'tour_route'
        WHERE p.post_type = 'tour' AND p.post_status = 'publish'
-       AND (LOWER(p.post_title) LIKE LOWER(%s) OR LOWER(pm.meta_value) LIKE LOWER(%s))",
+       AND (p.post_title COLLATE utf8mb4_unicode_ci LIKE %s COLLATE utf8mb4_unicode_ci
+            OR pm.meta_value COLLATE utf8mb4_unicode_ci LIKE %s COLLATE utf8mb4_unicode_ci)",
       $search_term,
       $search_term
     ));
