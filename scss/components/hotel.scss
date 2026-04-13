@@ -24,11 +24,18 @@
   }
 }
 
+.hotel-card__body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .hotel-card {
   display: flex;
   flex-direction: column;
   gap: 4px;
   position: relative;
+  height: 100%;
 
   &:hover {
     color: inherit;

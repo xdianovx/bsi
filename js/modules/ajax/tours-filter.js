@@ -643,15 +643,8 @@ export const initToursFilter = () => {
         viewBtns.forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
 
-        // Обновляем класс списка туров и всех карточек
-        const items = list.querySelectorAll('.tours-page__item');
-        if (view === 'list') {
-          list.classList.add('is-list-view');
-          items.forEach((item) => item.classList.add('is-list-view'));
-        } else {
-          list.classList.remove('is-list-view');
-          items.forEach((item) => item.classList.remove('is-list-view'));
-        }
+        // Перезагружаем туры с новым шаблоном
+        loadTours(1);
       });
     });
   }
