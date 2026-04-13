@@ -649,6 +649,10 @@ export const initToursFilter = () => {
         viewBtns.forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
 
+        // Очищаем список ПЕРЕД переключением, чтобы избежать смешивания разных шаблонов
+        list.innerHTML = '';
+        setLoading(true);
+
         // Обновляем класс списка и карточек
         if (view === 'list') {
           list.classList.add('is-list-view');
