@@ -88,33 +88,8 @@ function bsi_ajax_tours_filter()
     $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
   }
 
-  // Если есть поиск - ищем в title и tour_route
-  if ($search) {
-    // Ищем по названию тура и маршруту
-    // Используем глобальный $wpdb для поиска по post_title или tour_route (ACF)
-    global $wpdb;
-
-    // Нормализуем поисковую строку: приводим к нижнему регистру для сравнения
-    $search_lower = mb_strtolower($search, 'UTF-8');
-    $search_term = '%' . $wpdb->esc_like($search_lower) . '%';
-
-    // Запрос с подзапросом для поиска по title или meta (tour_route)
-    // Используем LOWER() и utf8mb4_unicode_ci для case-insensitive поиска
-    $args['post__in'] = $wpdb->get_col($wpdb->prepare(
-      "SELECT DISTINCT p.ID FROM {$wpdb->posts} p
-       LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'tour_route'
-       WHERE p.post_type = 'tour' AND p.post_status = 'publish'
-       AND (LOWER(p.post_title) LIKE %s
-            OR LOWER(CAST(pm.meta_value AS CHAR)) LIKE %s)",
-      $search_term,
-      $search_term
-    ));
-
-    // Если не найдено - вернем пустой массив чтобы не получить все посты
-    if (empty($args['post__in'])) {
-      $args['post__in'] = [0]; // Гарантирует, что результатов не будет
-    }
-  }
+  // Примечание: поиск будет сделан в PHP после загрузки постов (см. ниже)
+  // Это нужно для корректной работы с кириллицей и case-insensitivity
 
   $query = new WP_Query($args);
 
@@ -186,13 +161,19 @@ function bsi_ajax_tours_filter()
         continue;
       }
 
-      // Дополнительная фильтрация по поиску в route (поиск по title уже сделан через WP_Query)
+      // Дополнительная фильтрация по поиску (title и route)
       if ($search && function_exists('get_field')) {
-        $tour_route = get_field('tour_route', $post_id);
-        $title = get_the_title($post_id);
+        $tour_route = (string) get_field('tour_route', $post_id);
+        $title = (string) get_the_title($post_id);
 
         // Проверяем что поисковый термин есть либо в title, либо в route (case-insensitive)
-        if (stripos($title, $search) === false && stripos($tour_route, $search) === false) {
+        // Используем mb_stripos для правильной работы с кириллицей и UTF-8
+        $search_lower = mb_strtolower($search, 'UTF-8');
+        $title_lower = mb_strtolower($title, 'UTF-8');
+        $route_lower = mb_strtolower($tour_route, 'UTF-8');
+
+        if (mb_stripos($title_lower, $search_lower, 0, 'UTF-8') === false &&
+            mb_stripos($route_lower, $search_lower, 0, 'UTF-8') === false) {
           continue;
         }
       }
