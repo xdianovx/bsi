@@ -81,9 +81,26 @@ function bsi_ajax_tours_filter()
 
   // Если есть поиск - ищем в title и tour_route
   if ($search) {
-    // WordPress WP_Query не может напрямую делать OR между post_title и meta_value
-    // Поэтому мы будем фильтровать результаты в PHP после первого запроса
-    $args['s'] = $search;
+    // Ищем по названию тура и маршруту
+    // Используем глобальный $wpdb для поиска по post_title или tour_route (ACF)
+    global $wpdb;
+
+    $search_term = '%' . $wpdb->esc_like($search) . '%';
+
+    // Запрос с подзапросом для поиска по title или meta (tour_route)
+    $args['post__in'] = $wpdb->get_col($wpdb->prepare(
+      "SELECT DISTINCT p.ID FROM {$wpdb->posts} p
+       LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'tour_route'
+       WHERE p.post_type = 'tour' AND p.post_status = 'publish'
+       AND (p.post_title LIKE %s OR pm.meta_value LIKE %s)",
+      $search_term,
+      $search_term
+    ));
+
+    // Если не найдено - вернем пустой массив чтобы не получить все посты
+    if (empty($args['post__in'])) {
+      $args['post__in'] = [0]; // Гарантирует, что результатов не будет
+    }
   }
 
   $query = new WP_Query($args);
