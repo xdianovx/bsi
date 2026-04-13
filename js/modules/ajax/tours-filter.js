@@ -594,16 +594,29 @@ export const initToursFilter = () => {
     const SEARCH_DEBOUNCE_MS = 500; // Дебаунс 500мс для поиска
     const SEARCH_MIN_LENGTH = 3; // Минимум 3 символа для поиска
 
+    // Нормализация поискового запроса для лучшего UX
+    const normalizeSearchQuery = (query) => {
+      if (!query) return '';
+      // Обрезаем пробелы слева и справа
+      let normalized = query.trim();
+      // Заменяем множественные пробелы на один
+      normalized = normalized.replace(/\s+/g, ' ');
+      return normalized;
+    };
+
     searchInput.addEventListener('input', () => {
       clearTimeout(searchTimeout);
 
+      // Нормализуем ввод
+      const normalizedValue = normalizeSearchQuery(searchInput.value);
+
       // Если меньше 3 символов - ничего не делаем
-      if (searchInput.value.length > 0 && searchInput.value.length < SEARCH_MIN_LENGTH) {
+      if (normalizedValue.length > 0 && normalizedValue.length < SEARCH_MIN_LENGTH) {
         return;
       }
 
       // Показываем что идет поиск
-      if (searchInput.value.length > 0) {
+      if (normalizedValue.length > 0) {
         setLoading(true);
       }
 

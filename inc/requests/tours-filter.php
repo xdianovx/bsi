@@ -9,7 +9,16 @@ function bsi_ajax_tours_filter()
   $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
   $resort_id = isset($_POST['resort']) ? absint(wp_unslash($_POST['resort'])) : 0;
   $tour_type_id = isset($_POST['tour_type']) ? absint(wp_unslash($_POST['tour_type'])) : 0;
+
+  // Нормализуем поисковый запрос для лучшего UX
   $search = isset($_POST['search']) ? sanitize_text_field(wp_unslash($_POST['search'])) : '';
+  if (!empty($search)) {
+    // Обрезаем пробелы слева и справа
+    $search = trim($search);
+    // Заменяем множественные пробелы на один
+    $search = preg_replace('/\s+/', ' ', $search);
+  }
+
   $price_min = isset($_POST['price_min']) ? absint(wp_unslash($_POST['price_min'])) : 0;
   $price_max = isset($_POST['price_max']) ? absint(wp_unslash($_POST['price_max'])) : 0;
   $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
