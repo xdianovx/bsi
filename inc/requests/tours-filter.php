@@ -422,10 +422,36 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
     }
   }
 
-  // Типы туров - ВСЕГДА получаем из текущих результатов фильтрации
+  // Типы туров - получаем только те, что есть у туров в текущей выборке (по стране/региону/курорту)
   $tour_types_ids = [];
 
-  // Получаем туры с текущими фильтрами для определения доступных типов
+  // Строим локальные фильтры из параметров функции (без tour_type_id — иначе при выборе типа пропадают остальные)
+  $local_tax_query = [];
+  $local_meta_query = [];
+
+  if ($region_id) {
+    $local_tax_query[] = [
+      'taxonomy' => 'region',
+      'field' => 'term_id',
+      'terms' => [$region_id],
+      'include_children' => true,
+    ];
+  }
+  if ($resort_id) {
+    $local_tax_query[] = [
+      'taxonomy' => 'resort',
+      'field' => 'term_id',
+      'terms' => [$resort_id],
+    ];
+  }
+  if ($country_id) {
+    $local_meta_query[] = [
+      'key' => 'tour_country',
+      'value' => $country_id,
+      'compare' => '=',
+    ];
+  }
+
   $type_query_args = [
     'post_type' => 'tour',
     'post_status' => 'publish',
@@ -433,14 +459,11 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
     'fields' => 'ids',
   ];
 
-  if (!empty($tax_query)) {
-    $type_query_args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+  if (!empty($local_tax_query)) {
+    $type_query_args['tax_query'] = array_merge([['relation' => 'AND']], $local_tax_query);
   }
-  if (!empty($meta_query)) {
-    $type_query_args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
-  }
-  if ($search) {
-    $type_query_args['s'] = $search;
+  if (!empty($local_meta_query)) {
+    $type_query_args['meta_query'] = array_merge([['relation' => 'AND']], $local_meta_query);
   }
 
   $type_query = new WP_Query($type_query_args);

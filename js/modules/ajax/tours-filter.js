@@ -2,6 +2,7 @@ import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
 import { dropdown } from "../forms/dropdown.js";
+import { displayTourPrices } from "../services/priceLoader.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -403,6 +404,9 @@ export const initToursFilter = () => {
         }
       }
 
+      // Загружаем цены в только что отрендеренных карточках
+      displayTourPrices(list);
+
       if (counter) {
         counter.textContent = `Найдено: ${json.data.total || 0}`;
       }
@@ -415,7 +419,6 @@ export const initToursFilter = () => {
         updateFilterOptions(json.data.filter_options);
       }
 
-      updateUrl();
       renderPagination();
       updateResetButton();
     } catch (e) {
