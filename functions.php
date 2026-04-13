@@ -402,6 +402,7 @@ require get_template_directory() . '/inc/requests/news.php';
 require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
+require get_template_directory() . '/inc/requests/tours-filter.php';
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
 require get_template_directory() . '/inc/requests/popular-tours-section.php';
 require get_template_directory() . '/inc/requests/popular-education-section.php';
