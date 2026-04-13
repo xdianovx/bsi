@@ -408,13 +408,10 @@ require get_template_directory() . '/inc/requests/tours-filter.php';
 add_filter('template_include', function($template) {
   if (is_page()) {
     $page = get_queried_object();
-    if ($page && $page->ID) {
-      $page_template = get_post_meta($page->ID, '_wp_page_template', true);
-      if ($page_template === 'page-tours.php') {
-        $tours_template = get_template_directory() . '/page-tours.php';
-        if (file_exists($tours_template)) {
-          return $tours_template;
-        }
+    if ($page && $page->post_name === 'tury') {
+      $tours_template = get_template_directory() . '/page-tours.php';
+      if (file_exists($tours_template)) {
+        return $tours_template;
       }
     }
   }
