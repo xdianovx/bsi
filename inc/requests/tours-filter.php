@@ -78,8 +78,10 @@ function bsi_ajax_tours_filter()
     $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
   }
 
-  // Если есть поиск - добавляем параметр s
+  // Если есть поиск - ищем в title и tour_route
   if ($search) {
+    // WordPress WP_Query не может напрямую делать OR между post_title и meta_value
+    // Поэтому мы будем фильтровать результаты в PHP после первого запроса
     $args['s'] = $search;
   }
 
@@ -151,6 +153,17 @@ function bsi_ajax_tours_filter()
 
       if (!$dates_match) {
         continue;
+      }
+
+      // Дополнительная фильтрация по поиску в route (поиск по title уже сделан через WP_Query)
+      if ($search && function_exists('get_field')) {
+        $tour_route = get_field('tour_route', $post_id);
+        $title = get_the_title($post_id);
+
+        // Проверяем что поисковый термин есть либо в title, либо в route (case-insensitive)
+        if (stripos($title, $search) === false && stripos($tour_route, $search) === false) {
+          continue;
+        }
       }
 
       // Собираем данные тура для сортировки
@@ -409,13 +422,54 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
     }
   }
 
-  // Типы туров
-  $tour_types = get_terms([
+  // Типы туров - ВСЕГДА получаем из текущих результатов фильтрации
+  $tour_types_ids = [];
+
+  // Получаем туры с текущими фильтрами для определения доступных типов
+  $type_query_args = [
+    'post_type' => 'tour',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+  ];
+
+  if (!empty($tax_query)) {
+    $type_query_args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+  }
+  if (!empty($meta_query)) {
+    $type_query_args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
+  }
+  if ($search) {
+    $type_query_args['s'] = $search;
+  }
+
+  $type_query = new WP_Query($type_query_args);
+  if ($type_query->have_posts()) {
+    foreach ($type_query->posts as $post_id) {
+      $types = wp_get_post_terms($post_id, 'tour_type', ['fields' => 'ids']);
+      $tour_types_ids = array_merge($tour_types_ids, $types);
+    }
+  }
+  wp_reset_postdata();
+
+  $tour_types_ids = array_values(array_unique($tour_types_ids));
+
+  $tour_type_args = [
     'taxonomy' => 'tour_type',
     'hide_empty' => false,
     'orderby' => 'name',
     'order' => 'ASC',
-  ]);
+  ];
+
+  // Включаем только типы которые есть в результатах фильтрации
+  if (!empty($tour_types_ids)) {
+    $tour_type_args['include'] = $tour_types_ids;
+  } else {
+    // Если нет результатов - не показываем никакие типы туров
+    $tour_type_args['include'] = [0];
+  }
+
+  $tour_types = get_terms($tour_type_args);
 
   if (!is_wp_error($tour_types) && !empty($tour_types)) {
     foreach ($tour_types as $type) {

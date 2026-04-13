@@ -73,9 +73,15 @@ if (!empty($country_ids)) {
   ]);
 }
 
-$paged = get_query_var('paged') ? (int) get_query_var('paged') : 1;
-if (!$paged) {
-  $paged = get_query_var('page') ? (int) get_query_var('page') : 1;
+$paged = 1;
+
+// Получаем номер страницы из различных источников
+if (isset($_GET['page'])) {
+  $paged = max(1, (int) $_GET['page']);
+} elseif (isset($_GET['paged'])) {
+  $paged = max(1, (int) $_GET['paged']);
+} elseif (get_query_var('paged')) {
+  $paged = (int) get_query_var('paged');
 }
 
 // Начальный запрос - показываем все туры с сортировкой по цене (возрастание)
@@ -222,21 +228,20 @@ if ($all_tours_for_sort->have_posts()) {
         </div>
 
         <div class="tours-filter__field">
-          <div class="tours-filter__label">Цена (от)</div>
-          <input type="number"
-                 class="tours-filter__input"
-                 name="price_min"
-                 placeholder="Мин. цена"
-                 min="0">
-        </div>
-
-        <div class="tours-filter__field">
-          <div class="tours-filter__label">Цена (до)</div>
-          <input type="number"
-                 class="tours-filter__input"
-                 name="price_max"
-                 placeholder="Макс. цена"
-                 min="0">
+          <div class="tours-filter__label">Диапазон цены</div>
+          <div class="tours-filter__price-range">
+            <input type="number"
+                   class="tours-filter__input"
+                   name="price_min"
+                   placeholder="От"
+                   min="0">
+            <span class="tours-filter__range-separator">—</span>
+            <input type="number"
+                   class="tours-filter__input"
+                   name="price_max"
+                   placeholder="До"
+                   min="0">
+          </div>
         </div>
 
         <div class="tours-filter__field">
@@ -270,7 +275,8 @@ if ($all_tours_for_sort->have_posts()) {
       </div>
 
       <div class="tours-page__controls-right">
-        <div class="tours-page__per-page js-dropdown">
+
+        <!-- <div class="tours-page__per-page js-dropdown">
           <button type="button"
                   class="js-dropdown-trigger tours-page__per-page-trigger">
             <span class="tours-page__per-page-text">Показать: 12</span>
@@ -299,7 +305,7 @@ if ($all_tours_for_sort->have_posts()) {
                       data-value="48">48</button>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <div class="tours-page__sort js-dropdown">
           <button type="button"
@@ -333,6 +339,76 @@ if ($all_tours_for_sort->have_posts()) {
                       data-value="price_desc">По цене (убывание)</button>
             </div>
           </div>
+        </div>
+
+        <div class="tours-page__view-toggle js-tours-view-toggle">
+          <button type="button"
+                  class="tours-page__view-btn is-active"
+                  data-view="grid"
+                  title="Плитки">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+              <rect x="3"
+                    y="3"
+                    width="7"
+                    height="7"></rect>
+              <rect x="14"
+                    y="3"
+                    width="7"
+                    height="7"></rect>
+              <rect x="14"
+                    y="14"
+                    width="7"
+                    height="7"></rect>
+              <rect x="3"
+                    y="14"
+                    width="7"
+                    height="7"></rect>
+            </svg>
+          </button>
+          <button type="button"
+                  class="tours-page__view-btn"
+                  data-view="list"
+                  title="Список">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+              <line x1="8"
+                    y1="6"
+                    x2="21"
+                    y2="6"></line>
+              <line x1="8"
+                    y1="12"
+                    x2="21"
+                    y2="12"></line>
+              <line x1="8"
+                    y1="18"
+                    x2="21"
+                    y2="18"></line>
+              <circle cx="4"
+                      cy="6"
+                      r="1"></circle>
+              <circle cx="4"
+                      cy="12"
+                      r="1"></circle>
+              <circle cx="4"
+                      cy="18"
+                      r="1"></circle>
+            </svg>
+          </button>
         </div>
       </div>
     </div>

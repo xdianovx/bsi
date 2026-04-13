@@ -39,6 +39,8 @@ export const initToursFilter = () => {
   const sortContainer = root.querySelector(".tours-page__sort");
   const perPageContainer = root.querySelector(".tours-page__per-page");
   const resetBtn = root.querySelector(".js-tours-reset");
+  const viewToggle = root.querySelector(".js-tours-view-toggle");
+  const viewBtns = viewToggle?.querySelectorAll(".tours-page__view-btn");
 
   let datePickerInstance = null;
   let sortDropdown = null;
@@ -47,6 +49,7 @@ export const initToursFilter = () => {
   let currentPerPage = 12;
   let currentPage = 1;
   let totalPages = 1;
+  let currentView = 'grid'; // 'grid' или 'list'
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
@@ -113,10 +116,17 @@ export const initToursFilter = () => {
     if (currentPage > 1) {
       params.set("page", String(currentPage));
     }
+    if (currentView !== 'grid') {
+      params.set("view", currentView);
+    }
 
-    const newUrl = params.toString()
-      ? `${window.location.pathname}?${params.toString()}`
-      : window.location.pathname;
+    let newUrl = window.location.pathname;
+
+    // Удаляем слеш в конце pathname если есть параметры
+    if (params.toString()) {
+      newUrl = newUrl.replace(/\/$/, ''); // Удаляем слеш в конце
+      newUrl = `${newUrl}?${params.toString()}`;
+    }
 
     window.history.replaceState({}, '', newUrl);
   };
@@ -168,7 +178,6 @@ export const initToursFilter = () => {
         e.preventDefault();
         const page = parseInt(link.getAttribute('data-page'), 10);
         loadTours(page);
-        window.scrollTo({ top: root.offsetTop - 100, behavior: 'smooth' });
       });
     });
   };
@@ -177,36 +186,160 @@ export const initToursFilter = () => {
   const updateFilterOptions = (options) => {
     if (!options) return;
 
-    // Обновляем страны
-    if (countrySelect && options.countries) {
-      const currentValue = countrySelect.value;
-      const currentText = countrySelect.options[countrySelect.selectedIndex]?.text || '';
-
-      countrySelect.innerHTML = '<option value="">Все страны</option>';
-      options.countries.forEach((country) => {
+    // Обновляем регионы
+    if (regionSelect && options.regions) {
+      const currentValue = regionSelect.value;
+      regionSelect.innerHTML = '<option value="">Все регионы</option>';
+      options.regions.forEach((region) => {
         const opt = document.createElement('option');
-        opt.value = country.id;
-        opt.textContent = country.name;
-        countrySelect.appendChild(opt);
+        opt.value = region.id;
+        opt.textContent = region.name;
+        regionSelect.appendChild(opt);
       });
 
-      if (currentValue && options.countries.some(c => c.id == currentValue)) {
-        countrySelect.value = currentValue;
+      // Устанавливаем значение в select
+      if (currentValue && options.regions.some(r => r.id == currentValue)) {
+        regionSelect.value = currentValue;
+      } else {
+        regionSelect.value = '';
       }
 
-      if (countryChoice) {
-        countryChoice.destroy();
+      // Пересоздаем Choices и устанавливаем выбранное значение
+      if (regionChoice) {
+        regionChoice.destroy();
       }
-      countryChoice = new Choices(countrySelect, {
+      regionChoice = new Choices(regionSelect, {
         ...CHOICES_RU,
         searchEnabled: true,
         shouldSort: false,
         placeholder: true,
-        placeholderValue: "Все страны",
+        placeholderValue: "Все регионы",
       });
+      // Устанавливаем выбранное значение в Choices
+      if (regionSelect.value) {
+        regionChoice.setChoiceByValue(String(regionSelect.value));
+      }
     }
 
-    // Аналогично для других селектов
+    // Обновляем курорты
+    if (resortSelect && options.resorts) {
+      const currentValue = resortSelect.value;
+      resortSelect.innerHTML = '<option value="">Все курорты</option>';
+      options.resorts.forEach((resort) => {
+        const opt = document.createElement('option');
+        opt.value = resort.id;
+        opt.textContent = resort.name;
+        resortSelect.appendChild(opt);
+      });
+
+      // Устанавливаем значение в select
+      if (currentValue && options.resorts.some(r => r.id == currentValue)) {
+        resortSelect.value = currentValue;
+      } else {
+        resortSelect.value = '';
+      }
+
+      // Пересоздаем Choices и устанавливаем выбранное значение
+      if (resortChoice) {
+        resortChoice.destroy();
+      }
+      resortChoice = new Choices(resortSelect, {
+        ...CHOICES_RU,
+        searchEnabled: true,
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: "Все курорты",
+      });
+      // Устанавливаем выбранное значение в Choices
+      if (resortSelect.value) {
+        resortChoice.setChoiceByValue(String(resortSelect.value));
+      }
+    }
+
+    // Обновляем типы туров
+    if (tourTypeSelect && options.tour_types) {
+      const currentValue = tourTypeSelect.value;
+      tourTypeSelect.innerHTML = '<option value="">Все типы</option>';
+      options.tour_types.forEach((type) => {
+        const opt = document.createElement('option');
+        opt.value = type.id;
+        opt.textContent = type.name;
+        tourTypeSelect.appendChild(opt);
+      });
+
+      // Устанавливаем значение в select
+      if (currentValue && options.tour_types.some(t => t.id == currentValue)) {
+        tourTypeSelect.value = currentValue;
+      } else {
+        tourTypeSelect.value = '';
+      }
+
+      // Пересоздаем Choices и устанавливаем выбранное значение
+      if (tourTypeChoice) {
+        tourTypeChoice.destroy();
+      }
+      tourTypeChoice = new Choices(tourTypeSelect, {
+        ...CHOICES_RU,
+        searchEnabled: true,
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: "Все типы",
+      });
+      // Устанавливаем выбранное значение в Choices
+      if (tourTypeSelect.value) {
+        tourTypeChoice.setChoiceByValue(String(tourTypeSelect.value));
+      }
+    }
+  };
+
+  // Функция для получения обновленных опций фильтров
+  const fetchFilterOptions = async () => {
+    try {
+      const body = new URLSearchParams();
+      body.set("action", "tours_filter");
+
+      if (countrySelect?.value) {
+        body.set("country", countrySelect.value);
+      }
+      if (regionSelect?.value) {
+        body.set("region", regionSelect.value);
+      }
+      if (resortSelect?.value) {
+        body.set("resort", resortSelect.value);
+      }
+      if (tourTypeSelect?.value) {
+        body.set("tour_type", tourTypeSelect.value);
+      }
+      if (searchInput?.value) {
+        body.set("search", searchInput.value);
+      }
+      if (priceMinInput?.value) {
+        body.set("price_min", priceMinInput.value);
+      }
+      if (priceMaxInput?.value) {
+        body.set("price_max", priceMaxInput.value);
+      }
+      if (dateFromInput?.value) {
+        body.set("date_from", dateFromInput.value);
+      }
+      if (dateToInput?.value) {
+        body.set("date_to", dateToInput.value);
+      }
+
+      const res = await fetch(ajaxUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+        body: body.toString(),
+        credentials: "same-origin",
+      });
+
+      const json = await res.json();
+      if (json && json.success && json.data.filter_options) {
+        updateFilterOptions(json.data.filter_options);
+      }
+    } catch (e) {
+      console.error('Fetch filter options error:', e);
+    }
   };
 
   const loadTours = async (page = 1) => {
@@ -334,11 +467,28 @@ export const initToursFilter = () => {
     : null;
 
   // Инициализация datepicker для дат
-  if (dateFromInput && dateToInput) {
-    datePickerInstance = flatpickr([dateFromInput, dateToInput], {
+  const dateRangeInput = form.querySelector('input[name="date_range"]');
+  if (dateRangeInput && dateFromInput && dateToInput) {
+    datePickerInstance = flatpickr(dateRangeInput, {
       mode: "range",
-      dateFormat: "Y-m-d",
+      dateFormat: "d.m.Y",
       locale: Russian,
+      onChange: (selectedDates) => {
+        // Обновляем скрытые поля для AJAX запроса
+        if (selectedDates.length >= 1) {
+          const fromDate = new Date(selectedDates[0]);
+          dateFromInput.value = fromDate.toISOString().split('T')[0];
+        }
+        if (selectedDates.length === 2) {
+          const toDate = new Date(selectedDates[1]);
+          dateToInput.value = toDate.toISOString().split('T')[0];
+        }
+
+        // Обновляем доступные опции и загружаем туры при изменении дат
+        currentPage = 1;
+        fetchFilterOptions();
+        loadTours(1);
+      },
     });
   }
 
@@ -352,6 +502,10 @@ export const initToursFilter = () => {
         e.preventDefault();
         const value = option.getAttribute('data-value');
         currentSortValue = value;
+
+        // Обновляем активный класс
+        sortOptions.forEach((opt) => opt.classList.remove('is-active'));
+        option.classList.add('is-active');
 
         // Обновляем текст триггера
         const trigger = sortContainer.querySelector('.tours-page__sort-trigger');
@@ -381,6 +535,10 @@ export const initToursFilter = () => {
         if ([12, 24, 48].includes(value)) {
           currentPerPage = value;
 
+          // Обновляем активный класс
+          perPageOptions.forEach((opt) => opt.classList.remove('is-active'));
+          option.classList.add('is-active');
+
           // Обновляем текст триггера
           const trigger = perPageContainer.querySelector('.tours-page__per-page-trigger');
           if (trigger) {
@@ -401,6 +559,7 @@ export const initToursFilter = () => {
   // Обработчики событий для фильтров
   const onFilterChange = () => {
     currentPage = 1; // Сбрасываем на первую страницу при изменении фильтра
+    fetchFilterOptions(); // Обновляем доступные опции
     loadTours(1);
   };
 
@@ -417,15 +576,24 @@ export const initToursFilter = () => {
     tourTypeSelect.addEventListener('change', onFilterChange);
   }
 
-  // Обработчик для поиска с задержкой
+  // Обработчик для поиска с дебаунсом
   if (searchInput) {
     let searchTimeout = null;
+    const SEARCH_DEBOUNCE_MS = 500; // Дебаунс 500мс для поиска
+
     searchInput.addEventListener('input', () => {
       clearTimeout(searchTimeout);
+
+      // Показываем что идет поиск
+      if (searchInput.value.length > 0) {
+        setLoading(true);
+      }
+
       searchTimeout = setTimeout(() => {
         currentPage = 1;
+        fetchFilterOptions();
         loadTours(1);
-      }, 300); // Ждём 300мс после остановки печати
+      }, SEARCH_DEBOUNCE_MS);
     });
   }
 
@@ -437,14 +605,31 @@ export const initToursFilter = () => {
     priceMaxInput.addEventListener('change', onFilterChange);
   }
 
-  // Обработчик для дат
-  if (dateFromInput && dateToInput) {
-    const onDateChange = () => {
-      currentPage = 1;
-      loadTours(1);
-    };
-    dateFromInput.addEventListener('change', onDateChange);
-    dateToInput.addEventListener('change', onDateChange);
+  // Обработчик для дат больше не нужен - он в onChange callback flatpickr
+
+  // Обработчики для кнопок смены вида
+  if (viewBtns && viewBtns.length > 0) {
+    viewBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const view = btn.getAttribute('data-view');
+        currentView = view;
+
+        // Обновляем активную кнопку
+        viewBtns.forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+
+        // Обновляем класс списка туров
+        if (view === 'list') {
+          list.classList.add('is-list-view');
+        } else {
+          list.classList.remove('is-list-view');
+        }
+
+        // Обновляем URL с новым видом
+        updateUrl();
+      });
+    });
   }
 
   // Обработчик для кнопки сброса фильтров
@@ -462,6 +647,8 @@ export const initToursFilter = () => {
       if (priceMaxInput) priceMaxInput.value = '';
       if (dateFromInput) dateFromInput.value = '';
       if (dateToInput) dateToInput.value = '';
+      if (dateRangeInput) dateRangeInput.value = '';
+      if (datePickerInstance) datePickerInstance.clear();
 
       // Обновляем Choices
       if (countryChoice) countryChoice.setChoiceByValue('');
@@ -482,6 +669,21 @@ export const initToursFilter = () => {
       const perPageTrigger = perPageContainer?.querySelector('.tours-page__per-page-trigger');
       if (perPageTrigger) {
         perPageTrigger.querySelector('.tours-page__per-page-text').textContent = 'Показать: 12';
+      }
+
+      // Сбрасываем is-active классы для опций
+      const sortOptions = sortContainer?.querySelectorAll('.tours-page__sort-option');
+      if (sortOptions) {
+        sortOptions.forEach((opt) => opt.classList.remove('is-active'));
+        const defaultSortOption = sortContainer?.querySelector('[data-value="price_asc"]');
+        if (defaultSortOption) defaultSortOption.classList.add('is-active');
+      }
+
+      const perPageOptions = perPageContainer?.querySelectorAll('.tours-page__per-page-option');
+      if (perPageOptions) {
+        perPageOptions.forEach((opt) => opt.classList.remove('is-active'));
+        const defaultPerPageOption = perPageContainer?.querySelector('[data-value="12"]');
+        if (defaultPerPageOption) defaultPerPageOption.classList.add('is-active');
       }
 
       loadTours(1);
@@ -531,6 +733,14 @@ export const initToursFilter = () => {
     if (params.get('date_to') && dateToInput) {
       dateToInput.value = params.get('date_to');
     }
+    // Восстанавливаем отображение диапазона дат в видимое поле
+    if (dateRangeInput && params.get('date_from') && params.get('date_to')) {
+      const dateFrom = new Date(params.get('date_from'));
+      const dateTo = new Date(params.get('date_to'));
+      if (datePickerInstance) {
+        datePickerInstance.setDate([dateFrom, dateTo]);
+      }
+    }
 
     const sort = params.get('sort');
     if (sort) {
@@ -560,8 +770,46 @@ export const initToursFilter = () => {
     } else if (countActiveFilters() > 0) {
       loadTours(1);
     }
+
+    // Восстанавливаем вид (grid или list)
+    const view = params.get('view');
+    if (view && ['grid', 'list'].includes(view)) {
+      currentView = view;
+      if (viewBtns && viewBtns.length > 0) {
+        viewBtns.forEach((btn) => {
+          if (btn.getAttribute('data-view') === view) {
+            btn.classList.add('is-active');
+            if (view === 'list') {
+              list.classList.add('is-list-view');
+            }
+          } else {
+            btn.classList.remove('is-active');
+          }
+        });
+      }
+    }
   };
 
   applyFromUrl();
   updateResetButton();
+
+  // Инициализация is-active классов для sort и per-page опций
+  const initActiveClasses = () => {
+    // Sort опции
+    const sortOptions = sortContainer?.querySelectorAll('.tours-page__sort-option');
+    if (sortOptions) {
+      sortOptions.forEach((opt) => opt.classList.remove('is-active'));
+      const activeSort = sortContainer?.querySelector(`[data-value="${currentSortValue}"]`);
+      if (activeSort) activeSort.classList.add('is-active');
+    }
+
+    // Per-page опции
+    const perPageOptions = perPageContainer?.querySelectorAll('.tours-page__per-page-option');
+    if (perPageOptions) {
+      perPageOptions.forEach((opt) => opt.classList.remove('is-active'));
+      const activePerPage = perPageContainer?.querySelector(`[data-value="${currentPerPage}"]`);
+      if (activePerPage) activePerPage.classList.add('is-active');
+    }
+  };
+  initActiveClasses();
 };
