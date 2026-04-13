@@ -607,18 +607,22 @@ export const initToursFilter = () => {
     });
   }
 
-  // Обработчик для цены
+  // Обработчик для цены - форматируем при потере фокуса, не при вводе
   if (priceMinInput) {
-    priceMinInput.addEventListener('input', (e) => {
+    priceMinInput.addEventListener('blur', (e) => {
       const value = e.target.value.replace(/\s/g, '');
-      e.target.value = formatNumberInput(value);
+      if (value) {
+        e.target.value = formatNumberInput(value);
+      }
     });
     priceMinInput.addEventListener('change', onFilterChange);
   }
   if (priceMaxInput) {
-    priceMaxInput.addEventListener('input', (e) => {
+    priceMaxInput.addEventListener('blur', (e) => {
       const value = e.target.value.replace(/\s/g, '');
-      e.target.value = formatNumberInput(value);
+      if (value) {
+        e.target.value = formatNumberInput(value);
+      }
     });
     priceMaxInput.addEventListener('change', onFilterChange);
   }
