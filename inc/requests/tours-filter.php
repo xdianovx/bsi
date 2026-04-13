@@ -17,6 +17,7 @@ function bsi_ajax_tours_filter()
   $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'price_asc';
   $per_page = isset($_POST['per_page']) ? absint(wp_unslash($_POST['per_page'])) : 12;
   $paged = isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1;
+  $view = isset($_POST['view']) ? sanitize_text_field(wp_unslash($_POST['view'])) : 'grid';
 
   // Валидация per_page
   $per_page = in_array($per_page, [12, 24, 48], true) ? $per_page : 12;
@@ -263,7 +264,12 @@ function bsi_ajax_tours_filter()
       ];
 
       set_query_var('tour', $tour_data);
-      get_template_part('template-parts/tour/card');
+      // Используем разные шаблоны для grid и list view
+      if ($view === 'list') {
+        get_template_part('template-parts/tour/card-row', null, ['post_id' => $tour_id]);
+      } else {
+        get_template_part('template-parts/tour/card');
+      }
     }
   } else {
     echo '<div class="tours-page__empty">Туры не найдены.</div>';

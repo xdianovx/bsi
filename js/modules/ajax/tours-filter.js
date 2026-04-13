@@ -305,6 +305,7 @@ export const initToursFilter = () => {
     try {
       const body = new URLSearchParams();
       body.set("action", "tours_filter");
+      body.set("view", currentView);
 
       if (countrySelect?.value) {
         body.set("country", countrySelect.value);
@@ -358,6 +359,7 @@ export const initToursFilter = () => {
       body.set("action", "tours_filter");
       body.set("paged", String(page));
       body.set("per_page", String(currentPerPage));
+      body.set("view", currentView);
 
       if (currentSortValue) {
         body.set("sort", currentSortValue);
