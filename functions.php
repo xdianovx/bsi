@@ -403,6 +403,24 @@ require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/tours-filter.php';
+
+// Убедиться что page-tours.php загружается для страницы туров
+add_filter('template_include', function($template) {
+  if (is_page()) {
+    $page = get_queried_object();
+    if ($page && $page->ID) {
+      $page_template = get_post_meta($page->ID, '_wp_page_template', true);
+      if ($page_template === 'page-tours.php') {
+        $tours_template = get_template_directory() . '/page-tours.php';
+        if (file_exists($tours_template)) {
+          return $tours_template;
+        }
+      }
+    }
+  }
+  return $template;
+}, 99);
+
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
 require get_template_directory() . '/inc/requests/popular-tours-section.php';
 require get_template_directory() . '/inc/requests/popular-education-section.php';
@@ -419,7 +437,18 @@ require get_template_directory() . '/inc/requests/ajax-cbr-rates-history.php';
 // Обработка параметров фильтров для страницы образования
 add_action('template_redirect', function () {
 	global $wp_query;
-	
+
+	// Проверяем по REQUEST_URI, находимся ли мы на странице туров
+	$request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+
+	// Извлекаем путь без query string для проверки
+	$path_info = parse_url($request_uri, PHP_URL_PATH);
+
+	// Если это страница туров - пропускаем фильтр образования
+	if (preg_match('#/tury/?(?:\?|$)#', $path_info)) {
+		return;
+	}
+
 	// Проверяем, есть ли параметры фильтров образования
 	$has_education_params = !empty($_GET['program']) || !empty($_GET['language']) ||
 		!empty($_GET['type']) || !empty($_GET['accommodation']) ||
@@ -432,12 +461,6 @@ add_action('template_redirect', function () {
 	if (!$has_education_params) {
 		return;
 	}
-
-	// Получаем текущий путь запроса
-	$request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-	$request_path = parse_url($request_uri, PHP_URL_PATH);
-	$request_path = trim($request_path, '/');
-	$request_path = trim($request_path, '/bsinew/');
 
 	// Ищем страницу с шаблоном образования
 	$education_page = get_posts([
@@ -461,12 +484,12 @@ add_action('template_redirect', function () {
 	$education_page_id = $education_page[0];
 	$education_page_obj = get_post($education_page_id);
 	$education_page_slug = $education_page_obj->post_name;
-	
+
 	// Проверяем, соответствует ли путь slug страницы образования
 	$path_matches = false;
-	if ($request_path) {
+	if (!empty($path_info)) {
 		// Проверяем точное совпадение или что путь содержит slug
-		if ($request_path === $education_page_slug || strpos($request_path, $education_page_slug . '/') === 0) {
+		if (preg_match('#/' . preg_quote($education_page_slug) . '/?(?:\?|$)#', $path_info)) {
 			$path_matches = true;
 		}
 	}
