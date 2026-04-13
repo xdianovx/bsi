@@ -592,9 +592,15 @@ export const initToursFilter = () => {
   if (searchInput) {
     let searchTimeout = null;
     const SEARCH_DEBOUNCE_MS = 500; // Дебаунс 500мс для поиска
+    const SEARCH_MIN_LENGTH = 3; // Минимум 3 символа для поиска
 
     searchInput.addEventListener('input', () => {
       clearTimeout(searchTimeout);
+
+      // Если меньше 3 символов - ничего не делаем
+      if (searchInput.value.length > 0 && searchInput.value.length < SEARCH_MIN_LENGTH) {
+        return;
+      }
 
       // Показываем что идет поиск
       if (searchInput.value.length > 0) {
@@ -642,6 +648,13 @@ export const initToursFilter = () => {
         // Обновляем активную кнопку
         viewBtns.forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
+
+        // Обновляем класс списка и карточек
+        if (view === 'list') {
+          list.classList.add('is-list-view');
+        } else {
+          list.classList.remove('is-list-view');
+        }
 
         // Перезагружаем туры с новым шаблоном
         loadTours(1);
