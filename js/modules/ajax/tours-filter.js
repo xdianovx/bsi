@@ -88,9 +88,6 @@ export const initToursFilter = () => {
   const updateUrl = () => {
     const params = new URLSearchParams();
 
-    if (countrySelect?.value) {
-      params.set("country", countrySelect.value);
-    }
     if (regionSelect?.value) {
       params.set("region", regionSelect.value);
     }
@@ -195,108 +192,54 @@ export const initToursFilter = () => {
     if (!options) return;
 
     // Обновляем регионы
-    if (regionSelect && options.regions) {
+    if (regionSelect && regionChoice && options.regions) {
       const currentValue = regionSelect.value;
-      regionSelect.innerHTML = '<option value="">Все регионы</option>';
-      options.regions.forEach((region) => {
-        const opt = document.createElement('option');
-        opt.value = region.id;
-        opt.textContent = region.name;
-        regionSelect.appendChild(opt);
-      });
-
-      // Устанавливаем значение в select
-      if (currentValue && options.regions.some(r => r.id == currentValue)) {
-        regionSelect.value = currentValue;
-      } else {
-        regionSelect.value = '';
-      }
-
-      // Пересоздаем Choices и устанавливаем выбранное значение
-      if (regionChoice) {
-        regionChoice.destroy();
-      }
-      regionChoice = new Choices(regionSelect, {
-        ...CHOICES_RU,
-        searchEnabled: true,
-        shouldSort: false,
-        placeholder: true,
-        placeholderValue: "Все регионы",
-      });
-      // Устанавливаем выбранное значение в Choices
-      if (regionSelect.value) {
-        regionChoice.setChoiceByValue(String(regionSelect.value));
-      }
+      const hasCurrentValue = options.regions.some(r => String(r.id) === currentValue);
+      regionChoice.setChoices(
+        [
+          { value: '', label: 'Все регионы', selected: !hasCurrentValue || currentValue === '', placeholder: true },
+          ...options.regions.map(r => ({
+            value: String(r.id),
+            label: r.name,
+            selected: hasCurrentValue && String(r.id) === currentValue
+          }))
+        ],
+        'value', 'label', true
+      );
     }
 
     // Обновляем курорты
-    if (resortSelect && options.resorts) {
+    if (resortSelect && resortChoice && options.resorts) {
       const currentValue = resortSelect.value;
-      resortSelect.innerHTML = '<option value="">Все курорты</option>';
-      options.resorts.forEach((resort) => {
-        const opt = document.createElement('option');
-        opt.value = resort.id;
-        opt.textContent = resort.name;
-        resortSelect.appendChild(opt);
-      });
-
-      // Устанавливаем значение в select
-      if (currentValue && options.resorts.some(r => r.id == currentValue)) {
-        resortSelect.value = currentValue;
-      } else {
-        resortSelect.value = '';
-      }
-
-      // Пересоздаем Choices и устанавливаем выбранное значение
-      if (resortChoice) {
-        resortChoice.destroy();
-      }
-      resortChoice = new Choices(resortSelect, {
-        ...CHOICES_RU,
-        searchEnabled: true,
-        shouldSort: false,
-        placeholder: true,
-        placeholderValue: "Все курорты",
-      });
-      // Устанавливаем выбранное значение в Choices
-      if (resortSelect.value) {
-        resortChoice.setChoiceByValue(String(resortSelect.value));
-      }
+      const hasCurrentValue = options.resorts.some(r => String(r.id) === currentValue);
+      resortChoice.setChoices(
+        [
+          { value: '', label: 'Все курорты', selected: !hasCurrentValue || currentValue === '', placeholder: true },
+          ...options.resorts.map(r => ({
+            value: String(r.id),
+            label: r.name,
+            selected: hasCurrentValue && String(r.id) === currentValue
+          }))
+        ],
+        'value', 'label', true
+      );
     }
 
     // Обновляем типы туров
-    if (tourTypeSelect && options.tour_types) {
+    if (tourTypeSelect && tourTypeChoice && options.tour_types) {
       const currentValue = tourTypeSelect.value;
-      tourTypeSelect.innerHTML = '<option value="">Все типы</option>';
-      options.tour_types.forEach((type) => {
-        const opt = document.createElement('option');
-        opt.value = type.id;
-        opt.textContent = type.name;
-        tourTypeSelect.appendChild(opt);
-      });
-
-      // Устанавливаем значение в select
-      if (currentValue && options.tour_types.some(t => t.id == currentValue)) {
-        tourTypeSelect.value = currentValue;
-      } else {
-        tourTypeSelect.value = '';
-      }
-
-      // Пересоздаем Choices и устанавливаем выбранное значение
-      if (tourTypeChoice) {
-        tourTypeChoice.destroy();
-      }
-      tourTypeChoice = new Choices(tourTypeSelect, {
-        ...CHOICES_RU,
-        searchEnabled: true,
-        shouldSort: false,
-        placeholder: true,
-        placeholderValue: "Все типы",
-      });
-      // Устанавливаем выбранное значение в Choices
-      if (tourTypeSelect.value) {
-        tourTypeChoice.setChoiceByValue(String(tourTypeSelect.value));
-      }
+      const hasCurrentValue = options.tour_types.some(t => String(t.id) === currentValue);
+      tourTypeChoice.setChoices(
+        [
+          { value: '', label: 'Все типы', selected: !hasCurrentValue || currentValue === '', placeholder: true },
+          ...options.tour_types.map(t => ({
+            value: String(t.id),
+            label: t.name,
+            selected: hasCurrentValue && String(t.id) === currentValue
+          }))
+        ],
+        'value', 'label', true
+      );
     }
   };
 
@@ -745,12 +688,6 @@ export const initToursFilter = () => {
   const applyFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
 
-    if (params.get('country') && countrySelect) {
-      countrySelect.value = params.get('country');
-      if (countryChoice) {
-        countryChoice.setChoiceByValue(params.get('country'));
-      }
-    }
     if (params.get('region') && regionSelect) {
       regionSelect.value = params.get('region');
       if (regionChoice) {
@@ -793,7 +730,7 @@ export const initToursFilter = () => {
       }
     }
 
-    const sort = params.get('sort') || dataSort;
+    const sort = params.get('sort');
     if (sort && sort !== 'price_asc') {
       currentSortValue = sort;
       const sortTrigger = sortContainer?.querySelector('.tours-page__sort-trigger');
@@ -823,7 +760,7 @@ export const initToursFilter = () => {
     }
 
     // Восстанавливаем вид (grid или list)
-    const view = params.get('view') || dataView;
+    const view = params.get('view');
     if (view && ['grid', 'list'].includes(view)) {
       currentView = view;
       if (viewBtns && viewBtns.length > 0) {
