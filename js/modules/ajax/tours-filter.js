@@ -674,6 +674,9 @@ export const initToursFilter = () => {
           list.classList.remove('is-list-view');
         }
 
+        // Обновляем URL с новым видом
+        updateUrl();
+
         // Перезагружаем туры с новым шаблоном
         loadTours(1);
       });
@@ -790,8 +793,8 @@ export const initToursFilter = () => {
       }
     }
 
-    const sort = params.get('sort');
-    if (sort) {
+    const sort = params.get('sort') || dataSort;
+    if (sort && sort !== 'price_asc') {
       currentSortValue = sort;
       const sortTrigger = sortContainer?.querySelector('.tours-page__sort-trigger');
       if (sortTrigger) {
@@ -820,7 +823,7 @@ export const initToursFilter = () => {
     }
 
     // Восстанавливаем вид (grid или list)
-    const view = params.get('view');
+    const view = params.get('view') || dataView;
     if (view && ['grid', 'list'].includes(view)) {
       currentView = view;
       if (viewBtns && viewBtns.length > 0) {

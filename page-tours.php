@@ -84,6 +84,7 @@ if (isset($_GET['page'])) {
   $paged = (int) get_query_var('paged');
 }
 
+
 // Начальный запрос - показываем все туры с сортировкой по цене (возрастание)
 $per_page_initial = 12;
 $all_tours_for_sort = new WP_Query([

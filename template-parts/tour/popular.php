@@ -1,5 +1,17 @@
 <?php
 
+// Получаем страницу туров (page template с именем "Туры")
+$tours_page_url = '';
+$tours_pages = get_pages([
+  'meta_key' => '_wp_page_template',
+  'meta_value' => 'page-tours.php',
+  'post_status' => 'publish',
+  'number' => 1,
+]);
+if (!empty($tours_pages)) {
+  $tours_page_url = get_permalink($tours_pages[0]->ID);
+}
+
 $tour_query = new WP_Query([
   'post_type' => 'tour',
   'post_status' => 'publish',
@@ -157,25 +169,27 @@ foreach ($tour_posts as $tour_post) {
             </div>
           </div>
 
-          <a href="<?php echo esc_url(home_url('/tury/')); ?>"
-             class="title-wrap__link link-arrow title-wrap__link-education">
-            <span>Все туры </span>
-            <div class="link-arrow__icon">
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   width="24"
-                   height="24"
-                   viewBox="0 0 24 24"
-                   fill="none"
-                   stroke="currentColor"
-                   stroke-width="1.5"
-                   stroke-linecap="round"
-                   stroke-linejoin="round"
-                   class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
-                <path d="M7 7h10v10"></path>
-                <path d="M7 17 17 7"></path>
-              </svg>
-            </div>
-          </a>
+          <?php if ($tours_page_url): ?>
+            <a href="<?php echo esc_url($tours_page_url); ?>"
+               class="title-wrap__link link-arrow title-wrap__link-education">
+              <span>Все туры </span>
+              <div class="link-arrow__icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.5"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+                  <path d="M7 7h10v10"></path>
+                  <path d="M7 17 17 7"></path>
+                </svg>
+              </div>
+            </a>
+          <?php endif; ?>
         </div>
       </div>
 
