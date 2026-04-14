@@ -353,6 +353,7 @@ export const initToursFilter = () => {
 
   const loadTours = async (page = 1) => {
     setLoading(true);
+    updateUrl(); // Обновляем URL при загрузке туров
 
     try {
       const body = new URLSearchParams();

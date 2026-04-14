@@ -166,14 +166,10 @@ function bsi_ajax_tours_filter()
         $tour_route = (string) get_field('tour_route', $post_id);
         $title = (string) get_the_title($post_id);
 
-        // Проверяем что поисковый термин есть либо в title, либо в route (case-insensitive)
-        // Используем mb_stripos для правильной работы с кириллицей и UTF-8
-        $search_lower = mb_strtolower($search, 'UTF-8');
-        $title_lower = mb_strtolower($title, 'UTF-8');
-        $route_lower = mb_strtolower($tour_route, 'UTF-8');
-
-        if (mb_stripos($title_lower, $search_lower, 0, 'UTF-8') === false &&
-            mb_stripos($route_lower, $search_lower, 0, 'UTF-8') === false) {
+        // Используем mb_stripos для регистронезависимого поиска с правильной работой кириллицы
+        // mb_stripos уже делает case-insensitive сравнение, не нужно предварительно преобразовывать в нижний регистр
+        if (mb_stripos($title, $search, 0, 'UTF-8') === false &&
+            mb_stripos($tour_route, $search, 0, 'UTF-8') === false) {
           continue;
         }
       }
