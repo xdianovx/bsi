@@ -939,7 +939,9 @@
   }
 }
 
-// No additional styles needed for __head-left
+.country-tours__head-left {
+  flex: 1 1 auto;
+}
 
 .country-tours__head-right {
   display: flex;
@@ -959,12 +961,12 @@
   padding: 0;
   cursor: pointer;
   font-size: 16px;
-  color: $red;
+  color: #000;
   min-width: 120px;
   font-family: inherit;
 
   &::placeholder {
-    color: $red;
+    color: #000;
   }
 
   &:focus {
@@ -1000,7 +1002,7 @@
   padding: 0;
   cursor: pointer;
   gap: 8px;
-  color: $red;
+  color: #000;
   font-family: inherit;
 
   svg {
