@@ -5,7 +5,7 @@ if (!defined('_S_VERSION')) {
 }
 
 // Временно: очистка кеша через URL
-add_action('init', function() {
+add_action('init', function () {
 	if (isset($_GET['clear_price_cache']) && current_user_can('manage_options')) {
 		global $wpdb;
 		$deleted = $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_bsi_cache_tour%'");
@@ -17,7 +17,8 @@ add_action('init', function() {
  * Парсит строку координат "широта, долгота" (например "3.607725, 72.900417").
  * Возвращает ['lat' => float, 'lng' => float] или null при ошибке.
  */
-function bsi_parse_map_coordinates($str) {
+function bsi_parse_map_coordinates($str)
+{
 	$str = trim((string) $str);
 	if ($str === '') {
 		return null;
@@ -135,7 +136,7 @@ function bsi_scripts()
 			true
 		);
 	}
-	
+
 	// Передаем данные модального окна предупреждения
 	$maintenance_modal_enabled = get_field('maintenance_modal_enabled', 'option') ? true : false;
 	$maintenance_modal_message = get_field('maintenance_modal_message', 'option') ?: '';
@@ -405,17 +406,17 @@ require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/tours-filter.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
-add_filter('template_include', function($template) {
-  if (is_page()) {
-    $page = get_queried_object();
-    if ($page && $page->post_name === 'tury') {
-      $tours_template = get_template_directory() . '/page-tours.php';
-      if (file_exists($tours_template)) {
-        return $tours_template;
-      }
-    }
-  }
-  return $template;
+add_filter('template_include', function ($template) {
+	if (is_page()) {
+		$page = get_queried_object();
+		if ($page && $page->post_name === 'tury') {
+			$tours_template = get_template_directory() . '/page-tours.php';
+			if (file_exists($tours_template)) {
+				return $tours_template;
+			}
+		}
+	}
+	return $template;
 }, 99);
 
 require get_template_directory() . '/inc/requests/popular-hotels-section.php';
@@ -502,12 +503,12 @@ add_action('template_redirect', function () {
 		$wp_query->is_404 = false;
 		$wp_query->is_page = true;
 		$wp_query->is_singular = true;
-		
+
 		// Устанавливаем глобальную переменную $post
 		global $post;
 		$post = $education_page_obj;
 		setup_postdata($post);
-		
+
 		// Загружаем шаблон
 		$template = locate_template('page-education.php');
 		if ($template) {
@@ -516,7 +517,7 @@ add_action('template_redirect', function () {
 			exit;
 		}
 	}
-	
+
 	// Если это уже правильная страница, просто убеждаемся что не 404
 	if (is_page() && get_page_template_slug() === 'page-education.php') {
 		if ($wp_query->is_404) {
@@ -602,7 +603,6 @@ add_action('admin_init', function () {
 
 	wp_die('OK');
 });
-
 
 
 
