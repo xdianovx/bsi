@@ -156,6 +156,26 @@ foreach ($tour_posts as $tour_post) {
               aria-label="Next slide" aria-controls="swiper-wrapper-popular-tours" aria-disabled="false">
             </div>
           </div>
+
+          <a href="<?php echo esc_url(home_url('/tury/')); ?>"
+             class="title-wrap__link link-arrow title-wrap__link-education">
+            <span>Все туры </span>
+            <div class="link-arrow__icon">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   width="24"
+                   height="24"
+                   viewBox="0 0 24 24"
+                   fill="none"
+                   stroke="currentColor"
+                   stroke-width="1.5"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+                <path d="M7 7h10v10"></path>
+                <path d="M7 17 17 7"></path>
+              </svg>
+            </div>
+          </a>
         </div>
       </div>
 
