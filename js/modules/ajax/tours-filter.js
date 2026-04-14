@@ -519,8 +519,17 @@ export const initToursFilter = () => {
     loadTours(1);
   };
 
+  const onCountryChange = () => {
+    // Сброс зависимых фильтров при смене страны
+    if (regionChoice) regionChoice.setChoiceByValue('');
+    if (resortChoice) resortChoice.setChoiceByValue('');
+    if (tourTypeChoice) tourTypeChoice.setChoiceByValue('');
+
+    onFilterChange();
+  };
+
   if (countrySelect) {
-    countrySelect.addEventListener('change', onFilterChange);
+    countrySelect.addEventListener('change', onCountryChange);
   }
   if (regionSelect) {
     regionSelect.addEventListener('change', onFilterChange);
