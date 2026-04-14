@@ -15,6 +15,14 @@ $tour_gallery = function_exists('get_field') ? (array) get_field('tour_gallery',
 $duration = function_exists('get_field') ? trim((string) get_field('tour_duration', $post_id)) : '';
 $route = function_exists('get_field') ? trim((string) get_field('tour_route', $post_id)) : '';
 $booking_url = function_exists('get_field') ? trim((string) get_field('tour_booking_url', $post_id)) : '';
+$checkin_dates_raw = function_exists('get_field') ? trim((string) get_field('tour_checkin_dates', $post_id)) : '';
+
+// Парсим даты (разделены запятыми)
+$checkin_dates = [];
+if (!empty($checkin_dates_raw)) {
+  $checkin_dates = array_map('trim', explode(',', $checkin_dates_raw));
+  $checkin_dates = array_filter($checkin_dates);
+}
 
 // Taxonomies
 $types = get_the_terms($post_id, 'tour_type');
@@ -75,19 +83,23 @@ $country_title = $country_id ? get_the_title($country_id) : '';
 
     <div class="tour-card-row__top">
 
-      <?php if ($country_title || (!empty($regions) && !is_wp_error($regions)) || (!empty($resorts) && !is_wp_error($resorts))): ?>
-        <div class="tour-card-row__location">
+      <?php if (!empty($checkin_dates)): ?>
+        <div class="tour-card-row__dates">
+          <div class="tour-card-row__dates-list">
+            <?php
+              $display_count = 3;
+              $displayed = array_slice($checkin_dates, 0, $display_count);
+              $remaining = count($checkin_dates) - $display_count;
 
-          <?php
-            $location_parts = [];
-            if ($country_title) $location_parts[] = esc_html($country_title);
-            if (!empty($regions) && !is_wp_error($regions)) $location_parts[] = esc_html(implode(', ', wp_list_pluck($regions, 'name')));
-            if (!empty($resorts) && !is_wp_error($resorts)) $location_parts[] = esc_html(implode(', ', wp_list_pluck($resorts, 'name')));
-          ?>
-          <div class="tour-card-row__location-link">
-            <?= implode(' / ', $location_parts); ?>
+              foreach ($displayed as $date) {
+                echo '<span class="tour-card-row__date">' . esc_html($date) . '</span>';
+              }
+
+              if ($remaining > 0) {
+                echo '<span class="tour-card-row__date-more">еще ' . (int) $remaining . '</span>';
+              }
+            ?>
           </div>
-
         </div>
       <?php endif; ?>
 
