@@ -272,7 +272,7 @@ export const initCountryToursFilters = () => {
     flatpickr(dateRangeInput, {
       mode: 'range',
       locale: Russian,
-      dateFormat: 'd.m.Y',
+      dateFormat: 'd.m',
       disableMobile: true,
       minDate: 'today',
       onChange(selectedDates) {
