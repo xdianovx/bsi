@@ -4,6 +4,23 @@ if (!defined('_S_VERSION')) {
 	define('_S_VERSION', '1.0.0');
 }
 
+// Регистрируем кастомные query параметры
+add_filter('query_vars', function ($vars) {
+	$vars[] = 'country';
+	$vars[] = 'region';
+	$vars[] = 'resort';
+	$vars[] = 'tour_type';
+	$vars[] = 'search';
+	$vars[] = 'price_min';
+	$vars[] = 'price_max';
+	$vars[] = 'date_from';
+	$vars[] = 'date_to';
+	$vars[] = 'sort';
+	$vars[] = 'view';
+	$vars[] = 'per_page';
+	return $vars;
+});
+
 // Временно: очистка кеша через URL
 add_action('init', function () {
 	if (isset($_GET['clear_price_cache']) && current_user_can('manage_options')) {

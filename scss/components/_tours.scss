@@ -117,7 +117,6 @@
   padding: 0;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #999;
 
   svg {
     width: 20px;
@@ -126,7 +125,7 @@
   }
 
   &:hover {
-    color: #666;
+    color: #ff0000;
   }
 
   &.is-active {
