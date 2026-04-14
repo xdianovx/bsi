@@ -1,4 +1,7 @@
 import Choices from "choices.js";
+import flatpickr from "flatpickr";
+import { Russian } from "flatpickr/dist/l10n/ru.js";
+import { dropdown } from "../forms/dropdown.js";
 import { displayTourPrices } from "../services/priceLoader.js";
 
 const CHOICES_RU = {
@@ -32,6 +35,11 @@ export const initCountryToursFilters = () => {
   const regionSelect = root.querySelector('select[name="region"]');
   const resortSelect = root.querySelector('select[name="resort"]');
   const typeSelect = root.querySelector('select[name="tour_type"]');
+  const sortContainer = root.querySelector('.country-tours__sort');
+  const sortTextEl = sortContainer?.querySelector('.country-tours__sort-text');
+  const dateRangeInput = root.querySelector('input[name="date_range"]');
+  const dateFromInput = root.querySelector('input[name="date_from"]');
+  const dateToInput = root.querySelector('input[name="date_to"]');
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
@@ -39,6 +47,7 @@ export const initCountryToursFilters = () => {
   displayTourPrices(list);
 
   let currentPage = 1;
+  let currentSortValue = 'price_asc';
 
   const loadTours = async (page = 1) => {
     setLoading(true);
@@ -49,6 +58,7 @@ export const initCountryToursFilters = () => {
       body.set("action", "country_tours_filter");
       body.set("country_id", String(countryId));
       body.set("paged", String(page));
+      body.set("sort", currentSortValue);
 
       const regionId = regionSelect ? regionSelect.value || "" : "";
       if (regionId) body.set("region", regionId);
@@ -57,6 +67,9 @@ export const initCountryToursFilters = () => {
       if (resortVal) body.set("resort", resortVal);
       const typeVal = typeSelect ? typeSelect.value || "" : "";
       if (typeVal) body.set("tour_type", typeVal);
+
+      if (dateFromInput?.value) body.set("date_from", dateFromInput.value);
+      if (dateToInput?.value) body.set("date_to", dateToInput.value);
 
       const res = await fetch(ajaxUrl, {
         method: "POST",
@@ -231,6 +244,50 @@ export const initCountryToursFilters = () => {
       await loadTours(pageFromUrl);
     }
   };
+
+  // Sort dropdown initialization
+  if (sortContainer) {
+    const sortDropdown = dropdown(sortContainer);
+    sortContainer.querySelectorAll('.country-tours__sort-option').forEach(opt => {
+      opt.addEventListener('click', e => {
+        e.preventDefault();
+        currentSortValue = opt.dataset.value;
+        if (sortTextEl) sortTextEl.textContent = opt.textContent.trim();
+        sortContainer.querySelectorAll('.country-tours__sort-option').forEach(o => o.classList.remove('is-active'));
+        opt.classList.add('is-active');
+        sortDropdown.close();
+        loadTours(1);
+      });
+    });
+  }
+
+  // Helper to convert date to ISO format (local timezone safe)
+  const toLocalIso = (d) => {
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  };
+
+  // Flatpickr datepicker initialization
+  if (dateRangeInput) {
+    flatpickr(dateRangeInput, {
+      mode: 'range',
+      locale: Russian,
+      dateFormat: 'd.m.Y',
+      disableMobile: true,
+      minDate: 'today',
+      onChange(selectedDates) {
+        if (selectedDates.length === 2) {
+          dateFromInput.value = toLocalIso(selectedDates[0]);
+          dateToInput.value = toLocalIso(selectedDates[1]);
+          loadTours(1);
+        } else if (selectedDates.length === 0) {
+          dateFromInput.value = '';
+          dateToInput.value = '';
+          loadTours(1);
+        }
+      },
+    });
+  }
 
   if (regionSelect) {
     regionSelect.addEventListener("change", async () => {

@@ -27,6 +27,9 @@ function country_tours_filter()
   }
 
   $paged = isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1;
+  $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'price_asc';
+  $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
+  $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
 
   $tax_query = [];
 
@@ -58,8 +61,7 @@ function country_tours_filter()
   $args = [
     'post_type' => 'tour',
     'post_status' => 'publish',
-    'posts_per_page' => 12,
-    'paged' => $paged,
+    'posts_per_page' => -1,
     'orderby' => 'title',
     'order' => 'ASC',
     'meta_query' => bsi_build_tour_country_meta_query((int) $country_id),
@@ -73,10 +75,125 @@ function country_tours_filter()
 
   $q = new WP_Query($args);
 
-  ob_start();
+  // Массив отфильтрованных постов
+  $filtered_posts = [];
+
   if ($q->have_posts()) {
     while ($q->have_posts()) {
       $q->the_post();
+      $post_id = (int) get_the_ID();
+
+      // Получаем цену
+      $price_from = '';
+      if (function_exists('get_field')) {
+        $price_from = get_field('price_from', $post_id);
+      }
+
+      // Извлекаем число из цены для сравнения
+      $price_num = 0;
+      if ($price_from) {
+        preg_match('/[\d\s]+/', (string) $price_from, $matches);
+        if (!empty($matches[0])) {
+          $price_num = (int) str_replace(' ', '', $matches[0]);
+        }
+      }
+
+      // Проверяем диапазон дат (если фильтр активен)
+      $dates_match = true;
+      if ($date_from && $date_to && function_exists('get_field')) {
+        $checkin_dates_str = get_field('tour_checkin_dates', $post_id);
+        if ($checkin_dates_str) {
+          $checkin_dates = array_filter(array_map('trim', preg_split('/[,;\n]/', $checkin_dates_str)));
+          $has_matching_date = false;
+
+          foreach ($checkin_dates as $date_str) {
+            // Пытаемся распарсить дату в формате YYYY-MM-DD или DD.MM.YYYY
+            $date_obj = DateTime::createFromFormat('Y-m-d', $date_str);
+            if (!$date_obj) {
+              $date_obj = DateTime::createFromFormat('d.m.Y', $date_str);
+            }
+
+            if ($date_obj) {
+              $date_str_normalized = $date_obj->format('Y-m-d');
+              if ($date_str_normalized >= $date_from && $date_str_normalized <= $date_to) {
+                $has_matching_date = true;
+                break;
+              }
+            }
+          }
+
+          if (!$has_matching_date) {
+            $dates_match = false;
+          }
+        } else {
+          // Если дат нет и фильтр по датам активен - пропускаем
+          $dates_match = false;
+        }
+      }
+
+      if (!$dates_match) {
+        continue;
+      }
+
+      // Собираем данные тура для сортировки
+      $tour_data = [
+        'id' => $post_id,
+        'title' => get_the_title($post_id),
+        'price_num' => $price_num,
+        'price_from' => $price_from,
+      ];
+
+      $filtered_posts[] = $tour_data;
+    }
+    wp_reset_postdata();
+  }
+
+  // Сортировка
+  usort($filtered_posts, function ($a, $b) use ($sort) {
+    switch ($sort) {
+      case 'price_asc':
+        return $a['price_num'] <=> $b['price_num'];
+      case 'price_desc':
+        return $b['price_num'] <=> $a['price_num'];
+      case 'title_desc':
+        return strcmp($b['title'], $a['title']);
+      case 'title_asc':
+      default:
+        return strcmp($a['title'], $b['title']);
+    }
+  });
+
+  // Пагинация
+  $per_page = 12;
+  $total_filtered = count($filtered_posts);
+  $max_pages = (int) ceil($total_filtered / $per_page);
+  $offset = ($paged - 1) * $per_page;
+  $paginated_posts = array_slice($filtered_posts, $offset, $per_page);
+  $paginated_ids = array_column($paginated_posts, 'id');
+
+  // Если есть отфильтрованные посты, загружаем их с сохранением порядка
+  if (!empty($paginated_ids)) {
+    $final_args = [
+      'post_type' => 'tour',
+      'post_status' => 'publish',
+      'posts_per_page' => $per_page,
+      'post__in' => $paginated_ids,
+      'orderby' => 'post__in',
+    ];
+    $final_query = new WP_Query($final_args);
+  } else {
+    $final_query = new WP_Query([
+      'post_type' => 'tour',
+      'post_status' => 'publish',
+      'posts_per_page' => $per_page,
+      'post__in' => [0], // Пусто результаты
+    ]);
+  }
+
+  ob_start();
+  if ($final_query->have_posts()) {
+    while ($final_query->have_posts()) {
+      $final_query->the_post();
       get_template_part('template-parts/tour/card-row', null, ['post_id' => get_the_ID()]);
     }
   }
@@ -85,9 +202,9 @@ function country_tours_filter()
 
   // Генерируем пагинацию
   ob_start();
-  if ($q->max_num_pages > 1) {
+  if ($max_pages > 1) {
     echo paginate_links([
-      'total'   => $q->max_num_pages,
+      'total'   => $max_pages,
       'current' => $paged,
       'prev_text' => '&larr; Назад',
       'next_text' => 'Вперед &rarr;',
@@ -98,7 +215,7 @@ function country_tours_filter()
 
   wp_send_json_success([
     'html' => $html,
-    'total' => (int) $q->found_posts,
+    'total' => (int) $total_filtered,
     'pagination' => $pagination,
   ]);
 }

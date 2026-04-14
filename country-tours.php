@@ -113,13 +113,67 @@ get_header(); ?>
                data-country-id="<?= (int) $country_id; ?>">
 
             <div class="country-tours__head">
-              <h1 class="h1 country-tours__title">
-                <?= esc_html($country ? $country->post_title : ''); ?> — туры
-              </h1>
+              <div class="country-tours__head-left">
+                <h1 class="h1 country-tours__title">
+                  <?= esc_html($country ? $country->post_title : ''); ?> — туры
+                </h1>
 
-              <div class="country-tours__counter"
-                   data-tours-count>
-                Найдено туров: <?= (int) $tours_query->found_posts; ?>
+                <div class="country-tours__counter"
+                     data-tours-count>
+                  Найдено туров: <?= (int) $tours_query->found_posts; ?>
+                </div>
+              </div>
+
+              <div class="country-tours__head-right">
+                <!-- Датапикер -->
+                <div class="country-tours__date-wrap">
+                  <input type="text"
+                         class="country-tours__date-input"
+                         name="date_range"
+                         placeholder="Выбрать дату"
+                         readonly>
+                  <input type="hidden"
+                         name="date_from"
+                         value="">
+                  <input type="hidden"
+                         name="date_to"
+                         value="">
+                </div>
+
+                <!-- Сортировка -->
+                <div class="country-tours__sort js-dropdown">
+                  <button type="button"
+                          class="js-dropdown-trigger country-tours__sort-trigger">
+                    <span class="country-tours__sort-text">По цене (возрастание)</span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="20"
+                         height="20"
+                         viewBox="0 0 20 20"
+                         fill="none">
+                      <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
+                            stroke="black"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                  <div class="js-dropdown-panel country-tours__sort-panel">
+                    <div class="country-tours__sort-options">
+                      <button type="button"
+                              class="country-tours__sort-option is-active"
+                              data-value="price_asc">По цене (возрастание)</button>
+                      <button type="button"
+                              class="country-tours__sort-option"
+                              data-value="price_desc">По цене (убывание)</button>
+                      <button type="button"
+                              class="country-tours__sort-option"
+                              data-value="title_asc">По названию (А-Я)</button>
+                      <button type="button"
+                              class="country-tours__sort-option"
+                              data-value="title_desc">По названию (Я-А)</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
