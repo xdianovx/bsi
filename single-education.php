@@ -445,6 +445,16 @@ get_header();
                   <input type="text" class="education-programs-filter__input js-education-program-date"
                     name="program_date" placeholder="Выберите даты" readonly>
                 </div>
+
+                <div class="education-programs-filter__field">
+                  <div class="education-programs-filter__label">Валюта</div>
+                  <select name="display_currency" class="js-education-currency-select education-programs-filter__select">
+                    <option value="RUB">RUB</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
               </div>
 
 

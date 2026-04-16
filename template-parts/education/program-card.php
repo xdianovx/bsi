@@ -151,12 +151,42 @@ $accommodation_text = implode(', ', $accommodation_parts);
 // Форматируем цену используя функции из helpers.php
 $price_formatted = '';
 $price_numeric = 0;
+$price_data_attrs = []; // для передачи в data-attributes
+
 if (!empty($price_per_week)) {
   // Цена уже отформатирована функцией bsi_education_get_program_price_in_rub,
   // но применим дополнительное форматирование для "от" если нужно
   $price_formatted = format_price_with_from($price_per_week, true);
   // Извлекаем числовое значение цены для передачи в модалку
   $price_numeric = (int) preg_replace('/[^\d]/', '', $price_per_week);
+
+  // Собираем data-attributes для переключения валют
+  if (function_exists('bsi_education_get_program_price_with_currency')) {
+    $price_rub = 0;
+
+    // Получаем цену в рублях
+    if (!empty($program['program_price_per_week_original']) && !empty($program['program_price_per_week_currency'])) {
+      $price_rub_obj = bsi_education_get_program_price_with_currency($program, 'RUB');
+      if ($price_rub_obj) {
+        $price_rub = (int) $price_rub_obj['value'];
+      }
+    }
+
+    // Fallback
+    if ($price_rub <= 0) {
+      $price_rub = $price_numeric;
+    }
+
+    if ($price_rub > 0) {
+      $price_data_attrs['price-rub'] = $price_rub;
+
+      // Получаем оригинальную цену и валюту если есть
+      if (!empty($program['program_price_per_week_original']) && !empty($program['program_price_per_week_currency'])) {
+        $price_data_attrs['price-original'] = (float) $program['program_price_per_week_original'];
+        $price_data_attrs['price-currency'] = strtoupper((string) $program['program_price_per_week_currency']);
+      }
+    }
+  }
 }
 
 // Подготавливаем данные дополнительных услуг для JSON
@@ -238,7 +268,16 @@ foreach ($additional_services as $service) {
 
           <div class="education-program-card__actions">
             <?php if ($price_formatted): ?>
-              <div class="education-program-card__price"><?php echo esc_html($price_formatted); ?></div>
+              <div class="education-program-card__price"
+                   <?php if (!empty($price_data_attrs['price-rub'])): ?>
+                   data-price-rub="<?php echo esc_attr($price_data_attrs['price-rub']); ?>"
+                   <?php endif; ?>
+                   <?php if (!empty($price_data_attrs['price-original'])): ?>
+                   data-price-original="<?php echo esc_attr($price_data_attrs['price-original']); ?>"
+                   data-price-currency="<?php echo esc_attr($price_data_attrs['price-currency']); ?>"
+                   <?php endif; ?>>
+                <?php echo esc_html($price_formatted); ?>
+              </div>
             <?php endif; ?>
 
             <button type="button" class="education-program-card__book-btn btn btn-accent js-program-booking-btn"

@@ -554,3 +554,196 @@ function bsi_education_get_program_price_in_rub(array $program): string
 
   return '';
 }
+
+/**
+ * Конвертирует цену из рублей в целевую валюту.
+ * Используется для переключения валют на фронтенде.
+ *
+ * @param int|float $price_rub Цена в рублях
+ * @param string $target_currency Целевая валюта (USD, EUR, GBP, RUB)
+ * @return float|null Цена в целевой валюте или null если конвертация невозможна
+ */
+function bsi_education_convert_price_from_rub($price_rub, $target_currency)
+{
+  if (!$price_rub || $price_rub <= 0) {
+    return null;
+  }
+
+  $target_currency = strtoupper(trim((string) $target_currency));
+  if (empty($target_currency)) {
+    return null;
+  }
+
+  // Если целевая валюта - рубли, просто вернуть число
+  if ($target_currency === 'RUB') {
+    return (float) $price_rub;
+  }
+
+  // Получить последний снимок курсов (уже с наценкой)
+  if (!function_exists('bsi_currency_history_get_latest_snapshot')) {
+    return null;
+  }
+
+  $snapshot = bsi_currency_history_get_latest_snapshot();
+  if (!$snapshot || empty($snapshot['rates'][$target_currency])) {
+    return null;
+  }
+
+  $rate_data = $snapshot['rates'][$target_currency];
+  if (!is_array($rate_data) || !isset($rate_data['value']) || !isset($rate_data['nominal'])) {
+    return null;
+  }
+
+  // Формула: цена_в_валюте = цена_в_рублях / (курс_значение / номинал)
+  $rate_value = floatval($rate_data['value']);
+  $rate_nominal = (int) $rate_data['nominal'];
+
+  if ($rate_nominal <= 0 || $rate_value <= 0) {
+    return null;
+  }
+
+  $converted = ((float) $price_rub) / ($rate_value / $rate_nominal);
+  return round($converted, 2);
+}
+
+/**
+ * Получает цену поста education в запрашиваемой валюте.
+ *
+ * @param int $post_id ID поста education
+ * @param string $currency Целевая валюта (RUB, USD, EUR, GBP)
+ * @return array ['value' => number, 'currency' => 'USD', 'formatted' => '1 000 USD']
+ *               или null если цена не найдена
+ */
+function bsi_education_get_price_with_currency(int $post_id, string $currency)
+{
+  if ($post_id <= 0 || !function_exists('get_field')) {
+    return null;
+  }
+
+  $currency = strtoupper(trim((string) $currency));
+  if (empty($currency)) {
+    return null;
+  }
+
+  // Сначала получаем цену в рублях
+  $price_rub = null;
+  $price_original = get_field('education_price_original', $post_id);
+  $price_currency = get_field('education_price_currency', $post_id);
+
+  if ($price_original && $price_currency) {
+    $price_rub = bsi_education_convert_price_to_rub($price_original, $price_currency);
+  }
+
+  // Fallback на старое поле
+  if (!$price_rub || $price_rub <= 0) {
+    $old_price = get_field('education_price', $post_id);
+    if ($old_price) {
+      $price_rub = bsi_extract_price_number((string) $old_price);
+    }
+  }
+
+  if (!$price_rub || $price_rub <= 0) {
+    return null;
+  }
+
+  // Если целевая валюта - рубли, возвращаем сразу
+  if ($currency === 'RUB') {
+    return [
+      'value' => $price_rub,
+      'currency' => 'RUB',
+      'formatted' => number_format($price_rub, 0, ',', ' ') . ' ₽',
+    ];
+  }
+
+  // Конвертируем в целевую валюту
+  $price_in_currency = bsi_education_convert_price_from_rub($price_rub, $currency);
+  if (!$price_in_currency || $price_in_currency <= 0) {
+    return null;
+  }
+
+  $currency_symbols = [
+    'USD' => '$',
+    'EUR' => '€',
+    'GBP' => '£',
+  ];
+
+  $symbol = $currency_symbols[$currency] ?? $currency;
+  $formatted = number_format($price_in_currency, 2, '.', ' ') . ' ' . $symbol;
+
+  return [
+    'value' => $price_in_currency,
+    'currency' => $currency,
+    'formatted' => $formatted,
+  ];
+}
+
+/**
+ * Получает цену программы в запрашиваемой валюте.
+ *
+ * @param array $program Массив программы из repeater
+ * @param string $currency Целевая валюта (RUB, USD, EUR, GBP)
+ * @return array ['value' => number, 'currency' => 'USD', 'formatted' => '1 000 USD']
+ *               или null если цена не найдена
+ */
+function bsi_education_get_program_price_with_currency(array $program, string $currency)
+{
+  if (empty($program)) {
+    return null;
+  }
+
+  $currency = strtoupper(trim((string) $currency));
+  if (empty($currency)) {
+    return null;
+  }
+
+  // Сначала получаем цену в рублях
+  $price_rub = null;
+
+  if (!empty($program['program_price_per_week_original']) && !empty($program['program_price_per_week_currency'])) {
+    $price_rub = bsi_education_convert_price_to_rub(
+      $program['program_price_per_week_original'],
+      $program['program_price_per_week_currency']
+    );
+  }
+
+  // Fallback на старое поле
+  if (!$price_rub || $price_rub <= 0) {
+    if (!empty($program['program_price_per_week'])) {
+      $price_rub = bsi_extract_price_number((string) $program['program_price_per_week']);
+    }
+  }
+
+  if (!$price_rub || $price_rub <= 0) {
+    return null;
+  }
+
+  // Если целевая валюта - рубли, возвращаем сразу
+  if ($currency === 'RUB') {
+    return [
+      'value' => $price_rub,
+      'currency' => 'RUB',
+      'formatted' => number_format($price_rub, 0, ',', ' ') . ' ₽',
+    ];
+  }
+
+  // Конвертируем в целевую валюту
+  $price_in_currency = bsi_education_convert_price_from_rub($price_rub, $currency);
+  if (!$price_in_currency || $price_in_currency <= 0) {
+    return null;
+  }
+
+  $currency_symbols = [
+    'USD' => '$',
+    'EUR' => '€',
+    'GBP' => '£',
+  ];
+
+  $symbol = $currency_symbols[$currency] ?? $currency;
+  $formatted = number_format($price_in_currency, 2, '.', ' ') . ' ' . $symbol;
+
+  return [
+    'value' => $price_in_currency,
+    'currency' => $currency,
+    'formatted' => $formatted,
+  ];
+}

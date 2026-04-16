@@ -389,6 +389,17 @@ if ($all_edu_for_sort->have_posts()) {
                  value="">
         </div>
 
+        <div class="education-filter__field">
+          <div class="education-filter__label">Валюта отображения</div>
+          <select class="education-filter__select js-education-currency-select"
+                  name="display_currency"
+                  data-choice="single">
+            <option value="RUB">RUB (Рубли)</option>
+            <option value="USD">USD (Доллары)</option>
+            <option value="EUR">EUR (Евро)</option>
+            <option value="GBP">GBP (Фунты)</option>
+          </select>
+        </div>
 
       </div>
     </form>
@@ -710,6 +721,23 @@ if ($all_edu_for_sort->have_posts()) {
             }
           }
 
+          // Собираем data-attributes для переключения валют
+          $price_data_attrs = [];
+          if (function_exists('bsi_education_get_price_with_currency')) {
+            $price_rub_obj = bsi_education_get_price_with_currency($education_id, 'RUB');
+            if ($price_rub_obj) {
+              $price_data_attrs['price-rub'] = (int) $price_rub_obj['value'];
+
+              // Получаем оригинальную цену если есть
+              $price_original = get_field('education_price_original', $education_id);
+              $price_currency = get_field('education_price_currency', $education_id);
+              if ($price_original && $price_currency) {
+                $price_data_attrs['price-original'] = (float) $price_original;
+                $price_data_attrs['price-currency'] = strtoupper((string) $price_currency);
+              }
+            }
+          }
+
           $items[] = [
             'id' => $education_id,
             'url' => get_permalink($education_id),
@@ -728,6 +756,7 @@ if ($all_edu_for_sort->have_posts()) {
             'age_min' => $age_min,
             'age_max' => $age_max,
             'nearest_date' => $nearest_date,
+            'price_data_attrs' => $price_data_attrs,
           ];
         endwhile;
         wp_reset_postdata();
