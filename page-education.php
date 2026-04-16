@@ -127,7 +127,7 @@ if ($all_edu_for_sort->have_posts()) {
   $all_sorted_posts = $all_edu_for_sort->posts;
 
   usort($all_sorted_posts, function ($a, $b) {
-    if (!function_exists('get_field') || !function_exists('bsi_education_get_program_price_in_rub')) {
+    if (!function_exists('get_field') || !function_exists('bsi_education_get_program_price_numeric_rub')) {
       return 0;
     }
 
@@ -139,12 +139,9 @@ if ($all_edu_for_sort->have_posts()) {
     if (!empty($education_programs_a)) {
       $prices_a = [];
       foreach ($education_programs_a as $program) {
-        $program_price_rub = bsi_education_get_program_price_in_rub($program);
-        if (!empty($program_price_rub)) {
-          $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
-          if ($price_numeric > 0) {
-            $prices_a[] = $price_numeric;
-          }
+        $price_numeric = bsi_education_get_program_price_numeric_rub($program);
+        if ($price_numeric > 0) {
+          $prices_a[] = $price_numeric;
         }
       }
       if (!empty($prices_a)) {
@@ -160,12 +157,9 @@ if ($all_edu_for_sort->have_posts()) {
     if (!empty($education_programs_b)) {
       $prices_b = [];
       foreach ($education_programs_b as $program) {
-        $program_price_rub = bsi_education_get_program_price_in_rub($program);
-        if (!empty($program_price_rub)) {
-          $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
-          if ($price_numeric > 0) {
-            $prices_b[] = $price_numeric;
-          }
+        $price_numeric = bsi_education_get_program_price_numeric_rub($program);
+        if ($price_numeric > 0) {
+          $prices_b[] = $price_numeric;
         }
       }
       if (!empty($prices_b)) {

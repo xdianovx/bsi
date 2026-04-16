@@ -556,6 +556,37 @@ function bsi_education_get_program_price_in_rub(array $program): string
 }
 
 /**
+ * Получает числовую цену программы в рублях (для сортировки и сравнений)
+ *
+ * @param array $program Данные программы
+ * @return int Цена в рублях (целое число) или 0 если цена не найдена
+ */
+function bsi_education_get_program_price_numeric_rub(array $program): int
+{
+  // Пытаемся получить из новой системы (оригинальная валюта)
+  if (!empty($program['program_price_per_week_original']) && !empty($program['program_price_per_week_currency'])) {
+    $price_rub = bsi_education_convert_price_to_rub(
+      $program['program_price_per_week_original'],
+      $program['program_price_per_week_currency']
+    );
+    if ($price_rub && $price_rub > 0) {
+      return (int) $price_rub;
+    }
+  }
+
+  // Fallback на старое поле (извлекаем число)
+  if (!empty($program['program_price_per_week'])) {
+    $price_str = (string) $program['program_price_per_week'];
+    $price_numeric = (int) preg_replace('/[^\d]/', '', $price_str);
+    if ($price_numeric > 0) {
+      return $price_numeric;
+    }
+  }
+
+  return 0;
+}
+
+/**
  * Конвертирует цену из рублей в целевую валюту.
  * Используется для переключения валют на фронтенде.
  *
