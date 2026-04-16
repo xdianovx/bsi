@@ -127,42 +127,49 @@ if ($all_edu_for_sort->have_posts()) {
   $all_sorted_posts = $all_edu_for_sort->posts;
 
   usort($all_sorted_posts, function ($a, $b) {
-    if (!function_exists('bsi_education_convert_price_to_rub') || !function_exists('get_field')) {
+    if (!function_exists('get_field') || !function_exists('bsi_education_get_program_price_in_rub')) {
       return 0;
     }
 
-    // Пытаемся получить конвертированную цену из новой системы
-    $price_a_original = get_field('education_price_original', $a->ID);
-    $price_a_currency = get_field('education_price_currency', $a->ID);
+    // Получаем минимальную цену из программ для обеих школ
     $num_a = 0;
+    $education_programs_a = get_field('education_programs', $a->ID);
+    $education_programs_a = is_array($education_programs_a) ? $education_programs_a : [];
 
-    if ($price_a_original && $price_a_currency) {
-      $num_a = (int) bsi_education_convert_price_to_rub($price_a_original, $price_a_currency) ?: 0;
-    }
-
-    // Если новая система не дала результат, пытаемся старую
-    if ($num_a <= 0) {
-      $price_a_old = get_field('education_price', $a->ID);
-      if ($price_a_old) {
-        preg_match('/[\d\s]+/', (string) $price_a_old, $matches_a);
-        $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
+    if (!empty($education_programs_a)) {
+      $prices_a = [];
+      foreach ($education_programs_a as $program) {
+        $program_price_rub = bsi_education_get_program_price_in_rub($program);
+        if (!empty($program_price_rub)) {
+          $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
+          if ($price_numeric > 0) {
+            $prices_a[] = $price_numeric;
+          }
+        }
+      }
+      if (!empty($prices_a)) {
+        $num_a = min($prices_a);
       }
     }
 
     // То же для B
-    $price_b_original = get_field('education_price_original', $b->ID);
-    $price_b_currency = get_field('education_price_currency', $b->ID);
     $num_b = 0;
+    $education_programs_b = get_field('education_programs', $b->ID);
+    $education_programs_b = is_array($education_programs_b) ? $education_programs_b : [];
 
-    if ($price_b_original && $price_b_currency) {
-      $num_b = (int) bsi_education_convert_price_to_rub($price_b_original, $price_b_currency) ?: 0;
-    }
-
-    if ($num_b <= 0) {
-      $price_b_old = get_field('education_price', $b->ID);
-      if ($price_b_old) {
-        preg_match('/[\d\s]+/', (string) $price_b_old, $matches_b);
-        $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
+    if (!empty($education_programs_b)) {
+      $prices_b = [];
+      foreach ($education_programs_b as $program) {
+        $program_price_rub = bsi_education_get_program_price_in_rub($program);
+        if (!empty($program_price_rub)) {
+          $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
+          if ($price_numeric > 0) {
+            $prices_b[] = $price_numeric;
+          }
+        }
+      }
+      if (!empty($prices_b)) {
+        $num_b = min($prices_b);
       }
     }
 
