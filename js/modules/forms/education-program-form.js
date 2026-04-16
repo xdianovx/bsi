@@ -74,30 +74,6 @@ function updateTotalDisplay() {
     const total = calculateTotal();
     totalEl.textContent = formatPrice(total);
 
-    // Устанавливаем data-attributes для переключения валют
-    if (currentProgramData) {
-      totalEl.setAttribute('data-price-rub', total.toString());
-
-      if (currentProgramData.priceOriginal && currentProgramData.priceCurrency) {
-        const basePrice = parseFloat(currentProgramData.price) || 0;
-        const baseOriginal = parseFloat(currentProgramData.priceOriginal) || 0;
-
-        // Если есть базовая цена и оригинальная цена, рассчитываем курс
-        if (basePrice > 0 && baseOriginal > 0) {
-          const exchangeRate = basePrice / baseOriginal;
-          const servicesAndVisaAmount = total - basePrice;
-          const servicesAndVisaInOriginal = servicesAndVisaAmount / exchangeRate;
-          const totalOriginal = baseOriginal + servicesAndVisaInOriginal;
-
-          totalEl.setAttribute('data-price-original', totalOriginal.toString());
-        } else {
-          totalEl.setAttribute('data-price-original', currentProgramData.priceOriginal);
-        }
-
-        totalEl.setAttribute('data-price-currency', currentProgramData.priceCurrency);
-      }
-    }
-
     // Обновляем скрытое поле формы
     const totalInput = document.querySelector(".js-form-total-price");
     if (totalInput) {
@@ -537,8 +513,6 @@ export function initEducationProgramForm() {
       duration: btn.dataset.programDuration || "",
       accommodation: btn.dataset.programAccommodation || "",
       price: btn.dataset.programPrice || "0",
-      priceOriginal: btn.dataset.programPriceOriginal || "",
-      priceCurrency: btn.dataset.programPriceCurrency || "",
       visaRequired: btn.dataset.programVisaRequired === "1",
       visaPrice: btn.dataset.programVisaPrice || "0",
       services: [],
