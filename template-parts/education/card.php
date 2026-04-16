@@ -210,59 +210,71 @@ if (empty($checkin_dates_formatted) && $education_id && function_exists('get_fie
   }
 }
 
-if (empty($price) && $education_id && function_exists('get_field')) {
-  $price_val = get_field('education_price', $education_id);
+// Цена берется только из программ, не из полей школы
+$price_original = null;
+$price_currency = null;
 
-  if (is_string($price_val) && $price_val !== '') {
-    $price = (string) $price_val;
-  }
+if ($education_id && function_exists('get_field')) {
+  $education_programs = get_field('education_programs', $education_id);
+  $education_programs = is_array($education_programs) ? $education_programs : [];
 
-  if (empty($price)) {
-    $education_programs = get_field('education_programs', $education_id);
-    $education_programs = is_array($education_programs) ? $education_programs : [];
+  if (!empty($education_programs)) {
+    $prices_data = [];
 
-    if (!empty($education_programs)) {
-      $prices_rub = [];
-
-      // Используем новую систему конвертации для каждой программы
-      if (function_exists('bsi_education_get_program_price_in_rub')) {
-        foreach ($education_programs as $program) {
-          $program_price_rub = bsi_education_get_program_price_in_rub($program);
-          if (!empty($program_price_rub)) {
-            // Извлекаем числовое значение из отформатированной строки
-            $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
-            if ($price_numeric > 0) {
-              $prices_rub[] = $price_numeric;
-            }
-          }
-        }
-      } else {
-        // Fallback на старую логику если функция не существует
-        foreach ($education_programs as $program) {
-          $program_price = '';
-          if (isset($program['program_price_per_week'])) {
-            $program_price = (string) $program['program_price_per_week'];
-          } elseif (isset($program['price_per_week'])) {
-            $program_price = (string) $program['price_per_week'];
-          }
-          if ($program_price) {
-            preg_match('/[\d\s]+/', $program_price, $matches);
-            if (!empty($matches[0])) {
-              $prices_rub[] = (int) str_replace(' ', '', $matches[0]);
-            }
+    // Используем новую систему конвертации для каждой программы
+    if (function_exists('bsi_education_get_program_price_in_rub')) {
+      foreach ($education_programs as $program) {
+        $program_price_rub = bsi_education_get_program_price_in_rub($program);
+        if (!empty($program_price_rub)) {
+          // Извлекаем числовое значение из отформатированной строки
+          $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
+          if ($price_numeric > 0) {
+            $prices_data[] = [
+              'price_rub' => $price_numeric,
+              'original' => $program['program_price_per_week_original'] ?? null,
+              'currency' => $program['program_price_per_week_currency'] ?? null,
+            ];
           }
         }
       }
-
-      if (!empty($prices_rub)) {
-        $min_price_value = min($prices_rub);
-        $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+    } else {
+      // Fallback на старую логику если функция не существует
+      foreach ($education_programs as $program) {
+        $program_price = '';
+        if (isset($program['program_price_per_week'])) {
+          $program_price = (string) $program['program_price_per_week'];
+        } elseif (isset($program['price_per_week'])) {
+          $program_price = (string) $program['price_per_week'];
+        }
+        if ($program_price) {
+          preg_match('/[\d\s]+/', $program_price, $matches);
+          if (!empty($matches[0])) {
+            $prices_data[] = [
+              'price_rub' => (int) str_replace(' ', '', $matches[0]),
+              'original' => null,
+              'currency' => null,
+            ];
+          }
+        }
       }
     }
-  }
 
-  if (!empty($price)) {
-    $price = format_price_text($price);
+    if (!empty($prices_data)) {
+      // Находим программу с минимальной ценой в рублях
+      usort($prices_data, function ($a, $b) {
+        return $a['price_rub'] - $b['price_rub'];
+      });
+      $min_price_data = $prices_data[0];
+      $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽/неделя';
+
+      // Сохраняем информацию для передачи в data-attributes
+      $price_original = $min_price_data['original'];
+      $price_currency = $min_price_data['currency'];
+
+      if (!empty($price)) {
+        $price = format_price_text($price);
+      }
+    }
   }
 }
 
@@ -288,16 +300,19 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
 
 // Подготавливаем данные цены для переключения валют
 $price_data_attrs = [];
-$price_numeric = 0;
 
 if (!empty($price)) {
   // Извлекаем числовое значение из цены (например, "75 000 ₽/неделя" -> 75000)
   $price_numeric = (int) preg_replace('/[^\d]/', '', $price);
 
   if ($price_numeric > 0) {
-    // На карточке программы могут быть в разных валютах,
-    // поэтому передаем только цену в рублях для конвертации
     $price_data_attrs['price-rub'] = $price_numeric;
+
+    // Если есть информация об оригинальной цене (из минимальной программы)
+    if (!empty($price_original) && !empty($price_currency)) {
+      $price_data_attrs['price-original'] = (float) $price_original;
+      $price_data_attrs['price-currency'] = strtoupper((string) $price_currency);
+    }
   }
 }
 ?>
