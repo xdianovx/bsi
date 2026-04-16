@@ -287,6 +287,10 @@ foreach ($additional_services as $service) {
               data-program-duration="<?php echo esc_attr($duration_text); ?>"
               data-program-accommodation="<?php echo esc_attr($accommodation_text); ?>"
               data-program-price="<?php echo esc_attr($price_numeric); ?>"
+              <?php if (!empty($price_data_attrs['price-original'])): ?>
+              data-program-price-original="<?php echo esc_attr($price_data_attrs['price-original']); ?>"
+              data-program-price-currency="<?php echo esc_attr($price_data_attrs['price-currency']); ?>"
+              <?php endif; ?>
               data-program-visa-required="<?php echo $visa_required ? '1' : '0'; ?>"
               data-program-visa-price="<?php echo esc_attr($visa_price); ?>"
               data-program-services="<?php echo esc_attr(wp_json_encode($services_for_json)); ?>"

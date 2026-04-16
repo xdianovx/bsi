@@ -85,6 +85,11 @@ export const EducationCurrencySwitcher = (() => {
     document.querySelectorAll('.education-program-card__price').forEach(el => {
       updateElementPrice(el, showOriginal);
     });
+
+    // Update modal total price
+    document.querySelectorAll('.js-modal-total').forEach(el => {
+      updateElementPrice(el, showOriginal);
+    });
   };
 
   /**
