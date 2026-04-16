@@ -42,17 +42,15 @@ $country_ids = [];
 
 if (!empty($all_tours) && function_exists('get_field')) {
   foreach ($all_tours as $tour_id) {
-    $c = get_field('tour_country', $tour_id);
-    if ($c instanceof WP_Post) {
-      $c = (int) $c->ID;
-    } elseif (is_array($c)) {
-      $c = (int) reset($c);
-    } else {
-      $c = (int) $c;
-    }
+    $ids = function_exists('bsi_get_tour_country_ids')
+      ? bsi_get_tour_country_ids((int) $tour_id)
+      : [];
 
-    if ($c > 0) {
-      $country_ids[] = $c;
+    foreach ($ids as $country_id) {
+      $country_id = (int) $country_id;
+      if ($country_id > 0) {
+        $country_ids[] = $country_id;
+      }
     }
   }
 }
@@ -97,13 +95,14 @@ if ($all_tours_for_sort->have_posts()) {
   $all_sorted_posts = $all_tours_for_sort->posts;
 
   usort($all_sorted_posts, function ($a, $b) {
-    $price_a = function_exists('get_field') ? get_field('price_from', $a->ID) : '';
-    $price_b = function_exists('get_field') ? get_field('price_from', $b->ID) : '';
-    preg_match('/[\d\s]+/', (string) $price_a, $matches_a);
-    preg_match('/[\d\s]+/', (string) $price_b, $matches_b);
-    $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
-    $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
-    return $num_a <=> $num_b;
+    $price_a = function_exists('bsi_get_tour_sort_price') ? bsi_get_tour_sort_price((int) $a->ID) : null;
+    $price_b = function_exists('bsi_get_tour_sort_price') ? bsi_get_tour_sort_price((int) $b->ID) : null;
+
+    if (function_exists('bsi_compare_price_values')) {
+      return bsi_compare_price_values($price_a, $price_b, 'price_asc');
+    }
+
+    return ((int) $price_a) <=> ((int) $price_b);
   });
 
   $total_initial = count($all_sorted_posts);

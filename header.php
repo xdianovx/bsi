@@ -30,9 +30,6 @@
 
 
 
-
-
-
   <?php wp_head(); ?>
 
   <!-- Yandex.Metrika counter -->

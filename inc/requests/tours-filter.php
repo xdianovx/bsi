@@ -64,11 +64,12 @@ function bsi_ajax_tours_filter()
 
   // Фильтр по стране
   if ($country_id) {
-    $meta_query[] = [
-      'key' => 'tour_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ];
+    $country_meta_query = function_exists('bsi_build_tour_country_meta_query')
+      ? bsi_build_tour_country_meta_query((int) $country_id)
+      : [];
+    if (!empty($country_meta_query)) {
+      $meta_query[] = $country_meta_query;
+    }
   }
 
   // Базовый запрос - получаем все туры для сортировки и фильтрации
@@ -107,20 +108,15 @@ function bsi_ajax_tours_filter()
         $price_from = get_field('price_from', $post_id);
       }
 
-      // Извлекаем число из цены для сравнения
-      $price_num = 0;
-      if ($price_from) {
-        preg_match('/[\d\s]+/', (string) $price_from, $matches);
-        if (!empty($matches[0])) {
-          $price_num = (int) str_replace(' ', '', $matches[0]);
-        }
-      }
+      $price_num = function_exists('bsi_get_tour_sort_price')
+        ? bsi_get_tour_sort_price($post_id)
+        : null;
 
       // Проверяем диапазон цены
-      if ($price_min > 0 && $price_num < $price_min) {
+      if ($price_min > 0 && ($price_num === null || $price_num < $price_min)) {
         continue;
       }
-      if ($price_max > 0 && $price_num > $price_max) {
+      if ($price_max > 0 && ($price_num === null || $price_num > $price_max)) {
         continue;
       }
 
@@ -191,9 +187,13 @@ function bsi_ajax_tours_filter()
   usort($filtered_posts, function ($a, $b) use ($sort) {
     switch ($sort) {
       case 'price_asc':
-        return $a['price_num'] <=> $b['price_num'];
+        return function_exists('bsi_compare_price_values')
+          ? bsi_compare_price_values($a['price_num'], $b['price_num'], 'price_asc')
+          : ((int) $a['price_num'] <=> (int) $b['price_num']);
       case 'price_desc':
-        return $b['price_num'] <=> $a['price_num'];
+        return function_exists('bsi_compare_price_values')
+          ? bsi_compare_price_values($a['price_num'], $b['price_num'], 'price_desc')
+          : ((int) $b['price_num'] <=> (int) $a['price_num']);
       case 'title_desc':
         return strcmp($b['title'], $a['title']);
       case 'title_asc':
@@ -372,6 +372,10 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
   }
 
   $regions = get_terms($region_args);
+  if ($country_id && (is_wp_error($regions) || empty($regions))) {
+    unset($region_args['meta_query']);
+    $regions = get_terms($region_args);
+  }
   if (!is_wp_error($regions) && !empty($regions)) {
     foreach ($regions as $region) {
       // Считаем кол-во туров с этим регионом + другие фильтры
@@ -409,11 +413,12 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
         ];
       }
       if ($country_id) {
-        $additional_meta_query[] = [
-          'key' => 'tour_country',
-          'value' => $country_id,
-          'compare' => '=',
-        ];
+        $country_meta_query = function_exists('bsi_build_tour_country_meta_query')
+          ? bsi_build_tour_country_meta_query((int) $country_id)
+          : [];
+        if (!empty($country_meta_query)) {
+          $additional_meta_query[] = $country_meta_query;
+        }
       }
 
       if (!empty($additional_tax_query)) {
@@ -488,6 +493,10 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
   }
 
   $resorts = get_terms($resort_args);
+  if (($region_id || $country_id) && (is_wp_error($resorts) || empty($resorts))) {
+    unset($resort_args['meta_query']);
+    $resorts = get_terms($resort_args);
+  }
   if (!is_wp_error($resorts) && !empty($resorts)) {
     foreach ($resorts as $resort) {
       // Считаем кол-во туров с этим курортом + другие фильтры
@@ -525,11 +534,12 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
         ];
       }
       if ($country_id) {
-        $additional_meta_query[] = [
-          'key' => 'tour_country',
-          'value' => $country_id,
-          'compare' => '=',
-        ];
+        $country_meta_query = function_exists('bsi_build_tour_country_meta_query')
+          ? bsi_build_tour_country_meta_query((int) $country_id)
+          : [];
+        if (!empty($country_meta_query)) {
+          $additional_meta_query[] = $country_meta_query;
+        }
       }
 
       if (!empty($additional_tax_query)) {
@@ -583,11 +593,12 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
     ];
   }
   if ($country_id) {
-    $local_meta_query[] = [
-      'key' => 'tour_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ];
+    $country_meta_query = function_exists('bsi_build_tour_country_meta_query')
+      ? bsi_build_tour_country_meta_query((int) $country_id)
+      : [];
+    if (!empty($country_meta_query)) {
+      $local_meta_query[] = $country_meta_query;
+    }
   }
 
   $type_query_args = [
@@ -652,11 +663,12 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
         ];
       }
       if ($country_id) {
-        $additional_meta_query[] = [
-          'key' => 'tour_country',
-          'value' => $country_id,
-          'compare' => '=',
-        ];
+        $country_meta_query = function_exists('bsi_build_tour_country_meta_query')
+          ? bsi_build_tour_country_meta_query((int) $country_id)
+          : [];
+        if (!empty($country_meta_query)) {
+          $additional_meta_query[] = $country_meta_query;
+        }
       }
 
       if (!empty($additional_tax_query)) {

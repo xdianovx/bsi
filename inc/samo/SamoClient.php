@@ -41,8 +41,13 @@ class SamoClient
     ], $params);
 
     $query = array_filter($query, static fn($v) => $v !== null && $v !== '');
+    $normalizedQuery = $this->normalizeForCache($query);
 
-    $cacheKey = 'samo_' . md5($action . '_' . serialize($query));
+    $cache_payload = json_encode($normalizedQuery);
+    if ($cache_payload === false) {
+      $cache_payload = serialize($normalizedQuery);
+    }
+    $cacheKey = 'samo_' . md5($action . '_' . $cache_payload);
 
     $cacheExpiration = $this->getCacheExpiration($action);
 
@@ -126,19 +131,32 @@ class SamoClient
 
   private function getCacheExpiration(string $action): int
   {
-    if (strpos($action, 'PRICES') !== false) {
+    if (stripos($action, 'PRICES') !== false) {
       return 30 * MINUTE_IN_SECONDS;
     }
 
-    if (strpos($action, 'NIGHTS') !== false) {
+    if (stripos($action, 'NIGHTS') !== false) {
       return HOUR_IN_SECONDS;
     }
 
-    if (strpos($action, 'HOTELS') !== false) {
+    if (stripos($action, 'HOTELS') !== false) {
       return HOUR_IN_SECONDS;
     }
 
     return HOUR_IN_SECONDS;
+  }
+
+  private function normalizeForCache(array $query): array
+  {
+    ksort($query);
+
+    foreach ($query as $key => $value) {
+      if (is_array($value)) {
+        $query[$key] = $this->normalizeForCache($value);
+      }
+    }
+
+    return $query;
   }
 
   private function parseXmlResponse(string $xml): ?array

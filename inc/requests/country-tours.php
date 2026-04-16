@@ -83,20 +83,10 @@ function country_tours_filter()
       $q->the_post();
       $post_id = (int) get_the_ID();
 
-      // Получаем цену
-      $price_from = '';
-      if (function_exists('get_field')) {
-        $price_from = get_field('price_from', $post_id);
-      }
-
-      // Извлекаем число из цены для сравнения
-      $price_num = 0;
-      if ($price_from) {
-        preg_match('/[\d\s]+/', (string) $price_from, $matches);
-        if (!empty($matches[0])) {
-          $price_num = (int) str_replace(' ', '', $matches[0]);
-        }
-      }
+      $price_from = function_exists('get_field') ? get_field('price_from', $post_id) : '';
+      $price_num = function_exists('bsi_get_tour_sort_price')
+        ? bsi_get_tour_sort_price($post_id)
+        : null;
 
       // Проверяем диапазон дат (если фильтр активен)
       $dates_match = true;
@@ -152,9 +142,13 @@ function country_tours_filter()
   usort($filtered_posts, function ($a, $b) use ($sort) {
     switch ($sort) {
       case 'price_asc':
-        return $a['price_num'] <=> $b['price_num'];
+        return function_exists('bsi_compare_price_values')
+          ? bsi_compare_price_values($a['price_num'], $b['price_num'], 'price_asc')
+          : ((int) $a['price_num'] <=> (int) $b['price_num']);
       case 'price_desc':
-        return $b['price_num'] <=> $a['price_num'];
+        return function_exists('bsi_compare_price_values')
+          ? bsi_compare_price_values($a['price_num'], $b['price_num'], 'price_desc')
+          : ((int) $b['price_num'] <=> (int) $a['price_num']);
       case 'title_desc':
         return strcmp($b['title'], $a['title']);
       case 'title_asc':

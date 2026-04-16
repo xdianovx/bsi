@@ -88,6 +88,9 @@ export const initToursFilter = () => {
   const updateUrl = () => {
     const params = new URLSearchParams();
 
+    if (countrySelect?.value) {
+      params.set("country", countrySelect.value);
+    }
     if (regionSelect?.value) {
       params.set("region", regionSelect.value);
     }
@@ -697,6 +700,12 @@ export const initToursFilter = () => {
   const applyFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
 
+    if (params.get('country') && countrySelect) {
+      countrySelect.value = params.get('country');
+      if (countryChoice) {
+        countryChoice.setChoiceByValue(params.get('country'));
+      }
+    }
     if (params.get('region') && regionSelect) {
       regionSelect.value = params.get('region');
       if (regionChoice) {

@@ -260,6 +260,109 @@ function format_price_with_from(?string $price, bool $show_from = true): string
   return 'от ' . $price;
 }
 
+/**
+ * Извлекает числовое значение цены из строки.
+ * Возвращает null, если цена не распознана.
+ */
+function bsi_extract_price_number(?string $raw_price): ?int
+{
+  $raw_price = trim((string) $raw_price);
+  if ($raw_price === '') {
+    return null;
+  }
+
+  if (preg_match('/([\d\s.,]+)/u', $raw_price, $matches) !== 1) {
+    return null;
+  }
+
+  $value = preg_replace('/[^\d.,]/u', '', (string) $matches[1]);
+  if ($value === '') {
+    return null;
+  }
+
+  $last_comma_pos = strrpos($value, ',');
+  $last_dot_pos = strrpos($value, '.');
+  $decimal_pos = false;
+
+  if ($last_comma_pos !== false || $last_dot_pos !== false) {
+    if ($last_comma_pos === false) {
+      $decimal_pos = $last_dot_pos;
+    } elseif ($last_dot_pos === false) {
+      $decimal_pos = $last_comma_pos;
+    } else {
+      $decimal_pos = max($last_comma_pos, $last_dot_pos);
+    }
+  }
+
+  if ($decimal_pos !== false) {
+    $decimals_len = strlen($value) - $decimal_pos - 1;
+    if ($decimals_len >= 1 && $decimals_len <= 2) {
+      $value = substr($value, 0, $decimal_pos);
+    }
+  }
+
+  $digits = preg_replace('/\D/u', '', $value);
+  if ($digits === '') {
+    return null;
+  }
+
+  $number = (int) $digits;
+  return $number > 0 ? $number : null;
+}
+
+/**
+ * Каноническая цена тура для сортировки:
+ * 1) кешированная SAMO-цена,
+ * 2) fallback на ACF price_from.
+ */
+function bsi_get_tour_sort_price(int $tour_id): ?int
+{
+  if ($tour_id <= 0) {
+    return null;
+  }
+
+  if (class_exists('PriceLoaderService') && method_exists('PriceLoaderService', 'getCachedTourPrice')) {
+    $cached_price = PriceLoaderService::getCachedTourPrice($tour_id);
+    if (is_array($cached_price) && isset($cached_price['price'])) {
+      $price = (int) round((float) $cached_price['price']);
+      if ($price > 0) {
+        return $price;
+      }
+    }
+  }
+
+  if (function_exists('get_field')) {
+    return bsi_extract_price_number((string) get_field('price_from', $tour_id));
+  }
+
+  return null;
+}
+
+/**
+ * Сравнение двух цен для сортировки с отправкой null в конец.
+ */
+function bsi_compare_price_values(?int $price_a, ?int $price_b, string $sort): int
+{
+  $a_missing = $price_a === null || $price_a <= 0;
+  $b_missing = $price_b === null || $price_b <= 0;
+
+  if ($a_missing && $b_missing) {
+    return 0;
+  }
+  if ($a_missing) {
+    return 1;
+  }
+  if ($b_missing) {
+    return -1;
+  }
+
+  if ($sort === 'price_desc') {
+    return $price_b <=> $price_a;
+  }
+
+  return $price_a <=> $price_b;
+}
+
 function offer_get_country_flag_url($country_id): string
 {
   if (!$country_id)

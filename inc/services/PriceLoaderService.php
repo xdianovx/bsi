@@ -75,7 +75,10 @@ class PriceLoaderService
         $show_from = $show_from_field !== false;
         
         if (!empty($static_price)) {
-          $price_numeric = preg_replace('/[^\d]/', '', $static_price);
+          $price_numeric = function_exists('bsi_extract_price_number')
+            ? bsi_extract_price_number((string) $static_price)
+            : (int) preg_replace('/[^\d]/', '', (string) $static_price);
+
           if (!empty($price_numeric)) {
             return [
               'price' => (float) $price_numeric,
