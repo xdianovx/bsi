@@ -144,6 +144,26 @@ function bsi_scripts()
 		'url' => admin_url('admin-ajax.php'),
 		'recaptchaSiteKey' => $recaptcha_site_key,
 	));
+
+	// Передаем курсы обмена валют для переключателя на фронтенде
+	if (function_exists('bsi_currency_history_get_latest_snapshot')) {
+		$snapshot = bsi_currency_history_get_latest_snapshot();
+		if ($snapshot && !empty($snapshot['rates'])) {
+			$exchange_rates = array();
+			foreach (array('RUB', 'USD', 'EUR', 'GBP') as $currency) {
+				if (!empty($snapshot['rates'][$currency])) {
+					$rate_data = $snapshot['rates'][$currency];
+					if (is_array($rate_data) && isset($rate_data['value']) && isset($rate_data['nominal'])) {
+						// Сохраняем формулу: rate_value / nominal
+						$exchange_rates[$currency] = $rate_data['value'] / $rate_data['nominal'];
+					}
+				}
+			}
+			if (!empty($exchange_rates)) {
+				wp_localize_script('main', 'bsiEducationExchangeRates', $exchange_rates);
+			}
+		}
+	}
 	if ($recaptcha_site_key !== '') {
 		wp_enqueue_script(
 			'google-recaptcha',

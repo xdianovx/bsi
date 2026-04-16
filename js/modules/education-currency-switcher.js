@@ -11,9 +11,9 @@ export const EducationCurrencySwitcher = (() => {
     EUR: '€',
     GBP: '£',
   };
-  const EXCHANGE_RATES_ENDPOINT = '/wp-json/bsi/v1/exchange-rates';
 
-  let exchangeRates = {
+  // Получаем курсы из глобальной переменной или используем дефолтные
+  let exchangeRates = window.bsiEducationExchangeRates || {
     RUB: 1,
     USD: 100,
     EUR: 110,
@@ -111,9 +111,6 @@ export const EducationCurrencySwitcher = (() => {
    * Initialize currency switcher
    */
   const init = () => {
-    // Load exchange rates if available
-    loadExchangeRates();
-
     // Restore saved currency preference
     const savedCurrency = localStorage.getItem(STORAGE_KEY) || 'RUB';
 
@@ -137,22 +134,6 @@ export const EducationCurrencySwitcher = (() => {
     if (savedCurrency !== 'RUB') {
       updateAllPrices(savedCurrency);
     }
-  };
-
-  /**
-   * Load exchange rates from server
-   */
-  const loadExchangeRates = () => {
-    if (typeof fetch === 'undefined') return;
-
-    fetch(EXCHANGE_RATES_ENDPOINT)
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.rates) {
-          exchangeRates = data.rates;
-        }
-      })
-      .catch(err => console.warn('Failed to load exchange rates:', err));
   };
 
   return {
