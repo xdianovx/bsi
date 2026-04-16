@@ -390,12 +390,14 @@ if ($all_edu_for_sort->have_posts()) {
                  value="">
         </div>
 
-        <div class="education-filter__field">
-          <label class="education-filter__checkbox-label">
+        <div class="education-filter__field education-filter__field--checkbox">
+          <label class="ui-checkbox">
             <input type="checkbox"
-                   class="education-filter__checkbox js-education-show-original-currency"
-                   name="show_original_currency">
-            <span>Показать стоимость в валюте</span>
+                   class="ui-checkbox__input js-education-show-original-currency"
+                   name="show_original_currency"
+                   value="1">
+            <span class="ui-checkbox__mark"></span>
+            <span class="ui-checkbox__text">Показать стоимость в валюте</span>
           </label>
         </div>
 

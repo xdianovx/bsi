@@ -446,12 +446,14 @@ get_header();
                     name="program_date" placeholder="Выберите даты" readonly>
                 </div>
 
-                <div class="education-programs-filter__field">
-                  <label class="education-programs-filter__checkbox-label">
+                <div class="education-programs-filter__field education-programs-filter__field--checkbox">
+                  <label class="ui-checkbox">
                     <input type="checkbox"
-                           class="education-programs-filter__checkbox js-education-show-original-currency"
-                           name="show_original_currency">
-                    <span>Показать в валюте</span>
+                           class="ui-checkbox__input js-education-show-original-currency"
+                           name="show_original_currency"
+                           value="1">
+                    <span class="ui-checkbox__mark"></span>
+                    <span class="ui-checkbox__text">Показать в валюте</span>
                   </label>
                 </div>
               </div>
