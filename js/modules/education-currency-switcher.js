@@ -56,12 +56,19 @@ export const EducationCurrencySwitcher = (() => {
       displayCurrency = 'RUB';
     }
 
-    // Update the element's text content while preserving the "от" prefix if it exists
+    // Extract prefix ("от ") and suffix (duration "/ 1-5 недель") from current text
     const currentText = element.textContent.trim();
     const hasFrom = currentText.startsWith('от ');
     const prefix = hasFrom ? 'от ' : '';
 
-    element.textContent = prefix + formatPrice(displayPrice, displayCurrency);
+    // Extract duration suffix (everything after " / ")
+    let suffix = '';
+    const durationMatch = currentText.match(/\s*\/\s*.+$/);
+    if (durationMatch) {
+      suffix = durationMatch[0];  // " / 1-5 недель"
+    }
+
+    element.textContent = prefix + formatPrice(displayPrice, displayCurrency) + suffix;
   };
 
   /**
