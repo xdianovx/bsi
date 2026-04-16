@@ -397,10 +397,6 @@ if (!empty($price)) {
            class="btn btn-accent education-card__btn education-card__btn-book"
            <?php if (!empty($price_data_attrs['price-rub'])): ?>
            data-price-rub="<?php echo esc_attr($price_data_attrs['price-rub']); ?>"
-           <?php endif; ?>
-           <?php if (!empty($price_data_attrs['price-original'])): ?>
-           data-price-original="<?php echo esc_attr($price_data_attrs['price-original']); ?>"
-           data-price-currency="<?php echo esc_attr($price_data_attrs['price-currency']); ?>"
            <?php endif; ?>>
           <?php echo esc_html(($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price)); ?>
         </a>
