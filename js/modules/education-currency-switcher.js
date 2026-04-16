@@ -1,23 +1,15 @@
 /**
  * Education Currency Switcher
- * Handles currency selection and conversion for education program prices
+ * Toggles display between RUB (converted) and original currency prices
  */
 
 export const EducationCurrencySwitcher = (() => {
-  const STORAGE_KEY = 'bsi_education_currency';
+  const STORAGE_KEY = 'bsi_education_show_original_currency';
   const CURRENCY_SYMBOLS = {
     RUB: '₽',
     USD: '$',
     EUR: '€',
     GBP: '£',
-  };
-
-  // Получаем курсы из глобальной переменной или используем дефолтные
-  let exchangeRates = window.bsiEducationExchangeRates || {
-    RUB: 1,
-    USD: 100,
-    EUR: 110,
-    GBP: 130,
   };
 
   /**
@@ -40,47 +32,28 @@ export const EducationCurrencySwitcher = (() => {
   };
 
   /**
-   * Convert price from RUB to target currency
-   * @param {number} priceRub - Price in RUB
-   * @param {string} targetCurrency - Target currency
-   * @returns {number|null} Converted price or null
-   */
-  const convertPrice = (priceRub, targetCurrency) => {
-    if (targetCurrency === 'RUB' || !exchangeRates[targetCurrency]) {
-      return priceRub;
-    }
-    return Math.round((priceRub / exchangeRates[targetCurrency]) * 100) / 100;
-  };
-
-  /**
    * Update price display for elements with data attributes
    * @param {HTMLElement} element - Element with price data attributes
-   * @param {string} currency - Target currency
+   * @param {boolean} showOriginal - Whether to show original currency price
    */
-  const updateElementPrice = (element, currency) => {
+  const updateElementPrice = (element, showOriginal) => {
     const priceRub = element.dataset.priceRub;
+    const priceOriginal = element.dataset.priceOriginal;
+    const priceCurrency = element.dataset.priceCurrency;
 
     if (!priceRub) return;
 
     // Determine which price to show
     let displayPrice, displayCurrency;
 
-    if (currency === 'RUB') {
+    if (showOriginal && priceOriginal && priceCurrency) {
+      // Show original price in original currency
+      displayPrice = parseFloat(priceOriginal);
+      displayCurrency = priceCurrency;
+    } else {
+      // Show converted price in RUB
       displayPrice = parseInt(priceRub);
       displayCurrency = 'RUB';
-    } else {
-      // If original currency data exists and matches the requested currency
-      const priceOriginal = element.dataset.priceOriginal;
-      const priceCurrency = element.dataset.priceCurrency;
-
-      if (priceOriginal && priceCurrency === currency) {
-        displayPrice = parseFloat(priceOriginal);
-        displayCurrency = currency;
-      } else {
-        // Convert from RUB to target currency
-        displayPrice = convertPrice(parseInt(priceRub), currency);
-        displayCurrency = currency;
-      }
     }
 
     // Update the element's text content while preserving the "от" prefix if it exists
@@ -93,17 +66,17 @@ export const EducationCurrencySwitcher = (() => {
 
   /**
    * Update all prices on the page
-   * @param {string} currency - Target currency
+   * @param {boolean} showOriginal - Whether to show original currency prices
    */
-  const updateAllPrices = (currency) => {
+  const updateAllPrices = (showOriginal) => {
     // Update price buttons in catalog cards
     document.querySelectorAll('.education-card__btn-book').forEach(el => {
-      updateElementPrice(el, currency);
+      updateElementPrice(el, showOriginal);
     });
 
     // Update prices in program cards
     document.querySelectorAll('.education-program-card__price').forEach(el => {
-      updateElementPrice(el, currency);
+      updateElementPrice(el, showOriginal);
     });
   };
 
@@ -111,35 +84,34 @@ export const EducationCurrencySwitcher = (() => {
    * Initialize currency switcher
    */
   const init = () => {
-    // Restore saved currency preference
-    const savedCurrency = localStorage.getItem(STORAGE_KEY) || 'RUB';
+    // Restore saved preference
+    const savedPreference = localStorage.getItem(STORAGE_KEY) === 'true';
 
-    // Set select elements to saved value and listen for changes
-    document.querySelectorAll('.js-education-currency-select').forEach(select => {
-      select.value = savedCurrency;
+    // Set checkbox elements to saved value and listen for changes
+    document.querySelectorAll('.js-education-show-original-currency').forEach(checkbox => {
+      checkbox.checked = savedPreference;
 
-      select.addEventListener('change', (e) => {
-        const selectedCurrency = e.target.value;
-        localStorage.setItem(STORAGE_KEY, selectedCurrency);
-        updateAllPrices(selectedCurrency);
+      checkbox.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        localStorage.setItem(STORAGE_KEY, isChecked.toString());
+        updateAllPrices(isChecked);
 
-        // Update all select elements to maintain consistency
-        document.querySelectorAll('.js-education-currency-select').forEach(s => {
-          s.value = selectedCurrency;
+        // Update all checkboxes to maintain consistency
+        document.querySelectorAll('.js-education-show-original-currency').forEach(cb => {
+          cb.checked = isChecked;
         });
       });
     });
 
-    // Apply saved currency to all prices on load
-    if (savedCurrency !== 'RUB') {
-      updateAllPrices(savedCurrency);
+    // Apply saved preference to all prices on load
+    if (savedPreference) {
+      updateAllPrices(true);
     }
   };
 
   return {
     init,
     updateAllPrices,
-    convertPrice,
     formatPrice,
   };
 })();
