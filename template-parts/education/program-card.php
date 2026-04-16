@@ -19,7 +19,16 @@ if (empty($school_name) && isset($args['school_name'])) {
 }
 
 $program_title = $program['program_title'] ?? '';
-$price_per_week = $program['program_price_per_week'] ?? '';
+
+// Получаем цену через новую систему конвертации или fallback
+$price_per_week = '';
+if (function_exists('bsi_education_get_program_price_in_rub')) {
+  $price_per_week = bsi_education_get_program_price_in_rub($program);
+} else {
+  // Fallback на старое поле
+  $price_per_week = $program['program_price_per_week'] ?? '';
+}
+
 $age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
 $age_max = isset($program['program_age_max']) && $program['program_age_max'] !== '' ? (int) $program['program_age_max'] : 0;
 $duration = isset($program['program_duration']) ? (int) $program['program_duration'] : 0;
@@ -143,10 +152,9 @@ $accommodation_text = implode(', ', $accommodation_parts);
 $price_formatted = '';
 $price_numeric = 0;
 if (!empty($price_per_week)) {
-  // Сначала форматируем числа в тексте цены
-  $price_formatted = format_price_text($price_per_week);
-  // Затем применяем форматирование с "от"
-  $price_formatted = format_price_with_from($price_formatted, true);
+  // Цена уже отформатирована функцией bsi_education_get_program_price_in_rub,
+  // но применим дополнительное форматирование для "от" если нужно
+  $price_formatted = format_price_with_from($price_per_week, true);
   // Извлекаем числовое значение цены для передачи в модалку
   $price_numeric = (int) preg_replace('/[^\d]/', '', $price_per_week);
 }

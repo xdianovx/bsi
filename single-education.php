@@ -165,7 +165,12 @@ $education_course_duration = trim((string) (function_exists('get_field') ? get_f
 $address = trim((string) (function_exists('get_field') ? get_field('education_address', $post_id) : ''));
 $phone = trim((string) (function_exists('get_field') ? get_field('education_phone', $post_id) : ''));
 $website = trim((string) (function_exists('get_field') ? get_field('education_website', $post_id) : ''));
-$price = trim((string) (function_exists('get_field') ? get_field('education_price', $post_id) : ''));
+
+// Получаем цену через новую систему конвертации или fallback
+$price = '';
+if (function_exists('bsi_education_get_price_in_rub')) {
+  $price = bsi_education_get_price_in_rub($post_id, false);
+}
 
 $map_coords = function_exists('get_field') ? bsi_parse_map_coordinates(get_field('education_map_coordinates', $post_id)) : null;
 if ($map_coords) {

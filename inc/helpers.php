@@ -434,3 +434,123 @@ function get_tour_excursion_params(int $tour_id): array
 
   return parse_excursion_url((string) $booking_url);
 }
+
+/**
+ * Конвертирует цену из любой валюты в рубли, используя курсы ЦБР и наценку.
+ *
+ * @param float|int|null $amount Сумма в исходной валюте
+ * @param string $currency Код валюты (USD, EUR, GBP, RUB и т.д.)
+ * @return int|null Цена в рублях (целое число) или null если конвертация невозможна
+ */
+function bsi_education_convert_price_to_rub($amount, $currency)
+{
+  if (!$amount || $amount <= 0) {
+    return null;
+  }
+
+  $currency = strtoupper(trim((string) $currency));
+  if (empty($currency)) {
+    return null;
+  }
+
+  // Если уже в рублях, просто вернуть целое число
+  if ($currency === 'RUB') {
+    return (int) round((float) $amount);
+  }
+
+  // Получить последний снимок курсов (уже с наценкой)
+  if (!function_exists('bsi_currency_history_get_latest_snapshot')) {
+    return null;
+  }
+
+  $snapshot = bsi_currency_history_get_latest_snapshot();
+  if (!$snapshot || empty($snapshot['rates'][$currency])) {
+    return null;
+  }
+
+  $rate_data = $snapshot['rates'][$currency];
+  if (!is_array($rate_data) || !isset($rate_data['value']) || !isset($rate_data['nominal'])) {
+    return null;
+  }
+
+  // Формула: цена_в_рублях = сумма * (курс_значение / номинал)
+  $rate_value = floatval($rate_data['value']);
+  $rate_nominal = (int) $rate_data['nominal'];
+
+  if ($rate_nominal <= 0 || $rate_value <= 0) {
+    return null;
+  }
+
+  $converted = ((float) $amount) * ($rate_value / $rate_nominal);
+  return (int) round($converted);
+}
+
+/**
+ * Получает и форматирует цену образовательной программы.
+ * Сначала пытается использовать новую систему (исходная цена + валюта),
+ * затем fallback на старое поле.
+ *
+ * @param int $post_id ID поста
+ * @param bool $show_from Добавлять ли "от" в начало
+ * @return string Отформатированная цена с символом рубля (например: "от 75 000 ₽")
+ */
+function bsi_education_get_price_in_rub(int $post_id, bool $show_from = true): string
+{
+  if ($post_id <= 0 || !function_exists('get_field')) {
+    return '';
+  }
+
+  // Пытаемся получить цену из новой системы
+  $price_original = get_field('education_price_original', $post_id);
+  $price_currency = get_field('education_price_currency', $post_id);
+
+  if ($price_original && $price_currency) {
+    $price_rub = bsi_education_convert_price_to_rub($price_original, $price_currency);
+    if ($price_rub && $price_rub > 0) {
+      $formatted = number_format($price_rub, 0, ',', ' ') . ' ₽';
+      return $show_from ? 'от ' . $formatted : $formatted;
+    }
+  }
+
+  // Fallback на старое поле
+  $old_price = get_field('education_price', $post_id);
+  if ($old_price) {
+    return format_price_with_from((string) $old_price, $show_from);
+  }
+
+  return '';
+}
+
+/**
+ * Конвертирует цену программы в рубли (для программ с новой системой).
+ * Используется в repeater education_programs.
+ *
+ * @param array $program Массив программы из repeater
+ * @return string Отформатированная цена (например: "50 000 ₽") или пустая строка
+ */
+function bsi_education_get_program_price_in_rub(array $program): string
+{
+  if (empty($program['program_price_per_week_original']) || empty($program['program_price_per_week_currency'])) {
+    // Fallback на старое поле
+    if (!empty($program['program_price_per_week'])) {
+      return format_price_text((string) $program['program_price_per_week']);
+    }
+    return '';
+  }
+
+  $price_rub = bsi_education_convert_price_to_rub(
+    $program['program_price_per_week_original'],
+    $program['program_price_per_week_currency']
+  );
+
+  if ($price_rub && $price_rub > 0) {
+    return number_format($price_rub, 0, ',', ' ') . ' ₽';
+  }
+
+  // Fallback на старое поле
+  if (!empty($program['program_price_per_week'])) {
+    return format_price_text((string) $program['program_price_per_week']);
+  }
+
+  return '';
+}
