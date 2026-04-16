@@ -530,28 +530,11 @@ function bsi_education_get_price_in_rub(int $post_id, bool $show_from = true): s
  */
 function bsi_education_get_program_price_in_rub(array $program): string
 {
-  if (empty($program['program_price_per_week_original']) || empty($program['program_price_per_week_currency'])) {
-    // Fallback на старое поле
-    if (!empty($program['program_price_per_week'])) {
-      return format_price_text((string) $program['program_price_per_week']);
-    }
-    return '';
+  // Используем ту же логику что и numeric версия для консистентности
+  $price_numeric = bsi_education_get_program_price_numeric_rub($program);
+  if ($price_numeric > 0) {
+    return number_format($price_numeric, 0, ',', ' ') . ' ₽';
   }
-
-  $price_rub = bsi_education_convert_price_to_rub(
-    $program['program_price_per_week_original'],
-    $program['program_price_per_week_currency']
-  );
-
-  if ($price_rub && $price_rub > 0) {
-    return number_format($price_rub, 0, ',', ' ') . ' ₽';
-  }
-
-  // Fallback на старое поле
-  if (!empty($program['program_price_per_week'])) {
-    return format_price_text((string) $program['program_price_per_week']);
-  }
-
   return '';
 }
 
