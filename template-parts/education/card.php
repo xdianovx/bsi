@@ -269,6 +269,37 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
     $booking_url = trim((string) $booking_url_val);
   }
 }
+
+// Подготавливаем данные цены для переключения валют
+$price_data_attrs = [];
+$price_numeric = 0;
+
+if (!empty($price) && $education_id && function_exists('bsi_education_get_price_in_rub')) {
+  // Получаем цену в рублях
+  $price_rub = bsi_education_get_price_in_rub($education_id, false);
+
+  if (!empty($price_rub)) {
+    // Извлекаем числовое значение из строки цены (например, "75 000 ₽/неделя" -> 75000)
+    $price_numeric = (int) preg_replace('/[^\d]/', '', $price_rub);
+
+    if ($price_numeric > 0) {
+      $price_data_attrs['price-rub'] = $price_numeric;
+
+      // Получаем оригинальную цену и валюту если есть
+      if (function_exists('bsi_education_get_price_with_currency')) {
+        if (!empty(get_field('education_price_original', $education_id)) && !empty(get_field('education_price_currency', $education_id))) {
+          $price_original = (float) get_field('education_price_original', $education_id);
+          $price_currency = strtoupper((string) get_field('education_price_currency', $education_id));
+
+          if ($price_original > 0) {
+            $price_data_attrs['price-original'] = $price_original;
+            $price_data_attrs['price-currency'] = $price_currency;
+          }
+        }
+      }
+    }
+  }
+}
 ?>
 <div class="education-card">
 
@@ -363,7 +394,14 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
         <a href="<?php echo esc_url($price_url); ?>"
            target="_blank"
            rel="<?php echo esc_attr($price_rel); ?>"
-           class="btn btn-accent education-card__btn education-card__btn-book">
+           class="btn btn-accent education-card__btn education-card__btn-book"
+           <?php if (!empty($price_data_attrs['price-rub'])): ?>
+           data-price-rub="<?php echo esc_attr($price_data_attrs['price-rub']); ?>"
+           <?php endif; ?>
+           <?php if (!empty($price_data_attrs['price-original'])): ?>
+           data-price-original="<?php echo esc_attr($price_data_attrs['price-original']); ?>"
+           data-price-currency="<?php echo esc_attr($price_data_attrs['price-currency']); ?>"
+           <?php endif; ?>>
           <?php echo esc_html(($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price)); ?>
         </a>
       <?php endif; ?>

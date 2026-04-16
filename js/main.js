@@ -32,6 +32,7 @@ import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
 import { initMaps } from "./modules/maps";
+import { EducationCurrencySwitcher } from "./modules/education-currency-switcher";
 
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -69,6 +70,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initCountryEducationFilters();
   initSingleEducationPrograms();
   initEducationProgramForm();
+  EducationCurrencySwitcher.init();
   initEventTicketForm();
   initAgencyEventsFilter();
   initAgencyEventRegForm();
