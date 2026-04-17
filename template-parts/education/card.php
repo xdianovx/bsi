@@ -348,7 +348,13 @@ if (empty($price_data_attrs) && !empty($price)) {
            <?php if ($show_price_from): ?>
            data-has-from="true"
            <?php endif; ?>>
-          <?php echo esc_html(($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price)); ?>
+          <?php
+            $price_text = ($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price);
+            if (!empty($duration_range)) {
+              $price_text .= ' / ' . $duration_range;
+            }
+            echo esc_html($price_text);
+          ?>
         </a>
       <?php endif; ?>
     </div>

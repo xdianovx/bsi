@@ -676,6 +676,8 @@ if ($all_edu_for_sort->have_posts()) {
           $age_min = 0;
           $age_max = 0;
           $nearest_date = '';
+          $duration_min = 0;
+          $duration_max = 0;
 
           if (function_exists('get_field')) {
             $education_programs = get_field('education_programs', $education_id);
@@ -684,17 +686,22 @@ if ($all_edu_for_sort->have_posts()) {
             if (!empty($education_programs)) {
               $ages_min = [];
               $ages_max = [];
+              $durations = [];
               $all_dates = [];
 
               foreach ($education_programs as $program) {
                 $program_age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
                 $program_age_max = isset($program['program_age_max']) && $program['program_age_max'] !== '' ? (int) $program['program_age_max'] : 0;
+                $program_duration = isset($program['program_duration']) && $program['program_duration'] !== '' ? (int) $program['program_duration'] : 0;
 
                 if ($program_age_min > 0) {
                   $ages_min[] = $program_age_min;
                 }
                 if ($program_age_max > 0) {
                   $ages_max[] = $program_age_max;
+                }
+                if ($program_duration > 0) {
+                  $durations[] = $program_duration;
                 }
 
                 $all_dates = array_merge($all_dates, parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : ''));
@@ -705,6 +712,10 @@ if ($all_edu_for_sort->have_posts()) {
               }
               if (!empty($ages_max)) {
                 $age_max = max($ages_max);
+              }
+              if (!empty($durations)) {
+                $duration_min = min($durations);
+                $duration_max = max($durations);
               }
 
               if (!empty($all_dates)) {
@@ -740,6 +751,18 @@ if ($all_edu_for_sort->have_posts()) {
             }
           }
 
+          // Формируем диапазон недель для отображения
+          $duration_range = '';
+          if ($duration_min > 0 && $duration_max > 0) {
+            if ($duration_min === $duration_max) {
+              $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
+            } else {
+              $duration_range = $duration_min . '-' . $duration_max . ' недель';
+            }
+          } elseif ($duration_min > 0) {
+            $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
+          }
+
           $items[] = [
             'id' => $education_id,
             'url' => get_permalink($education_id),
@@ -759,6 +782,7 @@ if ($all_edu_for_sort->have_posts()) {
             'age_max' => $age_max,
             'nearest_date' => $nearest_date,
             'price_data_attrs' => $price_data_attrs,
+            'duration_range' => $duration_range,
           ];
         endwhile;
         wp_reset_postdata();
