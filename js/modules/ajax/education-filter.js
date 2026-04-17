@@ -272,6 +272,8 @@ export const initEducationFilter = () => {
         }
       }
 
+      document.dispatchEvent(new CustomEvent('education:content-updated'));
+
       if (counter) {
         counter.textContent = `Найдено школ: ${json.data.total || 0}`;
       }

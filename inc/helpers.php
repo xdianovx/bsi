@@ -761,3 +761,66 @@ function bsi_education_get_program_price_with_currency(array $program, string $c
     'formatted' => $formatted,
   ];
 }
+
+/**
+ * Формирует массив data-attributes для переключателя валют.
+ * Используется везде, где нужны data-price-rub / data-price-original / data-price-currency.
+ *
+ * @param array $program ACF-программа с полями program_price_per_week_original и т.д.
+ * @return array ['price-rub' => int, 'price-original' => float, 'price-currency' => string]
+ */
+function bsi_education_build_price_data_attrs(array $program): array {
+  if (empty($program)) {
+    return [];
+  }
+
+  $price_rub = bsi_education_get_program_price_numeric_rub($program);
+  if ($price_rub <= 0) {
+    return [];
+  }
+
+  $attrs = ['price-rub' => $price_rub];
+
+  if (!empty($program['program_price_per_week_original']) && !empty($program['program_price_per_week_currency'])) {
+    $attrs['price-original'] = (float) $program['program_price_per_week_original'];
+    $attrs['price-currency'] = strtoupper((string) $program['program_price_per_week_currency']);
+  }
+
+  return $attrs;
+}
+
+/**
+ * Получает минимальную цену школы в рублях для сортировки.
+ * Учитывает и старое поле education_price и новую систему программ.
+ *
+ * @param int $education_id ID школы (post ID)
+ * @return int Цена в рублях или 0 если цена не найдена
+ */
+function bsi_education_get_program_price_numeric_rub_from_post(int $education_id): int {
+  if (!function_exists('get_field')) {
+    return 0;
+  }
+
+  $price_val = get_field('education_price', $education_id);
+  if (!empty($price_val)) {
+    $num = (int) preg_replace('/[^\d]/', '', (string) $price_val);
+    if ($num > 0) {
+      return $num;
+    }
+  }
+
+  $programs = get_field('education_programs', $education_id);
+  if (!is_array($programs) || empty($programs)) {
+    return 0;
+  }
+
+  $min_price = 0;
+  foreach ($programs as $program) {
+    $price = bsi_education_get_program_price_numeric_rub($program);
+    if ($price > 0 && ($min_price === 0 || $price < $min_price)) {
+      $min_price = $price;
+    }
+  }
+
+  return $min_price;
+}

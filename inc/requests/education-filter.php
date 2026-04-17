@@ -266,18 +266,16 @@ function bsi_ajax_education_filter(): void
 
     if ($all_posts_query->have_posts()) {
       $all_posts = $all_posts_query->posts;
-      
+
       // Сортируем все посты по цене
       usort($all_posts, function ($a, $b) use ($sort) {
-        $price_a = function_exists('get_field') ? get_field('education_price', $a->ID) : '';
-        $price_b = function_exists('get_field') ? get_field('education_price', $b->ID) : '';
+        $num_a = 0;
+        $num_b = 0;
 
-        // Извлекаем числа из строк цен
-        preg_match('/[\d\s]+/', (string) $price_a, $matches_a);
-        preg_match('/[\d\s]+/', (string) $price_b, $matches_b);
-
-        $num_a = isset($matches_a[0]) ? (int) str_replace(' ', '', $matches_a[0]) : 0;
-        $num_b = isset($matches_b[0]) ? (int) str_replace(' ', '', $matches_b[0]) : 0;
+        if (function_exists('get_field')) {
+          $num_a = (int) bsi_education_get_program_price_numeric_rub_from_post($a->ID);
+          $num_b = (int) bsi_education_get_program_price_numeric_rub_from_post($b->ID);
+        }
 
         if ($sort === 'price_asc') {
           return $num_a <=> $num_b;
@@ -420,6 +418,10 @@ function bsi_ajax_education_filter(): void
       }
 
       $price = '';
+      $education_programs = [];
+      $price_data_attrs = [];
+      $show_price_from = false;
+
       if (function_exists('get_field')) {
         $price_val = get_field('education_price', $education_id);
 
@@ -450,11 +452,22 @@ function bsi_ajax_education_filter(): void
           if (!empty($prices)) {
             $min_price_value = min($prices);
             $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+            // Добавляем "от" если несколько программ
+            if (count($education_programs) > 1) {
+              $price = 'от ' . $price;
+              $show_price_from = true;
+            }
           }
         }
 
         if (!empty($price)) {
           $price = format_price_text($price);
+        }
+
+        // Собираем price_data_attrs из программ (БАГ 1)
+        if (!empty($education_programs) && function_exists('bsi_education_build_price_data_attrs')) {
+          $min_program = reset($education_programs);
+          $price_data_attrs = bsi_education_build_price_data_attrs($min_program);
         }
       }
 
@@ -477,9 +490,7 @@ function bsi_ajax_education_filter(): void
       $checkin_dates_formatted = '';
       $checkin_dates_remaining = 0;
 
-      if (function_exists('get_field')) {
-        $education_programs = get_field('education_programs', $education_id);
-        $education_programs = is_array($education_programs) ? $education_programs : [];
+      if (!empty($education_programs)) {
 
         if (!empty($education_programs)) {
           $ages_min = [];
@@ -535,6 +546,8 @@ function bsi_ajax_education_filter(): void
         'country_title' => $country_title,
         'resort_title' => $resort_title,
         'price' => $price,
+        'price_data_attrs' => $price_data_attrs,
+        'show_price_from' => $show_price_from,
         'languages' => $languages,
         'programs' => $programs,
         'country_id' => $country_id,
@@ -1409,6 +1422,7 @@ function bsi_ajax_education_programs_by_school(): void
       set_query_var('program', $program);
       set_query_var('program_index', $index);
       set_query_var('booking_url', $booking_url);
+      set_query_var('school_name', get_the_title($education_id));
       get_template_part('template-parts/education/program-card');
     }
   } else {

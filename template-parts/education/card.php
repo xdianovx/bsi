@@ -344,6 +344,9 @@ if (empty($price_data_attrs) && !empty($price)) {
            <?php if (!empty($price_data_attrs['price-original'])): ?>
            data-price-original="<?php echo esc_attr($price_data_attrs['price-original']); ?>"
            data-price-currency="<?php echo esc_attr($price_data_attrs['price-currency']); ?>"
+           <?php endif; ?>
+           <?php if ($show_price_from): ?>
+           data-has-from="true"
            <?php endif; ?>>
           <?php echo esc_html(($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price)); ?>
         </a>

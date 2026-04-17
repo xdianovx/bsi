@@ -56,16 +56,23 @@ export const EducationCurrencySwitcher = (() => {
       displayCurrency = 'RUB';
     }
 
-    // Extract prefix ("от ") and suffix (duration "/ 1-5 недель") from current text
-    const currentText = element.textContent.trim();
-    const hasFrom = currentText.startsWith('от ');
+    // Extract prefix ("от ") and suffix (duration "/ 1-5 недель")
+    const hasFrom = element.dataset.hasFrom === 'true';
     const prefix = hasFrom ? 'от ' : '';
 
-    // Extract duration suffix (everything after " / ")
-    let suffix = '';
-    const durationMatch = currentText.match(/\s*\/\s*.+$/);
-    if (durationMatch) {
-      suffix = durationMatch[0];  // " / 1-5 недель"
+    // Get suffix from cached data attribute, or extract from text if not cached
+    let suffix = element.dataset.priceSuffix || '';
+    if (!suffix) {
+      const currentText = element.textContent.trim();
+      const durationMatch = currentText.match(/\s*\/\s*.+$/);
+      if (durationMatch) {
+        suffix = durationMatch[0];  // " / 1-5 недель"
+        element.dataset.priceSuffix = suffix;
+      }
+      // Also cache whether there's a "от" prefix
+      if (currentText.startsWith('от ')) {
+        element.dataset.hasFrom = 'true';
+      }
     }
 
     element.textContent = prefix + formatPrice(displayPrice, displayCurrency) + suffix;
@@ -119,6 +126,12 @@ export const EducationCurrencySwitcher = (() => {
     if (savedPreference) {
       updateAllPrices(true);
     }
+
+    // Listen for content updates after AJAX loads (БАГ 4)
+    document.addEventListener('education:content-updated', () => {
+      const currentPreference = localStorage.getItem(STORAGE_KEY) === 'true';
+      updateAllPrices(currentPreference);
+    });
   };
 
   return {

@@ -288,6 +288,7 @@ export const initSingleEducationPrograms = () => {
       if (!json || !json.success) throw new Error("AJAX error");
 
       list.innerHTML = json.data.html || "";
+      document.dispatchEvent(new CustomEvent('education:content-updated'));
       initEducationProgramAccordion();
 
       // Обновляем опции фильтров, если они пришли с сервера
