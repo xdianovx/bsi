@@ -23,10 +23,10 @@ export const EducationCurrencySwitcher = (() => {
       // Format RUB with spaces: 75 000 ₽
       return Number(value).toLocaleString('ru-RU') + ' ' + CURRENCY_SYMBOLS[currency];
     } else {
-      // Format other currencies: 1,000.00 $
+      // Format other currencies: 1,000 $
       return Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
       }) + ' ' + CURRENCY_SYMBOLS[currency];
     }
   };
