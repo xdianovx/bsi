@@ -168,6 +168,8 @@ $website = trim((string) (function_exists('get_field') ? get_field('education_we
 
 // Получаем цену через новую систему конвертации или fallback
 $price = '';
+$price_original = null;
+$price_currency = null;
 if (function_exists('bsi_education_get_price_in_rub')) {
   $price = bsi_education_get_price_in_rub($post_id, false);
 }
@@ -228,25 +230,45 @@ if (function_exists('get_field')) {
   }
 
   if (empty($price) && !empty($programs)) {
-    $prices = [];
+    $prices_data = [];
     foreach ($programs as $program) {
-      $program_price = '';
-      if (isset($program['program_price_per_week'])) {
-        $program_price = (string) $program['program_price_per_week'];
-      } elseif (isset($program['price_per_week'])) {
-        $program_price = (string) $program['price_per_week'];
-      }
-      if ($program_price) {
-        preg_match('/[\d\s]+/', $program_price, $matches);
-        if (!empty($matches[0])) {
-          $prices[] = (int) str_replace(' ', '', $matches[0]);
+      if (function_exists('bsi_education_get_program_price_numeric_rub')) {
+        $price_numeric = bsi_education_get_program_price_numeric_rub($program);
+        if ($price_numeric > 0) {
+          $prices_data[] = [
+            'price_rub' => $price_numeric,
+            'original' => $program['program_price_per_week_original'] ?? null,
+            'currency' => $program['program_price_per_week_currency'] ?? null,
+          ];
+        }
+      } else {
+        $program_price = '';
+        if (isset($program['program_price_per_week'])) {
+          $program_price = (string) $program['program_price_per_week'];
+        } elseif (isset($program['price_per_week'])) {
+          $program_price = (string) $program['price_per_week'];
+        }
+        if ($program_price) {
+          preg_match('/[\d\s]+/', $program_price, $matches);
+          if (!empty($matches[0])) {
+            $prices_data[] = [
+              'price_rub' => (int) str_replace(' ', '', $matches[0]),
+              'original' => null,
+              'currency' => null,
+            ];
+          }
         }
       }
     }
 
-    if (!empty($prices)) {
-      $min_price_value = min($prices);
-      $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+    if (!empty($prices_data)) {
+      usort($prices_data, function ($a, $b) {
+        return $a['price_rub'] - $b['price_rub'];
+      });
+      $min_price_data = $prices_data[0];
+      $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽/неделя';
+      $price_original = $min_price_data['original'];
+      $price_currency = $min_price_data['currency'];
     }
   }
 
@@ -513,7 +535,13 @@ get_header();
             <?php if ($price): ?>
               <div class="single-education__info">
                 <div class="single-education__info-item">
-                  <div class="single-education__info-value"><?php echo esc_html(format_price_with_from($price, true)); ?>
+                  <div class="single-education__info-value js-education-price"
+                       <?php if (!empty($price_original) && !empty($price_currency)): ?>
+                       data-price-rub="<?php echo esc_attr((int) preg_replace('/[^\d]/', '', $price)); ?>"
+                       data-price-original="<?php echo esc_attr($price_original); ?>"
+                       data-price-currency="<?php echo esc_attr($price_currency); ?>"
+                       <?php endif; ?>>
+                    <?php echo esc_html(format_price_with_from($price, true)); ?>
                   </div>
                 </div>
               </div>
