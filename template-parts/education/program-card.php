@@ -154,7 +154,7 @@ $price_numeric = 0;
 $price_data_attrs = []; // для передачи в data-attributes
 
 if (!empty($price_per_week)) {
-  $price_formatted = format_price_with_from($price_per_week, true);
+  $price_formatted = format_price_with_from($price_per_week, false);
   $price_numeric = (int) preg_replace('/[^\d]/', '', $price_per_week);
 
   // Собираем data-attributes для переключения валют
@@ -249,9 +249,6 @@ foreach ($additional_services as $service) {
                    <?php if (!empty($price_data_attrs['price-original'])): ?>
                    data-price-original="<?php echo esc_attr($price_data_attrs['price-original']); ?>"
                    data-price-currency="<?php echo esc_attr($price_data_attrs['price-currency']); ?>"
-                   <?php endif; ?>
-                   <?php if (strpos($price_formatted, 'от') === 0): ?>
-                   data-has-from="true"
                    <?php endif; ?>>
                 <?php echo esc_html($price_formatted); ?>
               </div>

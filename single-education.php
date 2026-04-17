@@ -270,7 +270,7 @@ if (function_exists('get_field')) {
         return $a['price_rub'] - $b['price_rub'];
       });
       $min_price_data = $prices_data[0];
-      $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽/неделя';
+      $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽';
       $price_original = $min_price_data['original'];
       $price_currency = $min_price_data['currency'];
     }
@@ -279,6 +279,35 @@ if (function_exists('get_field')) {
   if (!empty($price)) {
     $price = format_price_text($price);
   }
+}
+
+// Вычисляем диапазон продолжительности из всех программ
+$duration_min = 0;
+$duration_max = 0;
+if (!empty($programs)) {
+  $durations = [];
+  foreach ($programs as $program) {
+    $program_duration = isset($program['program_duration']) && $program['program_duration'] !== '' ? (int) $program['program_duration'] : 0;
+    if ($program_duration > 0) {
+      $durations[] = $program_duration;
+    }
+  }
+  if (!empty($durations)) {
+    $duration_min = min($durations);
+    $duration_max = max($durations);
+  }
+}
+
+// Формируем диапазон недель для отображения
+$duration_range = '';
+if ($duration_min > 0 && $duration_max > 0) {
+  if ($duration_min === $duration_max) {
+    $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
+  } else {
+    $duration_range = $duration_min . '-' . $duration_max . ' недель';
+  }
+} elseif ($duration_min > 0) {
+  $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
 }
 
 get_header();
@@ -544,8 +573,17 @@ get_header();
                        data-price-rub="<?php echo esc_attr((int) preg_replace('/[^\d]/', '', $price)); ?>"
                        data-price-original="<?php echo esc_attr($price_original); ?>"
                        data-price-currency="<?php echo esc_attr($price_currency); ?>"
+                       <?php endif; ?>
+                       <?php if ($duration_range): ?>
+                       data-price-suffix=" / <?php echo esc_attr($duration_range); ?>"
                        <?php endif; ?>>
-                    <?php echo esc_html(format_price_with_from($price, true)); ?>
+                    <?php
+                    $price_display = format_price_with_from($price, true);
+                    if ($duration_range && strpos($price_display, ' / ') === false) {
+                      $price_display .= ' / ' . $duration_range;
+                    }
+                    echo esc_html($price_display);
+                    ?>
                   </div>
                 </div>
               </div>
