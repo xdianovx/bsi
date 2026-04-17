@@ -599,16 +599,20 @@ if ($all_edu_for_sort->have_posts()) {
               if (!empty($education_programs)) {
                 $prices_data = [];
 
-                // Используем ту же функцию что и при сортировке для консистентности
-                if (function_exists('bsi_education_get_program_price_numeric_rub')) {
+                // Пытаемся новую систему конвертации для каждой программы
+                if (function_exists('bsi_education_get_program_price_in_rub')) {
                   foreach ($education_programs as $program) {
-                    $price_numeric = bsi_education_get_program_price_numeric_rub($program);
-                    if ($price_numeric > 0) {
-                      $prices_data[] = [
-                        'price_rub' => $price_numeric,
-                        'original' => $program['program_price_per_week_original'] ?? null,
-                        'currency' => $program['program_price_per_week_currency'] ?? null,
-                      ];
+                    $program_price_rub = bsi_education_get_program_price_in_rub($program);
+                    if (!empty($program_price_rub)) {
+                      // Извлекаем числовое значение из отформатированной строки
+                      $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
+                      if ($price_numeric > 0) {
+                        $prices_data[] = [
+                          'price_rub' => $price_numeric,
+                          'original' => $program['program_price_per_week_original'] ?? null,
+                          'currency' => $program['program_price_per_week_currency'] ?? null,
+                        ];
+                      }
                     }
                   }
                 } else {
