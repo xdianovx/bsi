@@ -433,24 +433,23 @@ function bsi_ajax_education_filter(): void
         $education_programs = is_array($education_programs) ? $education_programs : [];
 
         if (empty($price) && !empty($education_programs)) {
-          $prices = [];
+          $price_numeric_values = [];
+          $min_price_program = null;
+
           foreach ($education_programs as $program) {
-            $program_price = '';
-            if (isset($program['program_price_per_week'])) {
-              $program_price = (string) $program['program_price_per_week'];
-            } elseif (isset($program['price_per_week'])) {
-              $program_price = (string) $program['price_per_week'];
-            }
-            if ($program_price) {
-              preg_match('/[\d\s]+/', $program_price, $matches);
-              if (!empty($matches[0])) {
-                $prices[] = (int) str_replace(' ', '', $matches[0]);
+            if (function_exists('bsi_education_get_program_price_numeric_rub')) {
+              $numeric = bsi_education_get_program_price_numeric_rub($program);
+              if ($numeric > 0) {
+                $price_numeric_values[] = $numeric;
+                if ($min_price_program === null || $numeric < $price_numeric_values[0]) {
+                  $min_price_program = $program;
+                }
               }
             }
           }
 
-          if (!empty($prices)) {
-            $min_price_value = min($prices);
+          if (!empty($price_numeric_values)) {
+            $min_price_value = min($price_numeric_values);
             $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
             // Добавляем "от" если несколько программ
             if (count($education_programs) > 1) {
@@ -464,10 +463,9 @@ function bsi_ajax_education_filter(): void
           $price = format_price_text($price);
         }
 
-        // Собираем price_data_attrs из программ (БАГ 1)
-        if (!empty($education_programs) && function_exists('bsi_education_build_price_data_attrs')) {
-          $min_program = reset($education_programs);
-          $price_data_attrs = bsi_education_build_price_data_attrs($min_program);
+        // Собираем price_data_attrs из программы с минимальной ценой (БАГ 1)
+        if (!empty($min_price_program) && function_exists('bsi_education_build_price_data_attrs')) {
+          $price_data_attrs = bsi_education_build_price_data_attrs($min_price_program);
         }
       }
 
@@ -491,11 +489,9 @@ function bsi_ajax_education_filter(): void
       $checkin_dates_remaining = 0;
 
       if (!empty($education_programs)) {
-
-        if (!empty($education_programs)) {
-          $ages_min = [];
-          $ages_max = [];
-          $all_dates = [];
+        $ages_min = [];
+        $ages_max = [];
+        $all_dates = [];
 
           foreach ($education_programs as $program) {
             $program_age_min = isset($program['program_age_min']) && $program['program_age_min'] !== '' ? (int) $program['program_age_min'] : 0;
@@ -534,7 +530,6 @@ function bsi_ajax_education_filter(): void
               $checkin_dates_remaining = max(0, $total - 2);
             }
           }
-        }
       }
 
       $item = [

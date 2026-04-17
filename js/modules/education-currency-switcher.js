@@ -69,10 +69,6 @@ export const EducationCurrencySwitcher = (() => {
         suffix = durationMatch[0];  // " / 1-5 недель"
         element.dataset.priceSuffix = suffix;
       }
-      // Also cache whether there's a "от" prefix
-      if (currentText.startsWith('от ')) {
-        element.dataset.hasFrom = 'true';
-      }
     }
 
     element.textContent = prefix + formatPrice(displayPrice, displayCurrency) + suffix;
