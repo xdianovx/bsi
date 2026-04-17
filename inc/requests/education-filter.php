@@ -432,35 +432,28 @@ function bsi_ajax_education_filter(): void
         $education_programs = get_field('education_programs', $education_id);
         $education_programs = is_array($education_programs) ? $education_programs : [];
 
-        if (empty($price) && !empty($education_programs)) {
-          $price_numeric_values = [];
-          $min_price_program = null;
+        $min_price_value = 0;
+        $min_price_program = null;
 
+        if (!empty($education_programs)) {
           foreach ($education_programs as $program) {
             if (function_exists('bsi_education_get_program_price_numeric_rub')) {
               $numeric = bsi_education_get_program_price_numeric_rub($program);
-              if ($numeric > 0) {
-                $price_numeric_values[] = $numeric;
-                if ($min_price_program === null || $numeric < $price_numeric_values[0]) {
-                  $min_price_program = $program;
-                }
+              if ($numeric > 0 && ($min_price_value === 0 || $numeric < $min_price_value)) {
+                $min_price_value = $numeric;
+                $min_price_program = $program;
               }
-            }
-          }
-
-          if (!empty($price_numeric_values)) {
-            $min_price_value = min($price_numeric_values);
-            $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
-            // Добавляем "от" если несколько программ
-            if (count($education_programs) > 1) {
-              $price = 'от ' . $price;
-              $show_price_from = true;
             }
           }
         }
 
-        if (!empty($price)) {
-          $price = format_price_text($price);
+        if (empty($price) && $min_price_value > 0) {
+          $price = format_number($min_price_value) . ' ₽/неделя';
+          // Добавляем "от" если несколько программ
+          if (count($education_programs) > 1) {
+            $price = 'от ' . $price;
+            $show_price_from = true;
+          }
         }
 
         // Собираем price_data_attrs из программы с минимальной ценой (БАГ 1)
