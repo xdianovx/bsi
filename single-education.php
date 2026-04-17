@@ -232,14 +232,18 @@ if (function_exists('get_field')) {
   if (empty($price) && !empty($programs)) {
     $prices_data = [];
     foreach ($programs as $program) {
-      if (function_exists('bsi_education_get_program_price_numeric_rub')) {
-        $price_numeric = bsi_education_get_program_price_numeric_rub($program);
-        if ($price_numeric > 0) {
-          $prices_data[] = [
-            'price_rub' => $price_numeric,
-            'original' => $program['program_price_per_week_original'] ?? null,
-            'currency' => $program['program_price_per_week_currency'] ?? null,
-          ];
+      if (function_exists('bsi_education_get_program_price_in_rub')) {
+        $program_price_rub = bsi_education_get_program_price_in_rub($program);
+        if (!empty($program_price_rub)) {
+          // Извлекаем числовое значение из отформатированной строки
+          $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
+          if ($price_numeric > 0) {
+            $prices_data[] = [
+              'price_rub' => $price_numeric,
+              'original' => $program['program_price_per_week_original'] ?? null,
+              'currency' => $program['program_price_per_week_currency'] ?? null,
+            ];
+          }
         }
       } else {
         $program_price = '';
