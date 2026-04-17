@@ -45,6 +45,7 @@ function bsi_register_education_acf_groups(): void
         'type' => 'text',
         'instructions' => 'Используется как fallback. Рекомендуется использовать поля ниже.',
         'wrapper' => ['width' => '50'],
+        'hidden' => 1,
       ],
       [
         'key' => 'field_education_price_original',
@@ -54,6 +55,7 @@ function bsi_register_education_acf_groups(): void
         'instructions' => 'Введите стоимость без форматирования. Например: 1000, 5000, 15000',
         'step' => 0.01,
         'wrapper' => ['width' => '25'],
+        'hidden' => 1,
       ],
       [
         'key' => 'field_education_price_currency',
@@ -70,6 +72,7 @@ function bsi_register_education_acf_groups(): void
         'allow_null' => 0,
         'instructions' => 'Выберите валюту исходной стоимости',
         'wrapper' => ['width' => '25'],
+        'hidden' => 1,
       ],
       [
         'key' => 'field_education_age',
