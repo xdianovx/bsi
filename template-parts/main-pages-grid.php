@@ -73,10 +73,10 @@ $main_page_items = [
 
      // ],
      [
-          'title' => 'Incoming',
-          'url' => 'https://incoming.bsigroup.ru/',
+          'title' => 'Круизы',
+          'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
           'target' => '_blank',
-          'img' => 'incoming.png',
+          'img' => 'https://bsigroup.ru/wp-content/uploads/2026/04/ship.png',
 
      ],
 
@@ -89,8 +89,9 @@ $main_page_items = [
                <?php foreach ($main_page_items as $item): ?>
                     <a href="<?= esc_url($item['url']) ?>" class="main-pages__item" <?= !empty($item['target']) ? 'target="' . esc_attr($item['target']) . '" rel="noopener noreferrer"' : '' ?>>
                          <div class="main-page__item-top">
+                              <?php $item_img_src = preg_match('#^https?://#i', $item['img']) ? $item['img'] : get_template_directory_uri() . '/img/page-grid/' . $item['img']; ?>
                               <img class="main-pages__item-img"
-                                   src="<?= get_template_directory_uri() . '/img/page-grid/' . esc_attr($item['img']); ?>"
+                                   src="<?= esc_url($item_img_src); ?>"
                                    alt="<?= esc_attr(strip_tags($item['title'])); ?>">
                               <p class="main-pages__item_title"><?= $item['title']; ?></p>
                          </div>
