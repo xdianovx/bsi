@@ -308,49 +308,16 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
     'tour_types' => [],
   ];
 
-  // Получаем все страны, в которых есть туры
-  $all_tours = get_posts([
-    'post_type' => 'tour',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'fields' => 'ids',
-  ]);
+  // Страны: всегда полный список стран с турами в стабильном RU-порядке.
+  $countries = function_exists('bsi_get_tour_countries_sorted')
+    ? bsi_get_tour_countries_sorted()
+    : [];
 
-  $country_ids_with_tours = [];
-  if (!empty($all_tours) && function_exists('get_field')) {
-    foreach ($all_tours as $tour_id) {
-      $country_val = get_field('tour_country', $tour_id);
-      if ($country_val instanceof WP_Post) {
-        $country_ids_with_tours[] = (int) $country_val->ID;
-      } elseif (is_array($country_val)) {
-        foreach ($country_val as $c) {
-          $country_ids_with_tours[] = (int) ($c instanceof WP_Post ? $c->ID : $c);
-        }
-      } else {
-        $country_ids_with_tours[] = (int) $country_val;
-      }
-    }
-  }
-
-  $country_ids_with_tours = array_values(array_unique(array_filter($country_ids_with_tours)));
-
-  // Страны
-  if (!empty($country_ids_with_tours)) {
-    $countries = get_posts([
-      'post_type' => 'country',
-      'post_status' => 'publish',
-      'post__in' => $country_ids_with_tours,
-      'posts_per_page' => -1,
-      'orderby' => 'title',
-      'order' => 'ASC',
-    ]);
-
-    foreach ($countries as $country) {
-      $options['countries'][] = [
-        'id' => (int) $country->ID,
-        'name' => $country->post_title,
-      ];
-    }
+  foreach ($countries as $country) {
+    $options['countries'][] = [
+      'id' => (int) $country->ID,
+      'name' => $country->post_title,
+    ];
   }
 
   // Регионы - получаем все или фильтруем по стране

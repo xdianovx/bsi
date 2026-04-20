@@ -29,47 +29,10 @@ $tour_type_terms = get_terms([
   'order' => 'ASC',
 ]);
 
-// Получаем все туры для определения стран, у которых есть туры
-$all_tours = get_posts([
-  'post_type' => 'tour',
-  'post_status' => 'publish',
-  'posts_per_page' => -1,
-  'fields' => 'ids',
-]);
-
-// Собираем уникальные ID стран из туров
-$country_ids = [];
-
-if (!empty($all_tours) && function_exists('get_field')) {
-  foreach ($all_tours as $tour_id) {
-    $ids = function_exists('bsi_get_tour_country_ids')
-      ? bsi_get_tour_country_ids((int) $tour_id)
-      : [];
-
-    foreach ($ids as $country_id) {
-      $country_id = (int) $country_id;
-      if ($country_id > 0) {
-        $country_ids[] = $country_id;
-      }
-    }
-  }
-}
-
-$country_ids = array_values(array_unique(array_filter($country_ids)));
-
-// Получаем только те страны, у которых есть туры
-$countries = [];
-if (!empty($country_ids)) {
-  $countries = get_posts([
-    'post_type' => 'country',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'post_parent' => 0,
-    'post__in' => $country_ids,
-    'orderby' => 'title',
-    'order' => 'ASC',
-  ]);
-}
+// Получаем полный список стран с турами в стабильном RU-порядке.
+$countries = function_exists('bsi_get_tour_countries_sorted')
+  ? bsi_get_tour_countries_sorted()
+  : [];
 
 $paged = 1;
 

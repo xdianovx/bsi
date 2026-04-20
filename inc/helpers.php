@@ -363,6 +363,98 @@ function bsi_compare_price_values(?int $price_a, ?int $price_b, string $sort): i
   return $price_a <=> $price_b;
 }
 
+/**
+ * Locale-aware сравнение строк для русской сортировки с fallback.
+ */
+function bsi_compare_titles_ru(string $title_a, string $title_b): int
+{
+  $title_a = trim($title_a);
+  $title_b = trim($title_b);
+
+  if ($title_a === $title_b) {
+    return 0;
+  }
+
+  if (class_exists('Collator')) {
+    static $collator = null;
+
+    if ($collator === null) {
+      $collator = new Collator('ru_RU');
+      $collator->setStrength(Collator::PRIMARY);
+      $collator->setAttribute(Collator::NUMERIC_COLLATION, Collator::ON);
+    }
+
+    $result = $collator->compare($title_a, $title_b);
+    if ($result !== false) {
+      return (int) $result;
+    }
+  }
+
+  return strnatcmp(
+    mb_strtolower($title_a, 'UTF-8'),
+    mb_strtolower($title_b, 'UTF-8')
+  );
+}
+
+/**
+ * Возвращает полный список стран, у которых есть туры, отсортированный по RU locale.
+ *
+ * @return array<int, WP_Post>
+ */
+function bsi_get_tour_countries_sorted(): array
+{
+  $all_tours = get_posts([
+    'post_type' => 'tour',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+  ]);
+
+  if (empty($all_tours) || !function_exists('get_field')) {
+    return [];
+  }
+
+  $country_ids = [];
+  foreach ($all_tours as $tour_id) {
+    $ids = function_exists('bsi_get_tour_country_ids')
+      ? bsi_get_tour_country_ids((int) $tour_id)
+      : [];
+
+    foreach ($ids as $country_id) {
+      $country_id = (int) $country_id;
+      if ($country_id > 0) {
+        $country_ids[] = $country_id;
+      }
+    }
+  }
+
+  $country_ids = array_values(array_unique(array_filter($country_ids)));
+  if (empty($country_ids)) {
+    return [];
+  }
+
+  $countries = get_posts([
+    'post_type' => 'country',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'post_parent' => 0,
+    'post__in' => $country_ids,
+    'orderby' => 'post__in',
+  ]);
+
+  if (empty($countries)) {
+    return [];
+  }
+
+  usort($countries, static function ($a, $b): int {
+    $title_a = isset($a->post_title) ? (string) $a->post_title : '';
+    $title_b = isset($b->post_title) ? (string) $b->post_title : '';
+    return bsi_compare_titles_ru($title_a, $title_b);
+  });
+
+  return $countries;
+}
+
 function offer_get_country_flag_url($country_id): string
 {
   if (!$country_id)

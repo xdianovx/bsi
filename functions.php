@@ -450,6 +450,85 @@ require get_template_directory() . '/inc/requests/ajax-education-program-form.ph
 require get_template_directory() . '/inc/requests/ajax-event-ticket-form.php';
 require get_template_directory() . '/inc/requests/ajax-cbr-rates-history.php';
 
+// Обработка параметров фильтров для страницы туров
+add_action('template_redirect', function () {
+	global $wp_query;
+
+	$has_tours_params = !empty($_GET['country']) || !empty($_GET['region']) ||
+		!empty($_GET['resort']) || !empty($_GET['tour_type']) ||
+		!empty($_GET['search']) || !empty($_GET['price_min']) ||
+		!empty($_GET['price_max']) || !empty($_GET['date_from']) ||
+		!empty($_GET['date_to']) || !empty($_GET['sort']) ||
+		!empty($_GET['view']) || !empty($_GET['per_page']) || !empty($_GET['page']);
+
+	if (!$has_tours_params) {
+		return;
+	}
+
+	$tours_page = get_page_by_path('tury');
+	if (!$tours_page) {
+		$tours_page_ids = get_posts([
+			'post_type' => 'page',
+			'post_status' => 'publish',
+			'meta_query' => [
+				[
+					'key' => '_wp_page_template',
+					'value' => 'page-tours.php',
+					'compare' => '=',
+				],
+			],
+			'posts_per_page' => 1,
+			'fields' => 'ids',
+		]);
+
+		if (!empty($tours_page_ids)) {
+			$tours_page = get_post((int) $tours_page_ids[0]);
+		}
+	}
+
+	if (!$tours_page instanceof WP_Post) {
+		return;
+	}
+
+	$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+	$path_info = (string) parse_url($request_uri, PHP_URL_PATH);
+	$tours_slug = (string) $tours_page->post_name;
+	$path_matches = $path_info !== '' && preg_match('#/' . preg_quote($tours_slug, '#') . '/?$#', $path_info);
+
+	// Guard применяется только на URL страницы туров.
+	if (!$path_matches) {
+		return;
+	}
+
+	// Если это 404 или путь не совпадает, но есть параметры туров - подставляем страницу туров.
+	if ($wp_query->is_404) {
+		$wp_query->queried_object = $tours_page;
+		$wp_query->queried_object_id = (int) $tours_page->ID;
+		$wp_query->post = $tours_page;
+		$wp_query->posts = [$tours_page];
+		$wp_query->post_count = 1;
+		$wp_query->is_404 = false;
+		$wp_query->is_page = true;
+		$wp_query->is_singular = true;
+
+		global $post;
+		$post = $tours_page;
+		setup_postdata($post);
+
+		$template = locate_template('page-tours.php');
+		if ($template) {
+			status_header(200);
+			include $template;
+			exit;
+		}
+	}
+
+	if (is_page() && get_page_template_slug() === 'page-tours.php' && $wp_query->is_404) {
+		$wp_query->is_404 = false;
+		status_header(200);
+	}
+}, 0);
+
 // Обработка параметров фильтров для страницы образования
 add_action('template_redirect', function () {
 	global $wp_query;

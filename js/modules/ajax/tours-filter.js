@@ -128,13 +128,9 @@ export const initToursFilter = () => {
       params.set("view", currentView);
     }
 
-    let newUrl = window.location.pathname;
-
-    // Удаляем слеш в конце pathname если есть параметры
-    if (params.toString()) {
-      newUrl = newUrl.replace(/\/$/, ''); // Удаляем слеш в конце
-      newUrl = `${newUrl}?${params.toString()}`;
-    }
+    const newUrl = params.toString()
+      ? `${window.location.pathname}?${params.toString()}`
+      : window.location.pathname;
 
     window.history.replaceState({}, '', newUrl);
   };
@@ -193,6 +189,23 @@ export const initToursFilter = () => {
   // Обновление опций фильтров на основе результатов
   const updateFilterOptions = (options) => {
     if (!options) return;
+
+    // Обновляем страны (всегда полный список, RU-алфавит с backend)
+    if (countrySelect && countryChoice && options.countries) {
+      const currentValue = countrySelect.value;
+      const hasCurrentValue = options.countries.some(c => String(c.id) === currentValue);
+      countryChoice.setChoices(
+        [
+          { value: '', label: 'Все страны', selected: !hasCurrentValue || currentValue === '', placeholder: true },
+          ...options.countries.map(c => ({
+            value: String(c.id),
+            label: c.name,
+            selected: hasCurrentValue && String(c.id) === currentValue
+          }))
+        ],
+        'value', 'label', true
+      );
+    }
 
     // Обновляем регионы
     if (regionSelect && regionChoice && options.regions) {
