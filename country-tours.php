@@ -10,6 +10,93 @@ if (!$country instanceof WP_Post) {
 }
 
 $country_id = $country ? (int) $country->ID : 0;
+$country_title = $country ? (string) $country->post_title : '';
+
+$country_title_prepositional = '';
+if ($country_id && function_exists('get_field')) {
+  $country_case_fields = [
+    'country_title_prepositional',
+    'country_name_prepositional',
+    'title_prepositional',
+    'name_prepositional',
+  ];
+
+  foreach ($country_case_fields as $field_name) {
+    $value = trim((string) get_field($field_name, $country_id));
+    if ($value !== '') {
+      $country_title_prepositional = $value;
+      break;
+    }
+  }
+}
+
+if ($country_title_prepositional === '' && $country_title !== '') {
+  $country_prepositional_map = [
+    'Австрия' => 'Австрию',
+    'Азербайджан' => 'Азербайджан',
+    'Албания' => 'Албанию',
+    'Армения' => 'Армению',
+    'Бахрейн' => 'Бахрейн',
+    'Белоруссия' => 'Белоруссию',
+    'Бельгия' => 'Бельгию',
+    'Бруней' => 'Бруней',
+    'Бутан' => 'Бутан',
+    'Великобритания' => 'Великобританию',
+    'Венгрия' => 'Венгрию',
+    'Вьетнам' => 'Вьетнам',
+    'Испания' => 'Испанию',
+    'Италия' => 'Италию',
+    'Греция' => 'Грецию',
+    'Грузия' => 'Грузию',
+    'Индия' => 'Индию',
+    'Индонезия' => 'Индонезию',
+    'Ирландия' => 'Ирландию',
+    'Исландия' => 'Исландию',
+    'Казахстан' => 'Казахстан',
+    'Камбоджа' => 'Камбоджу',
+    'Катар' => 'Катар',
+    'Кипр' => 'Кипр',
+    'Китай' => 'Китай',
+    'Лаос' => 'Лаос',
+    'Люксембург' => 'Люксембург',
+    'Маврикий' => 'Маврикий',
+    'Малайзия' => 'Малайзию',
+    'Мальдивы' => 'Мальдивы',
+    'Мьянма' => 'Мьянму',
+    'Непал' => 'Непал',
+    'Нидерланды' => 'Нидерланды',
+    'ОАЭ' => 'ОАЭ',
+    'Оман' => 'Оман',
+    'Португалия' => 'Португалию',
+    'Россия' => 'Россию',
+    'Саудовская Аравия' => 'Саудовскую Аравию',
+    'Сейшелы' => 'Сейшелы',
+    'Сербия' => 'Сербию',
+    'Сингапур' => 'Сингапур',
+    'Словакия' => 'Словакию',
+    'Словения' => 'Словению',
+    'США' => 'США',
+    'Таиланд' => 'Таиланд',
+    'Турция' => 'Турцию',
+    'Узбекистан' => 'Узбекистан',
+    'Филиппины' => 'Филиппины',
+    'Франция' => 'Францию',
+    'Хорватия' => 'Хорватию',
+    'Черногория' => 'Черногорию',
+    'Чехия' => 'Чехию',
+    'Швейцария' => 'Швейцарию',
+    'Шри-Ланка' => 'Шри-Ланку',
+    'Южная Корея' => 'Южную Корею',
+    'Япония' => 'Японию',
+    'Египет' => 'Египет',
+  ];
+
+  $country_title_prepositional = $country_prepositional_map[$country_title] ?? $country_title;
+}
+
+$country_tours_h1 = $country_title_prepositional !== ''
+  ? 'Туры в ' . $country_title_prepositional
+  : 'Туры';
 
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = 12;
@@ -115,7 +202,7 @@ get_header(); ?>
             <div class="country-tours__head">
               <div class="country-tours__head-left">
                 <h1 class="h1 country-tours__title">
-                  <?= esc_html($country ? $country->post_title : ''); ?> — туры
+                  <?= esc_html($country_tours_h1); ?>
                 </h1>
 
                 <div class="country-tours__counter"

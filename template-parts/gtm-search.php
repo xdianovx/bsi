@@ -55,8 +55,7 @@
       $education_page = get_page_by_path('obrazovanie-za-rubezhom');
       $education_url = $education_page ? get_permalink($education_page->ID) : '#';
       ?>
-      <a href="<?php echo esc_url($education_url); ?>"
-        class="gtm-search__tab-btn">
+      <a href="<?php echo esc_url($education_url); ?>" class="gtm-search__tab-btn">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
           xmlns="http://www.w3.org/2000/svg">
           <path
@@ -139,7 +138,7 @@
         <span>Деловой туризм</span>
       </div>
 
-      <div class="gtm-search__tab-btn gtm-search__tab-btn--disabled">
+      <div class="gtm-search__tab-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
           class="lucide lucide-ship-icon lucide-ship">

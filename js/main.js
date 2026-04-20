@@ -3,6 +3,7 @@ import { gtmSearch } from "./modules/gtm-search";
 import { fitForm } from "./modules/forms/fit-form";
 import { visaForm } from "./modules/forms/visa-form";
 import { initInsuranceForm } from "./modules/forms/insurance-form";
+import { initSingleVisaForm } from "./modules/forms/single-visa-form";
 import { sliders } from "./modules/sliders";
 import { phoneMask } from "./modules/forms/phone-mask";
 import MicroModal from "micromodal";
@@ -52,6 +53,7 @@ window.addEventListener("DOMContentLoaded", () => {
   fitForm();
   visaForm();
   initInsuranceForm();
+  initSingleVisaForm();
   gtmSearch();
   phoneMask();
   initNewsFilter();
@@ -81,6 +83,13 @@ window.addEventListener("DOMContentLoaded", () => {
   // Инициализация модального окна предупреждения
   if (window.maintenanceModal) {
     initMaintenanceModal(window.maintenanceModal);
+  }
+
+  // Метрика: просмотр страницы виз
+  const isVisaPage = document.body.classList.contains("page-template-page-visa-php")
+    || document.body.classList.contains("page-template-page-visa");
+  if (isVisaPage && typeof ym === "function") {
+    ym(108341897, "reachGoal", "page-visa");
   }
 
   // Метрика: подписка на рассылку (Unisender — внешний POST, перехватываем до навигации)

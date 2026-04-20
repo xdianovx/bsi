@@ -9,7 +9,10 @@ import {
  * Модуль для работы с формой консультации по страхованию
  */
 export const initInsuranceForm = () => {
-  const form = document.querySelector('.visa-consultation-form');
+  const insurancePhoneInput = document.getElementById("insurance_phone");
+  if (!insurancePhoneInput) return;
+
+  const form = insurancePhoneInput.closest("form");
   if (!form) return;
 
   let phoneMaskInstance = null;

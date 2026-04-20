@@ -65,7 +65,7 @@ get_header();
                   <?php
                   $included = $cost_item['included'] ?? '';
                   if (!empty($included)):
-                  ?>
+                    ?>
                     <div class="visa-cost-item__included">
                       <p><?= nl2br(esc_html($included)); ?></p>
                     </div>
@@ -275,6 +275,87 @@ get_header();
     </div>
   </div>
 </section>
+
+<section class="visa-page-consultation__section" id="contact-form">
+  <div class="container">
+    <?php
+    $visa_page_slug = (string) get_post_field('post_name', get_the_ID());
+    $visa_country_title = '';
+    $visa_country_id = (int) get_field('visa_country', get_the_ID());
+    if ($visa_country_id > 0) {
+      $visa_country_title = (string) get_the_title($visa_country_id);
+    }
+    $visa_type_terms = get_the_terms(get_the_ID(), 'visa_type');
+    $visa_type_label = '';
+    if (!is_wp_error($visa_type_terms) && !empty($visa_type_terms)) {
+      $visa_type_names = wp_list_pluck($visa_type_terms, 'name');
+      $visa_type_label = implode(', ', array_filter(array_map('strval', $visa_type_names)));
+    }
+    ?>
+    <h2 class="h2">Бесплатная консультация</h2>
+    <p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам получения виз</p>
+    <form id="single-visa-form" class="visa-consultation-form">
+
+      <div class="form-row form-row-3">
+
+
+
+        <div class="input-item white">
+          <label for="visa-name">Имя *</label>
+          <input type="text" name="name" id="visa-name" placeholder="Введите ваше имя" required>
+        </div>
+
+
+
+        <div class="input-item white">
+          <label for="visa-phone">Телефон *</label>
+          <input type="tel" name="phone" id="visa-phone" placeholder="+7 (___) ___-__-__" required>
+        </div>
+
+        <div class="input-item white">
+          <label for="visa-travel-dates">Даты поездки</label>
+          <input type="text" name="travel_dates" id="visa-travel-dates" placeholder="Укажите даты поездки">
+        </div>
+        <input type="hidden" name="visa_page_title" value="<?php echo esc_attr(get_the_title()); ?>">
+        <input type="hidden" name="visa_page_url" value="<?php echo esc_url(get_permalink()); ?>">
+        <input type="hidden" name="visa_country_title" value="<?php echo esc_attr($visa_country_title); ?>">
+        <input type="hidden" name="visa_page_slug" value="<?php echo esc_attr($visa_page_slug); ?>">
+        <input type="hidden" name="visa_type_label" value="<?php echo esc_attr($visa_type_label); ?>">
+      </div>
+
+      <div class="visa-consultation-form__bottom">
+
+        <button type="submit" class="btn btn-accent fit-form__btn-submit">
+          Отправить
+        </button>
+
+        <p class="form-policy fit-form__policy">
+          Нажимая на кнопку “Отправить”, вы соглашаетесь с нашей <a href="<?= get_permalink(47) ?>" class="policy-link">
+            политикой конфиденциальности
+          </a>
+        </p>
+      </div>
+      <div id="single-visa-form-status" class="form-status"></div>
+    </form>
+  </div>
+</section>
+
+<div class="modal micromodal-slide" id="modal-single-visa-success" aria-hidden="true">
+  <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+    <div class="modal__container modal-program-booking-success" role="dialog" aria-modal="true">
+      <div class="modal__content modal-program-booking-success__content">
+        <div class="modal-program-booking-success__icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="32" fill="#4CAF50" />
+            <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <h3 class="modal-program-booking-success__title">Заявка отправлена!</h3>
+        <p class="modal-program-booking-success__text">Мы свяжемся с вами в ближайшее время</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <?php
