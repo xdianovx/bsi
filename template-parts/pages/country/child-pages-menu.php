@@ -518,17 +518,19 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
 
         <div id="<?= esc_attr($acc_id); ?>" class="child-page-submenu" data-accordion-content <?= $is_tours_open ? '' : 'hidden'; ?>>
           <a class="child-page-subitem <?= ($is_tours_page && empty($active_tour_types)) ? 'active' : ''; ?>"
-            href="<?= esc_url($tours_list_url); ?>">Все туры</a>
+            href="<?= esc_url($tours_list_url); ?>"
+            data-sidebar-tour-type="">Все туры</a>
 
           <?php if (!empty($tour_types_for_country)): ?>
             <?php foreach ($tour_types_for_country as $tt): ?>
               <?php
               $tt_id = (int) $tt->term_id;
               $is_active_tt = in_array($tt_id, $active_tour_types, true);
-              $url = add_query_arg(['tour_type[]' => $tt_id], $tours_list_url);
+              $url = add_query_arg(['tour_type' => $tt_id], $tours_list_url);
               ?>
               <a class="child-page-subitem <?= $is_active_tt ? 'active' : ''; ?>"
-                href="<?= esc_url($url); ?>"><?= esc_html($tt->name); ?></a>
+                href="<?= esc_url($url); ?>"
+                data-sidebar-tour-type="<?= $tt_id; ?>"><?= esc_html($tt->name); ?></a>
             <?php endforeach; ?>
           <?php endif; ?>
         </div>

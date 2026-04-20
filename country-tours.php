@@ -141,7 +141,6 @@ if (!empty($country_tour_ids)) {
   $tour_type_terms = wp_get_object_terms($country_tour_ids, 'tour_type', [
     'orderby' => 'name',
     'order'   => 'ASC',
-    'parent'  => 0,
   ]);
 }
 

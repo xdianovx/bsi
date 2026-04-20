@@ -303,6 +303,30 @@ export const initCountryToursFilters = () => {
     initPaginationHandlers();
   }
 
-  // ✅ самое важное: проставляем значения из URL (например, tour_type[])
+  // Перехват кликов по типам туров в сайдбаре (без перезагрузки страницы)
+  const countryAside = document.querySelector('[data-country-aside]');
+  if (countryAside) {
+    countryAside.addEventListener('click', (e) => {
+      const link = e.target.closest('[data-sidebar-tour-type]');
+      if (!link) return;
+
+      e.preventDefault();
+
+      const typeId = link.getAttribute('data-sidebar-tour-type');
+
+      if (typeChoice) {
+        typeChoice.setChoiceByValue(typeId);
+      } else if (typeSelect) {
+        typeSelect.value = typeId;
+      }
+
+      countryAside.querySelectorAll('[data-sidebar-tour-type]').forEach((el) => el.classList.remove('active'));
+      link.classList.add('active');
+
+      loadTours(1);
+    });
+  }
+
+  // ✅ самое важное: проставляем значения из URL (например, tour_type)
   applyFromUrl();
 };
