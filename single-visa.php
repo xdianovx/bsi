@@ -293,7 +293,7 @@ get_header();
     }
     ?>
     <h2 class="h2">Бесплатная консультация</h2>
-    <p class="visa-consultation-form__descr">Оставьте заявку и проконсультируем вас по вопросам получения виз</p>
+    <p class="visa-consultation-form__descr">Оставьте заявку и мы проконсультируем вас по вопросам получения виз</p>
     <form id="single-visa-form" class="visa-consultation-form">
 
       <div class="form-row form-row-3">
@@ -347,7 +347,8 @@ get_header();
         <div class="modal-program-booking-success__icon">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="32" fill="#4CAF50" />
-            <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round"
+              stroke-linejoin="round" />
           </svg>
         </div>
         <h3 class="modal-program-booking-success__title">Заявка отправлена!</h3>
