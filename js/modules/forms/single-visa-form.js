@@ -128,10 +128,13 @@ export const initSingleVisaForm = () => {
 
       if (result.success) {
         if (typeof ym === "function") {
-          ym(108341897, "reachGoal", "single_visa_form_submitted", {
-            country: {
-              [formData.get("visa_country_title") || "unknown"]: {
-                label: formData.get("visa_page_slug") || "unknown",
+          const visaLabel = formData.get("visa_page_slug") || "unknown";
+          const countryLabel = formData.get("visa_country_title") || "unknown";
+
+          ym(108341897, "reachGoal", "single_visa_form_submitted_v2", {
+            visa: {
+              [visaLabel]: {
+                country: countryLabel,
               },
             },
           });

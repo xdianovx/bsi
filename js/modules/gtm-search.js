@@ -12,6 +12,7 @@ export const gtmSearch = async () => {
   if (!tabContent) return;
 
   const SAMO_LOADING_TIMEOUT_MS = 10000;
+  const MAX_DATE_RANGE_DAYS = 31;
   let loadingCounter = 0;
   let loadingStuckTimer = null;
 
@@ -30,6 +31,26 @@ export const gtmSearch = async () => {
     const month = parseInt(dateStr.substring(4, 6), 10) - 1;
     const day = parseInt(dateStr.substring(6, 8), 10);
     return new Date(year, month, day);
+  }
+
+  function clampDateRangeToMaxDays(selectedDates, instance) {
+    if (!selectedDates || selectedDates.length !== 2) {
+      return selectedDates;
+    }
+
+    const [startDate, endDate] = selectedDates;
+    const msInDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.floor((endDate - startDate) / msInDay) + 1;
+
+    if (diffDays <= MAX_DATE_RANGE_DAYS) {
+      return selectedDates;
+    }
+
+    const limitedEndDate = new Date(startDate);
+    limitedEndDate.setDate(limitedEndDate.getDate() + (MAX_DATE_RANGE_DAYS - 1));
+    instance.setDate([startDate, limitedEndDate], true);
+
+    return [startDate, limitedEndDate];
   }
 
   async function samoAjax(method, params = {}) {
@@ -359,9 +380,10 @@ export const gtmSearch = async () => {
           locale: Russian,
           dateFormat: "d.m",
           defaultDate: [defaultStart, defaultEnd],
-          onChange: (selectedDates) => {
-            if (selectedDates.length === 2) {
-              updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+          onChange: (selectedDates, dateStr, instance) => {
+            const normalizedDates = clampDateRangeToMaxDays(selectedDates, instance);
+            if (normalizedDates.length === 2) {
+              updateLink({ checkInStart: normalizedDates[0], checkInEnd: normalizedDates[1] });
             }
           },
           onReady: (selectedDates, dateStr, instance) => {
@@ -565,9 +587,10 @@ export const gtmSearch = async () => {
         locale: Russian,
         dateFormat: "d.m",
         defaultDate: [defaultStart, defaultEnd],
-        onChange: (selectedDates) => {
-          if (selectedDates.length === 2) {
-            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+        onChange: (selectedDates, dateStr, instance) => {
+          const normalizedDates = clampDateRangeToMaxDays(selectedDates, instance);
+          if (normalizedDates.length === 2) {
+            updateLink({ checkInStart: normalizedDates[0], checkInEnd: normalizedDates[1] });
           }
         },
         onReady: (selectedDates, dateStr, instance) => {
@@ -787,9 +810,10 @@ export const gtmSearch = async () => {
         locale: Russian,
         dateFormat: "d.m",
         defaultDate: [defaultStart, defaultEnd],
-        onChange: (selectedDates) => {
-          if (selectedDates.length === 2) {
-            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+        onChange: (selectedDates, dateStr, instance) => {
+          const normalizedDates = clampDateRangeToMaxDays(selectedDates, instance);
+          if (normalizedDates.length === 2) {
+            updateLink({ checkInStart: normalizedDates[0], checkInEnd: normalizedDates[1] });
           }
         },
         onReady: (selectedDates, dateStr, instance) => {
