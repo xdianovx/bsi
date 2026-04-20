@@ -1,4 +1,4 @@
-<section class="gtm-search__section is-loading">
+<section class="gtm-search__section">
   <div class="container">
 
     <div class="gtm-search__tab-btns">
@@ -157,7 +157,7 @@
     </div>
 
 
-    <div class="tab-content">
+    <div class="tab-content is-loading">
       <div class="gtm-search__item active" data-tab="tours">
         <div class="gtm-search__wrap">
 

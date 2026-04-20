@@ -8,6 +8,12 @@ import { peopleCounter } from "./gtm-people-counter.js";
 export const gtmSearch = async () => {
   const section = document.querySelector(".gtm-search__section");
   if (!section) return;
+  const tabContent = section.querySelector(".tab-content");
+  if (!tabContent) return;
+
+  const SAMO_LOADING_TIMEOUT_MS = 10000;
+  let loadingCounter = 0;
+  let loadingStuckTimer = null;
 
   function formatNightsText(startDay, endDay) {
     if (startDay === endDay) {
@@ -49,6 +55,36 @@ export const gtmSearch = async () => {
   const tabPanels = Array.from(section.querySelectorAll(".gtm-search__item"));
 
   const initedTabs = new Set();
+
+  function setSamoLoading(on) {
+    if (on) {
+      loadingCounter += 1;
+      tabContent.classList.add("is-loading");
+
+      if (loadingCounter === 1) {
+        if (loadingStuckTimer) {
+          clearTimeout(loadingStuckTimer);
+        }
+        loadingStuckTimer = window.setTimeout(() => {
+          if (loadingCounter > 0) {
+            section.classList.add("is-samo-loading-stuck");
+          }
+        }, SAMO_LOADING_TIMEOUT_MS);
+      }
+
+      return;
+    }
+
+    loadingCounter = Math.max(0, loadingCounter - 1);
+    if (loadingCounter === 0) {
+      tabContent.classList.remove("is-loading");
+      section.classList.remove("is-samo-loading-stuck");
+      if (loadingStuckTimer) {
+        clearTimeout(loadingStuckTimer);
+        loadingStuckTimer = null;
+      }
+    }
+  }
 
   function setActiveTab(index) {
     const btn = tabButtons[index];
@@ -95,20 +131,21 @@ export const gtmSearch = async () => {
 
   async function initTab(name) {
     if (initedTabs.has(name)) return;
+    setSamoLoading(true);
+    try {
+      if (name === "tours") await initToursTab();
+      if (name === "hotels") await initHotelsTab();
+      if (name === "excursions") await initExcursionsTab();
 
-    if (name === "tours") await initToursTab();
-    if (name === "hotels") await initHotelsTab();
-    if (name === "excursions") await initExcursionsTab();
-
-    initedTabs.add(name);
+      initedTabs.add(name);
+    } finally {
+      setSamoLoading(false);
+    }
   }
 
   async function initToursTab() {
     const rootEl = section.querySelector('.gtm-search__item[data-tab="tours"]');
     if (!rootEl) return;
-
-    section.classList.add("is-loading");
-
     dropdown('[data-tab="tours"] .gtm-nights-select');
     dropdown('[data-tab="tours"] .gtm-persons-select');
 
@@ -160,197 +197,192 @@ export const gtmSearch = async () => {
 
     updateLink();
 
-    const townSelect = new Choices(townSelectElement, {
-      searchEnabled: true,
-      loadingText: "Загрузка...",
-      noResultsText: "Ничего не найдено",
-      itemSelectText: "",
-      noChoicesText: "",
-    });
+      const townSelect = new Choices(townSelectElement, {
+        searchEnabled: true,
+        loadingText: "Загрузка...",
+        noResultsText: "Ничего не найдено",
+        itemSelectText: "",
+        noChoicesText: "",
+      });
 
-    const stateSelect = new Choices(stateSelectElement, {
-      searchEnabled: false,
-      loadingText: "Загрузка...",
-      noResultsText: "Ничего не найдено",
-      itemSelectText: "",
-      noChoicesText: "",
-    });
+      const stateSelect = new Choices(stateSelectElement, {
+        searchEnabled: false,
+        loadingText: "Загрузка...",
+        noResultsText: "Ничего не найдено",
+        itemSelectText: "",
+        noChoicesText: "",
+      });
 
-    async function loadTowns() {
-      townSelect.clearChoices();
-      townSelect.clearStore();
+      async function loadTowns() {
+        townSelect.clearChoices();
+        townSelect.clearStore();
 
-      const resp = await samoAjax("townfroms");
-      const towns = resp?.SearchTour_TOWNFROMS || resp;
+        const resp = await samoAjax("townfroms");
+        const towns = resp?.SearchTour_TOWNFROMS || resp;
 
-      townSelect.setChoices(
-        (towns || []).map((t) => ({ value: String(t.id), label: t.name })),
-        "value",
-        "label",
-        true
-      );
-
-      townSelect.setChoiceByValue(String(searchParams.activeTown));
-    }
-
-    async function loadStates(townId) {
-      stateSelect.clearChoices();
-      stateSelect.clearStore();
-
-      const resp = await samoAjax("states", { TOWNFROMINC: String(townId) });
-      const states = resp?.SearchTour_STATES || resp;
-
-      if (states && states.length) {
-        const DEFAULT_STATE_ID = "31"; // Китай
-        const defaultState =
-          states.find((s) => String(s?.id) === DEFAULT_STATE_ID) ||
-          states.find((s) => String(s?.stateISO3) === "CHN") ||
-          states.find((s) => String(s?.nameAlt).toLowerCase() === "china") ||
-          states.find((s) => String(s?.name).toLowerCase() === "китай");
-
-        const fallbackState = states[0];
-        const pickedState = defaultState || fallbackState;
-
-        stateSelect.setChoices(
-          states.map((s) => ({ value: String(s.id), label: s.name })),
+        townSelect.setChoices(
+          (towns || []).map((t) => ({ value: String(t.id), label: t.name })),
           "value",
           "label",
           true
         );
-        stateSelect.setChoiceByValue(String(pickedState.id));
-        updateLink({ activeState: String(pickedState.id) });
+
+        townSelect.setChoiceByValue(String(searchParams.activeTown));
       }
-    }
 
-    townSelect.passedElement.element.addEventListener("choice", async (e) => {
-      const townId = e.detail.value;
-      updateLink({ activeTown: String(townId), activeState: "" });
-      await loadStates(townId);
-    });
+      async function loadStates(townId) {
+        stateSelect.clearChoices();
+        stateSelect.clearStore();
 
-    stateSelect.passedElement.element.addEventListener("choice", (e) => {
-      updateLink({ activeState: String(e.detail.value) });
-    });
+        const resp = await samoAjax("states", { TOWNFROMINC: String(townId) });
+        const states = resp?.SearchTour_STATES || resp;
 
-    submitBtn.addEventListener("click", () => {
-      window.open(tourLink, "_blank");
-    });
+        if (states && states.length) {
+          const DEFAULT_STATE_ID = "31"; // Китай
+          const defaultState =
+            states.find((s) => String(s?.id) === DEFAULT_STATE_ID) ||
+            states.find((s) => String(s?.stateISO3) === "CHN") ||
+            states.find((s) => String(s?.nameAlt).toLowerCase() === "china") ||
+            states.find((s) => String(s?.name).toLowerCase() === "китай");
 
-    const dayRange = createDayRange({
-      rootEl,
-      gridSelector: ".day-grid",
-      defaultStartDay: searchParams.nightsFrom,
-      defaultEndDay: searchParams.nightsTill,
-      onChange: ({ startDay, endDay }) => {
-        if (startDay) {
-          const nightsTill = endDay || startDay;
-          updateLink({ nightsFrom: startDay, nightsTill: nightsTill });
-          const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
-          if (nightsValue) {
-            nightsValue.textContent = formatNightsText(startDay, nightsTill);
-          }
-        }
-      },
-    });
+          const fallbackState = states[0];
+          const pickedState = defaultState || fallbackState;
 
-    if (dayRange) {
-      const state = dayRange.getState();
-      if (state.startDay) {
-        const nightsTill = state.endDay || state.startDay;
-        const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
-        if (nightsValue) {
-          nightsValue.textContent = formatNightsText(state.startDay, nightsTill);
+          stateSelect.setChoices(
+            states.map((s) => ({ value: String(s.id), label: s.name })),
+            "value",
+            "label",
+            true
+          );
+          stateSelect.setChoiceByValue(String(pickedState.id));
+          updateLink({ activeState: String(pickedState.id) });
         }
       }
-    }
 
-    peopleCounter({
-      rootSelector: '[data-tab="tours"] .gtm-persons-select',
-      outputSelector: '[data-tab="tours"] .gtm-people-total',
-      maxAdults: 4,
-      maxChildren: 3,
-      onChange: ({ adults, children, ages }) => {
-        const encodedAges = ages.length ? ages.join("%2C") : "";
-        updateLink({
-          adultsCount: String(adults),
-          childCount: String(children),
-          childAges: encodedAges,
-        });
-      },
-    });
+      townSelect.passedElement.element.addEventListener("choice", async (e) => {
+        const townId = e.detail.value;
+        updateLink({ activeTown: String(townId), activeState: "" });
+        await loadStates(townId);
+      });
 
-    const datepick = rootEl.querySelector(".gtm-datepicker");
-    if (datepick) {
-      const startDate = parseDateYYYYMMDD(searchParams.checkInStart);
-      const endDate = parseDateYYYYMMDD(searchParams.checkInEnd);
+      stateSelect.passedElement.element.addEventListener("choice", (e) => {
+        updateLink({ activeState: String(e.detail.value) });
+      });
 
-      let defaultStart, defaultEnd;
+      submitBtn.addEventListener("click", () => {
+        window.open(tourLink, "_blank");
+      });
 
-      if (startDate) {
-        defaultStart = new Date(startDate);
-        defaultStart.setDate(defaultStart.getDate() + 2);
-      } else {
-        defaultStart = new Date();
-        defaultStart.setDate(defaultStart.getDate() + 2);
-      }
-
-      if (endDate) {
-        defaultEnd = new Date(endDate);
-        defaultEnd.setDate(defaultEnd.getDate() + 7);
-      } else {
-        defaultEnd = new Date();
-        defaultEnd.setDate(defaultEnd.getDate() + 7);
-      }
-
-      if (defaultEnd <= defaultStart) {
-        defaultEnd = new Date(defaultStart);
-        defaultEnd.setDate(defaultEnd.getDate() + 7);
-      }
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (defaultStart < today) {
-        defaultStart = new Date(today);
-        defaultStart.setDate(defaultStart.getDate() + 2);
-        defaultEnd = new Date(defaultStart);
-        defaultEnd.setDate(defaultEnd.getDate() + 7);
-      }
-
-      const fp = flatpickr(datepick, {
-        mode: "range",
-        minDate: "today",
-        locale: Russian,
-        dateFormat: "d.m",
-        defaultDate: [defaultStart, defaultEnd],
-        onChange: (selectedDates) => {
-          if (selectedDates.length === 2) {
-            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
-          }
-        },
-        onReady: (selectedDates, dateStr, instance) => {
-          if (!selectedDates || selectedDates.length !== 2) {
-            setTimeout(() => {
-              instance.setDate([defaultStart, defaultEnd], true);
-            }, 10);
-          } else {
-            updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+      const dayRange = createDayRange({
+        rootEl,
+        gridSelector: ".day-grid",
+        defaultStartDay: searchParams.nightsFrom,
+        defaultEndDay: searchParams.nightsTill,
+        onChange: ({ startDay, endDay }) => {
+          if (startDay) {
+            const nightsTill = endDay || startDay;
+            updateLink({ nightsFrom: startDay, nightsTill: nightsTill });
+            const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
+            if (nightsValue) {
+              nightsValue.textContent = formatNightsText(startDay, nightsTill);
+            }
           }
         },
       });
-    }
+
+      if (dayRange) {
+        const state = dayRange.getState();
+        if (state.startDay) {
+          const nightsTill = state.endDay || state.startDay;
+          const nightsValue = rootEl.querySelector(".gtm-nights-select-value");
+          if (nightsValue) {
+            nightsValue.textContent = formatNightsText(state.startDay, nightsTill);
+          }
+        }
+      }
+
+      peopleCounter({
+        rootSelector: '[data-tab="tours"] .gtm-persons-select',
+        outputSelector: '[data-tab="tours"] .gtm-people-total',
+        maxAdults: 4,
+        maxChildren: 3,
+        onChange: ({ adults, children, ages }) => {
+          const encodedAges = ages.length ? ages.join("%2C") : "";
+          updateLink({
+            adultsCount: String(adults),
+            childCount: String(children),
+            childAges: encodedAges,
+          });
+        },
+      });
+
+      const datepick = rootEl.querySelector(".gtm-datepicker");
+      if (datepick) {
+        const startDate = parseDateYYYYMMDD(searchParams.checkInStart);
+        const endDate = parseDateYYYYMMDD(searchParams.checkInEnd);
+
+        let defaultStart, defaultEnd;
+
+        if (startDate) {
+          defaultStart = new Date(startDate);
+          defaultStart.setDate(defaultStart.getDate() + 2);
+        } else {
+          defaultStart = new Date();
+          defaultStart.setDate(defaultStart.getDate() + 2);
+        }
+
+        if (endDate) {
+          defaultEnd = new Date(endDate);
+          defaultEnd.setDate(defaultEnd.getDate() + 7);
+        } else {
+          defaultEnd = new Date();
+          defaultEnd.setDate(defaultEnd.getDate() + 7);
+        }
+
+        if (defaultEnd <= defaultStart) {
+          defaultEnd = new Date(defaultStart);
+          defaultEnd.setDate(defaultEnd.getDate() + 7);
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (defaultStart < today) {
+          defaultStart = new Date(today);
+          defaultStart.setDate(defaultStart.getDate() + 2);
+          defaultEnd = new Date(defaultStart);
+          defaultEnd.setDate(defaultEnd.getDate() + 7);
+        }
+
+        flatpickr(datepick, {
+          mode: "range",
+          minDate: "today",
+          locale: Russian,
+          dateFormat: "d.m",
+          defaultDate: [defaultStart, defaultEnd],
+          onChange: (selectedDates) => {
+            if (selectedDates.length === 2) {
+              updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+            }
+          },
+          onReady: (selectedDates, dateStr, instance) => {
+            if (!selectedDates || selectedDates.length !== 2) {
+              setTimeout(() => {
+                instance.setDate([defaultStart, defaultEnd], true);
+              }, 10);
+            } else {
+              updateLink({ checkInStart: selectedDates[0], checkInEnd: selectedDates[1] });
+            }
+          },
+        });
+      }
 
     await loadTowns();
     await loadStates(searchParams.activeTown);
-
-    section.classList.remove("is-loading");
   }
 
   async function initHotelsTab() {
     const rootEl = section.querySelector('.gtm-search__item[data-tab="hotels"]');
     if (!rootEl) return;
-
-    section.classList.add("is-loading");
-
     dropdown('[data-tab="hotels"] .gtm-nights-select');
     dropdown('[data-tab="hotels"] .gtm-persons-select');
 
@@ -551,16 +583,11 @@ export const gtmSearch = async () => {
     }
 
     await loadHotelStates();
-
-    section.classList.remove("is-loading");
   }
 
   async function initExcursionsTab() {
     const rootEl = section.querySelector('.gtm-search__item[data-tab="excursions"]');
     if (!rootEl) return;
-
-    section.classList.add("is-loading");
-
     dropdown('[data-tab="excursions"] .gtm-persons-select');
 
     const stateSelectElement = rootEl.querySelector(".gtm-state-select");
@@ -778,8 +805,6 @@ export const gtmSearch = async () => {
     }
 
     await loadStates();
-
-    section.classList.remove("is-loading");
   }
 
   const activeIndex = tabPanels.findIndex((p) => p.classList.contains("active"));
