@@ -190,22 +190,7 @@ export const initToursFilter = () => {
   const updateFilterOptions = (options) => {
     if (!options) return;
 
-    // Обновляем страны (всегда полный список, RU-алфавит с backend)
-    if (countrySelect && countryChoice && options.countries) {
-      const currentValue = countrySelect.value;
-      const hasCurrentValue = options.countries.some(c => String(c.id) === currentValue);
-      countryChoice.setChoices(
-        [
-          { value: '', label: 'Все страны', selected: !hasCurrentValue || currentValue === '', placeholder: true },
-          ...options.countries.map(c => ({
-            value: String(c.id),
-            label: c.name,
-            selected: hasCurrentValue && String(c.id) === currentValue
-          }))
-        ],
-        'value', 'label', true
-      );
-    }
+    // Страны не обновляем динамически, чтобы не сбивать выбранное значение.
 
     // Обновляем регионы
     if (regionSelect && regionChoice && options.regions) {
