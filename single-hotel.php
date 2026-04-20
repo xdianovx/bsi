@@ -31,6 +31,28 @@ $region_link = $region_term ? get_term_link($region_term) : '';
 $resort_link = $resort_term ? get_term_link($resort_term) : '';
 
 $city = trim((string) (function_exists('get_field') ? get_field('hotel_city', $post_id) : ''));
+$hotel_opened_at_raw = trim((string) (function_exists('get_field') ? get_field('hotel_opened_at', $post_id) : ''));
+$hotel_renovated_at_raw = trim((string) (function_exists('get_field') ? get_field('hotel_renovated_at', $post_id) : ''));
+
+$format_hotel_month_year = static function (string $value): string {
+  if ($value === '') {
+    return '';
+  }
+
+  $date = DateTime::createFromFormat('Y-m', $value);
+  if ($date instanceof DateTime) {
+    return $date->format('m/Y');
+  }
+
+  if (preg_match('/^\d{4}-\d{2}$/', $value)) {
+    return substr($value, 5, 2) . '/' . substr($value, 0, 4);
+  }
+
+  return $value;
+};
+
+$hotel_opened_at = $format_hotel_month_year($hotel_opened_at_raw);
+$hotel_renovated_at = $format_hotel_month_year($hotel_renovated_at_raw);
 
 $parts = array_filter([$country_title, $region_name, $resort_name, $city]);
 $address_line = implode(', ', $parts);
@@ -283,6 +305,31 @@ get_header();
             </div>
           </div>
 
+
+          <?php if ($hotel_opened_at || $hotel_renovated_at): ?>
+            <div class="hotel-widget">
+              <p class="hotel-widget__title">История отеля</p>
+              <div class="hotel-widget__distances">
+                <?php if ($hotel_opened_at): ?>
+                  <div class="hotel-widget__distance-item">
+                    <span class="hotel-widget__distance-key">Построен:</span>
+                    <span class="hotel-widget__distance-value numfont">
+                      <?= esc_html($hotel_opened_at); ?>
+                    </span>
+                  </div>
+                <?php endif; ?>
+
+                <?php if ($hotel_renovated_at): ?>
+                  <div class="hotel-widget__distance-item">
+                    <span class="hotel-widget__distance-key">Реновация:</span>
+                    <span class="hotel-widget__distance-value numfont">
+                      <?= esc_html($hotel_renovated_at); ?>
+                    </span>
+                  </div>
+                <?php endif; ?>
+              </div>
+            </div>
+          <?php endif; ?>
 
           <?php if (function_exists('have_rows') && have_rows('hotel_distances', $post_id)): ?>
             <div class="hotel-widget">

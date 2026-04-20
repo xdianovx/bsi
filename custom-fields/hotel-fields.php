@@ -104,6 +104,28 @@ function bsi_register_hotel_acf_groups(): void
         'instructions' => 'Покажет отель в блоке «Популярные отели» (слайдер на главной/в секциях по странам).',
         'wrapper' => ['width' => '50'],
       ],
+      [
+        'key' => 'field_hotel_opened_at',
+        'label' => 'Дата постройки отеля',
+        'name' => 'hotel_opened_at',
+        'type' => 'date_picker',
+        'display_format' => 'm/Y',
+        'return_format' => 'Y-m',
+        'first_day' => 1,
+        'instructions' => 'Укажите месяц и год постройки отеля.',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_hotel_renovated_at',
+        'label' => 'Дата последней реновации',
+        'name' => 'hotel_renovated_at',
+        'type' => 'date_picker',
+        'display_format' => 'm/Y',
+        'return_format' => 'Y-m',
+        'first_day' => 1,
+        'instructions' => 'Укажите месяц и год последнего ремонта/реновации.',
+        'wrapper' => ['width' => '50'],
+      ],
     ],
     'location' => [
       [
