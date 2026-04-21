@@ -1,5 +1,15 @@
 <?php
 
+$cruise_pages = get_pages(
+     [
+          'meta_key' => '_wp_page_template',
+          'meta_value' => 'page-cruise.php',
+          'number' => 1,
+     ]
+);
+
+$cruise_url = ! empty($cruise_pages) ? get_permalink($cruise_pages[0]->ID) : '#';
+
 $main_page_items = [
      // [
      //      'title' => "Онлайн <br> бронирование",
@@ -74,8 +84,8 @@ $main_page_items = [
      // ],
      [
           'title' => 'Круизы',
-          'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
-          'target' => '_blank',
+          'url' => $cruise_url,
+          'target' => '',
           'img' => 'https://bsigroup.ru/wp-content/uploads/2026/04/ship.png',
 
      ],
