@@ -166,13 +166,11 @@ $address = trim((string) (function_exists('get_field') ? get_field('education_ad
 $phone = trim((string) (function_exists('get_field') ? get_field('education_phone', $post_id) : ''));
 $website = trim((string) (function_exists('get_field') ? get_field('education_website', $post_id) : ''));
 
-// Получаем цену через новую систему конвертации или fallback
+// Цена в сайдбаре: минимум из программ (согласовано с диапазоном недель), иначе пост, иначе legacy education_price
 $price = '';
 $price_original = null;
 $price_currency = null;
-if (function_exists('bsi_education_get_price_in_rub')) {
-  $price = bsi_education_get_price_in_rub($post_id, false);
-}
+$price_rub_numeric = 0;
 
 $map_coords = function_exists('get_field') ? bsi_parse_map_coordinates(get_field('education_map_coordinates', $post_id)) : null;
 if ($map_coords) {
@@ -223,25 +221,19 @@ if (!empty($programs)) {
 $booking_url = function_exists('get_field') ? get_field('education_booking_url', $post_id) : '';
 
 if (function_exists('get_field')) {
-  $price_val = get_field('education_price', $post_id);
-
-  if (is_string($price_val) && $price_val !== '') {
-    $price = (string) $price_val;
-  }
-
-  if (empty($price) && !empty($programs)) {
+  if (!empty($programs)) {
     $prices_data = [];
     foreach ($programs as $program) {
       if (function_exists('bsi_education_get_program_price_in_rub')) {
         $program_price_rub = bsi_education_get_program_price_in_rub($program);
         if (!empty($program_price_rub)) {
-          // Извлекаем числовое значение из отформатированной строки
           $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
           if ($price_numeric > 0) {
+            $cur = $program['program_price_per_week_currency'] ?? null;
             $prices_data[] = [
               'price_rub' => $price_numeric,
               'original' => $program['program_price_per_week_original'] ?? null,
-              'currency' => $program['program_price_per_week_currency'] ?? null,
+              'currency' => $cur !== null && $cur !== '' ? strtoupper(trim((string) $cur)) : null,
             ];
           }
         }
@@ -270,14 +262,45 @@ if (function_exists('get_field')) {
         return $a['price_rub'] - $b['price_rub'];
       });
       $min_price_data = $prices_data[0];
+      $price_rub_numeric = (int) $min_price_data['price_rub'];
       $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽';
-      $price_original = $min_price_data['original'];
-      $price_currency = $min_price_data['currency'];
+      $orig = $min_price_data['original'] ?? null;
+      $cur = $min_price_data['currency'] ?? null;
+      if ($orig !== null && $orig !== '' && $cur) {
+        $price_original = (float) $orig;
+        $price_currency = $cur;
+      }
+    }
+  }
+
+  if ($price === '' && function_exists('bsi_education_get_price_in_rub')) {
+    $price = bsi_education_get_price_in_rub($post_id, false);
+    if ($price !== '') {
+      $price_rub_numeric = (int) preg_replace('/[^\d]/', '', $price);
+      $po = get_field('education_price_original', $post_id);
+      $pc = get_field('education_price_currency', $post_id);
+      if ($po !== null && $po !== '' && $pc !== null && $pc !== '') {
+        $price_original = (float) $po;
+        $price_currency = strtoupper(trim((string) $pc));
+      }
+    }
+  }
+
+  if ($price === '') {
+    $price_val = get_field('education_price', $post_id);
+    if (is_string($price_val) && $price_val !== '') {
+      $price = (string) $price_val;
+      if ($price_rub_numeric <= 0) {
+        $price_rub_numeric = (int) preg_replace('/[^\d]/', '', $price);
+      }
     }
   }
 
   if (!empty($price)) {
     $price = format_price_text($price);
+    if ($price_rub_numeric <= 0) {
+      $price_rub_numeric = (int) preg_replace('/[^\d]/', '', $price);
+    }
   }
 }
 
@@ -569,11 +592,14 @@ get_header();
               <div class="single-education__info">
                 <div class="single-education__info-item">
                   <div class="single-education__info-value js-education-price"
+                       <?php if ($price_rub_numeric > 0): ?>
+                       data-price-rub="<?php echo esc_attr($price_rub_numeric); ?>"
+                       <?php endif; ?>
                        <?php if (!empty($price_original) && !empty($price_currency)): ?>
-                       data-price-rub="<?php echo esc_attr((int) preg_replace('/[^\d]/', '', $price)); ?>"
                        data-price-original="<?php echo esc_attr($price_original); ?>"
                        data-price-currency="<?php echo esc_attr($price_currency); ?>"
                        <?php endif; ?>
+                       data-has-from="true"
                        <?php if ($duration_range): ?>
                        data-price-suffix=" / <?php echo esc_attr($duration_range); ?>"
                        <?php endif; ?>>
