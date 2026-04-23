@@ -13,11 +13,34 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 .bsimice-page .hero-wrapper {
-  background-image: url("../../img/mice/4.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  // background-image: url("../../img/mice/4.png");
+  // background-size: cover;
+  // background-position: center;
+  // background-repeat: no-repeat;
   padding-block: 32px;
+  position: relative;
+}
+
+.bsimice-page .hero-wrapper .hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+}
+
+.bsimice-page .hero-wrapper .hero {
+  z-index: 2;
+  position: relative;
 }
 .bsimice-page .hero__top {
   display: flex;

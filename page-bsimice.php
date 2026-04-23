@@ -7,7 +7,9 @@ get_header('mice');
         <?php if (function_exists('yoast_breadcrumb')): ?>
         <?php yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>'); ?>
         <?php endif; ?>
-
+        <div class="hero-bg">
+            <img src="<?php echo get_template_directory_uri(); ?>/img/mice/4.png" alt="">
+        </div>
         <section class="hero">
             <div class="container">
                 <div class="hero__top">
@@ -16,8 +18,8 @@ get_header('mice');
                         и деловые мероприятия для корпоративных клиентов по России и за рубежом.</p>
 
                     <div class="hero__buttons">
-                        <button class="hero__btn hero__btn--primary">Обсудить</button>
-                        <a href="/proekty" class="hero__btn hero__btn--secondary">Посмотреть проекты</a>
+                        <a href="#" class="hero__btn hero__btn--primary">Обсудить</a>
+                        <a href="#" class="hero__btn hero__btn--secondary">Посмотреть проекты</a>
                     </div>
                 </div>
             </div>
