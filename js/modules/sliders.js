@@ -180,9 +180,11 @@ export const sliders = () => {
         loop: true,
         freeMode: true,
         speed: 300,
-        pagination: paginationEl ? {
-          el: paginationEl,
-        } : false,
+        pagination: paginationEl
+          ? {
+              el: paginationEl,
+            }
+          : false,
       });
     });
   }
@@ -279,6 +281,16 @@ export const sliders = () => {
       1200: {
         slidesPerView: 4,
       },
+    },
+  });
+
+  const newReviewsSlider = new Swiper(".new-reviews-swiper", {
+    spaceBetween: 100,
+    loop: true,
+    slidesPerView: "auto",
+    navigation: {
+      nextEl: ".projects-section-arrow-next",
+      prevEl: ".projects-section-arrow-prev",
     },
   });
 };

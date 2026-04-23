@@ -68,6 +68,7 @@
 @import "./page/bonus.scss";
 @import "./page/gde-kupit.scss";
 @import "./page/agency.scss";
+@import "./page/bsimice.scss";
 
 .phone-link {
   display: inline-block;
@@ -224,7 +225,6 @@
   }
 }
 
-
 .grecaptcha-badge {
-    visibility: hidden !important;
+  visibility: hidden !important;
 }
