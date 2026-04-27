@@ -383,41 +383,13 @@ if ($all_tours_for_sort->have_posts()) {
         while ($initial_query->have_posts()):
           $initial_query->the_post();
           $tour_id = (int) get_the_ID();
-
-          $country_id = 0;
-          if (function_exists('get_field')) {
-            $country_val = get_field('tour_country', $tour_id);
-            if ($country_val instanceof WP_Post) {
-              $country_id = (int) $country_val->ID;
-            } elseif (is_array($country_val)) {
-              $country_id = (int) reset($country_val);
-            } else {
-              $country_id = (int) $country_val;
-            }
+          $tour_data = function_exists('bsi_get_tour_card_query_var')
+            ? bsi_get_tour_card_query_var($tour_id)
+            : [];
+          if (empty($tour_data)) {
+            continue;
           }
-
-          $country_title = $country_id ? (string) get_the_title($country_id) : '';
-
-          $flag_url = '';
-          if ($country_id && function_exists('get_field')) {
-            $flag_field = get_field('flag', $country_id);
-            if ($flag_field) {
-              if (is_array($flag_field) && !empty($flag_field['url'])) {
-                $flag_url = (string) $flag_field['url'];
-              } elseif (is_string($flag_field)) {
-                $flag_url = (string) $flag_field;
-              }
-            }
-          }
-
-          $items[] = [
-            'id' => $tour_id,
-            'url' => get_permalink($tour_id),
-            'title' => get_the_title($tour_id),
-            'flag' => $flag_url,
-            'country_title' => $country_title,
-            'country_id' => $country_id,
-          ];
+          $items[] = $tour_data;
         endwhile;
         wp_reset_postdata();
 

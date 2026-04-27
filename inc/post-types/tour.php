@@ -223,6 +223,29 @@ if (!function_exists('bsi_get_tour_primary_country_id')) {
   }
 }
 
+if (!function_exists('bsi_get_homepage_featured_tour_ids')) {
+  /**
+   * Туры, выбранные для слайдера на главной (ACF relationship на странице «Главная»).
+   * Порядок массива = порядок слайдов. Пустой массив — поле не задано (использовать fallback).
+   */
+  function bsi_get_homepage_featured_tour_ids(): array
+  {
+    if (!function_exists('get_field')) {
+      return [];
+    }
+    $front_page_id = (int) get_option('page_on_front');
+    if ($front_page_id <= 0) {
+      return [];
+    }
+    $acf_ids = get_field('homepage_tour_items', $front_page_id);
+    if (empty($acf_ids) || !is_array($acf_ids)) {
+      return [];
+    }
+
+    return array_values(array_filter(array_map('intval', $acf_ids)));
+  }
+}
+
 if (!function_exists('bsi_build_tour_country_meta_query')) {
   function bsi_build_tour_country_meta_query(int $country_id): array
   {
@@ -403,7 +426,7 @@ add_action('acf/init', function () {
         'type' => 'true_false',
         'ui' => 1,
         'default_value' => 0,
-        'instructions' => 'Если выбрано, тур отобразится в слайдере популярных туров',
+        'instructions' => 'Слайдер на главной: список задаётся на странице «Главная»; эта галочка синхронизируется с ним. Если слайдер на главной пуст, показываются туры только с этой галочкой.',
         'wrapper' => ['width' => '50'],
       ],
       [

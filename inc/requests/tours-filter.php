@@ -236,39 +236,12 @@ function bsi_ajax_tours_filter()
 
       // Собираем данные для карточки тура
       $tour_id = (int) get_the_ID();
-      $country_id_tour = 0;
-      if (function_exists('get_field')) {
-        $country_val = get_field('tour_country', $tour_id);
-        if ($country_val instanceof WP_Post) {
-          $country_id_tour = (int) $country_val->ID;
-        } elseif (is_array($country_val)) {
-          $country_id_tour = (int) reset($country_val);
-        } else {
-          $country_id_tour = (int) $country_val;
-        }
+      $tour_data = function_exists('bsi_get_tour_card_query_var')
+        ? bsi_get_tour_card_query_var($tour_id)
+        : [];
+      if (empty($tour_data)) {
+        continue;
       }
-
-      $country_title = $country_id_tour ? get_the_title($country_id_tour) : '';
-      $flag_url = '';
-      if ($country_id_tour && function_exists('get_field')) {
-        $flag_field = get_field('flag', $country_id_tour);
-        if ($flag_field) {
-          if (is_array($flag_field) && !empty($flag_field['url'])) {
-            $flag_url = (string) $flag_field['url'];
-          } elseif (is_string($flag_field)) {
-            $flag_url = (string) $flag_field;
-          }
-        }
-      }
-
-      $tour_data = [
-        'id' => $tour_id,
-        'url' => get_permalink($tour_id),
-        'title' => get_the_title($tour_id),
-        'flag' => $flag_url,
-        'country_title' => $country_title,
-        'country_id' => $country_id_tour,
-      ];
 
       set_query_var('tour', $tour_data);
       // Используем разные шаблоны для grid и list view

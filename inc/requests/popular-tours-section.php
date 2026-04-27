@@ -6,23 +6,41 @@ add_action('wp_ajax_nopriv_popular_tours_by_country', 'bsi_ajax_popular_tours_by
 function bsi_ajax_popular_tours_by_country()
 {
   $country_id = isset($_POST['country_id']) ? (int) $_POST['country_id'] : 0;
+  $homepage_tour_ids = function_exists('bsi_get_homepage_featured_tour_ids')
+    ? bsi_get_homepage_featured_tour_ids()
+    : [];
+
   $args = [
     'post_type' => 'tour',
     'post_status' => 'publish',
-    'posts_per_page' => 12,
-    'orderby' => 'date',
-    'order' => 'DESC',
-    'meta_query' => [
+    'ignore_sticky_posts' => true,
+    'no_found_rows' => true,
+  ];
+
+  if (!empty($homepage_tour_ids)) {
+    $args['post__in'] = $homepage_tour_ids;
+    $args['posts_per_page'] = -1;
+    $args['orderby'] = 'post__in';
+    if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
+      $args['meta_query'] = [
+        'relation' => 'AND',
+        bsi_build_tour_country_meta_query((int) $country_id),
+      ];
+    }
+  } else {
+    $args['posts_per_page'] = 12;
+    $args['orderby'] = ['menu_order' => 'ASC', 'date' => 'DESC'];
+    $args['meta_query'] = [
+      'relation' => 'AND',
       [
         'key' => 'is_popular',
         'value' => '1',
         'compare' => '=',
       ],
-    ],
-  ];
-
-  if ($country_id > 0) {
-    $args['meta_query'][] = bsi_build_tour_country_meta_query((int) $country_id);
+    ];
+    if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
+      $args['meta_query'][] = bsi_build_tour_country_meta_query((int) $country_id);
+    }
   }
 
   $q = new WP_Query($args);
@@ -32,79 +50,15 @@ function bsi_ajax_popular_tours_by_country()
   if ($q->have_posts()) {
     while ($q->have_posts()) {
       $q->the_post();
-
-      $tour_id = get_the_ID();
-      $country = bsi_get_tour_primary_country_id((int) $tour_id);
-
-      $flag_url = '';
-      if ($country && function_exists('get_field')) {
-        $flag = get_field('flag', $country);
-        if (is_array($flag) && !empty($flag['url']))
-          $flag_url = $flag['url'];
-        elseif (is_string($flag))
-          $flag_url = $flag;
+      $tour_id = (int) get_the_ID();
+      $tour_data = function_exists('bsi_get_tour_card_query_var') ? bsi_get_tour_card_query_var($tour_id) : [];
+      if (empty($tour_data)) {
+        continue;
       }
-
-      $region_name = '';
-      $regions = get_the_terms($tour_id, 'region');
-      if (!empty($regions) && !is_wp_error($regions)) {
-        $region_name = $regions[0]->name;
-      }
-
-      $location_title = '';
-      if ($country) {
-        $location_title = get_the_title($country);
-        if ($region_name)
-          $location_title .= ', ' . $region_name;
-      }
-
-      $price_text = '';
-      if (function_exists('get_field')) {
-        $price = get_field('price_from', $tour_id);
-        $show_from = get_field('show_price_from', $tour_id) !== false;
-        if ($price) {
-          if (is_numeric($price)) {
-            $price_formatted = number_format((float) $price, 0, '.', ' ') . ' руб';
-            $price_text = format_price_with_from($price_formatted, $show_from);
-          } elseif (is_string($price) && $price !== '') {
-            $price_text = format_price_with_from($price, $show_from);
-          }
-        }
-      }
-
-      $duration = '';
-      if (function_exists('get_field')) {
-        $duration_val = get_field('tour_duration', $tour_id);
-        if (is_string($duration_val) && $duration_val !== '') {
-          $duration = $duration_val;
-        }
-      }
-
-      $tour_types = [];
-      $type_terms = get_the_terms($tour_id, 'tour_type');
-      if (!empty($type_terms) && !is_wp_error($type_terms)) {
-        $tour_types = array_map(function($term) {
-          return $term->name;
-        }, $type_terms);
-      }
-
-      $item = [
-        'id' => $tour_id,
-        'url' => get_permalink($tour_id),
-        'image' => (string) get_the_post_thumbnail_url($tour_id, 'large'),
-        'type' => 'Тур',
-        'tags' => $tour_types,
-        'title' => get_the_title($tour_id),
-        'flag' => $flag_url ? esc_url($flag_url) : '',
-        'location_title' => $location_title,
-        'price' => $price_text,
-        'duration' => $duration,
-        'country_id' => $country,
-        'country_slug' => $country ? get_post_field('post_name', $country) : '',
-      ];
-
-      echo '<div class="swiper-slide">';
-      set_query_var('tour', $item);
+      $country_id_attr = (int) ($tour_data['country_id'] ?? 0);
+      $country_slug_attr = (string) ($tour_data['country_slug'] ?? '');
+      echo '<div class="swiper-slide" data-country="' . esc_attr($country_id_attr) . '" data-country-slug="' . esc_attr($country_slug_attr) . '">';
+      set_query_var('tour', $tour_data);
       get_template_part('template-parts/tour/card');
       echo '</div>';
     }

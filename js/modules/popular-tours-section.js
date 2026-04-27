@@ -1,4 +1,4 @@
-import Swiper from "swiper";
+import { Swiper } from "swiper/bundle";
 import { displayTourPrices } from "./services/priceLoader.js";
 
 export const initPopularToursSlider = () => {
@@ -50,6 +50,9 @@ export const initPopularToursSlider = () => {
     sliderEl.swiper.destroy(true, true);
   }
 
+  const nextBtn = root.querySelector(".popular-tours-arrow-next");
+  const prevBtn = root.querySelector(".popular-tours-arrow-prev");
+
   const swiperConfig = {
     spaceBetween: 16,
     loop: false,
@@ -57,8 +60,8 @@ export const initPopularToursSlider = () => {
     observer: true,
     observeParents: true,
     navigation: {
-      nextEl: ".popular-tours-arrow-next",
-      prevEl: ".popular-tours-arrow-prev",
+      nextEl: nextBtn,
+      prevEl: prevBtn,
     },
     breakpoints: {
       320: { slidesPerView: 1 },

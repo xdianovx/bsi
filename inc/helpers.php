@@ -311,6 +311,63 @@ function bsi_extract_price_number(?string $raw_price): ?int
 }
 
 /**
+ * Данные для set_query_var( 'tour', … ) в template-parts/tour/card — тот же контракт, что страница «Туры» и tours-filter AJAX.
+ * Цена на карточке: PriceLoaderService::getCachedTourPrice + ACF + пакет get_batch_tour_prices / priceLoader (как в каталоге).
+ *
+ * @return array<string, int|string>
+ */
+function bsi_get_tour_card_query_var(int $tour_id): array
+{
+  $tour_id = (int) $tour_id;
+  if ($tour_id <= 0) {
+    return [];
+  }
+
+  $country_id_tour = 0;
+  if (function_exists('get_field')) {
+    $country_val = get_field('tour_country', $tour_id);
+    if ($country_val instanceof WP_Post) {
+      $country_id_tour = (int) $country_val->ID;
+    } elseif (is_array($country_val)) {
+      $country_id_tour = (int) reset($country_val);
+    } else {
+      $country_id_tour = (int) $country_val;
+    }
+  }
+  if ($country_id_tour <= 0 && function_exists('bsi_get_tour_primary_country_id')) {
+    $country_id_tour = bsi_get_tour_primary_country_id($tour_id);
+  }
+
+  $country_title = $country_id_tour ? (string) get_the_title($country_id_tour) : '';
+  $flag_url = '';
+  if ($country_id_tour && function_exists('get_field')) {
+    $flag_field = get_field('flag', $country_id_tour);
+    if ($flag_field) {
+      if (is_array($flag_field) && !empty($flag_field['url'])) {
+        $flag_url = (string) $flag_field['url'];
+      } elseif (is_string($flag_field)) {
+        $flag_url = (string) $flag_field;
+      }
+    }
+  }
+
+  $country_slug = '';
+  if ($country_id_tour > 0) {
+    $country_slug = (string) get_post_field('post_name', $country_id_tour);
+  }
+
+  return [
+    'id' => $tour_id,
+    'url' => (string) get_permalink($tour_id),
+    'title' => (string) get_the_title($tour_id),
+    'flag' => $flag_url,
+    'country_title' => $country_title,
+    'country_id' => (int) $country_id_tour,
+    'country_slug' => $country_slug,
+  ];
+}
+
+/**
  * Каноническая цена тура для сортировки:
  * 1) кешированная SAMO-цена,
  * 2) fallback на ACF price_from.
