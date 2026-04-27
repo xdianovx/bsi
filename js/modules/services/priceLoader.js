@@ -75,10 +75,14 @@ function findMinPrice(prices) {
 async function fetchTourMinPrice(params) {
   try {
     const defaults = defaultExcursionCheckinRange();
+    // Само часто кладёт CHECKIN_BEG === CHECKIN_END (один YYYYMMDD) при 11 ночах — тогда API даёт пусто.
+    const beg = params.CHECKIN_BEG || "";
+    const end = params.CHECKIN_END || "";
+    const skipUrlDates = beg && end && beg === end;
     const merged = {
       ...params,
-      CHECKIN_BEG: params.CHECKIN_BEG || defaults.CHECKIN_BEG,
-      CHECKIN_END: params.CHECKIN_END || defaults.CHECKIN_END,
+      CHECKIN_BEG: skipUrlDates ? defaults.CHECKIN_BEG : (params.CHECKIN_BEG || defaults.CHECKIN_BEG),
+      CHECKIN_END: skipUrlDates ? defaults.CHECKIN_END : (params.CHECKIN_END || defaults.CHECKIN_END),
       NIGHTS_FROM: params.NIGHTS_FROM || "1",
       NIGHTS_TILL: params.NIGHTS_TILL || "30",
       CURRENCY: "1",

@@ -509,6 +509,13 @@ function parse_excursion_url(string $url): array
     $result['NIGHTS_TILL'] = (int) $params['NIGHTS_TILL'];
   }
 
+  if (!empty($params['CHECKIN_BEG'])) {
+    $result['CHECKIN_BEG'] = preg_replace('/\D/', '', (string) $params['CHECKIN_BEG']);
+  }
+  if (!empty($params['CHECKIN_END'])) {
+    $result['CHECKIN_END'] = preg_replace('/\D/', '', (string) $params['CHECKIN_END']);
+  }
+
   return $result;
 }
 

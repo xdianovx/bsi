@@ -224,6 +224,16 @@ class PriceLoaderService
   private static function fetchTourPrice(int $tour_id, array $excursion_params, array $params = []): ?array
   {
     try {
+      $n_from = $excursion_params['NIGHTS_FROM'] ?? 0;
+      $n_till = $excursion_params['NIGHTS_TILL'] ?? 0;
+      $n_from = $n_from > 0 ? $n_from : 1;
+      $n_till = $n_till > 0 ? $n_till : 30;
+      if ($n_from > $n_till) {
+        $tmp = $n_from;
+        $n_from = $n_till;
+        $n_till = $tmp;
+      }
+
       $api_params = [
         'TOWNFROMINC' => $excursion_params['TOWNFROMINC'] ?? 1,
         'STATEINC' => $excursion_params['STATEINC'] ?? 0,
@@ -231,16 +241,24 @@ class PriceLoaderService
         'ADULT' => $params['adults'] ?? 2,
         'CHILD' => $params['children'] ?? 0,
         'CURRENCY' => 1,
-        'NIGHTS_FROM' => 1,
-        'NIGHTS_TILL' => 30,
+        'NIGHTS_FROM' => $n_from,
+        'NIGHTS_TILL' => $n_till,
       ];
 
       if (!empty($params['date_from']) && !empty($params['date_to'])) {
         $api_params['CHECKIN_BEG'] = $params['date_from'];
         $api_params['CHECKIN_END'] = $params['date_to'];
       } else {
-        $api_params['CHECKIN_BEG'] = date('Ymd');
-        $api_params['CHECKIN_END'] = date('Ymd', strtotime('+3 months'));
+        $url_beg = $excursion_params['CHECKIN_BEG'] ?? '';
+        $url_end = $excursion_params['CHECKIN_END'] ?? '';
+        // Одна дата в CHECKIN_BEG/END (часто в ссылках Само) — даёт пустой SearchExcursion_PRICES; игнорируем.
+        if (is_string($url_beg) && is_string($url_end) && $url_beg !== '' && $url_end !== '' && $url_beg !== $url_end) {
+          $api_params['CHECKIN_BEG'] = $url_beg;
+          $api_params['CHECKIN_END'] = $url_end;
+        } else {
+          $api_params['CHECKIN_BEG'] = date('Ymd');
+          $api_params['CHECKIN_END'] = date('Ymd', strtotime('+3 months'));
+        }
       }
 
       $result = SamoService::endpoints()->searchExcursionPrices($api_params);
