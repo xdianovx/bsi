@@ -19,16 +19,15 @@ export const EducationCurrencySwitcher = (() => {
    * @returns {string} Formatted price
    */
   const formatPrice = (value, currency) => {
-    if (currency === 'RUB') {
-      // Format RUB with spaces: 75 000 ₽
-      return Number(value).toLocaleString('ru-RU') + ' ' + CURRENCY_SYMBOLS[currency];
-    } else {
-      // Format other currencies: 1,000 $
-      return Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }) + ' ' + CURRENCY_SYMBOLS[currency];
+    const code = (currency || 'RUB').toString().toUpperCase();
+    const sym = CURRENCY_SYMBOLS[code] || code;
+    if (code === 'RUB') {
+      return Number(value).toLocaleString('ru-RU') + ' ' + sym;
     }
+    return Number(value).toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }) + ' ' + sym;
   };
 
   /**
@@ -39,7 +38,7 @@ export const EducationCurrencySwitcher = (() => {
   const updateElementPrice = (element, showOriginal) => {
     const priceRub = element.dataset.priceRub;
     const priceOriginal = element.dataset.priceOriginal;
-    const priceCurrency = element.dataset.priceCurrency;
+    const priceCurrency = (element.dataset.priceCurrency || '').toUpperCase();
 
     if (!priceRub) return;
 
@@ -47,12 +46,10 @@ export const EducationCurrencySwitcher = (() => {
     let displayPrice, displayCurrency;
 
     if (showOriginal && priceOriginal && priceCurrency) {
-      // Show original price in original currency
-      displayPrice = parseFloat(priceOriginal);
+      displayPrice = parseFloat(String(priceOriginal).replace(/\s/g, '').replace(',', '.'));
       displayCurrency = priceCurrency;
     } else {
-      // Show converted price in RUB
-      displayPrice = parseInt(priceRub);
+      displayPrice = parseInt(String(priceRub).replace(/\s/g, ''), 10);
       displayCurrency = 'RUB';
     }
 

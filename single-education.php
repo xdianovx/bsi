@@ -171,6 +171,7 @@ $price = '';
 $price_original = null;
 $price_currency = null;
 $price_rub_numeric = 0;
+$duration_range = '';
 
 $map_coords = function_exists('get_field') ? bsi_parse_map_coordinates(get_field('education_map_coordinates', $post_id)) : null;
 if ($map_coords) {
@@ -224,16 +225,27 @@ if (function_exists('get_field')) {
   if (!empty($programs)) {
     $prices_data = [];
     foreach ($programs as $program) {
+      $program_duration = isset($program['program_duration']) && $program['program_duration'] !== '' ? (int) $program['program_duration'] : 0;
       if (function_exists('bsi_education_get_program_price_in_rub')) {
         $program_price_rub = bsi_education_get_program_price_in_rub($program);
         if (!empty($program_price_rub)) {
           $price_numeric = (int) preg_replace('/[^\d]/', '', $program_price_rub);
           if ($price_numeric > 0) {
             $cur = $program['program_price_per_week_currency'] ?? null;
+            if (is_array($cur)) {
+              $cur = reset($cur);
+            }
+            $cur = $cur !== null && $cur !== '' ? strtoupper(trim((string) $cur)) : null;
+            $orig_raw = $program['program_price_per_week_original'] ?? null;
+            $orig_f = ($orig_raw !== null && $orig_raw !== '') ? (float) $orig_raw : null;
+            if ($orig_f !== null && $orig_f <= 0) {
+              $orig_f = null;
+            }
             $prices_data[] = [
               'price_rub' => $price_numeric,
-              'original' => $program['program_price_per_week_original'] ?? null,
-              'currency' => $cur !== null && $cur !== '' ? strtoupper(trim((string) $cur)) : null,
+              'original' => $orig_f,
+              'currency' => $cur,
+              'duration' => $program_duration,
             ];
           }
         }
@@ -251,6 +263,7 @@ if (function_exists('get_field')) {
               'price_rub' => (int) str_replace(' ', '', $matches[0]),
               'original' => null,
               'currency' => null,
+              'duration' => $program_duration,
             ];
           }
         }
@@ -259,16 +272,65 @@ if (function_exists('get_field')) {
 
     if (!empty($prices_data)) {
       usort($prices_data, function ($a, $b) {
-        return $a['price_rub'] - $b['price_rub'];
+        $cmp = $a['price_rub'] <=> $b['price_rub'];
+        if ($cmp !== 0) {
+          return $cmp;
+        }
+        $a_meta = !empty($a['original']) && !empty($a['currency']);
+        $b_meta = !empty($b['original']) && !empty($b['currency']);
+        if ($a_meta !== $b_meta) {
+          return $b_meta <=> $a_meta;
+        }
+        $a_fc = $a_meta && $a['currency'] !== 'RUB';
+        $b_fc = $b_meta && $b['currency'] !== 'RUB';
+        if ($a_fc !== $b_fc) {
+          return $b_fc <=> $a_fc;
+        }
+        return 0;
       });
-      $min_price_data = $prices_data[0];
-      $price_rub_numeric = (int) $min_price_data['price_rub'];
-      $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽';
-      $orig = $min_price_data['original'] ?? null;
-      $cur = $min_price_data['currency'] ?? null;
-      if ($orig !== null && $orig !== '' && $cur) {
-        $price_original = (float) $orig;
-        $price_currency = $cur;
+      $min_rub = (int) $prices_data[0]['price_rub'];
+      $tied = array_values(array_filter($prices_data, static function ($r) use ($min_rub) {
+        return (int) $r['price_rub'] === $min_rub;
+      }));
+      $tied_with_meta = array_values(array_filter($tied, static function ($r) {
+        return !empty($r['original']) && !empty($r['currency']);
+      }));
+      if (!empty($tied_with_meta)) {
+        usort($tied_with_meta, static function ($a, $b) {
+          $a_fc = $a['currency'] !== 'RUB';
+          $b_fc = $b['currency'] !== 'RUB';
+          if ($a_fc !== $b_fc) {
+            return $b_fc <=> $a_fc;
+          }
+          return 0;
+        });
+        $winner = $tied_with_meta[0];
+      } else {
+        $winner = $tied[0];
+      }
+
+      $price_rub_numeric = $min_rub;
+      $price = number_format($min_rub, 0, ',', ' ') . ' ₽';
+      if (!empty($winner['original']) && !empty($winner['currency'])) {
+        $price_original = (float) $winner['original'];
+        $price_currency = (string) $winner['currency'];
+      }
+
+      $durations_tied = [];
+      foreach ($tied as $row) {
+        $d = isset($row['duration']) ? (int) $row['duration'] : 0;
+        if ($d > 0) {
+          $durations_tied[] = $d;
+        }
+      }
+      if (!empty($durations_tied)) {
+        $duration_min_t = min($durations_tied);
+        $duration_max_t = max($durations_tied);
+        if ($duration_min_t === $duration_max_t) {
+          $duration_range = $duration_min_t . ' ' . ($duration_min_t === 1 ? 'неделя' : ($duration_min_t < 5 ? 'недели' : 'недель'));
+        } else {
+          $duration_range = $duration_min_t . '-' . $duration_max_t . ' недель';
+        }
       }
     }
   }
@@ -304,10 +366,8 @@ if (function_exists('get_field')) {
   }
 }
 
-// Вычисляем диапазон продолжительности из всех программ
-$duration_min = 0;
-$duration_max = 0;
-if (!empty($programs)) {
+// Если цена не из программ (пост / legacy) — диапазон недель по всем программам
+if ($duration_range === '' && !empty($programs)) {
   $durations = [];
   foreach ($programs as $program) {
     $program_duration = isset($program['program_duration']) && $program['program_duration'] !== '' ? (int) $program['program_duration'] : 0;
@@ -318,19 +378,12 @@ if (!empty($programs)) {
   if (!empty($durations)) {
     $duration_min = min($durations);
     $duration_max = max($durations);
+    if ($duration_min === $duration_max) {
+      $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
+    } else {
+      $duration_range = $duration_min . '-' . $duration_max . ' недель';
+    }
   }
-}
-
-// Формируем диапазон недель для отображения
-$duration_range = '';
-if ($duration_min > 0 && $duration_max > 0) {
-  if ($duration_min === $duration_max) {
-    $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
-  } else {
-    $duration_range = $duration_min . '-' . $duration_max . ' недель';
-  }
-} elseif ($duration_min > 0) {
-  $duration_range = $duration_min . ' ' . ($duration_min === 1 ? 'неделя' : ($duration_min < 5 ? 'недели' : 'недель'));
 }
 
 get_header();
