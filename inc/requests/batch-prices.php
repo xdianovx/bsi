@@ -24,9 +24,13 @@ add_action('wp_ajax_nopriv_get_batch_tour_prices', 'get_batch_tour_prices');
 function get_batch_tour_prices()
 {
   try {
-    $tour_ids = isset($_POST['tour_ids']) ? $_POST['tour_ids'] : [];
+    $tour_ids = isset($_POST['tour_ids']) ? wp_unslash($_POST['tour_ids']) : [];
 
-    if (!is_array($tour_ids) || empty($tour_ids)) {
+    if (!is_array($tour_ids)) {
+      $tour_ids = ($tour_ids !== '' && $tour_ids !== null) ? array( $tour_ids ) : array();
+    }
+
+    if (empty($tour_ids)) {
       wp_send_json_error(['message' => 'tour_ids parameter is required and must be an array']);
     }
 

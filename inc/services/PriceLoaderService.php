@@ -156,6 +156,64 @@ class PriceLoaderService
   }
 
   /**
+   * Собрать массив цены для кеша из ответа SearchExcursion_PRICES.
+   *
+   * @param int $tour_id ID тура
+   * @param array<string,mixed>|null $samo_data SearchExcursion_PRICES
+   * @return array<string,mixed>|null
+   */
+  private static function buildPriceRowFromSamoPricesData(int $tour_id, $samo_data): ?array
+  {
+    if (!$samo_data || !is_array($samo_data)) {
+      return null;
+    }
+
+    if (isset($samo_data['prices'])) {
+      $prices = is_array($samo_data['prices']) ? $samo_data['prices'] : [$samo_data['prices']];
+    } elseif (isset($samo_data[0])) {
+      $prices = $samo_data;
+    } else {
+      return null;
+    }
+
+    $min_price = null;
+    foreach ($prices as $price_item) {
+      $price_value = $price_item['convertedPriceNumber']
+        ?? $price_item['convertedPrice']
+        ?? $price_item['price']
+        ?? null;
+
+      if ($price_value === null) {
+        continue;
+      }
+
+      $price = (float) $price_value;
+      if ($min_price === null || $price < $min_price) {
+        $min_price = $price;
+      }
+    }
+
+    if ($min_price === null) {
+      return null;
+    }
+
+    $price_per_person = round($min_price / 2);
+
+    $show_from = true;
+    if (function_exists('get_field')) {
+      $show_from_field = get_field('show_price_from', $tour_id);
+      $show_from = $show_from_field !== false;
+    }
+
+    return [
+      'price' => $price_per_person,
+      'price_formatted' => number_format($price_per_person, 0, '.', ' '),
+      'show_from' => $show_from,
+      'currency' => '₽',
+    ];
+  }
+
+  /**
    * Загрузить цену тура из Samotour API
    * 
    * @param int $tour_id ID тура
@@ -166,87 +224,42 @@ class PriceLoaderService
   private static function fetchTourPrice(int $tour_id, array $excursion_params, array $params = []): ?array
   {
     try {
-      // Подготавливаем параметры для API
       $api_params = [
         'TOWNFROMINC' => $excursion_params['TOWNFROMINC'] ?? 1,
         'STATEINC' => $excursion_params['STATEINC'] ?? 0,
         'TOURS' => $excursion_params['TOURS'] ?? 0,
         'ADULT' => $params['adults'] ?? 2,
         'CHILD' => $params['children'] ?? 0,
-        'CURRENCY' => 1, // RUB
-        'NIGHTS_FROM' => 1,  // Минимум 1 ночь
-        'NIGHTS_TILL' => 30, // Максимум 30 ночей
+        'CURRENCY' => 1,
+        'NIGHTS_FROM' => 1,
+        'NIGHTS_TILL' => 30,
       ];
 
-      // Если даты указаны явно, используем их
       if (!empty($params['date_from']) && !empty($params['date_to'])) {
         $api_params['CHECKIN_BEG'] = $params['date_from'];
         $api_params['CHECKIN_END'] = $params['date_to'];
       } else {
-        // Иначе используем диапазон 3 месяца вперед
-        $api_params['CHECKIN_BEG'] = date('Ymd');  // Сегодня
-        $api_params['CHECKIN_END'] = date('Ymd', strtotime('+3 months'));  // +3 месяца
+        $api_params['CHECKIN_BEG'] = date('Ymd');
+        $api_params['CHECKIN_END'] = date('Ymd', strtotime('+3 months'));
       }
 
       $result = SamoService::endpoints()->searchExcursionPrices($api_params);
-
       $samo_data = $result['data']['SearchExcursion_PRICES'] ?? null;
-      if (!$samo_data || !is_array($samo_data)) {
-        return null;
-      }
+      $row = self::buildPriceRowFromSamoPricesData($tour_id, $samo_data);
 
-      // Обрабатываем оба формата ответа SAMO:
-      // 1) {"SearchExcursion_PRICES": {"prices": [...]}}  — вложенный ключ prices
-      // 2) {"SearchExcursion_PRICES": [{...}, {...}]}      — массив напрямую
-      if (isset($samo_data['prices'])) {
-        $prices = is_array($samo_data['prices']) ? $samo_data['prices'] : [$samo_data['prices']];
-      } elseif (isset($samo_data[0])) {
-        $prices = $samo_data;
-      } else {
-        return null;
-      }
-
-      // Находим минимальную цену: convertedPriceNumber > convertedPrice > price
-      $min_price = null;
-      foreach ($prices as $price_item) {
-        $price_value = $price_item['convertedPriceNumber'] 
-          ?? $price_item['convertedPrice'] 
-          ?? $price_item['price'] 
-          ?? null;
-
-        if ($price_value === null) {
-          continue;
-        }
-
-        $price = (float) $price_value;
-        if ($min_price === null || $price < $min_price) {
-          $min_price = $price;
+      if ($row === null && empty($params['date_from']) && empty($params['date_to'])) {
+        $avail = self::getAvailableDates($excursion_params);
+        if ($avail !== null) {
+          $api_params['CHECKIN_BEG'] = $avail['date_from'];
+          $api_params['CHECKIN_END'] = $avail['date_to'];
+          $result = SamoService::endpoints()->searchExcursionPrices($api_params);
+          $samo_data = $result['data']['SearchExcursion_PRICES'] ?? null;
+          $row = self::buildPriceRowFromSamoPricesData($tour_id, $samo_data);
         }
       }
 
-      if ($min_price === null) {
-        return null;
-      }
-
-      // Сохраняем цену за 1 чел (цена из API обычно за 2 чел)
-      $price_per_person = round($min_price / 2);
-
-      // Получаем настройку show_price_from из ACF
-      $show_from = true;
-      if (function_exists('get_field')) {
-        $show_from_field = get_field('show_price_from', $tour_id);
-        $show_from = $show_from_field !== false;
-      }
-
-      return [
-        'price' => $price_per_person,
-        'price_formatted' => number_format($price_per_person, 0, '.', ' '),
-        'show_from' => $show_from,
-        'currency' => '₽',
-      ];
-
+      return $row;
     } catch (Exception $e) {
-      // В случае ошибки возвращаем null
       return null;
     }
   }

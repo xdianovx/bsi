@@ -225,8 +225,16 @@ if (function_exists('get_field')) {
       <?php if ($booking_url): ?>
         <?php
           $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($tour_id) : null;
-          $price_text = $cached_price ? $cached_price['price_formatted'] . ' ₽ / чел' : '';
-          $is_price_loaded = !empty($price_text);
+          $price_text = '';
+          if (is_array($cached_price) && !empty($cached_price['price_formatted'])) {
+            $price_text = $cached_price['price_formatted'] . ' ₽ / чел';
+          } elseif ($price_value !== '') {
+            // Как в сайдбаре single-tour: статичная цена из ACF, если нет transient.
+            $show_from_flag = !isset($show_from) || $show_from;
+            $prefix = $show_from_flag ? 'от ' : '';
+            $price_text = $prefix . $price_value . ' ₽ / чел';
+          }
+          $is_price_loaded = $price_text !== '';
         ?>
         <a href="<?php echo esc_url($booking_url); ?>" 
            class="btn btn-accent hotel-card__btn hotel-card__btn-book"

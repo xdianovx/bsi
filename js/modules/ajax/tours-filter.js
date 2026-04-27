@@ -818,4 +818,13 @@ export const initToursFilter = () => {
     }
   };
   initActiveClasses();
+
+  // После Choices/applyFromUrl: отложенно подгружаем цены (текущий .js-tours-list в DOM).
+  // Дублирующий вызов после loadTours безвреден — loadTourPricesBatch пропускает [data-price-loaded].
+  setTimeout(() => {
+    const listEl = document.querySelector(".js-tours-page .js-tours-list");
+    if (listEl) {
+      displayTourPrices(listEl);
+    }
+  }, 0);
 };
