@@ -551,3 +551,11 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
 .bsimice-page-consultation {
   margin-top: 120px;
 }
+
+.bsimice-page {
+  .breadcrumbs {
+    position: relative;
+    z-index: 10;
+    color: #fff;
+  }
+}
