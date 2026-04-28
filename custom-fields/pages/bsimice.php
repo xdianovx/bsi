@@ -49,6 +49,7 @@ add_action('acf/init', function () {
         'label' => 'Кнопка 1 — ссылка',
         'name' => 'bsimice_hero_btn_primary_url',
         'type' => 'url',
+        'instructions' => 'Пусто — скролл к блоку «Услуги» (#bsimice-services). Можно внешний URL.',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -63,6 +64,7 @@ add_action('acf/init', function () {
         'label' => 'Кнопка 2 — ссылка',
         'name' => 'bsimice_hero_btn_secondary_url',
         'type' => 'url',
+        'instructions' => 'Пусто — скролл к блоку «Опыт / цифры» (#bsimice-proove). Можно внешний URL.',
         'wrapper' => ['width' => '50'],
       ],
       [

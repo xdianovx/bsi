@@ -6,6 +6,20 @@
 .bsimice-page {
   margin-top: 16px;
 }
+
+// Якоря hero: учёт липкой шапки (MICE header — sticky на узких экранах)
+#bsimice-proove,
+#bsimice-services {
+  scroll-margin-top: 96px;
+
+  @media screen and (min-width: 769px) {
+    scroll-margin-top: 24px;
+  }
+}
+
+html:has(.bsimice-page) {
+  scroll-behavior: smooth;
+}
 .bsimice-page .breadcrumbs .breadcrumb_last {
   color: #fff;
 }

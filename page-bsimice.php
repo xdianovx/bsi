@@ -21,6 +21,29 @@ if (!function_exists('bsimice_format_textarea')) {
   }
 }
 
+if (!function_exists('bsimice_hero_link')) {
+  /**
+   * Пустой URL → якорь на этой странице; иначе внешняя ссылка или #fragment.
+   *
+   * @param string|null $acf_url
+   */
+  function bsimice_hero_link($acf_url, string $default_fragment_id): string
+  {
+    $default_fragment_id = ltrim($default_fragment_id, '#');
+    $acf_url = is_string($acf_url) ? trim($acf_url) : '';
+
+    if ($acf_url !== '' && $acf_url !== '#') {
+      if (strpos($acf_url, '#') === 0) {
+        return get_permalink() . $acf_url;
+      }
+
+      return $acf_url;
+    }
+
+    return get_permalink() . '#' . $default_fragment_id;
+  }
+}
+
 $bsimice_defaults = [
   'hero_title' => 'организация MICE мероприятий',
   'hero_subtitle' => 'Более 35 лет организуем конференции, инсентив-туры, тимбилдинг и деловые мероприятия для корпоративных клиентов по России и за рубежом.',
@@ -90,11 +113,14 @@ while (have_posts()) :
     $btn1_text = $bsimice_defaults['hero_btn_primary_text'];
   }
   $btn1_url = function_exists('get_field') ? get_field('bsimice_hero_btn_primary_url') : '';
+  $btn1_href = bsimice_hero_link($btn1_url, 'bsimice-services');
+
   $btn2_text = function_exists('get_field') ? get_field('bsimice_hero_btn_secondary_text') : '';
   if ($btn2_text === '' || $btn2_text === null) {
     $btn2_text = $bsimice_defaults['hero_btn_secondary_text'];
   }
   $btn2_url = function_exists('get_field') ? get_field('bsimice_hero_btn_secondary_url') : '';
+  $btn2_href = bsimice_hero_link($btn2_url, 'bsimice-proove');
 
   $plates_acf = function_exists('get_field') ? get_field('bsimice_plates') : null;
   $plates_from_acf = !empty($plates_acf) && is_array($plates_acf);
@@ -168,10 +194,10 @@ while (have_posts()) :
 
                     <div class="hero__buttons">
                         <?php if ($btn1_text !== ''): ?>
-                        <a href="<?php echo $btn1_url !== '' ? esc_url($btn1_url) : '#'; ?>" class="hero__btn hero__btn--primary"><?php echo esc_html($btn1_text); ?></a>
+                        <a href="<?php echo esc_url($btn1_href); ?>" class="hero__btn hero__btn--primary"><?php echo esc_html($btn1_text); ?></a>
                         <?php endif; ?>
                         <?php if ($btn2_text !== ''): ?>
-                        <a href="<?php echo $btn2_url !== '' ? esc_url($btn2_url) : '#'; ?>" class="hero__btn hero__btn--secondary"><?php echo esc_html($btn2_text); ?></a>
+                        <a href="<?php echo esc_url($btn2_href); ?>" class="hero__btn hero__btn--secondary"><?php echo esc_html($btn2_text); ?></a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -222,7 +248,7 @@ while (have_posts()) :
         </div>
     </section>
 
-    <section class="mice-proove">
+    <section id="bsimice-proove" class="mice-proove">
         <div class="container">
             <div class="mice-proove__top">
                 <div class="mice-proove__content">
@@ -267,7 +293,7 @@ while (have_posts()) :
         </div>
     </section>
 
-    <section class="services">
+    <section id="bsimice-services" class="services">
         <div class="container">
             <h2 class="services__heading"><?php echo esc_html($services_heading); ?></h2>
             <div class="services__list">
