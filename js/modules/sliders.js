@@ -284,13 +284,30 @@ export const sliders = () => {
     },
   });
 
-  const newReviewsSlider = new Swiper(".new-reviews-swiper", {
-    spaceBetween: 100,
-    loop: true,
-    slidesPerView: "auto",
-    navigation: {
-      nextEl: ".projects-section-arrow-next",
-      prevEl: ".projects-section-arrow-prev",
-    },
-  });
+  const miceReviewsSliderEl = document.querySelector(".mice-reviews-slider");
+  if (miceReviewsSliderEl) {
+    const miceReviewsSection = miceReviewsSliderEl.closest(".mice-reviews");
+    const prevBtn = miceReviewsSection?.querySelector(".mice-reviews-slider__prev") ?? null;
+    const nextBtn = miceReviewsSection?.querySelector(".mice-reviews-slider__next") ?? null;
+
+    new Swiper(miceReviewsSliderEl, {
+      spaceBetween: 24,
+      loop: false,
+      watchOverflow: true,
+      slidesPerView: 1,
+      breakpoints: {
+        1200: {
+          slidesPerView: 2,
+        },
+      },
+      ...(prevBtn && nextBtn
+        ? {
+            navigation: {
+              prevEl: prevBtn,
+              nextEl: nextBtn,
+            },
+          }
+        : {}),
+    });
+  }
 };

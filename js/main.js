@@ -4,6 +4,7 @@ import { fitForm } from "./modules/forms/fit-form";
 import { visaForm } from "./modules/forms/visa-form";
 import { initInsuranceForm } from "./modules/forms/insurance-form";
 import { initSingleVisaForm } from "./modules/forms/single-visa-form";
+import { initBsimiceConsultationForm } from "./modules/forms/bsimice-consultation-form";
 import { sliders } from "./modules/sliders";
 import { phoneMask } from "./modules/forms/phone-mask";
 import MicroModal from "micromodal";
@@ -54,6 +55,7 @@ window.addEventListener("DOMContentLoaded", () => {
   visaForm();
   initInsuranceForm();
   initSingleVisaForm();
+  initBsimiceConsultationForm();
   gtmSearch();
   phoneMask();
   initNewsFilter();

@@ -9,7 +9,9 @@
 
 // Якоря hero: учёт липкой шапки (MICE header — sticky на узких экранах)
 #bsimice-proove,
-#bsimice-services {
+#bsimice-services,
+#projects,
+#bsimice-contact {
   scroll-margin-top: 96px;
 
   @media screen and (min-width: 769px) {
@@ -473,58 +475,43 @@ section.mice-reviews .section_head h2 {
   text-transform: uppercase;
 }
 
-section.mice-reviews .reviews-swiper-outer {
-  --swiper-offset: max(var(--container-padding), calc((100vw - var(--container)) / 2 + var(--container-padding)));
-  padding-left: var(--swiper-offset);
+section.mice-reviews .mice-reviews-slider {
+  overflow: hidden;
 }
 
-section.mice-reviews .new-reviews-swiper {
-  overflow: visible;
+section.mice-reviews .mice-reviews-slider .swiper-slide {
+  height: auto;
 }
 
-section.mice-reviews .new-reviews-swiper .swiper-slide {
-  width: calc((100vw - var(--swiper-offset) - 16px) / 2.7);
-}
-
-@media (max-width: 1023px) {
-  section.mice-reviews .new-reviews-swiper .swiper-slide {
-    width: calc((100vw - var(--swiper-offset) - 16px) / 1.6);
-  }
-}
-
-@media (max-width: 767px) {
-  section.mice-reviews .new-reviews-swiper .swiper-slide {
-    width: calc(100vw - var(--swiper-offset) * 2);
-  }
-}
-
-section.mice-reviews .new-reviews-swiper .slide_box {
+section.mice-reviews .mice-reviews-slider .slide_box {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 16px;
 }
 
-section.mice-reviews .new-reviews-swiper .slide_box .review_text {
+section.mice-reviews .mice-reviews-slider .slide_box .review_text {
   font-size: 18px;
   font-weight: 400;
   font-style: italic;
+  margin-bottom: 0;
+  line-height: 150%;
 }
 
-section.mice-reviews .new-reviews-swiper .slide_box .review_user {
+section.mice-reviews .mice-reviews-slider .slide_box .review_user {
   display: flex;
   flex-direction: column;
 }
 
-section.mice-reviews .new-reviews-swiper .slide_box .review_user p {
+section.mice-reviews .mice-reviews-slider .slide_box .review_user p {
   margin-bottom: 0;
 }
 
-section.mice-reviews .new-reviews-swiper .slide_box .review_user .review_user-name {
+section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-name {
   font-size: 20px;
   font-weight: 500;
 }
 
-section.mice-reviews .new-reviews-swiper .slide_box .review_user .review_user-title {
+section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-title {
   font-size: 16px;
   font-weight: 400;
   color: #5c5c5c;
@@ -542,15 +529,22 @@ section.mice-reviews .new-reviews-swiper .slide_box .review_user .review_user-ti
     margin-bottom: 24px;
   }
 
-  section.mice-reviews .new-reviews-swiper .slide_box {
+  section.mice-reviews .mice-reviews-slider .slide_box {
     gap: 20px;
   }
 
-  section.mice-reviews .new-reviews-swiper .slide_box .review_text {
+  section.mice-reviews .mice-reviews-slider .slide_box .review_text {
     font-size: 16px;
   }
 
-  section.mice-reviews .new-reviews-swiper .slide_box .review_user .review_user-name {
+  section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-name {
     font-size: 16px;
+  }
+}
+
+#bsimice-consultation-form {
+  margin-top: 16px;
+  .form-row {
+    margin-bottom: 16px;
   }
 }
