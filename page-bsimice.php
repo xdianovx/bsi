@@ -376,7 +376,7 @@ while (have_posts()):
         $bsimice_privacy_url = $bsimice_privacy_url ? $bsimice_privacy_url : home_url('/');
         ?>
 
-        <section class="visa-page-consultation__section" id="bsimice-contact">
+        <section class="visa-page-consultation__section bsimice-page-consultation" id="bsimice-contact">
             <div class="container">
                 <h2 class="h2">Бесплатная консультация</h2>
                 <p class="visa-consultation-form__descr">Оставьте заявку — обсудим формат MICE-мероприятия и подберём
