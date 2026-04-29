@@ -2,7 +2,7 @@
 /**
  * Получатели заявок с форм MICE (bsimice_consultation_form: bsimice, delovoy, mice).
  *
- * По умолчанию: dianov.js@gmail.com, o.petrova@bsigroup.ru
+ * По умолчанию: dianov.js@gmail.com, o.petrova@bsigroup.ru (все три MICE-страницы с формой консультации).
  *
  * Добавить адреса:
  * add_filter('bsi_bsimice_lead_recipient_emails', function (array $emails) {
@@ -13,6 +13,9 @@
 
 if (!function_exists('bsi_get_bsimice_lead_recipient_emails')) {
   /**
+   * Получатели одной заявки (wp_mail получит массив — уйдёт всем).
+   * Формы: page-mice.php, page-bsimice.php, page-delovoy.php — общий шаблон consultation-form-section + ajax bsimice_consultation_form.
+   *
    * @return string[]
    */
   function bsi_get_bsimice_lead_recipient_emails(): array
