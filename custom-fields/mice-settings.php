@@ -34,6 +34,46 @@ add_action('acf/init', function () {
         'type'  => 'textarea',
         'rows'  => 3,
       ],
+      [
+        'key' => 'field_mice_reviews_slider_heading',
+        'label' => 'Слайдер отзывов — заголовок',
+        'name' => 'mice_reviews_slider_heading',
+        'type' => 'text',
+        'instructions' => 'Заголовок блока отзывов на родительской странице MICE. Слайды берутся с лендингов (MICE + деловой туризм); если там пусто — из полей ниже.',
+      ],
+      [
+        'key' => 'field_mice_reviews_slider',
+        'label' => 'Слайдер отзывов — слайды',
+        'name' => 'mice_reviews_slider',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить отзыв',
+        'instructions' => 'Запасной набор слайдов, если на лендингах нет отзывов в ACF.',
+        'sub_fields' => [
+          [
+            'key' => 'field_mice_review_quote',
+            'label' => 'Текст',
+            'name' => 'quote',
+            'type' => 'textarea',
+            'rows' => 5,
+            'new_lines' => 'br',
+          ],
+          [
+            'key' => 'field_mice_review_author',
+            'label' => 'Имя',
+            'name' => 'author_name',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_mice_review_role',
+            'label' => 'Должность / компания',
+            'name' => 'author_title',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
+      ],
     ],
     'location' => [
       [

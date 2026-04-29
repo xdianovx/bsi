@@ -1,6 +1,8 @@
 <?php
 /**
- * Получатели заявок с лендинга MICE (page-bsimice).
+ * Получатели заявок с форм MICE (bsimice_consultation_form: bsimice, delovoy, mice).
+ *
+ * По умолчанию: dianov.js@gmail.com, o.petrova@bsigroup.ru
  *
  * Добавить адреса:
  * add_filter('bsi_bsimice_lead_recipient_emails', function (array $emails) {
@@ -15,7 +17,10 @@ if (!function_exists('bsi_get_bsimice_lead_recipient_emails')) {
    */
   function bsi_get_bsimice_lead_recipient_emails(): array
   {
-    $emails = ['dianov.js@gmail.com'];
+    $emails = [
+      'dianov.js@gmail.com',
+      'o.petrova@bsigroup.ru',
+    ];
     /** @var string[] $emails */
     $emails = apply_filters('bsi_bsimice_lead_recipient_emails', $emails);
     $emails = array_map('sanitize_email', $emails);

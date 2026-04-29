@@ -65,7 +65,7 @@ function handle_bsimice_consultation_form(): void
     .section-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #dc2626; }
     .field { margin: 8px 0; }
     .field-label { font-weight: bold; display: inline-block; min-width: 180px; }
-    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+    .footer { margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee; font-size: 12px; color: #666; }
   </style>
 </head>
 <body>
@@ -118,6 +118,8 @@ function handle_bsimice_consultation_form(): void
     </div>';
   }
 
+  $html_message .= bsi_mail_lead_signature_html();
+
   $html_message .= '
     <div class="footer">
       <p><strong>Дата отправки:</strong> ' . esc_html(date('d.m.Y H:i:s')) . '</p>
@@ -127,11 +129,7 @@ function handle_bsimice_consultation_form(): void
 </body>
 </html>';
 
-  $headers = [
-    'Content-Type: text/html; charset=UTF-8',
-    'From: ' . get_bloginfo('name') . ' <' . get_bloginfo('admin_email') . '>',
-    'Reply-To: ' . $email,
-  ];
+  $headers = bsi_mail_lead_headers($email);
 
   $subject = $page_title !== ''
     ? sprintf('Заявка MICE — %s', $page_title)

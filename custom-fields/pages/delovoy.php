@@ -1,0 +1,258 @@
+<?php
+
+/**
+ * Поля страницы шаблона «Деловой туризм».
+ * Hero: bsimice_hero_* — те же ключи мета, что у лендинга MICE при прошлом общем наборе полей.
+ */
+
+add_action('acf/init', function () {
+  if (!function_exists('acf_add_local_field_group')) {
+    return;
+  }
+
+  acf_add_local_field_group([
+    'key' => 'group_delovoy_page',
+    'title' => 'Деловой туризм',
+    'fields' => [
+      [
+        'key' => 'field_delovoy_tab_hero',
+        'label' => 'Hero',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_delovoy_hero_bg',
+        'label' => 'Фон hero',
+        'name' => 'bsimice_hero_bg',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'library' => 'all',
+      ],
+      [
+        'key' => 'field_delovoy_hero_title',
+        'label' => 'Заголовок',
+        'name' => 'bsimice_hero_title',
+        'type' => 'text',
+      ],
+      [
+        'key' => 'field_delovoy_hero_subtitle',
+        'label' => 'Подзаголовок',
+        'name' => 'bsimice_hero_subtitle',
+        'type' => 'textarea',
+        'rows' => 3,
+        'new_lines' => 'br',
+      ],
+      [
+        'key' => 'field_delovoy_tab_services',
+        'label' => 'Услуги',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_delovoy_services_heading',
+        'label' => 'Заголовок секции',
+        'name' => 'delovoy_services_heading',
+        'type' => 'text',
+      ],
+      [
+        'key' => 'field_delovoy_services',
+        'label' => 'Услуги',
+        'name' => 'delovoy_services',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить услугу',
+        'sub_fields' => [
+          [
+            'key' => 'field_delovoy_service_icon',
+            'label' => 'Иконка (необязательно)',
+            'name' => 'icon',
+            'type' => 'image',
+            'return_format' => 'array',
+            'preview_size' => 'thumbnail',
+            'library' => 'all',
+            'wrapper' => ['width' => '25'],
+          ],
+          [
+            'key' => 'field_delovoy_service_title',
+            'label' => 'Название',
+            'name' => 'title',
+            'type' => 'text',
+            'wrapper' => ['width' => '35'],
+          ],
+          [
+            'key' => 'field_delovoy_service_desc',
+            'label' => 'Описание',
+            'name' => 'description',
+            'type' => 'textarea',
+            'rows' => 4,
+            'new_lines' => 'br',
+            'wrapper' => ['width' => '100'],
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_delovoy_tab_why',
+        'label' => 'Почему нас выбирают',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_delovoy_why_heading',
+        'label' => 'Заголовок секции',
+        'name' => 'delovoy_why_heading',
+        'type' => 'text',
+      ],
+      [
+        'key' => 'field_delovoy_why_description',
+        'label' => 'Вводный текст',
+        'name' => 'delovoy_why_description',
+        'type' => 'textarea',
+        'rows' => 4,
+        'new_lines' => 'br',
+      ],
+      [
+        'key' => 'field_delovoy_why_items',
+        'label' => 'Пункты',
+        'name' => 'delovoy_why_items',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить пункт',
+        'sub_fields' => [
+          [
+            'key' => 'field_delovoy_why_item_title',
+            'label' => 'Заголовок',
+            'name' => 'title',
+            'type' => 'text',
+          ],
+          [
+            'key' => 'field_delovoy_why_item_text',
+            'label' => 'Текст',
+            'name' => 'text',
+            'type' => 'textarea',
+            'rows' => 4,
+            'new_lines' => 'br',
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_delovoy_tab_prove',
+        'label' => 'Блок «Опыт / цифры»',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_delovoy_prove_heading',
+        'label' => 'Заголовок',
+        'name' => 'delovoy_prove_heading',
+        'type' => 'text',
+      ],
+      [
+        'key' => 'field_delovoy_prove_paragraphs',
+        'label' => 'Абзацы',
+        'name' => 'delovoy_prove_paragraphs',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить абзац',
+        'sub_fields' => [
+          [
+            'key' => 'field_delovoy_prove_p_text',
+            'label' => 'Текст',
+            'name' => 'text',
+            'type' => 'textarea',
+            'rows' => 4,
+            'new_lines' => 'br',
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_delovoy_prove_image',
+        'label' => 'Изображение справа',
+        'name' => 'delovoy_prove_image',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'library' => 'all',
+      ],
+      [
+        'key' => 'field_delovoy_stats',
+        'label' => 'Статистика (карточки)',
+        'name' => 'delovoy_stats',
+        'type' => 'repeater',
+        'layout' => 'row',
+        'button_label' => 'Добавить показатель',
+        'sub_fields' => [
+          [
+            'key' => 'field_delovoy_stat_title',
+            'label' => 'Крупный заголовок',
+            'name' => 'title',
+            'type' => 'text',
+            'wrapper' => ['width' => '33'],
+          ],
+          [
+            'key' => 'field_delovoy_stat_text',
+            'label' => 'Подпись',
+            'name' => 'text',
+            'type' => 'text',
+            'wrapper' => ['width' => '33'],
+          ],
+          [
+            'key' => 'field_delovoy_stat_bg',
+            'label' => 'Фоновая крупная надпись',
+            'name' => 'bg_label',
+            'type' => 'text',
+            'wrapper' => ['width' => '34'],
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_delovoy_tab_reviews',
+        'label' => 'Отзывы',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_delovoy_reviews_heading',
+        'label' => 'Заголовок секции',
+        'name' => 'delovoy_reviews_heading',
+        'type' => 'text',
+      ],
+      [
+        'key' => 'field_delovoy_reviews',
+        'label' => 'Слайды отзывов',
+        'name' => 'delovoy_reviews',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить отзыв',
+        'sub_fields' => [
+          [
+            'key' => 'field_delovoy_review_quote',
+            'label' => 'Текст',
+            'name' => 'quote',
+            'type' => 'textarea',
+            'rows' => 5,
+            'new_lines' => 'br',
+          ],
+          [
+            'key' => 'field_delovoy_review_author',
+            'label' => 'Имя',
+            'name' => 'author_name',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_delovoy_review_role',
+            'label' => 'Должность / компания',
+            'name' => 'author_title',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'page_template',
+          'operator' => '==',
+          'value' => 'page-delovoy.php',
+        ],
+      ],
+    ],
+  ]);
+});

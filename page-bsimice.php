@@ -108,19 +108,10 @@ while (have_posts()):
     $hero_subtitle = $hero_subtitle_from_acf ? $hero_subtitle_acf : $bsimice_defaults['hero_subtitle'];
     $hero_subtitle_html = bsimice_format_textarea($hero_subtitle, $hero_subtitle_from_acf);
 
-    $btn1_text = function_exists('get_field') ? get_field('bsimice_hero_btn_primary_text') : '';
-    if ($btn1_text === '' || $btn1_text === null) {
-        $btn1_text = $bsimice_defaults['hero_btn_primary_text'];
-    }
-    $btn1_url = function_exists('get_field') ? get_field('bsimice_hero_btn_primary_url') : '';
-    $btn1_href = bsimice_hero_link($btn1_url, 'bsimice-contact');
-
-    $btn2_text = function_exists('get_field') ? get_field('bsimice_hero_btn_secondary_text') : '';
-    if ($btn2_text === '' || $btn2_text === null) {
-        $btn2_text = $bsimice_defaults['hero_btn_secondary_text'];
-    }
-    $btn2_url = function_exists('get_field') ? get_field('bsimice_hero_btn_secondary_url') : '';
-    $btn2_href = bsimice_hero_link($btn2_url, 'projects');
+    $btn1_text = $bsimice_defaults['hero_btn_primary_text'];
+    $btn1_href = bsimice_hero_link('', 'bsimice-contact');
+    $btn2_text = $bsimice_defaults['hero_btn_secondary_text'];
+    $btn2_href = bsimice_hero_link('', 'projects');
 
     $plates_acf = function_exists('get_field') ? get_field('bsimice_plates') : null;
     $plates_from_acf = !empty($plates_acf) && is_array($plates_acf);
@@ -209,7 +200,7 @@ while (have_posts()):
             </section>
         </div>
 
-        <section>
+        <section id="bsimice-advantages">
             <div class="container">
                 <div class="plates">
                     <?php foreach ($plates as $plate):
@@ -372,73 +363,17 @@ while (have_posts()):
         ?>
 
         <?php
-        $bsimice_privacy_url = get_permalink(47);
-        $bsimice_privacy_url = $bsimice_privacy_url ? $bsimice_privacy_url : home_url('/');
+        set_query_var('mice_consultation_cfg', [
+            'section_class' => 'visa-page-consultation__section bsimice-page-consultation',
+            'section_id' => 'bsimice-contact',
+            'heading' => 'Бесплатная консультация',
+            'description' => 'Оставьте заявку — обсудим формат MICE-мероприятия и подберём решение под ваши задачи',
+        ]);
+        get_template_part('template-parts/mice/consultation-form-section');
         ?>
-
-        <section class="visa-page-consultation__section bsimice-page-consultation" id="bsimice-contact">
-            <div class="container">
-                <h2 class="h2">Бесплатная консультация</h2>
-                <p class="visa-consultation-form__descr">Оставьте заявку — обсудим формат MICE-мероприятия и подберём
-                    решение под ваши задачи</p>
-                <form id="bsimice-consultation-form" class="visa-consultation-form">
-                    <div class="form-row form-row-3">
-                        <div class="input-item white">
-                            <label for="bsimice-name">Имя *</label>
-                            <input type="text" name="name" id="bsimice-name" placeholder="Введите ваше имя" required>
-                        </div>
-                        <div class="input-item white">
-                            <label for="bsimice-phone">Телефон *</label>
-                            <input type="tel" name="phone" id="bsimice-phone" placeholder="+7 (___) ___-__-__" required>
-                        </div>
-                        <div class="input-item white">
-                            <label for="bsimice-email">E-mail *</label>
-                            <input type="email" name="email" id="bsimice-email" placeholder="name@example.com"
-                                autocomplete="email" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-item white">
-                            <label for="bsimice-wishes">Пожелания</label>
-                            <textarea name="wishes" id="bsimice-wishes" rows="5"
-                                placeholder="Опишите задачу, формат мероприятия, численность, сроки"></textarea>
-                        </div>
-                    </div>
-                    <input type="hidden" name="source_page_title" value="<?php echo esc_attr(get_the_title()); ?>">
-                    <input type="hidden" name="source_page_url" value="<?php echo esc_attr(get_permalink()); ?>">
-                    <div class="visa-consultation-form__bottom">
-                        <button type="submit" class="btn btn-accent fit-form__btn-submit">
-                            Отправить
-                        </button>
-                        <p class="form-policy fit-form__policy">
-                            Нажимая на кнопку &quot;Отправить&quot;, вы соглашаетесь с нашей
-                            <a href="<?php echo esc_url($bsimice_privacy_url); ?>" class="policy-link">политикой
-                                конфиденциальности</a>
-                        </p>
-                    </div>
-                    <div id="bsimice-consultation-form-status" class="form-status"></div>
-                </form>
-            </div>
-        </section>
     </main>
 
-    <div class="modal micromodal-slide" id="modal-bsimice-consultation-success" aria-hidden="true">
-        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-            <div class="modal__container modal-program-booking-success" role="dialog" aria-modal="true">
-                <div class="modal__content modal-program-booking-success__content">
-                    <div class="modal-program-booking-success__icon">
-                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="32" cy="32" r="32" fill="#4CAF50" />
-                            <path d="M20 32L28 40L44 24" stroke="white" stroke-width="4" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                    </div>
-                    <h3 class="modal-program-booking-success__title">Заявка отправлена!</h3>
-                    <p class="modal-program-booking-success__text">Мы свяжемся с вами в ближайшее время</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php get_template_part('template-parts/mice/consultation-form-modal'); ?>
 
     <?php
 endwhile;

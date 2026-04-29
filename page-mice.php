@@ -100,76 +100,53 @@ get_header('mice');
 
   <?php get_template_part('template-parts/news/news-slider'); ?>
   <?php get_template_part('template-parts/awards/slider', null, ['filter_mice' => true]); ?>
-  <?php get_template_part('template-parts/reviews/slider', null, ['filter_mice' => true]); ?>
+  <?php
+  $reviews_heading_opt = function_exists('get_field') ? get_field('mice_reviews_slider_heading', 'option') : '';
+  $reviews_heading = $reviews_heading_opt !== '' && $reviews_heading_opt !== null ? (string) $reviews_heading_opt : 'Нас Благодарят';
+
+  $reviews_rows = bsi_get_mice_parent_reviews_rows();
+  $reviews_from_acf = $reviews_rows !== [];
+
+  if (!$reviews_from_acf) {
+    $reviews_opt = function_exists('get_field') ? get_field('mice_reviews_slider', 'option') : null;
+    if (!empty($reviews_opt) && is_array($reviews_opt) && count($reviews_opt) > 0) {
+      $reviews_rows = $reviews_opt;
+      $reviews_from_acf = true;
+    } else {
+      $reviews_rows = bsi_mice_reviews_slider_default_rows();
+      $reviews_from_acf = false;
+    }
+  }
+
+  set_query_var('bsimice_reviews_slider_reviews', $reviews_rows);
+  set_query_var('bsimice_reviews_slider_heading', $reviews_heading);
+  set_query_var('bsimice_reviews_slider_from_acf', $reviews_from_acf);
+  get_template_part('template-parts/mice/reviews-slider');
+  ?>
   <?php get_template_part('template-parts/partners/partners-slider', null, ['filter_mice' => true]); ?>
 
 
 
 
-  <section class="page-mice-cta">
-    <div class="container">
-      <h2 class="h2"><?php echo esc_html(get_field('mice_cta_title', 'option') ?: 'Оставьте заявку'); ?></h2>
-      <p class="page-mice-cta__description">
-        <?php echo esc_html(get_field('mice_cta_description', 'option') ?: 'И мы проконсультируем вас по всем вопросам'); ?>
-      </p>
-      <div class="page-mice-cta__wrap">
-
-        <form action="">
-          <div class="form-row form-row-2">
-            <div class="input-item white ">
-              <label for="name">Имя *</label>
-              <input type="text" name="name" id="name" placeholder="Ваше имя">
-
-              <div class="error-message" data-field="phone">
-              </div>
-            </div>
-
-            <div class="input-item white">
-              <label for="company">Компания</label>
-              <input type="text" name="company" id="company" placeholder="Название">
-
-              <div class="error-message" data-field="phone">
-              </div>
-            </div>
-
-            <div class="input-item white">
-              <label for="phone">Телефон *</label>
-              <input type="tel" name="phone" id="phone" placeholder="+7 (___) ___-__-__">
-
-              <div class="error-message" data-field="phone">
-              </div>
-            </div>
-            <div class="input-item white">
-              <label for="email">Email</label>
-              <input type="email" name="email" id="email" placeholder="Почта">
-
-              <div class="error-message" data-field="phone">
-              </div>
-            </div>
-          </div>
-
-          <div class="">
-            <div id="form-status"></div>
-            <button type="submit" class="btn btn-accent page-mice-cta-submit">
-              Отправить
-            </button>
-
-            <p class="form-policy fit-form__policy">
-              Нажимая на кнопку "Отправить", вы соглашаетесь с <a
-                href="http://localhost:8888/bsinew/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/"
-                class="policy-link">
-                нашей политикой обработки персональных данных
-              </a>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
+  <?php
+  $mice_cta_title = function_exists('get_field') ? get_field('mice_cta_title', 'option') : '';
+  $mice_cta_description = function_exists('get_field') ? get_field('mice_cta_description', 'option') : '';
+  set_query_var('mice_consultation_cfg', [
+    'section_class' => 'visa-page-consultation__section mice-page-consultation',
+    'section_id' => 'mice-contact',
+    'heading' => $mice_cta_title !== '' && $mice_cta_title !== null ? (string) $mice_cta_title : 'Оставьте заявку',
+    'description' => $mice_cta_description !== '' && $mice_cta_description !== null
+      ? (string) $mice_cta_description
+      : 'И мы проконсультируем вас по всем вопросам',
+  ]);
+  get_template_part('template-parts/mice/consultation-form-section');
+  ?>
 
   <?php
   the_content();
   ?>
 </main>
+
+<?php get_template_part('template-parts/mice/consultation-form-modal'); ?>
 
 <?php get_footer('mice'); ?>

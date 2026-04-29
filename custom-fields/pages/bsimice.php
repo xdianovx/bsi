@@ -7,7 +7,7 @@ add_action('acf/init', function () {
 
   acf_add_local_field_group([
     'key' => 'group_bsimice_page',
-    'title' => 'Страница MICE (лендинг)',
+    'title' => 'Лендинг MICE',
     'fields' => [
       [
         'key' => 'field_bsimice_tab_hero',
@@ -36,36 +36,6 @@ add_action('acf/init', function () {
         'type' => 'textarea',
         'rows' => 3,
         'new_lines' => 'br',
-      ],
-      [
-        'key' => 'field_bsimice_hero_btn_primary_text',
-        'label' => 'Кнопка 1 — текст',
-        'name' => 'bsimice_hero_btn_primary_text',
-        'type' => 'text',
-        'wrapper' => ['width' => '50'],
-      ],
-      [
-        'key' => 'field_bsimice_hero_btn_primary_url',
-        'label' => 'Кнопка 1 — ссылка',
-        'name' => 'bsimice_hero_btn_primary_url',
-        'type' => 'url',
-        'instructions' => 'Пусто — скролл к форме заявки (#bsimice-contact). Можно внешний URL.',
-        'wrapper' => ['width' => '50'],
-      ],
-      [
-        'key' => 'field_bsimice_hero_btn_secondary_text',
-        'label' => 'Кнопка 2 — текст',
-        'name' => 'bsimice_hero_btn_secondary_text',
-        'type' => 'text',
-        'wrapper' => ['width' => '50'],
-      ],
-      [
-        'key' => 'field_bsimice_hero_btn_secondary_url',
-        'label' => 'Кнопка 2 — ссылка',
-        'name' => 'bsimice_hero_btn_secondary_url',
-        'type' => 'url',
-        'instructions' => 'Пусто — скролл к блоку «Проекты» (#projects). Можно внешний URL.',
-        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_bsimice_tab_plates',
