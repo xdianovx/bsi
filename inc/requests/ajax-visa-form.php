@@ -13,7 +13,7 @@ function handle_visa_form()
 
   // Логируем входящие данные
   error_log('Visa Form Data: ' . print_r($_POST, true));
-  
+
   $errors = [];
 
   // Валидация страны
@@ -53,6 +53,10 @@ function handle_visa_form()
   $travel_dates = sanitize_text_field($_POST['travel_dates'] ?? '');
   if (empty($travel_dates)) {
     $errors['travel_dates'] = 'Укажите даты поездки';
+  }
+
+  if (!isset($_POST['privacy_agreement']) || (string) $_POST['privacy_agreement'] !== 'on') {
+    $errors['privacy_agreement'] = 'Необходимо согласие на обработку персональных данных';
   }
 
   // Если есть ошибки - возвращаем их

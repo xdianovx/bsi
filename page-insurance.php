@@ -75,8 +75,8 @@ get_header();
 							<?php if ($insurance_thumbnail): ?>
 								<div class="insurance_item_img">
 									<a href="<?php echo esc_url($insurance_url); ?>">
-										<img src="<?php echo esc_url($insurance_thumbnail); ?>"
-											alt="<?php echo esc_attr($insurance_title); ?>" loading="lazy">
+										<img src="<?php echo esc_url($insurance_thumbnail); ?>" alt="<?php echo esc_attr($insurance_title); ?>"
+											loading="lazy">
 									</a>
 								</div>
 							<?php endif; ?>
@@ -221,9 +221,9 @@ get_header();
 									<?php if ($phone): ?>
 										<a class="visa-contact-item__phone visa-contact-item__link numfont"
 											href="<?php echo esc_url('tel:' . $tel); ?>">
-											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-												fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-												stroke-linejoin="round" class="lucide lucide-phone-call-icon lucide-phone-call">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+												stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+												class="lucide lucide-phone-call-icon lucide-phone-call">
 												<path d="M13 2a9 9 0 0 1 9 9" />
 												<path d="M13 6a5 5 0 0 1 5 5" />
 												<path
@@ -236,9 +236,9 @@ get_header();
 									<?php if ($email): ?>
 										<a class="visa-contact-item__email visa-contact-item__link numfont"
 											href="<?php echo esc_url('mailto:' . $email); ?>">
-											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-												fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-												stroke-linejoin="round" class="lucide lucide-mail-check-icon lucide-mail-check">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+												stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+												class="lucide lucide-mail-check-icon lucide-mail-check">
 												<path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" />
 												<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
 												<path d="m16 19 2 2 4-4" />
@@ -287,19 +287,23 @@ get_header();
 					</div>
 				</div>
 
+				<?php
+				if (function_exists('bsi_render_privacy_consent_checkbox')) {
+					bsi_render_privacy_consent_checkbox([
+						'variant' => 'input-item',
+						'checkbox_id' => 'insurance-privacy',
+						'wrapper_class' => 'white',
+						'html_required' => true,
+					]);
+				}
+				?>
+
 				<div class="visa-consultation-form__bottom">
 
 					<button type="submit" class="btn btn-accent fit-form__btn-submit">
 						Отправить
 					</button>
 
-					<p class="form-policy fit-form__policy">
-						Нажимая на кнопку "Отправить", вы соглашаетесь с <a
-							href="<?php echo esc_url(home_url('/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/')); ?>"
-							class="policy-link">
-							нашей политикой обработки персональных данных
-						</a>
-					</p>
 				</div>
 
 				<div id="form-status"></div>

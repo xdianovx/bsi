@@ -1,8 +1,5 @@
 import Choices from "choices.js";
-import {
-  submitFormWithRecaptcha,
-  RECAPTCHA_NOT_LOADED,
-} from "./form-ajax.js";
+import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -37,8 +34,6 @@ export const visaForm = () => {
       }
     });
   }
-
-
 
   // Валидация формы
   function validateForm() {
@@ -85,6 +80,11 @@ export const visaForm = () => {
       errors.travel_dates = "Укажите даты поездки";
     }
 
+    const privacy = form.querySelector('[name="privacy_agreement"]');
+    if (!privacy || !privacy.checked) {
+      errors.privacy_agreement = "Необходимо согласие на обработку персональных данных";
+    }
+
     return errors;
   }
 
@@ -121,7 +121,6 @@ export const visaForm = () => {
         choicesEl.classList.add("is-error");
       }
     }
-
   }
 
   // Скролл к первому полю с ошибкой
@@ -148,7 +147,11 @@ export const visaForm = () => {
         const filterFields = form.querySelectorAll(".education-programs-filter__field");
         filterFields.forEach((item) => {
           const select = item.querySelector("select");
-          if (select && (select.name === fieldName || select.classList.contains(fieldName === "country_id" ? "visa-form__country-select" : "visa-form__visa-type-select"))) {
+          if (
+            select &&
+            (select.name === fieldName ||
+              select.classList.contains(fieldName === "country_id" ? "visa-form__country-select" : "visa-form__visa-type-select"))
+          ) {
             targetElement = item;
           }
         });
@@ -183,7 +186,6 @@ export const visaForm = () => {
       }
     });
 
-
     const statusEl = document.getElementById("visa-form-status");
     if (statusEl) {
       statusEl.textContent = "";
@@ -217,7 +219,6 @@ export const visaForm = () => {
         choicesEl.classList.remove("is-error");
       }
     }
-
   }
 
   // Показать статус
@@ -303,8 +304,6 @@ export const visaForm = () => {
             choice.setChoiceByValue("");
           }
         });
-
-
       } else {
         // Показываем ошибки полей
         if (result.data && result.data.errors) {
@@ -315,12 +314,7 @@ export const visaForm = () => {
             showFieldError(field, result.data.errors[field]);
           });
         }
-        showStatus(
-          result.data?.errors?.recaptcha ||
-            result.data?.message ||
-            "Ошибка отправки",
-          "error"
-        );
+        showStatus(result.data?.errors?.recaptcha || result.data?.message || "Ошибка отправки", "error");
 
         setTimeout(() => {
           scrollToFirstError();
@@ -368,6 +362,11 @@ export const visaForm = () => {
         }
       }
     });
+
+    const privacyBox = form.querySelector('[name="privacy_agreement"]');
+    if (privacyBox) {
+      privacyBox.addEventListener("change", () => clearFieldError("privacy_agreement"));
+    }
   }
 
   // Инициализация всех компонентов

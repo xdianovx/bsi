@@ -137,6 +137,8 @@
 	</div>
 </footer>
 
+<?php get_template_part('template-parts/cookie-consent'); ?>
+
 <?= get_template_part('template-parts/modals') ?>
 <?= get_template_part('template-parts/maintenance-modal') ?>
 

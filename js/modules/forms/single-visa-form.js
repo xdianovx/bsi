@@ -1,9 +1,6 @@
 import IMask from "imask";
 import MicroModal from "micromodal";
-import {
-  submitFormWithRecaptcha,
-  RECAPTCHA_NOT_LOADED,
-} from "./form-ajax.js";
+import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 export const initSingleVisaForm = () => {
   const form = document.getElementById("single-visa-form");
@@ -38,6 +35,11 @@ export const initSingleVisaForm = () => {
       if (phoneDigits.length < 11) {
         errors.phone = true;
       }
+    }
+
+    const privacy = form.querySelector('[name="privacy_agreement"]');
+    if (!privacy || !privacy.checked) {
+      errors.privacy_agreement = true;
     }
 
     return errors;
@@ -159,12 +161,7 @@ export const initSingleVisaForm = () => {
           });
         }
 
-        showStatus(
-          result.data?.errors?.recaptcha ||
-            result.data?.message ||
-            "Ошибка отправки",
-          "error"
-        );
+        showStatus(result.data?.errors?.recaptcha || result.data?.message || "Ошибка отправки", "error");
 
         setTimeout(() => {
           scrollToFirstError();
@@ -195,6 +192,11 @@ export const initSingleVisaForm = () => {
         }
       });
     });
+
+    const privacyAgree = form.querySelector('[name="privacy_agreement"]');
+    if (privacyAgree) {
+      privacyAgree.addEventListener("change", () => clearFieldError("privacy_agreement"));
+    }
   }
 
   initPhoneMask();

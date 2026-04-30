@@ -1,9 +1,6 @@
 import IMask from "imask";
 import MicroModal from "micromodal";
-import {
-  submitFormWithRecaptcha,
-  RECAPTCHA_NOT_LOADED,
-} from "./form-ajax.js";
+import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 export const initBsimiceConsultationForm = () => {
   const form = document.getElementById("bsimice-consultation-form");
@@ -46,6 +43,11 @@ export const initBsimiceConsultationForm = () => {
       errors.email = true;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
       errors.email = true;
+    }
+
+    const privacy = form.querySelector('[name="privacy_agreement"]');
+    if (!privacy || !privacy.checked) {
+      errors.privacy_agreement = true;
     }
 
     return errors;
@@ -154,12 +156,7 @@ export const initBsimiceConsultationForm = () => {
           });
         }
 
-        showStatus(
-          result.data?.errors?.recaptcha ||
-            result.data?.message ||
-            "Ошибка отправки",
-          "error"
-        );
+        showStatus(result.data?.errors?.recaptcha || result.data?.message || "Ошибка отправки", "error");
 
         setTimeout(() => {
           scrollToFirstError();
@@ -181,9 +178,7 @@ export const initBsimiceConsultationForm = () => {
   });
 
   function initErrorAutoClear() {
-    const inputFields = form.querySelectorAll(
-      'input[type="text"], input[type="tel"], input[type="email"], textarea'
-    );
+    const inputFields = form.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"], textarea');
     inputFields.forEach((input) => {
       input.addEventListener("input", () => {
         const fieldName = input.getAttribute("name");
@@ -192,6 +187,11 @@ export const initBsimiceConsultationForm = () => {
         }
       });
     });
+
+    const privacyAgree = form.querySelector('[name="privacy_agreement"]');
+    if (privacyAgree) {
+      privacyAgree.addEventListener("change", () => clearFieldError("privacy_agreement"));
+    }
   }
 
   initPhoneMask();

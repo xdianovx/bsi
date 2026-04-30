@@ -323,17 +323,23 @@ get_header();
         <input type="hidden" name="visa_type_label" value="<?php echo esc_attr($visa_type_label); ?>">
       </div>
 
+      <?php
+      if (function_exists('bsi_render_privacy_consent_checkbox')) {
+        bsi_render_privacy_consent_checkbox([
+          'variant' => 'input-item',
+          'checkbox_id' => 'single-visa-privacy',
+          'wrapper_class' => 'white',
+          'html_required' => true,
+        ]);
+      }
+      ?>
+
       <div class="visa-consultation-form__bottom">
 
         <button type="submit" class="btn btn-accent fit-form__btn-submit">
           Отправить
         </button>
 
-        <p class="form-policy fit-form__policy">
-          Нажимая на кнопку “Отправить”, вы соглашаетесь с нашей <a href="<?= get_permalink(47) ?>" class="policy-link">
-            политикой конфиденциальности
-          </a>
-        </p>
       </div>
       <div id="single-visa-form-status" class="form-status"></div>
     </form>

@@ -1,9 +1,6 @@
 import MicroModal from "micromodal";
 import IMask from "imask";
-import {
-  submitFormWithRecaptcha,
-  RECAPTCHA_NOT_LOADED,
-} from "./form-ajax.js";
+import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 /**
  * Модуль для работы с формой бронирования билета на событийный тур
@@ -170,6 +167,11 @@ function validateForm() {
     errors.quantity = "Укажите количество билетов";
   }
 
+  const privacy = form.querySelector('[name="privacy_agreement"]');
+  if (!privacy || !privacy.checked) {
+    errors.privacy_agreement = "Необходимо согласие на обработку персональных данных";
+  }
+
   return errors;
 }
 
@@ -223,11 +225,7 @@ async function submitForm(e) {
           showFieldError(field, message);
         });
       }
-      alert(
-        result.data?.errors?.recaptcha ||
-          result.data?.message ||
-          "Произошла ошибка при отправке"
-      );
+      alert(result.data?.errors?.recaptcha || result.data?.message || "Произошла ошибка при отправке");
     }
   } catch (error) {
     if (error.message === RECAPTCHA_NOT_LOADED) {
@@ -294,6 +292,14 @@ export function initEventTicketForm() {
         }
       });
     });
+
+    const privacyCb = form.querySelector('[name="privacy_agreement"]');
+    if (privacyCb) {
+      privacyCb.addEventListener("change", () => {
+        const err = form.querySelector('.js-field-error[data-error-for="privacy_agreement"]');
+        if (err) err.textContent = "";
+      });
+    }
   }
 
   // Обработчики кнопок "Купить" на билетах

@@ -75,8 +75,8 @@ function handle_simple_form()
   $tour_duration = sanitize_text_field($_POST['tour_duration'] ?? '');
   $budget = sanitize_text_field($_POST['budget'] ?? '');
   $hotel_stars = sanitize_text_field($_POST['hotel_stars'] ?? '');
-  $services = isset($_POST['services']) && is_array($_POST['services']) 
-    ? array_map('sanitize_text_field', $_POST['services']) 
+  $services = isset($_POST['services']) && is_array($_POST['services'])
+    ? array_map('sanitize_text_field', $_POST['services'])
     : [];
   $comments = sanitize_textarea_field($_POST['comments'] ?? '');
   $adults_count = intval($_POST['adults_count'] ?? 0);
@@ -92,12 +92,12 @@ function handle_simple_form()
 
   $message = "Новая заявка с формы FIT\n\n";
   $message .= "Тип клиента: " . ($client_type === 'corporate' ? 'Корпоративный' : 'Частный') . "\n\n";
-  
+
   $message .= "Контактные данные:\n";
   $message .= "ФИО: $full_name\n";
   $message .= "Email: $email\n";
   $message .= "Телефон: $phone\n";
-  
+
   if ($client_type === 'corporate') {
     $company_name_val = sanitize_text_field($_POST['company_name'] ?? '');
     $inn_val = sanitize_text_field($_POST['inn'] ?? '');
@@ -124,7 +124,7 @@ function handle_simple_form()
   if ($hotel_stars) {
     $message .= "Звездность отеля: $hotel_stars\n";
   }
-  
+
   $message .= "\nКоличество человек:\n";
   $message .= "Взрослых: $adults_count\n";
   if ($children_count > 0) {
@@ -133,7 +133,7 @@ function handle_simple_form()
       $message .= "Возраста детей: " . implode(', ', $children_ages) . "\n";
     }
   }
-  
+
   if (!empty($services)) {
     $service_names = [
       'flight' => 'Авиаперелет',
@@ -144,12 +144,12 @@ function handle_simple_form()
       'insurance' => 'Страховка',
       'visa' => 'Виза',
     ];
-    $selected_services = array_map(function($val) use ($service_names) {
+    $selected_services = array_map(function ($val) use ($service_names) {
       return $service_names[$val] ?? $val;
     }, $services);
     $message .= "\nВыбранные услуги: " . implode(', ', $selected_services) . "\n";
   }
-  
+
   if ($comments) {
     $message .= "\nКомментарии:\n$comments\n";
   }

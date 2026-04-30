@@ -85,14 +85,19 @@
               data-field="comment"></textarea>
           </div>
 
+          <?php
+          if (function_exists('bsi_render_privacy_consent_checkbox')) {
+            bsi_render_privacy_consent_checkbox([
+              'variant' => 'program-booking',
+              'checkbox_id' => 'event-ticket-privacy',
+            ]);
+          }
+          ?>
+
           <div class="modal-program-booking__form-footer">
             <button type="submit" class="modal-program-booking__submit btn btn-accent">
               Отправить заявку
             </button>
-            <p class="modal-program-booking__privacy">
-              Нажимая кнопку "Отправить" вы соглашаетесь<br>
-              с нашей <a href="/privacy-policy/" target="_blank">политикой конфиденциальности</a>
-            </p>
           </div>
         </form>
       </div>

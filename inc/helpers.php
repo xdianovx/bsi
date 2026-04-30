@@ -980,3 +980,43 @@ function bsi_education_get_program_price_numeric_rub_from_post(int $education_id
 
   return $min_price;
 }
+
+/**
+ * Публичный URL страницы политики обработки персональных данных.
+ */
+function bsi_get_privacy_policy_url(): string
+{
+  $page_id = (int) apply_filters('bsi_privacy_policy_page_id', 47);
+  if ($page_id > 0) {
+    $permalink = get_permalink($page_id);
+    if (is_string($permalink) && $permalink !== '') {
+      return $permalink;
+    }
+  }
+
+  return home_url('/politika-v-otnoshenii-obrabotki-personalnyh-dannyh/');
+}
+
+/**
+ * Чекбокс согласия с политикой (по умолчанию не отмечен).
+ *
+ * @param array $opt {
+ *   @type string $variant         'program-booking' | 'visa-page' | 'input-item'
+ *   @type string $checkbox_id     атрибут id у input
+ *   @type string $wrapper_class   доп. классы корневой обёртки (например 'white')
+ *   @type bool   $html_required   атрибут HTML required
+ * }
+ */
+function bsi_render_privacy_consent_checkbox(array $opt = []): void
+{
+  $variant = isset($opt['variant']) ? (string) $opt['variant'] : 'visa-page';
+  $checkbox_id = isset($opt['checkbox_id']) && $opt['checkbox_id'] !== ''
+    ? (string) $opt['checkbox_id']
+    : 'privacy-consent-' . wp_unique_id('');
+  $wrapper_class = isset($opt['wrapper_class']) ? (string) $opt['wrapper_class'] : '';
+  $html_required = !empty($opt['html_required']);
+
+  $privacy_url = bsi_get_privacy_policy_url();
+
+  require get_template_directory() . '/template-parts/form-privacy-consent.php';
+}

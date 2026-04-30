@@ -1,9 +1,6 @@
 import IMask from "imask";
 import MicroModal from "micromodal";
-import {
-  submitFormWithRecaptcha,
-  RECAPTCHA_NOT_LOADED,
-} from "./form-ajax.js";
+import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 /**
  * Модуль для работы с формой консультации по страхованию
@@ -19,7 +16,7 @@ export const initInsuranceForm = () => {
 
   // Инициализация маски телефона
   function initPhoneMask() {
-    const phoneInput = form.querySelector('#insurance_phone');
+    const phoneInput = form.querySelector("#insurance_phone");
     if (phoneInput && !phoneMaskInstance) {
       phoneMaskInstance = IMask(phoneInput, {
         mask: "+{7} (000) 000-00-00",
@@ -50,6 +47,11 @@ export const initInsuranceForm = () => {
       }
     }
 
+    const privacy = form.querySelector('[name="privacy_agreement"]');
+    if (!privacy || !privacy.checked) {
+      errors.privacy_agreement = true;
+    }
+
     return errors;
   }
 
@@ -57,7 +59,7 @@ export const initInsuranceForm = () => {
   function showFieldError(fieldName) {
     const inputEl = form.querySelector(`[name="${fieldName}"]`);
     if (inputEl) {
-      const inputItem = inputEl.closest('.input-item');
+      const inputItem = inputEl.closest(".input-item");
       if (inputItem) {
         inputItem.classList.add("err");
       }
@@ -81,7 +83,7 @@ export const initInsuranceForm = () => {
   function clearFieldError(fieldName) {
     const inputEl = form.querySelector(`[name="${fieldName}"]`);
     if (inputEl) {
-      const inputItem = inputEl.closest('.input-item');
+      const inputItem = inputEl.closest(".input-item");
       if (inputItem) {
         inputItem.classList.remove("err");
       }
@@ -100,7 +102,7 @@ export const initInsuranceForm = () => {
   // Скролл к первому полю с ошибкой
   function scrollToFirstError() {
     const firstErrorField = form.querySelector(".input-item.err");
-    
+
     if (firstErrorField) {
       const offsetTop = firstErrorField.getBoundingClientRect().top + window.pageYOffset - 100;
       window.scrollTo({
@@ -185,12 +187,7 @@ export const initInsuranceForm = () => {
             showFieldError(field);
           });
         }
-        showStatus(
-          result.data?.errors?.recaptcha ||
-            result.data?.message ||
-            "Ошибка отправки",
-          "error"
-        );
+        showStatus(result.data?.errors?.recaptcha || result.data?.message || "Ошибка отправки", "error");
 
         // Скролл к первому полю с ошибкой
         setTimeout(() => {
@@ -224,6 +221,11 @@ export const initInsuranceForm = () => {
         }
       });
     });
+
+    const privacyAgree = form.querySelector('[name="privacy_agreement"]');
+    if (privacyAgree) {
+      privacyAgree.addEventListener("change", () => clearFieldError("privacy_agreement"));
+    }
   }
 
   // Инициализация всех компонентов

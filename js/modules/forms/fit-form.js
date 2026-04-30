@@ -4,10 +4,7 @@ import { Russian } from "flatpickr/dist/l10n/ru.js";
 import { peopleCounter } from "../gtm-people-counter.js";
 import { dropdown } from "./dropdown.js";
 import { createDayRange } from "./day-range.js";
-import {
-  submitFormWithRecaptcha,
-  RECAPTCHA_NOT_LOADED,
-} from "./form-ajax.js";
+import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -381,6 +378,11 @@ export const fitForm = () => {
       }
     }
 
+    const privacy = form.querySelector('[name="privacy_agreement"]');
+    if (!privacy || !privacy.checked) {
+      errors.privacy_agreement = "Необходимо согласие на обработку персональных данных";
+    }
+
     return errors;
   }
 
@@ -710,12 +712,7 @@ export const fitForm = () => {
             showFieldError(field, result.data.errors[field]);
           });
         }
-        showStatus(
-          result.data?.errors?.recaptcha ||
-            result.data?.message ||
-            "Ошибка отправки",
-          "error"
-        );
+        showStatus(result.data?.errors?.recaptcha || result.data?.message || "Ошибка отправки", "error");
 
         // Скролл к первому полю с ошибкой
         setTimeout(() => {
@@ -743,6 +740,11 @@ export const fitForm = () => {
         }
       });
     });
+
+    const privacyAgree = form.querySelector('[name="privacy_agreement"]');
+    if (privacyAgree) {
+      privacyAgree.addEventListener("change", () => clearFieldError("privacy_agreement"));
+    }
 
     // Очистка ошибок для ChoicesJS
     Object.keys(choicesInstances).forEach((key) => {

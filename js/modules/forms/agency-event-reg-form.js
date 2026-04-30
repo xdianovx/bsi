@@ -60,6 +60,11 @@ export const initAgencyEventRegForm = () => {
       if (phoneDigits.length < 11) errors.tel = true;
     }
 
+    const privacy = form.querySelector('[name="privacy_agreement"]');
+    if (!privacy || !privacy.checked) {
+      errors.privacy_agreement = true;
+    }
+
     return errors;
   }
 
@@ -131,8 +136,7 @@ export const initAgencyEventRegForm = () => {
     }
 
     try {
-      const ajaxUrl =
-        (typeof ajax !== "undefined" && ajax.url) || window.ajaxurl;
+      const ajaxUrl = (typeof ajax !== "undefined" && ajax.url) || window.ajaxurl;
       const response = await fetch(ajaxUrl, {
         method: "POST",
         body: formData,
@@ -159,9 +163,7 @@ export const initAgencyEventRegForm = () => {
       } else {
         if (result.data && result.data.errors) {
           clearErrors();
-          Object.keys(result.data.errors).forEach((field) =>
-            showFieldError(field)
-          );
+          Object.keys(result.data.errors).forEach((field) => showFieldError(field));
         }
         showStatus(result.data?.message || "Ошибка отправки", "error");
       }
@@ -176,13 +178,16 @@ export const initAgencyEventRegForm = () => {
     }
   });
 
-  const inputFields = form.querySelectorAll(
-    'input[type="text"], input[type="tel"], input[type="email"]'
-  );
+  const inputFields = form.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"]');
   inputFields.forEach((input) => {
     input.addEventListener("input", () => {
       const fieldName = input.getAttribute("name");
       if (fieldName) clearFieldError(fieldName);
     });
   });
+
+  const privacyAgree = form.querySelector('[name="privacy_agreement"]');
+  if (privacyAgree) {
+    privacyAgree.addEventListener("change", () => clearFieldError("privacy_agreement"));
+  }
 };

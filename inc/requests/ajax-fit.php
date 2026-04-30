@@ -94,8 +94,9 @@ function handle_fit_form()
     }
   }
 
-  // Явно убираем ошибку privacy_agreement, если она была добавлена где-то еще
-  unset($errors['privacy_agreement']);
+  if (!isset($_POST['privacy_agreement']) || (string) $_POST['privacy_agreement'] !== 'on') {
+    $errors['privacy_agreement'] = 'Необходимо согласие на обработку персональных данных';
+  }
 
   // Если есть ошибки - возвращаем их
   if (!empty($errors)) {

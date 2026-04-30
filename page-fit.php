@@ -359,17 +359,22 @@ $selected_country_id = isset($_GET['country']) ? (int) $_GET['country'] : 0;
 
 
 
+          <?php
+          if (function_exists('bsi_render_privacy_consent_checkbox')) {
+            bsi_render_privacy_consent_checkbox([
+              'variant' => 'visa-page',
+              'checkbox_id' => 'fit-privacy',
+              'html_required' => true,
+            ]);
+          }
+          ?>
+
           <div class="fit-form__bottom">
-            
+
             <button type="submit" class="btn btn-accent fit-form__btn-submit">
               Отправить
             </button>
 
-            <p class="form-policy fit-form__policy">
-              Нажимая на кнопку "Отправить", вы соглашаетесь с <a href="<?= get_permalink(47) ?>" class="policy-link">
-                нашей политикой обработки персональных данных
-              </a>
-            </p>
             <div id="form-status"></div>
           </div>
         </form>

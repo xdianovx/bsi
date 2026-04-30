@@ -84,6 +84,17 @@
 
             <button class="btn btn-accent" type="submit">Подписаться</button>
 
+            <?php
+            if (function_exists('bsi_render_privacy_consent_checkbox')) {
+              bsi_render_privacy_consent_checkbox([
+                'variant' => 'input-item',
+                'checkbox_id' => 'subscribe-privacy',
+                'wrapper_class' => 'subscribe-section__privacy-consent',
+                'html_required' => true,
+              ]);
+            }
+            ?>
+
             <input type="hidden" name="charset" value="UTF-8">
             <input type="hidden" name="default_list_id" value="<?= esc_attr((string) $unisender_default_list_id) ?>">
             <?php foreach ($unisender_list_ids as $list_id): ?>
@@ -93,12 +104,6 @@
             <input type="hidden" name="is_v5" value="1">
           </form>
 
-          <p class="form-policy subscribe-form__policy">
-            Нажимая на кнопку "Отправить", вы соглашаетесь с <br> <a href="<?= esc_url(get_permalink(47)) ?>"
-              class="policy-link">
-              нашей политикой обработки персональных данных
-            </a>
-          </p>
         </div>
 
         <div class="subscribe-section-wrap-socials">

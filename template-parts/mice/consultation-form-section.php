@@ -20,8 +20,6 @@ $cfg = wp_parse_args(is_array($cfg) ? $cfg : [], [
   'description' => 'Оставьте заявку — обсудим формат MICE-мероприятия и подберём решение под ваши задачи',
 ]);
 
-$privacy_url = get_permalink(47);
-$privacy_url = $privacy_url ? $privacy_url : home_url('/');
 ?>
 
 <section class="<?php echo esc_attr($cfg['section_class']); ?>" id="<?php echo esc_attr($cfg['section_id']); ?>">
@@ -40,7 +38,8 @@ $privacy_url = $privacy_url ? $privacy_url : home_url('/');
         </div>
         <div class="input-item white">
           <label for="bsimice-email">E-mail *</label>
-          <input type="email" name="email" id="bsimice-email" placeholder="name@example.com" autocomplete="email" required>
+          <input type="email" name="email" id="bsimice-email" placeholder="name@example.com" autocomplete="email"
+            required>
         </div>
       </div>
       <div class="form-row">
@@ -52,14 +51,20 @@ $privacy_url = $privacy_url ? $privacy_url : home_url('/');
       </div>
       <input type="hidden" name="source_page_title" value="<?php echo esc_attr(get_the_title()); ?>">
       <input type="hidden" name="source_page_url" value="<?php echo esc_attr(get_permalink()); ?>">
+      <?php
+      if (function_exists('bsi_render_privacy_consent_checkbox')) {
+        bsi_render_privacy_consent_checkbox([
+          'variant' => 'input-item',
+          'checkbox_id' => 'bsimice-privacy',
+          'wrapper_class' => 'white',
+          'html_required' => true,
+        ]);
+      }
+      ?>
       <div class="visa-consultation-form__bottom">
         <button type="submit" class="btn btn-accent fit-form__btn-submit">
           Отправить
         </button>
-        <p class="form-policy fit-form__policy">
-          Нажимая на кнопку &quot;Отправить&quot;, вы соглашаетесь с нашей
-          <a href="<?php echo esc_url($privacy_url); ?>" class="policy-link">политикой конфиденциальности</a>
-        </p>
       </div>
       <div id="bsimice-consultation-form-status" class="form-status"></div>
     </form>

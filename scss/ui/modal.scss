@@ -242,8 +242,8 @@
   content: "";
   position: absolute;
   display: none;
-  left: 6px;
-  top: 2px;
+  left: 7px;
+  top: 4px;
   width: 4px;
   height: 9px;
   border: solid white;
@@ -269,6 +269,42 @@
   color: #999;
   margin-left: 32px;
   margin-top: -8px;
+}
+
+.modal-program-booking__service-item--policy {
+  align-items: flex-start;
+  font-size: 14px;
+  font-weight: 400;
+
+  .modal-program-booking__service-checkmark {
+    flex-shrink: 0;
+    min-width: 20px;
+    min-height: 20px;
+    margin-top: 1px;
+  }
+
+  .modal-program-booking__service-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.35;
+
+    a {
+      font-size: inherit;
+      font-weight: 400;
+      color: #e53935;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.modal-program-booking__form-group--privacy {
+  margin-bottom: 16px;
 }
 
 .modal-program-booking__total {

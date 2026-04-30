@@ -47,6 +47,10 @@ function bsi_agency_event_registration()
     }
   }
 
+  if (!isset($_POST['privacy_agreement']) || (string) $_POST['privacy_agreement'] !== 'on') {
+    $errors['privacy_agreement'] = true;
+  }
+
   if (!empty($errors)) {
     wp_send_json_error([
       'message' => 'Заполните обязательные поля',

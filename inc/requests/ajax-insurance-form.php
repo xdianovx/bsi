@@ -34,6 +34,10 @@ function handle_insurance_form()
     }
   }
 
+  if (!isset($_POST['privacy_agreement']) || (string) $_POST['privacy_agreement'] !== 'on') {
+    $errors['privacy_agreement'] = true;
+  }
+
   // Если есть ошибки - возвращаем их
   if (!empty($errors)) {
     wp_send_json_error([

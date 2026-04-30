@@ -239,8 +239,8 @@ class BSI_Mailer
     $phpmailer->SMTPSecure = defined('BSI_SMTP_SECURE') ? BSI_SMTP_SECURE : self::SMTP_SECURE;
     $phpmailer->SMTPOptions = [
       'ssl' => [
-        'verify_peer'       => false,
-        'verify_peer_name'  => false,
+        'verify_peer' => false,
+        'verify_peer_name' => false,
         'allow_self_signed' => true,
       ],
     ];
@@ -280,6 +280,10 @@ class BSI_Mailer
       if (strlen($phone_digits) < 11) {
         $errors['phone'] = 'Введите полный номер телефона';
       }
+    }
+
+    if (!isset($post['privacy_agreement']) || (string) $post['privacy_agreement'] !== 'on') {
+      $errors['privacy_agreement'] = 'Необходимо согласие на обработку персональных данных';
     }
 
     return $errors;

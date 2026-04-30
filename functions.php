@@ -358,6 +358,7 @@ function bsi_track_news_views()
 add_action('wp', 'bsi_track_news_views');
 
 require get_template_directory() . '/inc/helpers.php';
+require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/admin-tour-prices-cache.php';

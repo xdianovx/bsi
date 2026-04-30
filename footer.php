@@ -141,6 +141,8 @@
 	</div>
 </footer>
 
+<?php get_template_part('template-parts/cookie-consent'); ?>
+
 <!-- <div class="footer-logos">
 	<div class="container">
 		<div class="footer-logos__wrap">

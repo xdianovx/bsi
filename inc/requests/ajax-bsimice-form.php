@@ -36,6 +36,10 @@ function handle_bsimice_consultation_form(): void
 
   $wishes = sanitize_textarea_field($_POST['wishes'] ?? '');
 
+  if (!isset($_POST['privacy_agreement']) || (string) $_POST['privacy_agreement'] !== 'on') {
+    $errors['privacy_agreement'] = true;
+  }
+
   if (!empty($errors)) {
     wp_send_json_error([
       'message' => 'Заполните обязательные поля',

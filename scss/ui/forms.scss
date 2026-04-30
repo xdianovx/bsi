@@ -86,6 +86,34 @@ input.error {
   width: 100%;
 }
 
+/* Согласие с политикой: не использовать «плавающий» label .input-item */
+.input-item.form-privacy-consent {
+  padding-top: 0;
+
+  & > label.modal-program-booking__service-item {
+    position: static;
+    display: flex;
+    margin-bottom: 0;
+    left: auto;
+    top: auto;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.35;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+  }
+
+  &.white > label.modal-program-booking__service-item {
+    background: transparent;
+    padding: 0;
+  }
+}
+
 .choices[data-type*="select-one"]::after {
   width: 20px;
   height: 18px;

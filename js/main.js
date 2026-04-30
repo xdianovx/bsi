@@ -36,8 +36,62 @@ import { initBonusMarquee } from "./modules/bonus-marquee";
 import { initMaps } from "./modules/maps";
 import { EducationCurrencySwitcher } from "./modules/education-currency-switcher";
 
+import { initCookieConsent } from "./modules/cookie-consent";
+
+function initYmReachGoals() {
+  const isVisaPage =
+    document.body.classList.contains("page-template-page-visa-php") ||
+    document.body.classList.contains("page-template-page-visa");
+  if (isVisaPage && typeof ym === "function") {
+    ym(108341897, "reachGoal", "page-visa");
+  }
+
+  const subscribeForm = document.querySelector(".subscribe-section__form");
+  if (subscribeForm) {
+    subscribeForm.addEventListener("submit", () => {
+      if (typeof ym === "function") {
+        ym(108341897, "reachGoal", "newsletter_subscribed");
+      }
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a.social-item");
+    if (!link || typeof ym !== "function") return;
+
+    let network = "unknown";
+    const href = link.getAttribute("href") || "";
+
+    if (link.classList.contains("--tg") || href.includes("t.me")) {
+      network = "telegram";
+    } else if (link.classList.contains("--vk") || href.includes("vk.com")) {
+      network = "vk";
+    } else if (link.classList.contains("--max") || href.includes("max.ru")) {
+      network = "max";
+    }
+
+    const location = link.closest("header")
+      ? "header"
+      : link.closest("footer")
+        ? "footer"
+        : link.closest(".subscribe-section")
+          ? "subscribe"
+          : "other";
+
+    ym(108341897, "reachGoal", "social_click", {
+      network: {
+        [network]: {
+          location: location,
+        },
+      },
+    });
+  });
+}
 
 window.addEventListener("DOMContentLoaded", () => {
+  initYmReachGoals();
+  initCookieConsent();
+
   burger();
   mobileNavAccordion();
   MicroModal.init();
@@ -86,51 +140,4 @@ window.addEventListener("DOMContentLoaded", () => {
   if (window.maintenanceModal) {
     initMaintenanceModal(window.maintenanceModal);
   }
-
-  // Метрика: просмотр страницы виз
-  const isVisaPage = document.body.classList.contains("page-template-page-visa-php")
-    || document.body.classList.contains("page-template-page-visa");
-  if (isVisaPage && typeof ym === "function") {
-    ym(108341897, "reachGoal", "page-visa");
-  }
-
-  // Метрика: подписка на рассылку (Unisender — внешний POST, перехватываем до навигации)
-  const subscribeForm = document.querySelector(".subscribe-section__form");
-  if (subscribeForm) {
-    subscribeForm.addEventListener("submit", () => {
-      if (typeof ym !== "undefined") {
-        ym(108341897, "reachGoal", "newsletter_subscribed");
-      }
-    });
-  }
-
-  // Метрика: клики по соцсетям
-  document.addEventListener("click", (e) => {
-    const link = e.target.closest("a.social-item");
-    if (!link || typeof ym !== "function") return;
-
-    let network = "unknown";
-    const href = link.getAttribute("href") || "";
-
-    if (link.classList.contains("--tg") || href.includes("t.me")) {
-      network = "telegram";
-    } else if (link.classList.contains("--vk") || href.includes("vk.com")) {
-      network = "vk";
-    } else if (link.classList.contains("--max") || href.includes("max.ru")) {
-      network = "max";
-    }
-
-    const location = link.closest("header") ? "header"
-      : link.closest("footer") ? "footer"
-      : link.closest(".subscribe-section") ? "subscribe"
-      : "other";
-
-    ym(108341897, "reachGoal", "social_click", {
-      network: {
-        [network]: {
-          location: location,
-        },
-      },
-    });
-  });
 });
