@@ -202,10 +202,15 @@
   a {
     color: inherit;
     text-decoration: none;
+    transition: opacity 0.2s ease;
 
-    &:hover {
+    &:hover,
+    &:focus,
+    &:focus-visible,
+    &:active {
       color: inherit;
-      opacity: 0.85;
+      opacity: 0.88;
+      text-decoration: none;
     }
   }
 }
