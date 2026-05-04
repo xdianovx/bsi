@@ -137,6 +137,16 @@ add_action('acf/init', function () {
         'rows' => 3,
         'placeholder' => 'Введите текст о премии',
       ],
+      [
+        'key' => 'field_bonus_event_full_image',
+        'label' => 'Изображение на всю ширину экрана (под секцией «Ежегодная премия»)',
+        'name' => 'bonus_event_full_image',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'library' => 'all',
+        'instructions' => 'Выводится под блоком с заголовком и текстом премии, на ширину окна браузера.',
+      ],
       // Важная информация
       [
         'key' => 'field_bonus_info',

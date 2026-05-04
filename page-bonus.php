@@ -166,6 +166,26 @@ get_header();
             </div>
         </section>
     <?php endif; ?>
+    <?php
+    $bonus_event_full_image = get_field('bonus_event_full_image');
+    if ($bonus_event_full_image && !empty($bonus_event_full_image['url'])) :
+        $full_img_alt = isset($bonus_event_full_image['alt']) ? (string) $bonus_event_full_image['alt'] : '';
+        $full_img_w = isset($bonus_event_full_image['width']) ? (int) $bonus_event_full_image['width'] : 0;
+        $full_img_h = isset($bonus_event_full_image['height']) ? (int) $bonus_event_full_image['height'] : 0;
+        ?>
+        <section class="bonus-event-fullbleed">
+            <div class="container">
+                <img
+                    src="<?php echo esc_url($bonus_event_full_image['url']); ?>"
+                    alt="<?php echo esc_attr($full_img_alt); ?>"
+                    <?php if ($full_img_w > 0): ?>width="<?php echo esc_attr((string) $full_img_w); ?>"<?php endif; ?>
+                    <?php if ($full_img_h > 0): ?>height="<?php echo esc_attr((string) $full_img_h); ?>"<?php endif; ?>
+                    loading="lazy"
+                    decoding="async"
+                >
+            </div>
+        </section>
+    <?php endif; ?>
     <!-- Важная информация -->
     <?php $bonus_info = get_field('bonus_info'); ?>
     <?php if ($bonus_info): ?>
