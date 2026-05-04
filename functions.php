@@ -141,14 +141,10 @@ add_action('widgets_init', 'bsi_widgets_init');
 
 function bsi_scripts()
 {
-	$stylesheet_path = get_stylesheet_directory() . '/style.css';
 	$main_css_path = get_template_directory() . '/dist/css/main.min.css';
 	$main_js_path = get_template_directory() . '/dist/js/main.min.js';
 
-	wp_enqueue_style('bsi-style', get_stylesheet_uri(), array(), bsi_asset_version($stylesheet_path));
 	wp_enqueue_style('main', get_template_directory_uri() . '/dist/css/main.min.css', [], bsi_asset_version($main_css_path));
-
-	wp_style_add_data('bsi-style', 'rtl', 'replace');
 
 	wp_enqueue_script('main', get_template_directory_uri() . '/dist/js/main.min.js', array(), bsi_asset_version($main_js_path), true);
 	$recaptcha_site_key = function_exists('bsi_recaptcha_site_key') ? bsi_recaptcha_site_key() : '';
