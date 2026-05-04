@@ -155,7 +155,7 @@ if (function_exists('get_field')) {
         </div>
       <?php endif; ?>
     </div>
-    <h3 class="hotel-card__title"><?php echo esc_html($tour_title); ?></h3>
+    <h3 class="hotel-card__title"><a href="<?php echo esc_url($tour_url); ?>"><?php echo esc_html($tour_title); ?></a></h3>
 
     <?php if (!empty($tour_includes)): ?>
       <div class="hotel-card__includes tour-card__includes">

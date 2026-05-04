@@ -94,11 +94,13 @@ if (!empty($types) && !is_wp_error($types)) {
         </span>
       <?php endforeach; ?>
     </div>
-    <?php if ($img): ?>
-      <img class="tour-card-row__img" src="<?= esc_url($img); ?>" alt="<?= esc_attr($title); ?>" loading="lazy">
-    <?php else: ?>
-      <div class="tour-card-row__img-placeholder"></div>
-    <?php endif; ?>
+    <a href="<?= esc_url($link); ?>" class="tour-card-row__poster-link">
+      <?php if ($img): ?>
+        <img class="tour-card-row__img" src="<?= esc_url($img); ?>" alt="<?= esc_attr($title); ?>" loading="lazy">
+      <?php else: ?>
+        <div class="tour-card-row__img-placeholder"></div>
+      <?php endif; ?>
+    </a>
   </div>
 
   <div class="tour-card-row__content">
@@ -142,10 +144,7 @@ if (!empty($types) && !is_wp_error($types)) {
         </div>
       <?php endif; ?>
 
-      <h3 class="tour-card-row__title"><a href="<?= esc_url($link); ?>">
-
-          <?= esc_html($title); ?></h3>
-      </a>
+      <h3 class="tour-card-row__title"><a href="<?= esc_url($link); ?>"><?= esc_html($title); ?></a></h3>
 
       <?php if ($duration): ?>
         <div class="tour-card-row__duration">

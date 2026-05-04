@@ -73,11 +73,18 @@
 }
 
 .hotel-card__flag {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: 100%;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid #fff;
+
+  margin-left: -8px;
+
+  &:first-of-type {
+    margin-left: 0;
+  }
 
   img {
     width: 100%;
@@ -90,16 +97,15 @@
 .hotel-card__flags {
   display: flex;
   align-items: center;
-  gap: 4px;
   flex-shrink: 0;
 }
 
 .hotel-card__location {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
-  margin-top: 8px;
-  font-size: 14px;
+  margin-top: 4px;
+  font-size: 16px;
   svg {
     display: block;
   }
@@ -113,7 +119,7 @@
 }
 
 .hotel-card__location-text {
-  line-height: 130%;
+  line-height: 110%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -191,7 +197,17 @@
   font-weight: 700;
   font-size: 16px;
   margin-top: 4px;
-  line-height: 120%;
+  line-height: 140%;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: inherit;
+      opacity: 0.85;
+    }
+  }
 }
 
 .hotel-card__meal-plan {
