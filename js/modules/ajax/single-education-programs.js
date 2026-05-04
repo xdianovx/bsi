@@ -646,11 +646,6 @@ export const initSingleEducationPrograms = () => {
       },
     };
 
-    // Используем строки для enable (рекомендуемый формат для Flatpickr)
-    if (validAvailableDates.length > 0) {
-      flatpickrOptions.enable = validAvailableDates;
-    }
-
     // Инициализируем Flatpickr
     datePickerInstance = flatpickr(dateInput, flatpickrOptions);
 
