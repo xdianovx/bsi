@@ -1,40 +1,20 @@
-// Inter — локальные файлы из /fonts (woff2 приоритет, ttf fallback)
+// Inter — локальные файлы из /fonts (только woff2, только normal)
 
-@mixin inter-face($basename, $weight, $style: normal) {
+@mixin inter-face($basename, $weight) {
   @font-face {
     font-family: "Inter";
     font-display: swap;
     font-weight: $weight;
-    font-style: $style;
-    src:
-      url("../../fonts/#{$basename}.woff2") format("woff2"),
-      url("../../fonts/#{$basename}.ttf") format("truetype");
+    font-style: normal;
+    src: url("../../fonts/#{$basename}.woff2") format("woff2");
   }
 }
 
-@include inter-face("Inter-Thin", 100);
-@include inter-face("Inter-ThinItalic", 100, italic);
-
 @include inter-face("Inter-ExtraLight", 200);
-@include inter-face("Inter-ExtraLightItalic", 200, italic);
-
 @include inter-face("Inter-Light", 300);
-@include inter-face("Inter-LightItalic", 300, italic);
-
 @include inter-face("Inter-Regular", 400);
-@include inter-face("Inter-Italic", 400, italic);
-
 @include inter-face("Inter-Medium", 500);
-@include inter-face("Inter-MediumItalic", 500, italic);
-
 @include inter-face("Inter-SemiBold", 600);
-@include inter-face("Inter-SemiBoldItalic", 600, italic);
-
 @include inter-face("Inter-Bold", 700);
-@include inter-face("Inter-BoldItalic", 700, italic);
-
 @include inter-face("Inter-ExtraBold", 800);
-@include inter-face("Inter-ExtraBoldItalic", 800, italic);
-
 @include inter-face("Inter-Black", 900);
-@include inter-face("Inter-BlackItalic", 900, italic);
