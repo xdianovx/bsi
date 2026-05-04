@@ -6,6 +6,7 @@
  * - bsimice_reviews_slider_reviews (array)
  * - bsimice_reviews_slider_heading (string)
  * - bsimice_reviews_slider_from_acf (bool)
+ * - bsimice_reviews_section_id (string, опционально) id секции якоря
  */
 
 $reviews = get_query_var('bsimice_reviews_slider_reviews', []);
@@ -37,9 +38,12 @@ foreach ($reviews as $rev) {
 if (!$has_slides) {
   return;
 }
+
+$reviews_section_id = get_query_var('bsimice_reviews_section_id', '');
+$reviews_section_id = is_string($reviews_section_id) ? trim($reviews_section_id) : '';
 ?>
 
-<section class="mice-reviews">
+<section class="mice-reviews" <?php echo $reviews_section_id !== '' ? 'id="' . esc_attr($reviews_section_id) . '"' : ''; ?>>
   <div class="container">
     <div class="section_head">
       <h2 class="reviews__heading"><?php echo esc_html($reviews_heading); ?></h2>

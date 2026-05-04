@@ -1,3 +1,27 @@
+// Якоря: учёт липкой шапки на узких экранах (как #projects на bsimice)
+#mice-hero,
+#mice-benefits,
+#projects,
+#mice-news,
+#mice-awards,
+#mice-reviews,
+#mice-partners,
+#mice-contact,
+#mice-content {
+  scroll-margin-top: 96px;
+
+  @media screen and (min-width: 769px) {
+    scroll-margin-top: 24px;
+  }
+}
+
+  margin-top: 80px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 56px;
+  }
+}
+
 .mice-hero-section {
   margin-top: 40px;
 }

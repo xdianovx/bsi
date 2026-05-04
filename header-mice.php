@@ -20,6 +20,55 @@
 
 <body <?php body_class(); ?>>
 
+<?php
+$mice_header_nav_base = '';
+if (is_singular()) {
+  $perm = get_permalink();
+  $mice_header_nav_base = $perm ? $perm : '';
+}
+if ($mice_header_nav_base === '') {
+  $mice_header_nav_base = home_url('/');
+}
+$mice_header_contact_hash = is_page_template('page-mice.php') ? 'mice-contact' : 'bsimice-contact';
+$mice_header_nav_items = [
+  ['label' => 'Проекты', 'hash' => 'projects'],
+  ['label' => 'Новости', 'hash' => 'mice-news'],
+  ['label' => 'Отзывы', 'hash' => 'mice-reviews'],
+  ['label' => 'Связаться', 'hash' => $mice_header_contact_hash],
+];
+
+ob_start();
+?>
+  <nav class="header__nav" aria-label="<?php echo esc_attr__('Разделы страницы', 'bsi'); ?>">
+    <ul class="header__list">
+      <?php foreach ($mice_header_nav_items as $mice_header_item) : ?>
+        <li>
+          <a href="<?php echo esc_url($mice_header_nav_base . '#' . $mice_header_item['hash']); ?>">
+            <?php echo esc_html($mice_header_item['label']); ?>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </nav>
+<?php
+$mice_header_inline_nav = ob_get_clean();
+
+ob_start();
+?>
+  <nav class="mice-mobile-nav" aria-label="<?php echo esc_attr__('Разделы страницы', 'bsi'); ?>">
+    <?php foreach ($mice_header_nav_items as $mice_header_item) : ?>
+      <div class="mobile-nav__item">
+        <a class="mobile-nav__link"
+          href="<?php echo esc_url($mice_header_nav_base . '#' . $mice_header_item['hash']); ?>">
+          <span><?php echo esc_html($mice_header_item['label']); ?></span>
+        </a>
+      </div>
+    <?php endforeach; ?>
+  </nav>
+<?php
+$mice_header_mobile_nav = ob_get_clean();
+?>
+
   <header class="header">
     <div class="header-top__wrap">
       <div class="container">
@@ -80,14 +129,7 @@
         <div class="header__div"></div>
 
         <div class="header__right">
-          <?php wp_nav_menu([
-            'theme_location' => 'mice_header_nav',
-            'container' => 'nav',
-            'container_class' => 'header__nav',
-            'menu_class' => 'header__list',
-            'depth' => 1, // без выпадашек
-            'fallback_cb' => '__return_empty_string',
-          ]); ?>
+          <?php echo $mice_header_inline_nav; ?>
 
 
           <div class="header-old-btns">
@@ -134,16 +176,7 @@
     <div class="container">
       <div class="mobile-nav__wrap">
         <div class="mobile-nav__nav">
-          <?php
-          wp_nav_menu([
-            'theme_location' => 'mice_header_nav',
-            'container' => 'nav',
-            'container_class' => 'header__nav',
-            'menu_class' => 'header__list',
-            'depth' => 1, // без выпадашек
-            'fallback_cb' => '__return_empty_string',
-          ]);
-          ?>
+          <?php echo $mice_header_mobile_nav; ?>
         </div>
 
         <div class="mobile-nav-contacts">

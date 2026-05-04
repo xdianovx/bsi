@@ -35,9 +35,11 @@ if (!$awards->have_posts()) {
   wp_reset_postdata();
   return;
 }
+
+$awards_section_id = isset($args['section_id']) ? trim((string) $args['section_id']) : '';
 ?>
 
-<section class="awards__section best-offers__section">
+<section class="awards__section best-offers__section" <?php echo $awards_section_id !== '' ? 'id="' . esc_attr($awards_section_id) . '"' : ''; ?>>
   <div class="container">
     <div class="awards__title-wrap title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">

@@ -21,6 +21,24 @@
   transform: translateY(0);
 }
 
+.mobile-nav__nav .mice-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.mobile-nav__nav .mice-mobile-nav .mobile-nav__item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.mobile-nav__nav .mice-mobile-nav .mobile-nav__link {
+  text-decoration: none;
+  color: inherit;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .mobile-nav__wrap {
   height: 100%;
   min-height: 0;

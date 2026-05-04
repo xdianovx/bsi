@@ -48,9 +48,11 @@ if (!empty($meta_query)) {
 
 $news_page_link = get_post_type_archive_link('news');
 $news_query = new WP_Query($news_args);
+
+$news_section_id = isset($args['section_id']) ? trim((string) $args['section_id']) : '';
 ?>
 
-<section class="news-slider__section">
+<section class="news-slider__section" <?php echo $news_section_id !== '' ? 'id="' . esc_attr($news_section_id) . '"' : ''; ?>>
   <div class="container">
 
     <div class="title-wrap news-slider__title-wrap">

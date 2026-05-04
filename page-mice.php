@@ -6,7 +6,46 @@ get_header('mice');
 ?>
 
 <main class="mice-page">
-  <section class="mice-hero-section">
+  <?php
+  $pid = get_the_ID();
+
+  $mice_benefits_rows = function_exists('get_field') ? get_field('mice_benefits', 'option') : [];
+  $mice_has_benefits = !empty($mice_benefits_rows) && is_array($mice_benefits_rows);
+
+  $mice_editor_raw = trim((string) get_post_field('post_content', $pid, 'raw'));
+
+  $reviews_heading_opt = function_exists('get_field') ? get_field('mice_reviews_slider_heading', 'option') : '';
+  $reviews_heading = $reviews_heading_opt !== '' && $reviews_heading_opt !== null ? (string) $reviews_heading_opt : 'Нас Благодарят';
+
+  $reviews_rows = function_exists('bsi_get_mice_parent_reviews_rows') ? bsi_get_mice_parent_reviews_rows() : [];
+  $reviews_from_acf = $reviews_rows !== [];
+
+  if (!$reviews_from_acf) {
+    $reviews_opt = function_exists('get_field') ? get_field('mice_reviews_slider', 'option') : null;
+    if (!empty($reviews_opt) && is_array($reviews_opt) && count($reviews_opt) > 0) {
+      $reviews_rows = $reviews_opt;
+      $reviews_from_acf = true;
+    } elseif (function_exists('bsi_mice_reviews_slider_default_rows')) {
+      $reviews_rows = bsi_mice_reviews_slider_default_rows();
+      $reviews_from_acf = false;
+    }
+  }
+
+  $mice_has_reviews = false;
+  foreach ($reviews_rows as $mice_rev_row) {
+    if (!is_array($mice_rev_row)) {
+      continue;
+    }
+    $mice_q = $mice_rev_row['quote'] ?? '';
+    $mice_a = $mice_rev_row['author_name'] ?? '';
+    if ($mice_q !== '' || $mice_a !== '') {
+      $mice_has_reviews = true;
+      break;
+    }
+  }
+  ?>
+
+  <section id="mice-hero" class="mice-hero-section">
     <div class="container">
       <h1 class="h1 mice-page__title"><?php the_title(); ?></h1>
       <div class="mice-hero__wrap">
@@ -64,20 +103,19 @@ get_header('mice');
     </div>
   </section>
 
-  <?php
-  $rows = function_exists('get_field') ? get_field('mice_benefits', 'option') : [];
-  if (!empty($rows) && is_array($rows)): ?>
-    <section class="mice-benefits-section">
+  <?php if ($mice_has_benefits): ?>
+    <section id="mice-benefits" class="mice-benefits-section">
       <div class="container">
         <h2 class="h2 mice-benefits-section__title">Преимущества</h2>
         <div class="mice-benefit__wrap">
 
-          <?php foreach ($rows as $row):
+          <?php foreach ($mice_benefits_rows as $row):
             $icon_url = !empty($row['icon']['url']) ? $row['icon']['url'] : '';
             $title = !empty($row['title']) ? $row['title'] : '';
             $text = !empty($row['text']) ? $row['text'] : '';
-            if (!$title && !$text && !$icon_url)
+            if (!$title && !$text && !$icon_url) {
               continue;
+            }
             ?>
             <div class="mice-benefit">
 
@@ -95,35 +133,30 @@ get_header('mice');
     </section>
   <?php endif; ?>
 
-  <?= get_template_part('template-parts/projects/slider') ?>
+  <?php get_template_part('template-parts/projects/slider'); ?>
 
 
-  <?php get_template_part('template-parts/news/news-slider'); ?>
-  <?php get_template_part('template-parts/awards/slider', null, ['filter_mice' => true]); ?>
-  <?php
-  $reviews_heading_opt = function_exists('get_field') ? get_field('mice_reviews_slider_heading', 'option') : '';
-  $reviews_heading = $reviews_heading_opt !== '' && $reviews_heading_opt !== null ? (string) $reviews_heading_opt : 'Нас Благодарят';
-
-  $reviews_rows = bsi_get_mice_parent_reviews_rows();
-  $reviews_from_acf = $reviews_rows !== [];
-
-  if (!$reviews_from_acf) {
-    $reviews_opt = function_exists('get_field') ? get_field('mice_reviews_slider', 'option') : null;
-    if (!empty($reviews_opt) && is_array($reviews_opt) && count($reviews_opt) > 0) {
-      $reviews_rows = $reviews_opt;
-      $reviews_from_acf = true;
-    } else {
-      $reviews_rows = bsi_mice_reviews_slider_default_rows();
-      $reviews_from_acf = false;
-    }
-  }
-
-  set_query_var('bsimice_reviews_slider_reviews', $reviews_rows);
-  set_query_var('bsimice_reviews_slider_heading', $reviews_heading);
-  set_query_var('bsimice_reviews_slider_from_acf', $reviews_from_acf);
-  get_template_part('template-parts/mice/reviews-slider');
-  ?>
-  <?php get_template_part('template-parts/partners/partners-slider', null, ['filter_mice' => true]); ?>
+  <?php get_template_part('template-parts/news/news-slider', null, [
+    'filter_mice' => true,
+    'section_id' => 'mice-news',
+  ]); ?>
+  <?php get_template_part('template-parts/awards/slider', null, [
+    'filter_mice' => true,
+    'section_id' => 'mice-awards',
+  ]); ?>
+  <?php if ($mice_has_reviews): ?>
+    <?php
+    set_query_var('bsimice_reviews_slider_reviews', $reviews_rows);
+    set_query_var('bsimice_reviews_slider_heading', $reviews_heading);
+    set_query_var('bsimice_reviews_slider_from_acf', $reviews_from_acf);
+    set_query_var('bsimice_reviews_section_id', 'mice-reviews');
+    get_template_part('template-parts/mice/reviews-slider');
+    ?>
+  <?php endif; ?>
+  <?php get_template_part('template-parts/partners/partners-slider', null, [
+    'filter_mice' => true,
+    'section_id' => 'mice-partners',
+  ]); ?>
 
 
 
@@ -142,9 +175,13 @@ get_header('mice');
   get_template_part('template-parts/mice/consultation-form-section');
   ?>
 
-  <?php
-  the_content();
-  ?>
+  <?php if ($mice_editor_raw !== ''): ?>
+    <div id="mice-content" class="mice-page__content">
+      <?php the_content(); ?>
+    </div>
+  <?php else: ?>
+    <?php the_content(); ?>
+  <?php endif; ?>
 </main>
 
 <?php get_template_part('template-parts/mice/consultation-form-modal'); ?>

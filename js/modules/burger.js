@@ -2,6 +2,10 @@ export const burger = () => {
   const burger = document.querySelector(".burger");
   const nav = document.querySelector(".mobile-nav");
 
+  if (!burger || !nav) {
+    return;
+  }
+
   burger.addEventListener("click", () => {
     if (burger.classList.contains("active")) {
       burger.classList.remove("active");
@@ -12,6 +16,20 @@ export const burger = () => {
       nav.classList.add("active");
       document.body.style.overflow = "hidden";
     }
+  });
+
+  nav.addEventListener("click", (e) => {
+    const a = e.target.closest("a.mobile-nav__link");
+    if (!a || !nav.contains(a)) {
+      return;
+    }
+    const item = a.closest(".mobile-nav__item");
+    if (item && item.querySelector(".mobile-nav__submenu")) {
+      return;
+    }
+    burger.classList.remove("active");
+    nav.classList.remove("active");
+    document.body.style.overflow = "";
   });
 };
 

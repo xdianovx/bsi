@@ -25,9 +25,11 @@ if (!empty($meta_query)) {
 
 $partners_page_link = get_post_type_archive_link('partner');
 $partners_query = new WP_Query($partners_args);
+
+$partners_section_id = isset($args['section_id']) ? trim((string) $args['section_id']) : '';
 ?>
 
-<section class="partners-slider__section">
+<section class="partners-slider__section" <?php echo $partners_section_id !== '' ? 'id="' . esc_attr($partners_section_id) . '"' : ''; ?>>
   <div class="container">
 
     <div class="title-wrap">
