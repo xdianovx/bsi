@@ -1,6 +1,6 @@
 .gtm-search__section {
   position: relative;
-  z-index: 20;
+  z-index: 0;
   margin-top: 16px;
 }
 
@@ -27,7 +27,6 @@
   }
 
   @media screen and (max-width: 1024px) {
-    
     background: #000;
     color: #fff;
   }
@@ -367,7 +366,6 @@
     font-size: 14px;
     font-weight: 600;
   }
-  
 
   .child-age__select {
     width: 100%;
