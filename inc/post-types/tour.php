@@ -223,6 +223,52 @@ if (!function_exists('bsi_get_tour_primary_country_id')) {
   }
 }
 
+if (!function_exists('bsi_get_country_flag_url')) {
+  function bsi_get_country_flag_url(int $country_id): string
+  {
+    if ($country_id <= 0 || !function_exists('get_field')) {
+      return '';
+    }
+    $flag_field = get_field('flag', $country_id);
+    if (!$flag_field) {
+      return '';
+    }
+    if (is_array($flag_field) && !empty($flag_field['url'])) {
+      return (string) $flag_field['url'];
+    }
+    if (is_string($flag_field)) {
+      return (string) $flag_field;
+    }
+
+    return '';
+  }
+}
+
+if (!function_exists('bsi_get_tour_country_entries')) {
+  /**
+   * Страны тура по порядку ACF (для флагов). title — для alt; основной текст локации карточки — только primary.
+   *
+   * @return array<int, array{id: int, title: string, flag_url: string}>
+   */
+  function bsi_get_tour_country_entries(int $post_id): array
+  {
+    $out = [];
+    foreach (bsi_get_tour_country_ids($post_id) as $cid) {
+      $cid = (int) $cid;
+      if ($cid <= 0) {
+        continue;
+      }
+      $out[] = [
+        'id'       => $cid,
+        'title'    => (string) get_the_title($cid),
+        'flag_url' => bsi_get_country_flag_url($cid),
+      ];
+    }
+
+    return $out;
+  }
+}
+
 if (!function_exists('bsi_get_homepage_featured_tour_ids')) {
   /**
    * Туры, выбранные для слайдера на главной (ACF relationship на странице «Главная»).

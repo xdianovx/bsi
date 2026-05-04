@@ -314,7 +314,9 @@ function bsi_extract_price_number(?string $raw_price): ?int
  * Данные для set_query_var( 'tour', … ) в template-parts/tour/card — тот же контракт, что страница «Туры» и tours-filter AJAX.
  * Цена на карточке: PriceLoaderService::getCachedTourPrice + ACF + пакет get_batch_tour_prices / priceLoader (как в каталоге).
  *
- * @return array<string, int|string>
+ * country_id / country_title / flag — только первая страна (primary). countries — все страны тура для ряда флагов.
+ *
+ * @return array<string, mixed>
  */
 function bsi_get_tour_card_query_var(int $tour_id): array
 {
@@ -323,33 +325,18 @@ function bsi_get_tour_card_query_var(int $tour_id): array
     return [];
   }
 
-  $country_id_tour = 0;
-  if (function_exists('get_field')) {
-    $country_val = get_field('tour_country', $tour_id);
-    if ($country_val instanceof WP_Post) {
-      $country_id_tour = (int) $country_val->ID;
-    } elseif (is_array($country_val)) {
-      $country_id_tour = (int) reset($country_val);
-    } else {
-      $country_id_tour = (int) $country_val;
-    }
-  }
-  if ($country_id_tour <= 0 && function_exists('bsi_get_tour_primary_country_id')) {
-    $country_id_tour = bsi_get_tour_primary_country_id($tour_id);
-  }
+  $country_id_tour = function_exists('bsi_get_tour_primary_country_id')
+    ? bsi_get_tour_primary_country_id($tour_id)
+    : 0;
 
   $country_title = $country_id_tour ? (string) get_the_title($country_id_tour) : '';
-  $flag_url = '';
-  if ($country_id_tour && function_exists('get_field')) {
-    $flag_field = get_field('flag', $country_id_tour);
-    if ($flag_field) {
-      if (is_array($flag_field) && !empty($flag_field['url'])) {
-        $flag_url = (string) $flag_field['url'];
-      } elseif (is_string($flag_field)) {
-        $flag_url = (string) $flag_field;
-      }
-    }
-  }
+  $flag_url = ($country_id_tour > 0 && function_exists('bsi_get_country_flag_url'))
+    ? bsi_get_country_flag_url($country_id_tour)
+    : '';
+
+  $countries = function_exists('bsi_get_tour_country_entries')
+    ? bsi_get_tour_country_entries($tour_id)
+    : [];
 
   $country_slug = '';
   if ($country_id_tour > 0) {
@@ -364,6 +351,7 @@ function bsi_get_tour_card_query_var(int $tour_id): array
     'country_title' => $country_title,
     'country_id' => (int) $country_id_tour,
     'country_slug' => $country_slug,
+    'countries' => $countries,
   ];
 }
 

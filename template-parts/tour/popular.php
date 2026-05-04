@@ -50,13 +50,15 @@ wp_reset_postdata();
 
 $country_ids = [];
 
-if (!empty($tour_posts) && function_exists('get_field')) {
+if (!empty($tour_posts)) {
   foreach ($tour_posts as $tour_post) {
     $tour_id = (int) $tour_post->ID;
-    $c = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id((int) $tour_id) : 0;
-
-    if ($c > 0) {
-      $country_ids[] = $c;
+    $ids = function_exists('bsi_get_tour_country_ids') ? bsi_get_tour_country_ids($tour_id) : [];
+    foreach ($ids as $c) {
+      $c = (int) $c;
+      if ($c > 0) {
+        $country_ids[] = $c;
+      }
     }
   }
 }

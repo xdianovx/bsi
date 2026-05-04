@@ -28,21 +28,43 @@ if (!$tour_id) {
 $tour_url = !empty($tour['url']) ? (string) $tour['url'] : get_permalink($tour_id);
 $tour_image = !empty($tour['image']) ? (string) $tour['image'] : (get_the_post_thumbnail_url($tour_id, 'large') ?: '');
 $tour_title = !empty($tour['title']) ? (string) $tour['title'] : get_the_title($tour_id);
-$tour_flag = !empty($tour['flag']) ? (string) $tour['flag'] : '';
 
 $country_title = '';
 $country_id = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id((int) $tour_id) : 0;
 if ($country_id) {
   $country_title = get_the_title($country_id);
-  if (!$tour_flag && function_exists('get_field')) {
-    $flag_field = get_field('flag', $country_id);
-    if ($flag_field) {
-      if (is_array($flag_field) && !empty($flag_field['url'])) {
-        $tour_flag = (string) $flag_field['url'];
-      } elseif (is_string($flag_field)) {
-        $tour_flag = (string) $flag_field;
-      }
-    }
+}
+
+$tour_country_entries = [];
+if (!empty($tour['countries']) && is_array($tour['countries'])) {
+  $tour_country_entries = $tour['countries'];
+} elseif ($tour_id && function_exists('bsi_get_tour_country_entries')) {
+  $tour_country_entries = bsi_get_tour_country_entries((int) $tour_id);
+}
+
+$tour_flag_rows = [];
+foreach ($tour_country_entries as $entry) {
+  if (!is_array($entry)) {
+    continue;
+  }
+  $fu = isset($entry['flag_url']) ? trim((string) $entry['flag_url']) : '';
+  if ($fu !== '') {
+    $tour_flag_rows[] = [
+      'url' => $fu,
+      'alt' => isset($entry['title']) ? (string) $entry['title'] : '',
+    ];
+  }
+}
+if (empty($tour_flag_rows)) {
+  $fallback_flag = !empty($tour['flag']) ? (string) $tour['flag'] : '';
+  if ($fallback_flag === '' && $country_id && function_exists('bsi_get_country_flag_url')) {
+    $fallback_flag = bsi_get_country_flag_url($country_id);
+  }
+  if ($fallback_flag !== '') {
+    $tour_flag_rows[] = [
+      'url' => $fallback_flag,
+      'alt' => $country_title,
+    ];
   }
 }
 
@@ -115,9 +137,13 @@ if (function_exists('get_field')) {
 
   <div class="hotel-card__body">
     <div class="hotel-card__location tour-card__location">
-      <?php if ($tour_flag): ?>
-        <div class="hotel-card__flag">
-          <img src="<?php echo esc_url($tour_flag); ?>" alt="">
+      <?php if (!empty($tour_flag_rows)): ?>
+        <div class="hotel-card__flags">
+          <?php foreach ($tour_flag_rows as $flag_row): ?>
+            <div class="hotel-card__flag">
+              <img src="<?php echo esc_url($flag_row['url']); ?>" alt="<?php echo esc_attr($flag_row['alt']); ?>">
+            </div>
+          <?php endforeach; ?>
         </div>
       <?php endif; ?>
       <?php if ($country_title): ?>

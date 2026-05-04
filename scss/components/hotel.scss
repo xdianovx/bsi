@@ -77,6 +77,21 @@
   height: 18px;
   border-radius: 100%;
   overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+}
+
+.hotel-card__flags {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .hotel-card__location {

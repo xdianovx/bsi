@@ -54,19 +54,38 @@ if (!$img && !empty($tour_gallery)) {
   }
 }
 
-// Country title (в карточке без ссылок)
+// Country title — только primary; флаги — все страны тура.
 $country_title = $country_id ? get_the_title($country_id) : '';
+$country_entries = function_exists('bsi_get_tour_country_entries') ? bsi_get_tour_country_entries((int) $post_id) : [];
+$tour_row_flag_rows = [];
+foreach ($country_entries as $entry) {
+  if (!is_array($entry)) {
+    continue;
+  }
+  $fu = isset($entry['flag_url']) ? trim((string) $entry['flag_url']) : '';
+  if ($fu !== '') {
+    $tour_row_flag_rows[] = [
+      'url' => $fu,
+      'alt' => isset($entry['title']) ? (string) $entry['title'] : '',
+    ];
+  }
+}
+
+$types_list = [];
+if (!empty($types) && !is_wp_error($types)) {
+  $types_list = $types;
+}
 ?>
 
 <article class="tour-card-row">
 
-  <?php if (!empty($types) && !is_wp_error($types)): ?>
+  <?php if (!empty($types_list)): ?>
 
   <?php endif; ?>
 
   <div class="tour-card-row__poster">
     <div class="tour-card-row__tags">
-      <?php foreach ($types as $t): ?>
+      <?php foreach ($types_list as $t): ?>
         <span class="tour-card-row__tag">
           <?= esc_html($t->name); ?>
         </span>
@@ -100,6 +119,23 @@ $country_title = $country_id ? get_the_title($country_id) : '';
               }
             ?>
           </div>
+        </div>
+      <?php endif; ?>
+
+      <?php if (!empty($tour_row_flag_rows) || $country_title !== ''): ?>
+        <div class="tour-card-row__location">
+          <?php if (!empty($tour_row_flag_rows)): ?>
+            <span class="tour-card-row__flags">
+              <?php foreach ($tour_row_flag_rows as $fr): ?>
+                <span class="tour-card-row__flag">
+                  <img src="<?= esc_url($fr['url']); ?>" alt="<?= esc_attr($fr['alt']); ?>" loading="lazy" width="18" height="18">
+                </span>
+              <?php endforeach; ?>
+            </span>
+          <?php endif; ?>
+          <?php if ($country_title !== ''): ?>
+            <span class="tour-card-row__country-name"><?= esc_html($country_title); ?></span>
+          <?php endif; ?>
         </div>
       <?php endif; ?>
 
