@@ -142,37 +142,6 @@ export const initSingleEducationPrograms = () => {
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
-  // Получаем доступные даты и ближайшую дату из data-атрибутов
-  const availableDatesStr = root.getAttribute("data-available-dates");
-  const nearestDate = root.getAttribute("data-nearest-date") || "";
-  let availableDates = [];
-  
-  if (availableDatesStr) {
-    try {
-      availableDates = JSON.parse(availableDatesStr);
-    } catch (e) {
-      availableDates = [];
-    }
-  }
-
-  // Валидация и нормализация доступных дат (выполняется один раз при загрузке)
-  const validAvailableDates = availableDates
-    .filter(date => {
-      if (!date || !date.trim()) return false;
-      const dateStr = date.trim();
-      // Проверяем формат Y-m-d
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        return false;
-      }
-      // Проверяем валидность даты
-      const d = new Date(dateStr + 'T00:00:00');
-      if (isNaN(d.getTime())) {
-        return false;
-      }
-      return true;
-    })
-    .map(date => date.trim());
-
   const toLocalYmd = (date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -180,24 +149,9 @@ export const initSingleEducationPrograms = () => {
     return `${y}-${m}-${day}`;
   };
 
-  const addDaysToYmd = (ymd, days) => {
-    const d = new Date(`${ymd}T00:00:00`);
-    d.setDate(d.getDate() + days);
-    return toLocalYmd(d);
-  };
-
-  const YMD_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
   let datePickerInstance = null;
 
-  const getValues = (select) => {
-    if (!select) return [];
-    return Array.from(select.selectedOptions)
-      .map((o) => o.value)
-      .filter(Boolean);
-  };
-
-  // Функция проверки, есть ли активные фильтры (отличающиеся от значений по умолчанию)
+  // Функция проверки, есть ли активные фильтры
   const hasActiveFilters = () => {
     // Проверяем возраст (по умолчанию пусто)
     if (ageSelect && ageSelect.value) {
@@ -486,60 +440,6 @@ export const initSingleEducationPrograms = () => {
     }
   };
 
-  // Функция для вычисления дат по умолчанию (сегодня + 7 дней и сегодня + 14 дней)
-  const getDefaultDates = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const defaultStartDate = new Date(today);
-    defaultStartDate.setDate(today.getDate() + 7);
-    
-    const defaultEndDate = new Date(defaultStartDate);
-    defaultEndDate.setDate(defaultStartDate.getDate() + 7);
-    
-    // Форматируем даты в формат Y-m-d
-    const formatDate = (date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-    
-    return {
-      start: formatDate(defaultStartDate),
-      end: formatDate(defaultEndDate),
-    };
-  };
-
-  // Дефолтный диапазон в календаре: data-nearest-date или ближайший заезд к «сегодня + 7», конец — следующий заезд или +7 дней
-  const setDefaultDates = (triggerChange = false) => {
-    if (!datePickerInstance || validAvailableDates.length === 0) return;
-
-    const defaultDates = getDefaultDates();
-    const findNearestAvailable = (targetDate) => {
-      const found = validAvailableDates.find((d) => d >= targetDate);
-      return found ?? validAvailableDates[validAvailableDates.length - 1];
-    };
-
-    let actualStart;
-    if (nearestDate && YMD_PATTERN.test(nearestDate) && validAvailableDates.includes(nearestDate)) {
-      actualStart = nearestDate;
-    } else {
-      actualStart = findNearestAvailable(defaultDates.start);
-    }
-
-    const idx = validAvailableDates.indexOf(actualStart);
-    let actualEnd;
-    if (idx >= 0 && idx < validAvailableDates.length - 1) {
-      actualEnd = validAvailableDates[idx + 1];
-    } else {
-      actualEnd = findNearestAvailable(addDaysToYmd(actualStart, 7));
-    }
-
-    const datesToSet = actualEnd > actualStart ? [actualStart, actualEnd] : [actualStart];
-    datePickerInstance.setDate(datesToSet, triggerChange);
-  };
-
   // Функция сброса фильтров
   const resetFilters = () => {
     // Сбрасываем возраст
@@ -638,22 +538,14 @@ export const initSingleEducationPrograms = () => {
       disableMobile: true,
       conjunction: " - ", // Разделитель между датами в диапазоне
       altInputPlaceholder: "Выберите даты", // Плейсхолдер для альтернативного input
-      onChange: (selectedDates) => {
-        // Загружаем программы при выборе дат (как при выборе одной даты, так и при завершении диапазона)
-        if (selectedDates.length > 0) {
-          loadPrograms();
-        }
+      onChange: () => {
+        loadPrograms();
       },
     };
 
     // Инициализируем Flatpickr
     datePickerInstance = flatpickr(dateInput, flatpickrOptions);
-
-    loadInitialFilterOptions().then(() => {
-      if (validAvailableDates.length > 0) {
-        setDefaultDates(true);
-      }
-    });
+    loadInitialFilterOptions();
   } else {
     loadInitialFilterOptions();
   }

@@ -186,44 +186,6 @@ $map_zoom = function_exists('get_field') ? get_field('education_map_zoom', $post
 $programs = function_exists('get_field') ? get_field('education_programs', $post_id) : [];
 $programs = is_array($programs) ? $programs : [];
 
-// Собираем доступные даты из программ
-$available_dates = [];
-$nearest_date = '';
-if (!empty($programs)) {
-  $today = new DateTime();
-  $today->setTime(0, 0, 0);
-  $nearest_date_obj = null;
-
-  foreach ($programs as $program) {
-    foreach (parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '') as $date_val) {
-      $date_obj = DateTime::createFromFormat('Y-m-d', $date_val);
-      if (!$date_obj) continue;
-      $date_obj->setTime(0, 0, 0);
-
-      $available_dates[] = $date_val;
-
-      if ($date_obj >= $today) {
-        if (!$nearest_date_obj || $date_obj < $nearest_date_obj) {
-          $nearest_date_obj = clone $date_obj;
-          $nearest_date = $date_val;
-        }
-      }
-    }
-  }
-
-  // Сортируем даты и фильтруем пустые значения
-  $available_dates = array_filter($available_dates, function ($date) {
-    return !empty($date) && strlen(trim($date)) > 0;
-  });
-  sort($available_dates);
-  $available_dates = array_values(array_unique($available_dates));
-  // Только будущие/сегодняшние заезды — как в каталоге (page-education), без конфликта с minDate в Flatpickr
-  $today_str = $today->format('Y-m-d');
-  $available_dates = array_values(array_filter($available_dates, static function ($date) use ($today_str) {
-    return $date >= $today_str;
-  }));
-}
-
 $booking_url = function_exists('get_field') ? get_field('education_booking_url', $post_id) : '';
 
 if (function_exists('get_field')) {
@@ -506,9 +468,7 @@ get_header();
         <?php if (!empty($programs)): ?>
           <div class="single-education__programs-column">
             <div class="single-education__programs js-education-programs"
-              data-education-id="<?php echo esc_attr($post_id); ?>"
-              data-available-dates="<?php echo esc_attr(wp_json_encode($available_dates)); ?>"
-              data-nearest-date="<?php echo esc_attr($nearest_date); ?>">
+              data-education-id="<?php echo esc_attr($post_id); ?>">
 
 
               <div class="single-education__programs-title__wrap">
