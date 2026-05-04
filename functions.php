@@ -180,6 +180,30 @@ function bsi_scripts()
 }
 add_action('wp_enqueue_scripts', 'bsi_scripts');
 
+/**
+ * Preload критических шрифтов Inter (топ-4 веса по частоте использования в CSS).
+ * Только нормальное начертание — italic загружается браузером по требованию.
+ * Приоритет 1 — выводим до wp_head(), чтобы браузер начал загрузку как можно раньше.
+ */
+function bsi_preload_fonts(): void
+{
+	$fonts_uri = get_template_directory_uri() . '/fonts/';
+	$critical_fonts = [
+		'Inter-Regular',
+		'Inter-Medium',
+		'Inter-SemiBold',
+		'Inter-Bold',
+	];
+
+	foreach ($critical_fonts as $font) {
+		printf(
+			'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin="anonymous">' . "\n",
+			esc_url($fonts_uri . $font . '.woff2')
+		);
+	}
+}
+add_action('wp_head', 'bsi_preload_fonts', 1);
+
 // НЕ добавляем глобальный Referrer-Policy, так как bsistudy.ru требует referrer для обхода SSO
 
 // Автоматически добавляем rel="noopener noreferrer" ко всем внешним ссылкам в контенте
