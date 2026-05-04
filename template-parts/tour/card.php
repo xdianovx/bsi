@@ -8,7 +8,6 @@ $tour_id = 0;
 $tour_url = '';
 $tour_image = '';
 $tour_title = '';
-$tour_flag = '';
 $price_value = '';
 $nights = 0;
 $checkin_dates = '';
@@ -42,6 +41,10 @@ if (!empty($tour['countries']) && is_array($tour['countries'])) {
   $tour_country_entries = bsi_get_tour_country_entries((int) $tour_id);
 }
 
+$country_location_text = function_exists('bsi_format_tour_country_location_line')
+  ? bsi_format_tour_country_location_line($country_id, $tour_country_entries)
+  : '';
+
 $tour_flag_rows = [];
 foreach ($tour_country_entries as $entry) {
   if (!is_array($entry)) {
@@ -63,7 +66,7 @@ if (empty($tour_flag_rows)) {
   if ($fallback_flag !== '') {
     $tour_flag_rows[] = [
       'url' => $fallback_flag,
-      'alt' => $country_title,
+      'alt' => $country_location_text !== '' ? $country_location_text : $country_title,
     ];
   }
 }
@@ -146,9 +149,9 @@ if (function_exists('get_field')) {
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
-      <?php if ($country_title): ?>
+      <?php if ($country_location_text !== ''): ?>
         <div class="hotel-card__location-text">
-          <?php echo esc_html($country_title); ?>
+          <?php echo esc_html($country_location_text); ?>
         </div>
       <?php endif; ?>
     </div>

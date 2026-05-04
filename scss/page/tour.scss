@@ -78,6 +78,7 @@
 
 .tour-card-row__country-name {
   line-height: 130%;
+  white-space: normal;
 }
 
 .tour-card-row__title {
@@ -959,6 +960,12 @@
 }
 
 .tour-card__location {
+}
+
+.tour-card .hotel-card__location-text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .hotel-widget__price {

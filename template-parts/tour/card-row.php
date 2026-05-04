@@ -54,9 +54,12 @@ if (!$img && !empty($tour_gallery)) {
   }
 }
 
-// Country title — только primary; флаги — все страны тура.
-$country_title = $country_id ? get_the_title($country_id) : '';
+// Country line: primary + остальные через запятую; флаги — все страны тура.
 $country_entries = function_exists('bsi_get_tour_country_entries') ? bsi_get_tour_country_entries((int) $post_id) : [];
+$country_location_text = function_exists('bsi_format_tour_country_location_line')
+  ? bsi_format_tour_country_location_line($country_id, $country_entries)
+  : '';
+
 $tour_row_flag_rows = [];
 foreach ($country_entries as $entry) {
   if (!is_array($entry)) {
@@ -122,7 +125,7 @@ if (!empty($types) && !is_wp_error($types)) {
         </div>
       <?php endif; ?>
 
-      <?php if (!empty($tour_row_flag_rows) || $country_title !== ''): ?>
+      <?php if (!empty($tour_row_flag_rows) || $country_location_text !== ''): ?>
         <div class="tour-card-row__location">
           <?php if (!empty($tour_row_flag_rows)): ?>
             <span class="tour-card-row__flags">
@@ -133,8 +136,8 @@ if (!empty($types) && !is_wp_error($types)) {
               <?php endforeach; ?>
             </span>
           <?php endif; ?>
-          <?php if ($country_title !== ''): ?>
-            <span class="tour-card-row__country-name"><?= esc_html($country_title); ?></span>
+          <?php if ($country_location_text !== ''): ?>
+            <span class="tour-card-row__country-name"><?= esc_html($country_location_text); ?></span>
           <?php endif; ?>
         </div>
       <?php endif; ?>

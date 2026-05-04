@@ -246,7 +246,7 @@ if (!function_exists('bsi_get_country_flag_url')) {
 
 if (!function_exists('bsi_get_tour_country_entries')) {
   /**
-   * Страны тура по порядку ACF (для флагов). title — для alt; основной текст локации карточки — только primary.
+   * Страны тура по порядку ACF (флаги и строка локации через {@see bsi_format_tour_country_location_line()}).
    *
    * @return array<int, array{id: int, title: string, flag_url: string}>
    */
@@ -266,6 +266,40 @@ if (!function_exists('bsi_get_tour_country_entries')) {
     }
 
     return $out;
+  }
+}
+
+if (!function_exists('bsi_format_tour_country_location_line')) {
+  /**
+   * Строка локации карточки тура: primary, затем остальные страны через запятую (порядок как в $entries).
+   *
+   * @param array<int, array{id?: int, title?: string}> $entries
+   */
+  function bsi_format_tour_country_location_line(int $primary_id, array $entries): string
+  {
+    $primary_title = $primary_id > 0 ? trim((string) get_the_title($primary_id)) : '';
+    $others = [];
+    foreach ($entries as $entry) {
+      if (!is_array($entry)) {
+        continue;
+      }
+      $eid = isset($entry['id']) ? (int) $entry['id'] : 0;
+      if ($eid <= 0 || $eid === $primary_id) {
+        continue;
+      }
+      $t = isset($entry['title']) ? trim((string) $entry['title']) : '';
+      if ($t !== '') {
+        $others[] = $t;
+      }
+    }
+    if ($primary_title !== '' && !empty($others)) {
+      return $primary_title . ', ' . implode(', ', $others);
+    }
+    if ($primary_title !== '') {
+      return $primary_title;
+    }
+
+    return implode(', ', $others);
   }
 }
 
