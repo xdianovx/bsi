@@ -1308,13 +1308,6 @@ span.flatpickr-weekday{cursor:default;font-size:90%;background:transparent;color
 @font-face {
   font-family: "Inter";
   font-display: swap;
-  font-weight: 300;
-  font-style: normal;
-  src: url("../../fonts/Inter-Light.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Inter";
-  font-display: swap;
   font-weight: 400;
   font-style: normal;
   src: url("../../fonts/Inter-Regular.woff2") format("woff2");
