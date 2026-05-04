@@ -113,9 +113,10 @@ function bsi_ajax_education_filter(): void
   $args = [
     'post_type' => 'education',
     'post_status' => 'publish',
-    'posts_per_page' => -1, // Получаем все школы для фильтрации
+    'posts_per_page' => -1,
     'orderby' => 'title',
     'order' => 'ASC',
+    'no_found_rows' => true,
   ];
 
   if (!empty($tax_query)) {
@@ -261,7 +262,9 @@ function bsi_ajax_education_filter(): void
       'post_status' => 'publish',
       'post__in' => $filtered_ids,
       'posts_per_page' => -1,
-      'orderby' => 'post__in', // Сохраняем порядок из filtered_ids
+      'orderby' => 'post__in',
+      'no_found_rows' => true,
+      'update_post_term_cache' => false,
     ]);
 
     if ($all_posts_query->have_posts()) {
@@ -993,6 +996,7 @@ function bsi_ajax_education_filter_options(): void
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
+    'no_found_rows' => true,
   ];
 
   if ($country_id > 0) {

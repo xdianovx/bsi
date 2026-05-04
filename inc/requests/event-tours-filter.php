@@ -46,9 +46,10 @@ function event_tours_filter()
   $args = [
     'post_type' => 'event',
     'post_status' => 'publish',
-    'posts_per_page' => -1, // Получаем все для фильтрации по датам
+    'posts_per_page' => -1,
     'orderby' => 'title',
     'order' => 'ASC',
+    'no_found_rows' => true,
   ];
 
   if (!empty($tax_query)) {
@@ -216,6 +217,7 @@ function event_tours_countries()
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
+    'no_found_rows' => true,
   ];
 
   if (!empty($tax_query)) {
@@ -344,6 +346,7 @@ function event_tours_available_dates()
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
+    'no_found_rows' => true,
   ];
 
   if (!empty($tax_query)) {

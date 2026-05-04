@@ -3,6 +3,8 @@ Thumbs.db
 .cursor/
 .claude/
 CLAUDE.md
+AGENTS.md
+SEO-PERFORMANCE-AUDIT.md
 node_modules/
 npm-debug.log*
 yarn-error.log

@@ -79,6 +79,7 @@ function bsi_ajax_tours_filter()
     'posts_per_page' => -1,
     'orderby' => 'title',
     'order' => 'ASC',
+    'no_found_rows' => true,
   ];
 
   if (!empty($tax_query)) {
@@ -324,6 +325,8 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
         'post_status' => 'publish',
         'posts_per_page' => -1,
         'fields' => 'ids',
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
         'tax_query' => [
           [
             'taxonomy' => 'region',
@@ -445,6 +448,8 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
         'post_status' => 'publish',
         'posts_per_page' => -1,
         'fields' => 'ids',
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
         'tax_query' => [
           [
             'taxonomy' => 'resort',
@@ -546,6 +551,8 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
+    'no_found_rows' => true,
+    'update_post_meta_cache' => false,
   ];
 
   if (!empty($local_tax_query)) {
@@ -574,6 +581,8 @@ function bsi_get_tours_filter_options($country_id = 0, $region_id = 0, $tour_typ
         'post_status' => 'publish',
         'posts_per_page' => -1,
         'fields' => 'ids',
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
         'tax_query' => [
           [
             'taxonomy' => 'tour_type',

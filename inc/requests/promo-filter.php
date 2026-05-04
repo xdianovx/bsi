@@ -22,6 +22,7 @@ function bsi_filter_promos()
     'posts_per_page' => -1,
     'orderby' => 'date',
     'order' => 'DESC',
+    'no_found_rows' => true,
     'meta_query' => $active_meta,
   ];
 

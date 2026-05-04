@@ -64,6 +64,7 @@ function country_tours_filter()
     'posts_per_page' => -1,
     'orderby' => 'title',
     'order' => 'ASC',
+    'no_found_rows' => true,
     'meta_query' => bsi_build_tour_country_meta_query((int) $country_id),
   ];
 
