@@ -416,6 +416,8 @@ if (empty($promo_countries) && !empty($items)) {
         });
     }
 }
+
+$education_archive_url = home_url('/obrazovanie-za-rubezhom/');
 ?>
 
 <?php if (!empty($items)): ?>
@@ -441,7 +443,7 @@ if (empty($promo_countries) && !empty($items)) {
                         </div>
                     </div>
 
-                    <a href="<?php echo esc_url(home_url('/obrazovanie-za-rubezhom/')); ?>"
+                    <a href="<?php echo esc_url($education_archive_url); ?>"
                        class="title-wrap__link link-arrow title-wrap__link-education">
                         <span>Все программы </span>
                         <div class="link-arrow__icon">
@@ -552,6 +554,10 @@ if (empty($promo_countries) && !empty($items)) {
                         <?php endforeach; ?>
                     </div>
                 </div>
+            </div>
+
+            <div class="popular-education__all-mob">
+                <a href="<?php echo esc_url($education_archive_url); ?>" class="btn btn-gray">Все программы</a>
             </div>
 
         </div>

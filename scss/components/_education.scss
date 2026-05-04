@@ -1102,6 +1102,21 @@
   margin-top: 20px;
 }
 
+.popular-education__all-mob {
+  display: none;
+
+  a {
+    display: block;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    display: block;
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+}
+
 .education-card {
   display: flex;
   flex-direction: column;

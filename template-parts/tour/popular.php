@@ -200,6 +200,12 @@ foreach ($tour_posts as $tour_post) {
         </div>
       </div>
 
+      <?php if ($tours_page_url): ?>
+        <div class="popular-tours__all-mob">
+          <a href="<?php echo esc_url($tours_page_url); ?>" class="btn btn-gray">Все туры</a>
+        </div>
+      <?php endif; ?>
+
     </div>
   </section>
 <?php endif; ?>
