@@ -217,6 +217,11 @@ if (!empty($programs)) {
   });
   sort($available_dates);
   $available_dates = array_values(array_unique($available_dates));
+  // Только будущие/сегодняшние заезды — как в каталоге (page-education), без конфликта с minDate в Flatpickr
+  $today_str = $today->format('Y-m-d');
+  $available_dates = array_values(array_filter($available_dates, static function ($date) use ($today_str) {
+    return $date >= $today_str;
+  }));
 }
 
 $booking_url = function_exists('get_field') ? get_field('education_booking_url', $post_id) : '';

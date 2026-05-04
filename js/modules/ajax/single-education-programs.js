@@ -173,6 +173,21 @@ export const initSingleEducationPrograms = () => {
     })
     .map(date => date.trim());
 
+  const toLocalYmd = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const addDaysToYmd = (ymd, days) => {
+    const d = new Date(`${ymd}T00:00:00`);
+    d.setDate(d.getDate() + days);
+    return toLocalYmd(d);
+  };
+
+  const YMD_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
   let datePickerInstance = null;
 
   const getValues = (select) => {
@@ -256,12 +271,12 @@ export const initSingleEducationPrograms = () => {
       if (datePickerInstance && datePickerInstance.selectedDates.length > 0) {
         const selectedDates = datePickerInstance.selectedDates;
         if (selectedDates.length >= 1) {
-          const dateFrom = selectedDates[0].toISOString().split("T")[0];
+          const dateFrom = toLocalYmd(selectedDates[0]);
           body.set("program_date_from", dateFrom);
           
           // Если выбраны обе даты (диапазон), отправляем date_to
           if (selectedDates.length >= 2) {
-            const dateTo = selectedDates[1].toISOString().split("T")[0];
+            const dateTo = toLocalYmd(selectedDates[1]);
             body.set("program_date_to", dateTo);
           }
         }
@@ -471,8 +486,6 @@ export const initSingleEducationPrograms = () => {
     }
   };
 
-  loadInitialFilterOptions();
-
   // Функция для вычисления дат по умолчанию (сегодня + 7 дней и сегодня + 14 дней)
   const getDefaultDates = () => {
     const today = new Date();
@@ -498,48 +511,33 @@ export const initSingleEducationPrograms = () => {
     };
   };
 
-  // Функция для установки дат по умолчанию в Flatpickr
-  const setDefaultDates = () => {
-    if (!datePickerInstance) return;
-    
+  // Дефолтный диапазон в календаре: data-nearest-date или ближайший заезд к «сегодня + 7», конец — следующий заезд или +7 дней
+  const setDefaultDates = (triggerChange = false) => {
+    if (!datePickerInstance || validAvailableDates.length === 0) return;
+
     const defaultDates = getDefaultDates();
-    const defaultStartDateStr = defaultDates.start;
-    const defaultEndDateStr = defaultDates.end;
-    
-    // Определяем даты для установки
-    let datesToSet = [];
-    
-    if (validAvailableDates.length > 0) {
-      // Если есть ограничения по доступным датам, находим ближайшие доступные
-      const findNearestAvailable = (targetDate) => {
-        // Ищем первую доступную дату >= целевой даты
-        const found = validAvailableDates.find(d => d >= targetDate);
-        if (found) {
-          return found;
-        }
-        // Если не нашли, возвращаем последнюю доступную дату
-        return validAvailableDates[validAvailableDates.length - 1];
-      };
-      
-      const actualStart = findNearestAvailable(defaultStartDateStr);
-      const actualEnd = findNearestAvailable(defaultEndDateStr);
-      
-      // Убеждаемся, что конечная дата >= начальной
-      if (actualEnd >= actualStart) {
-        datesToSet = [actualStart, actualEnd];
-      } else {
-        // Если конечная дата меньше начальной, используем только начальную
-        datesToSet = [actualStart];
-      }
+    const findNearestAvailable = (targetDate) => {
+      const found = validAvailableDates.find((d) => d >= targetDate);
+      return found ?? validAvailableDates[validAvailableDates.length - 1];
+    };
+
+    let actualStart;
+    if (nearestDate && YMD_PATTERN.test(nearestDate) && validAvailableDates.includes(nearestDate)) {
+      actualStart = nearestDate;
     } else {
-      // Если нет ограничений, используем вычисленные даты
-      datesToSet = [defaultStartDateStr, defaultEndDateStr];
+      actualStart = findNearestAvailable(defaultDates.start);
     }
-    
-    // Устанавливаем даты
-    if (datesToSet.length > 0) {
-      datePickerInstance.setDate(datesToSet, false);
+
+    const idx = validAvailableDates.indexOf(actualStart);
+    let actualEnd;
+    if (idx >= 0 && idx < validAvailableDates.length - 1) {
+      actualEnd = validAvailableDates[idx + 1];
+    } else {
+      actualEnd = findNearestAvailable(addDaysToYmd(actualStart, 7));
     }
+
+    const datesToSet = actualEnd > actualStart ? [actualStart, actualEnd] : [actualStart];
+    datePickerInstance.setDate(datesToSet, triggerChange);
   };
 
   // Функция сброса фильтров
@@ -655,6 +653,14 @@ export const initSingleEducationPrograms = () => {
 
     // Инициализируем Flatpickr
     datePickerInstance = flatpickr(dateInput, flatpickrOptions);
+
+    loadInitialFilterOptions().then(() => {
+      if (validAvailableDates.length > 0) {
+        setDefaultDates(true);
+      }
+    });
+  } else {
+    loadInitialFilterOptions();
   }
   
   initEducationProgramAccordion();
