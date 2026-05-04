@@ -53,12 +53,9 @@ $country_ids = [];
 if (!empty($tour_posts)) {
   foreach ($tour_posts as $tour_post) {
     $tour_id = (int) $tour_post->ID;
-    $ids = function_exists('bsi_get_tour_country_ids') ? bsi_get_tour_country_ids($tour_id) : [];
-    foreach ($ids as $c) {
-      $c = (int) $c;
-      if ($c > 0) {
-        $country_ids[] = $c;
-      }
+    $c = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id($tour_id) : 0;
+    if ($c > 0) {
+      $country_ids[] = $c;
     }
   }
 }
