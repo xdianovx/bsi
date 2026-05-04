@@ -133,7 +133,7 @@ if (!empty($types) && !is_wp_error($types)) {
             <span class="tour-card-row__flags">
               <?php foreach ($tour_row_flag_rows as $fr): ?>
                 <span class="tour-card-row__flag">
-                  <img src="<?= esc_url($fr['url']); ?>" alt="<?= esc_attr($fr['alt']); ?>" loading="lazy" width="18" height="18">
+                  <img src="<?= esc_url($fr['url']); ?>" alt="<?= esc_attr($fr['alt']); ?>" width="18" height="18" loading="eager" decoding="async">
                 </span>
               <?php endforeach; ?>
             </span>

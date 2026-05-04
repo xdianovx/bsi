@@ -178,7 +178,7 @@ foreach ($tour_posts as $tour_post) {
             <?php if ($flag_url): ?>
               <span class="promo-filter__flag-wrap">
                 <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($country_title); ?>"
-                  class="promo-filter__flag">
+                  class="promo-filter__flag" width="28" height="28" loading="eager" decoding="async">
               </span>
             <?php endif; ?>
 

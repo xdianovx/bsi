@@ -144,7 +144,7 @@ if (function_exists('get_field')) {
         <div class="hotel-card__flags">
           <?php foreach ($tour_flag_rows as $flag_row): ?>
             <div class="hotel-card__flag">
-              <img src="<?php echo esc_url($flag_row['url']); ?>" alt="<?php echo esc_attr($flag_row['alt']); ?>">
+              <img src="<?php echo esc_url($flag_row['url']); ?>" alt="<?php echo esc_attr($flag_row['alt']); ?>" width="24" height="24" loading="eager" decoding="async">
             </div>
           <?php endforeach; ?>
         </div>
