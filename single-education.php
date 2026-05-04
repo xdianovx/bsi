@@ -186,6 +186,27 @@ $map_zoom = function_exists('get_field') ? get_field('education_map_zoom', $post
 $programs = function_exists('get_field') ? get_field('education_programs', $post_id) : [];
 $programs = is_array($programs) ? $programs : [];
 
+$program_dates_min = '';
+$program_dates_max = '';
+if (!empty($programs)) {
+  $all_checkin = [];
+  foreach ($programs as $program) {
+    foreach (parse_program_dates_string(isset($program['program_dates']) ? (string) $program['program_dates'] : '') as $d) {
+      $all_checkin[] = $d;
+    }
+  }
+  $all_checkin = array_values(array_unique($all_checkin));
+  sort($all_checkin);
+  $today_str = date('Y-m-d');
+  $future = array_values(array_filter($all_checkin, static function ($d) use ($today_str) {
+    return $d >= $today_str;
+  }));
+  if (!empty($future)) {
+    $program_dates_min = $future[0];
+    $program_dates_max = $future[count($future) - 1];
+  }
+}
+
 $booking_url = function_exists('get_field') ? get_field('education_booking_url', $post_id) : '';
 
 if (function_exists('get_field')) {
@@ -468,7 +489,9 @@ get_header();
         <?php if (!empty($programs)): ?>
           <div class="single-education__programs-column">
             <div class="single-education__programs js-education-programs"
-              data-education-id="<?php echo esc_attr($post_id); ?>">
+              data-education-id="<?php echo esc_attr($post_id); ?>"
+              <?php if ($program_dates_min !== ''): ?>data-program-dates-min="<?php echo esc_attr($program_dates_min); ?>"<?php endif; ?>
+              <?php if ($program_dates_max !== ''): ?>data-program-dates-max="<?php echo esc_attr($program_dates_max); ?>"<?php endif; ?>>
 
 
               <div class="single-education__programs-title__wrap">

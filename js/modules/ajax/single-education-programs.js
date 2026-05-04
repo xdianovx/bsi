@@ -149,6 +149,11 @@ export const initSingleEducationPrograms = () => {
     return `${y}-${m}-${day}`;
   };
 
+  const YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+  const programDatesMin = (root.getAttribute("data-program-dates-min") || "").trim();
+  const programDatesMax = (root.getAttribute("data-program-dates-max") || "").trim();
+
   let datePickerInstance = null;
 
   // Функция проверки, есть ли активные фильтры
@@ -530,20 +535,25 @@ export const initSingleEducationPrograms = () => {
   if (dateInput) {
     const flatpickrOptions = {
       locale: Russian,
-      dateFormat: "Y-m-d", // Формат для реального значения (отправка на сервер)
-      altInput: true, // Показывать альтернативный input для отображения
-      altFormat: "d.m", // Формат для отображения (день.месяц без года)
-      mode: "range", // Режим выбора диапазона дат
-      minDate: "today",
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "d.m",
+      mode: "range",
       disableMobile: true,
-      conjunction: " - ", // Разделитель между датами в диапазоне
-      altInputPlaceholder: "Выберите даты", // Плейсхолдер для альтернативного input
+      conjunction: " - ",
+      altInputPlaceholder: "Выберите даты",
       onChange: () => {
         loadPrograms();
       },
     };
 
-    // Инициализируем Flatpickr
+    if (YMD_RE.test(programDatesMin) && YMD_RE.test(programDatesMax) && programDatesMin <= programDatesMax) {
+      flatpickrOptions.minDate = programDatesMin;
+      flatpickrOptions.maxDate = programDatesMax;
+    } else {
+      flatpickrOptions.minDate = "today";
+    }
+
     datePickerInstance = flatpickr(dateInput, flatpickrOptions);
     loadInitialFilterOptions();
   } else {
