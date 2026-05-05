@@ -179,6 +179,11 @@ $mice_header_mobile_nav = ob_get_clean();
           <?php echo $mice_header_mobile_nav; ?>
         </div>
 
+        <div class="mobile-nav__old-site">
+          <a href="https://past.bsigroup.ru/" target="_blank" rel="noopener noreferrer"
+             class="button-login mobile-nav__old-site-link">Старый сайт</a>
+        </div>
+
         <div class="mobile-nav-contacts">
           <div class="mobile-nav-contacts__item">
             <img src="<?= get_template_directory_uri() ?>/img/icons/phone-call.svg"

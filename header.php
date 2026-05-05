@@ -152,6 +152,11 @@
 
         </div>
 
+        <div class="mobile-nav__old-site">
+          <a href="https://past.bsigroup.ru/" target="_blank" rel="noopener noreferrer"
+            class="button-login mobile-nav__old-site-link">Старый сайт</a>
+        </div>
+
         <div class="mobile-nav__currencies">
           <div class="currency-item">
             <div class="currency-item__title">USD</div>

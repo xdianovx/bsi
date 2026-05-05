@@ -126,6 +126,15 @@
   font-weight: 500;
 }
 
+.mobile-nav__old-site {
+  align-self: flex-start;
+}
+
+.mobile-nav__old-site-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .mobile-nav__currencies {
   font-size: 14px;
   font-weight: 600;
