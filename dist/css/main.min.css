@@ -5257,6 +5257,7 @@ input.error {
 .footer {
   background: #1b1b1b;
   color: #fff;
+  margin-top: 80px;
 }
 .footer__top {
   padding-top: 32px;
