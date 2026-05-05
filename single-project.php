@@ -50,7 +50,7 @@ $project_date_human = '';
 $project_date_attr = '';
 
 if ($project_event_raw !== '') {
-  $project_date_human = format_month_year_russian($project_event_raw);
+  $project_date_human = format_month_russian($project_event_raw);
   $event_ts = strtotime($project_event_raw);
   if (!$event_ts && preg_match('/^\d{8}$/', $project_event_raw)) {
     $d = DateTime::createFromFormat('Ymd', $project_event_raw);
@@ -66,8 +66,8 @@ if ($project_date_human === '') {
   $project_date_ts = $project_date_raw ? strtotime($project_date_raw) : 0;
 
   $project_date_human = $project_date_ts
-    ? format_date_russian($project_date_raw)
-    : format_date_russian(get_the_date('Y-m-d', $project_id));
+    ? format_month_russian($project_date_raw)
+    : format_month_russian(get_the_date('Y-m-d', $project_id));
 
   $project_date_attr = $project_date_ts
     ? date('Y-m-d', $project_date_ts)
