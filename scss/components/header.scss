@@ -8,6 +8,12 @@
     background: #fff;
     padding: 8px 0;
   }
+
+  .admin-bar & {
+    @media screen and (max-width: 768px) {
+      top: 46px;
+    }
+  }
   .socials {
     display: none;
   }

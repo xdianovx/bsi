@@ -95,15 +95,13 @@ if ($project_date_human === '') {
             <?php if ($country_id): ?>
               <div class="single-hotel__address single-project-country">
                 <?php if ($flag_url): ?>
-                  <img class="page-country__subtitle-flag"
-                       src="<?php echo esc_url($flag_url); ?>"
-                       alt="<?php echo esc_attr($country_title); ?>">
+                  <img class="page-country__subtitle-flag" src="<?php echo esc_url($flag_url); ?>"
+                    alt="<?php echo esc_attr($country_title); ?>">
                 <?php endif; ?>
 
 
                 <?php if ($country_url): ?>
-                  <a class="page-country__link"
-                     href="<?php echo esc_url($country_url); ?>">
+                  <a class="page-country__link" href="<?php echo esc_url($country_url); ?>">
                     <?php echo esc_html($country_title); ?>
                   </a>
                 <?php else: ?>
@@ -117,8 +115,7 @@ if ($project_date_human === '') {
 
 
             <?php if ($project_date_human): ?>
-              <time class="project-date numfont"
-                    datetime="<?php echo esc_attr($project_date_attr); ?>">
+              <time class="project-date numfont" datetime="<?php echo esc_attr($project_date_attr); ?>">
                 <?php echo esc_html($project_date_human); ?>
               </time>
             <?php endif; ?>
@@ -139,7 +136,7 @@ if ($project_date_human === '') {
           </div>
         <?php endif; ?>
 
-        <div class="editor-content post-content-section">
+        <div class="editor-content post-content-section --full">
           <?php the_content(); ?>
         </div>
 

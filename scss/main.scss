@@ -122,9 +122,11 @@
   max-width: 800px;
   width: 100%;
   margin: 64px auto 0;
-}
 
-.archive-page-head {
+  &.--full {
+    max-width: none;
+    margin-top: 40px;
+  }
 }
 
 .archive-page__top {

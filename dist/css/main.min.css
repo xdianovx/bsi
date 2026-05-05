@@ -1515,7 +1515,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-x: clip;
   scroll-margin-top: 100px;
 }
 main {
@@ -6035,6 +6035,11 @@ html.bsi-cookie-consented .cookie-consent {
     z-index: 100;
     background: #fff;
     padding: 8px 0;
+  }
+}
+@media screen and (max-width: 768px) {
+  .admin-bar .header {
+    top: 46px;
   }
 }
 .header .socials {
@@ -13765,6 +13770,10 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
   max-width: 800px;
   width: 100%;
   margin: 64px auto 0;
+}
+.post-content-section.--full {
+  max-width: none;
+  margin-top: 40px;
 }
 .archive-page__top {
   padding-bottom: 24px;
