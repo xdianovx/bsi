@@ -1,5 +1,7 @@
 .main-banner__section {
   margin-top: 8px;
+  position: relative;
+  z-index: -1;
 }
 
 .main-banners-slider {
