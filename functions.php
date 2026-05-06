@@ -210,7 +210,6 @@ function bsi_add_noreferrer_to_external_links($content)
 		$site_url = parse_url(home_url());
 		$site_host = !empty($site_url['host']) ? str_replace('www.', '', $site_url['host']) : '';
 		$file_extensions_for_download = [
-			'pdf',
 			'doc',
 			'docx',
 			'xls',
