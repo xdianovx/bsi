@@ -9495,7 +9495,7 @@ html.bsi-cookie-consented .cookie-consent {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-top: 32px;
+  margin-top: 24px;
 }
 @media screen and (max-width: 1200px) {
   .projects-archive__list {
@@ -9506,6 +9506,9 @@ html.bsi-cookie-consented .cookie-consent {
   .projects-archive__list {
     grid-template-columns: repeat(1, 1fr);
   }
+}
+.projects-archive .promo-filter {
+  margin-top: 16px;
 }
 .promo-filter__section {
   margin-top: 32px;

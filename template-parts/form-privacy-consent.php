@@ -23,10 +23,11 @@ $label_inner = static function () use ($checkbox_id, $privacy_url, $req) {
   <label class="modal-program-booking__service-item modal-program-booking__service-item--policy"
     for="<?php echo esc_attr($checkbox_id); ?>">
     <input type="checkbox" id="<?php echo esc_attr($checkbox_id); ?>" name="privacy_agreement" value="on"
-      class="modal-program-booking__service-checkbox" autocomplete="off"<?php echo $req; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+      class="modal-program-booking__service-checkbox" autocomplete="off" <?php echo $req; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
     <span class="modal-program-booking__service-checkmark" aria-hidden="true"></span>
     <span class="modal-program-booking__service-text">Отправляя форму, я подтверждаю, что ознакомился<br>
-      с <a href="<?php echo esc_url($privacy_url); ?>" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a> и даю согласие на обработку<br>
+      с <a href="<?php echo esc_url($privacy_url); ?>" target="_blank" rel="noopener noreferrer">Политикой
+        конфиденциальности</a> и даю согласие на обработку<br>
       своих персональных данных</span>
   </label>
   <?php

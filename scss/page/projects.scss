@@ -126,7 +126,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-top: 32px;
+  margin-top: 24px;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
@@ -138,4 +138,7 @@
 }
 
 .projects-archive {
+  .promo-filter {
+    margin-top: 16px;
+  }
 }
