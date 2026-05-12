@@ -1,128 +1,196 @@
 <?php
 
+/**
+ * Событийные туры: фильтры и фасеты (AJAX).
+ */
+
+if (!function_exists('bsi_event_tours_parse_request_filters')) {
+  /**
+   * @return array{country_id:int,region_id:int,tour_type_id:int,resort_id:int,search:string,date_from:string,date_to:string,paged:int}
+   */
+  function bsi_event_tours_parse_request_filters(): array
+  {
+    return [
+      'country_id' => isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0,
+      'region_id' => isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0,
+      'tour_type_id' => isset($_POST['tour_type']) ? absint(wp_unslash($_POST['tour_type'])) : 0,
+      'resort_id' => isset($_POST['resort']) ? absint(wp_unslash($_POST['resort'])) : 0,
+      'search' => isset($_POST['search']) ? sanitize_text_field(wp_unslash($_POST['search'])) : '',
+      'date_from' => isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '',
+      'date_to' => isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '',
+      'paged' => isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1,
+    ];
+  }
+}
+
+if (!function_exists('bsi_event_tours_filter_ids_by_event_dates')) {
+  /**
+   * @param int[] $post_ids
+   * @return int[]
+   */
+  function bsi_event_tours_filter_ids_by_event_dates(array $post_ids, string $date_from, string $date_to): array
+  {
+    if ($date_from === '' || $date_to === '' || empty($post_ids)) {
+      return [];
+    }
+    $from = strtotime($date_from);
+    $to = strtotime($date_to);
+    if (!$from || !$to) {
+      return [];
+    }
+    $out = [];
+    foreach ($post_ids as $post_id) {
+      $post_id = (int) $post_id;
+      $event_dates = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
+      if (empty($event_dates) || !is_array($event_dates)) {
+        continue;
+      }
+      foreach ($event_dates as $row) {
+        $d = isset($row['date_value']) ? $row['date_value'] : '';
+        if (!$d) {
+          continue;
+        }
+        $ts = strtotime($d);
+        if ($ts >= $from && $ts <= $to) {
+          $out[] = $post_id;
+          break;
+        }
+      }
+    }
+    return $out;
+  }
+}
+
+if (!function_exists('bsi_event_tours_build_query_args')) {
+  /**
+   * @param array $f   bsi_event_tours_parse_request_filters()
+   * @param array $omit skip_country?, skip_resort?, skip_tour_type?
+   */
+  function bsi_event_tours_build_query_args(array $f, array $omit = []): array
+  {
+    $tax_query = [];
+
+    if (!empty($f['region_id'])) {
+      $tax_query[] = [
+        'taxonomy' => 'region',
+        'field' => 'term_id',
+        'terms' => [(int) $f['region_id']],
+        'include_children' => true,
+      ];
+    }
+
+    if (!empty($f['tour_type_id']) && empty($omit['skip_tour_type'])) {
+      $tax_query[] = [
+        'taxonomy' => 'tour_type',
+        'field' => 'term_id',
+        'terms' => [(int) $f['tour_type_id']],
+      ];
+    }
+
+    if (!empty($f['resort_id']) && empty($omit['skip_resort'])) {
+      $tax_query[] = [
+        'taxonomy' => 'resort',
+        'field' => 'term_id',
+        'terms' => [(int) $f['resort_id']],
+      ];
+    }
+
+    $meta_query = [];
+    if (!empty($f['country_id']) && empty($omit['skip_country'])) {
+      $meta_query[] = [
+        'key' => 'tour_country',
+        'value' => (int) $f['country_id'],
+        'compare' => '=',
+      ];
+    }
+
+    $args = [
+      'post_type' => 'event',
+      'post_status' => 'publish',
+      'orderby' => 'title',
+      'order' => 'ASC',
+      'no_found_rows' => true,
+    ];
+
+    if (!empty($tax_query)) {
+      $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+    }
+
+    if (!empty($meta_query)) {
+      $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
+    }
+
+    if ($f['search'] !== '') {
+      $args['s'] = $f['search'];
+    }
+
+    return $args;
+  }
+}
+
+if (!function_exists('bsi_event_tours_get_matching_post_ids')) {
+  /**
+   * @param array $omit skip_country?, skip_resort?, skip_tour_type?
+   * @return int[]
+   */
+  function bsi_event_tours_get_matching_post_ids(array $f, array $omit = [], bool $apply_date_range = false): array
+  {
+    $args = bsi_event_tours_build_query_args($f, $omit);
+    $args['posts_per_page'] = -1;
+    $args['fields'] = 'ids';
+
+    $q = new WP_Query($args);
+    $ids = array_map('intval', $q->posts);
+    wp_reset_postdata();
+
+    if ($apply_date_range && $f['date_from'] !== '' && $f['date_to'] !== '') {
+      $ids = bsi_event_tours_filter_ids_by_event_dates($ids, $f['date_from'], $f['date_to']);
+    }
+
+    return $ids;
+  }
+}
+
 add_action('wp_ajax_event_tours_filter', 'event_tours_filter');
 add_action('wp_ajax_nopriv_event_tours_filter', 'event_tours_filter');
 
 function event_tours_filter()
 {
-  $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
-  $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
-  $tour_type_id = isset($_POST['tour_type']) ? absint(wp_unslash($_POST['tour_type'])) : 0;
-  $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
-  $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
+  $f = bsi_event_tours_parse_request_filters();
+  $per_page = 12;
 
-  $tax_query = [];
+  $has_date_filter = ($f['date_from'] !== '' && $f['date_to'] !== '');
+  $ids = bsi_event_tours_get_matching_post_ids($f, [], $has_date_filter);
 
-  // Фильтр по региону
-  if ($region_id) {
-    $tax_query[] = [
-      'taxonomy' => 'region',
-      'field' => 'term_id',
-      'terms' => [$region_id],
-      'include_children' => true,
-    ];
-  }
+  $total = count($ids);
+  $max_pages = $total > 0 ? (int) ceil($total / $per_page) : 0;
+  $paged = $max_pages > 0 ? min($f['paged'], $max_pages) : 1;
 
-  // Фильтр по типу тура
-  if ($tour_type_id) {
-    $tax_query[] = [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$tour_type_id],
-    ];
-  }
-
-  $meta_query = [];
-
-  // Фильтр по стране
-  if ($country_id) {
-    $meta_query[] = [
-      'key' => 'tour_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ];
-  }
-
-  $args = [
-    'post_type' => 'event',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'orderby' => 'title',
-    'order' => 'ASC',
-    'no_found_rows' => true,
-  ];
-
-  if (!empty($tax_query)) {
-    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
-  }
-
-  if (!empty($meta_query)) {
-    $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
-  }
-
-  $q = new WP_Query($args);
-
-  // Фильтрация по диапазону дат через ACF repeater event_dates
-  $filtered_posts = [];
-  $date_from_timestamp = $date_from ? strtotime($date_from) : 0;
-  $date_to_timestamp = $date_to ? strtotime($date_to) : 0;
-  $has_date_filter = ($date_from && $date_to);
-
-  if ($has_date_filter) {
-    // Получаем все посты для ручной фильтрации по датам
-    if ($q->have_posts()) {
-      while ($q->have_posts()) {
-        $q->the_post();
-        $post_id = get_the_ID();
-
-        $event_dates = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
-
-        // Если дат нет — не показываем при фильтрации по дате
-        if (empty($event_dates) || !is_array($event_dates)) {
-          continue;
-        }
-
-        foreach ($event_dates as $row) {
-          $d = isset($row['date_value']) ? $row['date_value'] : '';
-          if (!$d) continue;
-          $ts = strtotime($d);
-          if ($ts >= $date_from_timestamp && $ts <= $date_to_timestamp) {
-            $filtered_posts[] = $post_id;
-            break;
-          }
-        }
-      }
-      wp_reset_postdata();
-    }
-
-    if (!empty($filtered_posts)) {
-      $args['post__in'] = $filtered_posts;
-      $args['posts_per_page'] = 12;
-      $q = new WP_Query($args);
-    } else {
-      $q->posts = [];
-      $q->post_count = 0;
-      $q->found_posts = 0;
-    }
-  } else {
-    $args['posts_per_page'] = 12;
-    $q = new WP_Query($args);
-  }
+  $slice = array_slice($ids, ($paged - 1) * $per_page, $per_page);
 
   ob_start();
-  if ($q->have_posts()) {
-    while ($q->have_posts()) {
-      $q->the_post();
+  if (!empty($slice)) {
+    $q2 = new WP_Query([
+      'post_type' => 'event',
+      'post__in' => $slice,
+      'orderby' => 'post__in',
+      'posts_per_page' => count($slice),
+      'post_status' => 'publish',
+    ]);
+    while ($q2->have_posts()) {
+      $q2->the_post();
       get_template_part('template-parts/event/card-row', null, ['post_id' => get_the_ID()]);
     }
+    wp_reset_postdata();
   } else {
     echo '<div class="country-tours__empty">События не найдены.</div>';
   }
-  wp_reset_postdata();
 
   wp_send_json_success([
     'html' => ob_get_clean(),
-    'total' => (int) $q->found_posts,
+    'total' => $total,
+    'max_pages' => $max_pages,
+    'paged' => $paged,
   ]);
 }
 
@@ -135,7 +203,6 @@ function event_tours_regions()
   $country_id = isset($_POST['country_id']) ? absint(wp_unslash($_POST['country_id'])) : 0;
   $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
 
-  // Если выбран регион — курорты по нему (но это не используется в текущей реализации)
   if ($region_id) {
     $terms = get_terms([
       'taxonomy' => 'resort',
@@ -151,7 +218,6 @@ function event_tours_regions()
       ],
     ]);
   } elseif ($country_id) {
-    // Если выбрана страна — все регионы этой страны
     $terms = get_terms([
       'taxonomy' => 'region',
       'hide_empty' => false,
@@ -166,7 +232,6 @@ function event_tours_regions()
       ],
     ]);
   } else {
-    // Если страна не выбрана — возвращаем все регионы
     $terms = get_terms([
       'taxonomy' => 'region',
       'hide_empty' => false,
@@ -196,82 +261,23 @@ add_action('wp_ajax_nopriv_event_tours_countries', 'event_tours_countries');
 
 function event_tours_countries()
 {
-  $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
-  $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
-  $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
+  $f = bsi_event_tours_parse_request_filters();
+  $has_date_filter = ($f['date_from'] !== '' && $f['date_to'] !== '');
 
-  // Базовый запрос событийных туров
-  $tax_query = [];
+  $ids = bsi_event_tours_get_matching_post_ids($f, ['skip_country' => true], $has_date_filter);
 
-  if ($region_id) {
-    $tax_query[] = [
-      'taxonomy' => 'region',
-      'field' => 'term_id',
-      'terms' => [$region_id],
-      'include_children' => true,
-    ];
-  }
-
-  $args = [
-    'post_type' => 'event',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'fields' => 'ids',
-    'no_found_rows' => true,
-  ];
-
-  if (!empty($tax_query)) {
-    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
-  }
-
-  $q = new WP_Query($args);
-
-  // Фильтрация по диапазону дат
-  $filtered_tour_ids = [];
-  $has_date_filter = ($date_from && $date_to);
-
-  if ($q->have_posts()) {
-    $date_from_timestamp = $date_from ? strtotime($date_from) : 0;
-    $date_to_timestamp = $date_to ? strtotime($date_to) : 0;
-
-    foreach ($q->posts as $tour_id) {
-      if (!$has_date_filter) {
-        $filtered_tour_ids[] = $tour_id;
-        continue;
-      }
-
-      $event_dates = function_exists('get_field') ? get_field('event_dates', $tour_id) : [];
-      if (empty($event_dates) || !is_array($event_dates)) {
-        continue;
-      }
-
-      foreach ($event_dates as $row) {
-        $d = isset($row['date_value']) ? $row['date_value'] : '';
-        if (!$d) continue;
-        $ts = strtotime($d);
-        if ($ts >= $date_from_timestamp && $ts <= $date_to_timestamp) {
-          $filtered_tour_ids[] = $tour_id;
-          break;
-        }
-      }
-    }
-    wp_reset_postdata();
-  }
-
-  // Извлекаем страны из отфильтрованных туров
   $country_ids = [];
-  if (!empty($filtered_tour_ids)) {
-    foreach ($filtered_tour_ids as $tour_id) {
-      $country_val = function_exists('get_field') ? get_field('tour_country', $tour_id) : null;
-      if ($country_val) {
-        if (is_array($country_val)) {
-          $country_ids = array_merge($country_ids, array_map('intval', $country_val));
-        } elseif (is_numeric($country_val)) {
-          $country_ids[] = (int) $country_val;
-        } elseif ($country_val instanceof WP_Post) {
-          $country_ids[] = (int) $country_val->ID;
-        }
-      }
+  foreach ($ids as $tour_id) {
+    $country_val = function_exists('get_field') ? get_field('tour_country', $tour_id) : null;
+    if (!$country_val) {
+      continue;
+    }
+    if (is_array($country_val)) {
+      $country_ids = array_merge($country_ids, array_map('intval', $country_val));
+    } elseif (is_numeric($country_val)) {
+      $country_ids[] = (int) $country_val;
+    } elseif ($country_val instanceof WP_Post) {
+      $country_ids[] = (int) $country_val->ID;
     }
   }
 
@@ -281,7 +287,6 @@ function event_tours_countries()
     wp_send_json_success(['items' => []]);
   }
 
-  // Получаем страны
   $countries = get_posts([
     'post_type' => 'country',
     'post_status' => 'publish',
@@ -309,57 +314,11 @@ add_action('wp_ajax_nopriv_event_tours_available_dates', 'event_tours_available_
 
 function event_tours_available_dates()
 {
-  $country_id = isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0;
-  $region_id = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
-  $tour_type_id = isset($_POST['tour_type']) ? absint(wp_unslash($_POST['tour_type'])) : 0;
+  $f = bsi_event_tours_parse_request_filters();
+  $f['date_from'] = '';
+  $f['date_to'] = '';
 
-  $tax_query = [];
-
-  if ($region_id) {
-    $tax_query[] = [
-      'taxonomy' => 'region',
-      'field' => 'term_id',
-      'terms' => [$region_id],
-      'include_children' => true,
-    ];
-  }
-
-  if ($tour_type_id) {
-    $tax_query[] = [
-      'taxonomy' => 'tour_type',
-      'field' => 'term_id',
-      'terms' => [$tour_type_id],
-    ];
-  }
-
-  $meta_query = [];
-  if ($country_id) {
-    $meta_query[] = [
-      'key' => 'tour_country',
-      'value' => $country_id,
-      'compare' => '=',
-    ];
-  }
-
-  $args = [
-    'post_type' => 'event',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'fields' => 'ids',
-    'no_found_rows' => true,
-  ];
-
-  if (!empty($tax_query)) {
-    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
-  }
-
-  if (!empty($meta_query)) {
-    $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
-  }
-
-  $tours_query = new WP_Query($args);
-  $tour_ids = $tours_query->posts;
-  wp_reset_postdata();
+  $tour_ids = bsi_event_tours_get_matching_post_ids($f, [], false);
 
   if (empty($tour_ids)) {
     wp_send_json_success(['dates' => []]);
@@ -382,4 +341,59 @@ function event_tours_available_dates()
   sort($dates);
 
   wp_send_json_success(['dates' => $dates]);
+}
+
+
+add_action('wp_ajax_event_tours_facets', 'event_tours_facets');
+add_action('wp_ajax_nopriv_event_tours_facets', 'event_tours_facets');
+
+function event_tours_facets()
+{
+  $f = bsi_event_tours_parse_request_filters();
+  $has_date_filter = ($f['date_from'] !== '' && $f['date_to'] !== '');
+
+  $ids_resorts = bsi_event_tours_get_matching_post_ids($f, ['skip_resort' => true], $has_date_filter);
+  $resort_items = [];
+  if (!empty($ids_resorts)) {
+    $terms = get_terms([
+      'taxonomy' => 'resort',
+      'object_ids' => $ids_resorts,
+      'hide_empty' => false,
+      'orderby' => 'name',
+      'order' => 'ASC',
+    ]);
+    if (!is_wp_error($terms) && !empty($terms)) {
+      foreach ($terms as $t) {
+        $resort_items[] = [
+          'id' => (int) $t->term_id,
+          'text' => (string) $t->name,
+        ];
+      }
+    }
+  }
+
+  $ids_types = bsi_event_tours_get_matching_post_ids($f, ['skip_tour_type' => true], $has_date_filter);
+  $type_items = [];
+  if (!empty($ids_types)) {
+    $terms = get_terms([
+      'taxonomy' => 'tour_type',
+      'object_ids' => $ids_types,
+      'hide_empty' => false,
+      'orderby' => 'name',
+      'order' => 'ASC',
+    ]);
+    if (!is_wp_error($terms) && !empty($terms)) {
+      foreach ($terms as $t) {
+        $type_items[] = [
+          'id' => (int) $t->term_id,
+          'text' => (string) $t->name,
+        ];
+      }
+    }
+  }
+
+  wp_send_json_success([
+    'resorts' => $resort_items,
+    'tour_types' => $type_items,
+  ]);
 }

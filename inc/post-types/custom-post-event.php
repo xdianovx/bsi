@@ -183,6 +183,26 @@ add_action('acf/init', function () {
         'placeholder' => 'Например: 19:00',
         'instructions' => 'Время начала события',
       ],
+      [
+        'key' => 'field_event_tour_transport',
+        'label' => 'Транспорт',
+        'name' => 'tour_transport',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'Например: Авиа, Поезд',
+        'instructions' => 'Для блока кратких характеристик на странице тура',
+      ],
+      [
+        'key' => 'field_event_venue_scheme',
+        'label' => 'Схема зала / рассадки',
+        'name' => 'venue_scheme',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'library' => 'all',
+        'wrapper' => ['width' => '100'],
+        'instructions' => 'Статичное изображение схемы мест (при необходимости замените на интерактив позже)',
+      ],
     ],
     'location' => [
       [

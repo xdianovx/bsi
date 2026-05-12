@@ -181,3 +181,130 @@
   overflow: hidden;
   border-radius: 12px;
 }
+
+.country-tours__pagination {
+  margin-top: 24px;
+}
+
+.country-tours__pagination-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.country-tours__page-num {
+  font-weight: 600;
+}
+
+.country-tours__page-total {
+  color: #666;
+  font-size: 14px;
+}
+
+.country-tours__filters-row.--events .tours-filter__field--search {
+  flex: 1 1 100%;
+  min-width: 200px;
+}
+
+@media screen and (min-width: 900px) {
+  .country-tours__filters-row.--events .tours-filter__field--search {
+    flex: 1 1 220px;
+  }
+}
+
+.single-event__summary-wrap {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.single-event__summary {
+  font-size: 18px;
+  line-height: 140%;
+  margin: 0;
+  color: #333;
+}
+
+.single-event__summary-sep {
+  margin: 0 8px;
+  color: #999;
+}
+
+.single-event__calendar-block {
+  margin-top: 40px;
+
+  .h2 {
+    margin-bottom: 8px;
+  }
+}
+
+.single-event__calendar-hint {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 16px;
+}
+
+.single-event__calendar {
+  max-width: 640px;
+}
+
+.single-event__venue-scheme {
+  margin-top: 40px;
+
+  .h2 {
+    margin-bottom: 16px;
+  }
+}
+
+.single-event__venue-figure {
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f4f4f6;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.single-event__aside.hotel-aside--event-sticky {
+  position: sticky;
+  top: 96px;
+  align-self: flex-start;
+}
+
+@media screen and (max-width: 1024px) {
+  .single-event__aside.hotel-aside--event-sticky {
+    position: static;
+  }
+}
+
+.single-event__quick-facts {
+  margin-bottom: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hotel-widget__btn-question {
+  width: 100%;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.single-event__related {
+  margin-top: 48px;
+  padding-bottom: 48px;
+
+  .h2 {
+    margin-bottom: 24px;
+  }
+
+  .country-tours__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}

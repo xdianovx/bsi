@@ -17,6 +17,7 @@ import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initEventToursFilters } from "./modules/ajax/event-tours";
+import { initEventSinglePage } from "./modules/event-single";
 import { initCountryAside } from "./modules/country-aside";
 import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
 import { initPopularToursSlider } from "./modules/popular-tours-section";
@@ -117,6 +118,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initResortHotelsAjax();
   initCountryToursFilters();
   initEventToursFilters();
+  initEventSinglePage();
   initCountryAside();
   initPopularHotelsSlider();
   initPopularToursSlider();

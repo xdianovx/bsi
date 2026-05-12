@@ -110,6 +110,11 @@ $tour_type_terms = get_terms([
 
             <form class="country-tours__filters" data-tours-form>
               <div class="country-tours__filters-row --events">
+                <div class="tours-filter__field tours-filter__field--search">
+                  <div class="tours-filter__label">Поиск</div>
+                  <input type="search" class="tours-filter__input" name="event_search" autocomplete="off"
+                    placeholder="Название или описание">
+                </div>
 
                 <div class="tours-filter__field">
                   <div class="tours-filter__label">Направление</div>
@@ -136,6 +141,13 @@ $tour_type_terms = get_terms([
                 </div>
 
                 <div class="tours-filter__field">
+                  <div class="tours-filter__label">Город (курорт)</div>
+                  <select class="tours-filter__select" name="resort" data-choice="single">
+                    <option value="">Все города</option>
+                  </select>
+                </div>
+
+                <div class="tours-filter__field">
                   <div class="tours-filter__label">Тип</div>
                   <select class="tours-filter__select" name="tour_type" data-choice="single">
                     <option value="">Все типы</option>
@@ -158,7 +170,7 @@ $tour_type_terms = get_terms([
 
             <div class="country-tours__controls">
               <div class="country-tours__counter" data-tours-count>
-                Нашли туров:
+                Найдено туров:
                 <?= (int) $tours_query->found_posts; ?>
               </div>
 
@@ -182,7 +194,11 @@ $tour_type_terms = get_terms([
               <?php wp_reset_postdata(); ?>
             </div>
 
+            <nav class="country-tours__pagination" data-event-tours-pagination
+              aria-label="Навигация по страницам каталога"></nav>
+
           </div>
+
 
         </div>
 

@@ -20,6 +20,29 @@ $event_venue = function_exists('get_field') ? trim((string) get_field('event_ven
 $event_time = function_exists('get_field') ? trim((string) get_field('event_time', $post_id)) : '';
 $checkin_dates = function_exists('get_field') ? trim((string) get_field('tour_checkin_dates', $post_id)) : '';
 
+$event_dates_line = '';
+$event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
+if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
+  $ds = [];
+  foreach ($event_dates_rows as $row) {
+    if (!empty($row['date_value'])) {
+      $ds[] = (string) $row['date_value'];
+    }
+  }
+  $ds = array_values(array_unique($ds));
+  sort($ds);
+  if (!empty($ds)) {
+    $fmt = array_map(function ($d) {
+      return date_i18n('j.m.Y', strtotime($d));
+    }, $ds);
+    if (count($fmt) <= 3) {
+      $event_dates_line = implode(', ', $fmt);
+    } else {
+      $event_dates_line = $fmt[0] . ' — ' . $fmt[count($fmt) - 1] . ' (' . count($ds) . ')';
+    }
+  }
+}
+
 // Taxonomies
 $types = get_the_terms($post_id, 'tour_type');
 $regions = get_the_terms($post_id, 'region');
@@ -118,7 +141,14 @@ if (!empty($event_tickets) && is_array($event_tickets)) {
           <?= esc_html($title); ?></h3>
       </a>
 
-      <?php if ($checkin_dates): ?>
+      <?php if ($event_dates_line): ?>
+        <div class="tour-card-row__duration">
+          <span class="tour-card-row__duration-label">
+            <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/tour/cal.svg'); ?>" alt="">
+          </span>
+          <span class="tour-card-row__duration-value numfont"><?= esc_html($event_dates_line); ?></span>
+        </div>
+      <?php elseif ($checkin_dates): ?>
         <div class="tour-card-row__duration">
           <span class="tour-card-row__duration-label">
             <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/tour/cal.svg'); ?>" alt="">

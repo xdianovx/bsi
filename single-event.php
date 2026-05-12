@@ -52,8 +52,59 @@ $tour_extra = function_exists('get_field') ? (string) get_field('tour_extra', $p
 $event_tickets = function_exists('get_field') ? get_field('event_tickets', $post_id) : [];
 $event_venue = function_exists('get_field') ? trim((string) get_field('event_venue', $post_id)) : '';
 $event_time = function_exists('get_field') ? trim((string) get_field('event_time', $post_id)) : '';
+$tour_nights = function_exists('get_field') ? (int) get_field('tour_nights', $post_id) : 0;
+$tour_transport = function_exists('get_field') ? trim((string) get_field('tour_transport', $post_id)) : '';
+$venue_scheme = function_exists('get_field') ? get_field('venue_scheme', $post_id) : null;
+$venue_scheme_url = '';
+$venue_scheme_alt = '';
+if (is_array($venue_scheme) && !empty($venue_scheme['url'])) {
+  $venue_scheme_url = (string) $venue_scheme['url'];
+  $venue_scheme_alt = !empty($venue_scheme['alt']) ? (string) $venue_scheme['alt'] : 'Схема зала';
+}
 
-// Вычисляем минимальную цену из билетов
+$event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
+$calendar_dates = [];
+if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
+  foreach ($event_dates_rows as $row) {
+    if (!empty($row['date_value'])) {
+      $calendar_dates[] = (string) $row['date_value'];
+    }
+  }
+}
+$calendar_dates = array_values(array_unique($calendar_dates));
+sort($calendar_dates);
+
+$related_events = [];
+$rel_terms = get_the_terms($post_id, 'tour_type');
+$rel_type_ids = (!empty($rel_terms) && !is_wp_error($rel_terms)) ? wp_list_pluck($rel_terms, 'term_id') : [];
+$rel_q = [
+  'post_type' => 'event',
+  'post_status' => 'publish',
+  'posts_per_page' => 6,
+  'post__not_in' => [$post_id],
+  'orderby' => 'title',
+  'order' => 'ASC',
+  'no_found_rows' => true,
+];
+if (!empty($rel_type_ids)) {
+  $rel_q['tax_query'] = [
+    [
+      'taxonomy' => 'tour_type',
+      'field' => 'term_id',
+      'terms' => $rel_type_ids,
+    ],
+  ];
+} elseif ($country_id) {
+  $rel_q['meta_query'] = [
+    [
+      'key' => 'tour_country',
+      'value' => $country_id,
+      'compare' => '=',
+    ],
+  ];
+}
+$rel_q['suppress_filters'] = false;
+$related_events = get_posts($rel_q);
 $min_ticket_price = null;
 if (!empty($event_tickets) && is_array($event_tickets)) {
   foreach ($event_tickets as $ticket) {
@@ -106,6 +157,22 @@ get_header();
     </div>
   </div>
 
+  <?php if ($country_title || $resort_term): ?>
+    <div class="container single-event__summary-wrap">
+      <p class="single-event__summary">
+        <?php if ($country_title): ?>
+          <strong><?= esc_html($country_title); ?></strong>
+        <?php endif; ?>
+        <?php if ($country_title && $resort_term): ?>
+          <span class="single-event__summary-sep">—</span>
+        <?php endif; ?>
+        <?php if ($resort_term): ?>
+          <span><?= esc_html($resort_term->name); ?></span>
+        <?php endif; ?>
+      </p>
+    </div>
+  <?php endif; ?>
+
 
 
 
@@ -119,6 +186,25 @@ get_header();
           <div class="single-tour-content editor-content">
             <?php the_content(); ?>
           </div>
+
+          <?php if (!empty($calendar_dates)): ?>
+            <section class="single-event__calendar-block">
+              <h2 class="h2">Даты проведения</h2>
+              <p class="single-event__calendar-hint">Доступные даты выделены в календаре.</p>
+              <div class="single-event__calendar" data-event-calendar
+                data-dates="<?= esc_attr(wp_json_encode($calendar_dates, JSON_UNESCAPED_UNICODE)); ?>"></div>
+            </section>
+          <?php endif; ?>
+
+          <?php if ($venue_scheme_url): ?>
+            <section class="single-event__venue-scheme">
+              <h2 class="h2">Схема зала</h2>
+              <figure class="single-event__venue-figure">
+                <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>"
+                  loading="lazy">
+              </figure>
+            </section>
+          <?php endif; ?>
 
           <?php if (!empty($event_tickets) && is_array($event_tickets)): ?>
             <div class="event-tickets">
@@ -203,9 +289,39 @@ get_header();
         </div>
 
         <!-- Виджеты -->
-        <aside class="hotel-aside">
+        <aside class="hotel-aside hotel-aside--event-sticky single-event__aside">
 
           <div class="hotel-widget">
+            <?php
+            $show_quick = $tour_duration || $tour_nights || $resort_term || $tour_transport;
+            if ($show_quick): ?>
+              <div class="event-aside-details single-event__quick-facts">
+                <?php if ($tour_duration): ?>
+                  <div class="event-aside-detail">
+                    <span class="event-aside-detail__label">Срок</span>
+                    <span class="event-aside-detail__value"><?= esc_html($tour_duration); ?></span>
+                  </div>
+                <?php elseif ($tour_nights): ?>
+                  <div class="event-aside-detail">
+                    <span class="event-aside-detail__label">Ночей</span>
+                    <span class="event-aside-detail__value numfont"><?= (int) $tour_nights; ?></span>
+                  </div>
+                <?php endif; ?>
+                <?php if ($resort_term): ?>
+                  <div class="event-aside-detail">
+                    <span class="event-aside-detail__label">Город</span>
+                    <span class="event-aside-detail__value"><?= esc_html($resort_term->name); ?></span>
+                  </div>
+                <?php endif; ?>
+                <?php if ($tour_transport): ?>
+                  <div class="event-aside-detail">
+                    <span class="event-aside-detail__label">Транспорт</span>
+                    <span class="event-aside-detail__value"><?= esc_html($tour_transport); ?></span>
+                  </div>
+                <?php endif; ?>
+              </div>
+            <?php endif; ?>
+
             <?php if ($country_title || $region_term || $resort_term): ?>
               <?php
               $items = [];
@@ -301,6 +417,7 @@ get_header();
               <?php endif; ?>
             </div>
 
+            <a class="btn btn-gray hotel-widget__btn-question sm" href="tel:+74957855535">Задать вопрос</a>
 
 
             <?php if ($tour_booking_url): ?>
@@ -355,6 +472,22 @@ get_header();
         </div>
       </div>
 
+    </section>
+  <?php endif; ?>
+
+  <?php if (!empty($related_events)): ?>
+    <section class="single-event__related">
+      <div class="container">
+        <h2 class="h2">Похожие событийные туры</h2>
+        <div class="country-tours__list">
+          <?php foreach ($related_events as $rel_post):
+            if (!($rel_post instanceof WP_Post)) {
+              continue;
+            }
+            get_template_part('template-parts/event/card-row', null, ['post_id' => (int) $rel_post->ID]);
+          endforeach; ?>
+        </div>
+      </div>
     </section>
   <?php endif; ?>
 
