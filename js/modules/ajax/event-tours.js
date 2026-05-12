@@ -20,39 +20,17 @@ const debounce = (fn, ms) => {
   };
 };
 
-/** Параметры в query string: без префикса совпадают с public query_vars CPT/таксономий WP → ломается главный запрос при F5. */
-const ET_URL_LEGACY = [
-  "country",
-  "region",
-  "resort",
-  "tour_type",
-  "search",
-  "date_from",
-  "date_to",
-];
-const ET_URL = {
-  country: "et_country",
-  region: "et_region",
-  resort: "et_resort",
-  tour_type: "et_tour_type",
-  search: "et_search",
-  date_from: "et_date_from",
-  date_to: "et_date_to",
-  page: "event_page",
-};
-
-const clearEventToursUrlParams = (url) => {
-  [...ET_URL_LEGACY, ...Object.values(ET_URL)].forEach((k) =>
-    url.searchParams.delete(k),
-  );
-};
-
 export const initEventToursFilters = async () => {
   const root = document.querySelector("[data-event-tours-filter]");
   if (!root) return;
 
+  const initialPaged = Math.max(
+    1,
+    parseInt(root.dataset.initialPaged || "1", 10) || 1,
+  );
+
   const list = document.querySelector("[data-tours-list]");
-  const count = document.querySelector("[data-tours-count]");
+  const counter = root.querySelector(".js-tours-counter");
   const paginationEl = document.querySelector("[data-event-tours-pagination]");
   if (!list) return;
 
@@ -93,36 +71,6 @@ export const initEventToursFilters = async () => {
       body.set("date_to", dates[1]);
     }
     body.set("paged", String(currentPage));
-  };
-
-  const syncUrl = () => {
-    const url = new URL(window.location.href);
-    clearEventToursUrlParams(url);
-
-    if (countrySelect?.value)
-      url.searchParams.set(ET_URL.country, countrySelect.value);
-    if (regionSelect?.value)
-      url.searchParams.set(ET_URL.region, regionSelect.value);
-    if (resortSelect?.value)
-      url.searchParams.set(ET_URL.resort, resortSelect.value);
-    if (tourTypeSelect?.value)
-      url.searchParams.set(ET_URL.tour_type, tourTypeSelect.value);
-    const q = (searchInput?.value || "").trim();
-    if (q) url.searchParams.set(ET_URL.search, q);
-    if (
-      datePickerInstance &&
-      datePickerInstance.selectedDates &&
-      datePickerInstance.selectedDates.length === 2
-    ) {
-      const dates = datePickerInstance.selectedDates
-        .map((d) => d.toISOString().split("T")[0])
-        .sort();
-      url.searchParams.set(ET_URL.date_from, dates[0]);
-      url.searchParams.set(ET_URL.date_to, dates[1]);
-    }
-    if (currentPage > 1)
-      url.searchParams.set(ET_URL.page, String(currentPage));
-    window.history.replaceState({}, "", url.toString());
   };
 
   const renderPagination = (total, maxPages, paged) => {
@@ -302,9 +250,8 @@ export const initEventToursFilters = async () => {
       const paged = json.data.paged ?? 1;
       currentPage = paged;
 
-      if (count) count.textContent = `Найдено туров: ${total}`;
+      if (counter) counter.textContent = `Найдено: ${total}`;
       renderPagination(total, maxPages, paged);
-      syncUrl();
       updateResetButton();
     } catch (_e) {
       /* Error handling */
@@ -472,7 +419,12 @@ export const initEventToursFilters = async () => {
     await loadTours();
   };
 
-  if (resetBtn) resetBtn.addEventListener("click", resetFilters);
+  if (resetBtn) {
+    resetBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      await resetFilters();
+    });
+  }
 
   const onFacetChange = async () => {
     currentPage = 1;
@@ -510,42 +462,13 @@ export const initEventToursFilters = async () => {
     );
   }
 
-  const applyFromUrl = async () => {
-    const params = new URLSearchParams(window.location.search);
-
-    const country =
-      params.get(ET_URL.country) || params.get("country") || "";
-    const region = params.get(ET_URL.region) || params.get("region") || "";
-    const resort = params.get(ET_URL.resort) || params.get("resort") || "";
-    const tourType =
-      params.get(ET_URL.tour_type) || params.get("tour_type") || "";
-    const search =
-      params.get(ET_URL.search) || params.get("search") || "";
-    const dateFrom =
-      params.get(ET_URL.date_from) || params.get("date_from") || "";
-    const dateTo =
-      params.get(ET_URL.date_to) || params.get("date_to") || "";
-    const ep = params.get(ET_URL.page) || "";
-    currentPage = ep ? Math.max(1, parseInt(ep, 10) || 1) : 1;
-
-    if (search && searchInput) searchInput.value = search;
-    if (country && countryChoice) countryChoice.setChoiceByValue(country);
-    if (country) await loadRegions();
-    if (region && regionChoice) regionChoice.setChoiceByValue(region);
-
+  const initFromServer = async () => {
+    currentPage = initialPaged;
     await loadFacets();
-    if (resort && resortChoice) resortChoice.setChoiceByValue(resort);
-    if (tourType && tourTypeChoice) tourTypeChoice.setChoiceByValue(tourType);
-
-    if (dateFrom && dateTo && datePickerInstance) {
-      datePickerInstance.setDate([dateFrom, dateTo], false);
-    }
-
     await loadAvailableDates();
     await loadCountries();
     await loadTours();
-    updateResetButton();
   };
 
-  await applyFromUrl();
+  await initFromServer();
 };

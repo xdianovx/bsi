@@ -93,7 +93,7 @@ $tour_type_terms = get_terms([
 
         <div class="page-country__content">
 
-          <div class="country-tours" data-event-tours-filter>
+          <div class="country-tours" data-event-tours-filter data-initial-paged="<?= (int) $paged; ?>">
 
             <div class="country-tours__head">
               <h1 class="h1 country-tours__title">
@@ -168,15 +168,16 @@ $tour_type_terms = get_terms([
               </div>
             </form>
 
-            <div class="country-tours__controls">
-              <div class="country-tours__counter" data-tours-count>
-                Найдено туров:
-                <?= (int) $tours_query->found_posts; ?>
-              </div>
+            <div class="tours-page__controls">
+              <div class="tours-page__counter-wrap">
+                <div class="tours-page__counter js-tours-counter">
+                  Найдено: <?= (int) $tours_query->found_posts; ?>
+                </div>
 
-              <button type="button" class="country-tours__reset-btn js-tours-reset" style="display: none;">
-                Сбросить фильтры
-              </button>
+                <button type="button" class="tours-page__reset-btn js-tours-reset" style="display: none;">
+                  Сбросить фильтры
+                </button>
+              </div>
             </div>
 
 
