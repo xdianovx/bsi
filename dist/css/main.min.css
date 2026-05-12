@@ -5750,6 +5750,9 @@ html.bsi-cookie-consented .cookie-consent {
   align-items: stretch;
   width: 100%;
 }
+.gtm-search__wrap * {
+  font-size: 16px;
+}
 .gtm-search__wrap.--hotels {
   grid-template-columns: 3fr 1fr 1fr 1fr;
 }
@@ -5762,7 +5765,6 @@ html.bsi-cookie-consented .cookie-consent {
   .gtm-search__wrap.--hotels > * {
     border-radius: 8px;
     width: 100%;
-    font-size: 16px;
     color: #000000;
   }
 }
@@ -9004,6 +9006,7 @@ html.bsi-cookie-consented .cookie-consent {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  margin-top: 32px;
 }
 @media screen and (max-width: 768px) {
   .mice-hero__wrap {
@@ -11685,6 +11688,7 @@ html.bsi-cookie-consented .cookie-consent {
   cursor: pointer;
   height: 48px;
   width: 100%;
+  font-size: 16px;
   border-radius: 8px;
   padding: 12px 16px;
 }
