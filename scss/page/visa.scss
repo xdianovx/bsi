@@ -643,13 +643,21 @@
     position: static;
     background: none;
     padding: 0;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     font-weight: 500;
   }
 
   .input-item input {
     border: 1px solid #dfdfdf;
-    padding: 12px 16px;
+    padding: 16px 16px;
+    font-size: 16px;
+  }
+
+  .input-item textarea {
+    border: 1px solid #dfdfdf;
+    padding: 16px 16px;
+    font-size: 16px;
+    font-family: "Inter", sans-serif;
   }
 }
 
