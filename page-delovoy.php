@@ -322,14 +322,15 @@ while (have_posts()):
 
         <?php get_template_part('template-parts/projects/slider'); ?>
 
-        <?php get_template_part('template-parts/news/news-slider', null, ['section_id' => 'mice-news']); ?>
+        <?php get_template_part('template-parts/mice/reviews-slider'); ?>
 
         <?php
         set_query_var('bsimice_reviews_slider_reviews', $reviews);
         set_query_var('bsimice_reviews_slider_heading', $reviews_heading);
         set_query_var('bsimice_reviews_slider_from_acf', $reviews_from_acf);
         set_query_var('bsimice_reviews_section_id', 'mice-reviews');
-        get_template_part('template-parts/mice/reviews-slider');
+
+        get_template_part('template-parts/news/news-slider', null, ['section_id' => 'mice-news']);
         ?>
 
         <?php
