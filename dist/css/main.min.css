@@ -9493,7 +9493,7 @@ html.bsi-cookie-consented .cookie-consent {
 }
 .projects-archive__list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-top: 24px;
 }
