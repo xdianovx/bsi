@@ -20,6 +20,33 @@ const debounce = (fn, ms) => {
   };
 };
 
+/** Параметры в query string: без префикса совпадают с public query_vars CPT/таксономий WP → ломается главный запрос при F5. */
+const ET_URL_LEGACY = [
+  "country",
+  "region",
+  "resort",
+  "tour_type",
+  "search",
+  "date_from",
+  "date_to",
+];
+const ET_URL = {
+  country: "et_country",
+  region: "et_region",
+  resort: "et_resort",
+  tour_type: "et_tour_type",
+  search: "et_search",
+  date_from: "et_date_from",
+  date_to: "et_date_to",
+  page: "event_page",
+};
+
+const clearEventToursUrlParams = (url) => {
+  [...ET_URL_LEGACY, ...Object.values(ET_URL)].forEach((k) =>
+    url.searchParams.delete(k),
+  );
+};
+
 export const initEventToursFilters = async () => {
   const root = document.querySelector("[data-event-tours-filter]");
   if (!root) return;
@@ -70,24 +97,18 @@ export const initEventToursFilters = async () => {
 
   const syncUrl = () => {
     const url = new URL(window.location.href);
-    [
-      "country",
-      "region",
-      "resort",
-      "tour_type",
-      "search",
-      "date_from",
-      "date_to",
-      "event_page",
-    ].forEach((k) => url.searchParams.delete(k));
+    clearEventToursUrlParams(url);
 
-    if (countrySelect?.value) url.searchParams.set("country", countrySelect.value);
-    if (regionSelect?.value) url.searchParams.set("region", regionSelect.value);
-    if (resortSelect?.value) url.searchParams.set("resort", resortSelect.value);
+    if (countrySelect?.value)
+      url.searchParams.set(ET_URL.country, countrySelect.value);
+    if (regionSelect?.value)
+      url.searchParams.set(ET_URL.region, regionSelect.value);
+    if (resortSelect?.value)
+      url.searchParams.set(ET_URL.resort, resortSelect.value);
     if (tourTypeSelect?.value)
-      url.searchParams.set("tour_type", tourTypeSelect.value);
+      url.searchParams.set(ET_URL.tour_type, tourTypeSelect.value);
     const q = (searchInput?.value || "").trim();
-    if (q) url.searchParams.set("search", q);
+    if (q) url.searchParams.set(ET_URL.search, q);
     if (
       datePickerInstance &&
       datePickerInstance.selectedDates &&
@@ -96,11 +117,11 @@ export const initEventToursFilters = async () => {
       const dates = datePickerInstance.selectedDates
         .map((d) => d.toISOString().split("T")[0])
         .sort();
-      url.searchParams.set("date_from", dates[0]);
-      url.searchParams.set("date_to", dates[1]);
+      url.searchParams.set(ET_URL.date_from, dates[0]);
+      url.searchParams.set(ET_URL.date_to, dates[1]);
     }
     if (currentPage > 1)
-      url.searchParams.set("event_page", String(currentPage));
+      url.searchParams.set(ET_URL.page, String(currentPage));
     window.history.replaceState({}, "", url.toString());
   };
 
@@ -492,14 +513,19 @@ export const initEventToursFilters = async () => {
   const applyFromUrl = async () => {
     const params = new URLSearchParams(window.location.search);
 
-    const country = params.get("country") || "";
-    const region = params.get("region") || "";
-    const resort = params.get("resort") || "";
-    const tourType = params.get("tour_type") || "";
-    const search = params.get("search") || "";
-    const dateFrom = params.get("date_from") || "";
-    const dateTo = params.get("date_to") || "";
-    const ep = params.get("event_page") || "";
+    const country =
+      params.get(ET_URL.country) || params.get("country") || "";
+    const region = params.get(ET_URL.region) || params.get("region") || "";
+    const resort = params.get(ET_URL.resort) || params.get("resort") || "";
+    const tourType =
+      params.get(ET_URL.tour_type) || params.get("tour_type") || "";
+    const search =
+      params.get(ET_URL.search) || params.get("search") || "";
+    const dateFrom =
+      params.get(ET_URL.date_from) || params.get("date_from") || "";
+    const dateTo =
+      params.get(ET_URL.date_to) || params.get("date_to") || "";
+    const ep = params.get(ET_URL.page) || "";
     currentPage = ep ? Math.max(1, parseInt(ep, 10) || 1) : 1;
 
     if (search && searchInput) searchInput.value = search;

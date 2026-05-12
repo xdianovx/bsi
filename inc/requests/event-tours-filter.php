@@ -397,3 +397,25 @@ function event_tours_facets()
     'tour_types' => $type_items,
   ]);
 }
+
+/**
+ * GET country|region|resort|tour_type совпадают с public query_var CPT/таксономий —
+ * при обновлении страницы «Событийные туры» ломается главный запрос.
+ * Фильтры в URL: префикс et_* (см. js/modules/ajax/event-tours.js).
+ */
+add_filter('request', function (array $query_vars): array {
+  $pagename = isset($query_vars['pagename']) ? (string) $query_vars['pagename'] : '';
+  if ($pagename === '') {
+    return $query_vars;
+  }
+  $is_event_tours = $pagename === 'sobytiynye-tury'
+    || (strlen($pagename) > 16 && substr($pagename, -16) === '/sobytiynye-tury');
+  if (!$is_event_tours) {
+    return $query_vars;
+  }
+  foreach (['country', 'region', 'resort', 'tour_type'] as $conflict_key) {
+    unset($query_vars[$conflict_key]);
+  }
+
+  return $query_vars;
+}, 5);
