@@ -9006,7 +9006,7 @@ html.bsi-cookie-consented .cookie-consent {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin-top: 32px;
+  margin-top: 24zpx;
 }
 @media screen and (max-width: 768px) {
   .mice-hero__wrap {
