@@ -1382,6 +1382,8 @@ button {
   display: inline-block;
   padding: 0;
   border-radius: 0;
+  font-family: inherit;
+  font-size: 16px;
 }
 button::-moz-focus-inner {
   border: 0;
@@ -1548,11 +1550,6 @@ main {
 .breadcrumbs p {
   margin-bottom: 0;
 }
-@media screen and (max-width: 768px) {
-  .breadcrumbs {
-    font-size: 14px;
-  }
-}
 .breadcrumb-separator {
   background: #f4f4f6;
   margin: 0 8px 2px;
@@ -1569,6 +1566,7 @@ main {
 .btn {
   border-radius: 8px;
   padding: 16px 24px;
+  font-size: 16px;
   line-height: 100%;
   text-align: center;
   justify-content: center;
@@ -3562,7 +3560,7 @@ input.error {
 .education-program-card__booking-btn {
   white-space: nowrap;
   padding: 12px 24px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .education-program-card__actions {
   display: flex;
@@ -5020,6 +5018,7 @@ input.error {
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: all 0.3s ease;
+  font-size: 16px;
 }
 .editor-content a:hover {
   color: #ee3145;
@@ -5029,6 +5028,14 @@ input.error {
   .editor-content a {
     overflow-wrap: break-word;
   }
+}
+.editor-content h1 a,
+.editor-content h2 a,
+.editor-content h3 a,
+.editor-content h4 a,
+.editor-content h5 a,
+.editor-content h6 a {
+  font-size: inherit;
 }
 .editor-content img {
   max-width: 100%;
@@ -6393,7 +6400,7 @@ html.bsi-cookie-consented .cookie-consent {
   margin-top: auto;
   padding-top: 16px;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 16px;
   align-items: center;
 }
 .hotel-card__actions .hotel-card__btn {
@@ -6735,7 +6742,7 @@ html.bsi-cookie-consented .cookie-consent {
   text-decoration: none;
   color: #000000;
   transition: all 0.3s ease-in-out;
-  font-size: 15px;
+  font-size: 16px;
 }
 .aside-contact-item__link svg {
   display: block;
@@ -6893,7 +6900,7 @@ html.bsi-cookie-consented .cookie-consent {
   color: #ee3145;
   transition: all 0.3s ease-in-out;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 16px;
 }
 .header-menu__item {
   position: relative;
@@ -8011,6 +8018,14 @@ html.bsi-cookie-consented .cookie-consent {
   align-items: center;
   gap: 8px;
 }
+.event-aside-detail__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #666;
+}
+.event-aside-detail__icon svg {
+  display: block;
+}
 .event-aside-detail__label {
   font-weight: 500;
   line-height: 100%;
@@ -8043,7 +8058,7 @@ html.bsi-cookie-consented .cookie-consent {
 @media screen and (max-width: 640px) {
   .event-ticket__main {
     border-right: none;
-    border-bottom: 2px dashed #e0e0e0;
+    border-bottom: 1px dashed #e0e0e0;
   }
 }
 .event-ticket__main::before, .event-ticket__main::after {
@@ -8101,8 +8116,8 @@ html.bsi-cookie-consented .cookie-consent {
   gap: 4px;
 }
 .event-ticket__price-value {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 500;
   line-height: 100%;
 }
 .event-ticket__btn {
@@ -8112,7 +8127,7 @@ html.bsi-cookie-consented .cookie-consent {
   transition: all 0.3s ease;
   width: 100%;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 100%;
   border: none;
@@ -8225,9 +8240,9 @@ html.bsi-cookie-consented .cookie-consent {
   }
 }
 .single-event__quick-facts {
-  margin-bottom: 16px;
-  flex-direction: column;
-  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 .hotel-widget__btn-question {
   width: 100%;
@@ -10412,6 +10427,9 @@ html.bsi-cookie-consented .cookie-consent {
 .hotel-widget .single-hotel__address img {
   width: 18px;
   height: 18px;
+}
+.hotel-widget .single-hotel__address a {
+  font-size: 16px;
 }
 .hotel-widget__title {
   font-weight: 500;
@@ -13873,7 +13891,7 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 100%;
   transition: all 0.3s ease-in-out;
   font-weight: 700;

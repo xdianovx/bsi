@@ -156,12 +156,13 @@
     }
   }
 
-  // Ссылки
+  // Ссылки (минимум читаемый размер в тексте редактора)
   a {
     color: $red;
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: all 0.3s ease;
+    font-size: 16px;
 
     &:hover {
       color: $red;
@@ -170,6 +171,15 @@
     @media screen and (max-width: 380px) {
       overflow-wrap: break-word;
     }
+  }
+
+  h1 a,
+  h2 a,
+  h3 a,
+  h4 a,
+  h5 a,
+  h6 a {
+    font-size: inherit;
   }
 
   // Изображения

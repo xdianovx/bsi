@@ -157,22 +157,6 @@ get_header();
     </div>
   </div>
 
-  <?php if ($country_title || $resort_term): ?>
-    <div class="container single-event__summary-wrap">
-      <p class="single-event__summary">
-        <?php if ($country_title): ?>
-          <strong><?= esc_html($country_title); ?></strong>
-        <?php endif; ?>
-        <?php if ($country_title && $resort_term): ?>
-          <span class="single-event__summary-sep">—</span>
-        <?php endif; ?>
-        <?php if ($resort_term): ?>
-          <span><?= esc_html($resort_term->name); ?></span>
-        <?php endif; ?>
-      </p>
-    </div>
-  <?php endif; ?>
-
 
 
 
@@ -183,25 +167,48 @@ get_header();
 
 
         <div class="hotel-content">
+          <?php
+          $show_quick = $tour_duration || $tour_nights || $resort_term || $tour_transport;
+          $lucide_attrs = ['width' => '20', 'height' => '20', 'stroke' => 'currentColor'];
+          if ($show_quick): ?>
+            <div class="event-aside-details single-event__quick-facts">
+              <?php if ($tour_duration): ?>
+                <div class="event-aside-detail">
+
+                  <span class="event-aside-detail__value"><?= esc_html($tour_duration); ?></span>
+                </div>
+              <?php elseif ($tour_nights): ?>
+                <div class="event-aside-detail">
+                  <span class="event-aside-detail__icon" aria-hidden="true">
+                    <?php echo function_exists('bsi_lucide_icon') ? bsi_lucide_icon('calendar', $lucide_attrs) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                  </span>
+                  <span class="event-aside-detail__value numfont"><?= (int) $tour_nights; ?></span>
+                </div>
+              <?php endif; ?>
+
+              <?php if ($tour_transport): ?>
+                <div class="event-aside-detail">
+                  <span class="event-aside-detail__icon" aria-hidden="true">
+                    <?php echo function_exists('bsi_lucide_icon') ? bsi_lucide_icon('calendar', $lucide_attrs) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                  </span>
+                  <span class="event-aside-detail__label">Транспорт</span>
+                  <span class="event-aside-detail__value"><?= esc_html($tour_transport); ?></span>
+                </div>
+              <?php endif; ?>
+            </div>
+          <?php endif; ?>
+
           <div class="single-tour-content editor-content">
             <?php the_content(); ?>
           </div>
 
-          <?php if (!empty($calendar_dates)): ?>
-            <section class="single-event__calendar-block">
-              <h2 class="h2">Даты проведения</h2>
-              <p class="single-event__calendar-hint">Доступные даты выделены в календаре.</p>
-              <div class="single-event__calendar" data-event-calendar
-                data-dates="<?= esc_attr(wp_json_encode($calendar_dates, JSON_UNESCAPED_UNICODE)); ?>"></div>
-            </section>
-          <?php endif; ?>
+
 
           <?php if ($venue_scheme_url): ?>
             <section class="single-event__venue-scheme">
               <h2 class="h2">Схема зала</h2>
               <figure class="single-event__venue-figure">
-                <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>"
-                  loading="lazy">
+                <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
               </figure>
             </section>
           <?php endif; ?>
@@ -292,36 +299,6 @@ get_header();
         <aside class="hotel-aside hotel-aside--event-sticky single-event__aside">
 
           <div class="hotel-widget">
-            <?php
-            $show_quick = $tour_duration || $tour_nights || $resort_term || $tour_transport;
-            if ($show_quick): ?>
-              <div class="event-aside-details single-event__quick-facts">
-                <?php if ($tour_duration): ?>
-                  <div class="event-aside-detail">
-                    <span class="event-aside-detail__label">Срок</span>
-                    <span class="event-aside-detail__value"><?= esc_html($tour_duration); ?></span>
-                  </div>
-                <?php elseif ($tour_nights): ?>
-                  <div class="event-aside-detail">
-                    <span class="event-aside-detail__label">Ночей</span>
-                    <span class="event-aside-detail__value numfont"><?= (int) $tour_nights; ?></span>
-                  </div>
-                <?php endif; ?>
-                <?php if ($resort_term): ?>
-                  <div class="event-aside-detail">
-                    <span class="event-aside-detail__label">Город</span>
-                    <span class="event-aside-detail__value"><?= esc_html($resort_term->name); ?></span>
-                  </div>
-                <?php endif; ?>
-                <?php if ($tour_transport): ?>
-                  <div class="event-aside-detail">
-                    <span class="event-aside-detail__label">Транспорт</span>
-                    <span class="event-aside-detail__value"><?= esc_html($tour_transport); ?></span>
-                  </div>
-                <?php endif; ?>
-              </div>
-            <?php endif; ?>
-
             <?php if ($country_title || $region_term || $resort_term): ?>
               <?php
               $items = [];
@@ -417,7 +394,6 @@ get_header();
               <?php endif; ?>
             </div>
 
-            <a class="btn btn-gray hotel-widget__btn-question sm" href="tel:+74957855535">Задать вопрос</a>
 
 
             <?php if ($tour_booking_url): ?>

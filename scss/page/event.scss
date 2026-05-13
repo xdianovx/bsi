@@ -28,6 +28,16 @@
   gap: 8px;
 }
 
+.event-aside-detail__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #666;
+
+  svg {
+    display: block;
+  }
+}
+
 .event-aside-detail__label {
   font-weight: 500;
   line-height: 100%;
@@ -61,10 +71,9 @@
 
   @media screen and (max-width: 640px) {
     border-right: none;
-    border-bottom: 2px dashed #e0e0e0;
+    border-bottom: 1px dashed #e0e0e0;
   }
 
-  // Круглые вырезы для эффекта перфорации
   &::before,
   &::after {
     content: "";
@@ -127,8 +136,8 @@
 }
 
 .event-ticket__price-value {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 500;
   line-height: 100%;
 }
 
@@ -142,7 +151,7 @@
   transition: all 0.3s ease;
   width: 100%;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 100%;
   border: none;
@@ -283,9 +292,9 @@
 }
 
 .single-event__quick-facts {
-  margin-bottom: 16px;
-  flex-direction: column;
-  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .hotel-widget__btn-question {
