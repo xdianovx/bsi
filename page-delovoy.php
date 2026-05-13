@@ -152,13 +152,28 @@ while (have_posts()):
     $stats_acf = function_exists('get_field') ? get_field('delovoy_stats') : null;
     $stats = !empty($stats_acf) && is_array($stats_acf) ? $stats_acf : $delovoy_defaults['stats'];
 
+    // Заголовок: приоритет — родительская страница MICE; затем локальное поле; иначе дефолт.
     $reviews_heading = function_exists('get_field') ? get_field('delovoy_reviews_heading') : '';
     if ($reviews_heading === '' || $reviews_heading === null) {
         $reviews_heading = $delovoy_defaults['reviews_heading'];
     }
-    $reviews_acf = function_exists('get_field') ? get_field('delovoy_reviews') : null;
-    $reviews_from_acf = !empty($reviews_acf) && is_array($reviews_acf);
-    $reviews = $reviews_from_acf ? $reviews_acf : $delovoy_defaults['reviews'];
+    if (function_exists('bsi_get_mice_page_reviews_heading')) {
+        $parent_heading = bsi_get_mice_page_reviews_heading();
+        if ($parent_heading !== '') {
+            $reviews_heading = $parent_heading;
+        }
+    }
+
+    // Отзывы: ВСЕГДА из родительской MICE-страницы. Локальные delovoy_reviews оставлены
+    // в админке как резерв, но в рендере не используются.
+    $parent_reviews = function_exists('bsi_get_mice_page_reviews_rows') ? bsi_get_mice_page_reviews_rows() : [];
+    if ($parent_reviews !== []) {
+        $reviews = $parent_reviews;
+        $reviews_from_acf = true;
+    } else {
+        $reviews = $delovoy_defaults['reviews'];
+        $reviews_from_acf = false;
+    }
 
     $service_icon_svg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 7.601L5.006 15.791C4.86496 15.9837 4.79751 16.2204 4.81585 16.4585C4.83419 16.6966 4.93711 16.9202 5.106 17.089L5.923 17.907C6.09435 18.0782 6.32199 18.1813 6.56366 18.1973C6.80532 18.2133 7.04458 18.1411 7.237 17.994L15.09 12M16.5 21.174C15.5 20.5 14.372 20 13 20C10.942 20 9.072 22.356 7 22C4.928 21.644 4.225 18.631 5.5 17.5M21 7C21 9.76142 18.7614 12 16 12C13.2386 12 11 9.76142 11 7C11 4.23858 13.2386 2 16 2C18.7614 2 21 4.23858 21 7Z" stroke="#EF0101" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>';
     ?>
@@ -207,6 +222,11 @@ while (have_posts()):
                         $sdesc = $svc['description'] ?? '';
                         $icon = $svc['icon'] ?? null;
                         $icon_url = is_array($icon) && !empty($icon['url']) ? $icon['url'] : '';
+                        $icon_lucide_name = isset($svc['icon_lucide']) ? (string) $svc['icon_lucide'] : '';
+                        $icon_lucide_svg = '';
+                        if ($icon_url === '' && $icon_lucide_name !== '' && function_exists('bsi_lucide_icon')) {
+                            $icon_lucide_svg = bsi_lucide_icon($icon_lucide_name);
+                        }
                         if ($stitle === '' && $sdesc === '') {
                             continue;
                         }
@@ -216,6 +236,8 @@ while (have_posts()):
                                 <div class="services__item-icon">
                                     <?php if ($icon_url !== ''): ?>
                                         <img src="<?php echo esc_url($icon_url); ?>" alt="" width="24" height="24">
+                                    <?php elseif ($icon_lucide_svg !== ''): ?>
+                                        <?php echo $icon_lucide_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- inline lucide SVG ?>
                                     <?php else: ?>
                                         <?php echo $service_icon_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- fixed SVG ?>
                                     <?php endif; ?>

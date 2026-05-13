@@ -55,4 +55,60 @@ add_action('acf/init', function () {
       ],
     ],
   ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_mice_parent_reviews',
+    'title' => 'MICE — Отзывы (общий блок для всех страниц MICE)',
+    'fields' => [
+      [
+        'key' => 'field_mice_page_reviews_heading',
+        'label' => 'Заголовок секции',
+        'name' => 'mice_page_reviews_heading',
+        'type' => 'text',
+        'instructions' => 'Отзывы из этого блока показываются на странице MICE и на дочерних лендингах (page-bsimice.php, page-delovoy.php). Если оставить пустым — используются старые поля на лендингах.',
+      ],
+      [
+        'key' => 'field_mice_page_reviews',
+        'label' => 'Слайды отзывов',
+        'name' => 'mice_page_reviews',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить отзыв',
+        'instructions' => 'Заполненные отзывы будут показаны на странице MICE и на всех дочерних лендингах.',
+        'sub_fields' => [
+          [
+            'key' => 'field_mice_page_review_quote',
+            'label' => 'Текст',
+            'name' => 'quote',
+            'type' => 'textarea',
+            'rows' => 5,
+            'new_lines' => 'br',
+          ],
+          [
+            'key' => 'field_mice_page_review_author',
+            'label' => 'Имя',
+            'name' => 'author_name',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_mice_page_review_role',
+            'label' => 'Должность / компания',
+            'name' => 'author_title',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'page_template',
+          'operator' => '==',
+          'value' => 'page-mice.php',
+        ],
+      ],
+    ],
+  ]);
 });

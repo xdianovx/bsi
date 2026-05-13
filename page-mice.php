@@ -14,21 +14,27 @@ get_header('mice');
 
   $mice_editor_raw = trim((string) get_post_field('post_content', $pid, 'raw'));
 
+  // Заголовок: приоритет — собственное поле страницы MICE; затем настройки в опциях; иначе дефолт.
   $reviews_heading_opt = function_exists('get_field') ? get_field('mice_reviews_slider_heading', 'option') : '';
-  $reviews_heading = $reviews_heading_opt !== '' && $reviews_heading_opt !== null ? (string) $reviews_heading_opt : 'Нас Благодарят';
+  $reviews_heading = $reviews_heading_opt !== '' && $reviews_heading_opt !== null
+    ? (string) $reviews_heading_opt
+    : 'Нас Благодарят';
+  if (function_exists('bsi_get_mice_page_reviews_heading')) {
+    $parent_heading = bsi_get_mice_page_reviews_heading();
+    if ($parent_heading !== '') {
+      $reviews_heading = $parent_heading;
+    }
+  }
 
-  $reviews_rows = function_exists('bsi_get_mice_parent_reviews_rows') ? bsi_get_mice_parent_reviews_rows() : [];
+  // Отзывы: ВСЕГДА берём с этой же родительской MICE-страницы (mice_page_reviews).
+  // Старые источники (агрегатор с лендингов, опционный mice_reviews_slider) оставлены
+  // в коде как резерв и в рендере не используются.
+  $reviews_rows = function_exists('bsi_get_mice_page_reviews_rows') ? bsi_get_mice_page_reviews_rows() : [];
   $reviews_from_acf = $reviews_rows !== [];
 
-  if (!$reviews_from_acf) {
-    $reviews_opt = function_exists('get_field') ? get_field('mice_reviews_slider', 'option') : null;
-    if (!empty($reviews_opt) && is_array($reviews_opt) && count($reviews_opt) > 0) {
-      $reviews_rows = $reviews_opt;
-      $reviews_from_acf = true;
-    } elseif (function_exists('bsi_mice_reviews_slider_default_rows')) {
-      $reviews_rows = bsi_mice_reviews_slider_default_rows();
-      $reviews_from_acf = false;
-    }
+  if (!$reviews_from_acf && function_exists('bsi_mice_reviews_slider_default_rows')) {
+    $reviews_rows = bsi_mice_reviews_slider_default_rows();
+    $reviews_from_acf = false;
   }
 
   $mice_has_reviews = false;

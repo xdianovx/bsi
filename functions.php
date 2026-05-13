@@ -377,6 +377,7 @@ function bsi_track_news_views()
 add_action('wp', 'bsi_track_news_views');
 
 require get_template_directory() . '/inc/helpers.php';
+require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
@@ -435,6 +436,7 @@ require get_template_directory() . '/custom-fields/pages/delovoy.php';
 require get_template_directory() . '/custom-fields/mice-settings.php';
 require get_template_directory() . '/inc/mice-reviews-slider-defaults.php';
 require get_template_directory() . '/inc/mice-aggregate-reviews.php';
+require get_template_directory() . '/inc/mice-parent-page-reviews.php';
 require get_template_directory() . '/custom-fields/pages/visa.php';
 require get_template_directory() . '/custom-fields/pages/main-banners.php';
 require get_template_directory() . '/custom-fields/pages/gde-kupit.php';
