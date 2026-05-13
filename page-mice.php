@@ -137,7 +137,6 @@ get_header('mice');
 
 
   <?php get_template_part('template-parts/news/news-slider', null, [
-    'filter_mice' => true,
     'section_id' => 'mice-news',
   ]); ?>
   <?php get_template_part('template-parts/awards/slider', null, [
