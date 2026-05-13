@@ -45,7 +45,7 @@ if (!function_exists('bsi_get_mice_page_reviews_rows')) {
   function bsi_get_mice_page_reviews_rows(): array
   {
     if (!function_exists('get_field')) {
-      return bsi_get_mice_page_reviews_test_rows();
+      return [];
     }
 
     $rows = [];
@@ -67,51 +67,7 @@ if (!function_exists('bsi_get_mice_page_reviews_rows')) {
       }
     }
 
-    // === [TEST] ===========================================================
-    // Если в ACF на странице MICE отзывы ещё не заведены — отдаём заглушки,
-    // чтобы проверить, что блок одинаково отрисовывается на page-mice.php,
-    // page-bsimice.php и page-delovoy.php. Удалить эти 3 строки чтобы откатить.
-    if ($rows === []) {
-      $rows = bsi_get_mice_page_reviews_test_rows();
-    }
-    // === [/TEST] ==========================================================
-
     return $rows;
-  }
-}
-
-if (!function_exists('bsi_get_mice_page_reviews_test_rows')) {
-  /**
-   * [TEST] Заглушка отзывов «с родительской страницы MICE» для проверки вывода
-   * на page-mice.php, page-bsimice.php и page-delovoy.php.
-   * Удалить функцию вместе с TEST-блоком в bsi_get_mice_page_reviews_rows().
-   *
-   * @return list<array{quote: string, author_name: string, author_title: string}>
-   */
-  function bsi_get_mice_page_reviews_test_rows(): array
-  {
-    return [
-      [
-        'quote' => '[TEST · родительская MICE] Команда BSI Group полностью взяла на себя организацию нашей корпоративной конференции — от подбора площадки до логистики делегатов. Всё прошло безупречно.',
-        'author_name' => 'Анна Петрова',
-        'author_title' => 'HR-директор «ТестКорп»',
-      ],
-      [
-        'quote' => '[TEST · родительская MICE] Организовали инсентив-тур на 120 человек за 4 недели — нашли отель, маршрут, гидов, технику. Менеджер был на связи 24/7. Рекомендуем.',
-        'author_name' => 'Дмитрий Соколов',
-        'author_title' => 'Коммерческий директор «Демо Холдинг»',
-      ],
-      [
-        'quote' => '[TEST · родительская MICE] С BSI работаем уже 5 лет: командировки, конференции, тимбилдинги. Прозрачные отчёты, фиксированные цены, никаких сюрпризов.',
-        'author_name' => 'Ольга Иванова',
-        'author_title' => 'Финансовый директор «Пример Групп»',
-      ],
-      [
-        'quote' => '[TEST · родительская MICE] Заказывали форум на 500 участников. Регистрация, кейтеринг, синхронный перевод, трансляция — всё под ключ. Готовы рекомендовать.',
-        'author_name' => 'Сергей Михайлов',
-        'author_title' => 'CEO «Образец Индастриз»',
-      ],
-    ];
   }
 }
 
