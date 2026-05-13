@@ -159,10 +159,6 @@ get_header('mice');
     'filter_mice' => true,
     'section_id' => 'mice-awards',
   ]); ?>
-  <?php get_template_part('template-parts/partners/partners-slider', null, [
-    'filter_mice' => true,
-    'section_id' => 'mice-partners',
-  ]); ?>
 
 
 
