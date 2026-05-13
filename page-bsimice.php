@@ -375,8 +375,6 @@ while (have_posts()):
         <?php get_template_part('template-parts/projects/slider'); ?>
 
 
-        <?php get_template_part('template-parts/news/news-slider', null, ['section_id' => 'mice-news']); ?>
-
         <?php
         set_query_var('bsimice_reviews_slider_reviews', $reviews);
         set_query_var('bsimice_reviews_slider_heading', $reviews_heading);
@@ -384,6 +382,11 @@ while (have_posts()):
         set_query_var('bsimice_reviews_section_id', 'mice-reviews');
         get_template_part('template-parts/mice/reviews-slider');
         ?>
+
+        <?php get_template_part('template-parts/news/news-slider', null, [
+            'section_id' => 'mice-news',
+            'extra_class' => 'mice-news-section',
+        ]); ?>
 
         <?php
         set_query_var('mice_consultation_cfg', [

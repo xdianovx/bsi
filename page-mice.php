@@ -142,13 +142,6 @@ get_header('mice');
   <?php get_template_part('template-parts/projects/slider'); ?>
 
 
-  <?php get_template_part('template-parts/news/news-slider', null, [
-    'section_id' => 'mice-news',
-  ]); ?>
-  <?php get_template_part('template-parts/awards/slider', null, [
-    'filter_mice' => true,
-    'section_id' => 'mice-awards',
-  ]); ?>
   <?php if ($mice_has_reviews): ?>
     <?php
     set_query_var('bsimice_reviews_slider_reviews', $reviews_rows);
@@ -158,6 +151,14 @@ get_header('mice');
     get_template_part('template-parts/mice/reviews-slider');
     ?>
   <?php endif; ?>
+  <?php get_template_part('template-parts/news/news-slider', null, [
+    'section_id' => 'mice-news',
+    'extra_class' => 'mice-news-section',
+  ]); ?>
+  <?php get_template_part('template-parts/awards/slider', null, [
+    'filter_mice' => true,
+    'section_id' => 'mice-awards',
+  ]); ?>
   <?php get_template_part('template-parts/partners/partners-slider', null, [
     'filter_mice' => true,
     'section_id' => 'mice-partners',

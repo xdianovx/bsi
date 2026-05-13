@@ -9006,7 +9006,7 @@ html.bsi-cookie-consented .cookie-consent {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin-top: 24zpx;
+  margin-top: 24px;
 }
 @media screen and (max-width: 768px) {
   .mice-hero__wrap {
@@ -9108,6 +9108,16 @@ html.bsi-cookie-consented .cookie-consent {
 }
 @media screen and (max-width: 768px) {
   .mice-page-consultation {
+    margin-top: 80px;
+  }
+}
+/* Доп. отступ для секции новостей на страницах MICE / делового туризма / лендинга BSI MICE.
+   Селектор составной — нужно перебить базовое правило из page/news.scss (импортится позже). */
+.news-slider__section.mice-news-section {
+  margin-top: 120px;
+}
+@media screen and (max-width: 1200px) {
+  .news-slider__section.mice-news-section {
     margin-top: 80px;
   }
 }

@@ -50,9 +50,11 @@ $news_page_link = get_post_type_archive_link('news');
 $news_query = new WP_Query($news_args);
 
 $news_section_id = isset($args['section_id']) ? trim((string) $args['section_id']) : '';
+$news_extra_class = isset($args['extra_class']) ? trim((string) $args['extra_class']) : '';
+$news_section_class = 'news-slider__section' . ($news_extra_class !== '' ? ' ' . $news_extra_class : '');
 ?>
 
-<section class="news-slider__section" <?php echo $news_section_id !== '' ? 'id="' . esc_attr($news_section_id) . '"' : ''; ?>>
+<section class="<?php echo esc_attr($news_section_class); ?>" <?php echo $news_section_id !== '' ? 'id="' . esc_attr($news_section_id) . '"' : ''; ?>>
   <div class="container">
 
     <div class="title-wrap news-slider__title-wrap">

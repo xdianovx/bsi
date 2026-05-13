@@ -140,3 +140,13 @@
     margin-top: 80px;
   }
 }
+
+/* Доп. отступ для секции новостей на страницах MICE / делового туризма / лендинга BSI MICE.
+   Селектор составной — нужно перебить базовое правило из page/news.scss (импортится позже). */
+.news-slider__section.mice-news-section {
+  margin-top: 120px;
+
+  @media screen and (max-width: 1200px) {
+    margin-top: 80px;
+  }
+}

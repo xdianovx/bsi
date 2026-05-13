@@ -352,7 +352,10 @@ while (have_posts()):
 
         get_template_part('template-parts/mice/reviews-slider');
 
-        get_template_part('template-parts/news/news-slider', null, ['section_id' => 'mice-news']);
+        get_template_part('template-parts/news/news-slider', null, [
+            'section_id' => 'mice-news',
+            'extra_class' => 'mice-news-section',
+        ]);
         ?>
 
         <?php
