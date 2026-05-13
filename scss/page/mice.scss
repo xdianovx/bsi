@@ -31,7 +31,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin-top: 24zpx;
+  margin-top: 24px;
   @media screen and (max-width: 768px) {
     grid-template-columns: repeat(1, 1fr);
   }
