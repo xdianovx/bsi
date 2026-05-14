@@ -908,7 +908,7 @@ button.single-event__dates-book {
 .single-event__booking-cta-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 14px;
   width: 100%;
 
@@ -934,11 +934,12 @@ button.single-event__dates-book {
   width: 100%;
   box-sizing: border-box;
   margin: 0;
-  padding: 16px 20px;
+  height: 48px;
+  padding: 0 20px;
   font-family: inherit;
   font-size: 16px;
   font-weight: 400;
-  line-height: 110%;
+  line-height: 120%;
   color: #fff;
   background: transparent;
   border: 1px solid #5c5c5c;
@@ -966,11 +967,12 @@ button.single-event__dates-book {
   min-width: 0;
   box-sizing: border-box;
   margin: 0;
-  padding: 16px 48px;
+  height: 48px;
+  padding: 0 48px;
   font-family: inherit;
   font-size: 16px;
   font-weight: 500;
-  line-height: 100%;
+  line-height: 120%;
   color: #fff;
   background: #ef0101;
   border: none;

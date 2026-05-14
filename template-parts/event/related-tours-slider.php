@@ -1,9 +1,9 @@
 <?php
 /**
- * Блок «Похожие туры» для single event (слайдер Swiper, карточки — template-parts/tour/card-row).
+ * Блок «Похожие событийные туры» для single event (та же страна, до 10 CPT event).
  *
  * @var array $args {
- *   @type WP_Post[] $posts Обязательно: список постов CPT tour.
+ *   @type WP_Post[] $posts Список постов CPT event.
  * }
  */
 $posts = isset($args['posts']) ? $args['posts'] : [];
@@ -20,12 +20,12 @@ $more_label = 'Все событийные туры';
   <div class="container">
     <div class="title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">
-        <h2 id="single-event-related-tours-heading" class="h2 news-slider__title">Похожие туры</h2>
+        <h2 id="single-event-related-tours-heading" class="h2 news-slider__title">Похожие событийные туры</h2>
         <div class="slider-arrow-wrap news-slider__arrows-wrap">
           <div class="slider-arrow slider-arrow-prev single-event-related-prev" tabindex="0" role="button"
-            aria-label="Предыдущие туры"></div>
+            aria-label="Предыдущие"></div>
           <div class="slider-arrow slider-arrow-next single-event-related-next" tabindex="0" role="button"
-            aria-label="Следующие туры"></div>
+            aria-label="Следующие"></div>
         </div>
       </div>
       <div class="title-wrap__buttons">
@@ -46,12 +46,12 @@ $more_label = 'Все событийные туры';
       <div class="swiper-wrapper">
         <?php foreach ($posts as $rel_post): ?>
           <?php
-          if (!($rel_post instanceof WP_Post) || $rel_post->post_type !== 'tour') {
+          if (!($rel_post instanceof WP_Post) || $rel_post->post_type !== 'event') {
             continue;
           }
           ?>
           <div class="swiper-slide single-event-related-slide">
-            <?php get_template_part('template-parts/tour/card-row', null, ['post_id' => (int) $rel_post->ID]); ?>
+            <?php get_template_part('template-parts/event/card-row', null, ['post_id' => (int) $rel_post->ID]); ?>
           </div>
         <?php endforeach; ?>
       </div>

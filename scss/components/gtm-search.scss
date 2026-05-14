@@ -22,7 +22,7 @@
 .gtm-item__button {
   padding: 16px 40px;
 
-  @media screen and (max-width: 1200px) {
+  @media screen and (max-width: 1300px) {
     width: 100%;
   }
 
@@ -340,7 +340,7 @@
 .person-counter__wrap {
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1440px) {
   .gtm-search__tab-btns {
     overflow-x: scroll;
     &::-webkit-scrollbar {

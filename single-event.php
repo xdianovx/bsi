@@ -79,14 +79,15 @@ if (is_array($venue_scheme) && !empty($venue_scheme['url'])) {
 
 $event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
 
-$related_tours = [];
+$related_events = [];
 if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
   $country_tour_meta = bsi_build_tour_country_meta_query($country_id);
   if (!empty($country_tour_meta)) {
-    $related_tours = get_posts([
-      'post_type' => 'tour',
+    $related_events = get_posts([
+      'post_type' => 'event',
       'post_status' => 'publish',
-      'posts_per_page' => 6,
+      'posts_per_page' => 10,
+      'post__not_in' => [$post_id],
       'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
       'no_found_rows' => true,
       'meta_query' => $country_tour_meta,
@@ -662,9 +663,9 @@ get_header();
   <?php endif; ?>
 
   <?php
-  if (!empty($related_tours)) {
+  if (!empty($related_events)) {
     get_template_part('template-parts/event/related-tours-slider', null, [
-      'posts' => $related_tours,
+      'posts' => $related_events,
     ]);
   }
   ?>
