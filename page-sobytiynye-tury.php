@@ -66,9 +66,9 @@ $region_terms = get_terms([
   'order' => 'ASC',
 ]);
 
-// Получаем доступные типы туров, привязанные к event
+// Получаем типы событийных туров (отдельная таксономия от «Типов туров»)
 $tour_type_terms = get_terms([
-  'taxonomy' => 'tour_type',
+  'taxonomy' => BSI_EVENT_TOUR_TYPE_TAXONOMY,
   'hide_empty' => true,
   'object_ids' => $event_tours_countries_query->posts,
   'orderby' => 'name',

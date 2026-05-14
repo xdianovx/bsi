@@ -42,16 +42,26 @@ if (!function_exists('bsi_event_tours_filter_ids_by_event_dates')) {
     foreach ($post_ids as $post_id) {
       $post_id = (int) $post_id;
       $event_dates = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
-      if (empty($event_dates) || !is_array($event_dates)) {
+      $all_dates = [];
+      if (!empty($event_dates) && is_array($event_dates)) {
+        foreach ($event_dates as $row) {
+          $d = isset($row['date_value']) ? $row['date_value'] : '';
+          if ($d) {
+            $all_dates[] = (string) $d;
+          }
+        }
+      }
+      $hero_d = function_exists('get_field') ? get_field('event_hero_date', $post_id) : '';
+      if (is_string($hero_d) && $hero_d !== '') {
+        $all_dates[] = $hero_d;
+      }
+      $all_dates = array_values(array_unique($all_dates));
+      if (empty($all_dates)) {
         continue;
       }
-      foreach ($event_dates as $row) {
-        $d = isset($row['date_value']) ? $row['date_value'] : '';
-        if (!$d) {
-          continue;
-        }
+      foreach ($all_dates as $d) {
         $ts = strtotime($d);
-        if ($ts >= $from && $ts <= $to) {
+        if ($ts && $ts >= $from && $ts <= $to) {
           $out[] = $post_id;
           break;
         }
@@ -81,7 +91,7 @@ if (!function_exists('bsi_event_tours_build_query_args')) {
 
     if (!empty($f['tour_type_id']) && empty($omit['skip_tour_type'])) {
       $tax_query[] = [
-        'taxonomy' => 'tour_type',
+        'taxonomy' => BSI_EVENT_TOUR_TYPE_TAXONOMY,
         'field' => 'term_id',
         'terms' => [(int) $f['tour_type_id']],
       ];
@@ -335,6 +345,10 @@ function event_tours_available_dates()
         }
       }
     }
+    $hero_d = function_exists('get_field') ? get_field('event_hero_date', $tour_id) : '';
+    if (is_string($hero_d) && $hero_d !== '') {
+      $all_dates[$hero_d] = true;
+    }
   }
 
   $dates = array_keys($all_dates);
@@ -376,7 +390,7 @@ function event_tours_facets()
   $type_items = [];
   if (!empty($ids_types)) {
     $terms = get_terms([
-      'taxonomy' => 'tour_type',
+      'taxonomy' => BSI_EVENT_TOUR_TYPE_TAXONOMY,
       'object_ids' => $ids_types,
       'hide_empty' => false,
       'orderby' => 'name',
@@ -399,7 +413,7 @@ function event_tours_facets()
 }
 
 /**
- * GET country|region|resort|tour_type совпадают с public query_var CPT/таксономий —
+ * GET country|region|resort|tour_type|event_tour_type совпадают с public query_var CPT/таксономий —
  * при обновлении страницы «Событийные туры» ломается главный запрос.
  * Фильтры в URL: префикс et_* (см. js/modules/ajax/event-tours.js).
  */
@@ -413,7 +427,7 @@ add_filter('request', function (array $query_vars): array {
   if (!$is_event_tours) {
     return $query_vars;
   }
-  foreach (['country', 'region', 'resort', 'tour_type'] as $conflict_key) {
+  foreach (['country', 'region', 'resort', 'tour_type', 'event_tour_type'] as $conflict_key) {
     unset($query_vars[$conflict_key]);
   }
 

@@ -348,6 +348,65 @@ function bsi_extract_price_number(?string $raw_price): ?int
 }
 
 /**
+ * Значение цены в админке задано как целое × 1 000 000 — приводит к отображаемому числу (например 236000000 → 236).
+ */
+function bsi_price_divide_million(?int $amount): ?float
+{
+  if ($amount === null || $amount <= 0) {
+    return null;
+  }
+
+  return $amount / 1000000;
+}
+
+/**
+ * Строка цены для легенды схемы зала: при значении ≥ 1 000 000 делит через {@see bsi_price_divide_million}, иначе показывает число как есть; вывод только целых единиц (без копеек/центов). Суффикс валюты — отдельным полем.
+ *
+ * @param mixed $legend_price_raw Значение ACF legend_price.
+ */
+function bsi_format_venue_scheme_legend_price($legend_price_raw, string $currency = ''): string
+{
+  $currency = trim($currency);
+  $raw_str = trim((string) $legend_price_raw);
+
+  $num = null;
+  if ($legend_price_raw !== null && $legend_price_raw !== '' && is_numeric($legend_price_raw)) {
+    $n = (int) $legend_price_raw;
+    $num = $n > 0 ? $n : null;
+  } elseif ($raw_str !== '') {
+    $num = bsi_extract_price_number($raw_str);
+  }
+
+  if ($num === null) {
+    if ($raw_str === '') {
+      return $currency;
+    }
+
+    return trim($raw_str . ($currency !== '' ? ' ' . $currency : ''));
+  }
+
+  $display = ($num >= 1000000)
+    ? bsi_price_divide_million($num)
+    : (float) $num;
+
+  if ($display === null || $display <= 0) {
+    return $raw_str !== '' ? trim($raw_str . ($currency !== '' ? ' ' . $currency : '')) : ($currency !== '' ? $currency : '');
+  }
+
+  $display_whole = (int) round($display);
+  if ($display_whole <= 0) {
+    return $raw_str !== '' ? trim($raw_str . ($currency !== '' ? ' ' . $currency : '')) : ($currency !== '' ? $currency : '');
+  }
+
+  $out = format_number((float) $display_whole, 0);
+  if ($currency !== '') {
+    $out .= ' ' . $currency;
+  }
+
+  return $out;
+}
+
+/**
  * Данные для set_query_var( 'tour', … ) в template-parts/tour/card — тот же контракт, что страница «Туры» и tours-filter AJAX.
  * Цена на карточке: PriceLoaderService::getCachedTourPrice + ACF + пакет get_batch_tour_prices / priceLoader (как в каталоге).
  *
@@ -1026,7 +1085,7 @@ function bsi_get_privacy_policy_url(): string
  * Чекбокс согласия с политикой (по умолчанию не отмечен).
  *
  * @param array $opt {
- *   @type string $variant         'program-booking' | 'visa-page' | 'input-item'
+ *   @type string $variant         'program-booking' | 'visa-page' | 'input-item' | 'event-booking-cta'
  *   @type string $checkbox_id     атрибут id у input
  *   @type string $wrapper_class   доп. классы корневой обёртки (например 'white')
  *   @type bool   $html_required   атрибут HTML required

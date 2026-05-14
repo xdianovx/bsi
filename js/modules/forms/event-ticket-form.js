@@ -3,157 +3,98 @@ import IMask from "imask";
 import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 /**
- * Модуль для работы с формой бронирования билета на событийный тур
+ * Заявка по событию: модалка и inline-форма (имя + телефон обязательны; почта и комментарий — нет).
  */
 
-let phoneMaskInstance = null;
-let currentTicketData = null;
-
-/**
- * Форматирование цены
- */
-function formatPrice(price) {
-  if (!price && price !== 0) return "";
-  const num = parseInt(price, 10);
-  if (isNaN(num)) return price;
-  return num.toLocaleString("ru-RU") + " руб.";
+function getModalRoot() {
+  return document.getElementById("modal-event-ticket-booking");
 }
 
-/**
- * Парсинг цены из строки
- */
-function parsePrice(priceStr) {
-  if (!priceStr) return 0;
-  if (typeof priceStr === "number") return priceStr;
-  const cleaned = priceStr.replace(/[^\d]/g, "");
-  return parseInt(cleaned, 10) || 0;
+function getModalForm() {
+  const modal = getModalRoot();
+  return modal ? modal.querySelector(".js-event-ticket-booking-form") : null;
 }
 
-/**
- * Заполнение модального окна данными билета
- */
+function isMinimalBookingForm(form) {
+  const el = form.querySelector('input[name="event_booking_minimal"]');
+  return el !== null && el.value === "1";
+}
+
 function populateModal(ticketData) {
-  currentTicketData = ticketData;
+  const modalRoot = getModalRoot();
+  if (!modalRoot) {
+    return;
+  }
 
-  // Заголовок события
   const titleEl = document.getElementById("modal-event-ticket-booking-title");
   if (titleEl) {
     titleEl.textContent = ticketData.eventTitle || "";
   }
 
-  // Мета информация
-  const venueEl = document.querySelector(".js-modal-venue");
-  const timeEl = document.querySelector(".js-modal-time");
-
-  if (venueEl) {
-    venueEl.textContent = ticketData.eventVenue || "";
-    venueEl.style.display = ticketData.eventVenue ? "" : "none";
-    const nextSep = venueEl.nextElementSibling;
-    if (nextSep && nextSep.classList.contains("modal-program-booking__meta-separator")) {
-      nextSep.style.display = ticketData.eventVenue && ticketData.eventTime ? "" : "none";
-    }
+  const form = getModalForm();
+  if (!form) {
+    return;
   }
 
-  if (timeEl) {
-    timeEl.textContent = ticketData.eventTime || "";
-    timeEl.style.display = ticketData.eventTime ? "" : "none";
-  }
+  const setVal = (sel, val) => {
+    const input = form.querySelector(sel);
+    if (input) input.value = val;
+  };
 
-  // Тип билета
-  const ticketTypeEl = document.querySelector(".js-modal-ticket-type");
-  if (ticketTypeEl) {
-    ticketTypeEl.textContent = ticketData.ticketType || "";
-  }
-
-  // Цена билета
-  const ticketPriceEl = document.querySelector(".js-modal-ticket-price");
-  if (ticketPriceEl) {
-    ticketPriceEl.textContent = formatPrice(ticketData.ticketPrice);
-  }
-
-  // Заполняем скрытые поля формы
-  const formEventTitleInput = document.querySelector(".js-form-event-title");
-  const formEventVenueInput = document.querySelector(".js-form-event-venue");
-  const formEventTimeInput = document.querySelector(".js-form-event-time");
-  const formTicketTypeInput = document.querySelector(".js-form-ticket-type");
-  const formTicketPriceInput = document.querySelector(".js-form-ticket-price");
-  const formPageUrlInput = document.querySelector(".js-form-page-url");
-
-  if (formEventTitleInput) formEventTitleInput.value = ticketData.eventTitle || "";
-  if (formEventVenueInput) formEventVenueInput.value = ticketData.eventVenue || "";
-  if (formEventTimeInput) formEventTimeInput.value = ticketData.eventTime || "";
-  if (formTicketTypeInput) formTicketTypeInput.value = ticketData.ticketType || "";
-  if (formTicketPriceInput) formTicketPriceInput.value = parsePrice(ticketData.ticketPrice);
-  if (formPageUrlInput) formPageUrlInput.value = window.location.href;
+  setVal(".js-form-event-title", ticketData.eventTitle || "");
+  setVal(".js-form-page-url", window.location.href);
 }
 
-/**
- * Сброс формы
- */
-function resetForm() {
-  const form = document.querySelector(".js-event-ticket-booking-form");
-
-  if (form) {
-    form.reset();
-    form.querySelectorAll(".js-field-error").forEach((el) => {
-      el.textContent = "";
-    });
-    form.querySelectorAll(".modal-program-booking__input--error").forEach((el) => {
-      el.classList.remove("modal-program-booking__input--error");
-    });
-  }
+function resetModalForm() {
+  const form = getModalForm();
+  if (!form) return;
+  form.reset();
+  clearErrors(form);
 }
 
-/**
- * Показать ошибку поля
- */
-function showFieldError(fieldName, message) {
-  const errorEl = document.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
-  const input = document.querySelector(`[data-field="${fieldName}"]`);
+function showFieldError(fieldName, message, form) {
+  if (!form) return;
+  const errorEl = form.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
+  const input = form.querySelector(`[data-field="${fieldName}"]`);
 
   if (errorEl) {
     errorEl.textContent = message;
   }
   if (input) {
-    input.classList.add("modal-program-booking__input--error");
+    input.classList.add("modal-program-booking__input--error", "single-event__booking-cta-input--error");
   }
 }
 
-/**
- * Очистка ошибок
- */
-function clearErrors() {
-  document.querySelectorAll(".js-field-error").forEach((el) => {
+function clearErrors(form) {
+  if (!form) return;
+  form.querySelectorAll(".js-field-error").forEach((el) => {
     el.textContent = "";
   });
-  document.querySelectorAll(".modal-program-booking__input--error").forEach((el) => {
-    el.classList.remove("modal-program-booking__input--error");
+  form.querySelectorAll(".modal-program-booking__input--error, .single-event__booking-cta-input--error").forEach((el) => {
+    el.classList.remove("modal-program-booking__input--error", "single-event__booking-cta-input--error");
   });
 }
 
-/**
- * Валидация формы
- */
-function validateForm() {
+function validateForm(form) {
   const errors = {};
-  const form = document.querySelector(".js-event-ticket-booking-form");
   if (!form) return errors;
 
-  const name = form.querySelector('[name="name"]').value.trim();
-  const email = form.querySelector('[name="email"]').value.trim();
-  const phone = form.querySelector('[name="phone"]').value.trim();
-  const quantity = form.querySelector('[name="quantity"]').value;
-
+  const nameEl = form.querySelector('[name="name"]');
+  const name = nameEl ? nameEl.value.trim() : "";
   if (!name) {
     errors.name = "Введите имя";
   }
 
-  if (!email) {
-    errors.email = "Введите email";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = "Введите корректный email";
+  const emailEl = form.querySelector('[name="email"]');
+  if (emailEl) {
+    const email = emailEl.value.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Введите корректный email";
+    }
   }
 
+  const phoneEl = form.querySelector('[name="phone"]');
+  const phone = phoneEl ? phoneEl.value.trim() : "";
   if (!phone) {
     errors.phone = "Введите телефон";
   } else {
@@ -161,10 +102,6 @@ function validateForm() {
     if (phoneDigits.length < 11) {
       errors.phone = "Введите полный номер телефона";
     }
-  }
-
-  if (!quantity || quantity < 1) {
-    errors.quantity = "Укажите количество билетов";
   }
 
   const privacy = form.querySelector('[name="privacy_agreement"]');
@@ -175,27 +112,68 @@ function validateForm() {
   return errors;
 }
 
-/**
- * Отправка формы
- */
+function initPhoneMasks(root) {
+  root.querySelectorAll(".js-phone-mask").forEach((input) => {
+    if (input.dataset.imaskReady === "1") return;
+    IMask(input, {
+      mask: "+{7} (000) 000-00-00",
+      lazy: false,
+      placeholderChar: "_",
+    });
+    input.dataset.imaskReady = "1";
+  });
+}
+
+function bindBookingForm(form) {
+  if (!form) return;
+
+  form.addEventListener("submit", submitForm);
+
+  form.querySelectorAll("input, textarea").forEach((input) => {
+    input.addEventListener("input", () => {
+      const fieldName = input.dataset.field;
+      if (fieldName) {
+        const errorEl = form.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
+        if (errorEl) errorEl.textContent = "";
+        input.classList.remove("modal-program-booking__input--error", "single-event__booking-cta-input--error");
+      }
+    });
+  });
+
+  const privacyCb = form.querySelector('[name="privacy_agreement"]');
+  if (privacyCb) {
+    privacyCb.addEventListener("change", () => {
+      const err = form.querySelector('.js-field-error[data-error-for="privacy_agreement"]');
+      if (err) err.textContent = "";
+    });
+  }
+}
+
 async function submitForm(e) {
   e.preventDefault();
 
-  clearErrors();
+  const form = e.currentTarget;
+  if (!(form instanceof HTMLFormElement)) return;
 
-  const errors = validateForm();
+  clearErrors(form);
+
+  const errors = validateForm(form);
   if (Object.keys(errors).length > 0) {
     Object.entries(errors).forEach(([field, message]) => {
-      showFieldError(field, message);
+      showFieldError(field, message, form);
     });
     return;
   }
 
-  const form = document.querySelector(".js-event-ticket-booking-form");
-  const submitBtn = form.querySelector(".modal-program-booking__submit");
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const defaultLabel = submitBtn?.dataset.defaultLabel || submitBtn?.textContent || "Отправить";
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Отправка...";
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Отправка...";
+  }
+
+  const isMinimal = isMinimalBookingForm(form);
 
   try {
     const formData = new FormData(form);
@@ -205,27 +183,36 @@ async function submitForm(e) {
     });
 
     if (result.success) {
-      MicroModal.close("modal-event-ticket-booking");
+      if (!isMinimal) {
+        MicroModal.close("modal-event-ticket-booking");
+      }
 
       setTimeout(() => {
         MicroModal.show("modal-event-booking-success", {
           awaitCloseAnimation: true,
           onClose: () => {
-            resetForm();
+            if (isMinimal) {
+              form.reset();
+              clearErrors(form);
+            } else {
+              resetModalForm();
+            }
           },
         });
 
         setTimeout(() => {
           MicroModal.close("modal-event-booking-success");
         }, 2000);
-      }, 300);
+      }, isMinimal ? 0 : 300);
     } else {
       if (result.data && result.data.errors) {
         Object.entries(result.data.errors).forEach(([field, message]) => {
-          showFieldError(field, message);
+          showFieldError(field, message, form);
         });
       }
-      alert(result.data?.errors?.recaptcha || result.data?.message || "Произошла ошибка при отправке");
+      const errMsg =
+        result.data?.errors?.recaptcha || result.data?.message || "Произошла ошибка при отправке";
+      alert(errMsg);
     }
   } catch (error) {
     if (error.message === RECAPTCHA_NOT_LOADED) {
@@ -235,17 +222,15 @@ async function submitForm(e) {
       alert("Произошла ошибка при отправке. Попробуйте позже.");
     }
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Отправить заявку";
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = defaultLabel;
+    }
   }
 }
 
-/**
- * Открытие модального окна с данными билета
- */
 export function openEventTicketModal(ticketData) {
-  console.log("[Event Ticket Modal] Opening with data:", ticketData);
-  resetForm();
+  resetModalForm();
   populateModal(ticketData);
 
   MicroModal.show("modal-event-ticket-booking", {
@@ -254,55 +239,28 @@ export function openEventTicketModal(ticketData) {
     awaitOpenAnimation: true,
     awaitCloseAnimation: true,
     onClose: () => {
-      resetForm();
+      resetModalForm();
     },
   });
 }
 
-/**
- * Инициализация модуля
- */
 export function initEventTicketForm() {
-  const modal = document.getElementById("modal-event-ticket-booking");
-  if (!modal) return;
+  initPhoneMasks(document);
 
-  // Инициализируем маску телефона
-  const phoneInput = modal.querySelector(".js-phone-mask");
-  if (phoneInput && !phoneMaskInstance) {
-    phoneMaskInstance = IMask(phoneInput, {
-      mask: "+{7} (000) 000-00-00",
-      lazy: false,
-      placeholderChar: "_",
-    });
+  const modal = getModalRoot();
+  const ctaForm = document.getElementById("event-booking-cta-form");
+
+  if (modal) {
+    bindBookingForm(getModalForm());
+  }
+  if (ctaForm) {
+    bindBookingForm(ctaForm);
   }
 
-  // Обработчик отправки формы
-  const form = modal.querySelector(".js-event-ticket-booking-form");
-  if (form) {
-    form.addEventListener("submit", submitForm);
-
-    // Очистка ошибок при вводе
-    form.querySelectorAll("input, textarea").forEach((input) => {
-      input.addEventListener("input", () => {
-        const fieldName = input.dataset.field;
-        if (fieldName) {
-          const errorEl = document.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
-          if (errorEl) errorEl.textContent = "";
-          input.classList.remove("modal-program-booking__input--error");
-        }
-      });
-    });
-
-    const privacyCb = form.querySelector('[name="privacy_agreement"]');
-    if (privacyCb) {
-      privacyCb.addEventListener("change", () => {
-        const err = form.querySelector('.js-field-error[data-error-for="privacy_agreement"]');
-        if (err) err.textContent = "";
-      });
-    }
+  if (!modal && !ctaForm) {
+    return;
   }
 
-  // Обработчики кнопок "Купить" на билетах
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".js-event-ticket-booking-btn");
     if (!btn) return;
@@ -311,16 +269,11 @@ export function initEventTicketForm() {
 
     const ticketData = {
       eventTitle: btn.dataset.eventTitle || "",
-      eventVenue: btn.dataset.eventVenue || "",
-      eventTime: btn.dataset.eventTime || "",
-      ticketType: btn.dataset.ticketType || "",
-      ticketPrice: btn.dataset.ticketPrice || "0",
     };
 
     openEventTicketModal(ticketData);
   });
 
-  // Обработчик кнопки "Забронировать" в aside
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".js-event-booking-btn");
     if (!btn) return;
@@ -329,10 +282,6 @@ export function initEventTicketForm() {
 
     const ticketData = {
       eventTitle: btn.dataset.eventTitle || "",
-      eventVenue: btn.dataset.eventVenue || "",
-      eventTime: btn.dataset.eventTime || "",
-      ticketType: "Стандартный билет",
-      ticketPrice: btn.dataset.minPrice || "0",
     };
 
     openEventTicketModal(ticketData);

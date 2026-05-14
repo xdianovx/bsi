@@ -256,9 +256,10 @@ class BSI_Mailer
   /**
    * Хелпер для AJAX handlers - стандартная валидация
    */
-  public static function validate_contact_fields(array $post): array
+  public static function validate_contact_fields(array $post, array $opts = []): array
   {
     $errors = [];
+    $require_email = array_key_exists('require_email', $opts) ? (bool) $opts['require_email'] : true;
 
     $name = sanitize_text_field($post['name'] ?? '');
     if (empty($name)) {
@@ -266,9 +267,13 @@ class BSI_Mailer
     }
 
     $email = sanitize_email($post['email'] ?? '');
-    if (empty($email)) {
-      $errors['email'] = 'Введите email';
-    } elseif (!is_email($email)) {
+    if ($require_email) {
+      if (empty($email)) {
+        $errors['email'] = 'Введите email';
+      } elseif (!is_email($email)) {
+        $errors['email'] = 'Введите корректный email';
+      }
+    } elseif ($email !== '' && !is_email($email)) {
       $errors['email'] = 'Введите корректный email';
     }
 

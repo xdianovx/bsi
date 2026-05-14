@@ -1,12 +1,13 @@
 <?php
 /**
- * Email шаблон для бронирования билета на событийный тур
- * Доступные переменные:
- * - $name, $email, $phone
- * - $quantity, $comment
- * - $event_title, $event_venue, $event_time
- * - $ticket_type, $ticket_price, $total_price
- * - $page_url
+ * Письмо: заявка по событию (упрощённо).
+ *
+ * @var string $name
+ * @var string $email
+ * @var string $phone
+ * @var string $comment
+ * @var string $event_title
+ * @var string $page_url
  */
 
 if (!defined('ABSPATH')) {
@@ -25,7 +26,7 @@ $site_url = home_url();
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
+      line-height: 160%;
       color: #333;
       background-color: #f4f4f6;
       margin: 0;
@@ -50,29 +51,19 @@ $site_url = home_url();
 
     .email-header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-    }
-
-    .email-header p {
-      margin: 10px 0 0;
-      font-size: 14px;
-      opacity: 0.9;
     }
 
     .email-body {
       padding: 30px;
     }
 
-    .section {
-      margin-bottom: 30px;
-    }
-
     .section-title {
       font-size: 16px;
       font-weight: 700;
       color: #e53935;
-      margin: 0 0 15px;
+      margin: 0 0 16px;
       padding-bottom: 10px;
       border-bottom: 2px solid #f4f4f6;
     }
@@ -90,34 +81,12 @@ $site_url = home_url();
     .info-label {
       font-weight: 600;
       color: #666;
-      min-width: 150px;
+      min-width: 140px;
     }
 
     .info-value {
       color: #333;
       flex: 1;
-    }
-
-    .ticket-highlight {
-      background: #f4f4f6;
-      border-left: 4px solid #e53935;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-
-    .ticket-highlight .ticket-type {
-      font-size: 18px;
-      font-weight: 700;
-      color: #333;
-      margin: 0 0 10px;
-    }
-
-    .ticket-highlight .ticket-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #e53935;
-      margin: 10px 0 0;
     }
 
     .email-footer {
@@ -155,79 +124,47 @@ $site_url = home_url();
 <body>
   <div class="email-container">
     <div class="email-header">
-      <h1>🎫 Заявка на билет</h1>
-      <p><?php echo esc_html($event_title ?? ''); ?></p>
+      <h1>Заявка по событию</h1>
     </div>
 
     <div class="email-body">
-      <!-- Информация о событии -->
-      <div class="section">
-        <h2 class="section-title">Информация о событии</h2>
-        <?php if (!empty($event_venue)): ?>
-          <div class="info-row">
-            <div class="info-label">Место проведения:</div>
-            <div class="info-value"><?php echo esc_html($event_venue); ?></div>
-          </div>
-        <?php endif; ?>
-        <?php if (!empty($event_time)): ?>
-          <div class="info-row">
-            <div class="info-label">Время:</div>
-            <div class="info-value"><?php echo esc_html($event_time); ?></div>
-          </div>
-        <?php endif; ?>
+      <h2 class="section-title">Событие</h2>
+      <div class="info-row">
+        <div class="info-label">Название</div>
+        <div class="info-value"><?php echo esc_html($event_title ?? ''); ?></div>
       </div>
-
-      <!-- Выбранный билет -->
-      <div class="section">
-        <h2 class="section-title">Выбранный билет</h2>
-        <div class="ticket-highlight">
-          <div class="ticket-type"><?php echo esc_html($ticket_type ?? 'Билет'); ?></div>
-          <div class="info-row">
-            <div class="info-label">Цена за билет:</div>
-            <div class="info-value"><?php echo number_format($ticket_price ?? 0, 0, ',', ' '); ?> руб.</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Количество:</div>
-            <div class="info-value"><?php echo esc_html($quantity ?? 1); ?> шт.</div>
-          </div>
-          <div class="ticket-price">
-            Итого: <?php echo number_format($total_price ?? 0, 0, ',', ' '); ?> руб.
-          </div>
+      <?php if (!empty($page_url)): ?>
+        <div class="info-row">
+          <div class="info-label">Страница</div>
+          <div class="info-value"><a href="<?php echo esc_url($page_url); ?>"><?php echo esc_html($page_url); ?></a></div>
         </div>
+      <?php endif; ?>
+
+      <h2 class="section-title" style="margin-top: 28px;">Контакты</h2>
+      <div class="info-row">
+        <div class="info-label">Имя</div>
+        <div class="info-value"><?php echo esc_html($name ?? ''); ?></div>
       </div>
-
-      <!-- Контактные данные -->
-      <div class="section">
-        <h2 class="section-title">Контактные данные</h2>
-        <div class="info-row">
-          <div class="info-label">Имя:</div>
-          <div class="info-value"><?php echo esc_html($name ?? ''); ?></div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Телефон:</div>
-          <div class="info-value"><a href="tel:<?php echo esc_attr($phone ?? ''); ?>"><?php echo esc_html($phone ?? ''); ?></a></div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Email:</div>
-          <div class="info-value"><a href="mailto:<?php echo esc_attr($email ?? ''); ?>"><?php echo esc_html($email ?? ''); ?></a></div>
-        </div>
+      <div class="info-row">
+        <div class="info-label">Телефон</div>
+        <div class="info-value"><a href="tel:<?php echo esc_attr(preg_replace('/\D/', '', (string) ($phone ?? ''))); ?>"><?php echo esc_html($phone ?? ''); ?></a></div>
       </div>
+      <?php if (!empty($email) && is_email($email)): ?>
+        <div class="info-row">
+          <div class="info-label">Почта</div>
+          <div class="info-value"><a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a></div>
+        </div>
+      <?php endif; ?>
 
-      <!-- Комментарий -->
       <?php if (!empty($comment)): ?>
-        <div class="section">
-          <h2 class="section-title">Комментарий</h2>
-          <div class="info-value"><?php echo nl2br(esc_html($comment)); ?></div>
-        </div>
+        <h2 class="section-title" style="margin-top: 28px;">Комментарий</h2>
+        <div class="info-value" style="padding: 0 0 12px;"><?php echo nl2br(esc_html($comment)); ?></div>
       <?php endif; ?>
     </div>
 
     <div class="email-footer">
-      <p>
-        Заявка отправлена со страницы:<br>
-        <a href="<?php echo esc_url($page_url ?? $site_url); ?>"><?php echo esc_html($event_title ?? 'Страница события'); ?></a>
-      </p>
-      <p>&copy; <?php echo date('Y'); ?> <?php echo esc_html($site_name); ?>. Все права защищены.</p>
+      <p>&copy; <?php echo date('Y'); ?> <?php echo esc_html($site_name); ?></p>
+      <p><a href="<?php echo esc_url($site_url); ?>"><?php echo esc_html($site_url); ?></a></p>
     </div>
   </div>
 </body>

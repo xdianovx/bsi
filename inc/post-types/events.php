@@ -27,7 +27,7 @@ function register_post_types_event()
     'menu_position' => null,
     'menu_icon' => 'dashicons-calendar-alt',
     'hierarchical' => false,
-    'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'trackbacks', 'post-formats', 'page-attributes'], // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+    'supports' => ['title', 'thumbnail', 'excerpt', 'trackbacks', 'post-formats', 'page-attributes'], // без editor — контент через ACF/шаблон
     'taxonomies' => [],
     'has_archive' => true,
     'rewrite' => true,

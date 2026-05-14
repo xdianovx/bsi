@@ -151,8 +151,18 @@ function bsi_schema_event(): void
     $checkin    = function_exists('get_field') ? trim((string) get_field('tour_checkin_dates', $id)) : '';
     $price_from = function_exists('get_field') ? trim((string) get_field('price_from', $id)) : '';
     $gallery    = function_exists('get_field') ? (array) get_field('tour_gallery', $id) : [];
+    $hero_cover = function_exists('get_field') ? get_field('event_hero_cover', $id) : null;
+    $hero_cover_url = '';
+    if (is_array($hero_cover) && !empty($hero_cover['ID'])) {
+        $hero_cover_url = (string) wp_get_attachment_image_url((int) $hero_cover['ID'], 'large');
+    } elseif (is_array($hero_cover) && !empty($hero_cover['url'])) {
+        $hero_cover_url = (string) $hero_cover['url'];
+    }
 
     $images = bsi_schema_gallery_images($gallery);
+    if ($hero_cover_url !== '') {
+        $images = $images ? array_values(array_unique(array_merge([$hero_cover_url], $images))) : [$hero_cover_url];
+    }
     if (!$images) {
         $thumb = get_the_post_thumbnail_url($id, 'large');
         if ($thumb) {
@@ -197,19 +207,9 @@ function bsi_schema_event(): void
         }
     }
 
-    $tickets = function_exists('get_field') ? get_field('event_tickets', $id) : [];
-    $min_price = null;
-    if (!empty($tickets) && is_array($tickets)) {
-        foreach ($tickets as $t) {
-            $p = isset($t['ticket_price']) ? (float) preg_replace('/[^\d.]/', '', $t['ticket_price']) : 0;
-            if ($p > 0 && ($min_price === null || $p < $min_price)) {
-                $min_price = $p;
-            }
-        }
-    }
-    if (!$min_price && $price_from) {
-        $min_price = (float) preg_replace('/[^\d.]/', '', $price_from);
-    }
+    $min_price = function_exists('bsi_extract_price_number')
+        ? bsi_extract_price_number($price_from)
+        : (($price_from !== '') ? (float) preg_replace('/[^\d.]/', '', $price_from) : null);
     if ($min_price) {
         $schema['offers'] = [
             '@type'         => 'Offer',

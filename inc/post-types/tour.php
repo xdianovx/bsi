@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Обычные туры: CPT `tour`, таксономия `tour_type` («Типы туров»).
+ *
+ * Событийные туры — другой CPT: `event` в custom-post-event.php (типы: event_tour_type).
+ */
+
 add_filter('region_taxonomy_post_types', function ($types) {
   $types[] = 'tour';
   return array_values(array_unique($types));
@@ -12,6 +18,7 @@ add_filter('resort_taxonomy_post_types', function ($types) {
 
 add_action('init', function () {
 
+  // Только для CPT `tour`. У CPT `event` своя таксономия event_tour_type (custom-post-event.php).
   register_taxonomy('tour_type', ['tour'], [
     'labels' => [
       'name' => 'Типы туров',

@@ -70,31 +70,19 @@ if (!is_wp_error($include_terms) && !empty($include_terms)) {
   $event_includes = array_slice($include_terms, 0, 6);
 }
 
-// Get tickets
-$event_tickets = function_exists('get_field') ? get_field('event_tickets', $event_id) : [];
-$min_ticket_price = 0;
-if (!empty($event_tickets) && is_array($event_tickets)) {
-  $prices = array_map(function ($ticket) {
-    return isset($ticket['ticket_price']) ? (int) $ticket['ticket_price'] : 0;
-  }, $event_tickets);
-  $prices = array_filter($prices);
-  $min_ticket_price = !empty($prices) ? min($prices) : 0;
-}
+// Цена в карточке — из ACF «Цена от».
 
 $event_venue = '';
 $event_time = '';
 $checkin_dates = '';
 
 if (function_exists('get_field')) {
-  if ($min_ticket_price > 0) {
-    $price_value = 'от ' . number_format($min_ticket_price, 0, '.', ' ') . ' ₽';
-  } else {
-    $price_val = get_field('price_from', $event_id);
-    if (is_numeric($price_val)) {
-      $price_value = 'от ' . number_format((float) $price_val, 0, '.', ' ') . ' ₽';
-    } elseif (is_string($price_val) && $price_val !== '') {
-      $price_value = (string) $price_val;
-    }
+  $price_val = trim((string) get_field('price_from', $event_id));
+  $amount = function_exists('bsi_extract_price_number') ? bsi_extract_price_number($price_val) : null;
+  if ($amount !== null) {
+    $price_value = 'от ' . number_format($amount, 0, '.', ' ') . ' ₽';
+  } elseif ($price_val !== '') {
+    $price_value = $price_val;
   }
 
   $checkin_dates_val = get_field('tour_checkin_dates', $event_id);

@@ -44,6 +44,25 @@ if ($variant === 'program-booking') {
     <span class="modal-program-booking__error js-field-error" data-error-for="privacy_agreement"></span>
   </div>
   <?php
+} elseif ($variant === 'event-booking-cta') {
+  $root_class = 'single-event__booking-cta-privacy';
+  if ($wrapper_class !== '') {
+    $root_class .= ' ' . $wrapper_class;
+  }
+  ?>
+  <div class="<?php echo esc_attr($root_class); ?>">
+    <label class="single-event__booking-cta-privacy-label" for="<?php echo esc_attr($checkbox_id); ?>">
+      <input type="checkbox" id="<?php echo esc_attr($checkbox_id); ?>" name="privacy_agreement" value="on"
+        class="single-event__booking-cta-privacy-input" autocomplete="off" data-field="privacy_agreement" <?php echo $req; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+      <span class="single-event__booking-cta-privacy-box" aria-hidden="true"></span>
+      <span class="single-event__booking-cta-privacy-text">Отправляя форму, я подтверждаю, что ознакомился с
+        <a href="<?php echo esc_url($privacy_url); ?>" target="_blank" rel="noopener noreferrer">Политикой
+          конфиденциальности</a>
+        и даю согласие на обработку своих персональных данных.</span>
+    </label>
+    <span class="single-event__booking-cta-privacy-error js-field-error" data-error-for="privacy_agreement"></span>
+  </div>
+  <?php
 } elseif ($variant === 'input-item') {
   $root = 'input-item form-privacy-consent';
   if ($wrapper_class !== '') {
