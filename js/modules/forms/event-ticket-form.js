@@ -4,7 +4,11 @@ import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 /**
  * Заявка по событию: модалка и inline-форма (имя + телефон обязательны; почта и комментарий — нет).
+ * Метрика: ym(108341897, "reachGoal", "event_tour_submited").
  */
+
+const YM_ID = 108341897;
+const EVENT_TOUR_GOAL = "event_tour_submited";
 
 function getModalRoot() {
   return document.getElementById("modal-event-ticket-booking");
@@ -36,13 +40,25 @@ function populateModal(ticketData) {
     return;
   }
 
+  const title = ticketData.eventTitle || "";
+  const idStr = ticketData.eventId != null && ticketData.eventId !== "" ? String(ticketData.eventId) : "";
+  form.dataset.eventTitle = title;
+  form.dataset.eventId = idStr;
+
   const setVal = (sel, val) => {
     const input = form.querySelector(sel);
     if (input) input.value = val;
   };
 
-  setVal(".js-form-event-title", ticketData.eventTitle || "");
+  setVal(".js-form-event-title", title);
   setVal(".js-form-page-url", window.location.href);
+}
+
+function reachEventTourBookingGoal() {
+  if (typeof ym === "undefined") {
+    return;
+  }
+  ym(YM_ID, "reachGoal", EVENT_TOUR_GOAL);
 }
 
 function resetModalForm() {
@@ -55,13 +71,19 @@ function resetModalForm() {
 function showFieldError(fieldName, message, form) {
   if (!form) return;
   const errorEl = form.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
-  const input = form.querySelector(`[data-field="${fieldName}"]`);
+  const input =
+    form.querySelector(`[data-field="${fieldName}"]`) || form.querySelector(`[name="${fieldName}"]`);
 
   if (errorEl) {
     errorEl.textContent = message;
   }
   if (input) {
-    input.classList.add("modal-program-booking__input--error", "single-event__booking-cta-input--error");
+    const item = input.closest(".input-item");
+    if (item) {
+      item.classList.add("err");
+    } else {
+      input.classList.add("error");
+    }
   }
 }
 
@@ -70,8 +92,11 @@ function clearErrors(form) {
   form.querySelectorAll(".js-field-error").forEach((el) => {
     el.textContent = "";
   });
-  form.querySelectorAll(".modal-program-booking__input--error, .single-event__booking-cta-input--error").forEach((el) => {
-    el.classList.remove("modal-program-booking__input--error", "single-event__booking-cta-input--error");
+  form.querySelectorAll(".input-item.err").forEach((el) => {
+    el.classList.remove("err");
+  });
+  form.querySelectorAll("input.error, textarea.error").forEach((el) => {
+    el.classList.remove("error");
   });
 }
 
@@ -131,12 +156,13 @@ function bindBookingForm(form) {
 
   form.querySelectorAll("input, textarea").forEach((input) => {
     input.addEventListener("input", () => {
-      const fieldName = input.dataset.field;
-      if (fieldName) {
-        const errorEl = form.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
-        if (errorEl) errorEl.textContent = "";
-        input.classList.remove("modal-program-booking__input--error", "single-event__booking-cta-input--error");
-      }
+      const fieldName = input.dataset.field || input.name;
+      if (!fieldName) return;
+      const errorEl = form.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
+      if (errorEl) errorEl.textContent = "";
+      const item = input.closest(".input-item");
+      if (item) item.classList.remove("err");
+      input.classList.remove("error");
     });
   });
 
@@ -145,6 +171,8 @@ function bindBookingForm(form) {
     privacyCb.addEventListener("change", () => {
       const err = form.querySelector('.js-field-error[data-error-for="privacy_agreement"]');
       if (err) err.textContent = "";
+      const item = privacyCb.closest(".input-item");
+      if (item) item.classList.remove("err");
     });
   }
 }
@@ -183,6 +211,8 @@ async function submitForm(e) {
     });
 
     if (result.success) {
+      reachEventTourBookingGoal();
+
       if (!isMinimal) {
         MicroModal.close("modal-event-ticket-booking");
       }
@@ -269,6 +299,7 @@ export function initEventTicketForm() {
 
     const ticketData = {
       eventTitle: btn.dataset.eventTitle || "",
+      eventId: btn.dataset.eventId || "",
     };
 
     openEventTicketModal(ticketData);
@@ -282,6 +313,7 @@ export function initEventTicketForm() {
 
     const ticketData = {
       eventTitle: btn.dataset.eventTitle || "",
+      eventId: btn.dataset.eventId || "",
     };
 
     openEventTicketModal(ticketData);

@@ -593,45 +593,58 @@ get_header();
               target="_blank" rel="nofollow noopener">Забронировать</a>
           </div>
         <?php else: ?>
-          <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate>
+          <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate
+            data-event-id="<?= esc_attr((string) $post_id); ?>"
+            data-event-title="<?= esc_attr($event_title); ?>">
             <input type="hidden" name="action" value="event_ticket_booking">
             <input type="hidden" name="event_booking_minimal" value="1">
             <input type="hidden" name="event_title" value="<?= esc_attr($event_title); ?>">
             <input type="hidden" name="page_url" value="<?= esc_url(get_permalink($post_id)); ?>">
-            <div class="single-event__booking-cta-row">
-              <div class="single-event__booking-cta-field">
-                <label class="screen-reader-text" for="event-booking-cta-name">Имя</label>
-                <input id="event-booking-cta-name" type="text" name="name" class="single-event__booking-cta-input" placeholder="Имя" autocomplete="name" required data-field="name">
-                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="name"></span>
+
+            <div class="form-row form-row-2">
+              <div class="input-item white">
+                <label for="event-booking-cta-name">Имя <span class="modal-program-booking__req">*</span></label>
+                <input id="event-booking-cta-name" type="text" name="name" required data-field="name" autocomplete="name"
+                  placeholder="Ваше имя">
+                <span class="modal-program-booking__error js-field-error" data-error-for="name"></span>
               </div>
-              <div class="single-event__booking-cta-field">
-                <label class="screen-reader-text" for="event-booking-cta-phone">Телефон</label>
-                <input id="event-booking-cta-phone" type="tel" name="phone" class="single-event__booking-cta-input js-phone-mask" placeholder="Телефон" autocomplete="tel" required data-field="phone">
-                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="phone"></span>
-              </div>
-              <button type="submit" class="single-event__booking-cta-submit" data-default-label="Забронировать">
-                Забронировать
-              </button>
-            </div>
-            <div class="single-event__booking-cta-row single-event__booking-cta-row--optional">
-              <div class="single-event__booking-cta-field single-event__booking-cta-field--grow">
-                <label class="screen-reader-text" for="event-booking-cta-email">Почта (необязательно)</label>
-                <input id="event-booking-cta-email" type="email" name="email" class="single-event__booking-cta-input" placeholder="Почта (необязательно)" autocomplete="email" data-field="email">
-                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="email"></span>
+              <div class="input-item white">
+                <label for="event-booking-cta-phone">Телефон <span class="modal-program-booking__req">*</span></label>
+                <input id="event-booking-cta-phone" type="tel" name="phone" class="js-phone-mask" required data-field="phone"
+                  autocomplete="tel" placeholder="+7 (___) ___-__-__">
+                <span class="modal-program-booking__error js-field-error" data-error-for="phone"></span>
               </div>
             </div>
-            <div class="single-event__booking-cta-field single-event__booking-cta-field--comment">
-              <label class="screen-reader-text" for="event-booking-cta-comment">Комментарий (необязательно)</label>
-              <textarea id="event-booking-cta-comment" name="comment" class="single-event__booking-cta-input single-event__booking-cta-textarea" rows="2" placeholder="Комментарий (необязательно)" data-field="comment"></textarea>
+
+            <div class="input-item white">
+              <label for="event-booking-cta-email">Почта</label>
+              <input id="event-booking-cta-email" type="email" name="email" data-field="email" autocomplete="email"
+                placeholder="Необязательно">
+              <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
             </div>
+
+            <div class="input-item white">
+              <label for="event-booking-cta-comment">Комментарий</label>
+              <textarea id="event-booking-cta-comment" name="comment" rows="2" data-field="comment"
+                placeholder="Необязательно"></textarea>
+              <span class="modal-program-booking__error js-field-error" data-error-for="comment"></span>
+            </div>
+
             <?php
             if (function_exists('bsi_render_privacy_consent_checkbox')) {
               bsi_render_privacy_consent_checkbox([
-                'variant' => 'event-booking-cta',
+                'variant' => 'input-item',
+                'wrapper_class' => 'white',
                 'checkbox_id' => 'event-booking-cta-privacy',
               ]);
             }
             ?>
+
+            <div class="single-event__booking-cta-actions">
+              <button type="submit" class="single-event__booking-cta-submit" data-default-label="Забронировать">
+                Забронировать
+              </button>
+            </div>
           </form>
         <?php endif; ?>
       </div>

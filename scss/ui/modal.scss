@@ -330,6 +330,23 @@
   margin-top: 16px;
 }
 
+.modal-program-booking__req {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.modal-program-booking__form > .form-row {
+  margin-bottom: 16px;
+}
+
+.modal-program-booking__form > .input-item:not(.form-privacy-consent) {
+  margin-bottom: 16px;
+}
+
+.modal-program-booking__form > .input-item.form-privacy-consent {
+  margin-bottom: 16px;
+}
+
 .modal-program-booking__form-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

@@ -1,6 +1,6 @@
 <?php
 /**
- * Модальное окно заявки на событийный тур (упрощённая форма).
+ * Модальное окно заявки на событийный тур (поля UI: .input-item / .form-row).
  */
 ?>
 <div class="modal micromodal-slide" id="modal-event-ticket-booking" aria-hidden="true">
@@ -22,39 +22,39 @@
           <input type="hidden" name="event_title" class="js-form-event-title">
           <input type="hidden" name="page_url" class="js-form-page-url">
 
-          <div class="modal-program-booking__form-row">
-            <div class="modal-program-booking__form-group">
-              <label for="event-booking-name" class="modal-program-booking__label">Имя <span class="modal-program-booking__req">*</span></label>
-              <input type="text" id="event-booking-name" name="name" class="modal-program-booking__input" required
-                data-field="name" autocomplete="name">
+          <div class="form-row form-row-2">
+            <div class="input-item">
+              <label for="event-booking-name">Имя <span class="modal-program-booking__req">*</span></label>
+              <input type="text" id="event-booking-name" name="name" required data-field="name" autocomplete="name"
+                placeholder="Ваше имя">
               <span class="modal-program-booking__error js-field-error" data-error-for="name"></span>
             </div>
-
-            <div class="modal-program-booking__form-group">
-              <label for="event-booking-phone" class="modal-program-booking__label">Телефон <span class="modal-program-booking__req">*</span></label>
-              <input type="tel" id="event-booking-phone" name="phone" class="modal-program-booking__input js-phone-mask"
-                placeholder="+7" required data-field="phone" autocomplete="tel">
+            <div class="input-item">
+              <label for="event-booking-phone">Телефон <span class="modal-program-booking__req">*</span></label>
+              <input type="tel" id="event-booking-phone" name="phone" class="js-phone-mask" required
+                data-field="phone" autocomplete="tel" placeholder="+7 (___) ___-__-__">
               <span class="modal-program-booking__error js-field-error" data-error-for="phone"></span>
             </div>
           </div>
 
-          <div class="modal-program-booking__form-group modal-program-booking__form-group--full">
-            <label for="event-booking-email" class="modal-program-booking__label">Почта</label>
-            <input type="email" id="event-booking-email" name="email" class="modal-program-booking__input"
-              data-field="email" autocomplete="email" placeholder="Необязательно">
+          <div class="input-item">
+            <label for="event-booking-email">Почта</label>
+            <input type="email" id="event-booking-email" name="email" data-field="email" autocomplete="email"
+              placeholder="Необязательно">
             <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
           </div>
 
-          <div class="modal-program-booking__form-group modal-program-booking__form-group--full">
-            <label for="event-booking-comment" class="modal-program-booking__label">Комментарий</label>
-            <textarea id="event-booking-comment" name="comment" class="modal-program-booking__textarea" rows="3"
-              data-field="comment" placeholder="Необязательно"></textarea>
+          <div class="input-item">
+            <label for="event-booking-comment">Комментарий</label>
+            <textarea id="event-booking-comment" name="comment" rows="3" data-field="comment"
+              placeholder="Необязательно"></textarea>
+            <span class="modal-program-booking__error js-field-error" data-error-for="comment"></span>
           </div>
 
           <?php
           if (function_exists('bsi_render_privacy_consent_checkbox')) {
             bsi_render_privacy_consent_checkbox([
-              'variant' => 'program-booking',
+              'variant' => 'input-item',
               'checkbox_id' => 'event-ticket-privacy',
             ]);
           }
