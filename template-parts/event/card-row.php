@@ -50,7 +50,6 @@ if ($event_card_date === '' && $checkin_dates !== '') {
   $event_card_date = $parts[0] ?? '';
 }
 
-$regions = get_the_terms($post_id, 'region');
 $resorts = get_the_terms($post_id, 'resort');
 
 $link = get_permalink($post_id);
@@ -76,9 +75,6 @@ $flag_url = ($country_id && function_exists('bsi_get_country_flag_url'))
 $location_parts = [];
 if ($country_title !== '') {
   $location_parts[] = $country_title;
-}
-if (!empty($regions) && !is_wp_error($regions)) {
-  $location_parts[] = $regions[0]->name;
 }
 if (!empty($resorts) && !is_wp_error($resorts)) {
   $location_parts[] = $resorts[0]->name;
