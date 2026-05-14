@@ -929,6 +929,19 @@ button.single-event__dates-book {
   }
 }
 
+.single-event__booking-cta-field--grow {
+  flex: 1 1 100%;
+}
+
+.single-event__booking-cta-field--comment {
+  width: 100%;
+}
+
+.single-event__booking-cta-textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
 .single-event__booking-cta-input {
   width: 100%;
   box-sizing: border-box;
