@@ -895,6 +895,7 @@ button.single-event__dates-book {
 
 .single-event__booking-cta-actions {
   width: 100%;
+  margin-bottom: 16px;
 }
 
 .single-event__booking-cta-form {
@@ -904,10 +905,6 @@ button.single-event__dates-book {
 }
 
 .single-event__booking-cta-form .form-row {
-  margin-bottom: 16px;
-}
-
-.single-event__booking-cta-form > .input-item:not(.form-privacy-consent) {
   margin-bottom: 16px;
 }
 

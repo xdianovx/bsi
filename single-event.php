@@ -414,15 +414,7 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <?php if ($tour_duration || $tour_nights): ?>
-              <div class="single-event__widget-meta">
-                <?php if ($tour_duration): ?>
-                  <div class="single-event__widget-meta-row"><?= esc_html($tour_duration); ?></div>
-                <?php elseif ($tour_nights): ?>
-                  <div class="single-event__widget-meta-row"><?= esc_html((string) $tour_nights . ' ноч.'); ?></div>
-                <?php endif; ?>
-              </div>
-            <?php endif; ?>
+
 
             <div class="aside-contact-item single-event__booking-widget-phones">
               <a class="aside-contact-item__link numfont" href="tel:<?= esc_attr($event_widget_phone_primary_tel); ?>">
@@ -437,7 +429,8 @@ get_header();
                 </svg>
                 <span><?= esc_html($event_widget_phone_primary); ?></span>
               </a>
-              <a class="aside-contact-item__link numfont" href="tel:<?= esc_attr($event_widget_phone_secondary_tel); ?>">
+              <a class="aside-contact-item__link numfont"
+                href="tel:<?= esc_attr($event_widget_phone_secondary_tel); ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="lucide lucide-phone-call" aria-hidden="true">
@@ -589,13 +582,13 @@ get_header();
         </div>
         <?php if ($tour_booking_url): ?>
           <div class="single-event__booking-cta-actions">
-            <a href="<?= esc_url($tour_booking_url); ?>" class="single-event__booking-cta-submit single-event__booking-cta-submit--wide"
-              target="_blank" rel="nofollow noopener">Забронировать</a>
+            <a href="<?= esc_url($tour_booking_url); ?>"
+              class="single-event__booking-cta-submit single-event__booking-cta-submit--wide" target="_blank"
+              rel="nofollow noopener">Забронировать</a>
           </div>
         <?php else: ?>
           <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate
-            data-event-id="<?= esc_attr((string) $post_id); ?>"
-            data-event-title="<?= esc_attr($event_title); ?>">
+            data-event-id="<?= esc_attr((string) $post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>">
             <input type="hidden" name="action" value="event_ticket_booking">
             <input type="hidden" name="event_booking_minimal" value="1">
             <input type="hidden" name="event_title" value="<?= esc_attr($event_title); ?>">
@@ -610,24 +603,16 @@ get_header();
               </div>
               <div class="input-item white">
                 <label for="event-booking-cta-phone">Телефон <span class="modal-program-booking__req">*</span></label>
-                <input id="event-booking-cta-phone" type="tel" name="phone" class="js-phone-mask" required data-field="phone"
-                  autocomplete="tel" placeholder="+7 (___) ___-__-__">
+                <input id="event-booking-cta-phone" type="tel" name="phone" class="js-phone-mask" required
+                  data-field="phone" autocomplete="tel" placeholder="+7 (___) ___-__-__">
                 <span class="modal-program-booking__error js-field-error" data-error-for="phone"></span>
               </div>
             </div>
 
-            <div class="input-item white">
-              <label for="event-booking-cta-email">Почта</label>
-              <input id="event-booking-cta-email" type="email" name="email" data-field="email" autocomplete="email"
-                placeholder="Необязательно">
-              <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
-            </div>
-
-            <div class="input-item white">
-              <label for="event-booking-cta-comment">Комментарий</label>
-              <textarea id="event-booking-cta-comment" name="comment" rows="2" data-field="comment"
-                placeholder="Необязательно"></textarea>
-              <span class="modal-program-booking__error js-field-error" data-error-for="comment"></span>
+            <div class="single-event__booking-cta-actions">
+              <button type="submit" class="single-event__booking-cta-submit" data-default-label="Забронировать">
+                Забронировать
+              </button>
             </div>
 
             <?php
@@ -639,12 +624,6 @@ get_header();
               ]);
             }
             ?>
-
-            <div class="single-event__booking-cta-actions">
-              <button type="submit" class="single-event__booking-cta-submit" data-default-label="Забронировать">
-                Забронировать
-              </button>
-            </div>
           </form>
         <?php endif; ?>
       </div>
