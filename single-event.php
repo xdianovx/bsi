@@ -577,7 +577,7 @@ get_header();
     <div class="container">
       <div class="single-event__booking-cta-inner">
         <div class="single-event__booking-cta-head">
-          <h2 class="single-event__booking-cta-title h2">Забронировать</h2>
+          <h2 class="single-event__booking-cta-title">Забронировать</h2>
           <p class="single-event__booking-cta-lead"><?= esc_html($event_booking_cta_lead); ?></p>
         </div>
         <?php if ($tour_booking_url): ?>
@@ -594,22 +594,20 @@ get_header();
             <input type="hidden" name="event_title" value="<?= esc_attr($event_title); ?>">
             <input type="hidden" name="page_url" value="<?= esc_url(get_permalink($post_id)); ?>">
 
-            <div class="form-row form-row-2">
-              <div class="input-item white">
-                <label for="event-booking-cta-name">Имя <span class="modal-program-booking__req">*</span></label>
-                <input id="event-booking-cta-name" type="text" name="name" required data-field="name" autocomplete="name"
-                  placeholder="Ваше имя">
-                <span class="modal-program-booking__error js-field-error" data-error-for="name"></span>
+            <div class="single-event__booking-cta-row">
+              <div class="single-event__booking-cta-field">
+                <label class="screen-reader-text" for="event-booking-cta-name">Имя</label>
+                <input id="event-booking-cta-name" type="text" name="name" class="single-event__booking-cta-input"
+                  placeholder="имя" autocomplete="name" required data-field="name">
+                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="name"></span>
               </div>
-              <div class="input-item white">
-                <label for="event-booking-cta-phone">Телефон <span class="modal-program-booking__req">*</span></label>
-                <input id="event-booking-cta-phone" type="tel" name="phone" class="js-phone-mask" required
-                  data-field="phone" autocomplete="tel" placeholder="+7 (___) ___-__-__">
-                <span class="modal-program-booking__error js-field-error" data-error-for="phone"></span>
+              <div class="single-event__booking-cta-field">
+                <label class="screen-reader-text" for="event-booking-cta-phone">Телефон</label>
+                <input id="event-booking-cta-phone" type="tel" name="phone"
+                  class="single-event__booking-cta-input js-phone-mask" placeholder="Телефон" autocomplete="tel" required
+                  data-field="phone">
+                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="phone"></span>
               </div>
-            </div>
-
-            <div class="single-event__booking-cta-actions">
               <button type="submit" class="single-event__booking-cta-submit" data-default-label="Забронировать">
                 Забронировать
               </button>
@@ -618,8 +616,7 @@ get_header();
             <?php
             if (function_exists('bsi_render_privacy_consent_checkbox')) {
               bsi_render_privacy_consent_checkbox([
-                'variant' => 'input-item',
-                'wrapper_class' => 'white',
+                'variant' => 'event-booking-cta',
                 'checkbox_id' => 'event-booking-cta-privacy',
               ]);
             }

@@ -81,6 +81,8 @@ function showFieldError(fieldName, message, form) {
     const item = input.closest(".input-item");
     if (item) {
       item.classList.add("err");
+    } else if (input.classList.contains("single-event__booking-cta-input")) {
+      input.classList.add("single-event__booking-cta-input--error");
     } else {
       input.classList.add("error");
     }
@@ -97,6 +99,9 @@ function clearErrors(form) {
   });
   form.querySelectorAll("input.error, textarea.error").forEach((el) => {
     el.classList.remove("error");
+  });
+  form.querySelectorAll(".single-event__booking-cta-input--error").forEach((el) => {
+    el.classList.remove("single-event__booking-cta-input--error");
   });
 }
 
@@ -162,7 +167,7 @@ function bindBookingForm(form) {
       if (errorEl) errorEl.textContent = "";
       const item = input.closest(".input-item");
       if (item) item.classList.remove("err");
-      input.classList.remove("error");
+      input.classList.remove("error", "single-event__booking-cta-input--error");
     });
   });
 

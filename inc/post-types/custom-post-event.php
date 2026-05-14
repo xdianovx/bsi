@@ -286,14 +286,14 @@ add_action('acf/init', function () {
           ],
           [
             'key' => 'field_event_legend_price',
-            'label' => 'Цена (× 1 000 000)',
+            'label' => 'Цена (× 1 000)',
             'name' => 'legend_price',
             'type' => 'number',
             'wrapper' => ['width' => '35'],
             'min' => 0,
             'step' => 1,
-            'placeholder' => '236000000',
-            'instructions' => '≥ 1 000 000: на сайте делится на 1 000 000 (например 236000000 → 236). Меньше 1 000 000: без деления. Валюта — поле справа.',
+            'placeholder' => '236000',
+            'instructions' => 'Целое в тысячах единиц валюты: на сайте делится на 1 000 (236000 → 236). Валюта — поле справа.',
           ],
           [
             'key' => 'field_event_legend_currency',

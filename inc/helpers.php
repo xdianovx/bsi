@@ -348,19 +348,19 @@ function bsi_extract_price_number(?string $raw_price): ?int
 }
 
 /**
- * Значение цены в админке задано как целое × 1 000 000 — приводит к отображаемому числу (например 236000000 → 236).
+ * Значение цены в админке задано как целое × 1 000 — на сайте делится на 1 000 (например 236000 → 236).
  */
-function bsi_price_divide_million(?int $amount): ?float
+function bsi_price_divide_thousand(?int $amount): ?float
 {
   if ($amount === null || $amount <= 0) {
     return null;
   }
 
-  return $amount / 1000000;
+  return $amount / 1000;
 }
 
 /**
- * Строка цены для легенды схемы зала: при значении ≥ 1 000 000 делит через {@see bsi_price_divide_million}, иначе показывает число как есть; вывод только целых единиц (без копеек/центов). Суффикс валюты — отдельным полем.
+ * Строка цены для легенды схемы зала: числовое значение делится на 1 000; вывод только целых единиц (без копеек). Суффикс валюты — отдельным полем.
  *
  * @param mixed $legend_price_raw Значение ACF legend_price.
  */
@@ -385,9 +385,7 @@ function bsi_format_venue_scheme_legend_price($legend_price_raw, string $currenc
     return trim($raw_str . ($currency !== '' ? ' ' . $currency : ''));
   }
 
-  $display = ($num >= 1000000)
-    ? bsi_price_divide_million($num)
-    : (float) $num;
+  $display = bsi_price_divide_thousand($num);
 
   if ($display === null || $display <= 0) {
     return $raw_str !== '' ? trim($raw_str . ($currency !== '' ? ' ' . $currency : '')) : ($currency !== '' ? $currency : '');
