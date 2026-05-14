@@ -5,7 +5,7 @@
 get_header();
 
 $paged = max(1, (int) get_query_var('paged'));
-$per_page = 12;
+$per_page = (int) BSI_EVENT_TOURS_CATALOG_PER_PAGE;
 
 // Начальный запрос событийных туров
 $tours_query = new WP_Query([
@@ -78,35 +78,34 @@ $tour_type_terms = get_terms([
 
 <main class="site-main">
 
-  <?php
-  if (function_exists('yoast_breadcrumb')) {
-    yoast_breadcrumb(
-      '<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
-      '</p></div></div>'
-    );
-  }
-  ?>
+  <?php if (function_exists('yoast_breadcrumb')): ?>
+    <?php yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>'); ?>
+  <?php endif; ?>
 
-  <section>
-    <div class="container">
-      <div class="">
+  <?php while (have_posts()):
+    the_post(); ?>
 
-        <div class="page-country__content">
+    <section class="event-tours-page">
+      <div class="container">
 
-          <div class="country-tours" data-event-tours-filter data-initial-paged="<?= (int) $paged; ?>">
+        <div class="title-wrap">
+          <div class="">
+            <h1 class="h1"><?php the_title(); ?></h1>
+            <?php if (has_excerpt()): ?>
+              <div class="tours-page__title-description">
+                <?php the_excerpt(); ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
 
-            <div class="country-tours__head">
-              <h1 class="h1 country-tours__title">
-                <?php the_title(); ?>
-              </h1>
+        <?php if (get_the_content()): ?>
+          <div class="page-content">
+            <?php the_content(); ?>
+          </div>
+        <?php endif; ?>
 
-              <?php if (get_the_excerpt()): ?>
-                <div class="page-country__descr">
-                  <?php echo wp_kses_post(get_the_excerpt()); ?>
-                </div>
-              <?php endif; ?>
-
-            </div>
+        <div class="country-tours" data-event-tours-filter data-initial-paged="<?= (int) $paged; ?>">
 
             <form class="country-tours__filters" data-tours-form>
               <div class="country-tours__filters-row --events">
@@ -198,26 +197,13 @@ $tour_type_terms = get_terms([
             <nav class="country-tours__pagination" data-event-tours-pagination
               aria-label="Навигация по страницам каталога"></nav>
 
-          </div>
-
-
         </div>
 
-      </div>
-    </div>
-  </section>
-
-  <?php
-  // Дополнительный контент страницы (если есть)
-  if (get_the_content()): ?>
-    <section>
-      <div class="container">
-        <div class="editor-content">
-          <?php the_content(); ?>
-        </div>
       </div>
     </section>
-  <?php endif; ?>
+
+  <?php
+  endwhile; ?>
 
 </main>
 

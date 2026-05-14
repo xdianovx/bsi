@@ -124,41 +124,6 @@ export const initEventToursFilters = async () => {
     }
   };
 
-  const loadAvailableDates = async () => {
-    try {
-      const body = new URLSearchParams();
-      body.set("action", "event_tours_available_dates");
-      appendFilterBody(body);
-
-      const res = await fetch(ajaxUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        },
-        body: body.toString(),
-        credentials: "same-origin",
-      });
-
-      const json = await res.json();
-      if (!json || !json.success) throw new Error("AJAX error");
-
-      const availableDateStrings = json.data.dates || [];
-
-      if (datePickerInstance) {
-        datePickerInstance.set(
-          "enable",
-          availableDateStrings.length > 0 ? availableDateStrings : [],
-        );
-        datePickerInstance.redraw();
-      }
-    } catch (_e) {
-      if (datePickerInstance) {
-        datePickerInstance.set("enable", []);
-        datePickerInstance.redraw();
-      }
-    }
-  };
-
   const loadFacets = async () => {
     try {
       const body = new URLSearchParams();
@@ -298,12 +263,14 @@ export const initEventToursFilters = async () => {
       locale: Russian,
       dateFormat: "d.m.Y",
       disableMobile: true,
-      enable: [],
       onChange: async (selectedDates) => {
+        currentPage = 1;
         if (selectedDates.length === 2) {
-          currentPage = 1;
           await loadFacets();
-          await loadAvailableDates();
+          await loadCountries();
+          await loadTours();
+        } else if (selectedDates.length === 0) {
+          await loadFacets();
           await loadCountries();
           await loadTours();
         }
@@ -414,7 +381,6 @@ export const initEventToursFilters = async () => {
 
     if (regionChoice && countrySelect) await loadRegions();
     await loadFacets();
-    await loadAvailableDates();
     await loadCountries();
     await loadTours();
   };
@@ -429,7 +395,6 @@ export const initEventToursFilters = async () => {
   const onFacetChange = async () => {
     currentPage = 1;
     await loadFacets();
-    await loadAvailableDates();
     await loadCountries();
     await loadTours();
   };
@@ -465,7 +430,6 @@ export const initEventToursFilters = async () => {
   const initFromServer = async () => {
     currentPage = initialPaged;
     await loadFacets();
-    await loadAvailableDates();
     await loadCountries();
     await loadTours();
   };

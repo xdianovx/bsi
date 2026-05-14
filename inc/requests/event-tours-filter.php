@@ -4,6 +4,10 @@
  * Событийные туры: фильтры и фасеты (AJAX).
  */
 
+if (!defined('BSI_EVENT_TOURS_CATALOG_PER_PAGE')) {
+  define('BSI_EVENT_TOURS_CATALOG_PER_PAGE', 12);
+}
+
 if (!function_exists('bsi_event_tours_parse_request_filters')) {
   /**
    * @return array{country_id:int,region_id:int,tour_type_id:int,resort_id:int,search:string,date_from:string,date_to:string,paged:int}
@@ -167,7 +171,7 @@ add_action('wp_ajax_nopriv_event_tours_filter', 'event_tours_filter');
 function event_tours_filter()
 {
   $f = bsi_event_tours_parse_request_filters();
-  $per_page = 12;
+  $per_page = (int) BSI_EVENT_TOURS_CATALOG_PER_PAGE;
 
   $has_date_filter = ($f['date_from'] !== '' && $f['date_to'] !== '');
   $ids = bsi_event_tours_get_matching_post_ids($f, [], $has_date_filter);
