@@ -151,7 +151,7 @@ add_action('acf/init', function () {
         'layout' => 'table',
         'button_label' => 'Добавить дату',
         'wrapper' => ['width' => '50'],
-        'instructions' => 'Конкретные даты для фильтрации (формат YYYY-MM-DD)',
+        'instructions' => 'Даты для каталога и таблицы «Даты и места» на странице события.',
         'sub_fields' => [
           [
             'key' => 'field_event_date_value',
@@ -163,7 +163,50 @@ add_action('acf/init', function () {
             'first_day' => 1,
             'required' => 1,
           ],
+          [
+            'key' => 'field_event_date_city',
+            'label' => 'Город',
+            'name' => 'date_city',
+            'type' => 'text',
+            'wrapper' => ['width' => '25'],
+            'placeholder' => 'Москва',
+          ],
+          [
+            'key' => 'field_event_date_venue',
+            'label' => 'Площадка',
+            'name' => 'date_venue',
+            'type' => 'text',
+            'wrapper' => ['width' => '25'],
+            'placeholder' => 'Стадион',
+          ],
+          [
+            'key' => 'field_event_date_row_price',
+            'label' => 'Цена от (₽)',
+            'name' => 'date_row_price',
+            'type' => 'number',
+            'wrapper' => ['width' => '15'],
+            'instructions' => 'Опционально; если пусто — мин. цена билетов поста.',
+          ],
+          [
+            'key' => 'field_event_date_ticket_index',
+            'label' => 'Индекс билета',
+            'name' => 'date_ticket_index',
+            'type' => 'number',
+            'wrapper' => ['width' => '15'],
+            'instructions' => '0 = первый тип билета в блоке «Билеты» для кнопки «Забронировать».',
+            'min' => 0,
+            'step' => 1,
+          ],
         ],
+      ],
+      [
+        'key' => 'field_event_hero_extra_tag',
+        'label' => 'Доп. тег в шапке',
+        'name' => 'event_hero_extra_tag',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'Например: Групповой тур',
+        'instructions' => 'Необязательный тег рядом с датой и типами события.',
       ],
       [
         'key' => 'field_event_venue',
@@ -202,6 +245,31 @@ add_action('acf/init', function () {
         'library' => 'all',
         'wrapper' => ['width' => '100'],
         'instructions' => 'Статичное изображение схемы мест (при необходимости замените на интерактив позже)',
+      ],
+      [
+        'key' => 'field_event_venue_scheme_legend',
+        'label' => 'Легенда к схеме (сектор — цена)',
+        'name' => 'venue_scheme_legend',
+        'type' => 'repeater',
+        'layout' => 'table',
+        'button_label' => 'Добавить строку',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_legend_label',
+            'label' => 'Сектор / зона',
+            'name' => 'legend_label',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_event_legend_price',
+            'label' => 'Цена',
+            'name' => 'legend_price',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+            'placeholder' => 'от 50 000 ₽',
+          ],
+        ],
       ],
     ],
     'location' => [
@@ -365,6 +433,50 @@ add_action('acf/init', function () {
         'tabs' => 'all',
         'toolbar' => 'full',
         'media_upload' => 0,
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'event',
+        ],
+      ],
+    ],
+  ]);
+
+  // FAQ
+  acf_add_local_field_group([
+    'key' => 'group_event_faq',
+    'title' => 'Событийный тур — FAQ',
+    'position' => 'normal',
+    'menu_order' => 80,
+    'fields' => [
+      [
+        'key' => 'field_event_faq',
+        'label' => 'Вопросы и ответы',
+        'name' => 'event_faq',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить вопрос',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_faq_question',
+            'label' => 'Вопрос',
+            'name' => 'faq_question',
+            'type' => 'text',
+            'required' => 1,
+          ],
+          [
+            'key' => 'field_event_faq_answer',
+            'label' => 'Ответ',
+            'name' => 'faq_answer',
+            'type' => 'textarea',
+            'rows' => 5,
+            'new_lines' => 'wpautop',
+          ],
+        ],
       ],
     ],
     'location' => [

@@ -276,6 +276,16 @@ $has_news = get_posts([
   ],
 ]);
 
+$has_event_tours = get_posts([
+  'post_type' => 'event',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'fields' => 'ids',
+  'meta_query' => [
+    ['key' => 'tour_country', 'value' => $main_parent_id, 'compare' => '='],
+  ],
+]);
+
 $has_regions = get_terms([
   'taxonomy' => 'region',
   'hide_empty' => false,
@@ -554,6 +564,22 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
           </svg>
         </span>
         <span>Туры</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if (!empty($has_event_tours)): ?>
+      <a href="<?= esc_url(get_permalink($main_parent_id) . '#country-event-tours'); ?>"
+        class="child-page-item">
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 2v4" />
+            <path d="M16 2v4" />
+            <rect width="18" height="18" x="3" y="4" rx="2" />
+            <path d="M3 10h18" />
+          </svg>
+        </span>
+        <span>Событийные туры</span>
       </a>
     <?php endif; ?>
 

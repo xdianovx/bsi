@@ -118,6 +118,29 @@ export const sliders = () => {
     },
   });
 
+  const singleEventRelatedEl = document.querySelector(".single-event-related-slider");
+  if (singleEventRelatedEl) {
+    new Swiper(singleEventRelatedEl, {
+      spaceBetween: 16,
+      watchOverflow: true,
+      navigation: {
+        nextEl: ".single-event-related-next",
+        prevEl: ".single-event-related-prev",
+      },
+      breakpoints: {
+        320: {
+          slidesPerView: 1,
+        },
+        769: {
+          slidesPerView: 2,
+        },
+        1200: {
+          slidesPerView: 3,
+        },
+      },
+    });
+  }
+
   const partnersSectionSlider = new Swiper(".partners-slider-slider", {
     autoplay: { delay: 0 },
     loop: true,
