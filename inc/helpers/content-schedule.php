@@ -439,12 +439,99 @@ function bsi_content_schedule_query_vars(array $vars): array
   return $vars;
 }
 
-add_action('pre_get_posts', 'bsi_content_schedule_pre_get_posts', 20);
+add_action('pre_get_posts', 'bsi_content_schedule_pre_get_posts', 18);
+
+/**
+ * Оставляет в post__in только записи, активные по сроку показа (порядок сохраняется).
+ *
+ * @param int[] $post_in
+ * @return int[]
+ */
+function bsi_schedule_filter_post__in_ids(array $post_in): array
+{
+  $out = [];
+  foreach ($post_in as $id) {
+    $id = (int) $id;
+    if ($id <= 0) {
+      continue;
+    }
+    $type = get_post_type($id);
+    if ($type === false) {
+      continue;
+    }
+    if (!bsi_content_schedule_applies_to_post_type($type)) {
+      $out[] = $id;
+      continue;
+    }
+    if (bsi_post_is_schedule_active($id, $type)) {
+      $out[] = $id;
+    }
+  }
+
+  return $out;
+}
+
+/**
+ * Один тип записи по списку ID (для meta_query), или null при смеси / пусто.
+ *
+ * @param int[] $ids
+ */
+function bsi_content_schedule_infer_single_type_from_ids(array $ids): ?string
+{
+  $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+  if ($ids === []) {
+    return null;
+  }
+
+  $types = [];
+  $cap = 200;
+  foreach (array_slice($ids, 0, $cap) as $id) {
+    $t = get_post_type($id);
+    if ($t !== false && $t !== '') {
+      $types[$t] = true;
+    }
+  }
+
+  if (count($types) !== 1) {
+    return null;
+  }
+
+  return array_key_first($types);
+}
+
+/**
+ * Где применять фильтрацию: публичный фронт и admin-ajax (каталоги), не списки в wp-admin.
+ */
+function bsi_content_schedule_allow_query_filters(): bool
+{
+  if (defined('WP_CLI') && WP_CLI) {
+    return false;
+  }
+
+  if (!is_admin()) {
+    return true;
+  }
+
+  return function_exists('wp_doing_ajax') && wp_doing_ajax();
+}
 
 function bsi_content_schedule_pre_get_posts(WP_Query $query): void
 {
-  if (is_admin() || $query->get('bsi_skip_schedule')) {
+  if (!$query instanceof WP_Query || !bsi_content_schedule_allow_query_filters() || $query->get('bsi_skip_schedule')) {
     return;
+  }
+
+  $post_in = $query->get('post__in');
+  if (is_array($post_in) && $post_in !== []) {
+    $ids_for_check = array_values(array_unique(array_filter(array_map('intval', $post_in))));
+    if ($ids_for_check !== [0]) {
+      $filtered_in = bsi_schedule_filter_post__in_ids($post_in);
+      if ($filtered_in === []) {
+        $query->set('post__in', [0]);
+      } elseif (count($filtered_in) !== count($post_in) || $filtered_in !== array_map('intval', $post_in)) {
+        $query->set('post__in', $filtered_in);
+      }
+    }
   }
 
   if ($query->get('bsi_schedule_applied')) {
@@ -452,9 +539,20 @@ function bsi_content_schedule_pre_get_posts(WP_Query $query): void
   }
 
   $post_type = $query->get('post_type');
+  $post_in_current = $query->get('post__in');
+
   if ($post_type === '' || $post_type === null) {
     if ($query->is_home() && !$query->is_front_page()) {
       $post_type = 'post';
+    } elseif (is_array($post_in_current) && $post_in_current !== []) {
+      $inferred = bsi_content_schedule_infer_single_type_from_ids(
+        array_map('intval', $post_in_current)
+      );
+      if ($inferred !== null) {
+        $post_type = $inferred;
+      } else {
+        return;
+      }
     } else {
       return;
     }
@@ -566,4 +664,143 @@ function bsi_schedule_admin_render_column(string $column, int $post_id): void
   }
 
   echo esc_html(implode(' ', $parts));
+}
+
+add_action('acf/init', static function (): void {
+  add_filter('acf/format_value/type=repeater', 'bsi_acf_format_repeater_hide_inactive_schedule', 20, 3);
+  add_filter('acf/format_value/type=post_object', 'bsi_acf_format_post_object_hide_inactive_schedule', 20, 3);
+  add_filter('acf/format_value/type=relationship', 'bsi_acf_format_relationship_hide_inactive_schedule', 20, 3);
+});
+
+function bsi_acf_is_schedule_format_context(): bool
+{
+  if (!is_admin()) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * @param mixed $value
+ * @param int|string|false $post_id
+ * @param array<string, mixed> $field
+ */
+function bsi_acf_format_repeater_hide_inactive_schedule($value, $post_id, array $field)
+{
+  unset($post_id, $field);
+  if (!bsi_acf_is_schedule_format_context()) {
+    return $value;
+  }
+  if (!is_array($value) || $value === []) {
+    return $value;
+  }
+
+  $out = [];
+  foreach ($value as $row) {
+    if (!is_array($row)) {
+      $out[] = $row;
+      continue;
+    }
+    $has_keys = array_key_exists('bsi_active_from', $row) || array_key_exists('bsi_active_until', $row);
+    if (!$has_keys) {
+      $out[] = $row;
+      continue;
+    }
+    if (!bsi_is_content_active($row['bsi_active_from'] ?? null, $row['bsi_active_until'] ?? null)) {
+      continue;
+    }
+    $out[] = $row;
+  }
+
+  return array_values($out);
+}
+
+/**
+ * Удалённый объект → null или false как ожидает ACF.
+ *
+ * @param mixed $post
+ * @return mixed
+ */
+function bsi_acf_filter_single_post_reference($post)
+{
+  if ($post === null || $post === '' || $post === false) {
+    return $post;
+  }
+  $id = null;
+  $ptype = '';
+  if ($post instanceof WP_Post) {
+    $id = $post->ID;
+    $ptype = $post->post_type;
+  } elseif (is_numeric($post)) {
+    $id = (int) $post;
+    $ptype = (string) get_post_type($id);
+  }
+
+  if ($id === null || $id <= 0 || $ptype === '') {
+    return $post;
+  }
+
+  if (!bsi_content_schedule_applies_to_post_type($ptype)) {
+    return $post;
+  }
+
+  return bsi_post_is_schedule_active($id, $ptype) ? $post : null;
+}
+
+/**
+ * @param mixed $value
+ */
+function bsi_acf_format_post_object_hide_inactive_schedule($value, $post_id, array $field)
+{
+  unset($post_id);
+
+  if (!bsi_acf_is_schedule_format_context()) {
+    return $value;
+  }
+
+  $multi = !empty($field['multiple']);
+
+  if ($multi) {
+    if (!is_array($value) || $value === []) {
+      return $value;
+    }
+    $kept = [];
+    foreach ($value as $item) {
+      $f = bsi_acf_filter_single_post_reference($item);
+      if ($f !== null && $f !== '') {
+        $kept[] = $f;
+      }
+    }
+    return array_values($kept);
+  }
+
+  $filtered = bsi_acf_filter_single_post_reference($value);
+
+  return $filtered === null ? false : $filtered;
+}
+
+/**
+ * @param mixed $value
+ */
+function bsi_acf_format_relationship_hide_inactive_schedule($value, $post_id, array $field)
+{
+  unset($post_id, $field);
+
+  if (!bsi_acf_is_schedule_format_context()) {
+    return $value;
+  }
+  if (!is_array($value) || $value === []) {
+    return $value;
+  }
+
+  $kept = [];
+  foreach ($value as $item) {
+    $f = bsi_acf_filter_single_post_reference($item);
+    if ($f !== null && $f !== '') {
+      $kept[] = $f;
+    }
+  }
+
+  return array_values($kept);
 }
