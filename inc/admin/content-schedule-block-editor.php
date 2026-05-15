@@ -67,6 +67,9 @@ function bsi_content_schedule_enqueue_block_editor_assets(): void
   ]);
 
   wp_add_inline_style('wp-edit-blocks', '
+    .bsi-content-schedule-post-status { margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd; }
+    .bsi-content-schedule-post-status__heading { margin: 0 0 10px; font-size: 13px; font-weight: 600; }
+    .bsi-content-schedule-post-status .components-base-control { margin-bottom: 10px; }
     .bsi-content-schedule-panel__hint { margin: 0; color: #646970; font-size: 12px; line-height: 1.4; }
   ');
 }

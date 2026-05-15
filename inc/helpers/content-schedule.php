@@ -38,12 +38,8 @@ function bsi_content_schedule_post_types_excluded(): array
  */
 function bsi_content_schedule_post_types(): array
 {
-  static $types = null;
-
-  if ($types !== null) {
-    return $types;
-  }
-
+  // Без статического кэша: первый частый вызов — init:10 до register_post_type() у CPT
+  // (типы ещё не зарегистрированы), иначе навсегда выпадают event и другие поздние CPT.
   $exclude = array_flip(bsi_content_schedule_post_types_excluded());
   $types = [];
 
@@ -53,9 +49,7 @@ function bsi_content_schedule_post_types(): array
     }
   }
 
-  $types = apply_filters('bsi_content_schedule_post_types', $types);
-
-  return $types;
+  return apply_filters('bsi_content_schedule_post_types', $types);
 }
 
 /**
@@ -68,12 +62,15 @@ function bsi_content_schedule_supports_block_editor(string $post_type): bool
     return false;
   }
 
-  if (!empty($object->show_in_rest)) {
-    return true;
+  if (
+    empty($object->show_in_rest)
+    || !function_exists('use_block_editor_for_post_type')
+    || !use_block_editor_for_post_type($post_type)
+  ) {
+    return false;
   }
 
-  return function_exists('use_block_editor_for_post_type')
-    && use_block_editor_for_post_type($post_type);
+  return true;
 }
 
 /**
@@ -606,7 +603,7 @@ function bsi_content_schedule_template_redirect(): void
   nocache_headers();
 }
 
-add_action('init', 'bsi_content_schedule_register_admin_columns');
+add_action('init', 'bsi_content_schedule_register_admin_columns', 50);
 
 function bsi_content_schedule_register_admin_columns(): void
 {

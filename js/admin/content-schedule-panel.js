@@ -10,9 +10,11 @@
 
   var registerPlugin = wp.plugins.registerPlugin;
   var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
+  var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
   var useSelect = wp.data.useSelect;
   var useDispatch = wp.data.useDispatch;
   var createElement = wp.element.createElement;
+  var Fragment = wp.element.Fragment;
   var TextControl = wp.components.TextControl;
 
   function ymdToInput(ymd) {
@@ -52,21 +54,23 @@
     var fromKey = keys.from;
     var untilKey = keys.until;
 
-    return createElement(
-      PluginDocumentSettingPanel,
-      {
-        name: 'bsi-content-schedule-panel',
-        title: 'Срок показа на сайте',
-        className: 'bsi-content-schedule-panel',
-      },
+    var fields = createElement(
+      Fragment,
+      {},
+      createElement(
+        'div',
+        { className: 'bsi-content-schedule-post-status__heading' },
+        'Срок показа на сайте'
+      ),
       createElement(TextControl, {
         label: 'Показывать с',
         type: 'date',
         value: ymdToInput(meta[fromKey]),
         onChange: function (value) {
-          var patch = {};
-          patch[fromKey] = inputToYmd(value);
-          editPost({ meta: patch });
+          var nextMeta = Object.assign({}, meta, {
+            [fromKey]: inputToYmd(value),
+          });
+          editPost({ meta: nextMeta });
         },
       }),
       createElement(TextControl, {
@@ -74,9 +78,10 @@
         type: 'date',
         value: ymdToInput(meta[untilKey]),
         onChange: function (value) {
-          var patch = {};
-          patch[untilKey] = inputToYmd(value);
-          editPost({ meta: patch });
+          var nextMeta = Object.assign({}, meta, {
+            [untilKey]: inputToYmd(value),
+          });
+          editPost({ meta: nextMeta });
         },
       }),
       hint
@@ -86,6 +91,24 @@
             hint
           )
         : null
+    );
+
+    if (PluginPostStatusInfo) {
+      return createElement(
+        PluginPostStatusInfo,
+        { className: 'bsi-content-schedule-post-status' },
+        fields
+      );
+    }
+
+    return createElement(
+      PluginDocumentSettingPanel,
+      {
+        name: 'bsi-content-schedule-panel',
+        title: 'Срок показа на сайте',
+        className: 'bsi-content-schedule-panel',
+      },
+      fields
     );
   }
 
