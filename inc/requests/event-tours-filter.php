@@ -8,6 +8,24 @@ if (!defined('BSI_EVENT_TOURS_CATALOG_PER_PAGE')) {
   define('BSI_EVENT_TOURS_CATALOG_PER_PAGE', 12);
 }
 
+if (!function_exists('bsi_event_tours_prime_meta_for_ids')) {
+  /**
+   * Один-два запроса к wp_postmeta вместо тысячи при последующих get_field().
+   *
+   * @param int[] $ids
+   */
+  function bsi_event_tours_prime_meta_for_ids(array $ids): void
+  {
+    $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+    if ($ids === []) {
+      return;
+    }
+    foreach (array_chunk($ids, 500) as $chunk) {
+      update_postmeta_cache($chunk);
+    }
+  }
+}
+
 if (!function_exists('bsi_event_tours_parse_request_filters')) {
   /**
    * @return array{country_id:int,region_id:int,tour_type_id:int,resort_id:int,search:string,date_from:string,date_to:string,paged:int}
@@ -42,6 +60,9 @@ if (!function_exists('bsi_event_tours_filter_ids_by_event_dates')) {
     if (!$from || !$to) {
       return [];
     }
+
+    bsi_event_tours_prime_meta_for_ids($post_ids);
+
     $out = [];
     foreach ($post_ids as $post_id) {
       $post_id = (int) $post_id;
@@ -149,6 +170,18 @@ if (!function_exists('bsi_event_tours_get_matching_post_ids')) {
    */
   function bsi_event_tours_get_matching_post_ids(array $f, array $omit = [], bool $apply_date_range = false): array
   {
+    $omit_normalized = $omit;
+    ksort($omit_normalized);
+    static $memo = [];
+    $memo_key = md5(wp_json_encode([
+      'f' => $f,
+      'omit' => $omit_normalized,
+      'apply_date_range' => $apply_date_range,
+    ]));
+    if (isset($memo[$memo_key])) {
+      return $memo[$memo_key];
+    }
+
     $args = bsi_event_tours_build_query_args($f, $omit);
     $args['posts_per_page'] = -1;
     $args['fields'] = 'ids';
@@ -160,6 +193,8 @@ if (!function_exists('bsi_event_tours_get_matching_post_ids')) {
     if ($apply_date_range && $f['date_from'] !== '' && $f['date_to'] !== '') {
       $ids = bsi_event_tours_filter_ids_by_event_dates($ids, $f['date_from'], $f['date_to']);
     }
+
+    $memo[$memo_key] = $ids;
 
     return $ids;
   }
@@ -280,6 +315,8 @@ function event_tours_countries()
 
   $ids = bsi_event_tours_get_matching_post_ids($f, ['skip_country' => true], $has_date_filter);
 
+  bsi_event_tours_prime_meta_for_ids($ids);
+
   $country_ids = [];
   foreach ($ids as $tour_id) {
     $country_val = function_exists('get_field') ? get_field('tour_country', $tour_id) : null;
@@ -337,6 +374,8 @@ function event_tours_available_dates()
   if (empty($tour_ids)) {
     wp_send_json_success(['dates' => []]);
   }
+
+  bsi_event_tours_prime_meta_for_ids($tour_ids);
 
   $all_dates = [];
   foreach ($tour_ids as $tour_id) {

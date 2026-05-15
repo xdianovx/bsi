@@ -6,6 +6,19 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+/*
+ * --- Производительность / Query Monitor ---
+ *
+ * Топ-сценарии, где «срок показа» даёт доп. нагрузку в связке с тяжёлыми запросами:
+ *
+ * 1) Каталог событийных туров: см. page-sobytiynye-tury.php, inc/requests/event-tours-filter.php
+ *    (posts_per_page -1 + meta_query расписания; явный post__in — фильтр только в PHP, без JOIN см. bsi_schedule_post__in_is_finite_nonempty).
+ * 2) Admin-ajax event_tours_* / фильтры: полная выборка ID + schedule в SQL.
+ * 3) Прочие листинги с bsi_query_args_append_schedule(): туры/новости/промо и т.д. — см. grep по имени функции.
+ *
+ * В QM смотреть: толстые SELECT с JOIN к postmeta по bsi_active_* / promo_date_*; лавину get_post_meta.
+ */
+
 /**
  * Типы записей, для которых не подключаем срок показа.
  *
@@ -281,6 +294,19 @@ function bsi_schedule_meta_query(string $from_key, string $until_key, ?string $n
 }
 
 /**
+ * Явный непустой post__in (не только [0]).
+ * Такие запросы фильтруем по расписанию в PHP в pre_get_posts — см. bsi_schedule_filter_post__in_ids(),
+ * чтобы не добавлять в SQL второй слой тех же условий (LEFT JOIN wp_postmeta ×4 + GROUP BY).
+ *
+ * @param int[] $post_in
+ */
+function bsi_schedule_post__in_is_finite_nonempty(array $post_in): bool
+{
+  $normalized = array_values(array_unique(array_filter(array_map('intval', $post_in))));
+  return $normalized !== [] && $normalized !== [0];
+}
+
+/**
  * Активна ли запись по meta полям срока.
  */
 function bsi_post_is_schedule_active(int $post_id, ?string $post_type = null): bool
@@ -295,6 +321,42 @@ function bsi_post_is_schedule_active(int $post_id, ?string $post_type = null): b
   $until = function_exists('get_field') ? get_field($keys['until'], $post_id) : null;
 
   return bsi_is_content_active($from, $until);
+}
+
+/**
+ * Одним запросом: ID записи → post_type (для батча без N раз get_post_type).
+ *
+ * @param int[] $ids
+ * @return array<int, string>
+ */
+function bsi_schedule_map_post_types_for_ids(array $ids): array
+{
+  $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+  if ($ids === []) {
+    return [];
+  }
+
+  global $wpdb;
+  $out = [];
+  foreach (array_chunk($ids, 500) as $chunk) {
+    if ($chunk === []) {
+      continue;
+    }
+    $placeholders = implode(',', array_fill(0, count($chunk), '%d'));
+    // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPlaceholder
+    $sql = "SELECT ID, post_type FROM {$wpdb->posts} WHERE ID IN ($placeholders)";
+    // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- placeholders match chunk count
+    $prepared = $wpdb->prepare($sql, ...$chunk);
+    $rows = $wpdb->get_results($prepared, ARRAY_A);
+    if (!is_array($rows)) {
+      continue;
+    }
+    foreach ($rows as $row) {
+      $out[(int) $row['ID']] = (string) $row['post_type'];
+    }
+  }
+
+  return $out;
 }
 
 /**
@@ -327,6 +389,11 @@ function bsi_schedule_meta_query_is_present(array $meta_query, string $from_key,
 function bsi_query_args_append_schedule(array $args): array
 {
   if (!empty($args['bsi_schedule_applied'])) {
+    return $args;
+  }
+
+  if (isset($args['post__in']) && is_array($args['post__in']) && bsi_schedule_post__in_is_finite_nonempty($args['post__in'])) {
+    $args['bsi_schedule_applied'] = true;
     return $args;
   }
 
@@ -446,21 +513,55 @@ add_action('pre_get_posts', 'bsi_content_schedule_pre_get_posts', 18);
  */
 function bsi_schedule_filter_post__in_ids(array $post_in): array
 {
+  $normalized = [];
+  foreach ($post_in as $raw) {
+    $id = (int) $raw;
+    if ($id > 0) {
+      $normalized[] = $id;
+    }
+  }
+  $normalized = array_values(array_unique($normalized));
+  if ($normalized === []) {
+    return [];
+  }
+
+  $types_by_id = bsi_schedule_map_post_types_for_ids($normalized);
+
+  /** @var int[] $needs_meta_prime */
+  $needs_meta_prime = [];
+  foreach ($normalized as $id) {
+    $type = $types_by_id[$id] ?? '';
+    if ($type !== '' && bsi_content_schedule_applies_to_post_type($type)) {
+      $needs_meta_prime[] = $id;
+    }
+  }
+
+  if ($needs_meta_prime !== []) {
+    update_postmeta_cache($needs_meta_prime);
+  }
+
   $out = [];
-  foreach ($post_in as $id) {
-    $id = (int) $id;
+  foreach ($post_in as $raw) {
+    $id = (int) $raw;
     if ($id <= 0) {
       continue;
     }
-    $type = get_post_type($id);
-    if ($type === false) {
+
+    $type = $types_by_id[$id] ?? '';
+    if ($type === '') {
       continue;
     }
+
     if (!bsi_content_schedule_applies_to_post_type($type)) {
       $out[] = $id;
       continue;
     }
-    if (bsi_post_is_schedule_active($id, $type)) {
+
+    $keys = bsi_schedule_keys_for_post_type($type);
+    $from_raw = get_post_meta($id, $keys['from'], true);
+    $until_raw = get_post_meta($id, $keys['until'], true);
+
+    if (bsi_is_content_active($from_raw, $until_raw)) {
       $out[] = $id;
     }
   }
@@ -480,11 +581,10 @@ function bsi_content_schedule_infer_single_type_from_ids(array $ids): ?string
     return null;
   }
 
+  $map = bsi_schedule_map_post_types_for_ids($ids);
   $types = [];
-  $cap = 200;
-  foreach (array_slice($ids, 0, $cap) as $id) {
-    $t = get_post_type($id);
-    if ($t !== false && $t !== '') {
+  foreach ($map as $t) {
+    if ($t !== '') {
       $types[$t] = true;
     }
   }
@@ -528,6 +628,9 @@ function bsi_content_schedule_pre_get_posts(WP_Query $query): void
       } elseif (count($filtered_in) !== count($post_in) || $filtered_in !== array_map('intval', $post_in)) {
         $query->set('post__in', $filtered_in);
       }
+      $query->set('bsi_schedule_applied', true);
+
+      return;
     }
   }
 

@@ -27,6 +27,8 @@ $event_tours_countries_query = new WP_Query(bsi_query_args_append_schedule([
 
 $country_ids = [];
 if ($event_tours_countries_query->have_posts()) {
+  bsi_event_tours_prime_meta_for_ids(array_map('intval', $event_tours_countries_query->posts));
+
   foreach ($event_tours_countries_query->posts as $tour_id) {
     $country_val = function_exists('get_field') ? get_field('tour_country', $tour_id) : null;
     if ($country_val) {
