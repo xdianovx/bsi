@@ -101,29 +101,46 @@ $country_tours_h1 = $country_title_prepositional !== ''
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = 12;
 
-$tours_query = new WP_Query(bsi_query_args_append_schedule([
-  'post_type' => 'tour',
-  'post_status' => 'publish',
-  'posts_per_page' => $per_page,
-  'paged' => $paged,
-  'meta_query' => bsi_build_tour_country_meta_query((int) $country_id),
-  'orderby' => 'title',
-  'order' => 'ASC',
-]));
+$tour_candidates = $country_id > 0 && function_exists('bsi_get_country_tour_candidate_ids_cached')
+  ? bsi_get_country_tour_candidate_ids_cached((int) $country_id)
+  : [];
+
+$country_tour_ids = function_exists('bsi_schedule_filter_post__in_ids')
+  ? bsi_schedule_filter_post__in_ids($tour_candidates)
+  : array_values(array_map('intval', $tour_candidates));
+
+$total_country_tours = count($country_tour_ids);
+$total_pages = ($total_country_tours > 0 && $per_page > 0)
+  ? (int) ceil($total_country_tours / $per_page)
+  : 0;
+
+if ($total_pages > 0) {
+  $paged = min($paged, $total_pages);
+} else {
+  $paged = 1;
+}
+
+$page_ids = [];
+if ($total_country_tours > 0 && $per_page > 0) {
+  $page_ids = array_slice($country_tour_ids, ($paged - 1) * $per_page, $per_page);
+}
+
+$tours_query = new WP_Query([
+  'post_type'              => 'tour',
+  'post_status'            => 'publish',
+  'posts_per_page'         => $per_page,
+  'post__in'               => $page_ids !== [] ? $page_ids : [0],
+  'orderby'                => 'post__in',
+  'no_found_rows'          => true,
+  'bsi_skip_schedule'      => true,
+  'update_post_meta_cache' => false,
+]);
+
+$tours_query->found_posts = $total_country_tours;
+$tours_query->max_num_pages = $total_pages;
 
 /**
- * ID всех туров страны (используется для фильтрации регионов и типов)
- */
-$country_tour_ids = get_posts(bsi_query_args_append_schedule([
-  'post_type'      => 'tour',
-  'post_status'    => 'publish',
-  'posts_per_page' => -1,
-  'fields'         => 'ids',
-  'meta_query'     => bsi_build_tour_country_meta_query((int) $country_id),
-]));
-
-/**
- * Регионы: только те, в которых есть туры этой страны
+ * Туры страны, активные по расписанию — те же ID, что и список карточек и JS-фильтры.
  */
 $region_terms = [];
 if (!empty($country_tour_ids)) {

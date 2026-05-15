@@ -357,6 +357,133 @@ if (!function_exists('bsi_build_tour_country_meta_query')) {
   }
 }
 
+if (!function_exists('bsi_country_tour_candidate_ids_cache_version')) {
+  function bsi_country_tour_candidate_ids_cache_version(): int
+  {
+    return max(1, (int) get_option('bsi_country_tour_ids_cache_ver', 1));
+  }
+}
+
+if (!function_exists('bsi_country_tour_candidate_ids_cache_bump')) {
+  function bsi_country_tour_candidate_ids_cache_bump(): void
+  {
+    $v = bsi_country_tour_candidate_ids_cache_version();
+    update_option('bsi_country_tour_ids_cache_ver', $v + 1, false);
+  }
+}
+
+if (!function_exists('bsi_country_tour_candidate_ids_transient_key')) {
+  function bsi_country_tour_candidate_ids_transient_key(int $country_id): string
+  {
+    $country_id = (int) $country_id;
+
+    return 'bsi_tour_ids_country_' . $country_id . '_' . bsi_country_tour_candidate_ids_cache_version();
+  }
+}
+
+if (!function_exists('bsi_get_country_tour_candidate_ids_uncached')) {
+  /**
+   * ID опубликованных туров с tour_country (без фильтра срока показа; тяжёлый meta_query).
+   *
+   * @return int[]
+   */
+  function bsi_get_country_tour_candidate_ids_uncached(int $country_id): array
+  {
+    $country_id = (int) $country_id;
+    if ($country_id <= 0) {
+      return [];
+    }
+
+    $meta_query = bsi_build_tour_country_meta_query($country_id);
+    if ($meta_query === []) {
+      return [];
+    }
+
+    $q = new WP_Query([
+      'post_type'              => 'tour',
+      'post_status'            => 'publish',
+      'posts_per_page'         => -1,
+      'fields'                 => 'ids',
+      'meta_query'             => $meta_query,
+      'orderby'                => 'title',
+      'order'                  => 'ASC',
+      'no_found_rows'          => true,
+      'bsi_skip_schedule'      => true,
+      'update_post_meta_cache' => false,
+      'update_post_term_cache' => false,
+    ]);
+
+    return array_values(
+      array_unique(
+        array_filter(
+          array_map('intval', is_array($q->posts ?? null) ? $q->posts : [])
+        )
+      )
+    );
+  }
+}
+
+if (!function_exists('bsi_get_country_tour_candidate_ids_cached')) {
+  /**
+   * Кандидаты для страницы country/{slug}/tours: кеш на 15 мин + глобальная версия на save_post тура.
+   * Расписание применять в PHP: {@see bsi_schedule_filter_post__in_ids()}.
+   *
+   * @return int[]
+   */
+  function bsi_get_country_tour_candidate_ids_cached(int $country_id): array
+  {
+    $country_id = (int) $country_id;
+    if ($country_id <= 0) {
+      return [];
+    }
+
+    if (is_user_logged_in() && current_user_can('edit_posts')) {
+      return bsi_get_country_tour_candidate_ids_uncached($country_id);
+    }
+
+    $key = bsi_country_tour_candidate_ids_transient_key($country_id);
+    $cached = get_transient($key);
+    if (is_array($cached)) {
+      return array_values(
+        array_unique(
+          array_filter(array_map('intval', $cached))
+        )
+      );
+    }
+
+    $ids = bsi_get_country_tour_candidate_ids_uncached($country_id);
+    set_transient($key, $ids, 15 * MINUTE_IN_SECONDS);
+
+    return $ids;
+  }
+}
+
+add_action('transition_post_status', static function (
+  string $new_status,
+  string $old_status,
+  WP_Post $post
+): void {
+  if (($post->post_type ?? '') !== 'tour') {
+    return;
+  }
+  if ($old_status !== 'publish' && $new_status !== 'publish') {
+    return;
+  }
+  bsi_country_tour_candidate_ids_cache_bump();
+}, 10, 3);
+
+add_action('save_post_tour', static function (int $post_id, WP_Post $post, bool $update): void {
+  if (
+    wp_is_post_revision($post_id)
+    || (defined('DOING_AUTOSAVE') && constant('DOING_AUTOSAVE'))
+    || !$update
+    || $post->post_status !== 'publish'
+  ) {
+    return;
+  }
+  bsi_country_tour_candidate_ids_cache_bump();
+}, 99, 3);
+
 add_action('init', function () {
 
   add_rewrite_rule(
