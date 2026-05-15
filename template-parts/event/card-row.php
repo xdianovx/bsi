@@ -94,7 +94,7 @@ if ($excerpt_raw === '') {
 $excerpt_raw = preg_replace('/\s+/u', ' ', trim($excerpt_raw));
 ?>
 
-<article class="catalog-card">
+<article class="catalog-card catalog-card--event">
   <a href="<?= esc_url($link); ?>" class="catalog-card__media">
     <?php if ($img): ?>
       <img class="catalog-card__img" src="<?= esc_url($img); ?>" alt="<?= esc_attr($title); ?>" loading="lazy">
