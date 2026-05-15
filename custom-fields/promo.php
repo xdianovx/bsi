@@ -14,35 +14,16 @@ add_action('acf/init', function () {
         'return_format' => 'id',
         'ui' => 1,
         'wrapper' => [
-          'width' => '25',
+          'width' => '50',
         ],
       ],
-      [
-        'key' => 'field_promo_date_from',
-        'label' => 'Дата начала',
-        'name' => 'promo_date_from',
-        'type' => 'date_picker',
-        'wrapper' => [
-          'width' => '25',
-        ],
-      ],
-      [
-        'key' => 'field_promo_date_to',
-        'label' => 'Дата окончания',
-        'name' => 'promo_date_to',
-        'type' => 'date_picker',
-        'wrapper' => [
-          'width' => '25',
-        ],
-      ],
-
       [
         'key' => 'field_promo_link',
         'label' => 'Ссылка на подробности',
         'name' => 'promo_link',
         'type' => 'url',
         'wrapper' => [
-          'width' => '25',
+          'width' => '50',
         ],
       ],
     ],

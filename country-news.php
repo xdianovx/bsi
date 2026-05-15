@@ -14,7 +14,7 @@ $country_id = $country ? (int) $country->ID : 0;
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = 12;
 
-$news_query = new WP_Query([
+$news_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'news',
   'post_status' => 'publish',
   'posts_per_page' => $per_page,
@@ -28,7 +28,7 @@ $news_query = new WP_Query([
   ],
   'orderby' => 'date',
   'order' => 'DESC',
-]);
+]));
 
 get_header(); ?>
 

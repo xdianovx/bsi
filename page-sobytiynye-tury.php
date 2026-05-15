@@ -8,22 +8,22 @@ $paged = max(1, (int) get_query_var('paged'));
 $per_page = (int) BSI_EVENT_TOURS_CATALOG_PER_PAGE;
 
 // Начальный запрос событийных туров
-$tours_query = new WP_Query([
+$tours_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'event',
   'post_status' => 'publish',
   'posts_per_page' => $per_page,
   'paged' => $paged,
   'orderby' => 'title',
   'order' => 'ASC',
-]);
+]));
 
 // Получаем страны, у которых есть событийные туры
-$event_tours_countries_query = new WP_Query([
+$event_tours_countries_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'event',
   'post_status' => 'publish',
   'posts_per_page' => -1,
   'fields' => 'ids',
-]);
+]));
 
 $country_ids = [];
 if ($event_tours_countries_query->have_posts()) {

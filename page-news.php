@@ -16,13 +16,13 @@ if (!$paged) {
   $paged = get_query_var('page') ? (int) get_query_var('page') : 1;
 }
 
-$news_query = new WP_Query([
+$news_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'news',
   'posts_per_page' => 12,
   'paged' => $paged,
   'orderby' => 'date',
   'order' => 'DESC',
-]);
+]));
 ?>
 
 <main class="site-main">

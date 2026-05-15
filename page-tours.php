@@ -48,11 +48,11 @@ if (isset($_GET['page'])) {
 
 // Начальный запрос - показываем все туры с сортировкой по цене (возрастание)
 $per_page_initial = 12;
-$all_tours_for_sort = new WP_Query([
+$all_tours_for_sort = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'tour',
   'post_status' => 'publish',
   'posts_per_page' => -1,
-]);
+]));
 
 if ($all_tours_for_sort->have_posts()) {
   $all_sorted_posts = $all_tours_for_sort->posts;

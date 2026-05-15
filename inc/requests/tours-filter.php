@@ -93,7 +93,7 @@ function bsi_ajax_tours_filter()
   // Примечание: поиск будет сделан в PHP после загрузки постов (см. ниже)
   // Это нужно для корректной работы с кириллицей и case-insensitivity
 
-  $query = new WP_Query($args);
+  $query = new WP_Query(bsi_query_args_append_schedule($args));
 
   // Массив отфильтрованных постов с дополнительными данными
   $filtered_posts = [];

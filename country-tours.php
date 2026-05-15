@@ -101,7 +101,7 @@ $country_tours_h1 = $country_title_prepositional !== ''
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = 12;
 
-$tours_query = new WP_Query([
+$tours_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'tour',
   'post_status' => 'publish',
   'posts_per_page' => $per_page,
@@ -109,18 +109,18 @@ $tours_query = new WP_Query([
   'meta_query' => bsi_build_tour_country_meta_query((int) $country_id),
   'orderby' => 'title',
   'order' => 'ASC',
-]);
+]));
 
 /**
  * ID всех туров страны (используется для фильтрации регионов и типов)
  */
-$country_tour_ids = get_posts([
+$country_tour_ids = get_posts(bsi_query_args_append_schedule([
   'post_type'      => 'tour',
   'post_status'    => 'publish',
   'posts_per_page' => -1,
   'fields'         => 'ids',
   'meta_query'     => bsi_build_tour_country_meta_query((int) $country_id),
-]);
+]));
 
 /**
  * Регионы: только те, в которых есть туры этой страны

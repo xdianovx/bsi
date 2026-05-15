@@ -27,7 +27,7 @@ function bsi_filter_news()
     ];
   }
 
-  $query = new WP_Query($args);
+  $query = new WP_Query(bsi_query_args_append_schedule($args));
 
   $response = [
     'html' => '',

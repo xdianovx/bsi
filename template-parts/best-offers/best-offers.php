@@ -11,6 +11,7 @@ $collection = get_posts([
 $collection_id = !empty($collection) ? $collection[0]->ID : 0;
 
 $sections = $collection_id ? (get_field('offer_sections', $collection_id) ?: []) : [];
+$sections = function_exists('bsi_filter_schedule_rows') ? bsi_filter_schedule_rows($sections) : $sections;
 
 $slides_limit = 12;
 $slides = [];

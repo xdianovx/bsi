@@ -74,7 +74,7 @@ function country_tours_filter()
     $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
   }
 
-  $q = new WP_Query($args);
+  $q = new WP_Query(bsi_query_args_append_schedule($args));
 
   // Массив отфильтрованных постов
   $filtered_posts = [];

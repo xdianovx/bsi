@@ -43,7 +43,7 @@ while ($parent) {
 }
 
 /* Запрос новостей по стране */
-$news_query = new WP_Query([
+$news_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'news',
   'post_status' => 'publish',
   'posts_per_page' => 4,
@@ -54,10 +54,10 @@ $news_query = new WP_Query([
       'compare' => 'LIKE',
     ],
   ],
-]);
+]));
 
 /* Событийные туры: в ACF страна — родительская, совпадает с корнем ветки стран */
-$country_events_query = new WP_Query([
+$country_events_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'event',
   'post_status' => 'publish',
   'posts_per_page' => 12,
@@ -70,7 +70,7 @@ $country_events_query = new WP_Query([
       'compare' => '=',
     ],
   ],
-]);
+]));
 
 /* Получение регионов страны (meta_query + fallback через ACF, если meta_query не отрабатывает) */
 $regions = get_terms([

@@ -138,7 +138,7 @@ if (!function_exists('bsi_event_tours_build_query_args')) {
       $args['s'] = $f['search'];
     }
 
-    return $args;
+    return bsi_query_args_append_schedule($args);
   }
 }
 

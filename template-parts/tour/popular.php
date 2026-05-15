@@ -26,13 +26,13 @@ $common_tour_q = [
 ];
 
 if (!empty($homepage_tour_ids)) {
-  $tour_query = new WP_Query(array_merge($common_tour_q, [
+  $tour_query = new WP_Query(bsi_query_args_append_schedule(array_merge($common_tour_q, [
     'posts_per_page' => -1,
     'post__in' => $homepage_tour_ids,
     'orderby' => 'post__in',
-  ]));
+  ])));
 } else {
-  $tour_query = new WP_Query(array_merge($common_tour_q, [
+  $tour_query = new WP_Query(bsi_query_args_append_schedule(array_merge($common_tour_q, [
     'posts_per_page' => 12,
     'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
     'meta_query' => [
@@ -42,7 +42,7 @@ if (!empty($homepage_tour_ids)) {
         'compare' => '=',
       ],
     ],
-  ]));
+  ])));
 }
 
 $tour_posts = $tour_query->posts;

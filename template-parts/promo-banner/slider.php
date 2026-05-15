@@ -35,7 +35,7 @@ if ($section_id) {
   ];
 }
 
-$promo_banners = new WP_Query($query_args);
+$promo_banners = new WP_Query(bsi_query_args_append_schedule($query_args));
 
 
 ?>

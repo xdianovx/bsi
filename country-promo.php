@@ -11,7 +11,7 @@ if (!$country instanceof WP_Post) {
 
 $country_id = $country ? $country->ID : 0;
 
-$promos = get_posts([
+$promos = get_posts(bsi_query_args_append_schedule([
   'post_type' => 'promo',
   'post_status' => 'publish',
   'posts_per_page' => -1,
@@ -24,7 +24,7 @@ $promos = get_posts([
   ],
   'orderby' => 'date',
   'order' => 'DESC',
-]);
+]));
 
 get_header(); ?>
 

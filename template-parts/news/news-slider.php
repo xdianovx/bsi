@@ -47,7 +47,7 @@ if (!empty($meta_query)) {
 }
 
 $news_page_link = get_post_type_archive_link('news');
-$news_query = new WP_Query($news_args);
+$news_query = new WP_Query(bsi_query_args_append_schedule($news_args));
 
 $news_section_id = isset($args['section_id']) ? trim((string) $args['section_id']) : '';
 $news_extra_class = isset($args['extra_class']) ? trim((string) $args['extra_class']) : '';

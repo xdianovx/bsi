@@ -140,7 +140,7 @@ add_filter('wpseo_metadesc', function ($desc): string {
 
         $public_cpt = [
             'tour', 'hotel', 'country', 'news', 'event', 'education',
-            'promo', 'visa', 'insurance', 'review', 'project',
+            'promo', 'visa', 'insurance', 'project',
             'service', 'agency_event', 'documentation',
         ];
         if (!in_array($post->post_type, $public_cpt, true)) {

@@ -39,8 +39,6 @@ add_action('wp_head', function () {
         bsi_schema_hotel();
     } elseif (is_singular('education')) {
         bsi_schema_education();
-    } elseif (is_singular('review')) {
-        bsi_schema_review();
     }
 }, 99);
 
@@ -354,37 +352,3 @@ function bsi_schema_education(): void
     bsi_schema_json($schema);
 }
 
-// ── Review ──────────────────────────────────────────────────
-
-function bsi_schema_review(): void
-{
-    $id = get_the_ID();
-    $title = get_the_title($id);
-    $url = get_permalink($id);
-    $content = wp_trim_words(wp_strip_all_tags(get_the_content(null, false, $id)), 50, '…');
-
-    $schema = [
-        '@context'    => 'https://schema.org',
-        '@type'       => 'Review',
-        'name'        => $title,
-        'reviewBody'  => $content,
-        'url'         => $url,
-        'datePublished' => get_the_date('c', $id),
-        'author'      => [
-            '@type' => 'Person',
-            'name'  => $title,
-        ],
-        'itemReviewed' => [
-            '@type' => 'TravelAgency',
-            'name'  => 'BSI Group',
-            'url'   => home_url('/'),
-        ],
-    ];
-
-    $thumb = get_the_post_thumbnail_url($id, 'large');
-    if ($thumb) {
-        $schema['image'] = $thumb;
-    }
-
-    bsi_schema_json($schema);
-}

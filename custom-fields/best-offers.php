@@ -20,6 +20,7 @@ add_action('acf/init', function () {
             'name' => 'title',
             'type' => 'text',
           ],
+          ...bsi_schedule_repeater_sub_fields('offer_section'),
           [
             'key' => 'field_offer_section_items',
             'label' => 'Элементы',

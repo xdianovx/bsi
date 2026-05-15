@@ -273,20 +273,6 @@ export const sliders = () => {
     },
   });
 
-  const reviewsSliderEl = document.querySelector(".reviews-slider");
-  if (reviewsSliderEl) {
-    const reviewsSectionSlider = new Swiper(reviewsSliderEl, {
-      spaceBetween: 16,
-      loop: false,
-      watchOverflow: true, // если слайдов мало — свайп/стрелки не активны
-      slidesPerView: 1,
-      navigation: {
-        nextEl: ".reviews-arrow-next",
-        prevEl: ".reviews-arrow-prev",
-      },
-    });
-  }
-
   const projectsSectionSlider = new Swiper(".projects-section-slider", {
     spaceBetween: 16,
 

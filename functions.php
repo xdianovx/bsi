@@ -377,6 +377,9 @@ function bsi_track_news_views()
 add_action('wp', 'bsi_track_news_views');
 
 require get_template_directory() . '/inc/helpers.php';
+require get_template_directory() . '/inc/helpers/content-schedule.php';
+require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
+require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
 require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
@@ -393,7 +396,6 @@ require get_template_directory() . '/inc/post-types/documentation.php';
 require get_template_directory() . '/inc/post-types/agency-events.php';
 require get_template_directory() . '/inc/post-types/custom-post-types-hotel.php';
 require get_template_directory() . '/inc/post-types/education.php';
-require get_template_directory() . '/inc/post-types/review.php';
 require get_template_directory() . '/inc/post-types/promo.php';
 require get_template_directory() . '/inc/post-types/awards.php';
 require get_template_directory() . '/inc/post-types/banner.php';
@@ -418,9 +420,9 @@ require_once get_template_directory() . '/inc/samo/SamoService.php';
 require_once get_template_directory() . '/inc/samo/ajax/routes.php';
 
 require get_template_directory() . '/custom-fields/hotel-fields.php';
-require get_template_directory() . '/custom-fields/review.php';
 require get_template_directory() . '/custom-fields/news.php';
 require get_template_directory() . '/custom-fields/promo.php';
+require get_template_directory() . '/custom-fields/content-schedule.php';
 require get_template_directory() . '/custom-fields/pages/contacts.php';
 require get_template_directory() . '/custom-fields/pages/bonus.php';
 require get_template_directory() . '/custom-fields/award.php';

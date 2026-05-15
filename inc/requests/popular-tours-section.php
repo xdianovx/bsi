@@ -43,7 +43,7 @@ function bsi_ajax_popular_tours_by_country()
     }
   }
 
-  $q = new WP_Query($args);
+  $q = new WP_Query(bsi_query_args_append_schedule($args));
 
   ob_start();
 

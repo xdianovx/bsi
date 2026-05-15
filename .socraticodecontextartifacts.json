@@ -1,0 +1,9 @@
+{
+  "artifacts": [
+    {
+      "name": "content-schedule",
+      "path": "docs/content-schedule.md",
+      "description": "Срок показа контента на сайте: meta-ключи bsi_active_from/until, promo_date_*, хелперы, pre_get_posts, Publish metabox, Gutenberg panel, repeater баннеров"
+    }
+  ]
+}

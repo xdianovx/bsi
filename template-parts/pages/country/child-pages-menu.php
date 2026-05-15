@@ -223,14 +223,14 @@ $has_hotels = get_posts([
   ],
 ]);
 
-$has_promos = get_posts([
+$has_promos = get_posts(bsi_query_args_append_schedule([
   'post_type' => 'promo',
   'posts_per_page' => 1,
   'fields' => 'ids',
   'meta_query' => [
     ['key' => 'promo_countries', 'value' => '"' . $main_parent_id . '"', 'compare' => 'LIKE'],
   ],
-]);
+]));
 
 $has_visas = get_posts([
   'post_type' => 'visa',
@@ -241,12 +241,12 @@ $has_visas = get_posts([
   ],
 ]);
 
-$has_tours = get_posts([
+$has_tours = get_posts(bsi_query_args_append_schedule([
   'post_type' => 'tour',
   'posts_per_page' => 1,
   'fields' => 'ids',
   'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query((int) $main_parent_id) : [],
-]);
+]));
 
 $has_memo = get_posts([
   'post_type' => 'tourist_memo',
@@ -266,7 +266,7 @@ $has_entry_rules = get_posts([
   ],
 ]);
 
-$has_news = get_posts([
+$has_news = get_posts(bsi_query_args_append_schedule([
   'post_type' => 'news',
   'post_status' => 'publish',
   'posts_per_page' => 1,
@@ -274,9 +274,9 @@ $has_news = get_posts([
   'meta_query' => [
     ['key' => 'news_countries', 'value' => '"' . $main_parent_id . '"', 'compare' => 'LIKE'],
   ],
-]);
+]));
 
-$has_event_tours = get_posts([
+$has_event_tours = get_posts(bsi_query_args_append_schedule([
   'post_type' => 'event',
   'post_status' => 'publish',
   'posts_per_page' => 1,
@@ -284,7 +284,7 @@ $has_event_tours = get_posts([
   'meta_query' => [
     ['key' => 'tour_country', 'value' => $main_parent_id, 'compare' => '='],
   ],
-]);
+]));
 
 $has_regions = get_terms([
   'taxonomy' => 'region',
@@ -314,13 +314,13 @@ $tours_list_url = home_url("/country/{$country_slug}/tours/");
 $tour_types_for_country = [];
 
 if (!empty($has_tours)) {
-  $tour_ids = get_posts([
+  $tour_ids = get_posts(bsi_query_args_append_schedule([
     'post_type' => 'tour',
     'post_status' => 'publish',
     'posts_per_page' => -1,
     'fields' => 'ids',
     'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query((int) $main_parent_id) : [],
-  ]);
+  ]));
 
   if (!empty($tour_ids)) {
     $terms = wp_get_object_terms($tour_ids, 'tour_type', [

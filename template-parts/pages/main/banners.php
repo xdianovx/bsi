@@ -1,5 +1,15 @@
 <?php
-$banners = get_field('banners', get_the_ID());
+$front_page_id = (int) get_option('page_on_front');
+if ($front_page_id <= 0) {
+  return;
+}
+
+$banners = function_exists('get_field') ? (get_field('banners', $front_page_id) ?: []) : [];
+$banners = function_exists('bsi_filter_schedule_rows') ? bsi_filter_schedule_rows($banners) : $banners;
+
+if (empty($banners)) {
+  return;
+}
 ?>
 
 <section class="main-banner__section">

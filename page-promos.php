@@ -100,23 +100,13 @@ get_header();
       <div class="promo-page__list">
 
         <?php
-        $today = date('Ymd');
-
-        $active_meta = [
-          'relation' => 'OR',
-          ['key' => 'promo_date_to', 'compare' => 'NOT EXISTS'],
-          ['key' => 'promo_date_to', 'value' => '', 'compare' => '='],
-          ['key' => 'promo_date_to', 'value' => $today, 'compare' => '>='],
-        ];
-
-        $promo_query = new WP_Query([
+        $promo_query = new WP_Query(bsi_query_args_append_schedule([
           'post_type' => 'promo',
           'post_status' => 'publish',
           'posts_per_page' => -1,
           'orderby' => 'date',
           'order' => 'DESC',
-          'meta_query' => $active_meta,
-        ]);
+        ]));
         ?>
 
         <?php if ($promo_query->have_posts()): ?>

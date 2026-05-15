@@ -83,7 +83,7 @@ $related_events = [];
 if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
   $country_tour_meta = bsi_build_tour_country_meta_query($country_id);
   if (!empty($country_tour_meta)) {
-    $related_events = get_posts([
+    $related_events = get_posts(bsi_query_args_append_schedule([
       'post_type' => 'event',
       'post_status' => 'publish',
       'posts_per_page' => 10,
@@ -91,7 +91,7 @@ if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
       'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
       'no_found_rows' => true,
       'meta_query' => $country_tour_meta,
-    ]);
+    ]));
   }
 }
 $price_from_amount = function_exists('bsi_extract_price_number')

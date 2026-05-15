@@ -41,6 +41,7 @@ get_header();
           'posts_per_page' => -1,
           'orderby' => 'date',
           'order' => 'DESC',
+          'bsi_skip_schedule' => true,
           'meta_query' => [
             ['key' => 'promo_date_to', 'value' => date('Ymd'), 'compare' => '<'],
           ],

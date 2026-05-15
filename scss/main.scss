@@ -61,7 +61,6 @@
 @import "./page/news.scss";
 @import "./page/projects.scss";
 @import "./page/promo.scss";
-@import "./page/reviews.scss";
 @import "./page/services.scss";
 @import "./page/single-country.scss";
 @import "./page/single-hotel.scss";
@@ -161,61 +160,6 @@
 }
 
 .archive-page__content {
-}
-
-@media screen and (max-width: 1024px) {
-  .review-card__company-logo {
-    width: 120px;
-  }
-
-  .review-card__body {
-    gap: 16px;
-  }
-
-  .review-card__date {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 768px) {
-}
-
-@media screen and (max-width: 640px) {
-  .review-card__footer {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 0;
-  }
-
-  .review-card__company-logo {
-    width: 120px;
-  }
-
-  .review-card__body {
-    flex-direction: column;
-  }
-
-  .review-card__company {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .review-card__company-info {
-    margin-top: 0;
-  }
-
-  .review-card__company {
-    gap: 16px;
-  }
-
-  // .review-card__date {
-  //   display: block;
-  // }
-  .review-card__company-name {
-    font-size: 16px;
-    font-weight: 700;
-  }
 }
 
 .read-content {
