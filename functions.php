@@ -390,7 +390,6 @@ require get_template_directory() . '/inc/menus-functions.php';
 require get_template_directory() . '/inc/post-types/country.php';
 require get_template_directory() . '/inc/post-types/news.php';
 require get_template_directory() . '/inc/post-types/custom-post-event.php';
-require get_template_directory() . '/inc/post-types/custom-post-service.php';
 require get_template_directory() . '/inc/post-types/custom-post-partner.php';
 require get_template_directory() . '/inc/post-types/documentation.php';
 require get_template_directory() . '/inc/post-types/agency-events.php';
