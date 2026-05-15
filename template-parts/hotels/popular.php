@@ -1,21 +1,29 @@
 <?php
 
-$popular_hotel_ids = get_posts([
-  'post_type' => 'hotel',
-  'post_status' => 'publish',
-  'posts_per_page' => -1,
-  'fields' => 'ids',
-  'no_found_rows' => true,
+// Расписание в PHP после выборки (без schedule JOIN в meta_query см. pre_get_posts).
+$popular_hotel_candidates = get_posts([
+  'post_type'              => 'hotel',
+  'post_status'            => 'publish',
+  'posts_per_page'         => -1,
+  'fields'                 => 'ids',
+  'orderby'                => 'date',
+  'order'                  => 'DESC',
+  'no_found_rows'          => true,
+  'bsi_skip_schedule'      => true,
   'update_post_meta_cache' => false,
   'update_post_term_cache' => false,
-  'meta_query' => [
+  'meta_query'             => [
     [
-      'key' => 'is_popular',
-      'value' => '1',
+      'key'     => 'is_popular',
+      'value'   => '1',
       'compare' => '=',
     ],
   ],
 ]);
+
+$popular_hotel_ids = function_exists('bsi_schedule_filter_post__in_ids')
+  ? bsi_schedule_filter_post__in_ids(array_map('intval', $popular_hotel_candidates))
+  : array_values(array_filter(array_map('intval', $popular_hotel_candidates)));
 
 $country_ids = [];
 
@@ -80,18 +88,22 @@ if (!empty($country_ids)) {
   }
 }
 
-$hotel_posts = [];
-
+$display_hotel_ids = [];
 if (!empty($popular_hotel_ids)) {
+  $display_hotel_ids = array_slice($popular_hotel_ids, 0, 12);
+}
+
+$hotel_posts = [];
+if ($display_hotel_ids !== []) {
   $hotel_posts = get_posts([
-    'post_type' => 'hotel',
-    'posts_per_page' => 12,
-    'post_status' => 'publish',
-    'orderby' => 'date',
-    'order' => 'DESC',
-    'post__in' => $popular_hotel_ids,
-    'ignore_sticky_posts' => true,
-    'no_found_rows' => true,
+    'post_type'              => 'hotel',
+    'posts_per_page'         => count($display_hotel_ids),
+    'post_status'            => 'publish',
+    'orderby'                => 'post__in',
+    'post__in'               => $display_hotel_ids,
+    'ignore_sticky_posts'    => true,
+    'no_found_rows'          => true,
+    'bsi_skip_schedule'      => true,
     'update_post_meta_cache' => false,
     'update_post_term_cache' => false,
   ]);

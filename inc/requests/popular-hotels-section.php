@@ -6,30 +6,54 @@ add_action('wp_ajax_nopriv_popular_hotels_by_country', 'bsi_ajax_popular_hotels_
 function bsi_ajax_popular_hotels_by_country()
 {
   $country_id = isset($_POST['country_id']) ? (int) $_POST['country_id'] : 0;
-  $args = [
-    'post_type' => 'hotel',
-    'post_status' => 'publish',
-    'posts_per_page' => 12,
-    'orderby' => 'date',
-    'order' => 'DESC',
-    'meta_query' => [
-      [
-        'key' => 'is_popular',
-        'value' => '1',
-        'compare' => '=',
-      ],
+
+  $meta_query = [
+    [
+      'key' => 'is_popular',
+      'value' => '1',
+      'compare' => '=',
     ],
   ];
 
   if ($country_id > 0) {
-    $args['meta_query'][] = [
+    $meta_query[] = [
       'key' => 'hotel_country',
       'value' => $country_id,
       'compare' => '=',
     ];
   }
 
-  $q = new WP_Query($args);
+  $id_query = new WP_Query([
+    'post_type' => 'hotel',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'fields' => 'ids',
+    'orderby' => 'date',
+    'order' => 'DESC',
+    'no_found_rows' => true,
+    'meta_query' => $meta_query,
+    'bsi_skip_schedule' => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
+  ]);
+
+  $candidate_ids = array_map('intval', is_array($id_query->posts) ? $id_query->posts : []);
+  $active_ids = function_exists('bsi_schedule_filter_post__in_ids')
+    ? bsi_schedule_filter_post__in_ids($candidate_ids)
+    : array_values(array_filter($candidate_ids));
+  $slice_ids = array_slice($active_ids, 0, 12);
+
+  $q = new WP_Query([
+    'post_type' => 'hotel',
+    'post_status' => 'publish',
+    'post__in' => $slice_ids !== [] ? $slice_ids : [0],
+    'orderby' => 'post__in',
+    'posts_per_page' => $slice_ids !== [] ? count($slice_ids) : 1,
+    'no_found_rows' => true,
+    'bsi_skip_schedule' => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
+  ]);
 
   ob_start();
 
@@ -129,6 +153,6 @@ function bsi_ajax_popular_hotels_by_country()
 
   wp_send_json_success([
     'html' => $html,
-    'total' => (int) $q->found_posts,
+    'total' => count($active_ids),
   ]);
 }
