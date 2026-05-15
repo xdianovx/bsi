@@ -113,7 +113,8 @@
 }
 
 .promo-card__item-title.h3 {
-  font-size: 16px;
+  font-size: 18px;
+  line-height: 140%;
 }
 
 .promo-card__info {
@@ -125,7 +126,7 @@
 
   @media screen and (max-width: 768px) {
     padding: 12px;
-    margin-top: 8px;
+    margin-top: 0;
   }
 }
 
@@ -142,8 +143,8 @@
 }
 .promo-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 64px 16px;
   margin-top: 32px;
 
   @media screen and (max-width: 1200px) {
@@ -172,23 +173,31 @@
   line-height: 100%;
   width: auto;
   font-size: 14px;
+  display: none;
   border-radius: 2px;
   color: $text-gray;
+}
+
+.promo-card {
+  position: relative;
 }
 
 .promo-card__countdown {
   margin: 6px 0 0;
   padding: 0;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 150%;
   color: $red;
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  background: white;
+  border-radius: 2px;
+  padding: 2px 8px;
 }
 
 .promo-card__item-title {
-  margin-top: 8px;
-
   @media screen and (max-width: 768px) {
-    margin-top: 8px;
   }
 }
 
