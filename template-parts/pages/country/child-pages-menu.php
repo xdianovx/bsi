@@ -241,12 +241,18 @@ $has_visas = get_posts([
   ],
 ]);
 
-$has_tours = get_posts(bsi_query_args_append_schedule([
-  'post_type' => 'tour',
-  'posts_per_page' => 1,
-  'fields' => 'ids',
-  'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query((int) $main_parent_id) : [],
-]));
+$country_active_tour_ids = [];
+if (
+  $main_parent_id > 0
+  && function_exists('bsi_get_country_tour_candidate_ids_cached')
+  && function_exists('bsi_schedule_filter_post__in_ids')
+) {
+  $country_active_tour_ids = bsi_schedule_filter_post__in_ids(
+    bsi_get_country_tour_candidate_ids_cached((int) $main_parent_id)
+  );
+}
+
+$has_tours = !empty($country_active_tour_ids);
 
 $has_memo = get_posts([
   'post_type' => 'tourist_memo',
@@ -313,23 +319,13 @@ if (!empty($_GET['tour_type'])) {
 $tours_list_url = home_url("/country/{$country_slug}/tours/");
 $tour_types_for_country = [];
 
-if (!empty($has_tours)) {
-  $tour_ids = get_posts(bsi_query_args_append_schedule([
-    'post_type' => 'tour',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'fields' => 'ids',
-    'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query((int) $main_parent_id) : [],
-  ]));
-
-  if (!empty($tour_ids)) {
-    $terms = wp_get_object_terms($tour_ids, 'tour_type', [
-      'orderby' => 'name',
-      'order' => 'ASC',
-    ]);
-    if (!is_wp_error($terms) && !empty($terms)) {
-      $tour_types_for_country = $terms;
-    }
+if ($has_tours) {
+  $terms = wp_get_object_terms($country_active_tour_ids, 'tour_type', [
+    'orderby' => 'name',
+    'order' => 'ASC',
+  ]);
+  if (!is_wp_error($terms) && !empty($terms)) {
+    $tour_types_for_country = $terms;
   }
 }
 
