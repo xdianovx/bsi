@@ -376,7 +376,7 @@ function bsi_track_news_views()
 
 add_action('wp', 'bsi_track_news_views');
 
-// Временно: отключить срок показа контента на фронте (тяжёлые meta_query / фильтрация post__in). Удалить блок — включить обратно.
+// Временно: отключить срок показа на фронте + поля/колонки в админке. Удалить блок — включить обратно.
 if (!defined('BSI_CONTENT_SCHEDULE_DISABLED')) {
 	define('BSI_CONTENT_SCHEDULE_DISABLED', true);
 }

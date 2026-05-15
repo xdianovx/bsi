@@ -753,6 +753,10 @@ add_action('init', 'bsi_content_schedule_register_admin_columns', 50);
 
 function bsi_content_schedule_register_admin_columns(): void
 {
+  if (!bsi_content_schedule_enabled()) {
+    return;
+  }
+
   $admin_types = array_values(array_intersect(
     bsi_content_schedule_post_types(),
     get_post_types(['show_ui' => true], 'names')

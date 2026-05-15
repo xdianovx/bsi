@@ -12,6 +12,13 @@ function bsi_content_schedule_render_publish_box(): void
 {
   global $post;
 
+  if (
+    !function_exists('bsi_content_schedule_enabled')
+    || !bsi_content_schedule_enabled()
+  ) {
+    return;
+  }
+
   if (!($post instanceof WP_Post) || !bsi_content_schedule_applies_to_post_type($post->post_type)) {
     return;
   }
@@ -65,6 +72,13 @@ add_action('save_post', 'bsi_content_schedule_save_publish_box', 10, 2);
 
 function bsi_content_schedule_save_publish_box(int $post_id, WP_Post $post): void
 {
+  if (
+    !function_exists('bsi_content_schedule_enabled')
+    || !bsi_content_schedule_enabled()
+  ) {
+    return;
+  }
+
   if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
     return;
   }
@@ -104,6 +118,13 @@ add_action('admin_enqueue_scripts', 'bsi_content_schedule_publish_box_assets');
 
 function bsi_content_schedule_publish_box_assets(string $hook): void
 {
+  if (
+    !function_exists('bsi_content_schedule_enabled')
+    || !bsi_content_schedule_enabled()
+  ) {
+    return;
+  }
+
   if (!in_array($hook, ['post.php', 'post-new.php'], true)) {
     return;
   }

@@ -10,6 +10,13 @@ add_action('init', 'bsi_content_schedule_register_rest_meta', 20);
 
 function bsi_content_schedule_register_rest_meta(): void
 {
+  if (
+    !function_exists('bsi_content_schedule_enabled')
+    || !bsi_content_schedule_enabled()
+  ) {
+    return;
+  }
+
   foreach (bsi_content_schedule_post_types() as $post_type) {
     if (!bsi_content_schedule_supports_block_editor($post_type)) {
       continue;
@@ -37,6 +44,13 @@ add_action('enqueue_block_editor_assets', 'bsi_content_schedule_enqueue_block_ed
 
 function bsi_content_schedule_enqueue_block_editor_assets(): void
 {
+  if (
+    !function_exists('bsi_content_schedule_enabled')
+    || !bsi_content_schedule_enabled()
+  ) {
+    return;
+  }
+
   $screen = function_exists('get_current_screen') ? get_current_screen() : null;
   if (
     !$screen
