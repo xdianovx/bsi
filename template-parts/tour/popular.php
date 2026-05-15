@@ -32,17 +32,29 @@ if (!empty($homepage_tour_ids)) {
     'orderby' => 'post__in',
   ])));
 } else {
-  $tour_query = new WP_Query(bsi_query_args_append_schedule(array_merge($common_tour_q, [
-    'posts_per_page' => 12,
-    'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
-    'meta_query' => [
+  $candidate_tour_ids = get_posts(array_merge($common_tour_q, [
+    'posts_per_page' => -1,
+    'fields'         => 'ids',
+    'orderby'        => ['menu_order' => 'ASC', 'date' => 'DESC'],
+    'meta_query'     => [
       [
-        'key' => 'is_popular',
-        'value' => '1',
+        'key'     => 'is_popular',
+        'value'   => '1',
         'compare' => '=',
       ],
     ],
-  ])));
+    'bsi_skip_schedule' => true,
+  ]));
+  $active_tour_ids = function_exists('bsi_schedule_filter_post__in_ids')
+    ? bsi_schedule_filter_post__in_ids(array_map('intval', $candidate_tour_ids))
+    : array_values(array_filter(array_map('intval', $candidate_tour_ids)));
+  $slice_ids = array_slice($active_tour_ids, 0, 12);
+  $tour_query = new WP_Query(array_merge($common_tour_q, [
+    'posts_per_page'    => $slice_ids !== [] ? count($slice_ids) : 1,
+    'post__in'          => $slice_ids !== [] ? $slice_ids : [0],
+    'orderby'           => 'post__in',
+    'bsi_skip_schedule' => true,
+  ]));
 }
 
 $tour_posts = $tour_query->posts;

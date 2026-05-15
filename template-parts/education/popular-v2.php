@@ -9,6 +9,7 @@ $popular_education_ids = get_posts([
     'no_found_rows' => true,
     'update_post_meta_cache' => false,
     'update_post_term_cache' => false,
+    'bsi_skip_schedule' => true,
     'meta_query' => [
         [
             'key' => 'is_popular',
@@ -17,6 +18,10 @@ $popular_education_ids = get_posts([
         ],
     ],
 ]);
+
+$popular_education_ids = function_exists('bsi_schedule_filter_post__in_ids')
+    ? bsi_schedule_filter_post__in_ids(array_map('intval', $popular_education_ids))
+    : array_values(array_filter(array_map('intval', $popular_education_ids)));
 
 $country_ids = [];
 
