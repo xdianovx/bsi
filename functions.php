@@ -376,6 +376,11 @@ function bsi_track_news_views()
 
 add_action('wp', 'bsi_track_news_views');
 
+// Временно: отключить срок показа контента на фронте (тяжёлые meta_query / фильтрация post__in). Удалить блок — включить обратно.
+if (!defined('BSI_CONTENT_SCHEDULE_DISABLED')) {
+	define('BSI_CONTENT_SCHEDULE_DISABLED', true);
+}
+
 require get_template_directory() . '/inc/helpers.php';
 require get_template_directory() . '/inc/helpers/content-schedule.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';

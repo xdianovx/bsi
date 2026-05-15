@@ -6,6 +6,21 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+/**
+ * Срок показа включён для фронта и admin-ajax (фильтры запросов, 404 по сроку, ACF на фронте).
+ *
+ * Временное отключение: BSI_CONTENT_SCHEDULE_DISABLED в functions.php (до подключения файла)
+ * или в wp-config.php. Или фильтр bsi_content_schedule_enabled → false.
+ */
+function bsi_content_schedule_enabled(): bool
+{
+  if (defined('BSI_CONTENT_SCHEDULE_DISABLED') && BSI_CONTENT_SCHEDULE_DISABLED) {
+    return false;
+  }
+
+  return (bool) apply_filters('bsi_content_schedule_enabled', true);
+}
+
 /*
  * --- Производительность / Query Monitor ---
  *
@@ -248,6 +263,10 @@ function bsi_schedule_keys_map_for_js(): array
  */
 function bsi_is_content_active($from, $until, ?string $now = null): bool
 {
+  if (!bsi_content_schedule_enabled()) {
+    return true;
+  }
+
   $now = bsi_schedule_normalize_date($now ?? date('Ymd'));
   if ($now === null) {
     return true;
@@ -388,6 +407,10 @@ function bsi_schedule_meta_query_is_present(array $meta_query, string $from_key,
  */
 function bsi_query_args_append_schedule(array $args): array
 {
+  if (!bsi_content_schedule_enabled()) {
+    return $args;
+  }
+
   if (!empty($args['bsi_schedule_applied'])) {
     return $args;
   }
@@ -513,6 +536,18 @@ add_action('pre_get_posts', 'bsi_content_schedule_pre_get_posts', 18);
  */
 function bsi_schedule_filter_post__in_ids(array $post_in): array
 {
+  if (!bsi_content_schedule_enabled()) {
+    $out = [];
+    foreach ($post_in as $raw) {
+      $id = (int) $raw;
+      if ($id > 0) {
+        $out[] = $id;
+      }
+    }
+
+    return $out;
+  }
+
   $normalized = [];
   foreach ($post_in as $raw) {
     $id = (int) $raw;
@@ -614,6 +649,10 @@ function bsi_content_schedule_allow_query_filters(): bool
 
 function bsi_content_schedule_pre_get_posts(WP_Query $query): void
 {
+  if (!bsi_content_schedule_enabled()) {
+    return;
+  }
+
   if (!$query instanceof WP_Query || !bsi_content_schedule_allow_query_filters() || $query->get('bsi_skip_schedule')) {
     return;
   }
@@ -683,6 +722,10 @@ add_action('template_redirect', 'bsi_content_schedule_template_redirect', 5);
 
 function bsi_content_schedule_template_redirect(): void
 {
+  if (!bsi_content_schedule_enabled()) {
+    return;
+  }
+
   if (is_admin() || !is_singular()) {
     return;
   }
