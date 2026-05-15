@@ -743,6 +743,10 @@ function bsi_content_schedule_template_redirect(): void
     return;
   }
 
+  if ($post->post_type === 'promo') {
+    return;
+  }
+
   global $wp_query;
   $wp_query->set_404();
   status_header(404);

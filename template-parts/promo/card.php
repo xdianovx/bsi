@@ -2,13 +2,20 @@
 $promo_id = get_the_ID();
 
 $short = get_field('promo_short', $promo_id);
-$promo_link = get_field('promo_link', $promo_id) ?: get_permalink($promo_id);
+$promo_external = trim((string) get_field('promo_link', $promo_id));
+$promo_link = $promo_external !== ''
+  ? $promo_external
+  : (function_exists('bsi_get_promo_public_url') ? bsi_get_promo_public_url((int) $promo_id) : get_permalink($promo_id));
 
 $raw_from = get_field('promo_date_from', $promo_id);
 $raw_to = get_field('promo_date_to', $promo_id);
 
 $formatted_from = format_date_value($raw_from);
 $formatted_to = format_date_value($raw_to);
+
+$promo_card_countdown = function_exists('bsi_promo_countdown_public_message') && function_exists('bsi_promo_calendar_days_until_end_from_raw')
+  ? bsi_promo_countdown_public_message(bsi_promo_calendar_days_until_end_from_raw($raw_to))
+  : '';
 
 $thumb_url = get_the_post_thumbnail_url($promo_id, 'medium');
 $title = get_the_title($promo_id);
@@ -62,6 +69,10 @@ $excerpt = get_the_excerpt($promo_id);
           <span class="promo-card__date-to"><?= esc_html($formatted_to); ?></span>
         <?php endif; ?>
       </div>
+    <?php endif; ?>
+
+    <?php if ($promo_card_countdown !== ''): ?>
+      <p class="promo-card__countdown"><?= esc_html($promo_card_countdown); ?></p>
     <?php endif; ?>
 
     <h3 class="h3 promo-card__item-title">

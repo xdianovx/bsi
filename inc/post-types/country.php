@@ -49,7 +49,7 @@ add_action('template_redirect', function () {
 /**
  * Аргументы WP_Query для списка акций на фронте (активные по расписанию или архив по promo_date_to).
  *
- * @param bool $archived_only Только завершённые (promo_date_to уже в прошлом), без фильтра срока показа.
+ * @param bool $archived_only Только акции с непустой promo_date_to в прошлом (без даты окончания акция бессрочная и сюда не попадает).
  * @param int  $country_id    Ограничение по ACF promo_countries (0 — все страны).
  */
 function bsi_promo_list_query_args(bool $archived_only = false, int $country_id = 0): array
@@ -57,10 +57,26 @@ function bsi_promo_list_query_args(bool $archived_only = false, int $country_id 
   $meta_parts = [];
 
   if ($archived_only) {
+    $today = wp_date('Ymd');
+
+    // Только акции с явной датой окончания в прошлом (пустое «до» = бессрочная, не архивируем по дате).
     $meta_parts[] = [
-      'key' => 'promo_date_to',
-      'value' => wp_date('Ymd'),
-      'compare' => '<',
+      'relation' => 'AND',
+      [
+        'key' => 'promo_date_to',
+        'compare' => 'EXISTS',
+      ],
+      [
+        'key' => 'promo_date_to',
+        'value' => '',
+        'compare' => '!=',
+      ],
+      [
+        'key' => 'promo_date_to',
+        'value' => $today,
+        'compare' => '<',
+        'type' => 'NUMERIC',
+      ],
     ];
   }
 

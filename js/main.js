@@ -77,7 +77,9 @@ function initYmReachGoals() {
         ? "footer"
         : link.closest(".subscribe-section")
           ? "subscribe"
-          : "other";
+          : link.closest(".single-promo__ended")
+            ? "promo-ended"
+            : "other";
 
     ym(108341897, "reachGoal", "social_click", {
       network: {

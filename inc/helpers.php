@@ -38,7 +38,7 @@ function format_number($number, $decimals = 0)
   );
 }
 
-function format_date_russian($value)
+function format_date_russian($value, bool $with_year = false)
 {
   if (!$value) {
     return '';
@@ -48,14 +48,14 @@ function format_date_russian($value)
   $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
 
   foreach ($formats as $format) {
-    $date_obj = DateTime::createFromFormat($format, trim($value));
+    $date_obj = DateTime::createFromFormat($format, trim((string) $value));
     if ($date_obj instanceof DateTime) {
       break;
     }
   }
 
   if (!$date_obj) {
-    $timestamp = strtotime($value);
+    $timestamp = strtotime((string) $value);
     if ($timestamp) {
       $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
     }
@@ -79,10 +79,12 @@ function format_date_russian($value)
     ];
     $month_num = (int) $date_obj->format('n');
     $month_str = isset($months[$month_num]) ? $months[$month_num] : $date_obj->format('F');
-    return $day . ' ' . $month_str;
+    $out = $day . ' ' . $month_str;
+
+    return $with_year ? $out . ' ' . $date_obj->format('Y') : $out;
   }
 
-  return $value;
+  return (string) $value;
 }
 
 /**
@@ -195,7 +197,7 @@ function format_dates_string_russian($dates_string)
 
 function format_date_value($value)
 {
-  return format_date_russian($value);
+  return format_date_russian($value, true);
 }
 
 function format_date_short($date_string, $date_to_string = '')

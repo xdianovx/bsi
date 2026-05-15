@@ -24,6 +24,14 @@ get_header();
             <?php the_content(); ?>
           </div>
         <?php endif; ?>
+
+        <div class="promo-page__show-archived">
+          <label class="promo-page__show-archived-label">
+            <input type="checkbox" name="promo_show_archived" value="1"
+              class="promo-page__show-archived-input js-promo-archived-toggle">
+            <span class="promo-page__show-archived-text">Показать архивные</span>
+          </label>
+        </div>
       </div>
     </div>
   </section>
@@ -36,41 +44,27 @@ get_header();
       $total_archived = array_sum(array_column($promo_countries, 'count_archived'));
       ?>
 
-      <div class="promo-page__show-archived">
-        <label class="promo-page__show-archived-label">
-          <input type="checkbox"
-                 name="promo_show_archived"
-                 value="1"
-                 class="promo-page__show-archived-input js-promo-archived-toggle">
-          <span class="promo-page__show-archived-text">Показать архивные</span>
-        </label>
-      </div>
 
-      <div class="promo-filter promo-filter--page"
-           data-total-active="<?= (int) $total_active ?>"
-           data-total-archived="<?= (int) $total_archived ?>">
+
+      <div class="promo-filter promo-filter--page" data-total-active="<?= (int) $total_active ?>"
+        data-total-archived="<?= (int) $total_archived ?>">
         <!-- Кнопка "Все направления" -->
-        <button class="promo-filter__btn --all active js-promo-filter-btn"
-                type="button"
-                data-country=""
-                data-count-active="<?= (int) $total_active ?>"
-                data-count-archived="<?= (int) $total_archived ?>">
+        <button class="promo-filter__btn --all active js-promo-filter-btn" type="button" data-country=""
+          data-count-active="<?= (int) $total_active ?>" data-count-archived="<?= (int) $total_archived ?>">
           Все (<?= (int) $total_active ?>)
         </button>
 
         <?php if (!empty($promo_countries)): ?>
           <?php foreach ($promo_countries as $country): ?>
 
-            <button class="promo-filter__btn  js-promo-filter-btn"
-                    type="button"
-                    data-country="<?php echo esc_attr((string) $country['id']); ?>"
-                    data-count-active="<?= (int) $country['count_active'] ?>"
-                    data-count-archived="<?= (int) $country['count_archived'] ?>">
+            <button class="promo-filter__btn  js-promo-filter-btn" type="button"
+              data-country="<?php echo esc_attr((string) $country['id']); ?>"
+              data-count-active="<?= (int) $country['count_active'] ?>"
+              data-count-archived="<?= (int) $country['count_archived'] ?>">
               <?php if (!empty($country['flag'])): ?>
                 <span class="promo-filter__flag-wrap">
                   <img src="<?php echo esc_url((string) $country['flag']); ?>"
-                       alt="<?php echo esc_attr($country['title']); ?>"
-                       class="promo-filter__flag">
+                    alt="<?php echo esc_attr($country['title']); ?>" class="promo-filter__flag">
                 </span>
               <?php endif; ?>
 

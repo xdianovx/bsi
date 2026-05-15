@@ -176,6 +176,14 @@
   color: $text-gray;
 }
 
+.promo-card__countdown {
+  margin: 6px 0 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 150%;
+  color: $red;
+}
+
 .promo-card__item-title {
   margin-top: 8px;
 
@@ -200,9 +208,54 @@
 }
 
 .single-promo__dates {
-  margin-top: 8px;
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 150%;
+}
+
+.single-promo__dates-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+
+.single-promo__dates-label {
+  font-weight: 600;
+}
+
+.single-promo__dates-countdown {
+  margin: 8px 0 0;
+  padding: 0;
   font-size: 14px;
+  line-height: 150%;
+  color: $red;
+}
+
+.single-promo__ended {
+  margin-top: 20px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: $bg-gray;
+}
+
+.single-promo__ended-lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 150%;
+  font-weight: 600;
+}
+
+.single-promo__ended-hint {
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 150%;
   color: $text-gray;
+}
+
+.single-promo__ended-socials {
+  margin-top: 12px;
 }
 
 .single-promo__excerpt {
@@ -233,7 +286,7 @@
     margin: 32px auto 0;
   }
   .page-country__descr {
-    margin-top: 0;
+    margin-top: 16px;
     margin-bottom: 24px;
   }
 }

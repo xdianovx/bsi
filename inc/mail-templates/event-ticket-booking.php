@@ -8,6 +8,7 @@
  * @var string $comment
  * @var string $event_title
  * @var string $page_url
+ * @var string $booking_context 'event' | 'promo'
  */
 
 if (!defined('ABSPATH')) {
@@ -16,6 +17,9 @@ if (!defined('ABSPATH')) {
 
 $site_name = get_bloginfo('name');
 $site_url = home_url();
+$is_promo = (($booking_context ?? '') === 'promo');
+$mail_heading = $is_promo ? 'Заявка по акции' : 'Заявка по событию';
+$mail_section_title = $is_promo ? 'Акция' : 'Событие';
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -124,11 +128,11 @@ $site_url = home_url();
 <body>
   <div class="email-container">
     <div class="email-header">
-      <h1>Заявка по событию</h1>
+      <h1><?php echo esc_html($mail_heading); ?></h1>
     </div>
 
     <div class="email-body">
-      <h2 class="section-title">Событие</h2>
+      <h2 class="section-title"><?php echo esc_html($mail_section_title); ?></h2>
       <div class="info-row">
         <div class="info-label">Название</div>
         <div class="info-value"><?php echo esc_html($event_title ?? ''); ?></div>

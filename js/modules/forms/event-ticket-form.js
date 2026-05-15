@@ -284,6 +284,7 @@ export function initEventTicketForm() {
 
   const modal = getModalRoot();
   const ctaForm = document.getElementById("event-booking-cta-form");
+  const promoCtaForm = document.getElementById("promo-booking-cta-form");
 
   if (modal) {
     bindBookingForm(getModalForm());
@@ -291,8 +292,11 @@ export function initEventTicketForm() {
   if (ctaForm) {
     bindBookingForm(ctaForm);
   }
+  if (promoCtaForm) {
+    bindBookingForm(promoCtaForm);
+  }
 
-  if (!modal && !ctaForm) {
+  if (!modal && !ctaForm && !promoCtaForm) {
     return;
   }
 
