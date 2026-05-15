@@ -46,20 +46,29 @@ if (isset($_GET['page'])) {
 }
 
 
-// Начальный запрос - показываем все туры с сортировкой по цене (возрастание)
+// Начальный запрос: без schedule JOIN; срок показа в PHP; сортировка по цене по ID.
 $per_page_initial = 12;
-$all_tours_for_sort = new WP_Query(bsi_query_args_append_schedule([
-  'post_type' => 'tour',
-  'post_status' => 'publish',
-  'posts_per_page' => -1,
-]));
 
-if ($all_tours_for_sort->have_posts()) {
-  $all_sorted_posts = $all_tours_for_sort->posts;
+$candidate_ids = get_posts([
+  'post_type'              => 'tour',
+  'post_status'            => 'publish',
+  'posts_per_page'         => -1,
+  'fields'                 => 'ids',
+  'no_found_rows'          => true,
+  'bsi_skip_schedule'      => true,
+  'update_post_meta_cache' => false,
+  'update_post_term_cache' => false,
+]);
+$candidate_ids = array_values(array_unique(array_filter(array_map('intval', $candidate_ids))));
 
-  usort($all_sorted_posts, function ($a, $b) {
-    $price_a = function_exists('bsi_get_tour_sort_price') ? bsi_get_tour_sort_price((int) $a->ID) : null;
-    $price_b = function_exists('bsi_get_tour_sort_price') ? bsi_get_tour_sort_price((int) $b->ID) : null;
+$active_tour_ids = function_exists('bsi_schedule_filter_post__in_ids')
+  ? bsi_schedule_filter_post__in_ids($candidate_ids)
+  : $candidate_ids;
+
+if ($active_tour_ids !== []) {
+  usort($active_tour_ids, function ($a, $b) {
+    $price_a = function_exists('bsi_get_tour_sort_price') ? bsi_get_tour_sort_price((int) $a) : null;
+    $price_b = function_exists('bsi_get_tour_sort_price') ? bsi_get_tour_sort_price((int) $b) : null;
 
     if (function_exists('bsi_compare_price_values')) {
       return bsi_compare_price_values($price_a, $price_b, 'price_asc');
@@ -68,28 +77,41 @@ if ($all_tours_for_sort->have_posts()) {
     return ((int) $price_a) <=> ((int) $price_b);
   });
 
-  $total_initial = count($all_sorted_posts);
-  $max_pages_initial = (int) ceil($total_initial / $per_page_initial);
+  $total_initial = count($active_tour_ids);
+  $max_pages_initial = $total_initial > 0 ? (int) ceil($total_initial / $per_page_initial) : 0;
+  if ($max_pages_initial > 0) {
+    $paged = min(max(1, $paged), $max_pages_initial);
+  }
+
   $offset_initial = ($paged - 1) * $per_page_initial;
-  $paginated_initial = array_slice($all_sorted_posts, $offset_initial, $per_page_initial);
-  $paginated_ids_initial = !empty($paginated_initial) ? array_map(fn($p) => $p->ID, $paginated_initial) : [0];
+  $paginated_ids_initial = array_values(array_slice($active_tour_ids, $offset_initial, $per_page_initial));
 
   $initial_query = new WP_Query([
-    'post_type' => 'tour',
-    'post_status' => 'publish',
-    'posts_per_page' => $per_page_initial,
-    'post__in' => $paginated_ids_initial,
-    'orderby' => 'post__in',
+    'post_type'              => 'tour',
+    'post_status'            => 'publish',
+    'posts_per_page'         => $paginated_ids_initial !== [] ? count($paginated_ids_initial) : 1,
+    'post__in'               => $paginated_ids_initial !== [] ? $paginated_ids_initial : [0],
+    'orderby'                => 'post__in',
+    'no_found_rows'          => true,
+    'bsi_skip_schedule'      => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
   ]);
   $initial_query->found_posts = $total_initial;
   $initial_query->max_num_pages = $max_pages_initial;
 } else {
   $initial_query = new WP_Query([
-    'post_type' => 'tour',
-    'post_status' => 'publish',
-    'posts_per_page' => $per_page_initial,
-    'paged' => $paged,
+    'post_type'              => 'tour',
+    'post_status'            => 'publish',
+    'posts_per_page'         => 1,
+    'post__in'               => [0],
+    'no_found_rows'          => true,
+    'bsi_skip_schedule'      => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
   ]);
+  $initial_query->found_posts = 0;
+  $initial_query->max_num_pages = 0;
 }
 ?>
 

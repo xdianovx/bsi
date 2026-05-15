@@ -72,28 +72,47 @@ function bsi_ajax_tours_filter()
     }
   }
 
-  // Базовый запрос - получаем все туры для сортировки и фильтрации
-  $args = [
+  // IDs по таксономиям/meta без JOIN срока показа; активные ID — PHP.
+  $id_args = [
     'post_type' => 'tour',
     'post_status' => 'publish',
     'posts_per_page' => -1,
+    'fields' => 'ids',
     'orderby' => 'title',
     'order' => 'ASC',
     'no_found_rows' => true,
+    'bsi_skip_schedule' => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
   ];
 
   if (!empty($tax_query)) {
-    $args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
+    $id_args['tax_query'] = array_merge([['relation' => 'AND']], $tax_query);
   }
 
   if (!empty($meta_query)) {
-    $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
+    $id_args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
   }
 
-  // Примечание: поиск будет сделан в PHP после загрузки постов (см. ниже)
-  // Это нужно для корректной работы с кириллицей и case-insensitivity
+  $id_query = new WP_Query($id_args);
+  $candidate_ids = array_values(array_unique(array_filter(array_map('intval', is_array($id_query->posts ?? null) ? $id_query->posts : []))));
+  $schedule_active_ids = function_exists('bsi_schedule_filter_post__in_ids')
+    ? bsi_schedule_filter_post__in_ids($candidate_ids)
+    : $candidate_ids;
 
-  $query = new WP_Query(bsi_query_args_append_schedule($args));
+  $full_args = [
+    'post_type' => 'tour',
+    'post_status' => 'publish',
+    'posts_per_page' => count($schedule_active_ids) ?: 1,
+    'post__in' => $schedule_active_ids !== [] ? $schedule_active_ids : [0],
+    'orderby' => 'post__in',
+    'no_found_rows' => true,
+    'bsi_skip_schedule' => true,
+    'update_post_meta_cache' => false,
+    'update_post_term_cache' => false,
+  ];
+
+  $query = new WP_Query($full_args);
 
   // Массив отфильтрованных постов с дополнительными данными
   $filtered_posts = [];
@@ -218,6 +237,9 @@ function bsi_ajax_tours_filter()
       'posts_per_page' => $per_page,
       'post__in' => $paginated_ids,
       'orderby' => 'post__in',
+      'bsi_skip_schedule' => true,
+      'update_post_meta_cache' => false,
+      'update_post_term_cache' => false,
     ];
     $final_query = new WP_Query($final_args);
   } else {
@@ -225,7 +247,10 @@ function bsi_ajax_tours_filter()
       'post_type' => 'tour',
       'post_status' => 'publish',
       'posts_per_page' => $per_page,
-      'post__in' => [0], // Пусто результаты
+      'post__in' => [0],
+      'bsi_skip_schedule' => true,
+      'update_post_meta_cache' => false,
+      'update_post_term_cache' => false,
     ]);
   }
 
