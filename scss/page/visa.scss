@@ -889,3 +889,46 @@ a.visa-embassy__contact-item {
   width: 100%;
   align-items: center;
 }
+
+// CPT single visa: приоритет над поздними импортами и любыми общими правилами туров/каталога.
+// Не затрагивает .catalog-card--event / .event-tours-page (другие классы и контекст страницы).
+body.single-visa {
+  .visa-page__poster {
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .visa-page__poster img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .visa-cost-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .visa-cost-item__separator {
+    flex-grow: 1;
+    height: 1px;
+    border-bottom: 1px dashed #bebebe;
+    margin: 0 8px;
+  }
+
+  .visa-embassy__contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .visa-file-item {
+    display: flex;
+    align-items: center;
+  }
+}
