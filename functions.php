@@ -163,10 +163,12 @@ function bsi_scripts()
 	}
 
 	// Передаем данные модального окна предупреждения
-	$maintenance_modal_enabled = get_field('maintenance_modal_enabled', 'option') ? true : false;
+	$maintenance_modal_show = function_exists('bsi_maintenance_modal_is_visible')
+		? bsi_maintenance_modal_is_visible()
+		: false;
 	$maintenance_modal_message = get_field('maintenance_modal_message', 'option') ?: '';
 	wp_localize_script('main', 'maintenanceModal', array(
-		'enabled' => $maintenance_modal_enabled,
+		'enabled' => $maintenance_modal_show,
 		'message' => $maintenance_modal_message,
 	));
 

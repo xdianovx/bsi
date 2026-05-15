@@ -6,27 +6,12 @@ add_action('wp_ajax_nopriv_bsi_filter_promos', 'bsi_filter_promos');
 function bsi_filter_promos()
 {
   $country_id = isset($_POST['country']) ? (int) $_POST['country'] : 0;
+  $archived = isset($_POST['archived']) && (string) $_POST['archived'] === '1';
 
-  $query_args = [
-    'post_type' => 'promo',
-    'post_status' => 'publish',
-    'posts_per_page' => -1,
-    'orderby' => 'date',
-    'order' => 'DESC',
-    'no_found_rows' => true,
-  ];
+  $query_args = bsi_promo_list_query_args($archived, $country_id);
+  $query_args['no_found_rows'] = true;
 
-  if ($country_id) {
-    $query_args['meta_query'] = [
-      [
-        'key' => 'promo_countries',
-        'value' => '"' . $country_id . '"',
-        'compare' => 'LIKE',
-      ],
-    ];
-  }
-
-  $promos_query = new WP_Query(bsi_query_args_append_schedule($query_args));
+  $promos_query = new WP_Query($query_args);
 
   ob_start();
 
@@ -36,7 +21,10 @@ function bsi_filter_promos()
       get_template_part('template-parts/promo/card');
     }
   } else {
-    echo '<div class="promo-archive__empty"><p>Для выбранного направления нет активных акций.</p></div>';
+    $msg = $archived
+      ? 'Для выбранного направления нет архивных акций.'
+      : 'Для выбранного направления нет активных акций.';
+    echo '<div class="promo-archive__empty"><p>' . esc_html($msg) . '</p></div>';
   }
 
   wp_reset_postdata();

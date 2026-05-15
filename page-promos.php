@@ -19,27 +19,6 @@ get_header();
           <?php the_title(); ?>
         </h1>
 
-        <?php
-        $archive_page = get_posts([
-          'post_type' => 'page',
-          'posts_per_page' => 1,
-          'meta_key' => '_wp_page_template',
-          'meta_value' => 'page-promo-archive.php',
-          'fields' => 'ids',
-        ]);
-        if (!empty($archive_page)):
-          $archive_url = get_permalink($archive_page[0]);
-          ?>
-          <div class="promo-page__archive-link">
-            <a href="<?= esc_url($archive_url); ?>"
-               class="underline">
-              Архив акций
-            </a>
-          </div>
-        <?php endif; ?>
-
-
-
         <?php if (trim((string) get_the_content()) !== ''): ?>
           <div class="editor-content archive-page__content">
             <?php the_content(); ?>
@@ -52,40 +31,56 @@ get_header();
   <section class="promo-filter__section">
     <div class="container">
       <?php
-      // Страны, у которых есть акции
-      $promo_countries = bsi_get_promo_countries();
-      $total_promos = !empty($promo_countries)
-        ? array_sum(array_column($promo_countries, 'count'))
-        : 0;
+      $promo_countries = bsi_get_promo_countries_merged();
+      $total_active = array_sum(array_column($promo_countries, 'count_active'));
+      $total_archived = array_sum(array_column($promo_countries, 'count_archived'));
       ?>
 
-      <div class="promo-filter">
+      <div class="promo-page__show-archived">
+        <label class="promo-page__show-archived-label">
+          <input type="checkbox"
+                 name="promo_show_archived"
+                 value="1"
+                 class="promo-page__show-archived-input js-promo-archived-toggle">
+          <span class="promo-page__show-archived-text">Показать архивные</span>
+        </label>
+      </div>
+
+      <div class="promo-filter promo-filter--page"
+           data-total-active="<?= (int) $total_active ?>"
+           data-total-archived="<?= (int) $total_archived ?>">
         <!-- Кнопка "Все направления" -->
         <button class="promo-filter__btn --all active js-promo-filter-btn"
-                data-country="">
-          Все (<?= $total_promos ?>)
+                type="button"
+                data-country=""
+                data-count-active="<?= (int) $total_active ?>"
+                data-count-archived="<?= (int) $total_archived ?>">
+          Все (<?= (int) $total_active ?>)
         </button>
 
         <?php if (!empty($promo_countries)): ?>
           <?php foreach ($promo_countries as $country): ?>
 
             <button class="promo-filter__btn  js-promo-filter-btn"
-                    data-country="<?php echo esc_attr($country['id']); ?>">
+                    type="button"
+                    data-country="<?php echo esc_attr((string) $country['id']); ?>"
+                    data-count-active="<?= (int) $country['count_active'] ?>"
+                    data-count-archived="<?= (int) $country['count_archived'] ?>">
               <?php if (!empty($country['flag'])): ?>
                 <span class="promo-filter__flag-wrap">
-                  <img src="<?php echo $country['flag']; ?>"
+                  <img src="<?php echo esc_url((string) $country['flag']); ?>"
                        alt="<?php echo esc_attr($country['title']); ?>"
                        class="promo-filter__flag">
                 </span>
               <?php endif; ?>
 
               <span class="promo-filter__title">
-                <?php echo esc_html($country['title']); ?>
+                <?php echo esc_html((string) $country['title']); ?>
               </span>
 
-              <?php if (!empty($country['count'])): ?>
+              <?php if (!empty($country['count_active'])): ?>
                 <span class="promo-filter__count">
-                  <?php echo (int) $country['count']; ?>
+                  <?php echo (int) $country['count_active']; ?>
                 </span>
               <?php endif; ?>
             </button>
@@ -100,13 +95,7 @@ get_header();
       <div class="promo-page__list">
 
         <?php
-        $promo_query = new WP_Query(bsi_query_args_append_schedule([
-          'post_type' => 'promo',
-          'post_status' => 'publish',
-          'posts_per_page' => -1,
-          'orderby' => 'date',
-          'order' => 'DESC',
-        ]));
+        $promo_query = new WP_Query(bsi_promo_list_query_args(false));
         ?>
 
         <?php if ($promo_query->have_posts()): ?>

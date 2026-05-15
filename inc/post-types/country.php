@@ -46,16 +46,64 @@ add_action('template_redirect', function () {
   }
 });
 
-function bsi_get_promo_countries()
+/**
+ * Аргументы WP_Query для списка акций на фронте (активные по расписанию или архив по promo_date_to).
+ *
+ * @param bool $archived_only Только завершённые (promo_date_to уже в прошлом), без фильтра срока показа.
+ * @param int  $country_id    Ограничение по ACF promo_countries (0 — все страны).
+ */
+function bsi_promo_list_query_args(bool $archived_only = false, int $country_id = 0): array
 {
-  $result = [];
+  $meta_parts = [];
 
-  $promos = get_posts(bsi_query_args_append_schedule([
+  if ($archived_only) {
+    $meta_parts[] = [
+      'key' => 'promo_date_to',
+      'value' => wp_date('Ymd'),
+      'compare' => '<',
+    ];
+  }
+
+  if ($country_id > 0) {
+    $meta_parts[] = [
+      'key' => 'promo_countries',
+      'value' => '"' . $country_id . '"',
+      'compare' => 'LIKE',
+    ];
+  }
+
+  $base = [
     'post_type' => 'promo',
     'post_status' => 'publish',
     'posts_per_page' => -1,
-    'fields' => 'ids',
-  ]));
+    'orderby' => 'date',
+    'order' => 'DESC',
+  ];
+
+  if (!empty($meta_parts)) {
+    if (count($meta_parts) === 1) {
+      $base['meta_query'] = $meta_parts;
+    } else {
+      $base['meta_query'] = array_merge(['relation' => 'AND'], $meta_parts);
+    }
+  }
+
+  if ($archived_only) {
+    $base['bsi_skip_schedule'] = true;
+
+    return $base;
+  }
+
+  return bsi_query_args_append_schedule($base);
+}
+
+function bsi_get_promo_countries(bool $archived_only = false)
+{
+  $result = [];
+
+  $query_args = bsi_promo_list_query_args($archived_only);
+  $query_args['fields'] = 'ids';
+  $promos = get_posts($query_args);
 
   if (empty($promos)) {
     return $result;
@@ -113,6 +161,47 @@ function bsi_get_promo_countries()
   }
 
   return $result;
+}
+
+/**
+ * Страны с акциями: счётчики активных и архивных (для переключателя на странице акций).
+ *
+ * @return array<int, array{id:int, title:string, flag:string, count_active:int, count_archived:int}>
+ */
+function bsi_get_promo_countries_merged(): array
+{
+  $active = bsi_get_promo_countries(false);
+  $archived = bsi_get_promo_countries(true);
+  $ids = array_unique(array_merge(array_keys($active), array_keys($archived)));
+
+  $result = [];
+  foreach ($ids as $country_id) {
+    $row = $active[$country_id] ?? $archived[$country_id] ?? null;
+    if ($row === null) {
+      continue;
+    }
+
+    $result[$country_id] = [
+      'id' => (int) $country_id,
+      'title' => $row['title'],
+      'flag' => $row['flag'],
+      'count_active' => (int) ($active[$country_id]['count'] ?? 0),
+      'count_archived' => (int) ($archived[$country_id]['count'] ?? 0),
+    ];
+  }
+
+  if (class_exists('Collator')) {
+    $collator = new Collator('ru_RU');
+    uasort($result, function ($a, $b) use ($collator) {
+      return $collator->compare($a['title'], $b['title']);
+    });
+  } else {
+    uasort($result, function ($a, $b) {
+      return mb_strcasecmp($a['title'], $b['title']);
+    });
+  }
+
+  return array_values($result);
 }
 
 add_action('init', function () {

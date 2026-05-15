@@ -10561,6 +10561,24 @@ button.single-event__dates-book {
 .promo-filter__section {
   margin-top: 32px;
 }
+.promo-page__show-archived {
+  margin-bottom: 16px;
+}
+.promo-page__show-archived-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 150%;
+  color: inherit;
+}
+.promo-page__show-archived-input {
+  flex-shrink: 0;
+}
+.promo-page__show-archived-text {
+  user-select: none;
+}
 .promo-filter {
   display: flex;
   flex-wrap: wrap;

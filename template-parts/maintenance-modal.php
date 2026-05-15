@@ -3,7 +3,8 @@
  * Модальное окно предупреждения
  * Показывается пользователям при включении в настройках ACF Options
  */
-$modal_enabled = get_field('maintenance_modal_enabled', 'option');
+$modal_enabled =
+  function_exists('bsi_maintenance_modal_is_visible') && bsi_maintenance_modal_is_visible();
 $modal_message = get_field('maintenance_modal_message', 'option');
 
 if (!$modal_enabled || empty($modal_message)) {
