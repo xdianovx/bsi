@@ -82,7 +82,6 @@
 		"choices.js": "^11.1.0",
 		"daterangepicker": "^3.1.0",
 		"flatpickr": "^4.6.13",
-		"gsap": "^3.13.0",
 		"imask": "^7.6.1",
 		"micromodal": "^0.4.10",
 		"swiper": "^8.4.7"
