@@ -1,25 +1,29 @@
 .DS_Store
 Thumbs.db
+
+# AI assistants / planning
 .cursor/
 .claude/
+.planning/
 CLAUDE.md
 AGENTS.md
-SEO-PERFORMANCE-AUDIT.md
+
+# Project docs (хранятся локально в docs/)
+docs/
+
+# Dependencies & build
 node_modules/
-npm-debug.log*
-yarn-error.log
-yarn.lock
-
-.planning
-docs
-
 build/
 .cache/
 .sass-cache/
 .cache-loader/
 coverage/
 *.map
+npm-debug.log*
+yarn-error.log
+yarn.lock
 
+# Env & secrets
 .env
 .env.*
 .htaccess
@@ -30,13 +34,16 @@ wp-config.php
 *.tar.gz
 *.log
 
+# Composer
 vendor/
 composer.lock
 
+# IDE
 .idea/
 .vscode/
 *.sublime-*
 
+# WordPress runtime
 wp-content/uploads/
 wp-content/upgrade/
 wp-content/cache/
@@ -44,7 +51,6 @@ wp-content/backups/
 wp-content/aiowps_backups/
 wp-content/mu-plugins/
 
+# VCS leftovers
 .svn/
 .hg/
-
-docs

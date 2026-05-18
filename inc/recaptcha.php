@@ -27,6 +27,40 @@ function bsi_recaptcha_enabled(): bool
 }
 
 /**
+ * Возвращает true, если на текущей странице есть форма, защищённая reCAPTCHA.
+ * Используется для условной загрузки скрипта Google reCAPTCHA.
+ */
+function bsi_page_needs_recaptcha(): bool
+{
+  // Кастомные шаблоны страниц с формами
+  $form_templates = [
+    'page-visa.php',
+    'page-insurance.php',
+    'page-mice.php',
+    'page-bsimice.php',
+    'page-delovoy.php',
+  ];
+  foreach ($form_templates as $template) {
+    if (is_page_template($template)) {
+      return true;
+    }
+  }
+
+  // Страницы по slug — на случай, если шаблон загружается через page-{slug}.php
+  // без явного назначения в админке (например, page-fit.php).
+  if (is_page(['fit', 'visa', 'insurance', 'mice', 'bsimice', 'delovoy'])) {
+    return true;
+  }
+
+  // Single-страницы кастомных типов записей с формами
+  if (is_singular(['visa', 'event', 'promo', 'education', 'documentation', 'agency_event'])) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Верифицирует токен reCAPTCHA v3 через Google API.
  *
  * @param string $token Токен из g-recaptcha-response (frontend).

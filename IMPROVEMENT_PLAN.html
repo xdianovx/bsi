@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>План улучшения проекта BSI</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  h1 { font-size: 24px; border-bottom: 3px solid #2563eb; padding-bottom: 10px; }
+  h2 { font-size: 18px; color: #2563eb; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+  h3 { font-size: 15px; margin-top: 18px; }
+  code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; font-size: 13px; }
+  th { background: #f9fafb; font-weight: 600; }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  strong { color: #111; }
+  .meta { color: #6b7280; font-size: 13px; margin-bottom: 30px; }
+  del { color: #9ca3af; }
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 30px 0; }
+  @media print { body { margin: 20px; } h2 { page-break-before: auto; } }
+</style>
+</head>
+<body>
+
+<h1>План улучшения проекта BSI</h1>
+<p class="meta"><strong>Дата:</strong> 2026-05-18 &nbsp;|&nbsp; <strong>Анализ:</strong> PHP, фронтенд, БД/кеширование</p>
+
+<p>Проект имеет критические проблемы безопасности (пароли в коде, отсутствие CSRF), перегруженные бандлы (1.5 МБ JS, 342 КБ CSS), и N+1 запросы в ключевых фильтрах.</p>
+
+<hr>
+
+<h2>УРОВЕНЬ 1 — КРИТИЧНО (безопасность + блокеры производительности)</h2>
+
+<h3>1.1 Убрать пароли из кода</h3>
+<ul>
+  <li><code>inc/services/class-bsi-mailer.php:42-45</code> — SMTP логин/пароль в исходниках, видны в git</li>
+  <li><strong>Действие:</strong> перенести в <code>wp-config.php</code> через <code>define()</code> или <code>.env</code></li>
+</ul>
+
+<h3>1.2 Добавить nonce-проверки во все AJAX-обработчики</h3>
+<ul>
+  <li><code>inc/requests/ajax-visa-form.php</code>, <code>ajax-insurance-form.php</code> и др. — ни один POST не проверяет <code>wp_verify_nonce()</code></li>
+  <li>reCAPTCHA — не замена CSRF-защите</li>
+</ul>
+
+<h3>1.3 Убрать логирование персональных данных</h3>
+<ul>
+  <li><code>inc/requests/ajax-visa-form.php:15</code> — <code>print_r($_POST)</code> пишет ФИО, email, телефоны в error_log</li>
+</ul>
+
+<h3>1.4 <del>Удалить GSAP из зависимостей</del> ВЫПОЛНЕНО</h3>
+
+<h3>1.5 Устранить N+1 в education-filter.php</h3>
+<ul>
+  <li><code>inc/requests/education-filter.php:583-653</code> — 5 отдельных <code>wp_get_post_terms()</code> на каждую запись в цикле (50 записей = 250+ SQL-запросов)</li>
+  <li><strong>Действие:</strong> заранее загрузить термины для всех ID одним запросом через <code>wp_get_object_terms()</code></li>
+</ul>
+
+<hr>
+
+<h2>УРОВЕНЬ 2 — ВЫСОКИЙ ПРИОРИТЕТ (скорость загрузки)</h2>
+
+<h3>2.1 Code-splitting JS (1.5 МБ → ~300 КБ на страницу)</h3>
+<ul>
+  <li><code>js/main.js</code> — 38+ модулей загружаются на каждой странице</li>
+  <li><strong>Действие:</strong> разделить на бандлы:
+    <ul>
+      <li><code>common.min.js</code> — burger, sliders, cookie consent, lazy images</li>
+      <li><code>tours.min.js</code> — toursFilter, tourPrices, gtmSearch</li>
+      <li><code>education.min.js</code> — educationFilter</li>
+      <li><code>forms.min.js</code> — visaForm, fitForm, insuranceForm</li>
+    </ul>
+  </li>
+  <li>Загружать условно через <code>wp_enqueue_script()</code> + <code>is_page()</code></li>
+</ul>
+
+<h3>2.2 Code-splitting CSS (342 КБ → ~100 КБ на страницу)</h3>
+<ul>
+  <li><code>scss/main.scss</code> — все 59 файлов в одном бандле</li>
+  <li><strong>Действие:</strong> выделить <code>critical.css</code> (above-the-fold) + <code>common.css</code> + page-specific CSS</li>
+  <li>Отключить sourcemaps в production (<code>gulp/tasks/scss.js</code>)</li>
+</ul>
+
+<h3>2.3 Заменить тяжёлые библиотеки</h3>
+<table>
+  <tr><th>Библиотека</th><th>Сейчас</th><th>Замена</th><th>Экономия</th></tr>
+  <tr><td>choices.js</td><td>2.2 МБ</td><td>Tom Select или Slim Select</td><td>~2 МБ</td></tr>
+  <tr><td>daterangepicker</td><td>492 КБ (+ moment.js)</td><td>Оставить только flatpickr</td><td>~500 КБ</td></tr>
+  <tr><td>swiper 8.4.7</td><td>5.2 МБ</td><td>swiper 12 (tree-shakeable)</td><td>~3 МБ</td></tr>
+</table>
+
+<h3>2.4 Условная загрузка reCAPTCHA</h3>
+<ul>
+  <li><code>functions.php:155-163</code> — скрипт Google reCAPTCHA загружается на всех страницах</li>
+  <li><strong>Действие:</strong> загружать только на страницах с формами</li>
+</ul>
+
+<h3>2.5 Устранить N+1 в tour/card.php</h3>
+<ul>
+  <li><code>template-parts/tour/card.php:74-134</code> — <code>get_field()</code> + <code>wp_get_post_terms()</code> в каждой карточке (12 туров = 36+ ACF запросов)</li>
+  <li><strong>Действие:</strong> предзагружать мета-данные до цикла, передавать через <code>set_query_var()</code></li>
+</ul>
+
+<h3>2.6 Снизить timeout Samo API</h3>
+<ul>
+  <li><code>inc/samo/SamoClient.php:66</code> — timeout 25 сек блокирует AJAX</li>
+  <li><strong>Действие:</strong> снизить до 8-10 сек, добавить retry с backoff (2 попытки)</li>
+</ul>
+
+<h3>2.7 Лимит batch-prices</h3>
+<ul>
+  <li><code>inc/requests/batch-prices.php</code> — нет лимита на количество tour_ids</li>
+  <li><strong>Действие:</strong> ограничить до 30-50 ID за запрос</li>
+</ul>
+
+<hr>
+
+<h2>УРОВЕНЬ 3 — СРЕДНИЙ ПРИОРИТЕТ (качество кода)</h2>
+
+<h3>3.1 Разбить functions.php (759 строк)</h3>
+<ul>
+  <li>Выделить:
+    <ul>
+      <li><code>inc/filters/LinkProcessor.php</code> (строки 209-317)</li>
+      <li><code>inc/routing/TourPageRouter.php</code> (строки 504-675)</li>
+      <li><code>inc/admin/CountrySyncManager.php</code> (строки 712-752)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>3.2 Разбить helpers.php (1105 строк)</h3>
+<ul>
+  <li>3 функции форматирования дат с дублирующимися массивами месяцев</li>
+  <li><strong>Действие:</strong> создать <code>inc/services/DateFormatter.php</code></li>
+</ul>
+
+<h3>3.3 Синхронизировать TTL кэшей</h3>
+<ul>
+  <li><code>PriceLoaderService</code> кэширует на 3 часа, <code>SamoClient</code> — на 30 мин для тех же данных</li>
+  <li><strong>Действие:</strong> унифицировать TTL, добавить автоинвалидацию на хуке <code>save_post</code></li>
+</ul>
+
+<h3>3.4 Убрать extract() в BSI_Mailer</h3>
+<ul>
+  <li><code>inc/services/class-bsi-mailer.php:138</code> — <code>extract($data)</code> потенциально опасен</li>
+  <li><strong>Действие:</strong> заменить на явную передачу переменных в шаблон</li>
+</ul>
+
+<h3>3.5 Убрать 137 !important в CSS</h3>
+<ul>
+  <li>Индикатор проблем со специфичностью</li>
+  <li><strong>Действие:</strong> рефакторить постепенно, начиная с <code>buttons.scss</code>, <code>forms.scss</code>, <code>slider.scss</code></li>
+</ul>
+
+<hr>
+
+<h2>УРОВЕНЬ 4 — НИЗКИЙ ПРИОРИТЕТ (долгосрочное улучшение)</h2>
+
+<h3>4.1 Добавить type hints в PHP</h3>
+<ul>
+  <li>Большинство функций в <code>helpers.php</code>, <code>requests/</code> без типизации</li>
+  <li>Начать с сервисных классов и публичных API</li>
+</ul>
+
+<h3>4.2 Вынести бизнес-логику из шаблонов</h3>
+<ul>
+  <li><code>single-tour.php</code> (445 строк), <code>page-visa.php</code> (695 строк) содержат парсинг URL, обработку GET-параметров</li>
+  <li><strong>Действие:</strong> перенести в сервисные классы</li>
+</ul>
+
+<h3>4.3 Оптимизировать Webpack конфигурацию</h3>
+<ul>
+  <li><code>webpack.config.js</code> — <code>readDir()</code> создаёт entry point для каждого файла</li>
+  <li><strong>Действие:</strong> настроить явные entry points + tree-shaking + минификацию через esbuild</li>
+</ul>
+
+<h3>4.4 Оптимизировать шрифты</h3>
+<ul>
+  <li>7 начертаний Inter (2 МБ) — проверить, все ли используются (ExtraLight, Black?)</li>
+  <li>Оставить 3-4 основных</li>
+</ul>
+
+<hr>
+
+<h2>Ожидаемый эффект</h2>
+<table>
+  <tr><th>Метрика</th><th>Сейчас</th><th>После уровней 1-2</th></tr>
+  <tr><td>JS размер на страницу</td><td>1.5 МБ</td><td>~200-300 КБ</td></tr>
+  <tr><td>CSS размер на страницу</td><td>342 КБ</td><td>~80-120 КБ</td></tr>
+  <tr><td>SQL-запросов (education)</td><td>250+</td><td>~10-15</td></tr>
+  <tr><td>SQL-запросов (tours)</td><td>36+</td><td>~5-8</td></tr>
+  <tr><td>AJAX timeout</td><td>25 сек</td><td>8-10 сек</td></tr>
+</table>
+
+</body>
+</html>

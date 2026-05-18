@@ -148,11 +148,14 @@ function bsi_scripts()
 
 	wp_enqueue_script('main', get_template_directory_uri() . '/dist/js/main.min.js', array(), bsi_asset_version($main_js_path), true);
 	$recaptcha_site_key = function_exists('bsi_recaptcha_site_key') ? bsi_recaptcha_site_key() : '';
+	$load_recaptcha = $recaptcha_site_key !== ''
+		&& function_exists('bsi_page_needs_recaptcha')
+		&& bsi_page_needs_recaptcha();
 	wp_localize_script('main', 'ajax', array(
 		'url' => admin_url('admin-ajax.php'),
-		'recaptchaSiteKey' => $recaptcha_site_key,
+		'recaptchaSiteKey' => $load_recaptcha ? $recaptcha_site_key : '',
 	));
-	if ($recaptcha_site_key !== '') {
+	if ($load_recaptcha) {
 		wp_enqueue_script(
 			'google-recaptcha',
 			'https://www.google.com/recaptcha/api.js?render=' . esc_attr($recaptcha_site_key),
