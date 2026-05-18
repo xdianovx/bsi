@@ -40,51 +40,7 @@ function format_number($number, $decimals = 0)
 
 function format_date_russian($value, bool $with_year = false)
 {
-  if (!$value) {
-    return '';
-  }
-
-  $date_obj = null;
-  $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
-
-  foreach ($formats as $format) {
-    $date_obj = DateTime::createFromFormat($format, trim((string) $value));
-    if ($date_obj instanceof DateTime) {
-      break;
-    }
-  }
-
-  if (!$date_obj) {
-    $timestamp = strtotime((string) $value);
-    if ($timestamp) {
-      $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
-    }
-  }
-
-  if ($date_obj instanceof DateTime) {
-    $day = $date_obj->format('j');
-    $months = [
-      1 => 'января',
-      2 => 'февраля',
-      3 => 'марта',
-      4 => 'апреля',
-      5 => 'мая',
-      6 => 'июня',
-      7 => 'июля',
-      8 => 'августа',
-      9 => 'сентября',
-      10 => 'октября',
-      11 => 'ноября',
-      12 => 'декабря'
-    ];
-    $month_num = (int) $date_obj->format('n');
-    $month_str = isset($months[$month_num]) ? $months[$month_num] : $date_obj->format('F');
-    $out = $day . ' ' . $month_str;
-
-    return $with_year ? $out . ' ' . $date_obj->format('Y') : $out;
-  }
-
-  return (string) $value;
+  return BSI_Date_Formatter::dayMonthRu($value, $with_year);
 }
 
 /**
@@ -92,36 +48,7 @@ function format_date_russian($value, bool $with_year = false)
  */
 function format_month_russian($value): string
 {
-  if (!$value) {
-    return '';
-  }
-
-  $date_obj = null;
-  foreach (['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'] as $format) {
-    $date_obj = DateTime::createFromFormat($format, trim((string) $value));
-    if ($date_obj instanceof DateTime) {
-      break;
-    }
-  }
-
-  if (!$date_obj) {
-    $ts = strtotime((string) $value);
-    if ($ts) {
-      $date_obj = DateTime::createFromFormat('U', (string) $ts);
-    }
-  }
-
-  if (!$date_obj instanceof DateTime) {
-    return '';
-  }
-
-  $months = [
-    1 => 'январь', 2 => 'февраль', 3 => 'март', 4 => 'апрель',
-    5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август',
-    9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь',
-  ];
-
-  return $months[(int) $date_obj->format('n')] ?? $date_obj->format('F');
+  return BSI_Date_Formatter::monthRu($value);
 }
 
 /**
@@ -129,134 +56,25 @@ function format_month_russian($value): string
  */
 function format_month_year_russian($value)
 {
-  if (!$value) {
-    return '';
-  }
-
-  $date_obj = null;
-  $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
-
-  foreach ($formats as $format) {
-    $date_obj = DateTime::createFromFormat($format, trim((string) $value));
-    if ($date_obj instanceof DateTime) {
-      break;
-    }
-  }
-
-  if (!$date_obj) {
-    $timestamp = strtotime((string) $value);
-    if ($timestamp) {
-      $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
-    }
-  }
-
-  if (!$date_obj instanceof DateTime) {
-    return '';
-  }
-
-  $months = [
-    1 => 'январь',
-    2 => 'февраль',
-    3 => 'март',
-    4 => 'апрель',
-    5 => 'май',
-    6 => 'июнь',
-    7 => 'июль',
-    8 => 'август',
-    9 => 'сентябрь',
-    10 => 'октябрь',
-    11 => 'ноябрь',
-    12 => 'декабрь',
-  ];
-  $month_num = (int) $date_obj->format('n');
-  $month_str = $months[$month_num] ?? $date_obj->format('F');
-
-  return $month_str . ' ' . $date_obj->format('Y');
+  return BSI_Date_Formatter::monthYearRu($value);
 }
 
 function format_dates_string_russian($dates_string)
 {
-  if (!$dates_string || !is_string($dates_string)) {
+  if (!is_string($dates_string)) {
     return $dates_string;
   }
-
-  $dates = array_map('trim', explode(',', $dates_string));
-  $formatted_dates = [];
-
-  foreach ($dates as $date) {
-    $formatted = format_date_russian($date);
-    if ($formatted !== $date || preg_match('/\d{1,2}\.\d{1,2}\.\d{4}/', $date)) {
-      $formatted_dates[] = $formatted;
-    } else {
-      $formatted_dates[] = $date;
-    }
-  }
-
-  return implode(', ', $formatted_dates);
+  return BSI_Date_Formatter::formatCsvRu($dates_string);
 }
 
 function format_date_value($value)
 {
-  return format_date_russian($value, true);
+  return BSI_Date_Formatter::dayMonthRu($value, true);
 }
 
 function format_date_short($date_string, $date_to_string = '')
 {
-  if (!$date_string) {
-    return '';
-  }
-
-  $date_obj = null;
-  $formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
-
-  foreach ($formats as $format) {
-    $date_obj = DateTime::createFromFormat($format, trim($date_string));
-    if ($date_obj instanceof DateTime) {
-      break;
-    }
-  }
-
-  if (!$date_obj) {
-    $timestamp = strtotime($date_string);
-    if ($timestamp) {
-      $date_obj = DateTime::createFromFormat('U', (string) $timestamp);
-    }
-  }
-
-  if (!$date_obj instanceof DateTime) {
-    return $date_string;
-  }
-
-  $day = (int) $date_obj->format('j');
-  $month = (int) $date_obj->format('n');
-  $formatted = $day . '.' . str_pad($month, 2, '0', STR_PAD_LEFT);
-
-  // Если есть вторая дата, форматируем её тоже
-  if ($date_to_string) {
-    $date_to_obj = null;
-    foreach ($formats as $format) {
-      $date_to_obj = DateTime::createFromFormat($format, trim($date_to_string));
-      if ($date_to_obj instanceof DateTime) {
-        break;
-      }
-    }
-
-    if (!$date_to_obj) {
-      $timestamp_to = strtotime($date_to_string);
-      if ($timestamp_to) {
-        $date_to_obj = DateTime::createFromFormat('U', (string) $timestamp_to);
-      }
-    }
-
-    if ($date_to_obj instanceof DateTime) {
-      $day_to = (int) $date_to_obj->format('j');
-      $month_to = (int) $date_to_obj->format('n');
-      $formatted_to = $day_to . '.' . str_pad($month_to, 2, '0', STR_PAD_LEFT);
-      return $formatted . ' – ' . $formatted_to;
-    }
-  }
-
-  return $formatted;
+  return BSI_Date_Formatter::dayMonthShort((string) $date_string, (string) $date_to_string);
 }
 
 function format_price_text(?string $text): string

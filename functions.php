@@ -386,6 +386,7 @@ if (!defined('BSI_CONTENT_SCHEDULE_DISABLED')) {
 	define('BSI_CONTENT_SCHEDULE_DISABLED', true);
 }
 
+require get_template_directory() . '/inc/services/DateFormatter.php';
 require get_template_directory() . '/inc/helpers.php';
 require get_template_directory() . '/inc/helpers/content-schedule.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
