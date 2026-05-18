@@ -1,21 +1,29 @@
 <?php
 
+/**
+ * Подменю ACF после пункта MICE (inc/admin-menu-setup.php), иначе на части окружений parent_slug ещё нет в момент acf/init.
+ */
+add_action(
+  'admin_menu',
+  static function () {
+    if (!function_exists('acf_add_options_sub_page')) {
+      return;
+    }
+    acf_add_options_sub_page([
+      'page_title'  => 'Настройки MICE',
+      'menu_title'  => 'Настройки MICE',
+      'menu_slug'   => 'mice-settings',
+      'parent_slug' => 'mice-pages',
+      'capability'  => 'manage_options',
+    ]);
+  },
+  99
+);
+
 add_action('acf/init', function () {
   if (!function_exists('acf_add_local_field_group')) {
     return;
   }
-
-  if (!function_exists('acf_add_options_sub_page')) {
-    return;
-  }
-
-  acf_add_options_sub_page([
-    'page_title'  => 'Настройки MICE',
-    'menu_title'  => 'Настройки MICE',
-    'menu_slug'   => 'mice-settings',
-    'parent_slug' => 'mice-pages',
-    'capability'  => 'manage_options',
-  ]);
 
   acf_add_local_field_group([
     'key'    => 'group_mice_settings',

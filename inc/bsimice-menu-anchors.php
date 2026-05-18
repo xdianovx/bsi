@@ -10,15 +10,28 @@
 add_filter('nav_menu_link_attributes', 'bsimice_nav_menu_anchor_href', 10, 4);
 
 /**
- * @param array<string, string> $atts
- * @param WP_Post $item
- * @param stdClass $args
+ * @param array<string, string>|mixed $atts
+ * @param \WP_Post $item
+ * @param mixed $args
  * @param int $depth
  * @return array<string, string>
  */
-function bsimice_nav_menu_anchor_href(array $atts, $item, $args, $depth): array
+function bsimice_nav_menu_anchor_href($atts, $item, $args, $depth): array
 {
+  if (!is_array($atts)) {
+    $atts = [];
+  }
+
+  // В wp-admin нет корректного «главного» запроса страницы — is_page_template / get_permalink дают мусор и на части хостингов ловят fatal (редактор страниц MICE и др.).
+  if (is_admin()) {
+    return $atts;
+  }
+
   if (!is_page_template('page-bsimice.php') && !is_page_template('page-mice.php')) {
+    return $atts;
+  }
+
+  if (!is_object($item) || !isset($item->classes)) {
     return $atts;
   }
 

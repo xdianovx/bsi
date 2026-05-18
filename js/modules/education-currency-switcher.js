@@ -90,6 +90,10 @@ export const EducationCurrencySwitcher = (() => {
     document.querySelectorAll('.js-education-price').forEach(el => {
       updateElementPrice(el, showOriginal);
     });
+
+    document.querySelectorAll('.js-event-price').forEach(el => {
+      updateElementPrice(el, showOriginal);
+    });
   };
 
   /**

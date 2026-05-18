@@ -94,7 +94,7 @@ if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
     ]));
   }
 }
-$price_from_amount = function_exists('bsi_extract_price_number')
+$fallback_rub_from_post = function_exists('bsi_extract_price_number')
   ? bsi_extract_price_number($tour_price_from)
   : null;
 
@@ -153,14 +153,101 @@ if ($hero_date_label === '' && !empty($event_dates_rows) && is_array($event_date
   }
 }
 
+$dates_section_rows = [];
+if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
+  foreach ($event_dates_rows as $row) {
+    if (empty($row['date_value'])) {
+      continue;
+    }
+    $d = (string) $row['date_value'];
+    $city = isset($row['date_city']) ? trim((string) $row['date_city']) : '';
+    $venue_row = isset($row['date_venue']) ? trim((string) $row['date_venue']) : '';
+    if ($venue_row === '') {
+      $venue_row = $event_venue;
+    }
+
+    $currency = isset($row['date_row_price_currency']) ? strtoupper(trim((string) $row['date_row_price_currency'])) : 'RUB';
+    if ($currency === '') {
+      $currency = 'RUB';
+    }
+    $amount_raw = $row['date_row_price'] ?? null;
+    $amount = ($amount_raw !== null && $amount_raw !== '') ? (float) $amount_raw : null;
+
+    $price_rub = null;
+    $price_original = null;
+    $price_currency = null;
+
+    if ($amount !== null && $amount > 0 && function_exists('bsi_education_convert_price_to_rub')) {
+      $converted = bsi_education_convert_price_to_rub($amount, $currency);
+      if ($converted !== null && $converted > 0) {
+        $price_rub = (int) $converted;
+        if ($currency !== 'RUB') {
+          $price_original = $amount;
+          $price_currency = $currency;
+        }
+      }
+    }
+
+    if ($price_rub === null && $fallback_rub_from_post !== null && $fallback_rub_from_post > 0) {
+      $price_rub = (int) $fallback_rub_from_post;
+    }
+
+    $dates_section_rows[] = [
+      'date' => $d,
+      'city' => $city,
+      'venue' => $venue_row,
+      'price_rub' => $price_rub,
+      'price_original' => $price_original,
+      'price_currency' => $price_currency,
+    ];
+  }
+}
+
+$row_rubs_positive = [];
+foreach ($dates_section_rows as $r_row) {
+  if (isset($r_row['price_rub']) && (int) $r_row['price_rub'] > 0) {
+    $row_rubs_positive[] = (int) $r_row['price_rub'];
+  }
+}
+$price_from_amount = !empty($row_rubs_positive) ? min($row_rubs_positive) : $fallback_rub_from_post;
+
+$event_price_original = null;
+$event_price_currency = null;
+if ($price_from_amount !== null && (int) $price_from_amount > 0 && !empty($dates_section_rows)) {
+  $tied_rows = array_values(array_filter(
+    $dates_section_rows,
+    static function ($r) use ($price_from_amount) {
+      return isset($r['price_rub']) && (int) $r['price_rub'] === (int) $price_from_amount;
+    }
+  ));
+  if (!empty($tied_rows)) {
+    usort(
+      $tied_rows,
+      static function ($a, $b) {
+        $a_fc = !empty($a['price_currency']);
+        $b_fc = !empty($b['price_currency']);
+        if ($a_fc !== $b_fc) {
+          return $b_fc <=> $a_fc;
+        }
+        return 0;
+      }
+    );
+    $winner_row = $tied_rows[0];
+    if (!empty($winner_row['price_original']) && !empty($winner_row['price_currency'])) {
+      $event_price_original = (float) $winner_row['price_original'];
+      $event_price_currency = (string) $winner_row['price_currency'];
+    }
+  }
+}
+
 $hero_type_terms = get_the_terms($post_id, BSI_EVENT_TOUR_TYPE_TAXONOMY);
 if (is_wp_error($hero_type_terms)) {
   $hero_type_terms = [];
 }
 
 $hero_price_line = '';
-if ($price_from_amount !== null) {
-  $hero_price_line = 'от ' . number_format($price_from_amount, 0, ',', ' ') . ' ₽';
+if ($price_from_amount !== null && (int) $price_from_amount > 0) {
+  $hero_price_line = 'от ' . number_format((int) $price_from_amount, 0, ',', ' ') . ' ₽';
 } elseif ($tour_price_from !== '') {
   $hero_price_line = $tour_price_from;
 } else {
@@ -176,32 +263,6 @@ if ($hero_url) {
 }
 
 $event_title = get_the_title($post_id);
-
-$dates_section_rows = [];
-if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
-  foreach ($event_dates_rows as $row) {
-    if (empty($row['date_value'])) {
-      continue;
-    }
-    $d = (string) $row['date_value'];
-    $city = isset($row['date_city']) ? trim((string) $row['date_city']) : '';
-    $venue_row = isset($row['date_venue']) ? trim((string) $row['date_venue']) : '';
-    if ($venue_row === '') {
-      $venue_row = $event_venue;
-    }
-    $row_price = null;
-    if (!empty($row['date_row_price'])) {
-      $row_price = (int) $row['date_row_price'];
-    }
-    $display_price = $row_price !== null ? $row_price : $price_from_amount;
-    $dates_section_rows[] = [
-      'date' => $d,
-      'city' => $city,
-      'venue' => $venue_row,
-      'price' => $display_price,
-    ];
-  }
-}
 
 $excerpt = get_the_excerpt($post_id);
 $show_quick = $tour_duration || $tour_nights || $resort_term;
@@ -249,8 +310,17 @@ get_header();
             data-min-price="<?= esc_attr($price_from_amount ?? 0); ?>">Забронировать</button>
         <?php endif; ?>
 
-        <span class="single-event__hero-price numfont"><?= esc_html($hero_price_line); ?>
-        </span>
+        <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
+          <span class="single-event__hero-price numfont js-event-price"
+            data-price-rub="<?= esc_attr((string) (int) $price_from_amount); ?>"
+            <?php if ($event_price_original !== null && $event_price_original > 0 && $event_price_currency !== null && $event_price_currency !== ''): ?>
+            data-price-original="<?= esc_attr((string) $event_price_original); ?>"
+            data-price-currency="<?= esc_attr($event_price_currency); ?>"
+            <?php endif; ?>
+            data-has-from="true"><?= esc_html($hero_price_line); ?></span>
+        <?php else: ?>
+          <span class="single-event__hero-price numfont"><?= esc_html($hero_price_line); ?></span>
+        <?php endif; ?>
       </div>
     </div>
   </section>
@@ -296,6 +366,9 @@ get_header();
                   $row_city = $br['city'] !== '' ? $br['city'] : '—';
                   $row_venue = $br['venue'] !== '' ? $br['venue'] : '—';
                   $row_date_label = date_i18n('d.m.Y', strtotime($br['date']));
+                  $row_price_rub = isset($br['price_rub']) ? $br['price_rub'] : null;
+                  $row_orig = isset($br['price_original']) ? $br['price_original'] : null;
+                  $row_cur = isset($br['price_currency']) ? trim((string) $br['price_currency']) : '';
                   ?>
                   <li class="single-event__dates-row">
                     <div class="single-event__dates-row-left">
@@ -309,9 +382,19 @@ get_header();
                       </div>
                     </div>
                     <div class="single-event__dates-row-right">
-                      <span class="single-event__dates-price numfont"><?php if ($br['price'] !== null): ?>от
-                          <?= esc_html(number_format((int) $br['price'], 0, ',', ' ')); ?>
-                          ₽<?php else: ?>—<?php endif; ?></span>
+                      <?php if ($row_price_rub !== null && (int) $row_price_rub > 0): ?>
+                        <span class="single-event__dates-price numfont js-event-price"
+                          data-price-rub="<?= esc_attr((string) (int) $row_price_rub); ?>"
+                          <?php if ($row_orig !== null && (float) $row_orig > 0 && $row_cur !== ''): ?>
+                          data-price-original="<?= esc_attr((string) $row_orig); ?>"
+                          data-price-currency="<?= esc_attr($row_cur); ?>"
+                          <?php endif; ?>
+                          data-has-from="true">от
+                          <?= esc_html(number_format((int) $row_price_rub, 0, ',', ' ')); ?>
+                          ₽</span>
+                      <?php else: ?>
+                        <span class="single-event__dates-price numfont">—</span>
+                      <?php endif; ?>
                       <span class="single-event__dates-sep" aria-hidden="true"></span>
                       <span class="single-event__dates-book-wrap">
                         <?php if ($tour_booking_url): ?>
@@ -321,7 +404,7 @@ get_header();
                           <button type="button" class="single-event__dates-book js-event-booking-btn"
                             data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
                             data-event-venue="<?= esc_attr($br['venue']); ?>" data-event-time="<?= esc_attr($event_time); ?>"
-                            data-min-price="<?= esc_attr($br['price'] ?? 0); ?>">забронировать</button>
+                            data-min-price="<?= esc_attr($row_price_rub !== null ? (int) $row_price_rub : 0); ?>">забронировать</button>
                         <?php endif; ?>
                       </span>
                     </div>
@@ -462,10 +545,27 @@ get_header();
               </div>
             <?php endif; ?>
 
+            <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
+              <div class="single-event__currency-toggle">
+                <label class="ui-checkbox">
+                  <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" name="show_original_currency_event"
+                    value="1">
+                  <span class="ui-checkbox__mark"></span>
+                  <span class="ui-checkbox__text">Показать в валюте</span>
+                </label>
+              </div>
+            <?php endif; ?>
+
             <div class="hotel-widget__price numfont">
-              <?php if ($price_from_amount !== null): ?>
-                от <?= number_format($price_from_amount, 0, ',', ' '); ?> ₽
-              <?php elseif ($tour_price_from): ?>
+              <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
+                <span class="js-event-price"
+                  data-price-rub="<?= esc_attr((string) (int) $price_from_amount); ?>"
+                  <?php if ($event_price_original !== null && $event_price_original > 0 && $event_price_currency !== null && $event_price_currency !== ''): ?>
+                  data-price-original="<?= esc_attr((string) $event_price_original); ?>"
+                  data-price-currency="<?= esc_attr($event_price_currency); ?>"
+                  <?php endif; ?>
+                  data-has-from="true"><?= esc_html($hero_price_line); ?></span>
+              <?php elseif ($tour_price_from !== ''): ?>
                 <?= esc_html($tour_price_from); ?>
               <?php else: ?>
                 Запросить
