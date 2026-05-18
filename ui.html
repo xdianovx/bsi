@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Kit — BSI Theme</title>
+  <link rel="stylesheet" href="dist/css/main.min.css">
+  <style>
+    /* Витринные стили (не для проекта — только для этой страницы) */
+    :root {
+      --uikit-bg: #fafafa;
+      --uikit-panel: #fff;
+      --uikit-border: #e5e5e5;
+      --uikit-muted: #737373;
+      --uikit-accent: #ee3145;
+    }
+    body.uikit-page {
+      background: var(--uikit-bg);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+    .uikit-nav {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--uikit-panel);
+      border-right: 1px solid var(--uikit-border);
+      padding: 24px 16px;
+    }
+    .uikit-nav h1 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+    .uikit-nav__sub {
+      font-size: 12px;
+      color: var(--uikit-muted);
+      margin: 0 0 20px;
+    }
+    .uikit-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .uikit-nav li a {
+      display: block;
+      padding: 6px 8px;
+      border-radius: 6px;
+      color: #222;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.15s;
+    }
+    .uikit-nav li a:hover { background: #f4f4f6; color: var(--uikit-accent); }
+    .uikit-main { padding: 32px 40px; max-width: 1200px; }
+    .uikit-main > h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 8px;
+    }
+    .uikit-main > .uikit-intro {
+      color: var(--uikit-muted);
+      margin: 0 0 32px;
+      max-width: 720px;
+      line-height: 1.5;
+    }
+    .uikit-section {
+      background: var(--uikit-panel);
+      border: 1px solid var(--uikit-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      scroll-margin-top: 16px;
+    }
+    .uikit-section > h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      padding: 0;
+    }
+    .uikit-section > .uikit-section__hint {
+      color: var(--uikit-muted);
+      font-size: 13px;
+      margin: 0 0 16px;
+    }
+    .uikit-section > .uikit-section__hint code {
+      background: #f4f4f6;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .uikit-demo {
+      padding: 20px;
+      border: 1px dashed var(--uikit-border);
+      border-radius: 8px;
+      background: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .uikit-demo--block { display: block; }
+    .uikit-demo--gray { background: #f4f4f6; }
+    .uikit-demo--dark { background: #222; color: #fff; }
+    .uikit-snippet {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 0 0 16px;
+      white-space: pre;
+    }
+    .uikit-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .uikit-grid--tokens { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .uikit-grid--cards { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+    .uikit-token {
+      border: 1px solid var(--uikit-border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .uikit-token__swatch {
+      height: 64px;
+      border-bottom: 1px solid var(--uikit-border);
+    }
+    .uikit-token__meta {
+      padding: 8px 10px;
+      font-size: 12px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    .uikit-token__meta b { display: block; color: #222; }
+    .uikit-token__meta span { color: var(--uikit-muted); }
+    .uikit-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .uikit-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--uikit-muted);
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+    .uikit-note {
+      background: #fff7d6;
+      border-left: 3px solid #f0c000;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #6b5400;
+      margin: 0 0 16px;
+    }
+    @media (max-width: 900px) {
+      body.uikit-page { grid-template-columns: 1fr; }
+      .uikit-nav { position: static; height: auto; }
+      .uikit-main { padding: 24px 16px; }
+    }
+  </style>
+</head>
+
+<body class="uikit-page">
+
+<aside class="uikit-nav">
+  <h1>BSI UI Kit</h1>
+  <p class="uikit-nav__sub">Живая витрина повторяющихся элементов</p>
+  <ul>
+    <li><a href="#tokens">Tokens (цвета/типографика)</a></li>
+    <li><a href="#titles">Заголовки</a></li>
+    <li><a href="#buttons">Кнопки</a></li>
+    <li><a href="#links">Ссылки и иконки</a></li>
+    <li><a href="#forms">Формы</a></li>
+    <li><a href="#checkbox">Чекбоксы</a></li>
+    <li><a href="#daypicker">Day picker</a></li>
+    <li><a href="#dropdown">Dropdown</a></li>
+    <li><a href="#slider">Слайдер-стрелки</a></li>
+    <li><a href="#breadcrumbs">Хлебные крошки</a></li>
+    <li><a href="#callout">Callout / Алерты</a></li>
+    <li><a href="#counter">Counter</a></li>
+    <li><a href="#preloader">Preloader</a></li>
+    <li><a href="#modal">Модалки</a></li>
+    <li><a href="#socials">Соцсети</a></li>
+    <li><a href="#cards-hotel">Карточка отеля</a></li>
+    <li><a href="#cards-tour">Карточка тура</a></li>
+    <li><a href="#cards-event">Карточка события</a></li>
+    <li><a href="#cards-education">Карточка обучения</a></li>
+    <li><a href="#cards-news">Карточка новости</a></li>
+    <li><a href="#cards-promo">Карточка акции</a></li>
+  </ul>
+</aside>
+
+<main class="uikit-main">
+  <h1>UI Kit — BSI Theme</h1>
+  <p class="uikit-intro">
+    Витрина существующих повторяющихся элементов темы. <b>Перед вёрсткой нового блока сверяйся со списком слева</b> — если подходящий элемент уже есть, переиспользуй его классы вместо новых.
+    Источники: <code>scss/ui/*.scss</code>, <code>scss/config/vars.scss</code>, <code>template-parts/</code>.
+  </p>
+
+  <p class="uikit-note">
+    Этот файл редактируется вручную. Если добавил новый общий элемент в <code>scss/ui/</code> — допиши его сюда в соответствующий раздел.
+  </p>
+
+  <!-- ============ TOKENS ============ -->
+  <section class="uikit-section" id="tokens">
+    <h2>Tokens</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/config/vars.scss</code>. Используй переменные SCSS, а не хардкод hex.</p>
+
+    <p class="uikit-label">Brand</p>
+    <div class="uikit-grid uikit-grid--tokens" style="margin-bottom: 20px;">
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#f03232"></div><div class="uikit-token__meta"><b>$primary</b><span>#f03232</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#ee3145"></div><div class="uikit-token__meta"><b>$red</b><span>#ee3145</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#fb1229"></div><div class="uikit-token__meta"><b>$red-hover</b><span>#fb1229</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#222"></div><div class="uikit-token__meta"><b>$black</b><span>#222222</span></div></div>
+    </div>
+
+    <p class="uikit-label">Background</p>
+    <div class="uikit-grid uikit-grid--tokens" style="margin-bottom: 20px;">
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#fafafa;border-bottom:1px solid #ddd"></div><div class="uikit-token__meta"><b>$white</b><span>#fafafa</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#ffffff;border-bottom:1px solid #ddd"></div><div class="uikit-token__meta"><b>$bg-color</b><span>#ffffff</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#f4f4f6"></div><div class="uikit-token__meta"><b>$bg-gray</b><span>#f4f4f6</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#faf6f5"></div><div class="uikit-token__meta"><b>$bg-gray-light</b><span>#faf6f5</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#000"></div><div class="uikit-token__meta"><b>$bg-black</b><span>#000</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#7f7875"></div><div class="uikit-token__meta"><b>$bg-body</b><span>#7f7875</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#a29c9a"></div><div class="uikit-token__meta"><b>$bg-card</b><span>#a29c9a</span></div></div>
+    </div>
+
+    <p class="uikit-label">Text / Gray</p>
+    <div class="uikit-grid uikit-grid--tokens" style="margin-bottom: 20px;">
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#000"></div><div class="uikit-token__meta"><b>$text-black</b><span>#000000</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#5c5c5c"></div><div class="uikit-token__meta"><b>$text-gray</b><span>#5c5c5c</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#737373"></div><div class="uikit-token__meta"><b>$gray</b><span>#737373</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#d9d9d9"></div><div class="uikit-token__meta"><b>$gray-light</b><span>#d9d9d9</span></div></div>
+      <div class="uikit-token"><div class="uikit-token__swatch" style="background:#fff;border-bottom:1px solid #ddd"></div><div class="uikit-token__meta"><b>$text-white</b><span>#ffffff</span></div></div>
+    </div>
+
+    <p class="uikit-label">Layout / Misc</p>
+    <pre class="uikit-snippet">$container: 1310px;
+$container-padding: 15px;
+$trans-text: all 0.3s ease-in-out;
+
+// Шрифт: Inter — 200, 400, 500, 600, 700, 800, 900 (см. scss/config/fonts.scss)
+// font-size base: 16px / line-height: 150% (см. scss/config/base.scss)
+// .container = max-width 1310px + padding 0 15px
+// .numfont = Inter (для цифр)</pre>
+  </section>
+
+  <!-- ============ TITLES ============ -->
+  <section class="uikit-section" id="titles">
+    <h2>Заголовки</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/titles.scss</code>. На странице используется <b>один &lt;h1&gt;</b> — для остальных применяй <code>.h2</code>, <code>.h3</code> как классы.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="h1">.h1 — 32px / 700 — заголовок страницы</div>
+      <div class="h1-country">.h1-country — 32px / 700 (без margin-bottom)</div>
+      <div class="h2">.h2 — 24px / 700 — заголовок секции</div>
+      <div class="h3">.h3 — 20px / 700 — заголовок блока</div>
+    </div>
+    <pre class="uikit-snippet">&lt;h1 class="h1"&gt;Заголовок страницы&lt;/h1&gt;
+&lt;h2 class="h2"&gt;Заголовок секции&lt;/h2&gt;
+&lt;h3 class="h3"&gt;Заголовок блока&lt;/h3&gt;</pre>
+
+    <p class="uikit-label">title-wrap (заголовок + кнопки справа)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="title-wrap">
+        <div class="title-wrap__left">
+          <h2 class="h2">Популярные туры</h2>
+        </div>
+        <div class="title-wrap__buttons">
+          <button class="btn btn-gray sm">Показать все</button>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="title-wrap"&gt;
+  &lt;div class="title-wrap__left"&gt;
+    &lt;h2 class="h2"&gt;Популярные туры&lt;/h2&gt;
+  &lt;/div&gt;
+  &lt;div class="title-wrap__buttons"&gt;
+    &lt;button class="btn btn-gray sm"&gt;Показать все&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ BUTTONS ============ -->
+  <section class="uikit-section" id="buttons">
+    <h2>Кнопки</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/buttons.scss</code>. База — <code>.btn</code>, цвет добавляется модификатором (<code>btn-accent</code>, <code>btn-gray</code>, <code>btn-white</code>, <code>btn-black</code>). Малый размер — <code>.sm</code>.</p>
+
+    <div class="uikit-demo">
+      <button class="btn btn-accent">btn btn-accent</button>
+      <button class="btn btn-gray">btn btn-gray</button>
+      <button class="btn btn-black">btn btn-black</button>
+      <button class="btn btn-black disabled">btn btn-black disabled</button>
+    </div>
+    <div class="uikit-demo uikit-demo--dark">
+      <button class="btn btn-white">btn btn-white (на тёмном фоне)</button>
+    </div>
+    <div class="uikit-demo">
+      <button class="btn btn-accent sm">btn .sm</button>
+      <button class="btn btn-gray sm">btn .sm</button>
+      <button class="btn btn-black sm">btn .sm</button>
+    </div>
+    <pre class="uikit-snippet">&lt;a href="#" class="btn btn-accent"&gt;Забронировать&lt;/a&gt;
+&lt;button class="btn btn-gray sm"&gt;Показать ещё&lt;/button&gt;
+&lt;a href="#" class="btn btn-black disabled"&gt;Недоступно&lt;/a&gt;</pre>
+
+    <p class="uikit-label">.button-login (компактная серая кнопка с иконкой)</p>
+    <div class="uikit-demo">
+      <a href="#" class="button-login">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+        Войти
+      </a>
+    </div>
+    <pre class="uikit-snippet">&lt;a href="#" class="button-login"&gt;
+  &lt;svg&gt;...&lt;/svg&gt;
+  Войти
+&lt;/a&gt;</pre>
+
+    <p class="uikit-label">.print-btn (квадратная иконочная кнопка 48×48)</p>
+    <div class="uikit-demo">
+      <a href="#" class="print-btn" title="Распечатать">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      </a>
+    </div>
+    <pre class="uikit-snippet">&lt;a href="#" class="print-btn"&gt;&lt;svg&gt;...&lt;/svg&gt;&lt;/a&gt;</pre>
+
+    <p class="uikit-label">.btn-expand (ссылка-аккордеон «развернуть»)</p>
+    <div class="uikit-demo">
+      <a href="#" class="btn-expand">Развернуть описание</a>
+    </div>
+  </section>
+
+  <!-- ============ LINKS / ICONS ============ -->
+  <section class="uikit-section" id="links">
+    <h2>Ссылки и иконки</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/buttons.scss</code> — <code>.link-arrow</code>, <code>.burger</code>.</p>
+
+    <p class="uikit-label">.link-arrow (текст + круглая иконка-стрелка)</p>
+    <div class="uikit-demo">
+      <a href="#" class="link-arrow">
+        Перейти в каталог
+        <span class="link-arrow__icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+    </div>
+    <pre class="uikit-snippet">&lt;a href="#" class="link-arrow"&gt;
+  Перейти в каталог
+  &lt;span class="link-arrow__icon"&gt;&lt;svg&gt;...&lt;/svg&gt;&lt;/span&gt;
+&lt;/a&gt;</pre>
+
+    <p class="uikit-label">.burger (мобильный бургер-меню, виден при ≤ 1200px)</p>
+    <div class="uikit-demo">
+      <button class="burger" style="display:block">
+        <span></span><span></span><span></span>
+      </button>
+      <button class="burger active" style="display:block">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ FORMS ============ -->
+  <section class="uikit-section" id="forms">
+    <h2>Формы</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/forms.scss</code>. Поле = обёртка <code>.input-item</code> с label и input внутри. Для сетки полей — <code>.form-row .form-row-2/3/4</code>.</p>
+
+    <p class="uikit-label">Базовый .input-item с label</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="input-item">
+        <label>Имя</label>
+        <input type="text" value="Иван">
+      </div>
+    </div>
+
+    <p class="uikit-label">.input-item с ошибкой (.err)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="input-item err">
+        <label>Email</label>
+        <input type="email" value="неверно">
+        <span class="error-message">Введите корректный email</span>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="input-item"&gt;
+  &lt;label&gt;Имя&lt;/label&gt;
+  &lt;input type="text" name="name"&gt;
+&lt;/div&gt;
+
+&lt;!-- С ошибкой --&gt;
+&lt;div class="input-item err"&gt;
+  &lt;label&gt;Email&lt;/label&gt;
+  &lt;input type="email" name="email"&gt;
+  &lt;span class="error-message"&gt;Введите корректный email&lt;/span&gt;
+&lt;/div&gt;</pre>
+
+    <p class="uikit-label">.input-item.white (label на сером фоне)</p>
+    <div class="uikit-demo uikit-demo--gray uikit-demo--block">
+      <div class="input-item white">
+        <label>Дата</label>
+        <input type="text" class="input datepicker" placeholder="дд.мм.гггг">
+      </div>
+    </div>
+
+    <p class="uikit-label">Textarea</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="input-item">
+        <label>Комментарий</label>
+        <textarea rows="3" placeholder="Ваше сообщение"></textarea>
+      </div>
+    </div>
+
+    <p class="uikit-label">.form-row + .form-row-2 (сетка полей в две колонки)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="form-row form-row-2">
+        <div class="input-item">
+          <label>Имя</label>
+          <input type="text">
+        </div>
+        <div class="input-item">
+          <label>Телефон</label>
+          <input type="tel">
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="form-row form-row-2"&gt;
+  &lt;div class="input-item"&gt;...&lt;/div&gt;
+  &lt;div class="input-item"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Доступные варианты: form-row-2 / form-row-3 / form-row-4 --&gt;</pre>
+
+    <p class="uikit-label">.form-group + .form-group__title</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="form-group">
+        <div class="form-group__title">Контактные данные</div>
+        <div class="input-item">
+          <label>Email</label>
+          <input type="email">
+        </div>
+      </div>
+    </div>
+
+    <p class="uikit-label">.form-status (статусы отправки)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="form-status loading">Отправка…</div>
+      <div class="form-status success" style="margin-top:8px">Заявка отправлена</div>
+      <div class="form-status error" style="margin-top:8px">Ошибка отправки</div>
+    </div>
+
+    <p class="uikit-label">.form-policy (текст согласия)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <p class="form-policy">Нажимая «Отправить», вы соглашаетесь с <a href="#">политикой обработки персональных данных</a>.</p>
+    </div>
+  </section>
+
+  <!-- ============ CHECKBOX ============ -->
+  <section class="uikit-section" id="checkbox">
+    <h2>Чекбоксы</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/forms.scss</code> — <code>.ui-checkbox</code> (стандартный кастомный чекбокс).</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <label class="ui-checkbox">
+        <input type="checkbox" class="ui-checkbox__input">
+        <span class="ui-checkbox__mark"></span>
+        <span class="ui-checkbox__text">Согласен с условиями</span>
+      </label>
+      <label class="ui-checkbox" style="margin-top:12px">
+        <input type="checkbox" class="ui-checkbox__input" checked>
+        <span class="ui-checkbox__mark"></span>
+        <span class="ui-checkbox__text">Хочу получать новости</span>
+      </label>
+    </div>
+    <pre class="uikit-snippet">&lt;label class="ui-checkbox"&gt;
+  &lt;input type="checkbox" class="ui-checkbox__input"&gt;
+  &lt;span class="ui-checkbox__mark"&gt;&lt;/span&gt;
+  &lt;span class="ui-checkbox__text"&gt;Согласен с условиями&lt;/span&gt;
+&lt;/label&gt;</pre>
+  </section>
+
+  <!-- ============ DAY PICKER ============ -->
+  <section class="uikit-section" id="daypicker">
+    <h2>Day picker (сетка дат)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/daypicker.scss</code>. Состояния: <code>.is-active</code>, <code>.is-start</code>, <code>.is-disabled</code>.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="day-grid">
+        <div class="day-item">1</div>
+        <div class="day-item">2</div>
+        <div class="day-item is-start">3</div>
+        <div class="day-item is-active">4</div>
+        <div class="day-item is-active">5</div>
+        <div class="day-item">6</div>
+        <div class="day-item is-disabled">7</div>
+        <div class="day-item">8</div>
+        <div class="day-item">9</div>
+        <div class="day-item">10</div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="day-grid"&gt;
+  &lt;div class="day-item"&gt;1&lt;/div&gt;
+  &lt;div class="day-item is-start"&gt;3&lt;/div&gt;
+  &lt;div class="day-item is-active"&gt;4&lt;/div&gt;
+  &lt;div class="day-item is-disabled"&gt;7&lt;/div&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ DROPDOWN ============ -->
+  <section class="uikit-section" id="dropdown">
+    <h2>Dropdown</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/dropdown.scss</code> + JS из <code>js/modules/dropdown.js</code>. Открыто при классе <code>.is-open</code> на корне.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="js-dropdown is-open" style="max-width:300px">
+        <button class="js-dropdown-trigger btn btn-gray">Сортировать: по цене</button>
+        <div class="js-dropdown-panel">
+          <p style="margin:0 0 8px"><a href="#">По цене</a></p>
+          <p style="margin:0 0 8px"><a href="#">По рейтингу</a></p>
+          <p style="margin:0"><a href="#">По дате</a></p>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="js-dropdown"&gt;
+  &lt;button class="js-dropdown-trigger"&gt;Сортировать&lt;/button&gt;
+  &lt;div class="js-dropdown-panel"&gt;
+    ...
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- JS добавляет .is-open на .js-dropdown --&gt;</pre>
+  </section>
+
+  <!-- ============ SLIDER ARROWS ============ -->
+  <section class="uikit-section" id="slider">
+    <h2>Slider arrows</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/slider.scss</code>. Базовая 32×32 (<code>.slider-arrow</code>), большая 48×48 (<code>.xl</code>), мобильная — <code>.slider-arrow-wrap.--mob</code>.</p>
+
+    <p class="uikit-label">Стандартные</p>
+    <div class="uikit-demo">
+      <div class="slider-arrow-wrap">
+        <div class="slider-arrow slider-arrow-prev"></div>
+        <div class="slider-arrow slider-arrow-next"></div>
+      </div>
+      <span style="color:#737373;font-size:13px">Disabled:</span>
+      <div class="slider-arrow-wrap">
+        <div class="slider-arrow slider-arrow-prev swiper-button-disabled"></div>
+        <div class="slider-arrow slider-arrow-next swiper-button-disabled"></div>
+      </div>
+    </div>
+
+    <p class="uikit-label">Большие (.xl)</p>
+    <div class="uikit-demo">
+      <div class="slider-arrow-wrap">
+        <div class="slider-arrow xl slider-arrow-prev"></div>
+        <div class="slider-arrow xl slider-arrow-next"></div>
+      </div>
+    </div>
+
+    <p class="uikit-label">Мобильные (--mob)</p>
+    <div class="uikit-demo">
+      <div class="slider-arrow-wrap --mob">
+        <div class="slider-arrow slider-arrow-prev"></div>
+        <div class="slider-arrow slider-arrow-next"></div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="slider-arrow-wrap"&gt;
+  &lt;div class="slider-arrow slider-arrow-prev"&gt;&lt;/div&gt;
+  &lt;div class="slider-arrow slider-arrow-next"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Для большого размера: .slider-arrow.xl --&gt;
+&lt;!-- Для мобильного варианта: .slider-arrow-wrap.--mob --&gt;</pre>
+  </section>
+
+  <!-- ============ BREADCRUMBS ============ -->
+  <section class="uikit-section" id="breadcrumbs">
+    <h2>Хлебные крошки</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/breadcrumbs.scss</code>. Разделитель — <code>.breadcrumb-separator</code>.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="breadcrumbs">
+        <a href="#">Главная</a>
+        <span class="breadcrumb-separator"></span>
+        <a href="#">Туры</a>
+        <span class="breadcrumb-separator"></span>
+        Турция
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="breadcrumbs"&gt;
+  &lt;a href="#"&gt;Главная&lt;/a&gt;
+  &lt;span class="breadcrumb-separator"&gt;&lt;/span&gt;
+  &lt;a href="#"&gt;Туры&lt;/a&gt;
+  &lt;span class="breadcrumb-separator"&gt;&lt;/span&gt;
+  Турция
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ CALLOUT ============ -->
+  <section class="uikit-section" id="callout">
+    <h2>Callout / Алерты</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/callout.scss</code>. Три варианта: базовый <code>.callout</code> с <code>.callout__title</code>, <code>.callout-neutral</code> (серый), <code>.callout-success</code> (зелёный).</p>
+
+    <p class="uikit-label">.callout + .callout__title</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="callout" style="background:#f4f4f6">
+        <div class="callout__title">Важно</div>
+        <p>Цены актуальны на момент публикации и могут измениться.</p>
+      </div>
+    </div>
+
+    <p class="uikit-label">.callout-neutral</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="callout-neutral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <p>Для бронирования потребуется загранпаспорт со сроком действия не менее 6 месяцев.</p>
+      </div>
+    </div>
+
+    <p class="uikit-label">.callout-success</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="callout-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <p>Заявка успешно отправлена. Менеджер свяжется с вами в течение часа.</p>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="callout-neutral"&gt;
+  &lt;svg&gt;...&lt;/svg&gt;
+  &lt;p&gt;Информационное сообщение&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="callout-success"&gt;
+  &lt;svg&gt;...&lt;/svg&gt;
+  &lt;p&gt;Успех&lt;/p&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ COUNTER ============ -->
+  <section class="uikit-section" id="counter">
+    <h2>Counter (счётчик «минус — число — плюс»)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/counter.scss</code>. Используется в форме поиска для взрослых/детей.</p>
+
+    <div class="uikit-demo">
+      <div class="counter-item__wrap">
+        <div class="counter-item__title">Взрослые</div>
+        <div class="counter-item">
+          <button class="counter-item-minus">−</button>
+          <span class="counter-item-value">2</span>
+          <button class="counter-item-plus">+</button>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="counter-item__wrap"&gt;
+  &lt;div class="counter-item__title"&gt;Взрослые&lt;/div&gt;
+  &lt;div class="counter-item"&gt;
+    &lt;button class="counter-item-minus"&gt;−&lt;/button&gt;
+    &lt;span class="counter-item-value"&gt;2&lt;/span&gt;
+    &lt;button class="counter-item-plus"&gt;+&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ PRELOADER ============ -->
+  <section class="uikit-section" id="preloader">
+    <h2>Preloader (спиннер на блоке)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/preloader.scss</code>. Добавь класс <code>.is-loading</code> на любой блок — он перекроется белой подложкой со спиннером.</p>
+
+    <div class="uikit-demo">
+      <div class="is-loading" style="width:300px;height:120px;background:#f4f4f6;border-radius:8px;padding:16px;position:relative">
+        Содержимое блока, который сейчас загружается
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="results is-loading"&gt;
+  ...
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ MODAL ============ -->
+  <section class="uikit-section" id="modal">
+    <h2>Модалки</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/modal.scss</code> + библиотека MicroModal (<code>js/modules/modal.js</code>). Базовая структура: <code>.modal__overlay &gt; .modal__container</code>. Размер контейнера 500px; <code>.--xl</code> — 900px.</p>
+
+    <p class="uikit-label">Базовая структура (для триггера и обёртки используй MicroModal)</p>
+    <pre class="uikit-snippet">&lt;!-- Триггер --&gt;
+&lt;button data-micromodal-trigger="modal-1" class="btn btn-accent"&gt;Открыть&lt;/button&gt;
+
+&lt;!-- Модалка --&gt;
+&lt;div class="modal micromodal-slide" id="modal-1" aria-hidden="true"&gt;
+  &lt;div class="modal__overlay" tabindex="-1" data-micromodal-close&gt;
+    &lt;div class="modal__container" role="dialog" aria-modal="true"&gt;
+      &lt;button class="modal__close" aria-label="Закрыть" data-micromodal-close&gt;&lt;/button&gt;
+      &lt;div class="modal__content"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Большая модалка: добавь --xl на контейнер --&gt;
+&lt;div class="modal__container --xl"&gt;...&lt;/div&gt;</pre>
+
+    <p class="uikit-label">Превью контейнера (как выглядит)</p>
+    <div class="uikit-demo">
+      <div style="background:rgba(0,0,0,0.6);padding:24px;border-radius:8px;width:100%">
+        <div class="modal__container" style="margin:0 auto;padding:24px">
+          <h3 class="h3" style="margin-top:0">Заголовок модалки</h3>
+          <p>Содержимое модального окна. По умолчанию ширина 500px.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="uikit-label">Готовая модалка бронирования (modal-program-booking)</p>
+    <p class="uikit-section__hint">Готовый template с формой — см. <code>template-parts/education/program-booking-modal.php</code> и <code>scss/ui/modal.scss</code> (секция «Program Booking Modal»). Не дублируй разметку — переиспользуй partial.</p>
+  </section>
+
+  <!-- ============ SOCIALS ============ -->
+  <section class="uikit-section" id="socials">
+    <h2>Соцсети</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/socials.scss</code> + готовый partial <code>template-parts/ui/socials.php</code>. В шаблонах подключай через <code>get_template_part('template-parts/ui/socials')</code> — не верстай SVG-иконки повторно.</p>
+
+    <div class="uikit-demo">
+      <div class="socials">
+        <a href="#" class="social-item --tg">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M26.4 5.9c.6-.2 1.3 0 1.8.4.5.4.7 1 .6 1.7L25.8 26.4c-.3 1.8-1.9 2.4-3.4 1.5-1.4-.7-3.4-1.9-5.3-3-.9-.6-3.7-2.5-3.3-3.9.3-1.2 5-5.5 7.6-8.1 1.1-1-.5-1.7-1.4-.8-3.1 2.3-8 5.8-9.6 6.8-1.5.9-2.2 1-3.1.9-1.6-.3-3.2-.7-4.4-1.2-1.7-.7-1.6-3 0-3.7L26.4 5.9z" fill="#0088CC"/></svg>
+        </a>
+        <a href="#" class="social-item --vk">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M28.7 24.5h-3c-1.2 0-1.5-.9-3.6-3-1.8-1.7-2.5-1.9-3-1.9-.6 0-.8.2-.8 1v2.7c0 .7-.3 1.2-2.2 1.2-3.2 0-6.7-1.9-9.2-5.6C3.4 14.5 2.2 11 2 8.9c0-.5.2-.9 1-.9h3c.8 0 1 .3 1.3 1.1 1.5 4.3 4 8.1 5 8.1.4 0 .6-.2.6-1.2v-4.5C12.7 9.6 11.7 9.4 11.7 8.7c0-.2.1-.4.3-.5.2-.1.4-.2.5-.2h4.8c.7 0 .9.3.9 1.1v6c0 .7.3.9.5.9.4 0 .7-.2 1.4-.9 1.5-1.9 2.8-4 3.7-6.2.1-.3.3-.5.5-.7.2-.2.5-.2.8-.2h3c.9 0 1.1.5.9 1.1-1.1 2.5-2.5 4.8-4.1 7-.3.5-.4.8 0 1.4.3.5 1.4 1.4 2.1 2.2 1 1 1.9 2.2 2.6 3.6.3.8-.2 1.2-1 1.2z" fill="#0076FF"/></svg>
+        </a>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;?php get_template_part('template-parts/ui/socials'); ?&gt;
+
+&lt;!-- Или ручной markup для произвольных соцсетей: --&gt;
+&lt;div class="socials"&gt;
+  &lt;a href="..." class="social-item --tg"&gt;&lt;svg&gt;...&lt;/svg&gt;&lt;/a&gt;
+  &lt;a href="..." class="social-item --vk"&gt;&lt;svg&gt;...&lt;/svg&gt;&lt;/a&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ CARDS: HOTEL ============ -->
+  <section class="uikit-section" id="cards-hotel">
+    <h2>Карточка отеля (hotel-card)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/hotels/card.php</code>. Подключай через <code>get_template_part('template-parts/hotels/card')</code> с заданным <code>get_query_var('hotel')</code>. Базовые классы — <code>.hotel-card</code>, тур использует те же + модификатор <code>.tour-card</code>.</p>
+
+    <div class="uikit-grid uikit-grid--cards">
+      <div class="hotel-card">
+        <div class="hotel-card__media">
+          <img src="https://picsum.photos/seed/hotel/400/240" alt="" class="hotel-card__image">
+        </div>
+        <div class="hotel-card__body">
+          <div class="hotel-card__location">
+            <div class="hotel-card__flag">
+              <img src="https://flagcdn.com/w20/tr.png" alt="">
+            </div>
+            <div class="hotel-card__location-text">
+              <span class="hotel-card__country">Турция,</span>
+              <span class="hotel-card__region">Анталья,</span>
+              <span class="hotel-card__resort">Кемер</span>
+            </div>
+          </div>
+          <div class="hotel-card__title-wrap">
+            <div class="hotel-card__rating">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M11.5 2.3l2.3 4.7 5.2.7-3.7 3.6.9 5.1-4.6-2.4-4.6 2.4.9-5.1L4.2 9.8l5.2-.8z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M11.5 2.3l2.3 4.7 5.2.7-3.7 3.6.9 5.1-4.6-2.4-4.6 2.4.9-5.1L4.2 9.8l5.2-.8z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M11.5 2.3l2.3 4.7 5.2.7-3.7 3.6.9 5.1-4.6-2.4-4.6 2.4.9-5.1L4.2 9.8l5.2-.8z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M11.5 2.3l2.3 4.7 5.2.7-3.7 3.6.9 5.1-4.6-2.4-4.6 2.4.9-5.1L4.2 9.8l5.2-.8z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.5 2.3l2.3 4.7 5.2.7-3.7 3.6.9 5.1-4.6-2.4-4.6 2.4.9-5.1L4.2 9.8l5.2-.8z"/></svg>
+            </div>
+            <div class="hotel-card__booking-info">
+              <span class="hotel-card__nights">от 7 ночей</span>
+              <span class="hotel-card__checkin-date">с 12 июня</span>
+            </div>
+          </div>
+          <h3 class="hotel-card__title">Rixos Premium Belek</h3>
+          <p class="hotel-card__meal-plan">Питание: Ultra All Inclusive</p>
+          <div class="hotel-card__actions">
+            <a href="#" class="hotel-card__btn hotel-card__btn-details">Подробнее</a>
+            <a href="#" class="btn btn-accent hotel-card__btn hotel-card__btn-book">от 89 000 ₽ / чел</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;?php
+set_query_var('hotel', [
+  'id' =&gt; $hotel_id,
+  'url' =&gt; get_permalink($hotel_id),
+  'image' =&gt; get_the_post_thumbnail_url($hotel_id, 'large'),
+  'title' =&gt; get_the_title($hotel_id),
+  // ... см. template-parts/hotels/card.php для полного списка
+]);
+get_template_part('template-parts/hotels/card');
+?&gt;</pre>
+  </section>
+
+  <!-- ============ CARDS: TOUR ============ -->
+  <section class="uikit-section" id="cards-tour">
+    <h2>Карточка тура (hotel-card.tour-card)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/tour/card.php</code>. Использует те же базовые классы, что и hotel-card, плюс модификатор <code>.tour-card</code>.</p>
+
+    <div class="uikit-grid uikit-grid--cards">
+      <div class="hotel-card tour-card">
+        <a href="#" class="hotel-card__media">
+          <img src="https://picsum.photos/seed/tour/400/240" alt="" class="hotel-card__image">
+        </a>
+        <div class="hotel-card__body">
+          <div class="hotel-card__location tour-card__location">
+            <div class="hotel-card__flags">
+              <div class="hotel-card__flag"><img src="https://flagcdn.com/w20/it.png" alt="" width="24" height="24"></div>
+              <div class="hotel-card__flag"><img src="https://flagcdn.com/w20/fr.png" alt="" width="24" height="24"></div>
+            </div>
+            <div class="hotel-card__location-text">Италия — Франция</div>
+          </div>
+          <h3 class="hotel-card__title"><a href="#">Романтика Средиземноморья: Рим — Ницца</a></h3>
+          <div class="tour-card__booking-info">
+            <span class="hotel-card__nights">10 ночей,</span>
+            <span class="tour-card__excursions">5 экскурсий</span>
+          </div>
+          <div class="tour-card__checkin-dates">
+            <span class="tour-card__checkin-label">Заезды:</span>
+            <span class="tour-card__checkin-list">
+              15 июня, 22 июня
+              <span class="tour-card__checkin-ellipsis">...</span>
+              <span class="tour-card__checkin-more">еще 3</span>
+            </span>
+          </div>
+          <div class="hotel-card__actions">
+            <a href="#" class="hotel-card__btn hotel-card__btn-details">Подробнее</a>
+            <a href="#" class="btn btn-accent hotel-card__btn hotel-card__btn-book">от 145 000 ₽ / чел</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;?php
+set_query_var('tour', [
+  'id' =&gt; $tour_id,
+  // ... cм. template-parts/tour/card.php
+]);
+get_template_part('template-parts/tour/card');
+?&gt;</pre>
+  </section>
+
+  <!-- ============ CARDS: EVENT ============ -->
+  <section class="uikit-section" id="cards-event">
+    <h2>Карточка события (event)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/event/card.php</code>. Также использует <code>.hotel-card.tour-card</code> с дополнительными классами <code>.tour-card__venue</code>, <code>.tour-card__time</code>.</p>
+
+    <div class="uikit-grid uikit-grid--cards">
+      <div class="hotel-card tour-card">
+        <a href="#" class="hotel-card__media">
+          <img src="https://picsum.photos/seed/event/400/240" alt="" class="hotel-card__image">
+        </a>
+        <div class="hotel-card__body">
+          <div class="hotel-card__location tour-card__location">
+            <div class="hotel-card__flag"><img src="https://flagcdn.com/w20/ae.png" alt=""></div>
+            <div class="hotel-card__location-text">ОАЭ</div>
+          </div>
+          <h3 class="hotel-card__title">Концерт Andrea Bocelli в Dubai Opera</h3>
+          <div class="tour-card__booking-info">
+            <span class="hotel-card__checkin-date">15 декабря 2026</span>
+            <span class="tour-card__venue">Dubai Opera</span>
+            <span class="tour-card__time">20:00</span>
+          </div>
+          <div class="hotel-card__actions">
+            <a href="#" class="hotel-card__btn hotel-card__btn-details">Подробнее</a>
+            <a href="#" class="btn btn-accent hotel-card__btn hotel-card__btn-book">от 85 000 ₽</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARDS: EDUCATION ============ -->
+  <section class="uikit-section" id="cards-education">
+    <h2>Карточка обучения (education-card)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/education/card.php</code>. <b>Отдельный класс</b> <code>.education-card</code>, не делит вёрстку с hotel-card.</p>
+
+    <div class="uikit-grid uikit-grid--cards">
+      <div class="education-card">
+        <a href="#" class="education-card__media">
+          <img src="https://picsum.photos/seed/edu/400/240" alt="" class="education-card__image">
+        </a>
+        <div class="education-card__body">
+          <div class="education-card__location">
+            <div class="education-card__flag"><img src="https://flagcdn.com/w20/gb.png" alt=""></div>
+            <div class="education-card__location-text">
+              Великобритания,
+              <span>Лондон</span>
+            </div>
+          </div>
+          <h3 class="education-card__title">Kings Education London</h3>
+          <div class="education-card__date">
+            <span class="education-card__date-label">Заезды:</span>
+            5 июля, 12 июля
+            <span class="education-card__date-more">... еще 4</span>
+          </div>
+          <div class="education-card__programs">
+            <span class="education-card__program-tag">Общий английский</span>
+            <span class="education-card__program-tag --group-arrival">Групповой заезд</span>
+          </div>
+          <div class="education-card__info-row">
+            <span class="education-card__language">Английский</span>
+            <span class="education-card__age">Возраст: 12-17 лет</span>
+          </div>
+          <div class="education-card__actions">
+            <a href="#" class="education-card__btn education-card__btn-details">Подробнее</a>
+            <a href="#" class="btn btn-accent education-card__btn education-card__btn-book">от 320 000 ₽ / 2 недели</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARDS: NEWS ============ -->
+  <section class="uikit-section" id="cards-news">
+    <h2>Карточка новости (news-card)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/news/card.php</code>. Вся карточка — одна большая ссылка.</p>
+
+    <div class="uikit-grid uikit-grid--cards">
+      <div class="news-card post type-post">
+        <a href="#" class="news-card__link">
+          <div class="news-card__image">
+            <img src="https://picsum.photos/seed/news/400/240" alt="">
+          </div>
+          <div class="news-card__content">
+            <div class="news-card__meta numfont">
+              <time class="news-card__date" datetime="2026-05-18">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                <span>18 мая 2026</span>
+              </time>
+            </div>
+            <h2 class="news-card__title">Открыто бронирование летних туров в Турцию</h2>
+            <div class="news-card__excerpt">Раннее бронирование со скидкой до 30% — успейте забронировать любимый отель.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARDS: PROMO ============ -->
+  <section class="uikit-section" id="cards-promo">
+    <h2>Карточка акции (promo-card)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/promo/card.php</code>. Сама карточка — &lt;a&gt;-ссылка.</p>
+
+    <div class="uikit-grid uikit-grid--cards">
+      <a href="#" class="promo-card">
+        <div class="promo-card__poster">
+          <img src="https://picsum.photos/seed/promo/400/240" alt="">
+        </div>
+        <div class="promo-card__info">
+          <div class="promo-card__dates">
+            <span class="promo-card__date-range">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+              <span>1 июня – 31 августа</span>
+            </span>
+          </div>
+          <p class="promo-card__countdown">Осталось 5 дней</p>
+          <h3 class="h3 promo-card__item-title">Раннее бронирование 2026 — скидка до 30%</h3>
+          <div class="promo-card__excerpt">При оплате до 1 июня — гарантированная скидка на все туры в Турцию.</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <p style="text-align:center;color:var(--uikit-muted);font-size:13px;margin:40px 0 20px">
+    Витрина обновляется вручную. Добавил новый общий элемент в <code>scss/ui/</code> — допиши пример сюда.
+  </p>
+</main>
+
+</body>
+</html>
