@@ -115,11 +115,15 @@
       </a>
 
       <?php
-      // Get page by slug 'mice'
-      $mice_page = get_page_by_path('mice');
-      $mice_url = $mice_page ? get_permalink($mice_page->ID) : '#';
+      // Find page that uses page-mice.php template (slug may differ on prod)
+      $mice_pages = get_pages([
+        'meta_key'   => '_wp_page_template',
+        'meta_value' => 'page-mice.php',
+        'number'     => 1,
+      ]);
+      $mice_url = !empty($mice_pages) ? get_permalink($mice_pages[0]->ID) : '#';
       ?>
-      <div class="gtm-search__tab-btn gtm-search__tab-btn--disabled">
+      <a href="<?php echo esc_url($mice_url); ?>" class="gtm-search__tab-btn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
           stroke="currentColor">
           <path
@@ -135,7 +139,7 @@
         </svg>
 
         <span>Деловой туризм</span>
-      </div>
+      </a>
 
       <a href="https://incoming.bsigroup.ru/" target="_blank" rel="noopener noreferrer" class="gtm-search__tab-btn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 470" width="24" height="24" fill="currentColor">

@@ -9,7 +9,7 @@ CLAUDE.md
 AGENTS.md
 
 # Project docs (хранятся локально в docs/)
-docs/
+/docs
 
 # Dependencies & build
 node_modules/
