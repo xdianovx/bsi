@@ -211,6 +211,49 @@ foreach ($dates_section_rows as $r_row) {
 }
 $price_from_amount = !empty($row_rubs_positive) ? min($row_rubs_positive) : $fallback_rub_from_post;
 
+$event_accommodation_raw = function_exists('get_field') ? get_field('event_accommodation', $post_id) : [];
+$accommodation_rows = [];
+if (!empty($event_accommodation_raw) && is_array($event_accommodation_raw)) {
+  foreach ($event_accommodation_raw as $acc_row) {
+    $acc_name = isset($acc_row['accommodation_hotel_name']) ? trim((string) $acc_row['accommodation_hotel_name']) : '';
+    if ($acc_name === '') {
+      continue;
+    }
+    $acc_stars_raw = isset($acc_row['accommodation_stars']) ? (int) $acc_row['accommodation_stars'] : 0;
+    $acc_stars = max(0, min(5, $acc_stars_raw));
+    $acc_descr = isset($acc_row['accommodation_description']) ? trim((string) $acc_row['accommodation_description']) : '';
+    $acc_amount_raw = $acc_row['accommodation_price'] ?? null;
+    $acc_amount = ($acc_amount_raw !== null && $acc_amount_raw !== '') ? (float) $acc_amount_raw : null;
+    $acc_cur = isset($acc_row['accommodation_price_currency']) ? strtoupper(trim((string) $acc_row['accommodation_price_currency'])) : 'RUB';
+    if ($acc_cur === '') {
+      $acc_cur = 'RUB';
+    }
+
+    $acc_price_rub = null;
+    $acc_price_original = null;
+    $acc_price_currency = null;
+    if ($acc_amount !== null && $acc_amount > 0 && function_exists('bsi_education_convert_price_to_rub')) {
+      $acc_converted = bsi_education_convert_price_to_rub($acc_amount, $acc_cur);
+      if ($acc_converted !== null && $acc_converted > 0) {
+        $acc_price_rub = (int) $acc_converted;
+        if ($acc_cur !== 'RUB') {
+          $acc_price_original = $acc_amount;
+          $acc_price_currency = $acc_cur;
+        }
+      }
+    }
+
+    $accommodation_rows[] = [
+      'name' => $acc_name,
+      'stars' => $acc_stars,
+      'descr' => $acc_descr,
+      'price_rub' => $acc_price_rub,
+      'price_original' => $acc_price_original,
+      'price_currency' => $acc_price_currency,
+    ];
+  }
+}
+
 $event_price_original = null;
 $event_price_currency = null;
 if ($price_from_amount !== null && (int) $price_from_amount > 0 && !empty($dates_section_rows)) {
@@ -237,6 +280,25 @@ if ($price_from_amount !== null && (int) $price_from_amount > 0 && !empty($dates
       $event_price_original = (float) $winner_row['price_original'];
       $event_price_currency = (string) $winner_row['price_currency'];
     }
+  }
+}
+
+if ($event_price_original === null && !empty($accommodation_rows)) {
+  $acc_non_rub = array_values(array_filter(
+    $accommodation_rows,
+    static function ($r) {
+      return !empty($r['price_currency']) && (float) ($r['price_original'] ?? 0) > 0 && (int) ($r['price_rub'] ?? 0) > 0;
+    }
+  ));
+  if (!empty($acc_non_rub)) {
+    usort(
+      $acc_non_rub,
+      static function ($a, $b) {
+        return (int) $a['price_rub'] <=> (int) $b['price_rub'];
+      }
+    );
+    $event_price_original = (float) $acc_non_rub[0]['price_original'];
+    $event_price_currency = (string) $acc_non_rub[0]['price_currency'];
   }
 }
 
@@ -424,6 +486,14 @@ get_header();
                   <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
                 </figure>
                 <?php if (!empty($venue_scheme_legend) && is_array($venue_scheme_legend)): ?>
+                  <?php
+                  $legend_currency_map = [
+                    '₽' => 'RUB', 'руб' => 'RUB', 'руб.' => 'RUB', 'rub' => 'RUB',
+                    '$' => 'USD', 'usd' => 'USD',
+                    '€' => 'EUR', 'eur' => 'EUR',
+                    '£' => 'GBP', 'gbp' => 'GBP',
+                  ];
+                  ?>
                   <ul class="single-event__venue-legend">
                     <?php foreach ($venue_scheme_legend as $leg): ?>
                       <?php
@@ -435,15 +505,53 @@ get_header();
                       if ($lab === '' && trim($pr) === '') {
                         continue;
                       }
+
+                      $leg_amount_units = null;
+                      $leg_iso = null;
+                      $leg_raw = $leg['legend_price'] ?? null;
+                      if ($leg_raw !== null && $leg_raw !== '' && is_numeric($leg_raw)) {
+                        $leg_units = (int) round((int) $leg_raw / 1000);
+                        if ($leg_units > 0) {
+                          $leg_amount_units = $leg_units;
+                        }
+                      }
+                      $curr_key = mb_strtolower($curr);
+                      if (isset($legend_currency_map[$curr_key])) {
+                        $leg_iso = $legend_currency_map[$curr_key];
+                      }
+                      $leg_price_rub = null;
+                      $leg_price_original = null;
+                      $leg_price_currency = null;
+                      if ($leg_amount_units !== null && $leg_iso !== null && function_exists('bsi_education_convert_price_to_rub')) {
+                        $leg_rub_converted = bsi_education_convert_price_to_rub((float) $leg_amount_units, $leg_iso);
+                        if ($leg_rub_converted !== null && $leg_rub_converted > 0) {
+                          $leg_price_rub = (int) $leg_rub_converted;
+                          if ($leg_iso !== 'RUB') {
+                            $leg_price_original = (float) $leg_amount_units;
+                            $leg_price_currency = $leg_iso;
+                          }
+                        }
+                      }
                       ?>
                       <li class="single-event__venue-legend-item">
                         <span class="single-event__venue-legend-label">
                           <?= esc_html($lab); ?>
                         </span>
                         <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
-                        <span class="single-event__venue-legend-price numfont">
-                          <?= esc_html($pr); ?>
-                        </span>
+                        <?php if ($leg_price_rub !== null): ?>
+                          <span class="single-event__venue-legend-price numfont js-event-price"
+                            data-price-rub="<?= esc_attr((string) (int) $leg_price_rub); ?>"
+                            <?php if ($leg_price_original !== null && $leg_price_currency !== null): ?>
+                            data-price-original="<?= esc_attr((string) $leg_price_original); ?>"
+                            data-price-currency="<?= esc_attr($leg_price_currency); ?>"
+                            <?php endif; ?>>
+                            <?= esc_html($pr); ?>
+                          </span>
+                        <?php else: ?>
+                          <span class="single-event__venue-legend-price numfont">
+                            <?= esc_html($pr); ?>
+                          </span>
+                        <?php endif; ?>
                       </li>
                     <?php endforeach; ?>
                   </ul>
@@ -456,9 +564,110 @@ get_header();
 
 
           <!-- Living start -->
+          <?php
+          $event_accommodation = function_exists('get_field') ? get_field('event_accommodation', $post_id) : [];
+          $accommodation_rows = [];
+          if (!empty($event_accommodation) && is_array($event_accommodation)) {
+            foreach ($event_accommodation as $acc_row) {
+              $acc_name = isset($acc_row['accommodation_hotel_name']) ? trim((string) $acc_row['accommodation_hotel_name']) : '';
+              if ($acc_name === '') {
+                continue;
+              }
+              $acc_stars_raw = isset($acc_row['accommodation_stars']) ? (int) $acc_row['accommodation_stars'] : 0;
+              $acc_stars = max(0, min(5, $acc_stars_raw));
+              $acc_descr = isset($acc_row['accommodation_description']) ? trim((string) $acc_row['accommodation_description']) : '';
+              $acc_amount_raw = $acc_row['accommodation_price'] ?? null;
+              $acc_amount = ($acc_amount_raw !== null && $acc_amount_raw !== '') ? (float) $acc_amount_raw : null;
+              $acc_cur = isset($acc_row['accommodation_price_currency']) ? strtoupper(trim((string) $acc_row['accommodation_price_currency'])) : 'RUB';
+              if ($acc_cur === '') {
+                $acc_cur = 'RUB';
+              }
+
+              $acc_price_rub = null;
+              $acc_price_original = null;
+              $acc_price_currency = null;
+              if ($acc_amount !== null && $acc_amount > 0 && function_exists('bsi_education_convert_price_to_rub')) {
+                $acc_converted = bsi_education_convert_price_to_rub($acc_amount, $acc_cur);
+                if ($acc_converted !== null && $acc_converted > 0) {
+                  $acc_price_rub = (int) $acc_converted;
+                  if ($acc_cur !== 'RUB') {
+                    $acc_price_original = $acc_amount;
+                    $acc_price_currency = $acc_cur;
+                  }
+                }
+              }
+
+              $accommodation_rows[] = [
+                'name' => $acc_name,
+                'stars' => $acc_stars,
+                'descr' => $acc_descr,
+                'price_rub' => $acc_price_rub,
+                'price_original' => $acc_price_original,
+                'price_currency' => $acc_price_currency,
+              ];
+            }
+          }
+          ?>
+
+          <?php if (!empty($accommodation_rows)): ?>
+            <section class="single-event__accommodation-section">
+              <h2 class="h2">Варианты проживания и цены</h2>
+              <ul class="single-event__accommodation-grid">
+                <?php foreach ($accommodation_rows as $acc): ?>
+                  <li class="single-event__accommodation-card">
+                    <div class="single-event__accommodation-card-head">
+                      <?php if ($acc['stars'] > 0): ?>
+                        <span class="single-event__accommodation-card-stars" aria-label="<?= esc_attr($acc['stars'] . ' из 5'); ?>">
+                          <span class="single-event__accommodation-card-stars-num"><?= esc_html((string) $acc['stars']); ?></span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true">
+                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>
+                          </svg>
+                        </span>
+                      <?php endif; ?>
+                      <h3 class="single-event__accommodation-card-name"><?= esc_html($acc['name']); ?></h3>
+                    </div>
+                    <?php if ($acc['descr'] !== ''): ?>
+                      <p class="single-event__accommodation-card-descr"><?= esc_html($acc['descr']); ?></p>
+                    <?php endif; ?>
+                    <div class="single-event__accommodation-card-foot">
+                      <?php if ($acc['price_rub'] !== null && (int) $acc['price_rub'] > 0): ?>
+                        <span class="single-event__accommodation-card-price numfont js-event-price"
+                          data-price-rub="<?= esc_attr((string) (int) $acc['price_rub']); ?>"
+                          <?php if ($acc['price_original'] !== null && (float) $acc['price_original'] > 0 && $acc['price_currency'] !== null && $acc['price_currency'] !== ''): ?>
+                          data-price-original="<?= esc_attr((string) $acc['price_original']); ?>"
+                          data-price-currency="<?= esc_attr($acc['price_currency']); ?>"
+                          <?php endif; ?>><?= esc_html(number_format((int) $acc['price_rub'], 0, ',', ' ')); ?>
+                          ₽</span>
+                      <?php else: ?>
+                        <span class="single-event__accommodation-card-price numfont">Цена по запросу</span>
+                      <?php endif; ?>
+                      <button type="button"
+                        class="btn btn-accent sm single-event__accommodation-card-btn js-event-booking-btn"
+                        data-event-id="<?= esc_attr((string) $post_id); ?>"
+                        data-event-title="<?= esc_attr($event_title); ?>"
+                        data-event-venue="<?= esc_attr($event_venue); ?>"
+                        data-event-time="<?= esc_attr($event_time); ?>"
+                        data-accommodation-name="<?= esc_attr($acc['name']); ?>"
+                        data-accommodation-stars="<?= esc_attr((string) $acc['stars']); ?>"
+                        <?php if ($acc['price_rub'] !== null && (int) $acc['price_rub'] > 0): ?>
+                        data-min-price="<?= esc_attr((string) (int) $acc['price_rub']); ?>"
+                        <?php endif; ?>
+                        <?php if ($acc['price_original'] !== null && $acc['price_currency'] !== null): ?>
+                        data-accommodation-price-original="<?= esc_attr((string) $acc['price_original']); ?>"
+                        data-accommodation-price-currency="<?= esc_attr($acc['price_currency']); ?>"
+                        <?php endif; ?>>Забронировать</button>
+                    </div>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            </section>
+          <?php endif; ?>
+
           <?php if (!empty(trim(strip_tags($tour_extra)))): ?>
             <section class="single-event__accommodation editor-content">
-              <h2 class="h2">Размещение</h2>
+              <?php if (empty($accommodation_rows)): ?>
+                <h2 class="h2">Размещение</h2>
+              <?php endif; ?>
               <?= wp_kses_post($tour_extra); ?>
             </section>
           <?php endif; ?>

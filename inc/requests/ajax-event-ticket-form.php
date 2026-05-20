@@ -34,6 +34,7 @@ function bsi_handle_event_ticket_booking(): void
 
   $event_title = sanitize_text_field($_POST['event_title'] ?? '');
   $page_url = esc_url_raw($_POST['page_url'] ?? '');
+  $accommodation = sanitize_text_field(trim($_POST['accommodation'] ?? ''));
   $booking_context = sanitize_text_field($_POST['booking_context'] ?? 'event');
   if ($booking_context !== 'promo') {
     $booking_context = 'event';
@@ -42,10 +43,11 @@ function bsi_handle_event_ticket_booking(): void
   $subject_lead = ($booking_context === 'promo')
     ? 'Заявка по акции: '
     : 'Заявка по событию: ';
+  $subject_suffix = $accommodation !== '' ? ' / ' . $accommodation : '';
 
   $result = BSI_Mailer::send([
     'to' => $event_ticket_booking_email,
-    'subject' => $subject_lead . ($event_title !== '' ? $event_title : 'с сайта'),
+    'subject' => $subject_lead . ($event_title !== '' ? $event_title : 'с сайта') . $subject_suffix,
     'template' => 'event-ticket-booking',
     'data' => [
       'name' => $name,
@@ -54,6 +56,7 @@ function bsi_handle_event_ticket_booking(): void
       'comment' => $comment,
       'event_title' => $event_title,
       'page_url' => $page_url,
+      'accommodation' => $accommodation,
       'booking_context' => $booking_context,
     ],
     'reply_to' => is_email($email) ? $email : '',

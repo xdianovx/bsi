@@ -21,6 +21,7 @@
           <input type="hidden" name="action" value="event_ticket_booking">
           <input type="hidden" name="event_title" class="js-form-event-title">
           <input type="hidden" name="page_url" class="js-form-page-url">
+          <input type="hidden" name="accommodation" class="js-form-accommodation">
 
           <div class="form-row form-row-2">
             <div class="input-item">

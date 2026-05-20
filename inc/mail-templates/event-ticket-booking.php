@@ -8,6 +8,7 @@
  * @var string $comment
  * @var string $event_title
  * @var string $page_url
+ * @var string $accommodation
  * @var string $booking_context 'event' | 'promo'
  */
 
@@ -137,6 +138,12 @@ $mail_section_title = $is_promo ? 'Акция' : 'Событие';
         <div class="info-label">Название</div>
         <div class="info-value"><?php echo esc_html($event_title ?? ''); ?></div>
       </div>
+      <?php if (!empty($accommodation)): ?>
+        <div class="info-row">
+          <div class="info-label">Вариант проживания</div>
+          <div class="info-value"><?php echo esc_html($accommodation); ?></div>
+        </div>
+      <?php endif; ?>
       <?php if (!empty($page_url)): ?>
         <div class="info-row">
           <div class="info-label">Страница</div>

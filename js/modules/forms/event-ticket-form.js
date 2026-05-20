@@ -32,7 +32,8 @@ function populateModal(ticketData) {
 
   const titleEl = document.getElementById("modal-event-ticket-booking-title");
   if (titleEl) {
-    titleEl.textContent = ticketData.eventTitle || "";
+    const accSuffix = ticketData.accommodation ? ` — ${ticketData.accommodation}` : "";
+    titleEl.textContent = (ticketData.eventTitle || "") + accSuffix;
   }
 
   const form = getModalForm();
@@ -42,8 +43,10 @@ function populateModal(ticketData) {
 
   const title = ticketData.eventTitle || "";
   const idStr = ticketData.eventId != null && ticketData.eventId !== "" ? String(ticketData.eventId) : "";
+  const accommodation = ticketData.accommodation || "";
   form.dataset.eventTitle = title;
   form.dataset.eventId = idStr;
+  form.dataset.accommodation = accommodation;
 
   const setVal = (sel, val) => {
     const input = form.querySelector(sel);
@@ -52,13 +55,18 @@ function populateModal(ticketData) {
 
   setVal(".js-form-event-title", title);
   setVal(".js-form-page-url", window.location.href);
+  setVal(".js-form-accommodation", accommodation);
 }
 
-function reachEventTourBookingGoal() {
+function reachEventTourBookingGoal(params) {
   if (typeof ym === "undefined") {
     return;
   }
-  ym(YM_ID, "reachGoal", EVENT_TOUR_GOAL);
+  if (params && Object.keys(params).length > 0) {
+    ym(YM_ID, "reachGoal", EVENT_TOUR_GOAL, params);
+  } else {
+    ym(YM_ID, "reachGoal", EVENT_TOUR_GOAL);
+  }
 }
 
 function resetModalForm() {
@@ -216,7 +224,9 @@ async function submitForm(e) {
     });
 
     if (result.success) {
-      reachEventTourBookingGoal();
+      const accommodationParam = (form.dataset.accommodation
+        || (form.querySelector('.js-form-accommodation')?.value || '')).trim();
+      reachEventTourBookingGoal(accommodationParam ? { accommodation: accommodationParam } : null);
 
       if (!isMinimal) {
         MicroModal.close("modal-event-ticket-booking");
@@ -309,6 +319,7 @@ export function initEventTicketForm() {
     const ticketData = {
       eventTitle: btn.dataset.eventTitle || "",
       eventId: btn.dataset.eventId || "",
+      accommodation: btn.dataset.accommodationName || "",
     };
 
     openEventTicketModal(ticketData);
@@ -323,6 +334,7 @@ export function initEventTicketForm() {
     const ticketData = {
       eventTitle: btn.dataset.eventTitle || "",
       eventId: btn.dataset.eventId || "",
+      accommodation: btn.dataset.accommodationName || "",
     };
 
     openEventTicketModal(ticketData);

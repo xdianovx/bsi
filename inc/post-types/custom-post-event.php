@@ -527,13 +527,80 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Размещение — текст для блока на странице события
+  // Размещение — структурированный список вариантов + произвольный текст
   acf_add_local_field_group([
     'key' => 'group_event_accommodation',
     'title' => 'Размещение',
     'position' => 'normal',
     'menu_order' => 40,
     'fields' => [
+      [
+        'key' => 'field_event_accommodation',
+        'label' => 'Варианты проживания',
+        'name' => 'event_accommodation',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить вариант проживания',
+        'wrapper' => ['width' => '100'],
+        'min' => 0,
+        'instructions' => 'Список вариантов проживания на странице события. На фронте показывается над WYSIWYG «Текст». Цена пересчитывается в рубли по курсу ЦБР; чекбокс «Показать в валюте» переключает обратно.',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_accommodation_name',
+            'label' => 'Название отеля',
+            'name' => 'accommodation_hotel_name',
+            'type' => 'text',
+            'wrapper' => ['width' => '35'],
+            'required' => 1,
+            'placeholder' => 'Hotel Mariotte',
+          ],
+          [
+            'key' => 'field_event_accommodation_stars',
+            'label' => 'Звёздность',
+            'name' => 'accommodation_stars',
+            'type' => 'number',
+            'wrapper' => ['width' => '15'],
+            'min' => 0,
+            'max' => 5,
+            'step' => 1,
+            'instructions' => '0–5. Если 0 — звёзды не показываются.',
+          ],
+          [
+            'key' => 'field_event_accommodation_description',
+            'label' => 'Описание / примечание',
+            'name' => 'accommodation_description',
+            'type' => 'textarea',
+            'wrapper' => ['width' => '50'],
+            'rows' => 2,
+            'new_lines' => 'br',
+          ],
+          [
+            'key' => 'field_event_accommodation_price',
+            'label' => 'Цена от (число)',
+            'name' => 'accommodation_price',
+            'type' => 'number',
+            'wrapper' => ['width' => '25'],
+            'step' => '0.01',
+            'min' => 0,
+            'instructions' => 'В валюте из поля справа. Пусто — цена не выводится.',
+          ],
+          [
+            'key' => 'field_event_accommodation_currency',
+            'label' => 'Валюта цены',
+            'name' => 'accommodation_price_currency',
+            'type' => 'select',
+            'wrapper' => ['width' => '15'],
+            'choices' => [
+              'RUB' => 'RUB (₽)',
+              'USD' => 'USD ($)',
+              'EUR' => 'EUR (€)',
+              'GBP' => 'GBP (£)',
+            ],
+            'default_value' => 'RUB',
+            'return_format' => 'value',
+          ],
+        ],
+      ],
       [
         'key' => 'field_event_extra',
         'label' => 'Текст',
@@ -544,7 +611,7 @@ add_action('acf/init', function () {
         'media_upload' => 0,
         'delay' => 0,
         'wrapper' => ['width' => '100'],
-        'instructions' => 'Выводится в блоке «Размещение» на странице событийного тура.',
+        'instructions' => 'Доп. примечание под списком вариантов проживания (или альтернатива, если репитер пуст).',
       ],
     ],
     'location' => [
