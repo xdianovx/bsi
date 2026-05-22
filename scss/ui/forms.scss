@@ -1,3 +1,25 @@
+/**
+ * Базовые правила формы (UI токены проекта):
+ *  - input / textarea / select / button — font-size: 16px, font-family: inherit (родительский шрифт)
+ *  - сообщения об ошибках — font-size: 14px
+ * Подробности — docs/design-guidelines.md.
+ */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.js-field-error,
+.form-error,
+.modal-program-booking__error,
+.input-error,
+.single-event__booking-cta-field-error {
+  font-size: 14px;
+}
+
 .input {
   background: #fff;
   border-radius: 8px;

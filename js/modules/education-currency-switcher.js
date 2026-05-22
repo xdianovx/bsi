@@ -94,6 +94,10 @@ export const EducationCurrencySwitcher = (() => {
     document.querySelectorAll('.js-event-price').forEach(el => {
       updateElementPrice(el, showOriginal);
     });
+
+    document.querySelectorAll('.js-excursion-price').forEach(el => {
+      updateElementPrice(el, showOriginal);
+    });
   };
 
   /**

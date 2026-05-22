@@ -1021,6 +1021,78 @@ get_template_part('template-parts/tour/card');
     </ul>
   </section>
 
+  <!-- ============================================
+       EXCURSION — карточка каталога + single-блоки
+       Стили: scss/page/excursion.scss
+       Карточка наследует .catalog-card + модификатор .catalog-card--excursion
+       Цена: .js-excursion-price с data-price-rub/original/currency
+             переключатель — .js-education-show-original-currency
+       ============================================ -->
+  <section style="margin:40px 0">
+    <h2 class="h2" style="margin-bottom:16px">Excursion — карточка каталога (.catalog-card--excursion)</h2>
+
+    <article class="catalog-card catalog-card--excursion" style="max-width:760px">
+      <a href="#" class="catalog-card__media">
+        <span class="catalog-card__img-placeholder" role="img" aria-label=""></span>
+      </a>
+      <div class="catalog-card__body">
+        <div class="catalog-card__row">
+          <div class="catalog-card__row-left">
+            <span class="catalog-card__location-text">Турция, Стамбул</span>
+          </div>
+          <span class="catalog-card__date numfont">15.06.2026</span>
+        </div>
+        <h3 class="catalog-card__title">
+          <a href="#">Обзорная экскурсия по Стамбулу с гидом</a>
+        </h3>
+        <p class="catalog-card__excerpt">Прогулка по Старому городу: Софийский собор, Голубая мечеть, дворец Топкапы.</p>
+        <div class="catalog-card__meta">
+          <span class="catalog-card__chip">4 часа</span>
+          <span class="catalog-card__chip">русский, английский</span>
+        </div>
+        <div class="catalog-card__foot">
+          <span class="catalog-card__price numfont js-excursion-price"
+                data-price-rub="6500"
+                data-price-original="75"
+                data-price-currency="USD"
+                data-has-from="true">от 6 500 ₽</span>
+          <a href="#" class="btn btn-accent sm catalog-card__book" target="_blank" rel="nofollow noopener">Забронировать</a>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section style="margin:40px 0">
+    <h2 class="h2" style="margin-bottom:16px">Excursion — глобальный переключатель валюты</h2>
+    <label class="ui-checkbox">
+      <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" value="1">
+      <span class="ui-checkbox__mark"></span>
+      <span class="ui-checkbox__text">Стоимость в валюте</span>
+    </label>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-top:8px">
+      Обработчик: <code>js/modules/education-currency-switcher.js</code>. Один селектор переключает все цены на странице
+      (<code>.js-education-price</code>, <code>.js-event-price</code>, <code>.js-excursion-price</code> и др.).
+    </p>
+  </section>
+
+  <section style="margin:40px 0">
+    <h2 class="h2" style="margin-bottom:16px">Excursion — факты single-страницы (.single-excursion__facts)</h2>
+    <ul class="single-excursion__facts" style="max-width:760px">
+      <li class="single-excursion__fact">
+        <span class="single-excursion__fact-label">Место встречи</span>
+        <span class="single-excursion__fact-value">Площадь Султанахмет, у фонтана</span>
+      </li>
+      <li class="single-excursion__fact">
+        <span class="single-excursion__fact-label">Длительность</span>
+        <span class="single-excursion__fact-value">4 часа</span>
+      </li>
+      <li class="single-excursion__fact">
+        <span class="single-excursion__fact-label">Язык гида</span>
+        <span class="single-excursion__fact-value">русский, английский</span>
+      </li>
+    </ul>
+  </section>
+
   <p style="text-align:center;color:var(--uikit-muted);font-size:13px;margin:40px 0 20px">
     Витрина обновляется вручную. Добавил новый общий элемент в <code>scss/ui/</code> — допиши пример сюда.
   </p>

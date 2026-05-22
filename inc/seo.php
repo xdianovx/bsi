@@ -24,6 +24,7 @@ function bsi_seo_virtual_sections(): array
         'country_education'   => ['label' => 'Обучение',        'slug' => 'obuchenie'],
         'country_visa'        => ['label' => 'Виза',            'slug' => 'visa'],
         'country_news'        => ['label' => 'Новости',         'slug' => 'novosti'],
+        'country_excursions'  => ['label' => 'Экскурсии',       'slug' => 'ekskursii'],
     ];
 }
 
@@ -92,6 +93,7 @@ function bsi_seo_virtual_description(?array $vp): string
         'country_education'   => "Обучение за рубежом: {$n}. Языковые школы, образовательные программы. BSI Group.",
         'country_visa'        => "Оформление визы: {$n}. Требования, документы, сроки оформления. BSI Group.",
         'country_news'        => "Новости туризма: {$n}. Актуальная информация от туроператора BSI Group.",
+        'country_excursions'  => "Экскурсии в {$n}: программы, цены, расписание. Бронирование от туроператора BSI Group.",
     ];
 
     return $map[$vp['qv']] ?? '';

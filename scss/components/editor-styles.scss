@@ -1,12 +1,13 @@
 // Стили для контента из WordPress редактора
 .editor-content {
+  margin-top: 16px;
   margin-bottom: 64px;
 
   &:last-child {
     margin-bottom: 0;
   }
   > * {
-    margin-bottom: 1.5em;
+    margin-bottom: 16px;
 
     &:last-child {
       margin-bottom: 0;

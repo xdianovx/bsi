@@ -1567,6 +1567,7 @@ main {
   border-radius: 8px;
   padding: 16px 24px;
   font-size: 16px;
+  font-family: inherit;
   line-height: 100%;
   text-align: center;
   justify-content: center;
@@ -1998,6 +1999,26 @@ main {
 }
 .js-dropdown.is-open .js-dropdown-panel {
   display: block;
+}
+/**
+ * Базовые правила формы (UI токены проекта):
+ *  - input / textarea / select / button — font-size: 16px, font-family: inherit (родительский шрифт)
+ *  - сообщения об ошибках — font-size: 14px
+ * Подробности — docs/design-guidelines.md.
+ */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: 16px;
+}
+.js-field-error,
+.form-error,
+.modal-program-booking__error,
+.input-error,
+.single-event__booking-cta-field-error {
+  font-size: 14px;
 }
 .input {
   background: #fff;
@@ -4871,13 +4892,14 @@ input.error {
   font-size: 16px;
 }
 .editor-content {
+  margin-top: 16px;
   margin-bottom: 64px;
 }
 .editor-content:last-child {
   margin-bottom: 0;
 }
 .editor-content > * {
-  margin-bottom: 1.5em;
+  margin-bottom: 16px;
 }
 .editor-content > *:last-child {
   margin-bottom: 0;
@@ -7409,6 +7431,7 @@ html.bsi-cookie-consented .cookie-consent {
   background: #ee3145;
 }
 .promo-banner__wrap--education {
+  margin-top: 24px;
   margin-bottom: 16px;
 }
 @media screen and (max-width: 768px) {
@@ -9394,6 +9417,521 @@ button.single-event__dates-book {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+}
+/* Каталог в стране */
+.country-excursions__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.country-excursions__head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.country-excursions__head-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.country-excursions__counter {
+  color: #5c5c5c;
+  font-size: 16px;
+}
+.country-excursions__date-wrap {
+  position: relative;
+}
+.country-excursions__date-input {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  min-width: 180px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.country-excursions__date-input:focus {
+  outline: none;
+  border-color: #737373;
+}
+.country-excursions__sort {
+  position: relative;
+}
+.country-excursions__sort-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #000000;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: auto;
+  /* Скрываем дефолтный chevron из .js-dropdown-trigger::after — в HTML уже своя иконка */
+}
+.country-excursions__sort-trigger::after {
+  display: none !important;
+}
+.country-excursions__sort-trigger:hover {
+  color: #ee3145;
+}
+.country-excursions__sort-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 240px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 8px;
+  z-index: 5;
+}
+.country-excursions__sort-options {
+  display: flex;
+  flex-direction: column;
+}
+.country-excursions__sort-option {
+  background: transparent;
+  border: 0;
+  text-align: left;
+  padding: 8px 10px;
+  color: #000000;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.country-excursions__sort-option:hover {
+  background: #f4f4f6;
+}
+.country-excursions__sort-option.is-active {
+  color: #ee3145;
+  font-weight: 600;
+}
+.country-excursions__filters {
+  margin-bottom: 16px;
+}
+.country-excursions__filters-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1024px) {
+  .country-excursions__filters-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .country-excursions__filters-row {
+    grid-template-columns: 1fr;
+  }
+}
+.country-excursions__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin: 0 0 20px;
+  flex-wrap: wrap;
+}
+@media (max-width: 600px) {
+  .country-excursions__toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+.country-excursions__currency-toggle {
+  margin: 0;
+}
+.country-excursions__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+@media (max-width: 1200px) {
+  .country-excursions__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .country-excursions__list {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+.country-excursions__list.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.country-excursions__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: #ee3145;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.country-excursions__reset:hover {
+  color: #fb1229;
+}
+.country-excursions__reset.is-hidden {
+  display: none;
+}
+.country-excursions__pagination {
+  margin-top: 24px;
+}
+.country-excursions__empty {
+  padding: 32px;
+  text-align: center;
+  color: #5c5c5c;
+  background: #f4f4f6;
+  border-radius: 12px;
+}
+/* Карточка экскурсии — по образцу .education-card (page-education).
+   Hover — scale на <img> внутри ссылки, две кнопки внизу: gray "Подробнее" + красная с ценой. */
+.catalog-card.catalog-card--excursion {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  gap: 4px;
+}
+.catalog-card.catalog-card--excursion:hover .catalog-card__img {
+  transform: scale(1.05);
+}
+.catalog-card.catalog-card--excursion .catalog-card__media {
+  display: block;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.catalog-card.catalog-card--excursion .catalog-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease-in-out;
+}
+.catalog-card.catalog-card--excursion .catalog-card__img-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  background: #f4f4f6;
+}
+.catalog-card.catalog-card--excursion .catalog-card__body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+  gap: 4px;
+}
+.catalog-card.catalog-card--excursion .catalog-card__location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 14px;
+  min-width: 0;
+}
+.catalog-card.catalog-card--excursion .catalog-card__flag {
+  width: 18px;
+  height: 18px;
+  border-radius: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.catalog-card.catalog-card--excursion .catalog-card__flag img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.catalog-card.catalog-card--excursion .catalog-card__location-text {
+  line-height: 100%;
+  color: #000000;
+}
+.catalog-card.catalog-card--excursion .catalog-card__location-text span {
+  color: #000000;
+}
+.catalog-card.catalog-card--excursion .catalog-card__title {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 120%;
+  color: #000000;
+  margin: 8px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.catalog-card.catalog-card--excursion .catalog-card__title a {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+.catalog-card.catalog-card--excursion .catalog-card__title a:hover {
+  color: #ee3145;
+}
+.catalog-card.catalog-card--excursion .catalog-card__excerpt {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(0, 0, 0, 0.7);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.catalog-card.catalog-card--excursion .catalog-card__info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+}
+.catalog-card.catalog-card--excursion .catalog-card__duration {
+  font-size: 14px;
+  line-height: 140%;
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  flex-direction: column;
+  font-weight: 500;
+  font-size: 14px;
+  align-items: center;
+  padding-top: 8px;
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions * {
+  width: 100%;
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions .catalog-card__btn {
+  flex: 1;
+  text-align: center;
+  padding: 12px 16px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  line-height: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions .catalog-card__btn-details {
+  background: #f4f4f6;
+  color: #000000;
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions .catalog-card__btn-details:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions .catalog-card__btn-book {
+  background: #ee3145;
+  color: #fff;
+}
+.catalog-card.catalog-card--excursion .catalog-card__actions .catalog-card__btn-book:hover {
+  background: #fb1229;
+}
+/* Single-excursion: дополнения к single-event */
+.single-excursion {
+  /* Билет-карточка: минимальная, без декора. Белая, тонкий border, два блока. */
+}
+@media (max-width: 768px) {
+  .single-excursion__main-column {
+    width: 100%;
+  }
+}
+.single-excursion__facts {
+  list-style: none;
+  margin: 16px 0 24px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 720px) {
+  .single-excursion__facts {
+    grid-template-columns: 1fr;
+  }
+}
+.single-excursion__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: #f4f4f6;
+  border-radius: 10px;
+}
+.single-excursion__fact-label {
+  font-size: 12px;
+  color: #5c5c5c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.single-excursion__fact-value {
+  font-size: 15px;
+  color: #000000;
+  font-weight: 500;
+}
+.single-excursion__gallery {
+  margin: 24px 0;
+}
+.single-excursion__dates-section {
+  margin-top: 32px;
+}
+.single-excursion__tickets-section {
+  margin-top: 40px;
+}
+.single-excursion__tickets-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.single-excursion__tickets-title {
+  margin: 0 0 16px;
+}
+.single-excursion__tickets-currency-toggle {
+  flex-shrink: 0;
+}
+.single-excursion__tickets-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.single-excursion__ticket-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  /* Точку из базового макета прячем — лишний декор */
+  /* row-left — простой блок (не flex), всё выравнивание делает .dates-meta */
+  /* Базовые горизонтальные сепараторы скрываем — стек вертикальный */
+}
+.single-excursion__ticket-row .single-event__dates-dot {
+  display: none;
+}
+.single-excursion__ticket-row .single-event__dates-row-left {
+  display: block;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.single-excursion__ticket-row .single-event__dates-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+.single-excursion__ticket-row .single-event__dates-row-left .single-event__dates-sep,
+.single-excursion__ticket-row .single-event__dates-row-right .single-event__dates-sep {
+  display: none;
+}
+.single-excursion__ticket-row .single-event__dates-meta-txt {
+  white-space: normal;
+}
+.single-excursion__ticket-row .single-excursion__ticket-name {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #000000;
+}
+.single-excursion__ticket-row .single-excursion__ticket-desc {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #5c5c5c;
+}
+.single-excursion__ticket-row .single-event__dates-row-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.single-excursion__ticket-row .single-event__dates-price {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #000000;
+  white-space: nowrap;
+}
+.single-excursion__ticket-row .single-event__dates-book {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  color: #ee3145;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.3s ease-in-out;
+}
+.single-excursion__ticket-row .single-event__dates-book:hover {
+  color: #fb1229;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.single-excursion__ticket-row button.single-event__dates-book {
+  font-family: inherit;
+}
+@media (max-width: 640px) {
+  .single-excursion__ticket-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+  .single-excursion__ticket-row .single-event__dates-row-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}
+.single-excursion__program {
+  margin-top: 32px;
+}
+.single-excursion__faq {
+  margin-top: 40px;
+}
+.single-excursion__related {
+  margin: 48px 0;
 }
 .fit-form__section {
   margin-top: 32px;

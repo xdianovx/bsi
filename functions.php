@@ -417,6 +417,8 @@ require get_template_directory() . '/inc/post-types/tourist-memo.php';
 require get_template_directory() . '/inc/post-types/entry-rules.php';
 require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
+require get_template_directory() . '/inc/helpers/country-cases.php';
+require get_template_directory() . '/inc/post-types/excursion.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
 require get_template_directory() . '/inc/requests/agency-events-filter.php';
 require get_template_directory() . '/inc/requests/agency-event-registration.php';
@@ -476,6 +478,8 @@ require get_template_directory() . '/inc/requests/promo-filter.php';
 require get_template_directory() . '/inc/requests/resort-hotels.php';
 require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/tours-filter.php';
+require get_template_directory() . '/inc/requests/excursions-filter.php';
+require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
 add_filter('template_include', function ($template) {

@@ -30,6 +30,21 @@ if ($country_promos_slug) {
   exit;
 }
 
+$country_excursions_slug = get_query_var('country_excursions');
+
+if ($country_excursions_slug) {
+  $country = get_page_by_path($country_excursions_slug, OBJECT, 'country');
+
+  global $country_excursions_data;
+  $country_excursions_data = [
+    'country' => $country,
+    'country_slug' => $country_excursions_slug,
+  ];
+
+  get_template_part('country-excursions');
+  exit;
+}
+
 
 
 /* Контекст страны */

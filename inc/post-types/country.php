@@ -342,6 +342,7 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_visa';
   $vars[] = 'country_education';
   $vars[] = 'country_news';
+  $vars[] = 'country_excursions';
 
   return $vars;
 });
@@ -402,10 +403,16 @@ add_action('init', function () {
     'top'
   );
 
+  add_rewrite_rule(
+    '^country/([^/]+)/ekskursii/?$',
+    'index.php?post_type=country&name=$matches[1]&country_excursions=$matches[1]',
+    'top'
+  );
+
 }, 20);
 
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',
