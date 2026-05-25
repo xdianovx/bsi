@@ -79,7 +79,7 @@ $phone = function_exists('get_field') ? trim((string) get_field('excursion_phone
 $website = function_exists('get_field') ? trim((string) get_field('excursion_website', $post_id)) : '';
 $cta_lead = function_exists('get_field') ? trim((string) get_field('excursion_cta_lead', $post_id)) : '';
 if ($cta_lead === '') {
-  $cta_lead = 'Оставьте заявку — менеджер свяжется в течение дня и поможет подобрать удобную дату.';
+  $cta_lead = 'Оставьте заявку — менеджер свяжется с вами и поможет подобрать удобную дату.';
 }
 
 $tickets_rows = function_exists('bsi_get_excursion_tickets_rows') ? bsi_get_excursion_tickets_rows($post_id) : [];
