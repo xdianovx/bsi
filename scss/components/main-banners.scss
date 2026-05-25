@@ -26,7 +26,7 @@
 }
 
 .main-banner__slide_image--desktop {
-  @media screen and (max-width: 798px) {
+  @media screen and (max-width: 768px) {
     display: none;
   }
 }
@@ -34,7 +34,7 @@
 .main-banner__slide_image--mobile {
   display: none;
 
-  @media screen and (max-width: 798px) {
+  @media screen and (max-width: 768px) {
     display: block;
   }
 }
@@ -45,7 +45,7 @@
   bottom: 16px;
   z-index: 10;
 
-  @media screen and (max-width: 798px) {
+  @media screen and (max-width: 768px) {
     display: none;
   }
 }

@@ -82,11 +82,14 @@ export const sliders = () => {
   const mainBannersSlider = new Swiper(".main-banners-slider", {
     slidesPerView: 1,
     spaceBetween: 10,
-    speed: 300,
+    speed: 800,
     loop: true,
+    effect: "fade",
+    fadeEffect: { crossFade: true },
     autoplay: {
-      delay: 3000,
+      delay: 4000,
       disableOnInteraction: false,
+      pauseOnMouseEnter: true,
     },
     navigation: {
       nextEl: ".main-banner-arrow-next",

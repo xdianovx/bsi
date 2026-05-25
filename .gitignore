@@ -4,9 +4,16 @@ Thumbs.db
 # AI assistants / planning
 .cursor/
 .claude/
+.codex/
+.kiro/
+.agents/
+.remember/
 .planning/
 CLAUDE.md
 AGENTS.md
+IMPROVEMENT_PLAN.html
+skills-lock.json
+.socraticodecontextartifacts.json
 
 # Project docs (хранятся локально в docs/)
 /docs
@@ -14,6 +21,7 @@ AGENTS.md
 # Dependencies & build
 node_modules/
 build/
+dist/
 .cache/
 .sass-cache/
 .cache-loader/
