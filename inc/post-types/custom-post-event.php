@@ -647,6 +647,54 @@ add_action('acf/init', function () {
     ],
   ]);
 
+  // Программа тура (по дням)
+  acf_add_local_field_group([
+    'key' => 'group_event_program',
+    'title' => 'Программа тура',
+    'position' => 'normal',
+    'menu_order' => 45,
+    'fields' => [
+      [
+        'key' => 'field_event_tour_program',
+        'label' => 'Программа тура (по дням)',
+        'name' => 'tour_program',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить день',
+        'instructions' => 'Программа по дням. На фронте выводится аккордеоном сразу после блока «Размещение».',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_tour_program_day_title',
+            'label' => 'Заголовок дня',
+            'name' => 'day_title',
+            'type' => 'text',
+            'wrapper' => ['width' => '30'],
+            'placeholder' => 'День 1 / Прилет / ...',
+          ],
+          [
+            'key' => 'field_event_tour_program_day_content',
+            'label' => 'Описание дня',
+            'name' => 'day_content',
+            'type' => 'wysiwyg',
+            'tabs' => 'all',
+            'toolbar' => 'full',
+            'media_upload' => 0,
+            'wrapper' => ['width' => '70'],
+          ],
+        ],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'event',
+        ],
+      ],
+    ],
+  ]);
+
   // Включено/Не включено
   acf_add_local_field_group([
     'key' => 'group_event_included',

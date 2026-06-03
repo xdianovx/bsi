@@ -702,6 +702,50 @@ get_header();
           <?php endif; ?>
           <!-- Living end -->
 
+          <!-- Program start -->
+          <?php if (!empty($tour_program) && is_array($tour_program)): ?>
+            <section class="accordion tour-program single-event__program">
+              <div class="tour-program__acc-head accordion__head">
+                <h2 class="h2 tour-program__title">Программа тура</h2>
+                <button class="btn-expand  accordion__toggle-all" type="button">Раскрыть все</button>
+              </div>
+
+              <div class="accordion__list tour-program__list">
+                <?php foreach ($tour_program as $i => $day): ?>
+                  <?php
+                  $day_title = !empty($day['day_title']) ? (string) $day['day_title'] : '';
+                  $day_text = !empty($day['day_content']) ? (string) $day['day_content'] : '';
+                  if (!$day_title && !$day_text) {
+                    continue;
+                  }
+                  $is_open = false;
+                  ?>
+                  <div class="accordion__item tour-program__day <?= $is_open ? 'is-open' : ''; ?>">
+                    <button class="accordion__btn tour-program__day-btn" type="button">
+                      <span class="accordion__title">
+                        <?= esc_html($day_title ?: ('День ' . ($i + 1))); ?>
+                      </span>
+                      <span class="accordion__icon" aria-hidden="true">
+                        <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/chevron-d.svg'); ?>" alt="">
+                      </span>
+                    </button>
+
+                    <div class="accordion__panel">
+                      <div class="accordion__content">
+                        <?php if ($day_text): ?>
+                          <div class="editor-content">
+                            <?= wp_kses_post($day_text); ?>
+                          </div>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </section>
+          <?php endif; ?>
+          <!-- Program end -->
+
         </div>
 
 
@@ -823,63 +867,6 @@ get_header();
             <?php endif; ?>
           </div>
         </aside>
-      </div>
-
-      <div class="single-hotel__content__wrap single-event__columns">
-
-        <div class="hotel-content single-event__main-column">
-
-
-
-
-
-
-
-
-          <?php if (!empty($tour_program) && is_array($tour_program)): ?>
-            <section class="accordion tour-program">
-              <div class="tour-program__acc-head accordion__head">
-                <h2 class="h2 tour-program__title">Программа тура</h2>
-                <button class="btn-expand  accordion__toggle-all" type="button">Раскрыть все</button>
-              </div>
-
-              <div class="accordion__list tour-program__list">
-                <?php foreach ($tour_program as $i => $day): ?>
-                  <?php
-                  $day_title = !empty($day['day_title']) ? (string) $day['day_title'] : '';
-                  $day_text = !empty($day['day_content']) ? (string) $day['day_content'] : '';
-                  if (!$day_title && !$day_text) {
-                    continue;
-                  }
-                  $is_open = false;
-                  ?>
-                  <div class="accordion__item tour-program__day <?= $is_open ? 'is-open' : ''; ?>">
-                    <button class="accordion__btn tour-program__day-btn" type="button">
-                      <span class="accordion__title">
-                        <?= esc_html($day_title ?: ('День ' . ($i + 1))); ?>
-                      </span>
-                      <span class="accordion__icon" aria-hidden="true">
-                        <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/chevron-d.svg'); ?>" alt="">
-                      </span>
-                    </button>
-
-                    <div class="accordion__panel">
-                      <div class="accordion__content">
-                        <?php if ($day_text): ?>
-                          <div class="editor-content">
-                            <?= wp_kses_post($day_text); ?>
-                          </div>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            </section>
-          <?php endif; ?>
-
-        </div>
-
       </div>
 
     </div>
