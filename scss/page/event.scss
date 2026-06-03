@@ -1049,7 +1049,7 @@ button.single-event__dates-book {
   flex-direction: column;
   gap: 16px;
   box-sizing: border-box;
-  padding: 28px;
+  padding: 16px;
   background: $bg-gray;
   border-radius: 16px;
 
@@ -1069,7 +1069,7 @@ button.single-event__dates-book {
 
 .single-event__accommodation-card-name {
   margin: 0;
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 130%;
   color: $text-black;
@@ -1085,11 +1085,8 @@ button.single-event__dates-book {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
-  padding: 4px 8px;
-  background: rgba($black, 0.05);
-  border-radius: 6px;
   color: #e6a800; // semantic star gold — нет токена в vars.scss
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1;
 }
@@ -1100,11 +1097,42 @@ button.single-event__dates-book {
 
 .single-event__accommodation-card-stars svg {
   display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.single-event__accommodation-card-stay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.single-event__accommodation-card-stay-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.single-event__accommodation-card-stay-dates {
+  color: $text-black;
+}
+
+.single-event__accommodation-card-stay-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: $black;
+}
+
+.single-event__accommodation-card-stay-duration {
 }
 
 .single-event__accommodation-card-descr {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 155%;
   color: $text-gray;
   flex: 1 1 auto;
@@ -1114,15 +1142,15 @@ button.single-event__dates-book {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px 16px;
   margin-top: auto;
   padding-top: 4px;
 }
 
 .single-event__accommodation-card-price {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 500;
   line-height: 100%;
   color: $text-black;
   white-space: nowrap;
@@ -1130,8 +1158,6 @@ button.single-event__dates-book {
 
 .single-event__accommodation-card-btn {
   flex: 0 0 auto;
-  padding: 10px 22px;
-  font-size: 14px;
   text-align: center;
   justify-content: center;
   white-space: nowrap;

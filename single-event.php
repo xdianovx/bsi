@@ -597,6 +597,12 @@ get_header();
                 }
               }
 
+              $acc_date_from = isset($acc_row['accommodation_date_from']) ? trim((string) $acc_row['accommodation_date_from']) : '';
+              $acc_date_to = isset($acc_row['accommodation_date_to']) ? trim((string) $acc_row['accommodation_date_to']) : '';
+              $acc_stay = function_exists('bsi_format_stay_range')
+                ? bsi_format_stay_range($acc_date_from, $acc_date_to)
+                : ['label' => '', 'duration' => '', 'nights' => 0, 'days' => 0, 'from_ts' => 0, 'to_ts' => 0];
+
               $accommodation_rows[] = [
                 'name' => $acc_name,
                 'stars' => $acc_stars,
@@ -604,6 +610,13 @@ get_header();
                 'price_rub' => $acc_price_rub,
                 'price_original' => $acc_price_original,
                 'price_currency' => $acc_price_currency,
+                'date_from' => $acc_date_from,
+                'date_to' => $acc_date_to,
+                'stay_label' => $acc_stay['label'],
+                'stay_duration' => $acc_stay['duration'],
+                'stay_nights' => $acc_stay['nights'],
+                'stay_days' => $acc_stay['days'],
+                'stay_from_ts' => $acc_stay['from_ts'],
               ];
             }
           }
@@ -614,18 +627,34 @@ get_header();
               <h2 class="h2">Варианты проживания и цены</h2>
               <ul class="single-event__accommodation-grid">
                 <?php foreach ($accommodation_rows as $acc): ?>
-                  <li class="single-event__accommodation-card">
+                  <li class="single-event__accommodation-card" data-stay-from="<?= esc_attr($acc['date_from']); ?>"
+                    data-stay-to="<?= esc_attr($acc['date_to']); ?>"
+                    data-stay-from-ts="<?= esc_attr((string) $acc['stay_from_ts']); ?>"
+                    data-stay-nights="<?= esc_attr((string) $acc['stay_nights']); ?>"
+                    data-price-rub="<?= esc_attr((string) (int) ($acc['price_rub'] ?? 0)); ?>">
                     <div class="single-event__accommodation-card-head">
                       <?php if ($acc['stars'] > 0): ?>
                         <span class="single-event__accommodation-card-stars" aria-label="<?= esc_attr($acc['stars'] . ' из 5'); ?>">
                           <span class="single-event__accommodation-card-stars-num"><?= esc_html((string) $acc['stars']); ?></span>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true">
                             <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>
                           </svg>
                         </span>
                       <?php endif; ?>
                       <h3 class="single-event__accommodation-card-name"><?= esc_html($acc['name']); ?></h3>
                     </div>
+                    <?php if ($acc['stay_label'] !== ''): ?>
+                      <div class="single-event__accommodation-card-stay">
+                        <svg class="single-event__accommodation-card-stay-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+                        </svg>
+                        <span class="single-event__accommodation-card-stay-dates numfont"><?= esc_html($acc['stay_label']); ?></span>
+                        <?php if ($acc['stay_duration'] !== ''): ?>
+                          <span class="single-event__accommodation-card-stay-dot" aria-hidden="true"></span>
+                          <span class="single-event__accommodation-card-stay-duration"><?= esc_html($acc['stay_duration']); ?></span>
+                        <?php endif; ?>
+                      </div>
+                    <?php endif; ?>
                     <?php if ($acc['descr'] !== ''): ?>
                       <p class="single-event__accommodation-card-descr"><?= esc_html($acc['descr']); ?></p>
                     <?php endif; ?>

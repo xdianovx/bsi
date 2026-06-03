@@ -922,3 +922,75 @@ function bsi_render_privacy_consent_checkbox(array $opt = []): void
 
   require get_template_directory() . '/template-parts/form-privacy-consent.php';
 }
+/**
+ * Русское склонение существительного по числу.
+ *
+ * @param int    $n    Число.
+ * @param string $one  Форма для 1 (день).
+ * @param string $few  Форма для 2–4 (дня).
+ * @param string $many Форма для 0, 5–20 (дней).
+ */
+function bsi_plural_ru(int $n, string $one, string $few, string $many): string
+{
+  $n = abs($n) % 100;
+  $n1 = $n % 10;
+  if ($n > 10 && $n < 20) {
+    return $many;
+  }
+  if ($n1 > 1 && $n1 < 5) {
+    return $few;
+  }
+  if ($n1 === 1) {
+    return $one;
+  }
+  return $many;
+}
+
+/**
+ * Диапазон дат заезд–выезд + дни/ночи для карточки размещения.
+ *
+ * @param string $from ISO-дата заезда (Y-m-d).
+ * @param string $to   ISO-дата выезда (Y-m-d), может быть пустой.
+ * @return array{label:string,duration:string,nights:int,days:int,from_ts:int,to_ts:int}
+ */
+function bsi_format_stay_range(string $from, string $to): array
+{
+  $out = ['label' => '', 'duration' => '', 'nights' => 0, 'days' => 0, 'from_ts' => 0, 'to_ts' => 0];
+  $from = trim($from);
+  if ($from === '') {
+    return $out;
+  }
+  $from_ts = strtotime($from);
+  if (!$from_ts) {
+    return $out;
+  }
+  $out['from_ts'] = $from_ts;
+
+  $to = trim($to);
+  $to_ts = $to !== '' ? strtotime($to) : 0;
+
+  if ($to_ts && $to_ts > $from_ts) {
+    $out['to_ts'] = $to_ts;
+    $nights = (int) floor(($to_ts - $from_ts) / DAY_IN_SECONDS);
+    $days = $nights + 1;
+    $out['nights'] = $nights;
+    $out['days'] = $days;
+
+    $same_year = date('Y', $from_ts) === date('Y', $to_ts);
+    $same_month = $same_year && date('m', $from_ts) === date('m', $to_ts);
+    if ($same_month) {
+      $out['label'] = date_i18n('j', $from_ts) . '–' . date_i18n('j F Y', $to_ts);
+    } elseif ($same_year) {
+      $out['label'] = date_i18n('j F', $from_ts) . ' – ' . date_i18n('j F Y', $to_ts);
+    } else {
+      $out['label'] = date_i18n('j F Y', $from_ts) . ' – ' . date_i18n('j F Y', $to_ts);
+    }
+
+    $out['duration'] = $days . ' ' . bsi_plural_ru($days, 'день', 'дня', 'дней')
+      . ' / ' . $nights . ' ' . bsi_plural_ru($nights, 'ночь', 'ночи', 'ночей');
+  } else {
+    $out['label'] = date_i18n('j F Y', $from_ts);
+  }
+
+  return $out;
+}
