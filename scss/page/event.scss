@@ -1035,44 +1035,44 @@ button.single-event__dates-book {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 16px;
   }
 }
 
 .single-event__accommodation-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   box-sizing: border-box;
-  padding: 20px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
+  padding: 28px;
+  background: $bg-gray;
+  border-radius: 16px;
+
+  @media (max-width: 640px) {
+    padding: 20px;
+    gap: 14px;
+  }
 }
 
 .single-event__accommodation-card-head {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
 .single-event__accommodation-card-name {
   margin: 0;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 600;
   line-height: 130%;
-  color: #1f1f1f;
+  color: $text-black;
   flex: 1 1 auto;
   min-width: 0;
   white-space: nowrap;
@@ -1085,9 +1085,10 @@ button.single-event__dates-book {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
-  padding: 0;
-  background: transparent;
-  color: #e6a800;
+  padding: 4px 8px;
+  background: rgba($black, 0.05);
+  border-radius: 6px;
+  color: #e6a800; // semantic star gold — нет токена в vars.scss
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
@@ -1103,38 +1104,42 @@ button.single-event__dates-book {
 
 .single-event__accommodation-card-descr {
   margin: 0;
-  font-size: 14px;
-  line-height: 150%;
-  color: #5c5c5c;
+  font-size: 15px;
+  line-height: 155%;
+  color: $text-gray;
   flex: 1 1 auto;
 }
 
 .single-event__accommodation-card-foot {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
   margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  padding-top: 4px;
 }
 
 .single-event__accommodation-card-price {
-  align-self: flex-end;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   line-height: 100%;
-  color: #1f1f1f;
+  color: $text-black;
   white-space: nowrap;
 }
 
 .single-event__accommodation-card-btn {
-  width: 100%;
-  padding: 10px 18px;
+  flex: 0 0 auto;
+  padding: 10px 22px;
   font-size: 14px;
   text-align: center;
   justify-content: center;
   white-space: nowrap;
+
+  @media (max-width: 480px) {
+    flex: 1 1 100%;
+    width: 100%;
+  }
 }
 
 .single-event__price-details-section {
