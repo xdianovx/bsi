@@ -8546,6 +8546,15 @@ html.bsi-cookie-consented .cookie-consent {
     background-image: var(--single-event-hero-bg-mobile, var(--single-event-hero-bg));
   }
 }
+.single-event__hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 20, 20, 0.35) 0%, rgba(31, 31, 31, 0.45) 55%, rgba(18, 18, 18, 0.78) 100%);
+}
+.single-event__hero--no-poster .single-event__hero-bg::after {
+  content: none;
+}
 .single-event__hero--no-poster .single-event__hero-overlay {
   background: linear-gradient(180deg, rgba(20, 20, 20, 0.25) 0%, rgba(31, 31, 31, 0.5) 55%, rgba(18, 18, 18, 0.82) 100%);
 }
