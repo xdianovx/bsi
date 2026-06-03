@@ -8958,7 +8958,7 @@ button.single-event__dates-book {
   flex-direction: column;
   gap: 16px;
   box-sizing: border-box;
-  padding: 16px;
+  padding: 12px;
   background: #f4f4f6;
   border-radius: 12px;
 }
