@@ -671,7 +671,7 @@ get_header();
                         <span class="single-event__accommodation-card-price numfont">Цена по запросу</span>
                       <?php endif; ?>
                       <button type="button"
-                        class="btn btn-accent sm single-event__accommodation-card-btn js-event-booking-btn"
+                        class="single-event__accommodation-card-link js-event-booking-btn"
                         data-event-id="<?= esc_attr((string) $post_id); ?>"
                         data-event-title="<?= esc_attr($event_title); ?>"
                         data-event-venue="<?= esc_attr($event_venue); ?>"
@@ -684,7 +684,7 @@ get_header();
                         <?php if ($acc['price_original'] !== null && $acc['price_currency'] !== null): ?>
                         data-accommodation-price-original="<?= esc_attr((string) $acc['price_original']); ?>"
                         data-accommodation-price-currency="<?= esc_attr($acc['price_currency']); ?>"
-                        <?php endif; ?>>Забронировать</button>
+                        <?php endif; ?>><span>Забронировать</span><svg class="single-event__accommodation-card-link-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
                     </div>
                   </li>
                 <?php endforeach; ?>

@@ -1035,10 +1035,11 @@ button.single-event__dates-book {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 
   @media (max-width: 640px) {
+    grid-template-columns: 1fr;
     gap: 16px;
   }
 }
@@ -1069,8 +1070,8 @@ button.single-event__dates-book {
 
 .single-event__accommodation-card-name {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 500;
   line-height: 130%;
   color: $text-black;
   flex: 1 1 auto;
@@ -1156,16 +1157,37 @@ button.single-event__dates-book {
   white-space: nowrap;
 }
 
-.single-event__accommodation-card-btn {
+.single-event__accommodation-card-link {
   flex: 0 0 auto;
-  text-align: center;
-  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: $red;
   white-space: nowrap;
+  cursor: pointer;
+  transition: $trans-text;
 
-  @media (max-width: 480px) {
-    flex: 1 1 100%;
-    width: 100%;
+  &:hover,
+  &:focus-visible {
+    color: $red-hover;
   }
+
+  &:hover .single-event__accommodation-card-link-icon {
+    transform: translateX(3px);
+  }
+}
+
+.single-event__accommodation-card-link-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
 }
 
 .single-event__price-details-section {
