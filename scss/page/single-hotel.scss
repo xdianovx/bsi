@@ -225,6 +225,10 @@
 
     a {
       font-size: 16px;
+      line-height: 140%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
   }
 }

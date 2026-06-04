@@ -12097,6 +12097,10 @@ button.single-event__dates-book {
 }
 .hotel-widget .single-hotel__address a {
   font-size: 16px;
+  line-height: 140%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .hotel-widget__title {
   font-weight: 500;
