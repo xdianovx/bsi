@@ -846,30 +846,68 @@ get_template_part('template-parts/tour/card');
 
   <!-- ============ CARDS: EVENT ============ -->
   <section class="uikit-section" id="cards-event">
-    <h2>Карточка события (event)</h2>
-    <p class="uikit-section__hint">Готовый partial: <code>template-parts/event/card.php</code>. Также использует <code>.hotel-card.tour-card</code> с дополнительными классами <code>.tour-card__venue</code>, <code>.tour-card__time</code>.</p>
+    <h2>Карточка события — плитка (event-card)</h2>
+    <p class="uikit-section__hint">Готовый partial: <code>template-parts/event/card.php</code> (вид «плитки» каталога «Событийные туры»). Отдельный класс <code>.event-card</code>. Надпись на фото — тип события (<code>.event-card__label</code>), флаг в кружке (<code>.event-card__flag</code>), кнопки «Подробнее» (серая) и «От…» (красная). Иконки «включено в тур» (<code>.event-card__includes</code>) — таксономия <code>tour_include</code>. Вид «список» = та же карточка горизонтально (контейнер <code>.country-tours__list.is-list</code> → <code>.event-card</code> в ряд).</p>
 
-    <div class="uikit-grid uikit-grid--cards">
-      <div class="hotel-card tour-card">
-        <a href="#" class="hotel-card__media">
-          <img src="https://picsum.photos/seed/event/400/240" alt="" class="hotel-card__image">
-        </a>
-        <div class="hotel-card__body">
-          <div class="hotel-card__location tour-card__location">
-            <div class="hotel-card__flag"><img src="https://flagcdn.com/w20/ae.png" alt=""></div>
-            <div class="hotel-card__location-text">ОАЭ</div>
+    <div class="event-tours-page">
+      <div class="country-tours__list is-tiles" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <article class="event-card">
+          <a href="#" class="event-card__media">
+            <img src="https://picsum.photos/seed/event/400/240" alt="" class="event-card__img">
+            <div class="event-card__label">
+              <span class="event-card__label-tag">Музыкальное событие</span>
+            </div>
+          </a>
+          <div class="event-card__body">
+            <div class="event-card__location">
+              <span class="event-card__flag"><img src="https://flagcdn.com/w20/ae.png" alt=""></span>
+              <span class="event-card__location-text">ОАЭ, Дубай</span>
+            </div>
+            <h3 class="event-card__title"><a href="#">Концерт Andrea Bocelli в Dubai Opera</a></h3>
+            <div class="event-card__date numfont">15.12.2026</div>
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">Ночей: <span class="numfont">5</span></span>
+            </div>
+            <div class="hotel-card__includes tour-card__includes">
+              <div class="tour-card__anemeties">
+                <span class="hotel-card__anemetie" title="Отель"><img src="https://api.iconify.design/lucide/bed-single.svg" alt="Отель"></span>
+                <span class="hotel-card__anemetie" title="Трансфер"><img src="https://api.iconify.design/lucide/car.svg" alt="Трансфер"></span>
+                <span class="hotel-card__anemetie" title="Гид"><img src="https://api.iconify.design/lucide/user.svg" alt="Гид"></span>
+              </div>
+            </div>
+            <div class="event-card__actions">
+              <a href="#" class="event-card__btn event-card__btn-details">Подробнее</a>
+              <a href="#" class="btn btn-accent event-card__btn event-card__btn-book">от 85 000 ₽</a>
+            </div>
           </div>
-          <h3 class="hotel-card__title">Концерт Andrea Bocelli в Dubai Opera</h3>
-          <div class="tour-card__booking-info">
-            <span class="hotel-card__checkin-date">15 декабря 2026</span>
-            <span class="tour-card__venue">Dubai Opera</span>
-            <span class="tour-card__time">20:00</span>
-          </div>
-          <div class="hotel-card__actions">
-            <a href="#" class="hotel-card__btn hotel-card__btn-details">Подробнее</a>
-            <a href="#" class="btn btn-accent hotel-card__btn hotel-card__btn-book">от 85 000 ₽</a>
-          </div>
-        </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CATALOG VIEW TOGGLE ============ -->
+  <section class="uikit-section" id="catalog-view-toggle">
+    <h2>Переключатель выкладки (catalog-view-toggle)</h2>
+    <p class="uikit-section__hint">Плитки ⇄ список. Активная кнопка — <code>.is-active</code>. JS: <code>js/modules/ajax/event-tours.js</code> (атрибут <code>data-view-toggle</code> / <code>data-view</code>). Меняет класс контейнера списка <code>.is-tiles</code>/<code>.is-list</code> и перезапрашивает каталог.</p>
+
+    <div class="event-tours-page">
+      <div class="catalog-view-toggle" role="group" aria-label="Вид каталога">
+        <button type="button" class="catalog-view-toggle__btn is-active" data-view="tiles" aria-label="Плитки">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <rect x="2.5" y="2.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11.5" y="2.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="2.5" y="11.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11.5" y="11.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+        <button type="button" class="catalog-view-toggle__btn" data-view="list" aria-label="Список">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M6 4.5h11.5M6 10h11.5M6 15.5h11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="3" cy="4.5" r="1" fill="currentColor"/>
+            <circle cx="3" cy="10" r="1" fill="currentColor"/>
+            <circle cx="3" cy="15.5" r="1" fill="currentColor"/>
+          </svg>
+        </button>
       </div>
     </div>
   </section>

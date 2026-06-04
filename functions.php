@@ -418,6 +418,7 @@ require get_template_directory() . '/inc/post-types/entry-rules.php';
 require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
 require get_template_directory() . '/inc/helpers/country-cases.php';
+require get_template_directory() . '/inc/helpers/event-price.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
 require get_template_directory() . '/inc/requests/agency-events-filter.php';
@@ -458,6 +459,7 @@ require get_template_directory() . '/custom-fields/education-fields.php';
 require get_template_directory() . '/custom-fields/pages/front-page.php';
 require get_template_directory() . '/inc/acf-sync-homepage-tours.php';
 require get_template_directory() . '/custom-fields/pages/education.php';
+require get_template_directory() . '/custom-fields/pages/event-tours.php';
 require get_template_directory() . '/custom-fields/currency-settings.php';
 require get_template_directory() . '/custom-fields/maintenance-modal.php';
 

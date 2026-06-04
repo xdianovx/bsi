@@ -1,130 +1,161 @@
 <?php
-$event = get_query_var('event');
-if (!$event || !is_array($event)) {
+/**
+ * Карточка-плитка событийного тура (CPT event) — каталог «Событийные туры», вид «плитки».
+ *
+ *   get_template_part('template-parts/event/card', null, ['post_id' => $event_id]);
+ *
+ * Вид «список» использует template-parts/event/card-row.php.
+ */
+
+$post_id = isset($args['post_id']) ? (int) $args['post_id'] : (int) get_the_ID();
+if (!$post_id) {
   return;
 }
 
-$event_id = 0;
-$event_url = '';
-$event_image = '';
-$event_title = '';
-$event_flag = '';
-$price_value = '';
-$nights = 0;
-$checkin_dates = '';
-$excursions_count = 0;
-$booking_url = '';
-
-if (!empty($event['id'])) {
-  $event_id = (int) $event['id'];
-} elseif (!empty($event['url'])) {
-  $event_id = (int) url_to_postid($event['url']);
-}
-
-if (!$event_id) {
-  return;
-}
-
-$event_url = !empty($event['url']) ? (string) $event['url'] : get_permalink($event_id);
-$event_image = !empty($event['image']) ? (string) $event['image'] : (get_the_post_thumbnail_url($event_id, 'large') ?: '');
-$event_title = !empty($event['title']) ? (string) $event['title'] : get_the_title($event_id);
-$event_flag = !empty($event['flag']) ? (string) $event['flag'] : '';
-
-$country_title = '';
+$country_raw = function_exists('get_field') ? get_field('tour_country', $post_id) : null;
 $country_id = 0;
-if (function_exists('get_field')) {
-  $country_val = get_field('tour_country', $event_id);
-  if ($country_val instanceof WP_Post) {
-    $country_id = (int) $country_val->ID;
-  } elseif (is_array($country_val)) {
-    $country_id = (int) reset($country_val);
-  } else {
-    $country_id = (int) $country_val;
+if ($country_raw instanceof WP_Post) {
+  $country_id = (int) $country_raw->ID;
+} elseif (is_array($country_raw)) {
+  $country_id = (int) reset($country_raw);
+} else {
+  $country_id = (int) $country_raw;
+}
+
+$link = get_permalink($post_id);
+$title = get_the_title($post_id);
+
+// Изображение: миниатюра → галерея → hero-обложка.
+$img = get_the_post_thumbnail_url($post_id, 'large');
+if (!$img && function_exists('get_field')) {
+  $gallery = (array) get_field('tour_gallery', $post_id);
+  $first = $gallery[0] ?? null;
+  if (is_array($first)) {
+    $img = !empty($first['sizes']['large']) ? $first['sizes']['large'] : ($first['url'] ?? '');
   }
-  if ($country_id) {
-    $country_title = get_the_title($country_id);
-    if (!$event_flag && function_exists('get_field')) {
-      $flag_field = get_field('flag', $country_id);
-      if ($flag_field) {
-        if (is_array($flag_field) && !empty($flag_field['url'])) {
-          $event_flag = (string) $flag_field['url'];
-        } elseif (is_string($flag_field)) {
-          $event_flag = (string) $flag_field;
-        }
-      }
+}
+if (!$img && function_exists('get_field')) {
+  $hero = get_field('event_hero_cover', $post_id);
+  if (is_array($hero)) {
+    $img = !empty($hero['sizes']['large']) ? $hero['sizes']['large'] : ($hero['url'] ?? '');
+  }
+}
+
+// Тип события — плашки поверх фото.
+$type_terms = get_the_terms($post_id, BSI_EVENT_TOUR_TYPE_TAXONOMY);
+if (is_wp_error($type_terms)) {
+  $type_terms = [];
+}
+
+// Локация: страна + город (resort).
+$country_title = $country_id ? get_the_title($country_id) : '';
+$flag_url = ($country_id && function_exists('bsi_get_country_flag_url'))
+  ? bsi_get_country_flag_url($country_id)
+  : '';
+
+$resorts = get_the_terms($post_id, 'resort');
+$city = (!empty($resorts) && !is_wp_error($resorts)) ? $resorts[0]->name : '';
+
+// Ближайшая дата из event_dates (fallback — event_hero_date).
+$event_card_date = '';
+$event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
+if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
+  $ds = [];
+  foreach ($event_dates_rows as $row) {
+    if (!empty($row['date_value'])) {
+      $ds[] = (string) $row['date_value'];
     }
   }
-}
-
-$resort_terms = wp_get_post_terms($event_id, 'resort', ['orderby' => 'name', 'order' => 'ASC']);
-$resort_titles = [];
-if (!is_wp_error($resort_terms) && !empty($resort_terms)) {
-  $resort_titles = array_map(function ($term) {
-    return $term->name;
-  }, $resort_terms);
-}
-
-$event_includes = [];
-$include_terms = wp_get_post_terms($event_id, 'tour_include', ['orderby' => 'name', 'order' => 'ASC']);
-if (!is_wp_error($include_terms) && !empty($include_terms)) {
-  $event_includes = array_slice($include_terms, 0, 6);
-}
-
-// Цена в карточке — из ACF «Цена от».
-
-$event_venue = '';
-$event_time = '';
-$checkin_dates = '';
-
-if (function_exists('get_field')) {
-  $price_val = trim((string) get_field('price_from', $event_id));
-  $amount = function_exists('bsi_extract_price_number') ? bsi_extract_price_number($price_val) : null;
-  if ($amount !== null) {
-    $price_value = 'от ' . number_format($amount, 0, '.', ' ') . ' ₽';
-  } elseif ($price_val !== '') {
-    $price_value = $price_val;
-  }
-
-  $checkin_dates_val = get_field('tour_checkin_dates', $event_id);
-  if (is_string($checkin_dates_val) && $checkin_dates_val !== '') {
-    $checkin_dates = function_exists('format_dates_string_russian')
-      ? format_dates_string_russian($checkin_dates_val)
-      : $checkin_dates_val;
-  }
-
-  $event_venue = trim((string) get_field('event_venue', $event_id));
-  $event_time = trim((string) get_field('event_time', $event_id));
-
-  $booking_url_val = get_field('tour_booking_url', $event_id);
-  if (is_string($booking_url_val) && $booking_url_val !== '') {
-    $booking_url = (string) $booking_url_val;
+  $ds = array_values(array_unique($ds));
+  sort($ds);
+  if (!empty($ds[0])) {
+    $event_card_date = date_i18n('j.m.Y', strtotime($ds[0]));
   }
 }
+if ($event_card_date === '' && function_exists('get_field')) {
+  $hero_d = get_field('event_hero_date', $post_id);
+  if (is_string($hero_d) && $hero_d !== '') {
+    $event_card_date = date_i18n('j.m.Y', strtotime($hero_d));
+  }
+}
+
+$nights = function_exists('get_field') ? (int) get_field('tour_nights', $post_id) : 0;
+
+// «Экскурсий» — источника нет, поле скрыто (задел на будущее).
+$excursions = 0;
+
+// «Включено в тур» — иконки таксономии tour_include (как .tour-card__anemeties).
+$include_terms = get_the_terms($post_id, 'tour_include');
+if (is_wp_error($include_terms) || empty($include_terms)) {
+  $include_terms = [];
+}
+
+// Цена для кнопки «От …».
+$price = function_exists('bsi_event_card_price')
+  ? bsi_event_card_price($post_id)
+  : ['rub' => null, 'original' => null, 'currency' => null];
+$price_rub = isset($price['rub']) ? $price['rub'] : null;
+$price_original = isset($price['original']) ? $price['original'] : null;
+$price_currency = isset($price['currency']) ? $price['currency'] : null;
 ?>
-<div class="hotel-card tour-card">
-  <a href="<?php echo esc_url($event_url); ?>" class="hotel-card__media">
-    <img src="<?php echo esc_url($event_image); ?>" alt="<?php echo esc_attr($event_title); ?>" class="hotel-card__image">
+
+<article class="event-card">
+  <a href="<?= esc_url($link); ?>" class="event-card__media">
+    <?php if ($img): ?>
+      <img class="event-card__img" src="<?= esc_url($img); ?>" alt="<?= esc_attr($title); ?>" loading="lazy">
+    <?php else: ?>
+      <span class="event-card__img-placeholder" aria-hidden="true"></span>
+    <?php endif; ?>
+
+    <?php if (!empty($type_terms)): ?>
+      <div class="event-card__label">
+        <?php foreach (array_slice($type_terms, 0, 3) as $term): ?>
+          <span class="event-card__label-tag"><?= esc_html($term->name); ?></span>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
   </a>
 
-  <div class="hotel-card__body">
-    <div class="hotel-card__location tour-card__location">
-      <?php if ($event_flag): ?>
-        <div class="hotel-card__flag">
-          <img src="<?php echo esc_url($event_flag); ?>" alt="">
-        </div>
-      <?php endif; ?>
-      <?php if ($country_title): ?>
-        <div class="hotel-card__location-text">
-          <?php echo esc_html($country_title); ?>
-        </div>
-      <?php endif; ?>
-    </div>
-    <h3 class="hotel-card__title"><?php echo esc_html($event_title); ?></h3>
+  <div class="event-card__body">
+    <?php if ($country_title !== '' || $city !== ''): ?>
+      <div class="event-card__location">
+        <?php if ($flag_url !== ''): ?>
+          <span class="event-card__flag">
+            <img src="<?= esc_url($flag_url); ?>" alt="" width="18" height="18" loading="lazy">
+          </span>
+        <?php endif; ?>
+        <span class="event-card__location-text">
+          <?php
+          $loc = array_filter([$country_title, $city]);
+          echo esc_html(implode(', ', $loc));
+          ?>
+        </span>
+      </div>
+    <?php endif; ?>
 
-    <?php if (!empty($event_includes)): ?>
+    <h3 class="event-card__title">
+      <a href="<?= esc_url($link); ?>"><?= esc_html($title); ?></a>
+    </h3>
+
+    <?php if ($event_card_date !== ''): ?>
+      <div class="event-card__date numfont"><?= esc_html($event_card_date); ?></div>
+    <?php endif; ?>
+
+    <?php if ($nights > 0 || $excursions > 0): ?>
+      <div class="event-card__meta">
+        <?php if ($nights > 0): ?>
+          <span class="event-card__meta-item">Ночей: <span class="numfont"><?= esc_html((string) $nights); ?></span></span>
+        <?php endif; ?>
+        <?php if ($excursions > 0): ?>
+          <span class="event-card__meta-item">Экскурсий: <span class="numfont"><?= esc_html((string) $excursions); ?></span></span>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($include_terms)): ?>
       <div class="hotel-card__includes tour-card__includes">
         <div class="tour-card__anemeties">
-          <?php foreach ($event_includes as $term): ?>
+          <?php foreach ($include_terms as $term): ?>
             <?php
             $icon_url = '';
             if (function_exists('get_field')) {
@@ -166,40 +197,24 @@ if (function_exists('get_field')) {
       </div>
     <?php endif; ?>
 
-
-
-    <?php if ($event_venue || $event_time || $checkin_dates): ?>
-      <div class="tour-card__booking-info">
-        <?php if ($checkin_dates): ?>
-          <span class="hotel-card__checkin-date">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#999" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#999" stroke-width="2" stroke-linecap="round"/></svg>
-            <?php echo esc_html($checkin_dates); ?>
-          </span>
+    <div class="event-card__actions">
+      <a href="<?= esc_url($link); ?>" class="event-card__btn event-card__btn-details">Подробнее</a>
+      <a href="<?= esc_url($link); ?>"
+        class="btn btn-accent event-card__btn event-card__btn-book<?= $price_rub !== null ? ' js-event-price' : ''; ?>"
+        <?php if ($price_rub !== null): ?>
+        data-price-rub="<?= esc_attr((string) (int) $price_rub); ?>"
+        <?php if ($price_original !== null && $price_currency !== null): ?>
+        data-price-original="<?= esc_attr((string) $price_original); ?>"
+        data-price-currency="<?= esc_attr($price_currency); ?>"
         <?php endif; ?>
-        <?php if ($event_venue): ?>
-          <span class="tour-card__venue">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:4px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#999" stroke-width="2"/><circle cx="12" cy="9" r="2.5" stroke="#999" stroke-width="2"/></svg>
-            <?php echo esc_html($event_venue); ?>
-          </span>
+        data-has-from="true"
+        <?php endif; ?>>
+        <?php if ($price_rub !== null): ?>
+          от <?= esc_html(number_format((int) $price_rub, 0, ',', ' ')); ?> ₽
+        <?php else: ?>
+          Подробнее
         <?php endif; ?>
-        <?php if ($event_time): ?>
-          <span class="tour-card__time">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:4px"><path d="M12 6v6l4 2" stroke="#999" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="10" stroke="#999" stroke-width="2"/></svg>
-            <?php echo esc_html($event_time); ?>
-          </span>
-        <?php endif; ?>
-      </div>
-    <?php endif; ?>
-
-    <div class="hotel-card__actions">
-      <a href="<?php echo esc_url($event_url); ?>" class="hotel-card__btn hotel-card__btn-details">
-        Подробнее
-      </a>
-      <a href="<?php echo esc_url($booking_url ?: $event_url); ?>"
-         class="btn btn-accent hotel-card__btn hotel-card__btn-book"
-         <?php echo $booking_url ? 'target="_blank" rel="noopener nofollow"' : ''; ?>>
-         <?php echo $price_value ? esc_html($price_value) : 'Забронировать'; ?>
       </a>
     </div>
   </div>
-</div>
+</article>

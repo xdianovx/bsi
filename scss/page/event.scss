@@ -353,7 +353,7 @@
 
 @media screen and (min-width: 1200px) {
   .event-tours-page .country-tours__filters-row.--events {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .event-tours-page .country-tours__filters-row.--events .tours-filter__field--search {
@@ -366,27 +366,362 @@
 .event-tours-page .country-tours__list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 40px 16px;
   margin-top: 32px;
+}
+
+.event-tours-page .country-tours__list.is-list {
+  gap: 24px;
 }
 
 .event-tours-page .country-tours__list .country-tours__empty {
   grid-column: 1 / -1;
 }
 
-.event-tours-page .country-tours__list .catalog-card--event {
+.event-tours-page .country-tours__list .catalog-card--event,
+.event-tours-page .country-tours__list .event-card {
   min-width: 0;
 }
 
-@media screen and (min-width: 680px) {
-  .event-tours-page .country-tours__list {
+// Плитки: 1 → 2 → 3 → 4
+@media screen and (min-width: 600px) {
+  .event-tours-page .country-tours__list.is-tiles {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media screen and (min-width: 1200px) {
-  .event-tours-page .country-tours__list {
+@media screen and (min-width: 768px) {
+  .event-tours-page .country-tours__list.is-tiles {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .event-tours-page .country-tours__list.is-tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Промо-баннер на странице каталога */
+.promo-banner__wrap--events {
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+/* Голова каталога: счётчик слева, сортировка + выкладка справа */
+.event-tours-page .country-tours__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.event-tours-page .country-tours__head-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.event-tours-page .country-tours__head-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-tours-page .country-tours__counter {
+  font-size: 16px;
+  font-weight: 500;
+  color: $text-black;
+}
+
+/* Сортировка (dropdown) */
+.event-tours-page .country-tours__sort {
+  position: relative;
+}
+
+.event-tours-page .country-tours__sort-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid $gray-light;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 16px;
+  color: $text-black;
+  cursor: pointer;
+}
+
+.event-tours-page .country-tours__sort-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 220px;
+  padding: 6px;
+  border: 1px solid $gray-light;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: none;
+}
+
+.event-tours-page .country-tours__sort.is-open .country-tours__sort-panel {
+  display: block;
+}
+
+.event-tours-page .country-tours__sort-option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 15px;
+  color: $text-black;
+  cursor: pointer;
+  transition: $trans-text;
+
+  &:hover {
+    background: $bg-gray;
+  }
+
+  &.is-active {
+    color: $red;
+    font-weight: 500;
+  }
+}
+
+/* Переключатель выкладки */
+.catalog-view-toggle {
+  display: inline-flex;
+  border: 1px solid $gray-light;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.catalog-view-toggle__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: #fff;
+  color: $text-gray;
+  cursor: pointer;
+  transition: $trans-text;
+
+  & + & {
+    border-left: 1px solid $gray-light;
+  }
+
+  &:hover {
+    color: $text-black;
+  }
+
+  &.is-active {
+    background: $bg-gray;
+    color: $red;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .event-tours-page .country-tours__sort-trigger {
+    height: 40px;
+  }
+}
+
+/* Карточка-плитка событийного тура */
+.event-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.event-card__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: $bg-gray;
+}
+
+.event-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.event-card__media:hover .event-card__img {
+  transform: scale(1.05);
+}
+
+.event-card__img-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: $bg-gray;
+}
+
+.event-card__label {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.event-card__label-tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  line-height: 120%;
+  color: $text-black;
+}
+
+.event-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 12px;
+}
+
+.event-card__location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-card__flag {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.event-card__location-text {
+  font-size: 14px;
+  line-height: 120%;
+  color: $text-gray;
+}
+
+.event-card__title {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 120%;
+
+  a {
+    color: $text-black;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
+
+.event-card__date {
+  font-size: 14px;
+  color: $text-black;
+}
+
+.event-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.event-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.event-card__btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 100%;
+  text-align: center;
+  transition: $trans-text;
+}
+
+.event-card__btn-details {
+  background: $bg-gray;
+  color: $text-black;
+
+  &:hover {
+    color: $red;
+  }
+}
+
+.event-card__btn-book {
+  white-space: nowrap;
+}
+
+/* Горизонтальный вид (список) */
+.event-tours-page .country-tours__list.is-list .event-card {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 20px;
+}
+
+.event-tours-page .country-tours__list.is-list .event-card__media {
+  flex: 0 0 320px;
+  align-self: flex-start;
+  aspect-ratio: 16 / 10;
+}
+
+.event-tours-page .country-tours__list.is-list .event-card__body {
+  flex: 1 1 auto;
+  padding-top: 0;
+}
+
+.event-tours-page .country-tours__list.is-list .event-card__actions {
+  max-width: 340px;
+}
+
+@media screen and (max-width: 600px) {
+  .event-tours-page .country-tours__list.is-list .event-card {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .event-tours-page .country-tours__list.is-list .event-card__media {
+    flex-basis: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .event-tours-page .country-tours__list.is-list .event-card__body {
+    padding-top: 12px;
   }
 }
 

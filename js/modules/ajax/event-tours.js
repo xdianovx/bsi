@@ -1,6 +1,9 @@
 import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
+import { dropdown } from "../forms/dropdown.js";
+
+const VIEW_STORAGE_KEY = "bsi_event_tours_view";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -46,9 +49,13 @@ export const initEventToursFilters = async () => {
     'input[name="departure_date"]',
   );
   const resetBtn = root.querySelector(".js-tours-reset");
+  const sortEl = root.querySelector("[data-tours-sort]");
+  const viewToggleEl = root.querySelector("[data-view-toggle]");
 
   let datePickerInstance = null;
   let currentPage = 1;
+  let sortValue = "title_asc";
+  let viewValue = "tiles";
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
@@ -70,6 +77,8 @@ export const initEventToursFilters = async () => {
       body.set("date_from", dates[0]);
       body.set("date_to", dates[1]);
     }
+    body.set("sort", sortValue);
+    body.set("view", viewValue);
     body.set("paged", String(currentPage));
   };
 
@@ -189,6 +198,33 @@ export const initEventToursFilters = async () => {
     }
   };
 
+  const loadAvailableDates = async () => {
+    if (!datePickerInstance) return;
+    try {
+      const body = new URLSearchParams();
+      body.set("action", "event_tours_available_dates");
+      appendFilterBody(body);
+
+      const res = await fetch(ajaxUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        },
+        body: body.toString(),
+        credentials: "same-origin",
+      });
+
+      const json = await res.json();
+      if (!json || !json.success) throw new Error("AJAX error");
+
+      const dates = Array.isArray(json.data.dates) ? json.data.dates : [];
+      // Календарь активирует только даты, внесённые в туры (event_dates / event_hero_date).
+      datePickerInstance.set("enable", dates.length ? dates : [() => false]);
+    } catch (_e) {
+      /* ignore */
+    }
+  };
+
   const loadTours = async () => {
     setLoading(true);
 
@@ -218,6 +254,7 @@ export const initEventToursFilters = async () => {
       if (counter) counter.textContent = `Найдено: ${total}`;
       renderPagination(total, maxPages, paged);
       updateResetButton();
+      document.dispatchEvent(new CustomEvent("education:content-updated"));
     } catch (_e) {
       /* Error handling */
     } finally {
@@ -382,6 +419,7 @@ export const initEventToursFilters = async () => {
     if (regionChoice && countrySelect) await loadRegions();
     await loadFacets();
     await loadCountries();
+    await loadAvailableDates();
     await loadTours();
   };
 
@@ -396,8 +434,58 @@ export const initEventToursFilters = async () => {
     currentPage = 1;
     await loadFacets();
     await loadCountries();
+    await loadAvailableDates();
     await loadTours();
   };
+
+  // Сортировка
+  if (sortEl) {
+    dropdown(sortEl);
+    const sortText = sortEl.querySelector(".country-tours__sort-text");
+    const sortOptions = sortEl.querySelectorAll(".country-tours__sort-option");
+    sortOptions.forEach((opt) => {
+      opt.addEventListener("click", async () => {
+        const val = opt.dataset.value || "title_asc";
+        if (val === sortValue) {
+          sortEl.classList.remove("is-open");
+          return;
+        }
+        sortValue = val;
+        sortOptions.forEach((o) => o.classList.toggle("is-active", o === opt));
+        if (sortText) sortText.textContent = opt.textContent.trim();
+        sortEl.classList.remove("is-open");
+        currentPage = 1;
+        await loadTours();
+      });
+    });
+  }
+
+  // Переключатель выкладки плитки/список
+  const applyViewClass = () => {
+    if (!list) return;
+    list.classList.toggle("is-tiles", viewValue === "tiles");
+    list.classList.toggle("is-list", viewValue === "list");
+  };
+  if (viewToggleEl) {
+    const savedView = localStorage.getItem(VIEW_STORAGE_KEY);
+    if (savedView === "tiles" || savedView === "list") {
+      viewValue = savedView;
+    }
+    const viewBtns = viewToggleEl.querySelectorAll("[data-view]");
+    viewBtns.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.view === viewValue);
+      btn.addEventListener("click", async () => {
+        const val = btn.dataset.view === "list" ? "list" : "tiles";
+        if (val === viewValue) return;
+        viewValue = val;
+        localStorage.setItem(VIEW_STORAGE_KEY, viewValue);
+        viewBtns.forEach((b) => b.classList.toggle("is-active", b.dataset.view === viewValue));
+        applyViewClass();
+        await loadTours();
+      });
+    });
+    applyViewClass();
+  }
 
   if (countrySelect) {
     countrySelect.addEventListener("change", async () => {
@@ -431,6 +519,7 @@ export const initEventToursFilters = async () => {
     currentPage = initialPaged;
     await loadFacets();
     await loadCountries();
+    await loadAvailableDates();
     await loadTours();
   };
 

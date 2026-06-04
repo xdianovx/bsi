@@ -28,10 +28,19 @@ if (!function_exists('bsi_event_tours_prime_meta_for_ids')) {
 
 if (!function_exists('bsi_event_tours_parse_request_filters')) {
   /**
-   * @return array{country_id:int,region_id:int,tour_type_id:int,resort_id:int,search:string,date_from:string,date_to:string,paged:int}
+   * @return array{country_id:int,region_id:int,tour_type_id:int,resort_id:int,search:string,date_from:string,date_to:string,paged:int,sort:string,view:string}
    */
   function bsi_event_tours_parse_request_filters(): array
   {
+    $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'title_asc';
+    if (!in_array($sort, ['title_asc', 'title_desc', 'price_asc', 'price_desc'], true)) {
+      $sort = 'title_asc';
+    }
+    $view = isset($_POST['view']) ? sanitize_text_field(wp_unslash($_POST['view'])) : 'tiles';
+    if (!in_array($view, ['tiles', 'list'], true)) {
+      $view = 'tiles';
+    }
+
     return [
       'country_id' => isset($_POST['country']) ? absint(wp_unslash($_POST['country'])) : 0,
       'region_id' => isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0,
@@ -41,6 +50,8 @@ if (!function_exists('bsi_event_tours_parse_request_filters')) {
       'date_from' => isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '',
       'date_to' => isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '',
       'paged' => isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1,
+      'sort' => $sort,
+      'view' => $view,
     ];
   }
 }
@@ -200,6 +211,57 @@ if (!function_exists('bsi_event_tours_get_matching_post_ids')) {
   }
 }
 
+if (!function_exists('bsi_event_tours_sort_ids')) {
+  /**
+   * @param int[] $ids уже в порядке title ASC
+   * @return int[]
+   */
+  function bsi_event_tours_sort_ids(array $ids, string $sort): array
+  {
+    if (empty($ids)) {
+      return $ids;
+    }
+
+    if ($sort === 'title_asc') {
+      return $ids;
+    }
+    if ($sort === 'title_desc') {
+      return array_reverse($ids);
+    }
+
+    // price_asc / price_desc
+    bsi_event_tours_prime_meta_for_ids($ids);
+    $rows = [];
+    foreach ($ids as $i => $id) {
+      $price = function_exists('bsi_event_card_price') ? bsi_event_card_price((int) $id) : ['rub' => null];
+      $rub = isset($price['rub']) && $price['rub'] !== null ? (int) $price['rub'] : null;
+      $rows[] = ['id' => (int) $id, 'rub' => $rub, 'pos' => $i];
+    }
+
+    $desc = ($sort === 'price_desc');
+    usort($rows, static function ($a, $b) use ($desc) {
+      // Без цены — всегда в конце.
+      $an = $a['rub'] === null;
+      $bn = $b['rub'] === null;
+      if ($an !== $bn) {
+        return $an ? 1 : -1;
+      }
+      if ($an && $bn) {
+        return $a['pos'] <=> $b['pos'];
+      }
+      $cmp = $a['rub'] <=> $b['rub'];
+      if ($cmp === 0) {
+        return $a['pos'] <=> $b['pos'];
+      }
+      return $desc ? -$cmp : $cmp;
+    });
+
+    return array_map(static function ($r) {
+      return $r['id'];
+    }, $rows);
+  }
+}
+
 add_action('wp_ajax_event_tours_filter', 'event_tours_filter');
 add_action('wp_ajax_nopriv_event_tours_filter', 'event_tours_filter');
 
@@ -211,12 +273,16 @@ function event_tours_filter()
   $has_date_filter = ($f['date_from'] !== '' && $f['date_to'] !== '');
   $ids = bsi_event_tours_get_matching_post_ids($f, [], $has_date_filter);
 
+  // Сортировка. По умолчанию $ids уже в порядке title ASC (см. build_query_args).
+  $ids = bsi_event_tours_sort_ids($ids, $f['sort']);
+
   $total = count($ids);
   $max_pages = $total > 0 ? (int) ceil($total / $per_page) : 0;
   $paged = $max_pages > 0 ? min($f['paged'], $max_pages) : 1;
 
   $slice = array_slice($ids, ($paged - 1) * $per_page, $per_page);
 
+  // Одна карточка для обоих видов; горизонтальный (list) — через CSS-модификатор контейнера.
   ob_start();
   if (!empty($slice)) {
     $q2 = new WP_Query([
@@ -228,7 +294,7 @@ function event_tours_filter()
     ]);
     while ($q2->have_posts()) {
       $q2->the_post();
-      get_template_part('template-parts/event/card-row', null, ['post_id' => get_the_ID()]);
+      get_template_part('template-parts/event/card', null, ['post_id' => get_the_ID()]);
     }
     wp_reset_postdata();
   } else {
