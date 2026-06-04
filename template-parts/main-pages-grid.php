@@ -10,6 +10,17 @@ $cruise_pages = get_pages(
 
 $cruise_url = ! empty($cruise_pages) ? get_permalink($cruise_pages[0]->ID) : '#';
 
+// Событийные туры: ищем страницу по шаблону (надёжнее слага).
+$event_tours_pages = get_pages(
+     [
+          'meta_key' => '_wp_page_template',
+          'meta_value' => 'page-sobytiynye-tury.php',
+          'number' => 1,
+     ]
+);
+
+$event_tours_url = ! empty($event_tours_pages) ? get_permalink($event_tours_pages[0]->ID) : '#';
+
 $main_page_items = [
      // [
      //      'title' => "Онлайн <br> бронирование",
@@ -41,7 +52,7 @@ $main_page_items = [
      // ],
      [
           'title' => 'Событийные <br> туры',
-          'url' => '#',
+          'url' => $event_tours_url,
           'target' => '',
           'img' => 'event.png',
 
