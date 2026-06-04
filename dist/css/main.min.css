@@ -8473,6 +8473,13 @@ html.bsi-cookie-consented .cookie-consent {
   margin-top: 24px;
   line-height: 150%;
 }
+.single-event__booking-widget-includes-title {
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+}
 .single-event__booking-widget-includes {
   margin-top: 8px;
   margin-bottom: 4px;
@@ -12098,9 +12105,6 @@ button.single-event__dates-book {
 .hotel-widget .single-hotel__address a {
   font-size: 16px;
   line-height: 140%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 .hotel-widget__title {
   font-weight: 500;

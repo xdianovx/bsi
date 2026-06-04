@@ -812,6 +812,7 @@ get_header();
             </div>
 
             <?php if (!empty($include_terms) && !is_wp_error($include_terms)): ?>
+              <h3 class="single-event__booking-widget-includes-title">Включено</h3>
               <div class="sigle-tour-include tour-card-row__included single-event__booking-widget-includes">
                 <?php foreach ($include_terms as $t): ?>
                   <?php
