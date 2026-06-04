@@ -16,11 +16,8 @@
         <div class="subscribe-section__form_wrap">
           <?php
           $unisender_action = 'https://cp.unisender.com/ru/subscribe?hash=6w9zi9a93r6q6k7gd77osrtx7sehuo9kqhaysuxekseaxnnymabsy';
-          $unisender_default_list_id = 13090573;
-          $unisender_list_ids = [
-            20097402,
+          $unisender_default_list_id = 20097402;
 
-          ];
           ?>
           <form method="POST"
                 action="<?= esc_url($unisender_action) ?>"
