@@ -606,6 +606,7 @@
 
 .event-card__flag {
   flex: 0 0 auto;
+  margin-top: -2px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -641,17 +642,43 @@
   }
 }
 
-.event-card__date {
+.event-card__topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  display: none;
   font-size: 14px;
   color: $text-black;
 }
 
-.event-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
+.event-card__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
+  color: $text-black;
+}
+
+.event-card__date-icon {
+  flex-shrink: 0;
   color: $text-gray;
+}
+
+.event-card__nights {
+  color: $text-gray;
+}
+
+.event-card__excerpt {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .event-card__actions {

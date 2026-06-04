@@ -84,6 +84,19 @@ $nights = function_exists('get_field') ? (int) get_field('tour_nights', $post_id
 // «Экскурсий» — источника нет, поле скрыто (задел на будущее).
 $excursions = 0;
 
+// Описание: event_about → excerpt (обрезка 3 строки через CSS).
+$excerpt_raw = '';
+if (function_exists('get_field')) {
+  $about = get_field('event_about', $post_id);
+  if (is_string($about) && trim($about) !== '') {
+    $excerpt_raw = wp_strip_all_tags($about);
+  }
+}
+if ($excerpt_raw === '') {
+  $excerpt_raw = wp_strip_all_tags(get_the_excerpt($post_id));
+}
+$excerpt_raw = preg_replace('/\s+/u', ' ', trim((string) $excerpt_raw));
+
 // «Включено в тур» — иконки таксономии tour_include (как .tour-card__anemeties).
 $include_terms = get_the_terms($post_id, 'tour_include');
 if (is_wp_error($include_terms) || empty($include_terms)) {
@@ -117,6 +130,22 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
   </a>
 
   <div class="event-card__body">
+    <?php if ($event_card_date !== '' || $nights > 0): ?>
+      <div class="event-card__topline">
+        <?php if ($event_card_date !== ''): ?>
+          <span class="event-card__date">
+            <svg class="event-card__date-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+            </svg>
+            <span class="numfont"><?= esc_html($event_card_date); ?></span>
+          </span>
+        <?php endif; ?>
+        <?php if ($nights > 0): ?>
+          <span class="event-card__nights">Ночей: <span class="numfont"><?= esc_html((string) $nights); ?></span></span>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
+
     <?php if ($country_title !== '' || $city !== ''): ?>
       <div class="event-card__location">
         <?php if ($flag_url !== ''): ?>
@@ -136,6 +165,10 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
     <h3 class="event-card__title">
       <a href="<?= esc_url($link); ?>"><?= esc_html($title); ?></a>
     </h3>
+
+    <?php if ($excerpt_raw !== ''): ?>
+      <p class="event-card__excerpt"><?= esc_html($excerpt_raw); ?></p>
+    <?php endif; ?>
 
     <?php if (!empty($include_terms)): ?>
       <div class="hotel-card__includes tour-card__includes">
@@ -179,21 +212,6 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
             <?php endif; ?>
           <?php endforeach; ?>
         </div>
-      </div>
-    <?php endif; ?>
-
-    <?php if ($event_card_date !== ''): ?>
-      <div class="event-card__date numfont"><?= esc_html($event_card_date); ?></div>
-    <?php endif; ?>
-
-    <?php if ($nights > 0 || $excursions > 0): ?>
-      <div class="event-card__meta">
-        <?php if ($nights > 0): ?>
-          <span class="event-card__meta-item">Ночей: <span class="numfont"><?= esc_html((string) $nights); ?></span></span>
-        <?php endif; ?>
-        <?php if ($excursions > 0): ?>
-          <span class="event-card__meta-item">Экскурсий: <span class="numfont"><?= esc_html((string) $excursions); ?></span></span>
-        <?php endif; ?>
       </div>
     <?php endif; ?>
 
