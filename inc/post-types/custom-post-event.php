@@ -720,6 +720,16 @@ add_action('acf/init', function () {
         'toolbar' => 'full',
         'media_upload' => 0,
       ],
+      [
+        'key' => 'field_event_additional',
+        'label' => 'Дополнительно',
+        'name' => 'event_additional',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+        'instructions' => 'Текстовая секция «Дополнительно» под блоком «В стоимость входит / Оплачивается дополнительно».',
+      ],
     ],
     'location' => [
       [

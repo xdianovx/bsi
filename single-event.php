@@ -40,6 +40,7 @@ $venue_scheme = function_exists('get_field') ? get_field('venue_scheme', $post_i
 $venue_scheme_legend = function_exists('get_field') ? get_field('venue_scheme_legend', $post_id) : [];
 $event_faq = function_exists('get_field') ? get_field('event_faq', $post_id) : [];
 $event_about = function_exists('get_field') ? (string) get_field('event_about', $post_id) : '';
+$event_additional = function_exists('get_field') ? (string) get_field('event_additional', $post_id) : '';
 
 $event_widget_phone_primary = function_exists('get_field') ? trim((string) get_field('event_widget_phone_primary', $post_id)) : '';
 $event_widget_phone_secondary = function_exists('get_field') ? trim((string) get_field('event_widget_phone_secondary', $post_id)) : '';
@@ -894,6 +895,17 @@ get_header();
               </div>
             </div>
           <?php endif; ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
+
+  <?php if (!empty(trim(strip_tags($event_additional)))): ?>
+    <section class="tour-extra-section single-event__additional">
+      <div class="container">
+        <h3 class="h3 tour-extra-section__title">Дополнительно</h3>
+        <div class="tour-extra-section__content editor-content">
+          <?= wp_kses_post($event_additional); ?>
         </div>
       </div>
     </section>
