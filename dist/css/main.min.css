@@ -8574,14 +8574,15 @@ html.bsi-cookie-consented .cookie-consent {
 .event-card__title a:hover {
   color: #ee3145;
 }
-.event-card__topline {
+.event-card__dateline {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px 16px;
-  display: none;
-  font-size: 14px;
-  color: #000000;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+.event-card__dateline .tour-card__includes {
+  margin-left: auto;
 }
 .event-card__date {
   display: inline-flex;
@@ -8590,12 +8591,14 @@ html.bsi-cookie-consented .cookie-consent {
   font-size: 14px;
   color: #000000;
 }
+.event-card__nights {
+  font-size: 14px;
+  color: #5c5c5c;
+  white-space: nowrap;
+}
 .event-card__date-icon {
   flex-shrink: 0;
-  color: #5c5c5c;
-}
-.event-card__nights {
-  color: #5c5c5c;
+  color: #000000;
 }
 .event-card__excerpt {
   margin: 4px 0 0;
@@ -8822,7 +8825,7 @@ html.bsi-cookie-consented .cookie-consent {
 }
 .single-event__hero {
   position: relative;
-  min-height: 480px;
+  min-height: 580px;
   display: flex;
   flex-direction: column;
   margin-top: 16px;

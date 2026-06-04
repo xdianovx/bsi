@@ -642,14 +642,16 @@
   }
 }
 
-.event-card__topline {
+.event-card__dateline {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px 16px;
-  display: none;
-  font-size: 14px;
-  color: $text-black;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.event-card__dateline .tour-card__includes {
+  margin-left: auto;
 }
 
 .event-card__date {
@@ -660,13 +662,15 @@
   color: $text-black;
 }
 
-.event-card__date-icon {
-  flex-shrink: 0;
+.event-card__nights {
+  font-size: 14px;
   color: $text-gray;
+  white-space: nowrap;
 }
 
-.event-card__nights {
-  color: $text-gray;
+.event-card__date-icon {
+  flex-shrink: 0;
+  color: $text-black;
 }
 
 .event-card__excerpt {
@@ -938,7 +942,7 @@
 
 .single-event__hero {
   position: relative;
-  min-height: 480px;
+  min-height: 580px;
   display: flex;
   flex-direction: column;
   margin-top: 16px;

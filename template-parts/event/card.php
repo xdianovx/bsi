@@ -130,22 +130,6 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
   </a>
 
   <div class="event-card__body">
-    <?php if ($event_card_date !== '' || $nights > 0): ?>
-      <div class="event-card__topline">
-        <?php if ($event_card_date !== ''): ?>
-          <span class="event-card__date">
-            <svg class="event-card__date-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-            </svg>
-            <span class="numfont"><?= esc_html($event_card_date); ?></span>
-          </span>
-        <?php endif; ?>
-        <?php if ($nights > 0): ?>
-          <span class="event-card__nights">Ночей: <span class="numfont"><?= esc_html((string) $nights); ?></span></span>
-        <?php endif; ?>
-      </div>
-    <?php endif; ?>
-
     <?php if ($country_title !== '' || $city !== ''): ?>
       <div class="event-card__location">
         <?php if ($flag_url !== ''): ?>
@@ -166,8 +150,21 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
       <a href="<?= esc_url($link); ?>"><?= esc_html($title); ?></a>
     </h3>
 
-    <?php if ($excerpt_raw !== ''): ?>
-      <p class="event-card__excerpt"><?= esc_html($excerpt_raw); ?></p>
+    <?php if ($event_card_date !== '' || $nights > 0): ?>
+      <div class="event-card__dateline">
+        <?php if ($event_card_date !== ''): ?>
+          <div class="event-card__date">
+            <svg class="event-card__date-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+            </svg>
+            <span class="numfont"><?= esc_html($event_card_date); ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ($nights > 0): ?>
+          <span class="event-card__nights"><span class="numfont"><?= esc_html((string) $nights); ?></span>
+            <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($nights, 'ночь', 'ночи', 'ночей') : 'ночей'); ?></span>
+        <?php endif; ?>
+      </div>
     <?php endif; ?>
 
     <?php if (!empty($include_terms)): ?>
@@ -213,6 +210,10 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
           <?php endforeach; ?>
         </div>
       </div>
+    <?php endif; ?>
+
+    <?php if ($excerpt_raw !== ''): ?>
+      <p class="event-card__excerpt"><?= esc_html($excerpt_raw); ?></p>
     <?php endif; ?>
 
     <div class="event-card__actions">

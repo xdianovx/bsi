@@ -314,7 +314,7 @@ if ($price_from_amount !== null && (int) $price_from_amount > 0) {
 } elseif ($tour_price_from !== '') {
   $hero_price_line = $tour_price_from;
 } else {
-  $hero_price_line = 'Запросить';
+  $hero_price_line = 'По запросу';
 }
 
 $hero_style = '';
@@ -857,7 +857,7 @@ get_header();
               <?php elseif ($tour_price_from !== ''): ?>
                 <?= esc_html($tour_price_from); ?>
               <?php else: ?>
-                Запросить
+                По запросу
               <?php endif; ?>
             </div>
 
