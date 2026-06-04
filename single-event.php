@@ -479,14 +479,19 @@ get_header();
           <!-- Dates end -->
 
           <!-- Scheme start -->
-          <?php if ($venue_scheme_url): ?>
-            <section class="single-event__venue-scheme">
+          <?php
+          $has_scheme_legend = !empty($venue_scheme_legend) && is_array($venue_scheme_legend);
+          if ($venue_scheme_url || $has_scheme_legend):
+            ?>
+            <section class="single-event__venue-scheme<?= $venue_scheme_url ? '' : ' single-event__venue-scheme--no-image'; ?>">
               <h2 class="h2">Схема зала</h2>
               <div class="single-event__venue-layout">
-                <figure class="single-event__venue-figure">
-                  <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
-                </figure>
-                <?php if (!empty($venue_scheme_legend) && is_array($venue_scheme_legend)): ?>
+                <?php if ($venue_scheme_url): ?>
+                  <figure class="single-event__venue-figure">
+                    <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
+                  </figure>
+                <?php endif; ?>
+                <?php if ($has_scheme_legend): ?>
                   <?php
                   $legend_currency_map = [
                     '₽' => 'RUB', 'руб' => 'RUB', 'руб.' => 'RUB', 'rub' => 'RUB',
@@ -546,7 +551,7 @@ get_header();
                             data-price-original="<?= esc_attr((string) $leg_price_original); ?>"
                             data-price-currency="<?= esc_attr($leg_price_currency); ?>"
                             <?php endif; ?>>
-                            <?= esc_html($pr); ?>
+                            <?= esc_html(number_format((int) $leg_price_rub, 0, ',', ' ')); ?> ₽
                           </span>
                         <?php else: ?>
                           <span class="single-event__venue-legend-price numfont">

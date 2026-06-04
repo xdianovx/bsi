@@ -8408,6 +8408,9 @@ html.bsi-cookie-consented .cookie-consent {
     grid-template-columns: 1fr;
   }
 }
+.single-event__venue-scheme--no-image .single-event__venue-layout {
+  grid-template-columns: 1fr;
+}
 .single-event__venue-figure {
   flex: 0 0 auto;
   margin: 0;
@@ -8474,14 +8477,14 @@ html.bsi-cookie-consented .cookie-consent {
   line-height: 150%;
 }
 .single-event__booking-widget-includes-title {
-  margin-top: 20px;
+  margin-top: 16px;
   margin-bottom: 8px;
   font-size: 16px;
   font-weight: 600;
   color: #000000;
 }
 .single-event__booking-widget-includes {
-  margin-top: 8px;
+  margin-top: 4px;
   margin-bottom: 4px;
 }
 .single-event__quick-facts {
