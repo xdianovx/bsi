@@ -137,21 +137,6 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
       <a href="<?= esc_url($link); ?>"><?= esc_html($title); ?></a>
     </h3>
 
-    <?php if ($event_card_date !== ''): ?>
-      <div class="event-card__date numfont"><?= esc_html($event_card_date); ?></div>
-    <?php endif; ?>
-
-    <?php if ($nights > 0 || $excursions > 0): ?>
-      <div class="event-card__meta">
-        <?php if ($nights > 0): ?>
-          <span class="event-card__meta-item">Ночей: <span class="numfont"><?= esc_html((string) $nights); ?></span></span>
-        <?php endif; ?>
-        <?php if ($excursions > 0): ?>
-          <span class="event-card__meta-item">Экскурсий: <span class="numfont"><?= esc_html((string) $excursions); ?></span></span>
-        <?php endif; ?>
-      </div>
-    <?php endif; ?>
-
     <?php if (!empty($include_terms)): ?>
       <div class="hotel-card__includes tour-card__includes">
         <div class="tour-card__anemeties">
@@ -197,6 +182,21 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
       </div>
     <?php endif; ?>
 
+    <?php if ($event_card_date !== ''): ?>
+      <div class="event-card__date numfont"><?= esc_html($event_card_date); ?></div>
+    <?php endif; ?>
+
+    <?php if ($nights > 0 || $excursions > 0): ?>
+      <div class="event-card__meta">
+        <?php if ($nights > 0): ?>
+          <span class="event-card__meta-item">Ночей: <span class="numfont"><?= esc_html((string) $nights); ?></span></span>
+        <?php endif; ?>
+        <?php if ($excursions > 0): ?>
+          <span class="event-card__meta-item">Экскурсий: <span class="numfont"><?= esc_html((string) $excursions); ?></span></span>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
+
     <div class="event-card__actions">
       <a href="<?= esc_url($link); ?>" class="event-card__btn event-card__btn-details">Подробнее</a>
       <a href="<?= esc_url($link); ?>"
@@ -212,7 +212,7 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
         <?php if ($price_rub !== null): ?>
           от <?= esc_html(number_format((int) $price_rub, 0, ',', ' ')); ?> ₽
         <?php else: ?>
-          Подробнее
+          по запросу
         <?php endif; ?>
       </a>
     </div>

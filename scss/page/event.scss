@@ -656,6 +656,7 @@
 
 .event-card__actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-top: auto;
   padding-top: 12px;
