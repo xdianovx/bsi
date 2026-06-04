@@ -209,6 +209,14 @@ $tour_type_terms = get_terms([
               <div class="country-tours__counter js-tours-counter">
                 Найдено: <?= (int) $tours_query->found_posts; ?>
               </div>
+
+              <label class="ui-checkbox country-tours__currency-toggle">
+                <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency"
+                  name="show_original_currency_event_catalog" value="1">
+                <span class="ui-checkbox__mark"></span>
+                <span class="ui-checkbox__text">Показать в валюте</span>
+              </label>
+
               <button type="button" class="tours-page__reset-btn js-tours-reset" style="display: none;">
                 Сбросить фильтры
               </button>
@@ -234,25 +242,6 @@ $tour_type_terms = get_terms([
                 </div>
               </div>
 
-              <!-- Переключатель выкладки -->
-              <div class="catalog-view-toggle" data-view-toggle role="group" aria-label="Вид каталога">
-                <button type="button" class="catalog-view-toggle__btn is-active" data-view="tiles" aria-label="Плитки">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <rect x="2.5" y="2.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                    <rect x="11.5" y="2.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                    <rect x="2.5" y="11.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                    <rect x="11.5" y="11.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                  </svg>
-                </button>
-                <button type="button" class="catalog-view-toggle__btn" data-view="list" aria-label="Список">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <path d="M6 4.5h11.5M6 10h11.5M6 15.5h11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <circle cx="3" cy="4.5" r="1" fill="currentColor"/>
-                    <circle cx="3" cy="10" r="1" fill="currentColor"/>
-                    <circle cx="3" cy="15.5" r="1" fill="currentColor"/>
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
 
