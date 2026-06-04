@@ -8531,6 +8531,7 @@ html.bsi-cookie-consented .cookie-consent {
   color: #000000;
 }
 .event-card__body {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -13564,12 +13565,6 @@ button.single-event__dates-book {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-}
-@media screen and (max-width: 768px) {
-  .country-tours__head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
 .country-tours__head-left {
   flex: 1 1 auto;
