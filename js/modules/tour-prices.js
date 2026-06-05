@@ -53,6 +53,7 @@ export const tourPrices = () => {
   let currentStarFilter = "";
   let starFilterChoice = null;
   let availableDates = [];
+  let availableDatesSet = new Set();
   let datePickerInstance = null;
 
   function formatDateYYYYMMDD(date) {
@@ -577,6 +578,8 @@ export const tourPrices = () => {
         if (checkInBeg.validDates && checkInBeg.startDate) {
           const parsedDates = parseValidDates(checkInBeg.validDates, checkInBeg.startDate);
           availableDates = Array.isArray(parsedDates) ? parsedDates : [];
+          availableDatesSet = new Set(availableDates);
+          datePickerInstance?.redraw();
 
           if (availableDates.length > 0) {
             const today = new Date();
@@ -875,6 +878,13 @@ export const tourPrices = () => {
         mode: "range",
         locale: Russian,
         dateFormat: "d.m",
+        onDayCreate: (_dObj, _dStr, fp, dayElem) => {
+          // Точка-маркер под датами заезда (validDates из excursion_all).
+          const ymd = fp.formatDate(dayElem.dateObj, "Ymd");
+          if (availableDatesSet.has(ymd)) {
+            dayElem.classList.add("has-event");
+          }
+        },
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
             searchParams.checkInBeg = formatDateYYYYMMDD(selectedDates[0]);
