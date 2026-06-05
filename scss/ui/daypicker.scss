@@ -41,29 +41,126 @@
   opacity: 0.35;
 }
 
-// Flatpickr (popup): подсветка дней с реальным событием (event_dates / event_hero_date).
-// Глобально, т.к. календарь рендерится в <body> вне обёртки страницы.
-.flatpickr-day.has-event {
-  position: relative;
-  font-weight: 600;
+// Flatpickr (popup каталога событийных туров).
+// Класс event-tours-calendar навешивается в JS (onReady) — стилизуем только этот
+// инстанс, не задевая остальные пикеры. Рендерится в <body> вне обёртки страницы.
+.flatpickr-calendar.event-tours-calendar {
+  border: 1px solid $gray-light;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font-family: "Inter", sans-serif;
+  padding: 8px;
 
+  // стрелка-указатель popup'а убрана — плоский блок
+  &::before,
   &::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 4px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: $red;
-    transform: translateX(-50%);
+    display: none !important;
   }
 
-  &.selected,
-  &.startRange,
-  &.endRange {
-    &::after {
-      background: #fff;
+  .flatpickr-months {
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .flatpickr-current-month {
+    font-size: 15px;
+    font-weight: 600;
+
+    .flatpickr-monthDropdown-months {
+      font-weight: 600;
+    }
+  }
+
+  .flatpickr-prev-month,
+  .flatpickr-next-month {
+    border-radius: 8px;
+
+    &:hover svg {
+      fill: $red;
+    }
+  }
+
+  .flatpickr-weekday {
+    color: $text-gray;
+    font-weight: 500;
+    font-size: 12px;
+  }
+
+  .flatpickr-day {
+    position: relative;
+    border-radius: 8px;
+    border-color: transparent;
+    color: $text-black;
+    font-size: 14px;
+
+    &:hover {
+      background: $bg-gray;
+      border-color: transparent;
+    }
+
+    &.today {
+      // текущая дата — не круг, а квадрат с rounded 8px, тонкая обводка
+      border-color: $gray-light;
+    }
+
+    &.selected,
+    &.startRange,
+    &.endRange {
+      background: $red;
+      border-color: $red;
+      color: #fff;
+    }
+
+    &.startRange {
+      border-radius: 8px 0 0 8px;
+    }
+
+    &.endRange {
+      border-radius: 0 8px 8px 0;
+    }
+
+    &.selected.startRange.endRange {
+      border-radius: 8px;
+    }
+
+    &.inRange {
+      background: rgba($red, 0.1);
+      border-color: transparent;
+      box-shadow: -5px 0 0 rgba($red, 0.1), 5px 0 0 rgba($red, 0.1);
+    }
+
+    &.flatpickr-disabled {
+      color: $gray-light;
+    }
+
+    &.prevMonthDay,
+    &.nextMonthDay {
+      color: $gray-light;
+    }
+
+    // День с событием — точка-маркер под цифрой.
+    &.has-event {
+      font-weight: 600;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 4px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: $red;
+        transform: translateX(-50%);
+      }
+
+      &.selected,
+      &.startRange,
+      &.endRange {
+        &::after {
+          background: #fff;
+        }
+      }
     }
   }
 }
