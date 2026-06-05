@@ -55,7 +55,7 @@ export const initEventToursFilters = async () => {
   let datePickerInstance = null;
   let availableDatesSet = new Set();
   let currentPage = 1;
-  let sortValue = "title_asc";
+  let sortValue = "date_asc";
   let viewValue = "tiles";
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
@@ -459,7 +459,7 @@ export const initEventToursFilters = async () => {
     const sortOptions = sortEl.querySelectorAll(".country-tours__sort-option");
     sortOptions.forEach((opt) => {
       opt.addEventListener("click", async () => {
-        const val = opt.dataset.value || "title_asc";
+        const val = opt.dataset.value || "date_asc";
         if (val === sortValue) {
           sortEl.classList.remove("is-open");
           return;

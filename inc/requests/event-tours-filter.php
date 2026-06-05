@@ -32,9 +32,9 @@ if (!function_exists('bsi_event_tours_parse_request_filters')) {
    */
   function bsi_event_tours_parse_request_filters(): array
   {
-    $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'title_asc';
-    if (!in_array($sort, ['title_asc', 'title_desc', 'price_asc', 'price_desc'], true)) {
-      $sort = 'title_asc';
+    $sort = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'date_asc';
+    if (!in_array($sort, ['date_asc', 'date_desc', 'title_asc', 'title_desc', 'price_asc', 'price_desc'], true)) {
+      $sort = 'date_asc';
     }
     $view = isset($_POST['view']) ? sanitize_text_field(wp_unslash($_POST['view'])) : 'tiles';
     if (!in_array($view, ['tiles', 'list'], true)) {
@@ -211,6 +211,52 @@ if (!function_exists('bsi_event_tours_get_matching_post_ids')) {
   }
 }
 
+if (!function_exists('bsi_event_tours_nearest_ts')) {
+  /**
+   * Ближайшая (предстоящая) дата события как timestamp.
+   * Берём минимальную дату >= сегодня из event_dates / event_hero_date.
+   * Если все даты в прошлом — возвращаем PHP_INT_MAX (такие уходят в конец списка «ближайшие»).
+   */
+  function bsi_event_tours_nearest_ts(int $post_id): int
+  {
+    $today = strtotime(date('Y-m-d', current_time('timestamp')));
+
+    $all = [];
+    $event_dates = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
+    if (!empty($event_dates) && is_array($event_dates)) {
+      foreach ($event_dates as $row) {
+        $d = isset($row['date_value']) ? $row['date_value'] : '';
+        if ($d) {
+          $ts = strtotime((string) $d);
+          if ($ts) {
+            $all[] = $ts;
+          }
+        }
+      }
+    }
+    $hero_d = function_exists('get_field') ? get_field('event_hero_date', $post_id) : '';
+    if (is_string($hero_d) && $hero_d !== '') {
+      $ts = strtotime($hero_d);
+      if ($ts) {
+        $all[] = $ts;
+      }
+    }
+
+    if (empty($all)) {
+      return PHP_INT_MAX;
+    }
+
+    $upcoming = array_filter($all, static function ($ts) use ($today) {
+      return $ts >= $today;
+    });
+    if (!empty($upcoming)) {
+      return min($upcoming);
+    }
+
+    return PHP_INT_MAX;
+  }
+}
+
 if (!function_exists('bsi_event_tours_sort_ids')) {
   /**
    * @param int[] $ids уже в порядке title ASC
@@ -227,6 +273,31 @@ if (!function_exists('bsi_event_tours_sort_ids')) {
     }
     if ($sort === 'title_desc') {
       return array_reverse($ids);
+    }
+
+    if ($sort === 'date_asc' || $sort === 'date_desc') {
+      bsi_event_tours_prime_meta_for_ids($ids);
+      $rows = [];
+      foreach ($ids as $i => $id) {
+        $rows[] = ['id' => (int) $id, 'ts' => bsi_event_tours_nearest_ts((int) $id), 'pos' => $i];
+      }
+      $desc = ($sort === 'date_desc');
+      usort($rows, static function ($a, $b) use ($desc) {
+        // События без предстоящих дат (PHP_INT_MAX) — всегда в конце, независимо от направления.
+        $an = $a['ts'] === PHP_INT_MAX;
+        $bn = $b['ts'] === PHP_INT_MAX;
+        if ($an !== $bn) {
+          return $an ? 1 : -1;
+        }
+        $cmp = $a['ts'] <=> $b['ts'];
+        if ($cmp === 0) {
+          return $a['pos'] <=> $b['pos'];
+        }
+        return $desc ? -$cmp : $cmp;
+      });
+      return array_map(static function ($r) {
+        return $r['id'];
+      }, $rows);
     }
 
     // price_asc / price_desc

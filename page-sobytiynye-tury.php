@@ -7,15 +7,27 @@ get_header();
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = (int) BSI_EVENT_TOURS_CATALOG_PER_PAGE;
 
-// Начальный запрос событийных туров
-$tours_query = new WP_Query(bsi_query_args_append_schedule([
+// Начальный запрос событийных туров — порядок «сначала ближайшие» (как дефолтная сортировка).
+$event_tours_total = 0;
+$event_tours_slice_ids = [];
+if (function_exists('bsi_event_tours_get_matching_post_ids') && function_exists('bsi_event_tours_sort_ids')) {
+  $event_tours_default_f = function_exists('bsi_event_tours_parse_request_filters')
+    ? bsi_event_tours_parse_request_filters()
+    : ['sort' => 'date_asc'];
+  $event_tours_all_ids = bsi_event_tours_get_matching_post_ids($event_tours_default_f, [], false);
+  $event_tours_all_ids = bsi_event_tours_sort_ids($event_tours_all_ids, 'date_asc');
+  $event_tours_total = count($event_tours_all_ids);
+  $event_tours_slice_ids = array_slice($event_tours_all_ids, ($paged - 1) * $per_page, $per_page);
+}
+
+$tours_query = new WP_Query([
   'post_type' => 'event',
   'post_status' => 'publish',
+  'post__in' => !empty($event_tours_slice_ids) ? $event_tours_slice_ids : [0],
+  'orderby' => 'post__in',
   'posts_per_page' => $per_page,
-  'paged' => $paged,
-  'orderby' => 'title',
-  'order' => 'ASC',
-]));
+  'no_found_rows' => true,
+]);
 
 // Получаем страны, у которых есть событийные туры
 $event_tours_countries_query = new WP_Query(bsi_query_args_append_schedule([
@@ -207,7 +219,7 @@ $tour_type_terms = get_terms([
           <div class="country-tours__head">
             <div class="country-tours__head-left">
               <div class="country-tours__counter js-tours-counter">
-                Найдено: <?= (int) $tours_query->found_posts; ?>
+                Найдено: <?= (int) $event_tours_total; ?>
               </div>
 
               <label class="ui-checkbox country-tours__currency-toggle">
@@ -226,7 +238,7 @@ $tour_type_terms = get_terms([
               <!-- Сортировка -->
               <div class="country-tours__sort js-dropdown" data-tours-sort>
                 <button type="button" class="js-dropdown-trigger country-tours__sort-trigger">
-                  <span class="country-tours__sort-text">По названию (А-Я)</span>
+                  <span class="country-tours__sort-text">По дате (сначала ближайшие)</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
                           stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -234,8 +246,8 @@ $tour_type_terms = get_terms([
                 </button>
                 <div class="js-dropdown-panel country-tours__sort-panel">
                   <div class="country-tours__sort-options">
-                    <button type="button" class="country-tours__sort-option is-active" data-value="title_asc">По названию (А-Я)</button>
-                    <button type="button" class="country-tours__sort-option" data-value="title_desc">По названию (Я-А)</button>
+                    <button type="button" class="country-tours__sort-option is-active" data-value="date_asc">По дате (сначала ближайшие)</button>
+                    <button type="button" class="country-tours__sort-option" data-value="date_desc">По дате (сначала поздние)</button>
                     <button type="button" class="country-tours__sort-option" data-value="price_asc">По цене (возрастание)</button>
                     <button type="button" class="country-tours__sort-option" data-value="price_desc">По цене (убывание)</button>
                   </div>
