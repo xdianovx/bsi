@@ -40,3 +40,30 @@
 .day-item.is-disabled {
   opacity: 0.35;
 }
+
+// Flatpickr (popup): подсветка дней с реальным событием (event_dates / event_hero_date).
+// Глобально, т.к. календарь рендерится в <body> вне обёртки страницы.
+.flatpickr-day.has-event {
+  position: relative;
+  font-weight: 600;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: $red;
+    transform: translateX(-50%);
+  }
+
+  &.selected,
+  &.startRange,
+  &.endRange {
+    &::after {
+      background: #fff;
+    }
+  }
+}

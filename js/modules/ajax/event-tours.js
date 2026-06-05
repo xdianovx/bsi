@@ -53,6 +53,7 @@ export const initEventToursFilters = async () => {
   const viewToggleEl = root.querySelector("[data-view-toggle]");
 
   let datePickerInstance = null;
+  let availableDatesSet = new Set();
   let currentPage = 1;
   let sortValue = "title_asc";
   let viewValue = "tiles";
@@ -218,8 +219,14 @@ export const initEventToursFilters = async () => {
       if (!json || !json.success) throw new Error("AJAX error");
 
       const dates = Array.isArray(json.data.dates) ? json.data.dates : [];
-      // Календарь активирует только даты, внесённые в туры (event_dates / event_hero_date).
-      datePickerInstance.set("enable", dates.length ? dates : [() => false]);
+      // Существующие даты событий (event_dates / event_hero_date) для подсветки точкой
+      // в onDayCreate. Календарь полностью кликабелен — даты не ограничиваем,
+      // лишь помечаем те, где есть событие.
+      availableDatesSet = new Set(dates);
+      datePickerInstance.set("enable", [() => true]);
+      datePickerInstance.set("minDate", null);
+      datePickerInstance.set("maxDate", null);
+      datePickerInstance.redraw();
     } catch (_e) {
       /* ignore */
     }
@@ -300,6 +307,13 @@ export const initEventToursFilters = async () => {
       locale: Russian,
       dateFormat: "d.m.Y",
       disableMobile: true,
+      onDayCreate: (_dObj, _dStr, fp, dayElem) => {
+        // Подсветка дней, у которых есть событие (event_dates / event_hero_date).
+        const ymd = fp.formatDate(dayElem.dateObj, "Y-m-d");
+        if (availableDatesSet.has(ymd)) {
+          dayElem.classList.add("has-event");
+        }
+      },
       onChange: async (selectedDates) => {
         currentPage = 1;
         if (selectedDates.length === 2) {
