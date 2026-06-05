@@ -581,6 +581,7 @@ get_header();
               }
               $acc_stars_raw = isset($acc_row['accommodation_stars']) ? (int) $acc_row['accommodation_stars'] : 0;
               $acc_stars = max(0, min(5, $acc_stars_raw));
+              $acc_stars_plus = !empty($acc_row['accommodation_stars_plus']);
               $acc_descr = isset($acc_row['accommodation_description']) ? trim((string) $acc_row['accommodation_description']) : '';
               $acc_amount_raw = $acc_row['accommodation_price'] ?? null;
               $acc_amount = ($acc_amount_raw !== null && $acc_amount_raw !== '') ? (float) $acc_amount_raw : null;
@@ -612,6 +613,7 @@ get_header();
               $accommodation_rows[] = [
                 'name' => $acc_name,
                 'stars' => $acc_stars,
+                'stars_plus' => $acc_stars_plus,
                 'descr' => $acc_descr,
                 'price_rub' => $acc_price_rub,
                 'price_original' => $acc_price_original,
@@ -640,8 +642,9 @@ get_header();
                     data-price-rub="<?= esc_attr((string) (int) ($acc['price_rub'] ?? 0)); ?>">
                     <div class="single-event__accommodation-card-head">
                       <?php if ($acc['stars'] > 0): ?>
-                        <span class="single-event__accommodation-card-stars" aria-label="<?= esc_attr($acc['stars'] . ' из 5'); ?>">
-                          <span class="single-event__accommodation-card-stars-num"><?= esc_html((string) $acc['stars']); ?></span>
+                        <?php $acc_stars_label = (string) $acc['stars'] . (!empty($acc['stars_plus']) ? '+' : ''); ?>
+                        <span class="single-event__accommodation-card-stars" aria-label="<?= esc_attr($acc_stars_label . ' из 5'); ?>">
+                          <span class="single-event__accommodation-card-stars-num"><?= esc_html($acc_stars_label); ?></span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true">
                             <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>
                           </svg>
@@ -683,7 +686,7 @@ get_header();
                         data-event-venue="<?= esc_attr($event_venue); ?>"
                         data-event-time="<?= esc_attr($event_time); ?>"
                         data-accommodation-name="<?= esc_attr($acc['name']); ?>"
-                        data-accommodation-stars="<?= esc_attr((string) $acc['stars']); ?>"
+                        data-accommodation-stars="<?= esc_attr((string) $acc['stars'] . (!empty($acc['stars_plus']) ? '+' : '')); ?>"
                         <?php if ($acc['price_rub'] !== null && (int) $acc['price_rub'] > 0): ?>
                         data-min-price="<?= esc_attr((string) (int) $acc['price_rub']); ?>"
                         <?php endif; ?>
