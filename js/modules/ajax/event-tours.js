@@ -307,11 +307,6 @@ export const initEventToursFilters = async () => {
       locale: Russian,
       dateFormat: "d.m.Y",
       disableMobile: true,
-      onReady: (_d, _s, fp) => {
-        // Свой класс на контейнер popup'а — чтобы стилизовать только этот календарь,
-        // не задевая остальные flatpickr-инстансы (popup рендерится в <body>).
-        fp.calendarContainer.classList.add("event-tours-calendar");
-      },
       onDayCreate: (_dObj, _dStr, fp, dayElem) => {
         // Подсветка дней, у которых есть событие (event_dates / event_hero_date).
         const ymd = fp.formatDate(dayElem.dateObj, "Y-m-d");

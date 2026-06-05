@@ -41,15 +41,16 @@
   opacity: 0.35;
 }
 
-// Flatpickr (popup каталога событийных туров).
-// Класс event-tours-calendar навешивается в JS (onReady) — стилизуем только этот
-// инстанс, не задевая остальные пикеры. Рендерится в <body> вне обёртки страницы.
-.flatpickr-calendar.event-tours-calendar {
+// Flatpickr — единая тема для всех календарей проекта (popup и inline).
+// Рендерятся в <body> вне обёртки страницы, поэтому стили глобальные.
+.flatpickr-calendar {
+  width: fit-content;
   border: 1px solid $gray-light;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   font-family: "Inter", sans-serif;
-  padding: 8px;
+  // padding не добавляем: flatpickr box-sizing:border-box + фикс-ширина .flatpickr-days
+  // → padding обрезал бы последний столбец (Вс).
 
   // стрелка-указатель popup'а убрана — плоский блок
   &::before,
@@ -124,9 +125,12 @@
     }
 
     &.inRange {
+      // без box-shadow-«растяжки» — дни flatpickr идут впритык, фон сам соединяется,
+      // shadow же наезжал на соседние ячейки. Промежуточные дни диапазона без скругления.
       background: rgba($red, 0.1);
       border-color: transparent;
-      box-shadow: -5px 0 0 rgba($red, 0.1), 5px 0 0 rgba($red, 0.1);
+      border-radius: 0;
+      box-shadow: none;
     }
 
     &.flatpickr-disabled {
@@ -162,5 +166,13 @@
         }
       }
     }
+  }
+
+  // Дефолт flatpickr вешает box-shadow на крайние дни недели в диапазоне
+  // (.flatpickr-day.inRange:nth-child(7n+1) / 7n) — гасим, фон и так непрерывный.
+  .flatpickr-days .dayContainer:nth-child(n + 2) .flatpickr-day.inRange:nth-child(7n + 1),
+  .flatpickr-day.inRange:nth-child(7n + 1),
+  .flatpickr-day.inRange:nth-child(7n) {
+    box-shadow: none;
   }
 }
