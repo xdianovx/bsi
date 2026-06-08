@@ -56,8 +56,9 @@ $flag_url = ($country_id && function_exists('bsi_get_country_flag_url'))
 $resorts = get_the_terms($post_id, 'resort');
 $city = (!empty($resorts) && !is_wp_error($resorts)) ? $resorts[0]->name : '';
 
-// Ближайшая дата из event_dates (fallback — event_hero_date).
+// Ближайшая дата из event_dates (fallback — event_hero_date) + кол-во остальных дат.
 $event_card_date = '';
+$event_dates_more = 0;
 $event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
 if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
   $ds = [];
@@ -70,6 +71,7 @@ if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
   sort($ds);
   if (!empty($ds[0])) {
     $event_card_date = date_i18n('j.m.Y', strtotime($ds[0]));
+    $event_dates_more = max(0, count($ds) - 1);
   }
 }
 if ($event_card_date === '' && function_exists('get_field')) {
@@ -158,6 +160,10 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
               <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
             </svg>
             <span class="numfont"><?= esc_html($event_card_date); ?></span>
+            <?php if ($event_dates_more > 0): ?>
+              <span class="event-card__date-more">…и еще <span class="numfont"><?= (int) $event_dates_more; ?></span>
+                <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($event_dates_more, 'дата', 'даты', 'дат') : 'дат'); ?></span>
+            <?php endif; ?>
           </div>
         <?php endif; ?>
         <?php if ($nights > 0): ?>

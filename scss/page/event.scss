@@ -673,6 +673,12 @@
   color: $text-black;
 }
 
+.event-card__date-more {
+  font-size: 14px;
+  color: $text-gray;
+  white-space: nowrap;
+}
+
 .event-card__excerpt {
   margin: 4px 0 0;
   font-size: 14px;
@@ -1966,6 +1972,14 @@ button.single-event__dates-book {
     font-weight: 500;
     line-height: 140%;
     color: #000;
+  }
+
+  .catalog-card__date-more {
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 140%;
+    color: $text-gray;
+    white-space: nowrap;
   }
 
   .catalog-card__title {

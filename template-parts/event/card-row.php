@@ -26,6 +26,7 @@ $checkin_dates = function_exists('get_field') ? trim((string) get_field('tour_ch
 $event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
 
 $event_card_date = '';
+$event_dates_more = 0;
 if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
   $ds = [];
   foreach ($event_dates_rows as $row) {
@@ -37,6 +38,7 @@ if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
   sort($ds);
   if (!empty($ds[0])) {
     $event_card_date = date_i18n('j.m.Y', strtotime($ds[0]));
+    $event_dates_more = max(0, count($ds) - 1);
   }
 }
 if ($event_card_date === '' && function_exists('get_field')) {
@@ -118,6 +120,10 @@ $excerpt_raw = preg_replace('/\s+/u', ' ', trim($excerpt_raw));
         </div>
         <?php if ($event_card_date !== ''): ?>
           <span class="catalog-card__date numfont"><?= esc_html($event_card_date); ?></span>
+          <?php if ($event_dates_more > 0): ?>
+            <span class="catalog-card__date-more">…и еще <span class="numfont"><?= (int) $event_dates_more; ?></span>
+              <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($event_dates_more, 'дата', 'даты', 'дат') : 'дат'); ?></span>
+          <?php endif; ?>
         <?php endif; ?>
       </div>
     <?php endif; ?>

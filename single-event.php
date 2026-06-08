@@ -189,9 +189,7 @@ if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
       }
     }
 
-    if ($price_rub === null && $fallback_rub_from_post !== null && $fallback_rub_from_post > 0) {
-      $price_rub = (int) $fallback_rub_from_post;
-    }
+    // Пустая ячейка цены строки → не подставляем общую цену поста: строка покажет «По запросу».
 
     $dates_section_rows[] = [
       'date' => $d,
@@ -456,7 +454,7 @@ get_header();
                           <?= esc_html(number_format((int) $row_price_rub, 0, ',', ' ')); ?>
                           ₽</span>
                       <?php else: ?>
-                        <span class="single-event__dates-price numfont">—</span>
+                        <span class="single-event__dates-price single-event__dates-price--request">По запросу</span>
                       <?php endif; ?>
                       <span class="single-event__dates-sep" aria-hidden="true"></span>
                       <span class="single-event__dates-book-wrap">

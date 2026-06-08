@@ -73,7 +73,7 @@ export const initEventToursFilters = async () => {
       datePickerInstance.selectedDates.length === 2
     ) {
       const dates = datePickerInstance.selectedDates
-        .map((d) => d.toISOString().split("T")[0])
+        .map((d) => datePickerInstance.formatDate(d, "Y-m-d"))
         .sort();
       body.set("date_from", dates[0]);
       body.set("date_to", dates[1]);
