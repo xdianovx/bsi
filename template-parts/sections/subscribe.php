@@ -17,6 +17,7 @@
           <?php
           $unisender_action = 'https://cp.unisender.com/ru/subscribe?hash=6w9zi9a93r6q6k7gd77osrtx7sehuo9kqhaysuxekseaxnnymabsy';
           $unisender_default_list_id = 20097402;
+          $unisender_list_ids = [$unisender_default_list_id];
 
           ?>
           <form method="POST"
