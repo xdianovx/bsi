@@ -420,7 +420,7 @@ get_header();
           <!-- Dates start -->
           <?php if (!empty($dates_section_rows)): ?>
             <section class="single-event__dates-section">
-              <h2 class="h2 single-event__dates-title">Даты и места концертов</h2>
+              <h2 class="h2 single-event__dates-title">Даты и место</h2>
               <ul class="single-event__dates-list">
                 <?php foreach ($dates_section_rows as $br): ?>
                   <?php
