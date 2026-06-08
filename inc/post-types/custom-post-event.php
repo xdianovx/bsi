@@ -583,12 +583,12 @@ add_action('acf/init', function () {
           ],
           [
             'key' => 'field_event_accommodation_description',
-            'label' => 'Описание / примечание',
+            'label' => 'Трибуна / сектор / зона',
             'name' => 'accommodation_description',
-            'type' => 'textarea',
+            'type' => 'text',
             'wrapper' => ['width' => '100'],
-            'rows' => 2,
-            'new_lines' => 'br',
+            'placeholder' => 'Например: Трибуна A, сектор 12',
+            'instructions' => 'Привязка отеля к трибуне / сектору / зоне. Выводится на карточке проживания.',
           ],
           [
             'key' => 'field_event_accommodation_price',
