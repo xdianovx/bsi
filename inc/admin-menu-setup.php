@@ -165,9 +165,10 @@ function add_cpt_separator()
 {
   global $menu;
 
-  // Две линии-разделителя для групп (см. bsi_admin_menu_order).
+  // Три линии-разделителя для групп (см. bsi_admin_menu_order).
   $menu[58] = ['', 'read', 'bsi-separator-1', '', 'wp-menu-separator'];
   $menu[59] = ['', 'read', 'cpt-separator', '', 'wp-menu-separator'];
+  $menu[60] = ['', 'read', 'bsi-separator-2', '', 'wp-menu-separator'];
 
   ksort($menu);
 }
@@ -206,10 +207,32 @@ function bsi_admin_menu_order($menu_ord)
     'cpt-separator',                  // ──────
   ];
 
-  // Остальное (Секции, MICE и пр.) — в исходном порядке, без дублей.
-  $rest = array_values(array_diff($menu_ord, $desired));
+  // Технические/системные ссылки — в самый низ, в этом порядке.
+  $bottom = [
+    'upload.php',                         // Медиатека
+    'bsi-tour-prices-cache',              // Кэш цен туров
+    'currency-settings',                  // Настройки валют
+    'maintenance-modal-settings',         // Предупреждение на сайте
+    'edit.php?post_type=acf-field-group', // ACF (поля)
+    'wpseo_dashboard',                    // Yoast SEO
+    'themes.php',                         // Внешний вид
+    'plugins.php',                        // Плагины
+    'users.php',                          // Пользователи
+    'options-general.php',                // Настройки
+    'tools.php',                          // Инструменты
+  ];
 
-  return array_merge($desired, $rest);
+  // Дефолтные WP-разделители убираем — используем только свои.
+  $default_seps = ['separator1', 'separator2', 'separator-last'];
+
+  // Середина: контентные пункты (Секции, MICE, прочие CPT) — в исходном порядке.
+  $middle = array_values(array_diff($menu_ord, $desired, $bottom, $default_seps));
+
+  // Нижняя группа — только реально существующие пункты, в заданном порядке.
+  $bottom_present = array_values(array_intersect($bottom, $menu_ord));
+  $bottom_block = $bottom_present ? array_merge(['bsi-separator-2'], $bottom_present) : [];
+
+  return array_merge($desired, $middle, $bottom_block);
 }
 
 /**
