@@ -2,16 +2,10 @@
 /**
  * Информация об отелях страны — /country/{slug}/informaciya-ob-otelyah/
  *
- * Раздел-«события по отелям» (например: ремонт бассейна, реновация и т.п.).
+ * По образцу памятки туристам (country-memo.php): выводит записи CPT
+ * hotel_info, привязанные к стране через ACF `hotel_info_country`.
  * Шаблон грузится через роутер в single-country.php после установки
  * глобальной $country_hotels_info_data ({country: WP_Post, country_slug: string}).
- *
- * TODO (контент-модель ещё не утверждена):
- *  - Источник данных пока не определён. Сейчас выводится WYSIWYG-поле
- *    `hotels_info_content` на записи country (если заведено в ACF),
- *    иначе — заглушка. Когда решим структуру (отдельный CPT «событие по
- *    отелю» / repeater на country / привязка к hotel) — заменить блок
- *    .country-hotels-info__body на реальный вывод списка.
  */
 
 global $country_hotels_info_data;
@@ -36,10 +30,21 @@ $hotels_info_h1 = $country_locative !== ''
   ? 'Информация об отелях в ' . $country_locative
   : 'Информация об отелях';
 
-/* Временный источник контента — WYSIWYG-поле на country (если заведено). */
-$hotels_info_content = $country_id && function_exists('get_field')
-  ? get_field('hotels_info_content', $country_id)
-  : '';
+/* Записи CPT hotel_info по стране. */
+$hotel_info_q = $country_id ? new WP_Query([
+  'post_type' => 'hotel_info',
+  'post_status' => 'publish',
+  'posts_per_page' => -1,
+  'orderby' => 'date',
+  'order' => 'DESC',
+  'meta_query' => [
+    [
+      'key' => 'hotel_info_country',
+      'value' => $country_id,
+      'compare' => '=',
+    ],
+  ],
+]) : null;
 
 get_header(); ?>
 
@@ -69,13 +74,19 @@ get_header(); ?>
           </div>
 
           <div class="country-hotels-info">
-            <?php if (!empty($hotels_info_content)): ?>
-              <div class="country-hotels-info__body editor-content">
-                <?= wp_kses_post($hotels_info_content); ?>
-              </div>
+            <?php if ($hotel_info_q && $hotel_info_q->have_posts()): ?>
+              <?php while ($hotel_info_q->have_posts()):
+                $hotel_info_q->the_post(); ?>
+                <article class="country-hotels-info__item">
+                  <div class="country-hotels-info__body editor-content">
+                    <?php the_content(); ?>
+                  </div>
+                </article>
+              <?php endwhile; ?>
+              <?php wp_reset_postdata(); ?>
             <?php else: ?>
               <div class="country-hotels-info__empty">
-                Раздел в разработке.
+                Пока нет информации об отелях для этой страны.
               </div>
             <?php endif; ?>
           </div>

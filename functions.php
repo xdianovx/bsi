@@ -415,6 +415,7 @@ require get_template_directory() . '/inc/post-types/best-offers.php';
 require get_template_directory() . '/inc/post-types/tour.php';
 require get_template_directory() . '/inc/post-types/tourist-memo.php';
 require get_template_directory() . '/inc/post-types/entry-rules.php';
+require get_template_directory() . '/inc/post-types/hotel-info.php';
 require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
 require get_template_directory() . '/inc/helpers/country-cases.php';

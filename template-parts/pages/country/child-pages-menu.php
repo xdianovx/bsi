@@ -99,6 +99,29 @@ if (is_singular('tour')) {
     $country_title = (string) get_the_title($main_parent_id);
   }
 
+} elseif (is_singular('hotel_info')) {
+
+  $hotel_info_country_id = function_exists('get_field') ? get_field('hotel_info_country', $current_id) : 0;
+
+  if ($hotel_info_country_id instanceof WP_Post) {
+    $hotel_info_country_id = (int) $hotel_info_country_id->ID;
+  } elseif (is_array($hotel_info_country_id)) {
+    $hotel_info_country_id = (int) reset($hotel_info_country_id);
+  } else {
+    $hotel_info_country_id = (int) $hotel_info_country_id;
+  }
+
+  if ($hotel_info_country_id) {
+    $main_parent_id = $hotel_info_country_id;
+    $country_slug = (string) get_post_field('post_name', $main_parent_id);
+    $country_title = (string) get_the_title($main_parent_id);
+    $is_hotels_info_page = true;
+  } else {
+    $main_parent_id = $parent_id ?: $current_id;
+    $country_slug = (string) get_post_field('post_name', $main_parent_id);
+    $country_title = (string) get_the_title($main_parent_id);
+  }
+
 } elseif (is_singular('visa')) {
 
   $visa_country_id = function_exists('get_field') ? get_field('visa_country', $current_id) : 0;
@@ -338,6 +361,16 @@ $has_event_tours = get_posts(bsi_query_args_append_schedule([
     ['key' => 'tour_country', 'value' => $main_parent_id, 'compare' => '='],
   ],
 ]));
+
+$has_hotel_info = get_posts([
+  'post_type' => 'hotel_info',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'fields' => 'ids',
+  'meta_query' => [
+    ['key' => 'hotel_info_country', 'value' => $main_parent_id, 'compare' => '='],
+  ],
+]);
 
 $has_excursions = get_posts([
   'post_type' => 'excursion',
@@ -654,7 +687,7 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
       </a>
     <?php endif; ?>
 
-    <?php if (!empty($has_hotels)): ?>
+    <?php if (!empty($has_hotel_info)): ?>
       <a href="<?= esc_url(home_url("/country/{$country_slug}/informaciya-ob-otelyah/")); ?>"
         class="child-page-item <?= $is_hotels_info_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">

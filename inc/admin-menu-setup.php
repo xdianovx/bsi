@@ -164,16 +164,70 @@ add_action('admin_menu', 'add_cpt_separator', 99);
 function add_cpt_separator()
 {
   global $menu;
-  $position = 59;
 
-  $menu[$position] = [
-    '',                   // page_title
-    'read',               // capability
-    'cpt-separator',      // slug (просто уникальная строка)
-    '',                   // menu_title
-    'wp-menu-separator',  // CSS-класс — делает именно линию
-  ];
+  // Две линии-разделителя для групп (см. bsi_admin_menu_order).
+  $menu[58] = ['', 'read', 'bsi-separator-1', '', 'wp-menu-separator'];
+  $menu[59] = ['', 'read', 'cpt-separator', '', 'wp-menu-separator'];
 
   ksort($menu);
+}
+
+/**
+ * Упорядочивание верхнего уровня админ-меню по группам:
+ *   Консоль / Страницы / Новости / Туры / Отели
+ *   ──────
+ *   Страны / Памятки туристам / Правила въезда
+ *   ──────
+ *   остальные пункты (Секции, MICE …) — в исходном порядке
+ *
+ * «Информация об отелях» — не пункт меню (ACF-поле внутри каждой «Страны»),
+ * поэтому в сайдбаре не размещается.
+ */
+add_filter('custom_menu_order', '__return_true');
+add_filter('menu_order', 'bsi_admin_menu_order');
+
+function bsi_admin_menu_order($menu_ord)
+{
+  if (!is_array($menu_ord)) {
+    return $menu_ord;
+  }
+
+  $desired = [
+    'index.php',                      // Консоль
+    'edit.php?post_type=page',        // Страницы
+    'edit.php?post_type=news',        // Новости
+    'edit.php?post_type=tour',        // Туры
+    'edit.php?post_type=hotel',       // Отели
+    'bsi-separator-1',                // ──────
+    'edit.php?post_type=country',     // Страны
+    'edit.php?post_type=tourist_memo',// Памятки туристам
+    'edit.php?post_type=entry_rules', // Правила въезда
+    'edit.php?post_type=hotel_info',  // Информация об отелях
+    'cpt-separator',                  // ──────
+  ];
+
+  // Остальное (Секции, MICE и пр.) — в исходном порядке, без дублей.
+  $rest = array_values(array_diff($menu_ord, $desired));
+
+  return array_merge($desired, $rest);
+}
+
+/**
+ * Стиль линий-разделителей в сайдбаре админки.
+ */
+add_action('admin_head', 'bsi_admin_menu_separator_css');
+
+function bsi_admin_menu_separator_css()
+{
+  echo '<style>
+    #adminmenu li.wp-menu-separator {
+      height: 1px;
+      padding: 0 8px;
+      margin: 6px 0;
+      cursor: inherit;
+      background: #fff;
+      opacity: .3;
+    }
+  </style>';
 }
 

@@ -433,3 +433,21 @@
     gap: 8px;
   }
 }
+
+/* Информация об отелях (/country/{slug}/informaciya-ob-otelyah/).
+   Пока простая страница с привязкой к стране; стиль — как у соседних разделов. */
+.country-hotels-info {
+  margin-top: 24px;
+
+  &__body {
+    line-height: 150%;
+  }
+
+  &__empty {
+    padding: 32px;
+    text-align: center;
+    color: $text-gray;
+    background: $bg-gray;
+    border-radius: 12px;
+  }
+}
