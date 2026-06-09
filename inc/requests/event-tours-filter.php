@@ -341,6 +341,12 @@ function event_tours_filter()
   $f = bsi_event_tours_parse_request_filters();
   $per_page = (int) BSI_EVENT_TOURS_CATALOG_PER_PAGE;
 
+  // Необязательное переопределение размера страницы (каталог в рамках страны — 4).
+  $req_per_page = isset($_POST['per_page']) ? absint(wp_unslash($_POST['per_page'])) : 0;
+  if ($req_per_page >= 1 && $req_per_page <= 48) {
+    $per_page = $req_per_page;
+  }
+
   $has_date_filter = ($f['date_from'] !== '' && $f['date_to'] !== '');
   $ids = bsi_event_tours_get_matching_post_ids($f, [], $has_date_filter);
 

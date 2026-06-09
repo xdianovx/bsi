@@ -15,6 +15,8 @@ $is_memo_page = false;
 $is_entry_rules_page = false;
 $is_news_page = false;
 $is_excursions_page = false;
+$is_events_page = false;
+$is_hotels_info_page = false;
 
 $country_slug = '';
 $country_title = '';
@@ -205,6 +207,24 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_excursions_page = true;
 
+} elseif (get_query_var('country_events')) {
+
+  $country_slug = (string) get_query_var('country_events');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_events_page = true;
+
+} elseif (get_query_var('country_hotels_info')) {
+
+  $country_slug = (string) get_query_var('country_hotels_info');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_hotels_info_page = true;
+
 } elseif (is_tax('resort')) {
 
   $term = get_queried_object();
@@ -344,7 +364,7 @@ $is_country_overview = (
   !$is_hotels_page && !$is_promos_page && !$is_visas_page &&
   !$is_resorts_page && !$is_tours_page &&
   !$is_memo_page && !$is_entry_rules_page && !$is_news_page &&
-  !$is_excursions_page
+  !$is_excursions_page && !$is_events_page && !$is_hotels_info_page
 );
 
 $active_tour_types = [];
@@ -602,8 +622,8 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
     <?php endif; ?>
 
     <?php if (!empty($has_event_tours)): ?>
-      <a href="<?= esc_url(get_permalink($main_parent_id) . '#country-event-tours'); ?>"
-        class="child-page-item">
+      <a href="<?= esc_url(home_url("/country/{$country_slug}/sobytiynye-tury/")); ?>"
+        class="child-page-item <?= $is_events_page ? 'active' : ''; ?>">
         <span class="child-page-item__icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -631,6 +651,25 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
           </svg>
         </span>
         <span>Экскурсии</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if (!empty($has_hotels)): ?>
+      <a href="<?= esc_url(home_url("/country/{$country_slug}/informaciya-ob-otelyah/")); ?>"
+        class="child-page-item <?= $is_hotels_info_page ? 'active' : ''; ?>">
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-clipboard-list-icon lucide-clipboard-list">
+            <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <path d="M12 11h4" />
+            <path d="M12 16h4" />
+            <path d="M8 11h.01" />
+            <path d="M8 16h.01" />
+          </svg>
+        </span>
+        <span>Информация об отелях</span>
       </a>
     <?php endif; ?>
 

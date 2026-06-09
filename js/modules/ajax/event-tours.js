@@ -32,6 +32,13 @@ export const initEventToursFilters = async () => {
     parseInt(root.dataset.initialPaged || "1", 10) || 1,
   );
 
+  // Каталог в рамках страны (/country/{slug}/sobytiynye-tury/): страна «залочена»,
+  // фильтр по стране не выводится, но во все запросы подставляем её id.
+  const lockedCountry = (root.dataset.lockedCountry || "").trim();
+
+  // Переопределение количества карточек на страницу (по умолчанию на бэке — 12).
+  const perPage = (root.dataset.perPage || "").trim();
+
   const list = document.querySelector("[data-tours-list]");
   const counter = root.querySelector(".js-tours-counter");
   const paginationEl = document.querySelector("[data-event-tours-pagination]");
@@ -61,7 +68,8 @@ export const initEventToursFilters = async () => {
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
   const appendFilterBody = (body) => {
-    if (countrySelect?.value) body.set("country", countrySelect.value);
+    if (lockedCountry) body.set("country", lockedCountry);
+    else if (countrySelect?.value) body.set("country", countrySelect.value);
     if (regionSelect?.value) body.set("region", regionSelect.value);
     if (resortSelect?.value) body.set("resort", resortSelect.value);
     if (tourTypeSelect?.value) body.set("tour_type", tourTypeSelect.value);
@@ -81,6 +89,7 @@ export const initEventToursFilters = async () => {
     body.set("sort", sortValue);
     body.set("view", viewValue);
     body.set("paged", String(currentPage));
+    if (perPage) body.set("per_page", perPage);
   };
 
   const renderPagination = (total, maxPages, paged) => {

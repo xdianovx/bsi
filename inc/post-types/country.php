@@ -343,6 +343,8 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_education';
   $vars[] = 'country_news';
   $vars[] = 'country_excursions';
+  $vars[] = 'country_events';
+  $vars[] = 'country_hotels_info';
 
   return $vars;
 });
@@ -409,10 +411,22 @@ add_action('init', function () {
     'top'
   );
 
+  add_rewrite_rule(
+    '^country/([^/]+)/sobytiynye-tury/?$',
+    'index.php?post_type=country&name=$matches[1]&country_events=$matches[1]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/informaciya-ob-otelyah/?$',
+    'index.php?post_type=country&name=$matches[1]&country_hotels_info=$matches[1]',
+    'top'
+  );
+
 }, 20);
 
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|sobytiynye-tury|informaciya-ob-otelyah)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',

@@ -2019,20 +2019,50 @@ button.single-event__dates-book {
   }
 }
 
-.page-country__event-tours {
-  margin-top: 48px;
-  scroll-margin-top: 120px;
-}
-
-.page-country__event-tours .h2 {
-  margin-bottom: 8px;
-}
-
-.page-country__event-tours-top {
+/* Каталог событийных туров в рамках страны (/country/{slug}/sobytiynye-tury/).
+   Лежит в узкой колонке .page-country__content (есть aside), поэтому плитка
+   1 → 2 → 3, без 4-й колонки. Базовый .country-tours__list (tour.scss) —
+   flex-column, перебиваем на grid здесь. */
+.country-tours--country-events .country-tours__head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-top: 16px;
+}
+
+.country-tours--country-events .country-tours__head-left,
+.country-tours--country-events .country-tours__head-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.country-tours--country-events .country-tours__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px 16px;
+  margin-top: 24px;
+}
+
+.country-tours--country-events .country-tours__list .country-tours__empty {
+  grid-column: 1 / -1;
+}
+
+.country-tours--country-events .country-tours__list .event-card,
+.country-tours--country-events .country-tours__list .catalog-card--event {
+  min-width: 0;
+}
+
+@media screen and (min-width: 600px) {
+  .country-tours--country-events .country-tours__list.is-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .country-tours--country-events .country-tours__list.is-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }

@@ -45,17 +45,40 @@ if ($country_excursions_slug) {
   exit;
 }
 
+$country_events_slug = get_query_var('country_events');
+
+if ($country_events_slug) {
+  $country = get_page_by_path($country_events_slug, OBJECT, 'country');
+
+  global $country_events_data;
+  $country_events_data = [
+    'country' => $country,
+    'country_slug' => $country_events_slug,
+  ];
+
+  get_template_part('country-events');
+  exit;
+}
+
+$country_hotels_info_slug = get_query_var('country_hotels_info');
+
+if ($country_hotels_info_slug) {
+  $country = get_page_by_path($country_hotels_info_slug, OBJECT, 'country');
+
+  global $country_hotels_info_data;
+  $country_hotels_info_data = [
+    'country' => $country,
+    'country_slug' => $country_hotels_info_slug,
+  ];
+
+  get_template_part('country-hotels-info');
+  exit;
+}
+
 
 
 /* Контекст страны */
 $country_id = get_the_ID();
-
-$country_root_id = $country_id;
-$parent = wp_get_post_parent_id($country_root_id);
-while ($parent) {
-  $country_root_id = (int) $parent;
-  $parent = wp_get_post_parent_id($country_root_id);
-}
 
 /* Запрос новостей по стране */
 $news_query = new WP_Query(bsi_query_args_append_schedule([
@@ -67,22 +90,6 @@ $news_query = new WP_Query(bsi_query_args_append_schedule([
       'key' => 'news_countries',
       'value' => '"' . $country_id . '"',
       'compare' => 'LIKE',
-    ],
-  ],
-]));
-
-/* Событийные туры: в ACF страна — родительская, совпадает с корнем ветки стран */
-$country_events_query = new WP_Query(bsi_query_args_append_schedule([
-  'post_type' => 'event',
-  'post_status' => 'publish',
-  'posts_per_page' => 12,
-  'orderby' => 'title',
-  'order' => 'ASC',
-  'meta_query' => [
-    [
-      'key' => 'tour_country',
-      'value' => $country_root_id,
-      'compare' => '=',
     ],
   ],
 ]));
@@ -189,37 +196,6 @@ get_header();
           <div class="editor-content page-country__editor-content">
             <?php the_content(); ?>
           </div>
-
-          <?php
-          $event_tours_catalog = get_page_by_path('sobytiynye-tury');
-          $event_tours_catalog_url = $event_tours_catalog ? get_permalink($event_tours_catalog->ID) : home_url('/sobytiynye-tury/');
-          if ($country_events_query->have_posts()):
-            ?>
-            <section id="country-event-tours" class="page-country__event-tours">
-              <div class="page-country__event-tours-top">
-                <h2 class="h2">Событийные туры</h2>
-                <a href="<?= esc_url($event_tours_catalog_url); ?>" class="title-wrap__link link-arrow">
-                  <span>Все событийные туры</span>
-                  <div class="link-arrow__icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M7 7h10v10" />
-                      <path d="M7 17 17 7" />
-                    </svg>
-                  </div>
-                </a>
-              </div>
-              <div class="country-tours__list">
-                <?php
-                while ($country_events_query->have_posts()):
-                  $country_events_query->the_post();
-                  get_template_part('template-parts/event/card-row', null, ['post_id' => (int) get_the_ID()]);
-                endwhile;
-                wp_reset_postdata();
-                ?>
-              </div>
-            </section>
-          <?php endif; ?>
 
           <?php if ($news_query && $news_query->have_posts()): ?>
             <section class="page-country__news">
