@@ -370,7 +370,7 @@ function bsi_crosstour_hotel_display_name(string $name): string
  *
  * @return array<int,array{name:string,star:string,star_key:int,price_rub:?int}>
  */
-function bsi_crosstour_hotels_from_prices(array $rows): array
+function bsi_crosstour_hotels_from_prices(array $rows, array $ref = []): array
 {
   $by = [];
   foreach ($rows as $r) {
@@ -419,11 +419,13 @@ function bsi_crosstour_hotels_from_prices(array $rows): array
         'price_rub' => $pp,
         'price_original' => $pp !== null ? $orig : null,
         'price_currency' => $pp !== null ? $cur : null,
+        'booking_url' => bsi_crosstour_row_booking_url($ref, $r),
       ];
     } elseif ($pp !== null && ($by[$key]['price_rub'] === null || $pp < $by[$key]['price_rub'])) {
       $by[$key]['price_rub'] = $pp;
       $by[$key]['price_original'] = $orig;
       $by[$key]['price_currency'] = $cur;
+      $by[$key]['booking_url'] = bsi_crosstour_row_booking_url($ref, $r);
     }
   }
 
@@ -487,6 +489,50 @@ function bsi_crosstour_booking_url(array $ref): string
 }
 
 /**
+ * Ссылка брони на конкретный номер (строка PRICES): своя дата/ночи/отель/номер + DOLOAD.
+ */
+function bsi_crosstour_row_booking_url(array $ref, array $row): string
+{
+  $state = (int) ($ref['STATEINC'] ?? 0);
+  $tour = (int) ($ref['TOURINC'] ?? 0);
+  $townfrom = (int) ($ref['TOWNFROMINC'] ?? BSI_CROSSTOUR_TOWNFROM);
+  if (!$state || !$tour) {
+    return '';
+  }
+
+  $checkin = preg_replace('/\D/', '', (string) ($row['checkIn'] ?? ''));
+  $nights = (int) ($row['nights'] ?? 0);
+  $hk = (int) ($row['hotelKey'] ?? 0);
+
+  // Порядок/набор как у рабочей ссылки Само: *_ANY=1 остаются вместе с HOTELS=<key>.
+  $params = [
+    'TOWNFROMINC' => $townfrom,
+    'STATEINC' => $state,
+    'TOURINC' => $tour,
+  ];
+  if ($checkin !== '') {
+    $params['CHECKIN_BEG'] = $checkin;
+    $params['NIGHTS_FROM'] = $nights > 0 ? $nights : 1;
+    $params['CHECKIN_END'] = $checkin;
+    $params['NIGHTS_TILL'] = $nights > 0 ? $nights : 30;
+  }
+  $params['ADULT'] = 2;
+  $params['CURRENCY'] = 1;
+  $params['CHILD'] = 0;
+  $params['HOTELS_ANY'] = 1;
+  if ($hk) {
+    $params['HOTELS'] = $hk;
+  }
+  $params['MEALS_ANY'] = 1;
+  $params['ROOMS_ANY'] = 1;
+  $params['FREIGHT'] = 1;
+  $params['PRICEPAGE'] = 1;
+  $params['DOLOAD'] = 1;
+
+  return 'https://online.bsigroup.ru/search_crosstour?' . http_build_query($params);
+}
+
+/**
  * Оффер: мин. цена + отели + даты + ночи + ссылка брони. Кеш ~3ч.
  *
  * @return array{price_rub:?int,currency:string,hotels:array,dates:array,nights:array,booking_url:string}
@@ -528,7 +574,7 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
 
   // Кэш на уровне тура — показываем ВСЕ доступные комбинации (даты/ночи/номера),
   // а не только узкий слот из ссылки. Узкие даты ссылки идут лишь в booking_url.
-  $cache_key = 'crosstour_offer_v4_' . $townfrom . '_' . $state . '_' . $tour;
+  $cache_key = 'crosstour_offer_v6_' . $townfrom . '_' . $state . '_' . $tour;
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
     if (is_array($cached)) {
@@ -625,7 +671,7 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
     $price_rub = $price['rub'];
     $price_original = $price['original'];
     $price_currency = $price['currency'];
-    $hotels = bsi_crosstour_hotels_from_prices($rows);
+    $hotels = bsi_crosstour_hotels_from_prices($rows, $ref);
   }
 
   // Фолбэк отелей из HOTELS, если PRICES пуст.
