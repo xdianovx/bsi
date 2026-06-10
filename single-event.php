@@ -556,10 +556,10 @@ get_header();
                       ?>
                       <li class="single-event__venue-legend-item">
                         <span class="single-event__venue-legend-label">
-                          <?= esc_html($lab); ?>
                           <?php if ($leg_date !== ''): ?>
                             <span class="single-event__venue-legend-date numfont"><?= esc_html($leg_date); ?></span>
                           <?php endif; ?>
+                          <?= esc_html($lab); ?>
                         </span>
                         <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
                         <?php if ($leg_price_rub !== null): ?>
@@ -656,7 +656,7 @@ get_header();
           <?php endif; ?>
 
           <?php if (!empty($accommodation_rows)): ?>
-            <section class="single-event__accommodation-section"<?php if ($crosstour_ref): ?> data-manual-accommodation<?php endif; ?>>
+            <section class="single-event__accommodation-section"<?php if ($crosstour_ref): ?> data-manual-accommodation hidden<?php endif; ?>>
               <h2 class="h2">Варианты проживания и цены</h2>
               <ul class="single-event__accommodation-grid">
                 <?php foreach ($accommodation_rows as $acc): ?>

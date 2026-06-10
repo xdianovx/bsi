@@ -48,13 +48,25 @@ const renderPrice = (offer) => {
   document.dispatchEvent(new CustomEvent("education:content-updated"));
 };
 
+const revealManualAccommodation = () => {
+  const manual = document.querySelector("[data-manual-accommodation]");
+  if (manual) manual.hidden = false;
+};
+
 const renderHotels = (offer) => {
   const wrap = document.querySelector("[data-crosstour-hotels]");
   const list = document.querySelector("[data-crosstour-hotels-list]");
-  if (!wrap || !list) return;
+  if (!wrap || !list) {
+    revealManualAccommodation();
+    return;
+  }
 
   const hotels = Array.isArray(offer.hotels) ? offer.hotels : [];
-  if (!hotels.length) return;
+  if (!hotels.length) {
+    // Само без отелей → возвращаем ручной блок (fallback).
+    revealManualAccommodation();
+    return;
+  }
 
   const bookingUrl = offer.booking_url || "";
   const arrow = `<svg class="single-event__accommodation-card-link-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
@@ -161,6 +173,7 @@ export const initCrosstourEvent = async () => {
 
     if (!json || !json.success || !json.data || !json.data.samo) {
       console.debug("[crosstour] Само не вернул данные (samo=false / ошибка)");
+      revealManualAccommodation();
       return;
     }
 
@@ -171,5 +184,6 @@ export const initCrosstourEvent = async () => {
     renderDates(offer);
   } catch (e) {
     console.warn("[crosstour] ошибка запроса", e);
+    revealManualAccommodation();
   }
 };

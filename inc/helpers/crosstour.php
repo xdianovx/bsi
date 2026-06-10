@@ -364,7 +364,9 @@ function bsi_crosstour_hotel_display_name(string $name): string
 }
 
 /**
- * Отели из строк PRICES (есть цена). Дедуп по hotelKey, мин. цена per-person.
+ * Отели из строк PRICES. Для событийных туров НЕ объединяем по звёздности/отелю:
+ * каждая комбинация отель × номер × питание = отдельная карточка (разные билеты/номера).
+ * Дедуп только точных дублей (тот же отель+номер+питание) — мин. цена per-person.
  *
  * @return array<int,array{name:string,star:string,star_key:int,price_rub:?int}>
  */
@@ -379,10 +381,16 @@ function bsi_crosstour_hotels_from_prices(array $rows): array
     if ($name === '') {
       continue;
     }
-    $key = (int) ($r['hotelKey'] ?? 0);
-    if (!$key) {
-      $key = crc32($name);
+
+    $room = trim((string) ($r['room'] ?? ''));
+    $meal = trim((string) ($r['mealGroup'] ?? ($r['meal'] ?? '')));
+
+    // Ключ — конкретная комбинация (отель + номер + питание), не просто отель.
+    $key = (int) ($r['hotelKey'] ?? 0) . '_' . (int) ($r['roomKey'] ?? 0) . '_' . (int) ($r['mealKey'] ?? 0);
+    if ($key === '0_0_0') {
+      $key = md5($name . '|' . $room . '|' . $meal);
     }
+
     $rub = (isset($r['convertedPriceNumber']) && $r['convertedPriceNumber'] !== '')
       ? (int) $r['convertedPriceNumber']
       : null;
@@ -398,9 +406,6 @@ function bsi_crosstour_hotels_from_prices(array $rows): array
       $orig = round($o / 2, 2);
       $cur = $c;
     }
-
-    $room = trim((string) ($r['room'] ?? ''));
-    $meal = trim((string) ($r['mealGroup'] ?? ($r['meal'] ?? '')));
 
     if (!isset($by[$key])) {
       $by[$key] = [
@@ -418,8 +423,6 @@ function bsi_crosstour_hotels_from_prices(array $rows): array
       $by[$key]['price_rub'] = $pp;
       $by[$key]['price_original'] = $orig;
       $by[$key]['price_currency'] = $cur;
-      $by[$key]['room'] = $room;
-      $by[$key]['meal'] = $meal;
     }
   }
 
@@ -522,14 +525,9 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
     return $empty;
   }
 
-  // Даты/ночи из ссылки (если заданы) — приоритетнее автоподбора.
-  $checkin_beg = isset($ref['CHECKIN_BEG']) ? (string) $ref['CHECKIN_BEG'] : '';
-  $checkin_end = isset($ref['CHECKIN_END']) ? (string) $ref['CHECKIN_END'] : '';
-  $n_from = isset($ref['NIGHTS_FROM']) ? (int) $ref['NIGHTS_FROM'] : 0;
-  $n_till = isset($ref['NIGHTS_TILL']) ? (int) $ref['NIGHTS_TILL'] : 0;
-
-  $cache_key = 'crosstour_offer_v2_' . $townfrom . '_' . $state . '_' . $tour
-    . '_' . ($checkin_beg !== '' ? $checkin_beg : 'auto') . '_' . $n_from;
+  // Кэш на уровне тура — показываем ВСЕ доступные комбинации (даты/ночи/номера),
+  // а не только узкий слот из ссылки. Узкие даты ссылки идут лишь в booking_url.
+  $cache_key = 'crosstour_offer_v3_' . $townfrom . '_' . $state . '_' . $tour;
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
     if (is_array($cached)) {
@@ -548,38 +546,33 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
     'FREIGHT' => 1,
   ];
 
-  $dates = [];
-  if ($checkin_beg === '') {
-    // Ссылка без дат → берём валидные из ALL.
-    $all_resp = $endpoints->searchCrosstourAll(array_merge($base, $flags, [
-      'TOURS' => $tour,
-      'ADULT' => 2,
-      'CHILD' => 0,
-      'CURRENCY' => 1,
-      'NIGHTS_FROM' => 1,
-      'NIGHTS_TILL' => 30,
-    ]));
-    $all = ($all_resp['ok'] ?? false) ? ($all_resp['data']['SearchCrosstour_ALL'] ?? []) : [];
-    $dates = bsi_crosstour_valid_dates($all['CHECKIN_BEG'] ?? []);
-    $checkin_beg = $dates[0] ?? '';
-    $checkin_end = !empty($dates) ? (string) end($dates) : $checkin_beg;
+  // Ночи — весь набор тура (min..max из NIGHTS.nights), НЕ default (может быть вне диапазона).
+  $nights_resp = $endpoints->searchCrosstourNights($base);
+  $nights_node = ($nights_resp['ok'] ?? false) ? ($nights_resp['data']['SearchCrosstour_NIGHTS'] ?? []) : [];
+  $nights_list = (isset($nights_node['nights']) && is_array($nights_node['nights']))
+    ? array_values(array_filter(array_map('intval', $nights_node['nights'])))
+    : [];
+  if (!empty($nights_list)) {
+    $n_from = min($nights_list);
+    $n_till = max($nights_list);
   } else {
-    $dates = [$checkin_beg];
-    if ($checkin_end === '') {
-      $checkin_end = $checkin_beg;
-    }
+    $n_from = (int) ($nights_node['default']['from'] ?? 1);
+    $n_till = (int) ($nights_node['default']['till'] ?? max($n_from, 30));
   }
 
-  if (!$n_from || !$n_till) {
-    $nights_resp = $endpoints->searchCrosstourNights($base);
-    $nights_node = ($nights_resp['ok'] ?? false) ? ($nights_resp['data']['SearchCrosstour_NIGHTS'] ?? []) : [];
-    if (!$n_from) {
-      $n_from = (int) ($nights_node['default']['from'] ?? 1);
-    }
-    if (!$n_till) {
-      $n_till = (int) ($nights_node['default']['till'] ?? max($n_from, 30));
-    }
-  }
+  // Даты — все валидные из ALL (полный диапазон), не узкий слот ссылки.
+  $all_resp = $endpoints->searchCrosstourAll(array_merge($base, $flags, [
+    'TOURS' => $tour,
+    'ADULT' => 2,
+    'CHILD' => 0,
+    'CURRENCY' => 1,
+    'NIGHTS_FROM' => $n_from,
+    'NIGHTS_TILL' => $n_till,
+  ]));
+  $all = ($all_resp['ok'] ?? false) ? ($all_resp['data']['SearchCrosstour_ALL'] ?? []) : [];
+  $dates = bsi_crosstour_valid_dates($all['CHECKIN_BEG'] ?? []);
+  $checkin_beg = $dates[0] ?? '';
+  $checkin_end = !empty($dates) ? (string) end($dates) : $checkin_beg;
 
   // PRICES → мин. цена (с оригинальной валютой) + список отелей с ценами.
   $price_rub = null;
