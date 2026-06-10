@@ -33,6 +33,18 @@ add_action('acf/init', function () {
         'min' => 0,
         'max' => 0,
       ],
+      [
+        'key' => 'field_homepage_event_items',
+        'label' => 'Событийные туры (слайдер)',
+        'name' => 'homepage_event_items',
+        'type' => 'relationship',
+        'instructions' => 'Выберите и упорядочьте событийные туры для блока «Событийные туры» на главной. Порядок слайдов = порядок выбранных записей. Если пусто — показываются свежие события.',
+        'post_type' => ['event'],
+        'filters' => ['search'],
+        'return_format' => 'id',
+        'min' => 0,
+        'max' => 0,
+      ],
     ],
     'location' => [
       [
@@ -52,6 +64,11 @@ add_filter('acf/fields/relationship/query/key=field_homepage_education_items', f
 });
 
 add_filter('acf/fields/relationship/query/key=field_homepage_tour_items', function (array $args): array {
+  $args['posts_per_page'] = -1;
+  return $args;
+});
+
+add_filter('acf/fields/relationship/query/key=field_homepage_event_items', function (array $args): array {
   $args['posts_per_page'] = -1;
   return $args;
 });

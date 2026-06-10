@@ -2112,3 +2112,47 @@ button.single-event__dates-book {
 .modal-program-booking__details-key {
   color: $text-gray;
 }
+
+/* Блок «Событийные туры» на главной (по образцу popular-education). */
+.popular-event-tours__section {
+  margin-top: 80px;
+}
+
+.popular-event-tours__content {
+  margin-top: 20px;
+}
+
+.popular-event-tours-filter {
+  margin-top: 16px;
+  max-width: 800px;
+
+  @media screen and (max-width: 1200px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+
+.popular-event-tours-slider .swiper-slide {
+  height: auto;
+}
+
+.popular-event-tours__all-link {
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.popular-event-tours__all-mob {
+  display: none;
+
+  a {
+    display: block;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    display: block;
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+}
