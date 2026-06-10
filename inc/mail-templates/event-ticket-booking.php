@@ -144,6 +144,24 @@ $mail_section_title = $is_promo ? 'Акция' : 'Событие';
           <div class="info-value"><?php echo esc_html($accommodation); ?></div>
         </div>
       <?php endif; ?>
+      <?php if (!empty($event_price)): ?>
+        <div class="info-row">
+          <div class="info-label">Цена</div>
+          <div class="info-value"><?php echo esc_html($event_price); ?></div>
+        </div>
+      <?php endif; ?>
+      <?php if (!empty($event_venue)): ?>
+        <div class="info-row">
+          <div class="info-label">Площадка</div>
+          <div class="info-value"><?php echo esc_html($event_venue); ?></div>
+        </div>
+      <?php endif; ?>
+      <?php if (!empty($event_time)): ?>
+        <div class="info-row">
+          <div class="info-label">Время</div>
+          <div class="info-value"><?php echo esc_html($event_time); ?></div>
+        </div>
+      <?php endif; ?>
       <?php if (!empty($page_url)): ?>
         <div class="info-row">
           <div class="info-label">Страница</div>

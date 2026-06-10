@@ -24,6 +24,36 @@ function isMinimalBookingForm(form) {
   return el !== null && el.value === "1";
 }
 
+function buildTicketData(btn) {
+  const d = btn.dataset;
+  const accName = (d.accommodationName || "").trim();
+  const stars = (d.accommodationStars || "").trim();
+  const accommodation = accName
+    ? accName + (stars ? ` ${stars}*` : "")
+    : "";
+
+  let price = "";
+  const rub = parseInt(String(d.minPrice || "").replace(/\D/g, ""), 10);
+  if (rub > 0) {
+    price = `от ${rub.toLocaleString("ru-RU")} ₽`;
+    const orig = d.accommodationPriceOriginal;
+    const cur = d.accommodationPriceCurrency;
+    if (orig && cur) {
+      price += ` (${Number(orig).toLocaleString("ru-RU")} ${cur})`;
+    }
+  }
+
+  return {
+    eventTitle: (d.eventTitle || "").trim(),
+    eventId: d.eventId || "",
+    accName,
+    accommodation,
+    venue: (d.eventVenue || "").trim(),
+    time: (d.eventTime || "").trim(),
+    price,
+  };
+}
+
 function populateModal(ticketData) {
   const modalRoot = getModalRoot();
   if (!modalRoot) {
@@ -32,7 +62,7 @@ function populateModal(ticketData) {
 
   const titleEl = document.getElementById("modal-event-ticket-booking-title");
   if (titleEl) {
-    const accSuffix = ticketData.accommodation ? ` — ${ticketData.accommodation}` : "";
+    const accSuffix = ticketData.accName ? ` — ${ticketData.accName}` : "";
     titleEl.textContent = (ticketData.eventTitle || "") + accSuffix;
   }
 
@@ -50,12 +80,48 @@ function populateModal(ticketData) {
 
   const setVal = (sel, val) => {
     const input = form.querySelector(sel);
-    if (input) input.value = val;
+    if (input) input.value = val || "";
   };
+
+  // Детали брони (видимый блок + скрытые поля для письма).
+  const rows = [
+    ["Размещение", accommodation],
+    ["Цена", ticketData.price],
+    ["Площадка", ticketData.venue],
+    ["Время", ticketData.time],
+  ].filter(([, v]) => v);
+
+  const detailsEl = modalRoot.querySelector(".js-form-details");
+  if (detailsEl) {
+    if (rows.length) {
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+        );
+      detailsEl.innerHTML = rows
+        .map(
+          ([k, v]) =>
+            `<li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">${esc(k)}:</span> ${esc(v)}</li>`,
+        )
+        .join("");
+      detailsEl.hidden = false;
+    } else {
+      detailsEl.innerHTML = "";
+      detailsEl.hidden = true;
+    }
+  }
 
   setVal(".js-form-event-title", title);
   setVal(".js-form-page-url", window.location.href);
   setVal(".js-form-accommodation", accommodation);
+  setVal(".js-form-event-venue", ticketData.venue);
+  setVal(".js-form-event-time", ticketData.time);
+  setVal(".js-form-event-price", ticketData.price);
+  setVal(
+    ".js-form-event-details",
+    rows.map(([k, v]) => `${k}: ${v}`).join("; "),
+  );
 }
 
 function reachEventTourBookingGoal(params) {
@@ -313,30 +379,14 @@ export function initEventTicketForm() {
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".js-event-ticket-booking-btn");
     if (!btn) return;
-
     e.preventDefault();
-
-    const ticketData = {
-      eventTitle: btn.dataset.eventTitle || "",
-      eventId: btn.dataset.eventId || "",
-      accommodation: btn.dataset.accommodationName || "",
-    };
-
-    openEventTicketModal(ticketData);
+    openEventTicketModal(buildTicketData(btn));
   });
 
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".js-event-booking-btn");
     if (!btn) return;
-
     e.preventDefault();
-
-    const ticketData = {
-      eventTitle: btn.dataset.eventTitle || "",
-      eventId: btn.dataset.eventId || "",
-      accommodation: btn.dataset.accommodationName || "",
-    };
-
-    openEventTicketModal(ticketData);
+    openEventTicketModal(buildTicketData(btn));
   });
 }

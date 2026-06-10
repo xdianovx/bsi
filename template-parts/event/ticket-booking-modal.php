@@ -17,11 +17,17 @@
       <div class="modal__content modal-program-booking__content">
         <h2 class="modal-program-booking__title" id="modal-event-ticket-booking-title"></h2>
 
+        <ul class="modal-program-booking__details js-form-details" hidden></ul>
+
         <form class="modal-program-booking__form js-event-ticket-booking-form" novalidate>
           <input type="hidden" name="action" value="event_ticket_booking">
           <input type="hidden" name="event_title" class="js-form-event-title">
           <input type="hidden" name="page_url" class="js-form-page-url">
           <input type="hidden" name="accommodation" class="js-form-accommodation">
+          <input type="hidden" name="event_venue" class="js-form-event-venue">
+          <input type="hidden" name="event_time" class="js-form-event-time">
+          <input type="hidden" name="event_price" class="js-form-event-price">
+          <input type="hidden" name="event_details" class="js-form-event-details">
 
           <div class="form-row form-row-2">
             <div class="input-item">

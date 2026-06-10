@@ -35,6 +35,10 @@ function bsi_handle_event_ticket_booking(): void
   $event_title = sanitize_text_field($_POST['event_title'] ?? '');
   $page_url = esc_url_raw($_POST['page_url'] ?? '');
   $accommodation = sanitize_text_field(trim($_POST['accommodation'] ?? ''));
+  $event_venue = sanitize_text_field(trim($_POST['event_venue'] ?? ''));
+  $event_time = sanitize_text_field(trim($_POST['event_time'] ?? ''));
+  $event_price = sanitize_text_field(trim($_POST['event_price'] ?? ''));
+  $event_details = sanitize_text_field(trim($_POST['event_details'] ?? ''));
   $booking_context = sanitize_text_field($_POST['booking_context'] ?? 'event');
   if ($booking_context !== 'promo') {
     $booking_context = 'event';
@@ -57,6 +61,10 @@ function bsi_handle_event_ticket_booking(): void
       'event_title' => $event_title,
       'page_url' => $page_url,
       'accommodation' => $accommodation,
+      'event_venue' => $event_venue,
+      'event_time' => $event_time,
+      'event_price' => $event_price,
+      'event_details' => $event_details,
       'booking_context' => $booking_context,
     ],
     'reply_to' => is_email($email) ? $email : '',
