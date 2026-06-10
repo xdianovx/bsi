@@ -2124,7 +2124,8 @@ button.single-event__dates-book {
 
 .popular-event-tours-filter {
   margin-top: 16px;
-  max-width: 800px;
+  max-width: none;
+  width: 100%;
 
   @media screen and (max-width: 1200px) {
     flex-wrap: nowrap;
