@@ -86,10 +86,13 @@ const renderHotels = (offer) => {
         h.price_rub && Number(h.price_rub) > 0
           ? `<span class="single-event__accommodation-card-price numfont js-event-price" data-price-rub="${Number(h.price_rub)}" data-has-from="true"${origAttr}>от ${fmtPrice(h.price_rub)} ₽</span>`
           : `<span class="single-event__accommodation-card-price numfont">Цена по запросу</span>`;
-      const hotelUrl =
-        bookingUrl && h.hotel_key && Number(h.hotel_key) > 0
-          ? `${bookingUrl}&HOTELS=${Number(h.hotel_key)}`
-          : bookingUrl;
+      let hotelUrl = bookingUrl;
+      if (bookingUrl && h.hotel_key && Number(h.hotel_key) > 0) {
+        hotelUrl += `&HOTELS=${Number(h.hotel_key)}`;
+        if (h.room_key && Number(h.room_key) > 0) {
+          hotelUrl += `&ROOMS=${Number(h.room_key)}`;
+        }
+      }
       const bookBtn = hotelUrl
         ? `<a class="single-event__accommodation-card-link" href="${escapeHtml(hotelUrl)}" target="_blank" rel="nofollow noopener"><span>Забронировать</span>${arrow}</a>`
         : "";

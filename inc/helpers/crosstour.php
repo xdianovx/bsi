@@ -413,6 +413,7 @@ function bsi_crosstour_hotels_from_prices(array $rows): array
         'star' => (string) ($r['star'] ?? ''),
         'star_key' => (int) ($r['starKey'] ?? 0),
         'hotel_key' => (int) ($r['hotelKey'] ?? 0),
+        'room_key' => (int) ($r['roomKey'] ?? 0),
         'room' => $room,
         'meal' => $meal,
         'price_rub' => $pp,
@@ -527,7 +528,7 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
 
   // Кэш на уровне тура — показываем ВСЕ доступные комбинации (даты/ночи/номера),
   // а не только узкий слот из ссылки. Узкие даты ссылки идут лишь в booking_url.
-  $cache_key = 'crosstour_offer_v3_' . $townfrom . '_' . $state . '_' . $tour;
+  $cache_key = 'crosstour_offer_v4_' . $townfrom . '_' . $state . '_' . $tour;
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
     if (is_array($cached)) {
@@ -574,13 +575,15 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
   $checkin_beg = $dates[0] ?? '';
   $checkin_end = !empty($dates) ? (string) end($dates) : $checkin_beg;
 
-  // PRICES → мин. цена (с оригинальной валютой) + список отелей с ценами.
+  // PRICES → мин. цена + ВСЕ номера. Нюанс API: запрос по всем отелям отдаёт
+  // 1 строку/отель (самый дешёвый номер); чтобы получить все номера/трибуны —
+  // запрашиваем PRICES по каждому отелю отдельно (HOTELS=<key>).
   $price_rub = null;
   $price_original = null;
   $price_currency = null;
   $hotels = [];
   if ($checkin_beg !== '') {
-    $prices_resp = $endpoints->searchCrosstourPrices(array_merge($base, $flags, [
+    $price_params = array_merge($base, $flags, [
       'TOURS' => $tour,
       'ADULT' => 2,
       'CHILD' => 0,
@@ -589,9 +592,35 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
       'CHECKIN_END' => $checkin_end,
       'NIGHTS_FROM' => $n_from,
       'NIGHTS_TILL' => $n_till,
-    ]));
-    $prices_node = ($prices_resp['ok'] ?? false) ? ($prices_resp['data']['SearchCrosstour_PRICES'] ?? []) : [];
-    $rows = $prices_node['prices'] ?? [];
+    ]);
+
+    // 1) Список отелей тура (по строке на отель).
+    $base_resp = $endpoints->searchCrosstourPrices($price_params);
+    $base_node = ($base_resp['ok'] ?? false) ? ($base_resp['data']['SearchCrosstour_PRICES'] ?? []) : [];
+    $base_rows = $base_node['prices'] ?? [];
+
+    $hotel_keys = [];
+    foreach ($base_rows as $r) {
+      $hk = (int) ($r['hotelKey'] ?? 0);
+      if ($hk && !in_array($hk, $hotel_keys, true)) {
+        $hotel_keys[] = $hk;
+      }
+    }
+    $hotel_keys = array_slice($hotel_keys, 0, 20);
+
+    // 2) По каждому отелю — все номера/трибуны.
+    $rows = [];
+    foreach ($hotel_keys as $hk) {
+      $h_resp = $endpoints->searchCrosstourPrices(array_merge($price_params, ['HOTELS' => $hk]));
+      $h_node = ($h_resp['ok'] ?? false) ? ($h_resp['data']['SearchCrosstour_PRICES'] ?? []) : [];
+      foreach (($h_node['prices'] ?? []) as $hr) {
+        $rows[] = $hr;
+      }
+    }
+    if (empty($rows)) {
+      $rows = $base_rows;
+    }
+
     $price = bsi_crosstour_price_from_rows($rows);
     $price_rub = $price['rub'];
     $price_original = $price['original'];
