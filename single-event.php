@@ -19,6 +19,17 @@ if ($event_booking_cta_lead === '' && defined('BSI_EVENT_BOOKING_CTA_LEAD_DEFAUL
   $event_booking_cta_lead = BSI_EVENT_BOOKING_CTA_LEAD_DEFAULT;
 }
 
+/* Crosstour (Самотур): авто-связь по slug. Живые цена/отели/даты подгружает JS
+   (data-crosstour-event). Резолв даёт ref для авто-ссылки брони. */
+$crosstour_ref = function_exists('bsi_crosstour_event_ref')
+  ? bsi_crosstour_event_ref($post_id)
+  : null;
+$samo_booking_url = ($crosstour_ref && function_exists('bsi_crosstour_booking_url'))
+  ? bsi_crosstour_booking_url($crosstour_ref)
+  : '';
+/* Эффективная ссылка брони: ручная приоритетнее; иначе авто из Само. Пустая → форма-заявка (модалка). */
+$effective_booking_url = $tour_booking_url !== '' ? $tour_booking_url : $samo_booking_url;
+
 $region_terms = get_the_terms($post_id, 'region');
 $region_term = (!empty($region_terms) && !is_wp_error($region_terms)) ? $region_terms[0] : null;
 
@@ -331,7 +342,7 @@ $show_quick = $tour_duration || $tour_nights || $resort_term;
 get_header();
 ?>
 
-<main class="site-main single-event-page">
+<main class="site-main single-event-page"<?php if ($crosstour_ref): ?> data-crosstour-event="<?= esc_attr((string) $post_id); ?>"<?php endif; ?>>
 
   <!-- Hero Start -->
   <section class="single-event__hero<?= $hero_url ? '' : ' single-event__hero--no-poster'; ?>"
@@ -361,8 +372,8 @@ get_header();
 
       <div class="single-event__hero-actions">
 
-        <?php if ($tour_booking_url): ?>
-          <a href="<?= esc_url($tour_booking_url); ?>" class="btn btn-accent single-event__hero-btn" target="_blank"
+        <?php if ($effective_booking_url): ?>
+          <a href="<?= esc_url($effective_booking_url); ?>" class="btn btn-accent single-event__hero-btn" target="_blank"
             rel="nofollow noopener">Забронировать</a>
         <?php else: ?>
           <button type="button" class="btn btn-accent single-event__hero-btn js-event-booking-btn"
@@ -372,7 +383,7 @@ get_header();
         <?php endif; ?>
 
         <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
-          <span class="single-event__hero-price numfont js-event-price"
+          <span class="single-event__hero-price numfont js-event-price"<?php if ($crosstour_ref): ?> data-crosstour-price<?php endif; ?>
             data-price-rub="<?= esc_attr((string) (int) $price_from_amount); ?>"
             <?php if ($event_price_original !== null && $event_price_original > 0 && $event_price_currency !== null && $event_price_currency !== ''): ?>
             data-price-original="<?= esc_attr((string) $event_price_original); ?>"
@@ -380,7 +391,7 @@ get_header();
             <?php endif; ?>
             data-has-from="true"><?= esc_html($hero_price_line); ?></span>
         <?php else: ?>
-          <span class="single-event__hero-price numfont"><?= esc_html($hero_price_line); ?></span>
+          <span class="single-event__hero-price numfont"<?php if ($crosstour_ref): ?> data-crosstour-price data-has-from="true"<?php endif; ?>><?= esc_html($hero_price_line); ?></span>
         <?php endif; ?>
       </div>
     </div>
@@ -418,6 +429,9 @@ get_header();
           <!-- About end -->
 
           <!-- Dates start -->
+          <?php if ($crosstour_ref): ?>
+            <p class="single-event__samo-dates" data-crosstour-dates hidden></p>
+          <?php endif; ?>
           <?php if (!empty($dates_section_rows)): ?>
             <section class="single-event__dates-section">
               <h2 class="h2 single-event__dates-title">Даты и место</h2>
@@ -458,8 +472,8 @@ get_header();
                       <?php endif; ?>
                       <span class="single-event__dates-sep" aria-hidden="true"></span>
                       <span class="single-event__dates-book-wrap">
-                        <?php if ($tour_booking_url): ?>
-                          <a href="<?= esc_url($tour_booking_url); ?>" class="single-event__dates-book" target="_blank"
+                        <?php if ($effective_booking_url): ?>
+                          <a href="<?= esc_url($effective_booking_url); ?>" class="single-event__dates-book" target="_blank"
                             rel="nofollow noopener">забронировать</a>
                         <?php else: ?>
                           <button type="button" class="single-event__dates-book js-event-booking-btn"
@@ -502,44 +516,50 @@ get_header();
                     <?php foreach ($venue_scheme_legend as $leg): ?>
                       <?php
                       $lab = isset($leg['legend_label']) ? trim((string) $leg['legend_label']) : '';
+                      $leg_date = isset($leg['legend_date']) ? trim((string) $leg['legend_date']) : '';
                       $curr = isset($leg['legend_currency']) ? trim((string) $leg['legend_currency']) : '';
-                      $pr = function_exists('bsi_format_venue_scheme_legend_price')
-                        ? bsi_format_venue_scheme_legend_price($leg['legend_price'] ?? '', $curr)
-                        : trim((string) ($leg['legend_price'] ?? ''));
-                      if ($lab === '' && trim($pr) === '') {
-                        continue;
-                      }
 
-                      $leg_amount_units = null;
-                      $leg_iso = null;
+                      // Цена вводится как есть (без ×1000), конвертируется в рубли по валюте.
                       $leg_raw = $leg['legend_price'] ?? null;
-                      if ($leg_raw !== null && $leg_raw !== '' && is_numeric($leg_raw)) {
-                        $leg_units = (int) round((int) $leg_raw / 1000);
-                        if ($leg_units > 0) {
-                          $leg_amount_units = $leg_units;
-                        }
-                      }
+                      $leg_amount = ($leg_raw !== null && $leg_raw !== '' && is_numeric($leg_raw))
+                        ? (float) $leg_raw
+                        : null;
+
                       $curr_key = mb_strtolower($curr);
-                      if (isset($legend_currency_map[$curr_key])) {
-                        $leg_iso = $legend_currency_map[$curr_key];
-                      }
+                      $leg_iso = $legend_currency_map[$curr_key] ?? ($curr !== '' ? strtoupper($curr) : null);
+
                       $leg_price_rub = null;
                       $leg_price_original = null;
                       $leg_price_currency = null;
-                      if ($leg_amount_units !== null && $leg_iso !== null && function_exists('bsi_education_convert_price_to_rub')) {
-                        $leg_rub_converted = bsi_education_convert_price_to_rub((float) $leg_amount_units, $leg_iso);
+                      if ($leg_amount !== null && $leg_amount > 0 && $leg_iso !== null && function_exists('bsi_education_convert_price_to_rub')) {
+                        $leg_rub_converted = bsi_education_convert_price_to_rub($leg_amount, $leg_iso);
                         if ($leg_rub_converted !== null && $leg_rub_converted > 0) {
                           $leg_price_rub = (int) $leg_rub_converted;
                           if ($leg_iso !== 'RUB') {
-                            $leg_price_original = (float) $leg_amount_units;
+                            $leg_price_original = $leg_amount;
                             $leg_price_currency = $leg_iso;
                           }
                         }
+                      }
+
+                      // Текст-фолбэк, если цена не сконвертилась (нечисловая / нет валюты).
+                      $pr = '';
+                      if ($leg_amount !== null) {
+                        $pr = number_format((int) round($leg_amount), 0, ',', ' ') . ($curr !== '' ? ' ' . $curr : '');
+                      } elseif (trim((string) ($leg_raw ?? '')) !== '') {
+                        $pr = trim(trim((string) $leg_raw) . ($curr !== '' ? ' ' . $curr : ''));
+                      }
+
+                      if ($lab === '' && $leg_price_rub === null && $pr === '') {
+                        continue;
                       }
                       ?>
                       <li class="single-event__venue-legend-item">
                         <span class="single-event__venue-legend-label">
                           <?= esc_html($lab); ?>
+                          <?php if ($leg_date !== ''): ?>
+                            <span class="single-event__venue-legend-date numfont"><?= esc_html($leg_date); ?></span>
+                          <?php endif; ?>
                         </span>
                         <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
                         <?php if ($leg_price_rub !== null): ?>
@@ -628,8 +648,15 @@ get_header();
           }
           ?>
 
+          <?php if ($crosstour_ref): ?>
+            <section class="single-event__accommodation-section single-event__accommodation-section--samo" data-crosstour-hotels hidden>
+              <h2 class="h2">Варианты проживания</h2>
+              <ul class="single-event__accommodation-grid" data-crosstour-hotels-list></ul>
+            </section>
+          <?php endif; ?>
+
           <?php if (!empty($accommodation_rows)): ?>
-            <section class="single-event__accommodation-section">
+            <section class="single-event__accommodation-section"<?php if ($crosstour_ref): ?> data-manual-accommodation<?php endif; ?>>
               <h2 class="h2">Варианты проживания и цены</h2>
               <ul class="single-event__accommodation-grid">
                 <?php foreach ($accommodation_rows as $acc): ?>
@@ -835,7 +862,7 @@ get_header();
               </div>
             <?php endif; ?>
 
-            <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
+            <?php if (($price_from_amount !== null && (int) $price_from_amount > 0) || $crosstour_ref || $has_scheme_legend): ?>
               <div class="single-event__currency-toggle">
                 <label class="ui-checkbox">
                   <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" name="show_original_currency_event"
@@ -848,7 +875,7 @@ get_header();
 
             <div class="hotel-widget__price numfont">
               <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
-                <span class="js-event-price"
+                <span class="js-event-price"<?php if ($crosstour_ref): ?> data-crosstour-price<?php endif; ?>
                   data-price-rub="<?= esc_attr((string) (int) $price_from_amount); ?>"
                   <?php if ($event_price_original !== null && $event_price_original > 0 && $event_price_currency !== null && $event_price_currency !== ''): ?>
                   data-price-original="<?= esc_attr((string) $event_price_original); ?>"
@@ -856,14 +883,14 @@ get_header();
                   <?php endif; ?>
                   data-has-from="true"><?= esc_html($hero_price_line); ?></span>
               <?php elseif ($tour_price_from !== ''): ?>
-                <?= esc_html($tour_price_from); ?>
+                <span<?php if ($crosstour_ref): ?> data-crosstour-price data-has-from="true"<?php endif; ?>><?= esc_html($tour_price_from); ?></span>
               <?php else: ?>
-                По запросу
+                <span<?php if ($crosstour_ref): ?> data-crosstour-price data-has-from="true"<?php endif; ?>>По запросу</span>
               <?php endif; ?>
             </div>
 
-            <?php if ($tour_booking_url): ?>
-              <a href="<?= esc_url($tour_booking_url); ?>" class="btn btn-accent hotel-widget__btn-book sm"
+            <?php if ($effective_booking_url): ?>
+              <a href="<?= esc_url($effective_booking_url); ?>" class="btn btn-accent hotel-widget__btn-book sm"
                 target="_blank" rel="nofollow noopener">Забронировать</a>
             <?php else: ?>
               <button type="button" class="btn btn-accent hotel-widget__btn-book sm js-event-booking-btn"
@@ -925,9 +952,9 @@ get_header();
           <h2 class="single-event__booking-cta-title">Забронировать</h2>
           <p class="single-event__booking-cta-lead"><?= esc_html($event_booking_cta_lead); ?></p>
         </div>
-        <?php if ($tour_booking_url): ?>
+        <?php if ($effective_booking_url): ?>
           <div class="single-event__booking-cta-actions">
-            <a href="<?= esc_url($tour_booking_url); ?>"
+            <a href="<?= esc_url($effective_booking_url); ?>"
               class="single-event__booking-cta-submit single-event__booking-cta-submit--wide" target="_blank"
               rel="nofollow noopener">Забронировать</a>
           </div>

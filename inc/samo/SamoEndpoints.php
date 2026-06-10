@@ -72,6 +72,54 @@ class SamoEndpoints
     return $this->client->request('SearchExcursion_ALL', $params);
   }
 
+  public function searchCrosstourStates(array $params = []): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_STATES', $params);
+  }
+
+  public function searchCrosstourTownFroms(array $params = []): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_TOWNFROMS', $params);
+  }
+
+  public function searchCrosstourTours(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_TOURS', $params);
+  }
+
+  public function searchCrosstourHotels(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_HOTELS', $params);
+  }
+
+  public function searchCrosstourNights(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_NIGHTS', $params);
+  }
+
+  public function searchCrosstourAll(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_ALL', $params);
+  }
+
+  public function searchCrosstourPrices(array $params): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_PRICES', $params);
+  }
+
+  public function searchCrosstourCurrencies(array $params = []): array
+  {
+    $params['type'] = 'api';
+    return $this->client->request('SearchCrosstour_CURRENCIES', $params);
+  }
+
   public function ticketsTransportTypes(array $params = []): array
   {
     $defaultParams = [

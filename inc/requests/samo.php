@@ -297,6 +297,112 @@ function samo_ajax()
       }
       return $send(SamoService::endpoints()->ticketsAll($params));
 
+    case 'crosstour_states':
+      return $send(SamoService::endpoints()->searchCrosstourStates());
+
+    case 'crosstour_tours':
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : BSI_CROSSTOUR_TOWNFROM;
+      if (!$stateInc) {
+        wp_send_json_error(['message' => 'STATEINC required'], 400);
+      }
+      return $send(SamoService::endpoints()->searchCrosstourTours([
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+      ]));
+
+    case 'crosstour_hotels':
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : BSI_CROSSTOUR_TOWNFROM;
+      if (!$stateInc) {
+        wp_send_json_error(['message' => 'STATEINC required'], 400);
+      }
+      return $send(SamoService::endpoints()->searchCrosstourHotels([
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+      ]));
+
+    case 'crosstour_nights':
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : BSI_CROSSTOUR_TOWNFROM;
+      if (!$stateInc) {
+        wp_send_json_error(['message' => 'STATEINC required'], 400);
+      }
+      return $send(SamoService::endpoints()->searchCrosstourNights([
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+      ]));
+
+    case 'crosstour_all':
+    case 'crosstour_prices':
+      $stateInc = isset($_POST['STATEINC']) ? (int) $_POST['STATEINC'] : 0;
+      $tours = isset($_POST['TOURS']) ? (int) $_POST['TOURS'] : 0;
+      $townFromInc = isset($_POST['TOWNFROMINC']) ? (int) $_POST['TOWNFROMINC'] : BSI_CROSSTOUR_TOWNFROM;
+      if (!$stateInc || !$tours) {
+        wp_send_json_error(['message' => 'STATEINC and TOURS required'], 400);
+      }
+      $params = [
+        'TOWNFROMINC' => $townFromInc,
+        'STATEINC' => $stateInc,
+        'TOURS' => $tours,
+        'ADULT' => isset($_POST['ADULT']) ? (int) $_POST['ADULT'] : 2,
+        'CHILD' => isset($_POST['CHILD']) ? (int) $_POST['CHILD'] : 0,
+        'CURRENCY' => isset($_POST['CURRENCY']) ? (int) $_POST['CURRENCY'] : 1,
+        'TOWNS_ANY' => 1,
+        'STARS_ANY' => 1,
+        'HOTELS_ANY' => 1,
+        'MEALS_ANY' => 1,
+        'ROOMS_ANY' => 1,
+        'FREIGHT' => 1,
+      ];
+      foreach (['CHECKIN_BEG', 'CHECKIN_END'] as $k) {
+        if (!empty($_POST[$k])) {
+          $params[$k] = sanitize_text_field(wp_unslash($_POST[$k]));
+        }
+      }
+      foreach (['NIGHTS_FROM', 'NIGHTS_TILL'] as $k) {
+        if (!empty($_POST[$k])) {
+          $params[$k] = (int) $_POST[$k];
+        }
+      }
+      $result = $method === 'crosstour_prices'
+        ? SamoService::endpoints()->searchCrosstourPrices($params)
+        : SamoService::endpoints()->searchCrosstourAll($params);
+      return $send($result);
+
+    case 'crosstour_event':
+      $eventId = isset($_POST['event_id']) ? (int) $_POST['event_id'] : 0;
+      if (!$eventId) {
+        wp_send_json_error(['message' => 'event_id required'], 400);
+      }
+      $force = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+      $data = function_exists('bsi_crosstour_event_data')
+        ? bsi_crosstour_event_data($eventId, $force)
+        : null;
+      if ($data === null) {
+        wp_send_json_success(['samo' => false]);
+      }
+      wp_send_json_success(array_merge(['samo' => true], $data));
+
+    case 'crosstour_batch':
+      $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];
+      $ids = array_slice(array_values(array_unique(array_map('intval', $ids))), 0, 50);
+      $prices = [];
+      foreach ($ids as $id) {
+        if (!$id || !function_exists('bsi_crosstour_event_data')) {
+          continue;
+        }
+        $data = bsi_crosstour_event_data($id);
+        if ($data && !empty($data['offer']) && !empty($data['offer']['price_rub'])) {
+          $prices[$id] = [
+            'price_rub' => (int) $data['offer']['price_rub'],
+            'price_original' => $data['offer']['price_original'] ?? null,
+            'price_currency' => $data['offer']['price_currency'] ?? null,
+          ];
+        }
+      }
+      wp_send_json_success(['prices' => $prices]);
+
     default:
       wp_send_json_error(['message' => 'Unknown endpoint'], 400);
   }

@@ -865,6 +865,9 @@
 
 .single-event__venue-legend-label {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-weight: 400;
 }
 
@@ -1390,6 +1393,14 @@ button.single-event__dates-book {
   text-underline-offset: 2px;
 }
 
+/* При переносе строк (планшет/моб) вертикальные разделители висят криво —
+   убираем, расстояние держит gap. На десктопе (1 строка) оставляем. */
+@media screen and (max-width: 1024px) {
+  .single-event__dates-sep {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 640px) {
   .single-event__dates-row {
     flex-direction: column;
@@ -1433,7 +1444,7 @@ button.single-event__dates-book {
 .single-event__accommodation-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
   box-sizing: border-box;
   padding: 12px;
   background: #f4f4f6;
@@ -1543,7 +1554,9 @@ button.single-event__dates-book {
   white-space: nowrap;
 }
 
-.single-event__accommodation-card-link {
+.single-event__accommodation-card-link,
+.single-event__accommodation-card-link:link,
+.single-event__accommodation-card-link:visited {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -1558,7 +1571,9 @@ button.single-event__dates-book {
   white-space: nowrap;
   cursor: pointer;
   transition: $trans-text;
+}
 
+.single-event__accommodation-card-link {
   &:hover,
   &:focus-visible {
     color: $red-hover;
@@ -2065,4 +2080,17 @@ button.single-event__dates-book {
   .country-tours--country-events .country-tours__list.is-tiles {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+/* Crosstour (Самотур): строка доступных дат вылета на странице события. */
+.single-event__samo-dates {
+  margin: 0 0 16px;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+/* Дата сектора в легенде схемы зала. */
+.single-event__venue-legend-date {
+  color: $text-gray;
+  font-size: 14px;
 }

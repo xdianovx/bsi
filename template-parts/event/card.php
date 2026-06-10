@@ -226,6 +226,7 @@ $price_currency = isset($price['currency']) ? $price['currency'] : null;
       <a href="<?= esc_url($link); ?>" class="event-card__btn event-card__btn-details">Подробнее</a>
       <a href="<?= esc_url($link); ?>"
         class="btn btn-accent event-card__btn event-card__btn-book<?= $price_rub !== null ? ' js-event-price' : ''; ?>"
+        data-crosstour-card="<?= esc_attr((string) (int) $post_id); ?>"
         <?php if ($price_rub !== null): ?>
         data-price-rub="<?= esc_attr((string) (int) $price_rub); ?>"
         <?php if ($price_original !== null && $price_currency !== null): ?>

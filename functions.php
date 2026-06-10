@@ -420,6 +420,7 @@ require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
 require get_template_directory() . '/inc/helpers/country-cases.php';
 require get_template_directory() . '/inc/helpers/event-price.php';
+require get_template_directory() . '/inc/helpers/crosstour.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
 require get_template_directory() . '/inc/requests/agency-events-filter.php';
