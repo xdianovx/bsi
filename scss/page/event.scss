@@ -2127,6 +2127,10 @@ button.single-event__dates-book {
   max-width: none;
   width: 100%;
 
+  &.promo-filer {
+    max-width: 100%;
+  }
+
   @media screen and (max-width: 1200px) {
     flex-wrap: nowrap;
     overflow-x: auto;
