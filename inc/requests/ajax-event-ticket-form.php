@@ -6,7 +6,7 @@ declare(strict_types=1);
  * AJAX: заявка с формы событийного тура (модалка / блок на странице).
  */
 
-$event_ticket_booking_email = 'dianov.js@gmail.com, a.hani@bsigroup.ru';
+$event_ticket_booking_email = 'dianov.js@gmail.com, o.ser@bsigroup.ru';
 
 add_action('wp_ajax_event_ticket_booking', 'bsi_handle_event_ticket_booking');
 add_action('wp_ajax_nopriv_event_ticket_booking', 'bsi_handle_event_ticket_booking');
