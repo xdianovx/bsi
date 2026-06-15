@@ -552,6 +552,7 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
     $tours = ($tours_resp['ok'] ?? false) ? ($tours_resp['data']['SearchCrosstour_TOURS'] ?? []) : [];
     if (!empty($tours)) {
       $tour = (int) ($tours[0]['id'] ?? 0);
+      $ref['TOURINC'] = $tour; // иначе per-row booking_url строится с tour=0 → нет кнопки
       if (empty($ref['name']) && isset($tours[0]['name'])) {
         $ref['name'] = (string) $tours[0]['name'];
       }
@@ -574,7 +575,7 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
 
   // Кэш на уровне тура — показываем ВСЕ доступные комбинации (даты/ночи/номера),
   // а не только узкий слот из ссылки. Узкие даты ссылки идут лишь в booking_url.
-  $cache_key = 'crosstour_offer_v6_' . $townfrom . '_' . $state . '_' . $tour;
+  $cache_key = 'crosstour_offer_v7_' . $townfrom . '_' . $state . '_' . $tour;
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
     if (is_array($cached)) {
