@@ -698,6 +698,63 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
 }
 
 /**
+ * Лёгкая мин. цена per-person по ref ссылки (1 запрос PRICES, если в ссылке есть
+ * tour + даты + ночи). Иначе — через полный offer. Кеш ~3ч. Для страницы тура.
+ */
+function bsi_crosstour_quick_price(array $ref, bool $force = false): ?int
+{
+  $state = (int) ($ref['STATEINC'] ?? 0);
+  $tour = (int) ($ref['TOURINC'] ?? 0);
+  $townfrom = (int) ($ref['TOWNFROMINC'] ?? BSI_CROSSTOUR_TOWNFROM);
+  if (!$state) {
+    return null;
+  }
+
+  $checkin = (string) ($ref['CHECKIN_BEG'] ?? '');
+  $nf = (int) ($ref['NIGHTS_FROM'] ?? 0);
+  $nt = (int) ($ref['NIGHTS_TILL'] ?? 0);
+
+  // Нет точных данных в ссылке → полный offer (он сам подберёт даты/ночи/тур).
+  if (!$tour || $checkin === '' || !$nf) {
+    $offer = bsi_crosstour_event_offer($ref, $force);
+    return $offer['price_rub'] ?? null;
+  }
+
+  $cache_key = 'crosstour_qprice_' . $townfrom . '_' . $state . '_' . $tour . '_' . $checkin . '_' . $nf;
+  if (!$force) {
+    $cached = CacheService::get($cache_key, 'samotour');
+    if ($cached !== false) {
+      return $cached === '' ? null : (int) $cached;
+    }
+  }
+
+  $resp = SamoService::endpoints()->searchCrosstourPrices([
+    'TOWNFROMINC' => $townfrom,
+    'STATEINC' => $state,
+    'TOURS' => $tour,
+    'ADULT' => 2,
+    'CHILD' => 0,
+    'CURRENCY' => 1,
+    'CHECKIN_BEG' => $checkin,
+    'CHECKIN_END' => (string) ($ref['CHECKIN_END'] ?? $checkin),
+    'NIGHTS_FROM' => $nf,
+    'NIGHTS_TILL' => $nt > 0 ? $nt : $nf,
+    'TOWNS_ANY' => 1,
+    'STARS_ANY' => 1,
+    'HOTELS_ANY' => 1,
+    'MEALS_ANY' => 1,
+    'ROOMS_ANY' => 1,
+    'FREIGHT' => 1,
+  ]);
+  $node = ($resp['ok'] ?? false) ? ($resp['data']['SearchCrosstour_PRICES'] ?? []) : [];
+  $price = bsi_crosstour_price_from_rows($node['prices'] ?? []);
+  $rub = $price['rub'];
+
+  CacheService::set($cache_key, $rub === null ? '' : $rub, 3 * HOUR_IN_SECONDS, 'samotour');
+  return $rub;
+}
+
+/**
  * Высокоуровневое: данные события (ref + offer) или null (нет Само / ручной режим).
  *
  * @return array{ref:array,offer:array}|null

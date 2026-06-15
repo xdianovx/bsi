@@ -48,6 +48,19 @@ if (!empty($tour_booking_url)) {
   }
 }
 
+// Crosstour-ссылка (событийный/переездной тур) — мин. цена через crosstour API.
+$crosstour_price_rub = null;
+if (!empty($tour_booking_url)
+  && stripos($tour_booking_url, 'search_crosstour') !== false
+  && function_exists('bsi_crosstour_ref_from_url')
+  && function_exists('bsi_crosstour_quick_price')
+) {
+  $ct_ref = bsi_crosstour_ref_from_url($tour_booking_url);
+  if ($ct_ref) {
+    $crosstour_price_rub = bsi_crosstour_quick_price($ct_ref);
+  }
+}
+
 $excerpt = has_excerpt($post_id) ? get_the_excerpt($post_id) : '';
 
 get_header();
@@ -372,7 +385,9 @@ get_header();
             <?php
             $cached_tour_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($post_id) : null;
             $tour_price_display = '';
-            if ($cached_tour_price) {
+            if ($crosstour_price_rub !== null && $crosstour_price_rub > 0) {
+              $tour_price_display = number_format((int) $crosstour_price_rub, 0, '.', ' ') . ' ₽ / чел';
+            } elseif ($cached_tour_price) {
               $tour_price_display = $cached_tour_price['price_formatted'] . ' ₽ / чел';
             } elseif ($tour_price_from) {
               $price_num = preg_replace('/[^\d]/', '', $tour_price_from);
