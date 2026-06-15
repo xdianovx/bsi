@@ -429,9 +429,6 @@ get_header();
           <!-- About end -->
 
           <!-- Dates start -->
-          <?php if ($crosstour_ref): ?>
-            <p class="single-event__samo-dates" data-crosstour-dates hidden></p>
-          <?php endif; ?>
           <?php if (!empty($dates_section_rows)): ?>
             <section class="single-event__dates-section">
               <h2 class="h2 single-event__dates-title">Даты и место</h2>
