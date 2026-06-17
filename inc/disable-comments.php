@@ -127,3 +127,24 @@ remove_action('wp_head', 'feed_links_extra', 3);
  * Не показывать аватары/поля комментариев в админ-баре и т.п.
  */
 add_filter('comments_rewrite_rules', '__return_empty_array');
+
+/**
+ * Заглушить письма-уведомления о комментариях (defense-in-depth):
+ * если коммент всё же создастся — никаких писем модерации/уведомления.
+ */
+add_filter('comment_notification_recipients', '__return_empty_array', 20);
+add_filter('comment_moderation_recipients', '__return_empty_array', 20);
+add_filter('notify_post_author', '__return_false');
+add_filter('notify_moderator', '__return_false');
+
+/**
+ * Принудительно закрыть комментарии в опциях (на случай чужих хуков).
+ */
+function bsi_force_comment_options() {
+	update_option('default_comment_status', 'closed');
+	update_option('default_ping_status', 'closed');
+	update_option('comment_registration', 1);
+	update_option('comments_notify', 0);
+	update_option('moderation_notify', 0);
+}
+add_action('admin_init', 'bsi_force_comment_options');
