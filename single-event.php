@@ -141,10 +141,17 @@ if ($hero_url === '' && $hero_url_mobile !== '') {
 
 $hero_date_label = '';
 $hero_concert_date = function_exists('get_field') ? get_field('event_hero_date', $post_id) : '';
+$hero_concert_date_end = function_exists('get_field') ? get_field('event_hero_date_end', $post_id) : '';
 if (is_string($hero_concert_date) && $hero_concert_date !== '') {
   $hero_ts = strtotime($hero_concert_date);
+  $hero_end_ts = is_string($hero_concert_date_end) && $hero_concert_date_end !== '' ? strtotime($hero_concert_date_end) : 0;
   if ($hero_ts) {
-    $hero_date_label = date_i18n('j F Y', $hero_ts);
+    if ($hero_end_ts && $hero_end_ts !== $hero_ts) {
+      // Многодневное на первом экране → диапазон '31.05 – 2.06.2026'.
+      $hero_date_label = bsi_format_event_date_range($hero_concert_date, (string) $hero_concert_date_end);
+    } else {
+      $hero_date_label = date_i18n('j F Y', $hero_ts);
+    }
   }
 }
 if ($hero_date_label === '' && !empty($event_dates_rows) && is_array($event_dates_rows)) {
@@ -153,14 +160,19 @@ if ($hero_date_label === '' && !empty($event_dates_rows) && is_array($event_date
     if (!empty($row['date_value'])) {
       $ds[] = (string) $row['date_value'];
     }
+    if (!empty($row['date_value_end'])) {
+      $ds[] = (string) $row['date_value_end'];
+    }
   }
   $ds = array_values(array_unique($ds));
   sort($ds);
   if (!empty($ds)) {
-    if (count($ds) === 1) {
-      $hero_date_label = date_i18n('j F Y', strtotime($ds[0]));
+    $hero_min = $ds[0];
+    $hero_max = $ds[count($ds) - 1];
+    if ($hero_min === $hero_max) {
+      $hero_date_label = date_i18n('j F Y', strtotime($hero_min));
     } else {
-      $hero_date_label = date_i18n('j F Y', strtotime($ds[0])) . ' — ' . date_i18n('j F Y', strtotime($ds[count($ds) - 1]));
+      $hero_date_label = bsi_format_event_date_range($hero_min, $hero_max);
     }
   }
 }
@@ -172,6 +184,7 @@ if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
       continue;
     }
     $d = (string) $row['date_value'];
+    $d_end = isset($row['date_value_end']) ? trim((string) $row['date_value_end']) : '';
     $city = isset($row['date_city']) ? trim((string) $row['date_city']) : '';
     $venue_row = isset($row['date_venue']) ? trim((string) $row['date_venue']) : '';
     if ($venue_row === '') {
@@ -204,6 +217,7 @@ if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
 
     $dates_section_rows[] = [
       'date' => $d,
+      'date_end' => $d_end,
       'city' => $city,
       'venue' => $venue_row,
       'price_rub' => $price_rub,
@@ -378,6 +392,7 @@ get_header();
         <?php else: ?>
           <button type="button" class="btn btn-accent single-event__hero-btn js-event-booking-btn"
             data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
+            data-event-date="<?= esc_attr($hero_date_label); ?>"
             data-event-venue="<?= esc_attr($event_venue); ?>" data-event-time="<?= esc_attr($event_time); ?>"
             data-min-price="<?= esc_attr($price_from_amount ?? 0); ?>">Забронировать</button>
         <?php endif; ?>
@@ -437,7 +452,7 @@ get_header();
                   <?php
                   $row_city = $br['city'] !== '' ? $br['city'] : '—';
                   $row_venue = $br['venue'] !== '' ? $br['venue'] : '—';
-                  $row_date_label = date_i18n('d.m.Y', strtotime($br['date']));
+                  $row_date_label = bsi_format_event_date_range($br['date'], $br['date_end'] ?? '');
                   $row_price_rub = isset($br['price_rub']) ? $br['price_rub'] : null;
                   $row_orig = isset($br['price_original']) ? $br['price_original'] : null;
                   $row_cur = isset($br['price_currency']) ? trim((string) $br['price_currency']) : '';
@@ -475,6 +490,7 @@ get_header();
                         <?php else: ?>
                           <button type="button" class="single-event__dates-book js-event-booking-btn"
                             data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
+                            data-event-date="<?= esc_attr($row_date_label); ?>"
                             data-event-venue="<?= esc_attr($br['venue']); ?>" data-event-time="<?= esc_attr($event_time); ?>"
                             data-min-price="<?= esc_attr($row_price_rub !== null ? (int) $row_price_rub : 0); ?>">забронировать</button>
                         <?php endif; ?>
@@ -705,6 +721,7 @@ get_header();
                         class="single-event__accommodation-card-link js-event-booking-btn"
                         data-event-id="<?= esc_attr((string) $post_id); ?>"
                         data-event-title="<?= esc_attr($event_title); ?>"
+                        data-event-date="<?= esc_attr($hero_date_label); ?>"
                         data-event-venue="<?= esc_attr($event_venue); ?>"
                         data-event-time="<?= esc_attr($event_time); ?>"
                         data-accommodation-name="<?= esc_attr($acc['name']); ?>"
@@ -892,6 +909,7 @@ get_header();
             <?php else: ?>
               <button type="button" class="btn btn-accent hotel-widget__btn-book sm js-event-booking-btn"
                 data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
+                data-event-date="<?= esc_attr($hero_date_label); ?>"
                 data-event-venue="<?= esc_attr($event_venue); ?>" data-event-time="<?= esc_attr($event_time); ?>"
                 data-min-price="<?= esc_attr($price_from_amount ?? 0); ?>">
                 Забронировать

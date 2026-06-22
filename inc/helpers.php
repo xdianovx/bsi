@@ -994,3 +994,36 @@ function bsi_format_stay_range(string $from, string $to): array
 
   return $out;
 }
+
+/**
+ * Лейбл даты строки события (event_dates): один день или диапазон.
+ *
+ * @param string $from ISO-дата начала (Y-m-d).
+ * @param string $to   ISO-дата окончания (Y-m-d), может быть пустой.
+ * @return string '08.06.2026' (один день) или '6.06 – 8.06.2026' (диапазон). '' если from невалиден.
+ */
+function bsi_format_event_date_range(string $from, string $to = ''): string
+{
+  $from = trim($from);
+  if ($from === '') {
+    return '';
+  }
+  $from_ts = strtotime($from);
+  if (!$from_ts) {
+    return '';
+  }
+
+  $to = trim($to);
+  $to_ts = $to !== '' ? strtotime($to) : 0;
+
+  // end пусто / невалидно / совпадает → один день.
+  if (!$to_ts || $to_ts === $from_ts) {
+    return date_i18n('d.m.Y', $from_ts);
+  }
+
+  // Порядок ввода не важен: меньшая дата — начало, большая — окончание.
+  $start_ts = min($from_ts, $to_ts);
+  $end_ts = max($from_ts, $to_ts);
+
+  return date_i18n('j.m', $start_ts) . ' – ' . date_i18n('j.m.Y', $end_ts);
+}

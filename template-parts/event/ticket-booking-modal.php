@@ -24,6 +24,7 @@
           <input type="hidden" name="event_title" class="js-form-event-title">
           <input type="hidden" name="page_url" class="js-form-page-url">
           <input type="hidden" name="accommodation" class="js-form-accommodation">
+          <input type="hidden" name="event_date" class="js-form-event-date">
           <input type="hidden" name="event_venue" class="js-form-event-venue">
           <input type="hidden" name="event_time" class="js-form-event-time">
           <input type="hidden" name="event_price" class="js-form-event-price">

@@ -78,26 +78,39 @@ if (!function_exists('bsi_event_tours_filter_ids_by_event_dates')) {
     foreach ($post_ids as $post_id) {
       $post_id = (int) $post_id;
       $event_dates = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
-      $all_dates = [];
+      $ranges = [];
       if (!empty($event_dates) && is_array($event_dates)) {
         foreach ($event_dates as $row) {
-          $d = isset($row['date_value']) ? $row['date_value'] : '';
-          if ($d) {
-            $all_dates[] = (string) $d;
+          $d = isset($row['date_value']) ? (string) $row['date_value'] : '';
+          if ($d === '') {
+            continue;
           }
+          $start_ts = strtotime($d);
+          if (!$start_ts) {
+            continue;
+          }
+          $d_end = isset($row['date_value_end']) ? trim((string) $row['date_value_end']) : '';
+          $end_ts = $d_end !== '' ? strtotime($d_end) : 0;
+          if (!$end_ts) {
+            $end_ts = $start_ts;
+          }
+          // Порядок ввода не важен.
+          $ranges[] = [min($start_ts, $end_ts), max($start_ts, $end_ts)];
         }
       }
       $hero_d = function_exists('get_field') ? get_field('event_hero_date', $post_id) : '';
       if (is_string($hero_d) && $hero_d !== '') {
-        $all_dates[] = $hero_d;
+        $hero_ts = strtotime($hero_d);
+        if ($hero_ts) {
+          $ranges[] = [$hero_ts, $hero_ts];
+        }
       }
-      $all_dates = array_values(array_unique($all_dates));
-      if (empty($all_dates)) {
+      if (empty($ranges)) {
         continue;
       }
-      foreach ($all_dates as $d) {
-        $ts = strtotime($d);
-        if ($ts && $ts >= $from && $ts <= $to) {
+      foreach ($ranges as $r) {
+        // Пересечение диапазона события [start,end] с окном фильтра [$from,$to].
+        if ($r[0] <= $to && $r[1] >= $from) {
           $out[] = $post_id;
           break;
         }

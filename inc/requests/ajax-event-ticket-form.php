@@ -35,6 +35,7 @@ function bsi_handle_event_ticket_booking(): void
   $event_title = sanitize_text_field($_POST['event_title'] ?? '');
   $page_url = esc_url_raw($_POST['page_url'] ?? '');
   $accommodation = sanitize_text_field(trim($_POST['accommodation'] ?? ''));
+  $event_date = sanitize_text_field(trim($_POST['event_date'] ?? ''));
   $event_venue = sanitize_text_field(trim($_POST['event_venue'] ?? ''));
   $event_time = sanitize_text_field(trim($_POST['event_time'] ?? ''));
   $event_price = sanitize_text_field(trim($_POST['event_price'] ?? ''));
@@ -61,6 +62,7 @@ function bsi_handle_event_ticket_booking(): void
       'event_title' => $event_title,
       'page_url' => $page_url,
       'accommodation' => $accommodation,
+      'event_date' => $event_date,
       'event_venue' => $event_venue,
       'event_time' => $event_time,
       'event_price' => $event_price,

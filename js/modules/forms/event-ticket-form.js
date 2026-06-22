@@ -48,6 +48,7 @@ function buildTicketData(btn) {
     eventId: d.eventId || "",
     accName,
     accommodation,
+    date: (d.eventDate || "").trim(),
     venue: (d.eventVenue || "").trim(),
     time: (d.eventTime || "").trim(),
     price,
@@ -86,6 +87,7 @@ function populateModal(ticketData) {
   // Детали брони (видимый блок + скрытые поля для письма).
   const rows = [
     ["Размещение", accommodation],
+    ["Дата", ticketData.date],
     ["Цена", ticketData.price],
     ["Площадка", ticketData.venue],
     ["Время", ticketData.time],
@@ -115,6 +117,7 @@ function populateModal(ticketData) {
   setVal(".js-form-event-title", title);
   setVal(".js-form-page-url", window.location.href);
   setVal(".js-form-accommodation", accommodation);
+  setVal(".js-form-event-date", ticketData.date);
   setVal(".js-form-event-venue", ticketData.venue);
   setVal(".js-form-event-time", ticketData.time);
   setVal(".js-form-event-price", ticketData.price);
