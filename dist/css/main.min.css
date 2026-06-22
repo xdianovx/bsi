@@ -15427,6 +15427,7 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
 }
 .visa-info-img img {
   object-fit: cover;
+  width: 100%;
 }
 .visa-page-anchor-form {
   display: flex;
@@ -15438,7 +15439,6 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
 }
 .visa-info-item {
   border-radius: 8px;
-  max-width: 82%;
 }
 .visa-info-item.--warn {
   margin-top: 8px;
@@ -15637,7 +15637,8 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
     content: "";
     position: absolute;
     left: 100%;
-    bottom: -13px; /* фиксируем от нижнего края карточки */
+    bottom: -13px;
+    /* фиксируем от нижнего края карточки */
     transform: translateX(-50%);
     width: calc(100% + 80px);
     max-width: 110%;
@@ -15653,7 +15654,8 @@ section.mice-reviews .mice-reviews-slider .slide_box .review_user .review_user-t
     content: "";
     position: absolute;
     left: 100%;
-    top: -13px; /* фиксируем от верхнего края карточки */
+    top: -13px;
+    /* фиксируем от верхнего края карточки */
     transform: translateX(-50%);
     width: calc(100% + 80px);
     max-width: 110%;

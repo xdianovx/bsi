@@ -121,6 +121,7 @@
 
   img {
     object-fit: cover;
+    width: 100%;
   }
 }
 
@@ -136,7 +137,6 @@
 
 .visa-info-item {
   border-radius: 8px;
-  max-width: 82%;
 
   &.--warn {
     margin-top: 8px;
@@ -195,7 +195,7 @@
   gap: 8px;
 }
 
-.visa-info-item__value + .visa-info-item__value {
+.visa-info-item__value+.visa-info-item__value {
   margin-top: 8px;
 }
 
@@ -203,6 +203,7 @@
   .visa-info-item__icon svg path {
     stroke: $red;
   }
+
   a {
     color: $red;
   }
@@ -358,7 +359,8 @@
     content: "";
     position: absolute;
     left: 100%;
-    bottom: -13px; /* фиксируем от нижнего края карточки */
+    bottom: -13px;
+    /* фиксируем от нижнего края карточки */
     transform: translateX(-50%);
     width: calc(100% + 80px);
     max-width: 110%;
@@ -375,7 +377,8 @@
     content: "";
     position: absolute;
     left: 100%;
-    top: -13px; /* фиксируем от верхнего края карточки */
+    top: -13px;
+    /* фиксируем от верхнего края карточки */
     transform: translateX(-50%);
     width: calc(100% + 80px);
     max-width: 110%;
@@ -461,6 +464,7 @@
     .visa-contacts-item__icon svg path {
       stroke: $red;
     }
+
     a {
       color: $red;
     }
@@ -486,6 +490,7 @@
     .visa-contacts-item__icon svg path {
       stroke: $red;
     }
+
     a {
       color: $red;
     }
@@ -549,8 +554,7 @@
   }
 }
 
-.visa-country-card {
-}
+.visa-country-card {}
 
 .visa-country-card__head {
   display: flex;
@@ -858,6 +862,7 @@ a.visa-embassy__contact-item {
     .visa-contacts-item__icon svg path {
       stroke: $red;
     }
+
     a {
       color: $red;
     }
