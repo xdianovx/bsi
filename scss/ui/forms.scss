@@ -111,8 +111,9 @@ input.error {
 /* Согласие с политикой: не использовать «плавающий» label .input-item */
 .input-item.form-privacy-consent {
   padding-top: 0;
+  margin-top: 8px;
 
-  & > label.modal-program-booking__service-item {
+  &>label.modal-program-booking__service-item {
     position: static;
     display: flex;
     margin-bottom: 0;
@@ -130,7 +131,7 @@ input.error {
     cursor: pointer;
   }
 
-  &.white > label.modal-program-booking__service-item {
+  &.white>label.modal-program-booking__service-item {
     background: transparent;
     padding: 0;
   }
@@ -225,10 +226,12 @@ input.error {
   background: #fef3c7;
   color: #92400e;
 }
+
 .form-status.success {
   background: #d1fae5;
   color: #065f46;
 }
+
 .form-status.error {
   background: #fee2e2;
   color: #dc2626;
@@ -236,10 +239,12 @@ input.error {
 
 .form-group {
   margin-bottom: 32px;
+
   &:last-of-type {
     margin-bottom: 0;
   }
 }
+
 .form-group__title {
   font-weight: 600;
   font-size: 20px;
@@ -258,6 +263,7 @@ input.error {
 
   &.form-row-3 {
     grid-template-columns: repeat(3, 1fr);
+
     @media screen and (max-width: 1200px) {
       grid-template-columns: repeat(1, 1fr);
     }
@@ -287,7 +293,7 @@ input.error {
     width: 0;
 
     &:checked {
-      & ~ .ui-checkbox__mark {
+      &~.ui-checkbox__mark {
         background-color: $red;
         border-color: $red;
 

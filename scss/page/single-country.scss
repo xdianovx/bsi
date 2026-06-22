@@ -1,11 +1,12 @@
-.page-country__top {
-}
+.page-country__top {}
 
 .page-country__title {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 16px;
   line-height: 100%;
+
   img {
     height: 42px;
     width: 42px;
@@ -22,6 +23,7 @@
     }
   }
 }
+
 .country-page__values {
   margin-top: 34px;
   display: grid;
@@ -44,7 +46,7 @@
   }
 }
 
-.coutry-page__wrap > * {
+.coutry-page__wrap>* {
   min-width: 0;
 }
 
@@ -70,15 +72,15 @@
 .country-page__gallery .swiper-wrapper,
 .country-page__gallery .swiper-slide {
   max-width: 100%;
-  min-width: 0; /* тоже помогает, если внутри ещё flex */
+  min-width: 0;
+  /* тоже помогает, если внутри ещё flex */
 }
 
 .country-attr__key {
   font-weight: 600;
 }
 
-.country-attr__value {
-}
+.country-attr__value {}
 
 .country-attr-item {
   display: flex;
@@ -146,6 +148,7 @@
   &.is-open {
     .child-page-item {
       background: $bg-gray;
+
       &.active {
         background: $red;
         color: #fff;
@@ -164,6 +167,7 @@
 
 .child-page-item__chevrone {
   margin-left: auto;
+
   img {
     display: block;
   }
@@ -188,6 +192,7 @@
   &.active {
     color: $red;
   }
+
   &::before {
     content: "";
     position: absolute;
@@ -199,6 +204,7 @@
     border-radius: 2px;
   }
 }
+
 .child-page-item {
   padding: 12px 12px 10px;
   width: 100%;
@@ -218,6 +224,7 @@
       display: flex;
     }
   }
+
   &:hover {
     background: $bg-gray;
     color: $red;
@@ -231,7 +238,9 @@
   &.active {
     background: $red;
     color: #fff;
+
     &:hover {
+
       // color: #fff;
       .child-page-item__icon {
         color: #fff;
@@ -239,7 +248,7 @@
     }
   }
 
-  > span {
+  >span {
     font-weight: 500;
   }
 
@@ -297,8 +306,7 @@
   border-bottom: 1px solid #bebebe;
 }
 
-.country-page__gallery {
-}
+.country-page__gallery {}
 
 .country-page__gallery-slide {
   width: 100%;
@@ -343,6 +351,7 @@
 
 .country-regions__resort {
   transition: all 0.3s ease-in-out;
+
   &:hover {
     color: $red;
   }
@@ -378,6 +387,7 @@
   aspect-ratio: 19/9;
   display: block;
   height: 600px;
+
   img {
     display: block;
     width: 100%;
@@ -390,10 +400,10 @@
   }
 }
 
-.js-gallery {
-}
+.js-gallery {}
 
 .hotel-gallery-thumb-slide {
+
   // aspect-ratio: 16/9;
   img {
     width: 100%;
@@ -415,8 +425,7 @@
   padding-bottom: 24px;
 }
 
-.page-country__resort-title {
-}
+.page-country__resort-title {}
 
 .tour-program {
   margin-top: 64px;

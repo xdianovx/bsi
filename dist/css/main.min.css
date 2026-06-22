@@ -2189,6 +2189,7 @@ input.error {
 /* Согласие с политикой: не использовать «плавающий» label .input-item */
 .input-item.form-privacy-consent {
   padding-top: 0;
+  margin-top: 8px;
 }
 .input-item.form-privacy-consent > label.modal-program-booking__service-item {
   position: static;
@@ -12064,6 +12065,7 @@ button.single-event__dates-book {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 16px;
   line-height: 100%;
 }
 .page-country__title img {
@@ -12121,7 +12123,8 @@ button.single-event__dates-book {
 .country-page__gallery .swiper-wrapper,
 .country-page__gallery .swiper-slide {
   max-width: 100%;
-  min-width: 0; /* тоже помогает, если внутри ещё flex */
+  min-width: 0;
+  /* тоже помогает, если внутри ещё flex */
 }
 .country-attr__key {
   font-weight: 600;
