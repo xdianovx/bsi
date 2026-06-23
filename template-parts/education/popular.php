@@ -136,37 +136,34 @@ if (!$use_test_data) {
             }
         }
 
+        // Цена: та же логика, что и на single-education.php (программы → helper → legacy),
+        // с конвертацией валюты в рубли. Иначе сырое program_price_per_week даёт завышенную цену.
         $price = '';
         if (function_exists('get_field')) {
-            $price_val = get_field('education_price', $education_id);
-
-            if (is_string($price_val) && $price_val !== '') {
-                $price = (string) $price_val;
-            }
-
             $education_programs = get_field('education_programs', $education_id);
             $education_programs = is_array($education_programs) ? $education_programs : [];
 
-            if (empty($price) && !empty($education_programs)) {
-                $prices = [];
+            if (!empty($education_programs) && function_exists('bsi_education_get_program_price_numeric_rub')) {
+                $program_rubs = [];
                 foreach ($education_programs as $program) {
-                    $program_price = '';
-                    if (isset($program['program_price_per_week'])) {
-                        $program_price = (string) $program['program_price_per_week'];
-                    } elseif (isset($program['price_per_week'])) {
-                        $program_price = (string) $program['price_per_week'];
-                    }
-                    if ($program_price) {
-                        preg_match('/[\d\s]+/', $program_price, $matches);
-                        if (!empty($matches[0])) {
-                            $prices[] = (int) str_replace(' ', '', $matches[0]);
-                        }
+                    $rub = bsi_education_get_program_price_numeric_rub($program);
+                    if ($rub > 0) {
+                        $program_rubs[] = $rub;
                     }
                 }
+                if (!empty($program_rubs)) {
+                    $price = number_format(min($program_rubs), 0, ',', ' ') . ' ₽';
+                }
+            }
 
-                if (!empty($prices)) {
-                    $min_price_value = min($prices);
-                    $price = number_format($min_price_value, 0, ',', ' ') . ' ₽/неделя';
+            if ($price === '' && function_exists('bsi_education_get_price_in_rub')) {
+                $price = bsi_education_get_price_in_rub($education_id, false);
+            }
+
+            if ($price === '') {
+                $price_val = get_field('education_price', $education_id);
+                if (is_string($price_val) && $price_val !== '') {
+                    $price = (string) $price_val;
                 }
             }
 
