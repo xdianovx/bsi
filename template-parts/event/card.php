@@ -125,6 +125,9 @@ $price = function_exists('bsi_event_card_price')
 $price_rub = isset($price['rub']) ? $price['rub'] : null;
 $price_original = isset($price['original']) ? $price['original'] : null;
 $price_currency = isset($price['currency']) ? $price['currency'] : null;
+
+// Booking URL для клиентского fallback (тот же механизм, что у карточек туров).
+$event_booking_url = function_exists('get_field') ? trim((string) get_field('tour_booking_url', $post_id)) : '';
 ?>
 
 <article class="event-card">
