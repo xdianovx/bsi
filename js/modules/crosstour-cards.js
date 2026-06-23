@@ -13,7 +13,8 @@ const fmtPrice = (n) => Number(n).toLocaleString("ru-RU");
 
 const fetchBatch = async (ids) => {
   const ajaxUrl = window.ajax?.url || window.ajaxurl;
-  if (!ajaxUrl) return {};
+  if (!ajaxUrl) { console.warn("[crosstour-cards] no ajaxUrl"); return {}; }
+  console.log("[crosstour-cards] batch request →", ids);
   const body = new URLSearchParams();
   body.set("action", "bsi_samo");
   body.set("method", "crosstour_batch");
@@ -26,6 +27,7 @@ const fetchBatch = async (ids) => {
     credentials: "same-origin",
   });
   const json = await res.json();
+  console.log("[crosstour-cards] batch response:", json);
   return json && json.success && json.data ? json.data.prices || {} : {};
 };
 
@@ -48,7 +50,10 @@ const run = async () => {
   let changed = false;
   cards.forEach((el) => {
     const d = prices[el.dataset.crosstourCard];
-    if (!d || !d.price_rub || Number(d.price_rub) <= 0) return;
+    if (!d || !d.price_rub || Number(d.price_rub) <= 0) {
+      console.log("[crosstour-cards] no price for event", el.dataset.crosstourCard, "→ got:", d);
+      return;
+    }
 
     el.classList.add("js-event-price");
     el.dataset.priceRub = String(Number(d.price_rub));

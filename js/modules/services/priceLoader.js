@@ -153,6 +153,7 @@ function formatServerPriceRow(p) {
  */
 async function fetchBatchTourPricesFromServer(tourIds) {
   if (tourIds.length === 0) return {};
+  console.log("[priceLoader] batch request →", tourIds);
   try {
     const body = new URLSearchParams();
     body.set("action", "get_batch_tour_prices");
@@ -170,13 +171,17 @@ async function fetchBatchTourPricesFromServer(tourIds) {
     try {
       json = JSON.parse(text);
     } catch {
+      console.warn("[priceLoader] batch parse error, raw:", text.slice(0, 300));
       return {};
     }
+    console.log("[priceLoader] batch response:", json);
     if (!json?.success || !json.data?.prices) {
+      console.warn("[priceLoader] batch no prices, success:", json?.success, "data:", json?.data);
       return {};
     }
     return json.data.prices;
-  } catch {
+  } catch (e) {
+    console.error("[priceLoader] batch fetch error:", e);
     return {};
   }
 }
@@ -262,6 +267,7 @@ export async function loadTourPricesBatch(container, params = {}) {
     }
 
     const still = toLoad.filter((el) => !el.hasAttribute("data-price-loaded"));
+    if (still.length) console.log("[priceLoader] client fallback for", still.length, "tours");
     await Promise.all(
       still.map(async (el) => {
         el.classList.add("is-loading");
@@ -270,13 +276,16 @@ export async function loadTourPricesBatch(container, params = {}) {
         const bookingParams = parseBookingParams(href);
 
         if (!tourId || !bookingParams) {
+          console.warn("[priceLoader] fallback skip tour", tourId, "— no bookingParams, href:", href);
           markPriceFailed(el);
           return;
         }
 
+        console.log("[priceLoader] fallback tour", tourId, "params:", bookingParams);
         try {
           const minPrice = await fetchTourMinPrice(bookingParams);
           el.classList.remove("is-loading");
+          console.log("[priceLoader] fallback tour", tourId, "minPrice:", minPrice);
 
           if (minPrice !== null) {
             const displayPrice = Math.round(minPrice / 2);
