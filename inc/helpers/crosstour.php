@@ -144,7 +144,9 @@ function bsi_crosstour_tour_name(int $townfrom, int $state, int $tour): string
  */
 function bsi_crosstour_ref_from_url(string $url): ?array
 {
-  if ($url === '' || stripos($url, 'search_crosstour') === false) {
+  // Парсим query независимо от пути (search_crosstour / search_excursion / др.) —
+  // как parse_excursion_url для обычных туров. Достаточно STATEINC в query.
+  if ($url === '') {
     return null;
   }
   $parsed = wp_parse_url($url);
