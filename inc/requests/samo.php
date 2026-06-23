@@ -416,13 +416,17 @@ function samo_ajax()
         }
         $data = bsi_crosstour_event_data($id);
         if ($debug_batch !== null) {
+          $enabled     = function_exists('bsi_crosstour_event_enabled') ? bsi_crosstour_event_enabled($id) : '?';
+          $booking_url = (function_exists('get_field') ? (string) get_field('tour_booking_url', $id) : '') ?: '';
           $debug_batch[$id] = [
-            'samo'      => $data !== null ? 'ok' : 'null',
-            'price_rub' => $data['offer']['price_rub'] ?? 'missing',
-            'nights'    => $data['offer']['nights'] ?? 'missing',
-            'ref_state' => $data['ref']['STATEINC'] ?? null,
-            'ref_tour'  => $data['ref']['TOURINC'] ?? null,
-            'ref_town'  => $data['ref']['TOWNFROMINC'] ?? null,
+            'samo'        => $data !== null ? 'ok' : 'null',
+            'enabled'     => $enabled,
+            'booking_url' => $booking_url !== '' ? $booking_url : '(empty)',
+            'price_rub'   => $data['offer']['price_rub'] ?? 'missing',
+            'nights'      => $data['offer']['nights'] ?? 'missing',
+            'ref_state'   => $data['ref']['STATEINC'] ?? null,
+            'ref_tour'    => $data['ref']['TOURINC'] ?? null,
+            'ref_town'    => $data['ref']['TOWNFROMINC'] ?? null,
           ];
         }
         if ($data && !empty($data['offer']) && !empty($data['offer']['price_rub'])) {
