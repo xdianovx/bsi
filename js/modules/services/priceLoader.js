@@ -27,7 +27,7 @@ function defaultExcursionCheckinRange() {
 /**
  * Парсит ВСЕ нужные параметры из booking URL
  */
-function parseBookingParams(href) {
+export function parseBookingParams(href) {
   if (!href) return null;
   try {
     const url = new URL(href, window.location.origin);
@@ -72,7 +72,7 @@ function findMinPrice(prices) {
 /**
  * Загружает min цену тура — один вызов excursion_prices с параметрами из URL
  */
-async function fetchTourMinPrice(params) {
+export async function fetchTourMinPrice(params) {
   try {
     const defaults = defaultExcursionCheckinRange();
     // Само часто кладёт CHECKIN_BEG === CHECKIN_END (один YYYYMMDD) при 11 ночах — тогда API даёт пусто.

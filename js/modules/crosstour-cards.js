@@ -5,7 +5,12 @@
  * батчем тянет цены через AJAX (bsi_samo&method=crosstour_batch) и проставляет
  * «от X ₽» + data-price-* (совместимо с переключателем валют). Карточки,
  * не связанные с Само, остаются как есть (ручная цена / «по запросу»).
+ *
+ * Fallback: если batch не вернул цену, но карточка имеет data-booking-url —
+ * грузим через excursion_prices (тот же механизм, что у card.php туров).
  */
+
+import { parseBookingParams, fetchTourMinPrice } from "./services/priceLoader.js";
 
 const processed = new Set();
 
@@ -48,10 +53,12 @@ const run = async () => {
   }
 
   let changed = false;
+  const needFallback = [];
   cards.forEach((el) => {
     const d = prices[el.dataset.crosstourCard];
     if (!d || !d.price_rub || Number(d.price_rub) <= 0) {
       console.log("[crosstour-cards] no price for event", el.dataset.crosstourCard, "→ got:", d);
+      if (el.dataset.bookingUrl) needFallback.push(el);
       return;
     }
 
@@ -66,6 +73,28 @@ const run = async () => {
     el.textContent = `от ${fmtPrice(d.price_rub)} ₽`;
     changed = true;
   });
+
+  // Fallback: тот же механизм, что у карточек туров — excursion_prices по booking URL.
+  if (needFallback.length) {
+    console.log("[crosstour-cards] excursion fallback for", needFallback.length, "events");
+    await Promise.all(
+      needFallback.map(async (el) => {
+        const params = parseBookingParams(el.dataset.bookingUrl);
+        if (!params) return;
+        const minPrice = await fetchTourMinPrice(params);
+        console.log("[crosstour-cards] fallback event", el.dataset.crosstourCard, "minPrice:", minPrice);
+        if (minPrice !== null && minPrice > 0) {
+          const perPerson = Math.round(minPrice / 2);
+          el.classList.add("js-event-price");
+          el.dataset.priceRub = String(perPerson);
+          el.dataset.hasFrom = "true";
+          delete el.dataset.priceSuffix;
+          el.textContent = `от ${fmtPrice(perPerson)} ₽`;
+          changed = true;
+        }
+      })
+    );
+  }
 
   if (changed) {
     document.dispatchEvent(new CustomEvent("education:content-updated"));
