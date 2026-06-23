@@ -405,6 +405,25 @@ function samo_ajax()
       }
       wp_send_json_success(array_merge(['samo' => true, '_debug' => $debug], $data));
 
+    case 'crosstour_quick_price':
+      $state    = isset($_POST['STATEINC'])    ? (int) sanitize_text_field($_POST['STATEINC'])    : 0;
+      $tour     = isset($_POST['TOURINC'])     ? (int) sanitize_text_field($_POST['TOURINC'])     : 0;
+      $townfrom = isset($_POST['TOWNFROMINC']) ? (int) sanitize_text_field($_POST['TOWNFROMINC']) : (defined('BSI_CROSSTOUR_TOWNFROM') ? BSI_CROSSTOUR_TOWNFROM : 1);
+      if (!$state || !$tour) {
+        wp_send_json_error(['message' => 'STATEINC and TOURINC required'], 400);
+      }
+      $ref = [
+        'TOWNFROMINC' => $townfrom,
+        'STATEINC'    => $state,
+        'TOURINC'     => $tour,
+        'CHECKIN_BEG' => isset($_POST['CHECKIN_BEG']) ? preg_replace('/\D/', '', sanitize_text_field($_POST['CHECKIN_BEG'])) : '',
+        'CHECKIN_END' => isset($_POST['CHECKIN_END']) ? preg_replace('/\D/', '', sanitize_text_field($_POST['CHECKIN_END'])) : '',
+        'NIGHTS_FROM' => isset($_POST['NIGHTS_FROM']) ? (int) $_POST['NIGHTS_FROM'] : 0,
+        'NIGHTS_TILL' => isset($_POST['NIGHTS_TILL']) ? (int) $_POST['NIGHTS_TILL'] : 0,
+      ];
+      $price = function_exists('bsi_crosstour_quick_price') ? bsi_crosstour_quick_price($ref) : null;
+      wp_send_json_success(['price_rub' => $price]);
+
     case 'crosstour_batch':
       $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];
       $ids = array_slice(array_values(array_unique(array_map('intval', $ids))), 0, 50);

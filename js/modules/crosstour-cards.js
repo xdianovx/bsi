@@ -6,8 +6,9 @@
  * «от X ₽» + data-price-* (совместимо с переключателем валют). Карточки,
  * не связанные с Само, остаются как есть (ручная цена / «по запросу»).
  *
- * Fallback: если batch не вернул цену, но карточка имеет data-booking-url —
- * грузим через excursion_prices (тот же механизм, что у card.php туров).
+ * Fallback: если batch не вернул цену, но карточка имеет data-booking-url:
+ *  - search_crosstour URL → crosstour_quick_price (SearchCrosstour_PRICES)
+ *  - search_excursion URL → excursion_prices (SearchExcursion_PRICES)
  */
 
 import { parseBookingParams, fetchTourMinPrice } from "./services/priceLoader.js";
@@ -15,6 +16,35 @@ import { parseBookingParams, fetchTourMinPrice } from "./services/priceLoader.js
 const processed = new Set();
 
 const fmtPrice = (n) => Number(n).toLocaleString("ru-RU");
+
+/** Мин. цена через SearchCrosstour_PRICES (для search_crosstour URL). */
+const fetchCrosstourQuickPrice = async (params) => {
+  const ajaxUrl = window.ajax?.url || window.ajaxurl;
+  if (!ajaxUrl || !params.STATEINC || !params.TOURS) return null;
+  try {
+    const body = new URLSearchParams({
+      action: "bsi_samo",
+      method: "crosstour_quick_price",
+      TOWNFROMINC: params.TOWNFROMINC || "1",
+      STATEINC: params.STATEINC,
+      TOURINC: params.TOURS,
+      CHECKIN_BEG: params.CHECKIN_BEG || "",
+      CHECKIN_END: params.CHECKIN_END || "",
+      NIGHTS_FROM: params.NIGHTS_FROM || "0",
+      NIGHTS_TILL: params.NIGHTS_TILL || "0",
+    });
+    const res = await fetch(ajaxUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+      body: body.toString(),
+      credentials: "same-origin",
+    });
+    const json = await res.json();
+    return json?.success ? (json.data?.price_rub ?? null) : null;
+  } catch {
+    return null;
+  }
+};
 
 const fetchBatch = async (ids) => {
   const ajaxUrl = window.ajax?.url || window.ajaxurl;
@@ -74,22 +104,30 @@ const run = async () => {
     changed = true;
   });
 
-  // Fallback: тот же механизм, что у карточек туров — excursion_prices по booking URL.
+  // Fallback по booking URL: search_crosstour → crosstour_quick_price, иначе → excursion_prices.
   if (needFallback.length) {
-    console.log("[crosstour-cards] excursion fallback for", needFallback.length, "events");
+    console.log("[crosstour-cards] URL fallback for", needFallback.length, "events");
     await Promise.all(
       needFallback.map(async (el) => {
-        const params = parseBookingParams(el.dataset.bookingUrl);
+        const bookingUrl = el.dataset.bookingUrl;
+        const params = parseBookingParams(bookingUrl);
         if (!params) return;
-        const minPrice = await fetchTourMinPrice(params);
-        console.log("[crosstour-cards] fallback event", el.dataset.crosstourCard, "minPrice:", minPrice);
-        if (minPrice !== null && minPrice > 0) {
-          const perPerson = Math.round(minPrice / 2);
+        const isCrosstour = bookingUrl.includes("search_crosstour");
+        let priceRub = null;
+        if (isCrosstour) {
+          priceRub = await fetchCrosstourQuickPrice(params);
+          console.log("[crosstour-cards] crosstour fallback event", el.dataset.crosstourCard, "price_rub:", priceRub);
+        } else {
+          const minPrice = await fetchTourMinPrice(params);
+          priceRub = minPrice !== null ? Math.round(minPrice / 2) : null;
+          console.log("[crosstour-cards] excursion fallback event", el.dataset.crosstourCard, "price_rub:", priceRub);
+        }
+        if (priceRub !== null && priceRub > 0) {
           el.classList.add("js-event-price");
-          el.dataset.priceRub = String(perPerson);
+          el.dataset.priceRub = String(priceRub);
           el.dataset.hasFrom = "true";
           delete el.dataset.priceSuffix;
-          el.textContent = `от ${fmtPrice(perPerson)} ₽`;
+          el.textContent = `от ${fmtPrice(priceRub)} ₽`;
           changed = true;
         }
       })
