@@ -409,11 +409,22 @@ function samo_ajax()
       $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];
       $ids = array_slice(array_values(array_unique(array_map('intval', $ids))), 0, 50);
       $prices = [];
+      $debug_batch = !empty($_POST['debug']) ? [] : null;
       foreach ($ids as $id) {
         if (!$id || !function_exists('bsi_crosstour_event_data')) {
           continue;
         }
         $data = bsi_crosstour_event_data($id);
+        if ($debug_batch !== null) {
+          $debug_batch[$id] = [
+            'samo'      => $data !== null ? 'ok' : 'null',
+            'price_rub' => $data['offer']['price_rub'] ?? 'missing',
+            'nights'    => $data['offer']['nights'] ?? 'missing',
+            'ref_state' => $data['ref']['STATEINC'] ?? null,
+            'ref_tour'  => $data['ref']['TOURINC'] ?? null,
+            'ref_town'  => $data['ref']['TOWNFROMINC'] ?? null,
+          ];
+        }
         if ($data && !empty($data['offer']) && !empty($data['offer']['price_rub'])) {
           $prices[$id] = [
             'price_rub' => (int) $data['offer']['price_rub'],
@@ -422,7 +433,7 @@ function samo_ajax()
           ];
         }
       }
-      wp_send_json_success(['prices' => $prices]);
+      wp_send_json_success(['prices' => $prices, '_debug' => $debug_batch]);
 
     default:
       wp_send_json_error(['message' => 'Unknown endpoint'], 400);
