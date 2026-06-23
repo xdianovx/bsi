@@ -156,6 +156,18 @@ class PriceLoaderService
   }
 
   /**
+   * Обёртка для внешних вызовов (напр. bsi_crosstour_event_data fallback).
+   *
+   * @param int $post_id Для поля show_price_from
+   * @param array<string,mixed>|null $samo_data SearchExcursion_PRICES
+   * @return array<string,mixed>|null
+   */
+  public static function buildExcursionPriceRow(int $post_id, $samo_data): ?array
+  {
+    return self::buildPriceRowFromSamoPricesData($post_id, $samo_data);
+  }
+
+  /**
    * Собрать массив цены для кеша из ответа SearchExcursion_PRICES.
    *
    * @param int $tour_id ID тура

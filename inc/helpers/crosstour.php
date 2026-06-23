@@ -770,14 +770,42 @@ function bsi_crosstour_event_data(int $event_id, bool $force = false): ?array
   $offer = bsi_crosstour_event_offer($ref, $force);
 
   // Фолбэк цены через excursion-namespace (SearchExcursion_*, как обычные туры):
-  // часть продуктов (та же ссылка search_crosstour) живёт в excursion, а не crosstour,
-  // тогда SearchCrosstour_* отдаёт пусто. PriceLoaderService читает тот же tour_booking_url.
-  if (empty($offer['price_rub']) && class_exists('PriceLoaderService')) {
-    $pl = PriceLoaderService::getTourPrice($event_id);
-    if (!empty($pl['price']) && (float) $pl['price'] > 0) {
-      $offer['price_rub'] = (int) round((float) $pl['price']);
-      $offer['price_original'] = null;
-      $offer['price_currency'] = null;
+  // Часть продуктов живёт в excursion, а не crosstour → SearchCrosstour_PRICES пуст.
+  // Используем $ref напрямую (STATEINC/TOURINC/TOWNFROMINC уже известны), не идём
+  // через event_id → ACF → parse_url (может не сработать если URL не заполнен вручную).
+  if (empty($offer['price_rub'])) {
+    $fb_state    = (int) ($ref['STATEINC']   ?? 0);
+    $fb_tour     = (int) ($ref['TOURINC']    ?? 0);
+    $fb_townfrom = (int) ($ref['TOWNFROMINC'] ?? BSI_CROSSTOUR_TOWNFROM);
+    $fb_nf       = (int) ($offer['nights']['from'] ?? 1);
+    $fb_nt       = (int) ($offer['nights']['till'] ?? 30);
+    if ($fb_nf < 1) $fb_nf = 1;
+    if ($fb_nt < $fb_nf) $fb_nt = $fb_nf;
+
+    if ($fb_state && $fb_tour && class_exists('SamoService')) {
+      $fb_resp = SamoService::endpoints()->searchExcursionPrices([
+        'TOWNFROMINC' => $fb_townfrom,
+        'STATEINC'    => $fb_state,
+        'TOURS'       => $fb_tour,
+        'ADULT'       => 2,
+        'CHILD'       => 0,
+        'CURRENCY'    => 1,
+        'NIGHTS_FROM' => $fb_nf,
+        'NIGHTS_TILL' => $fb_nt,
+        'CHECKIN_BEG' => date('Ymd'),
+        'CHECKIN_END' => date('Ymd', strtotime('+3 months')),
+      ]);
+      $fb_data = ($fb_resp['ok'] ?? false)
+        ? ($fb_resp['data']['SearchExcursion_PRICES'] ?? null)
+        : null;
+      if ($fb_data && class_exists('PriceLoaderService')) {
+        $fb_row = PriceLoaderService::buildExcursionPriceRow($event_id, $fb_data);
+        if (!empty($fb_row['price']) && (float) $fb_row['price'] > 0) {
+          $offer['price_rub']      = (int) round((float) $fb_row['price']);
+          $offer['price_original'] = null;
+          $offer['price_currency'] = null;
+        }
+      }
     }
   }
 
