@@ -422,7 +422,7 @@ $education_archive_url = home_url('/obrazovanie-za-rubezhom/');
         <div class="container">
             <div class="title-wrap news-slider__title-wrap">
                 <div class="news-slider__title-wrap-left">
-                    <h2 class="h2 news-slider__title">Популярные программы образования</h2>
+                    <h2 class="h2 news-slider__title">Программы образования</h2>
                     <div class="slider-arrow-wrap news-slider__arrows-wrap">
                         <div class="slider-arrow slider-arrow-prev popular-education-arrow-prev"
                              tabindex="-1"
@@ -442,7 +442,7 @@ $education_archive_url = home_url('/obrazovanie-za-rubezhom/');
 
                     <a href="<?php echo esc_url($education_archive_url); ?>"
                        class="title-wrap__link link-arrow title-wrap__link-education">
-                        <span>Все программы </span>
+                        <span>Все программы</span>
                         <div class="link-arrow__icon">
 
                             <svg xmlns="http://www.w3.org/2000/svg"

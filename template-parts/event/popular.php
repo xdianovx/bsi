@@ -122,7 +122,7 @@ $event_archive_url = $event_archive ? get_permalink($event_archive->ID) : home_u
 
       <a href="<?php echo esc_url($event_archive_url); ?>"
         class="title-wrap__link link-arrow popular-event-tours__all-link">
-        <span>Все событийные туры</span>
+        <span>Все туры</span>
         <div class="link-arrow__icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -174,7 +174,7 @@ $event_archive_url = $event_archive ? get_permalink($event_archive->ID) : home_u
     </div>
 
     <div class="popular-event-tours__all-mob">
-      <a href="<?php echo esc_url($event_archive_url); ?>" class="btn btn-gray">Все событийные туры</a>
+      <a href="<?php echo esc_url($event_archive_url); ?>" class="btn btn-gray">Все туры</a>
     </div>
 
   </div>

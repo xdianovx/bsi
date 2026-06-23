@@ -13,7 +13,7 @@ if (empty($posts)) {
 
 $event_catalog_page = get_page_by_path('sobytiynye-tury');
 $more_href = $event_catalog_page ? get_permalink($event_catalog_page->ID) : home_url('/sobytiynye-tury/');
-$more_label = 'Все событийные туры';
+$more_label = 'Все туры';
 ?>
 
 <section class="single-event__related single-event__related-tours news-slider__section" aria-labelledby="single-event-related-tours-heading">
