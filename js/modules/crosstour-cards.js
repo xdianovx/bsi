@@ -18,7 +18,6 @@ const fetchBatch = async (ids) => {
   const body = new URLSearchParams();
   body.set("action", "bsi_samo");
   body.set("method", "crosstour_batch");
-  body.set("debug", "1");
   ids.forEach((id) => body.append("ids[]", id));
 
   const res = await fetch(ajaxUrl, {

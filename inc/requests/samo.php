@@ -409,7 +409,7 @@ function samo_ajax()
       $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];
       $ids = array_slice(array_values(array_unique(array_map('intval', $ids))), 0, 50);
       $prices = [];
-      $debug_batch = !empty($_POST['debug']) ? [] : null;
+      $debug_batch = (current_user_can('manage_options') && !empty($_POST['debug'])) ? [] : null;
       foreach ($ids as $id) {
         if (!$id || !function_exists('bsi_crosstour_event_data')) {
           continue;
