@@ -236,9 +236,12 @@ if (empty($booking_url) && $education_id && function_exists('get_field')) {
   }
 }
 
-// Если price_data_attrs не передан (карточка используется отдельно), вычисляем его
+// Если price_data_attrs не передан (карточка используется отдельно), вычисляем его.
+// ВАЖНО: берём цифры только из части ДО «/», иначе число длительности
+// («/ 2-4 недели») приклеивается к цене → завышенный data-price-rub и скачок в JS.
 if (empty($price_data_attrs) && !empty($price)) {
-  $price_numeric = (int) preg_replace('/[^\d]/', '', $price);
+  $price_only = strpos($price, '/') !== false ? strstr($price, '/', true) : $price;
+  $price_numeric = (int) preg_replace('/[^\d]/', '', $price_only);
   if ($price_numeric > 0) {
     $price_data_attrs['price-rub'] = $price_numeric;
   }
