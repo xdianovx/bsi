@@ -804,6 +804,12 @@ function bsi_crosstour_event_data(int $event_id, bool $force = false): ?array
           $offer['price_rub']      = (int) round((float) $fb_row['price']);
           $offer['price_original'] = null;
           $offer['price_currency'] = null;
+          // Обновляем кеш offer — тот же ключ, что в bsi_crosstour_event_offer.
+          // Иначе каждый crosstour_batch будет делать лишний excursion API call.
+          $fb_cache_key = 'crosstour_offer_v7_' . $fb_townfrom . '_' . $fb_state . '_' . $fb_tour;
+          if (class_exists('CacheService')) {
+            CacheService::set($fb_cache_key, $offer, 3 * HOUR_IN_SECONDS, 'samotour');
+          }
         }
       }
     }
