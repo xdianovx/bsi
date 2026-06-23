@@ -376,13 +376,34 @@ function samo_ajax()
         wp_send_json_error(['message' => 'event_id required'], 400);
       }
       $force = isset($_POST['_force_refresh']) && $_POST['_force_refresh'];
+
+      // ВРЕМЕННАЯ ДИАГНОСТИКА: ?debug=1 в запросе → вернём цепочку разбора в _debug.
+      $debug = null;
+      if (!empty($_POST['debug'])) {
+        $bu = function_exists('get_field') ? (string) get_field('tour_booking_url', $eventId) : '';
+        $src = function_exists('get_field') ? (string) get_field('event_data_source', $eventId) : '';
+        $enabled = function_exists('bsi_crosstour_event_enabled') ? bsi_crosstour_event_enabled($eventId) : null;
+        $ref = function_exists('bsi_crosstour_event_ref') ? bsi_crosstour_event_ref($eventId) : null;
+        $exc_params = function_exists('get_tour_excursion_params') ? get_tour_excursion_params($eventId) : null;
+        $pl = (class_exists('PriceLoaderService')) ? PriceLoaderService::getTourPrice($eventId) : null;
+        $debug = [
+          'event_id' => $eventId,
+          'event_data_source' => $src,
+          'enabled' => $enabled,
+          'tour_booking_url' => $bu,
+          'ref' => $ref,
+          'excursion_params' => $exc_params,
+          'priceLoader_getTourPrice' => $pl,
+        ];
+      }
+
       $data = function_exists('bsi_crosstour_event_data')
         ? bsi_crosstour_event_data($eventId, $force)
         : null;
       if ($data === null) {
-        wp_send_json_success(['samo' => false]);
+        wp_send_json_success(['samo' => false, '_debug' => $debug]);
       }
-      wp_send_json_success(array_merge(['samo' => true], $data));
+      wp_send_json_success(array_merge(['samo' => true, '_debug' => $debug], $data));
 
     case 'crosstour_batch':
       $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];
