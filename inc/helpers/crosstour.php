@@ -767,8 +767,22 @@ function bsi_crosstour_event_data(int $event_id, bool $force = false): ?array
   if (!$ref) {
     return null;
   }
+  $offer = bsi_crosstour_event_offer($ref, $force);
+
+  // Фолбэк цены через excursion-namespace (SearchExcursion_*, как обычные туры):
+  // часть продуктов (та же ссылка search_crosstour) живёт в excursion, а не crosstour,
+  // тогда SearchCrosstour_* отдаёт пусто. PriceLoaderService читает тот же tour_booking_url.
+  if (empty($offer['price_rub']) && class_exists('PriceLoaderService')) {
+    $pl = PriceLoaderService::getTourPrice($event_id);
+    if (!empty($pl['price']) && (float) $pl['price'] > 0) {
+      $offer['price_rub'] = (int) round((float) $pl['price']);
+      $offer['price_original'] = null;
+      $offer['price_currency'] = null;
+    }
+  }
+
   return [
     'ref' => $ref,
-    'offer' => bsi_crosstour_event_offer($ref, $force),
+    'offer' => $offer,
   ];
 }
