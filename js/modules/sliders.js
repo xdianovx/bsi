@@ -198,15 +198,19 @@ export const sliders = () => {
   const promoBannerSliders = document.querySelectorAll(".promo-banner-slider");
   if (promoBannerSliders.length > 0) {
     promoBannerSliders.forEach((sliderEl) => {
+      const slideCount = sliderEl.querySelectorAll(".swiper-slide").length;
+      const single = slideCount <= 1;
       const paginationEl = sliderEl.parentElement.querySelector(".promo-banner-slider-pag");
       new Swiper(sliderEl, {
         slidesPerView: 1,
         spaceBetween: 32,
-        autoplay: { delay: 3000 },
-        loop: true,
-        freeMode: true,
+        // 1 слайд — без листания: без autoplay/loop, пагинацию скрываем.
+        autoplay: single ? false : { delay: 3000 },
+        loop: !single,
+        allowTouchMove: !single,
+        freeMode: !single,
         speed: 300,
-        pagination: paginationEl
+        pagination: !single && paginationEl
           ? {
               el: paginationEl,
             }
