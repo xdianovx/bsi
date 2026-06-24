@@ -17,6 +17,24 @@ function bsi_event_card_price(int $post_id): array
     return $result;
   }
 
+  // Приоритет: живая crosstour-цена из ручной ссылки search_crosstour (как single-event.php /
+  // single-tour.php). Серверно + кеш 3ч; на проде даёт цену даже когда JS-батч пуст.
+  $booking_url = trim((string) get_field('tour_booking_url', $post_id));
+  if ($booking_url !== ''
+    && stripos($booking_url, 'search_crosstour') !== false
+    && function_exists('bsi_crosstour_ref_from_url')
+    && function_exists('bsi_crosstour_quick_price')
+  ) {
+    $ct_ref = bsi_crosstour_ref_from_url($booking_url);
+    if ($ct_ref) {
+      $ct_rub = bsi_crosstour_quick_price($ct_ref);
+      if ($ct_rub !== null && (int) $ct_rub > 0) {
+        $result['rub'] = (int) $ct_rub;
+        return $result;
+      }
+    }
+  }
+
   $rows = get_field('event_dates', $post_id);
   $candidates = [];
 

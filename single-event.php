@@ -30,6 +30,20 @@ $samo_booking_url = ($crosstour_ref && function_exists('bsi_crosstour_booking_ur
 /* Эффективная ссылка брони: ручная приоритетнее; иначе авто из Само. Пустая → форма-заявка (модалка). */
 $effective_booking_url = $tour_booking_url !== '' ? $tour_booking_url : $samo_booking_url;
 
+/* Серверная crosstour-цена из ручной ссылки search_crosstour — как в single-tour.php.
+   Кеш 3ч; на проде даёт цену даже если JS-батч (data-crosstour-event) пуст / Само 403. */
+$crosstour_price_rub = null;
+if ($tour_booking_url !== ''
+  && stripos($tour_booking_url, 'search_crosstour') !== false
+  && function_exists('bsi_crosstour_ref_from_url')
+  && function_exists('bsi_crosstour_quick_price')
+) {
+  $ct_ref = bsi_crosstour_ref_from_url($tour_booking_url);
+  if ($ct_ref) {
+    $crosstour_price_rub = bsi_crosstour_quick_price($ct_ref);
+  }
+}
+
 $region_terms = get_the_terms($post_id, 'region');
 $region_term = (!empty($region_terms) && !is_wp_error($region_terms)) ? $region_terms[0] : null;
 
@@ -234,6 +248,10 @@ foreach ($dates_section_rows as $r_row) {
   }
 }
 $price_from_amount = !empty($row_rubs_positive) ? min($row_rubs_positive) : $fallback_rub_from_post;
+// Живая crosstour-цена (ссылка search_crosstour) приоритетнее — как single-tour.php.
+if ($crosstour_price_rub !== null && (int) $crosstour_price_rub > 0) {
+  $price_from_amount = (int) $crosstour_price_rub;
+}
 
 $event_accommodation_raw = function_exists('get_field') ? get_field('event_accommodation', $post_id) : [];
 $accommodation_rows = [];
