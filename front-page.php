@@ -26,6 +26,14 @@ get_header();
   <?= get_template_part('template-parts/education/popular') ?>
   <?= get_template_part('template-parts/promo-banner/slider') ?>
   <?= get_template_part('template-parts/tour/popular') ?>
+
+  <?php
+  // Промо баннеры 3 после секции популярных туров
+  // Управление: Секции -> Промо баннеры 3
+  set_query_var('promo_banner_post_type', 'banner_third');
+  get_template_part('template-parts/promo-banner/slider');
+  ?>
+
   <?= get_template_part('template-parts/event/popular') ?>
 
   <?php

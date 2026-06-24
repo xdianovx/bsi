@@ -5,12 +5,12 @@ function remove_admin_menu_items()
   remove_menu_page('edit-comments.php');
 
   add_menu_page(
-    'Секции',
-    'Секции',
+    'Баннеры',
+    'Баннеры',
     'manage_options',
     'sections',
     'render_sections_page',
-    'dashicons-screenoptions',
+    'dashicons-format-image',
     32
 
   );
@@ -25,10 +25,10 @@ function render_sections_page()
 {
   ?>
   <div class="wrap">
-    <h1>Секции сайта</h1>
+    <h1>Баннеры</h1>
 
     <p>
-      Все, что не имеет страниц
+      Промо-баннеры главной страницы
     </p>
 
     <h2>Блоки:</h2>
