@@ -16,7 +16,7 @@ function register_post_type_banner()
     'search_items' => 'Искать баннеры',
     'not_found' => 'Баннеры не найдены',
     'not_found_in_trash' => 'В корзине баннеров нет',
-    'all_items' => 'Все баннеры',
+    'all_items' => 'Баннеры №1',
   ];
 
   $args = [
