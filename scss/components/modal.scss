@@ -20,6 +20,10 @@
   overflow-y: auto;
   box-sizing: border-box;
   position: relative;
+
+  @media screen and (max-width: 768px) {
+    padding: 16px;
+  }
 }
 
 .modal__close-btn {
