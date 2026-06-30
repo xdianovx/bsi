@@ -18,7 +18,7 @@ function bsi_handle_event_ticket_booking(): void
   $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
   bsi_recaptcha_verify_or_die($token);
 
-  $errors = BSI_Mailer::validate_contact_fields($_POST, ['require_email' => false]);
+  $errors = BSI_Mailer::validate_contact_fields($_POST, ['require_email' => true]);
 
   if (!empty($errors)) {
     wp_send_json_error([

@@ -144,6 +144,11 @@
   cursor: pointer;
   transition: color 0.2s;
   padding: 0;
+
+  @media screen and (max-width: 768px) {
+    top: 10px;
+    right: 10px;
+  }
 }
 .modal-program-booking__close:hover {
   color: #000;
@@ -160,6 +165,12 @@
   font-weight: 500;
   max-width: 70%;
   line-height: 120%;
+
+  @media screen and (max-width: 768px) {
+    font-weight: 600;
+    max-width: 100%;
+    font-size: 18px;
+  }
 }
 
 .modal-program-booking__meta {
@@ -399,7 +410,7 @@
 }
 
 .modal-program-booking__error {
-  font-size: 12px;
+  font-size: 14px;
   color: #e53935;
   min-height: 16px;
 }

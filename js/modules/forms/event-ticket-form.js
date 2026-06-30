@@ -195,7 +195,9 @@ function validateForm(form) {
   const emailEl = form.querySelector('[name="email"]');
   if (emailEl) {
     const email = emailEl.value.trim();
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email) {
+      errors.email = "Введите email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.email = "Введите корректный email";
     }
   }

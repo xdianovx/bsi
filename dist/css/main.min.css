@@ -2732,6 +2732,12 @@ input.error {
   transition: color 0.2s;
   padding: 0;
 }
+@media screen and (max-width: 768px) {
+  .modal-program-booking__close {
+    top: 10px;
+    right: 10px;
+  }
+}
 .modal-program-booking__close:hover {
   color: #000;
 }
@@ -2745,6 +2751,13 @@ input.error {
   font-weight: 500;
   max-width: 70%;
   line-height: 120%;
+}
+@media screen and (max-width: 768px) {
+  .modal-program-booking__title {
+    font-weight: 600;
+    max-width: 100%;
+    font-size: 18px;
+  }
 }
 .modal-program-booking__meta {
   display: flex;
@@ -2950,7 +2963,7 @@ input.error {
   min-height: 100px;
 }
 .modal-program-booking__error {
-  font-size: 12px;
+  font-size: 14px;
   color: #e53935;
   min-height: 16px;
 }
@@ -7359,6 +7372,11 @@ html.bsi-cookie-consented .cookie-consent {
   box-sizing: border-box;
   position: relative;
 }
+@media screen and (max-width: 768px) {
+  .modal__container {
+    padding: 16px;
+  }
+}
 .modal__close-btn {
   position: absolute;
   top: 16px;
@@ -9962,15 +9980,19 @@ button.single-event__dates-book {
 /* Детали брони в модалке заявки (что бронируют). */
 .modal-program-booking__details {
   list-style: none;
-  margin: 0 0 16px;
-  padding: 12px 16px;
-  background: #f4f4f6;
-  border-radius: 8px;
+  margin: 16px 0 24px;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  column-gap: 0;
   font-size: 14px;
   line-height: 140%;
+}
+.modal-program-booking__details-item:not(:last-child)::after {
+  content: "|";
+  margin: 0 8px;
+  color: #5c5c5c;
 }
 .modal-program-booking__details-key {
   color: #5c5c5c;
