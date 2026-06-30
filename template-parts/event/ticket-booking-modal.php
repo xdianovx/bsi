@@ -46,9 +46,9 @@
           </div>
 
           <div class="input-item">
-            <label for="event-booking-email">Почта</label>
-            <input type="email" id="event-booking-email" name="email" data-field="email" autocomplete="email"
-              placeholder="Необязательно">
+            <label for="event-booking-email">Почта <span class="modal-program-booking__req">*</span></label>
+            <input type="email" id="event-booking-email" name="email" required data-field="email" autocomplete="email"
+              placeholder="example@mail.ru">
             <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
           </div>
 
