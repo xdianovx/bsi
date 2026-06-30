@@ -97,9 +97,12 @@ $tour_type_terms = get_terms([
         <div class="title-wrap">
           <div class="">
             <h1 class="h1"><?php the_title(); ?></h1>
-            <?php if (has_excerpt()): ?>
+            <?php if (has_excerpt()):
+              // 2+ <br> подряд или пустая строка → новый абзац; одиночный <br> остаётся переносом
+              $evt_desc_html = wpautop(preg_replace('#(\s*<br\s*/?>\s*){2,}#i', "\n\n", get_the_excerpt()));
+              ?>
               <div class="tours-page__title-description">
-                <?php the_excerpt(); ?>
+                <?= wp_kses_post($evt_desc_html); ?>
               </div>
             <?php endif; ?>
           </div>

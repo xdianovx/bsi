@@ -451,4 +451,12 @@
   font-size: 16px;
   line-height: 1.5;
   color: #666;
+
+  p {
+    margin: 0 0 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }

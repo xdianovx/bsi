@@ -4833,6 +4833,12 @@ input.error {
   line-height: 1.5;
   color: #666;
 }
+.tours-page__title-description p {
+  margin: 0 0 12px;
+}
+.tours-page__title-description p:last-child {
+  margin-bottom: 0;
+}
 .best-offers__section {
   margin-top: 80px;
 }
