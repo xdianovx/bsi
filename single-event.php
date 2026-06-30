@@ -168,28 +168,6 @@ if (is_string($hero_concert_date) && $hero_concert_date !== '') {
     }
   }
 }
-if ($hero_date_label === '' && !empty($event_dates_rows) && is_array($event_dates_rows)) {
-  $ds = [];
-  foreach ($event_dates_rows as $row) {
-    if (!empty($row['date_value'])) {
-      $ds[] = (string) $row['date_value'];
-    }
-    if (!empty($row['date_value_end'])) {
-      $ds[] = (string) $row['date_value_end'];
-    }
-  }
-  $ds = array_values(array_unique($ds));
-  sort($ds);
-  if (!empty($ds)) {
-    $hero_min = $ds[0];
-    $hero_max = $ds[count($ds) - 1];
-    if ($hero_min === $hero_max) {
-      $hero_date_label = date_i18n('j F Y', strtotime($hero_min));
-    } else {
-      $hero_date_label = bsi_format_event_date_range($hero_min, $hero_max);
-    }
-  }
-}
 
 $dates_section_rows = [];
 if (!empty($event_dates_rows) && is_array($event_dates_rows)) {

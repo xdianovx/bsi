@@ -56,37 +56,10 @@ $flag_url = ($country_id && function_exists('bsi_get_country_flag_url'))
 $resorts = get_the_terms($post_id, 'resort');
 $city = (!empty($resorts) && !is_wp_error($resorts)) ? $resorts[0]->name : '';
 
-// Ближайшая дата из event_dates (fallback — event_hero_date) + кол-во остальных дат.
+// Диапазон дат только с первого экрана (event_hero_date / event_hero_date_end).
 $event_card_date = '';
 $event_dates_more = 0;
-$event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
-if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
-  $rows_norm = [];
-  foreach ($event_dates_rows as $row) {
-    if (empty($row['date_value'])) {
-      continue;
-    }
-    $ts = strtotime((string) $row['date_value']);
-    if (!$ts) {
-      continue;
-    }
-    $rows_norm[] = [
-      'start' => (string) $row['date_value'],
-      'end' => isset($row['date_value_end']) ? trim((string) $row['date_value_end']) : '',
-      'ts' => $ts,
-    ];
-  }
-  if (!empty($rows_norm)) {
-    usort($rows_norm, static function ($a, $b) {
-      return $a['ts'] <=> $b['ts'];
-    });
-    $first = $rows_norm[0];
-    // Ближайшая строка: её диапазон (или один день).
-    $event_card_date = bsi_format_event_date_range($first['start'], $first['end']);
-    $event_dates_more = max(0, count($rows_norm) - 1);
-  }
-}
-if ($event_card_date === '' && function_exists('get_field')) {
+if (function_exists('get_field')) {
   $hero_d = get_field('event_hero_date', $post_id);
   if (is_string($hero_d) && $hero_d !== '') {
     $hero_end = get_field('event_hero_date_end', $post_id);
