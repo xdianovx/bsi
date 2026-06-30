@@ -448,7 +448,7 @@ get_header();
                 <?= wp_kses_post($event_about); ?>
               </div>
             <?php elseif ($excerpt !== ''): ?>
-              <p class="single-event__lead"><?= esc_html($excerpt); ?></p>
+              <p class="single-event__lead"><?= wp_kses($excerpt, ['br' => []]); ?></p>
             <?php endif; ?>
 
             <?php
