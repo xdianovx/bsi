@@ -141,8 +141,7 @@
   line-height: 100%;
 }
 
-.event-ticket__price-currency {
-}
+.event-ticket__price-currency {}
 
 .event-ticket__btn {
   padding: 12px 24px;
@@ -516,7 +515,7 @@
   cursor: pointer;
   transition: $trans-text;
 
-  & + & {
+  &+& {
     border-left: 1px solid $gray-light;
   }
 
@@ -813,7 +812,7 @@
 
 .single-event__venue-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 24px;
   width: 100%;
@@ -938,8 +937,7 @@
   margin-top: 24px;
 }
 
-.single-event__related .h2 {
-}
+.single-event__related .h2 {}
 
 .single-event__related .country-tours__list {
   display: flex;
@@ -1108,6 +1106,7 @@
   background: #d9d9d9;
   margin-right: 16px;
   flex-shrink: 0;
+
   @media (max-width: 550px) {
     margin-right: 8px;
   }
@@ -1218,6 +1217,7 @@
 .single-event__about-aside {
   position: sticky;
   top: 16px;
+
   @media screen and (max-width: 1024px) {
     order: -1;
     position: static;
@@ -1525,8 +1525,7 @@ button.single-event__dates-book {
   background: $black;
 }
 
-.single-event__accommodation-card-stay-duration {
-}
+.single-event__accommodation-card-stay-duration {}
 
 .single-event__accommodation-card-descr {
   margin: 0;
@@ -1574,6 +1573,7 @@ button.single-event__dates-book {
 }
 
 .single-event__accommodation-card-link {
+
   &:hover,
   &:focus-visible {
     color: $red-hover;
@@ -1788,17 +1788,17 @@ button.single-event__dates-book {
   white-space: nowrap;
   border: 0;
 
-  &:focus-visible + .single-event__booking-cta-privacy-box {
+  &:focus-visible+.single-event__booking-cta-privacy-box {
     outline: 2px solid #fff;
     outline-offset: 2px;
   }
 
-  &:checked + .single-event__booking-cta-privacy-box {
+  &:checked+.single-event__booking-cta-privacy-box {
     background: #ef0101;
     border-color: #ef0101;
   }
 
-  &:checked + .single-event__booking-cta-privacy-box::after {
+  &:checked+.single-event__booking-cta-privacy-box::after {
     content: "";
     display: block;
     width: 5px;
@@ -2016,7 +2016,7 @@ button.single-event__dates-book {
     }
   }
 
-  .catalog-card__body > .catalog-card__title:first-child {
+  .catalog-card__body>.catalog-card__title:first-child {
     margin-top: 0;
   }
 
