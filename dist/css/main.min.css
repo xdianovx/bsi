@@ -5875,7 +5875,7 @@ html.bsi-cookie-consented .cookie-consent {
 .gtm-item__button {
   padding: 16px 40px;
 }
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1200px) {
   .gtm-item__button {
     width: 100%;
   }
@@ -6064,6 +6064,11 @@ html.bsi-cookie-consented .cookie-consent {
   border-radius: 12px;
   padding: 8px;
 }
+@media screen and (max-width: 1200px) {
+  .gtm-search__item {
+    flex-direction: column;
+  }
+}
 .gtm-nights-select {
   align-self: stretch;
   display: flex;
@@ -6169,9 +6174,6 @@ html.bsi-cookie-consented .cookie-consent {
   }
   .gtm-search__tab-btn {
     flex-shrink: 0;
-  }
-  .gtm-search__item {
-    flex-direction: column;
   }
   .gtm-search__item.active {
     display: flex;

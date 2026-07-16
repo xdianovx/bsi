@@ -22,7 +22,7 @@
 .gtm-item__button {
   padding: 16px 40px;
 
-  @media screen and (max-width: 1300px) {
+  @media screen and (max-width: 1200px) {
     width: 100%;
   }
 
@@ -65,12 +65,13 @@
 
   &.--hotels {
     grid-template-columns: 3fr 1fr 1fr 1fr;
+
     @media screen and (max-width: 1024px) {
       grid-template-columns: repeat(1, 1fr);
       width: 100%;
       gap: 8px;
 
-      > * {
+      >* {
         border-radius: 8px;
         width: 100%;
         color: $text-black;
@@ -86,26 +87,29 @@
       width: 100%;
       gap: 8px;
 
-      > * {
+      >* {
         border-radius: 8px;
         width: 100%;
       }
     }
-    > .gtm-tours-select {
+
+    >.gtm-tours-select {
       min-width: 0;
       overflow: hidden;
     }
   }
+
   @media screen and (max-width: 1024px) {
     grid-template-columns: repeat(1, 1fr);
     width: 100%;
     gap: 8px;
 
-    > * {
+    >* {
       border-radius: 8px;
       width: 100%;
     }
   }
+
   .choices {
     flex-grow: 1;
     width: 100%;
@@ -167,21 +171,22 @@
     }
   }
 
-  > * {
+  >* {
     border-right: 1px solid #dfdfdf;
     height: 48px;
     min-width: 0;
+
     &:last-child {
       border-right: none;
     }
   }
 
-  > .gtm-tours-select {
+  >.gtm-tours-select {
     min-width: 0 !important;
     overflow: hidden !important;
   }
 
-  > *:first-child {
+  >*:first-child {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
 
@@ -200,7 +205,7 @@
     }
   }
 
-  > *:last-child {
+  >*:last-child {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
@@ -224,6 +229,10 @@
   background: $red;
   border-radius: 12px;
   padding: 8px;
+
+  @media screen and (max-width: 1200px) {
+    flex-direction: column;
+  }
 }
 
 .gtm-nights-select {
@@ -260,6 +269,7 @@
   background: #fff;
   padding: 0 16px;
 }
+
 .gtm-search__tab-btns {
   display: flex;
   align-items: center;
@@ -320,6 +330,7 @@
 
 .tab-content__item {
   display: none;
+
   &.active {
     display: block;
   }
@@ -337,12 +348,12 @@
   gap: 16px;
 }
 
-.person-counter__wrap {
-}
+.person-counter__wrap {}
 
 @media screen and (max-width: 1440px) {
   .gtm-search__tab-btns {
     overflow-x: scroll;
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -353,7 +364,8 @@
   }
 
   .gtm-search__item {
-    flex-direction: column;
+
+    // flex-direction: column;
     &.active {
       display: flex;
     }
