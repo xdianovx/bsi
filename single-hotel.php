@@ -234,13 +234,39 @@ get_header();
 
         <div class="hotel-content editor-content">
           <?php the_content() ?>
+
+          <?php
+          $hotel_sections = [
+            'sec_infrastructure' => 'Инфраструктура',
+            'sec_meals'          => 'Питание',
+            'sec_restaurants'    => 'Рестораны и бары',
+            'sec_spa'            => 'Spa и оздоровление',
+            'sec_sport'          => 'Спорт и развлечения',
+            'sec_kids'           => 'Для детей',
+            'sec_mice'           => 'MICE',
+            'sec_beach'          => 'Пляж',
+            'sec_rooms'          => 'Номера',
+          ];
+
+          foreach ($hotel_sections as $sec_name => $sec_title):
+            $sec_content = function_exists('get_field') ? get_field($sec_name) : '';
+            if (empty(trim((string) $sec_content))) {
+              continue;
+            }
+            $sec_id = 'hotel-' . str_replace('sec_', '', $sec_name);
+          ?>
+            <section class="hotel-section" id="<?= esc_attr($sec_id); ?>">
+              <h2 class="hotel-section__title"><?= esc_html($sec_title); ?></h2>
+              <div class="hotel-section__body"><?= $sec_content; ?></div>
+            </section>
+          <?php endforeach; ?>
         </div>
 
         <aside class="hotel-aside">
 
           <div class="hotel-widget">
             <div class="hotel-widget__address"> <?php if ($address_line): ?>
-                <div class="single-hotel__address">
+                <div class="single-hotel__address single-hotel__address--widget">
                   <?php if ($country_flag): ?>
                     <img src="<?= esc_url($country_flag); ?>"
                          alt="">

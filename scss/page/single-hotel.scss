@@ -22,6 +22,7 @@
 
 .single-hotel__rating-stars {
   margin-bottom: 8px;
+
   .stars-rating {
     justify-content: flex-start;
   }
@@ -89,8 +90,7 @@
   margin-top: 20px;
 }
 
-.hotel-gallery__wrap {
-}
+.hotel-gallery__wrap {}
 
 .single-hotel__content {
   margin-top: 32px;
@@ -165,23 +165,25 @@
   transform: translateY(-50%);
   z-index: 10;
   left: 16px;
+
   @media screen and (max-width: 768px) {
     display: none;
   }
 }
+
 .hotel-gallery-main-arrow-next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
   right: 16px;
+
   @media screen and (max-width: 768px) {
     display: none;
   }
 }
 
-@media screen and (max-width: 1440px) {
-}
+@media screen and (max-width: 1440px) {}
 
 .single-hotel__content__wrap {
   gap: 16px;
@@ -206,6 +208,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
   @media screen and (max-width: 1024px) {
     width: 100%;
   }
@@ -219,6 +222,7 @@
   .single-hotel__address {
     font-size: 14px;
     font-weight: 500;
+
     img {
       width: 18px;
       height: 18px;
@@ -306,6 +310,7 @@
   align-items: flex-start;
   gap: 8px;
   font-weight: 400;
+
   a {
     display: flex;
     align-items: center;
@@ -381,6 +386,7 @@
 
   // Фиксируем оверлей на позиции 4-го слайда
   .gallery-thumb-overlay {
+
     // Для вертикального направления (desktop)
     // При 4 слайдах: 4-й слайд начинается на 75% + отступы между слайдами
     @media screen and (min-width: 1201px) {
@@ -418,6 +424,7 @@
   flex-direction: column;
   gap: 8px;
 }
+
 .tour-page-detail__key {
   font-weight: 500;
   line-height: 100%;
@@ -430,6 +437,7 @@
   display: flex;
   gap: 4px;
   align-items: center;
+
   img {
     width: 18px;
     height: 18px;
@@ -477,4 +485,34 @@
   @media screen and (max-width: 768px) {
     font-size: 16px;
   }
+}
+
+.hotel-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid $gray-light;
+
+  &:first-child {
+    margin-top: 32px;
+  }
+
+  @media screen and (max-width: 768px) {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+}
+
+.hotel-section__title {
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 22px;
+
+  @media screen and (max-width: 768px) {
+    font-size: 18px;
+  }
+}
+
+
+.single-hotel__address--widget {
+  div {}
 }

@@ -331,6 +331,113 @@ function bsi_register_hotel_acf_groups(): void
     ],
     'menu_order' => 5,
   ]);
+
+  acf_add_local_field_group([
+    'key' => 'group_hotel_sections',
+    'title' => 'Секции описания',
+    'fields' => [
+      [
+        'key' => 'field_hotel_sections_notice',
+        'label' => '',
+        'name' => 'hotel_sections_notice',
+        'type' => 'message',
+        'message' => 'Каждая секция выводится на странице отеля отдельным блоком с заголовком. Пустые секции не показываются.',
+        'new_lines' => 'wpautop',
+        'esc_html' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_infrastructure',
+        'label' => 'Инфраструктура',
+        'name' => 'sec_infrastructure',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_meals',
+        'label' => 'Питание',
+        'name' => 'sec_meals',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_restaurants',
+        'label' => 'Рестораны и бары',
+        'name' => 'sec_restaurants',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_spa',
+        'label' => 'Spa и оздоровление',
+        'name' => 'sec_spa',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_sport',
+        'label' => 'Спорт и развлечения',
+        'name' => 'sec_sport',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_kids',
+        'label' => 'Для детей',
+        'name' => 'sec_kids',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_mice',
+        'label' => 'MICE',
+        'name' => 'sec_mice',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_beach',
+        'label' => 'Пляж',
+        'name' => 'sec_beach',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+      [
+        'key' => 'field_hotel_sec_rooms',
+        'label' => 'Номера',
+        'name' => 'sec_rooms',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'full',
+        'media_upload' => 0,
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'hotel',
+        ],
+      ],
+    ],
+    'menu_order' => 6,
+  ]);
 }
 
 add_action('acf/init', 'bsi_register_amenity_term_meta');
