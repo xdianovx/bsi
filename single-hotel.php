@@ -107,7 +107,7 @@ get_header();
               </div>
             <?php endif; ?>
           </div>
-          <h1 class="h1 single-hotel__title"><?php the_title() ?></h1>
+          <h1 class="h1 single-hotel__title">Отель <?php the_title() ?></h1>
 
         </div>
 
@@ -268,11 +268,11 @@ get_header();
             <div class="hotel-widget__address"> <?php if ($address_line): ?>
                 <div class="single-hotel__address single-hotel__address--widget">
                   <?php if ($country_flag): ?>
-                    <img src="<?= esc_url($country_flag); ?>"
+                    <img class="single-hotel__address-flag" src="<?= esc_url($country_flag); ?>"
                          alt="">
                   <?php endif; ?>
 
-                  <div><?= esc_html($address_line); ?></div>
+                  <div class="single-hotel__address-text"><?= esc_html($address_line); ?></div>
                 </div>
               <?php endif; ?>
             </div>

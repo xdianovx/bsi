@@ -12929,6 +12929,14 @@ button.single-event__dates-book {
     font-size: 18px;
   }
 }
+.hotel-widget .single-hotel__address .single-hotel__address-flag {
+  margin-top: 0;
+  width: 24px;
+  height: 24px;
+}
+.single-hotel__address-text {
+  margin-top: 5px;
+}
 .tour-card-row {
   display: grid;
   grid-template-columns: 2fr 3fr 2fr;
