@@ -111,13 +111,25 @@ get_header();
 
         </div>
 
-        <button class="print-btn single-hotel__print-btn" data-micromodal-trigger="modal-hotel-pdf">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-printer-icon lucide-printer">
+        <button class="print-btn single-hotel__print-btn"
+                data-micromodal-trigger="modal-hotel-pdf">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               width="24"
+               height="24"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="2"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+               class="lucide lucide-printer-icon lucide-printer">
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
             <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
-            <rect x="6" y="14" width="12" height="8" rx="1" />
+            <rect x="6"
+                  y="14"
+                  width="12"
+                  height="8"
+                  rx="1" />
           </svg>
         </button>
       </div>
@@ -154,7 +166,8 @@ get_header();
 
           <div class="single-hotel__address">
             <?php if (!empty($country_flag)): ?>
-              <img src="<?= esc_url($country_flag); ?>" alt="">
+              <img src="<?= esc_url($country_flag); ?>"
+                   alt="">
             <?php endif; ?>
 
             <div class="single-hotel__address-text">
@@ -229,7 +242,8 @@ get_header();
             <div class="hotel-widget__address"> <?php if ($address_line): ?>
                 <div class="single-hotel__address">
                   <?php if ($country_flag): ?>
-                    <img src="<?= esc_url($country_flag); ?>" alt="">
+                    <img src="<?= esc_url($country_flag); ?>"
+                         alt="">
                   <?php endif; ?>
 
                   <div><?= esc_html($address_line); ?></div>
@@ -283,16 +297,20 @@ get_header();
               <?php if ($booking_url_tour): ?>
                 <div class="hotel-widget__btns">
                   <p class="hotel-widget__booking-label">Тур - отель с перелетом</p>
-                  <a href="<?= esc_url($booking_url_tour); ?>" class="btn btn-accent hotel-widget__btn-book sm"
-                    target="_blank" rel="noopener nofollow">Забронировать</a>
+                  <a href="<?= esc_url($booking_url_tour); ?>"
+                     class="btn btn-accent hotel-widget__btn-book sm"
+                     target="_blank"
+                     rel="noopener nofollow">Забронировать</a>
                 </div>
               <?php endif; ?>
 
               <?php if ($booking_url_hotel): ?>
                 <div class="hotel-widget__btns">
                   <p class="hotel-widget__booking-label">Отель без перелета</p>
-                  <a href="<?= esc_url($booking_url_hotel); ?>" class="btn btn-accent hotel-widget__btn-book sm"
-                    target="_blank" rel="noopener nofollow">Забронировать</a>
+                  <a href="<?= esc_url($booking_url_hotel); ?>"
+                     class="btn btn-accent hotel-widget__btn-book sm"
+                     target="_blank"
+                     rel="noopener nofollow">Забронировать</a>
                 </div>
               <?php endif; ?>
 
@@ -367,7 +385,8 @@ get_header();
                 <?php if ($phone): ?>
                   <div class="hotel-widget__phone hotel-widget__contacts-item">
                     <a href="tel:<?= esc_attr(preg_replace('/\s+/', '', $phone)); ?>">
-                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg" alt="">
+                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/call.svg"
+                           alt="">
                       <span><?= esc_html($phone); ?></span>
                     </a>
                   </div>
@@ -375,15 +394,19 @@ get_header();
 
                 <?php if ($address): ?>
                   <div class="hotel-widget__address hotel-widget__contacts-item">
-                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg" alt="">
+                    <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/home.svg"
+                         alt="">
                     <span><?= esc_html($address); ?></span>
                   </div>
                 <?php endif; ?>
 
                 <?php if ($website): ?>
                   <div class="hotel-widget__site hotel-widget__contacts-item">
-                    <a href="<?= esc_url($website); ?>" target="_blank" rel="nofollow noopener">
-                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg" alt="">
+                    <a href="<?= esc_url($website); ?>"
+                       target="_blank"
+                       rel="nofollow noopener">
+                      <img src="<?= get_template_directory_uri() ?>/img/icons/hotel/url.svg"
+                           alt="">
                       <span>Сайт отеля</span>
                     </a>
                   </div>
@@ -397,7 +420,8 @@ get_header();
           <?php if ($map_lat && $map_lng): ?>
 
             <div class="hotel-widget">
-              <a href="#hotel-map" class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
+              <a href="#hotel-map"
+                 class="btn btn-black sm hotel-widget__btn-map">Смотреть на карте</a>
             </div>
           <?php endif; ?>
         </aside>
@@ -411,13 +435,18 @@ get_header();
     $map_zoom_safe = max(1, min(17, (int) $map_zoom));
     $yandex_map_url = 'https://yandex.ru/maps/?ll=' . rawurlencode((string) $map_lng) . '%2C' . rawurlencode((string) $map_lat) . '&z=' . $map_zoom_safe . '&pt=' . rawurlencode((string) $map_lng) . ',' . rawurlencode((string) $map_lat);
     ?>
-    <section class="single-hotel__map-section map-section" id="hotel-map">
+    <section class="single-hotel__map-section map-section"
+             id="hotel-map">
       <div class="container">
         <h2 class="h2 map-section__title">Расположение</h2>
         <?php $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg'; ?>
-        <div class="hotel-map map-wrap" id="hotel-map-container" data-lat="<?php echo esc_attr($map_lat); ?>"
-          data-lng="<?php echo esc_attr($map_lng); ?>" data-zoom="<?php echo esc_attr($map_zoom); ?>"
-          data-marker-icon="<?php echo esc_url($marker_icon_url); ?>" style="width: 100%; height: 400px;"></div>
+        <div class="hotel-map map-wrap"
+             id="hotel-map-container"
+             data-lat="<?php echo esc_attr($map_lat); ?>"
+             data-lng="<?php echo esc_attr($map_lng); ?>"
+             data-zoom="<?php echo esc_attr($map_zoom); ?>"
+             data-marker-icon="<?php echo esc_url($marker_icon_url); ?>"
+             style="width: 100%; height: 400px;"></div>
 
       </div>
     </section>
@@ -435,11 +464,7 @@ get_header();
           номерном фонде у менеджеров туроператора или на официальном сайте отеля.
         </p>
 
-        <p class="callout__text-warn">
-          Нашли неточную информацию? Сообщите нам, и мы исправим ее! <a href="#">Написать сообщение</a>
 
-
-        </p>
       </div>
     </div>
   </section>
