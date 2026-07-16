@@ -47,11 +47,13 @@
 							</span>
 							<div class="footer-contact__links">
 
-								<a href="tel:8 (495) 785-55-35" class="footer-contact__link">
+								<a href="tel:8 (495) 785-55-35"
+									 class="footer-contact__link">
 									8 (495) 785-55-35
-									<span>ПН-ПТ 10:00-19:00</span>
+									<span>Поддержка 24/7</span>
 								</a>
-								<a href="tel:8 (800) 200-55-35" class="footer-contact__link">
+								<a href="tel:8 (800) 200-55-35"
+									 class="footer-contact__link">
 									8 (800) 200-55-35
 									<span>Бесплатно из регионов</span>
 								</a>
@@ -77,7 +79,8 @@
 								<div class="currency-select js-dropdown">
 									<button class="js-dropdown-trigger currency-select-trigger__wrap">
 										<span class="currency-current">RUB</span>
-										<img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg" alt="">
+										<img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg"
+												 alt="">
 									</button>
 
 									<div class="js-dropdown-panel"></div>
@@ -91,7 +94,8 @@
 							Email
 						</span>
 
-						<a href="mailto:<?php the_field('email', 'option'); ?>" class="footer-contact__link">
+						<a href="mailto:<?php the_field('email', 'option'); ?>"
+							 class="footer-contact__link">
 							<?php the_field('email', 'option'); ?>
 						</a>
 					</div>
@@ -120,7 +124,8 @@
 				<div class="footer-cookie-policy">
 					Мы используем файлы cookie, чтобы запоминать ваши предпочтения, анализировать трафик и сделать наш
 					сайт более удобным для вас. Вы можете управлять настройками куки в своем браузере или прочитать нашу
-					<a href="<?= get_permalink(47) ?>" class="policy-link footer-policy-link">
+					<a href="<?= get_permalink(47) ?>"
+						 class="policy-link footer-policy-link">
 						политику в отношении обработки персональных данных
 					</a>
 				</div>
@@ -175,17 +180,19 @@
 
 <!-- Yandex.Metrika counter — всегда (баннер cookie фиксирует выбор пользователя отдельно) -->
 <script type="text/javascript">
-  (function (m, e, t, r, i, k, a) {
-    m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
-    m[i].l = 1 * new Date();
-    for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
-    k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
-  })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=108341897', 'ym');
+	(function (m, e, t, r, i, k, a) {
+		m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+		m[i].l = 1 * new Date();
+		for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+		k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+	})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=108341897', 'ym');
 
-  ym(108341897, 'init', { ssr: true, webvisor: true, clickmap: true, ecommerce: "dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce: true, trackLinks: true });
+	ym(108341897, 'init', { ssr: true, webvisor: true, clickmap: true, ecommerce: "dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce: true, trackLinks: true });
 </script>
 <noscript>
-  <div><img src="https://mc.yandex.ru/watch/108341897" style="position:absolute; left:-9999px;" alt="" /></div>
+	<div><img src="https://mc.yandex.ru/watch/108341897"
+				 style="position:absolute; left:-9999px;"
+				 alt="" /></div>
 </noscript>
 <!-- /Yandex.Metrika counter -->
 

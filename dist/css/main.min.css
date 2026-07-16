@@ -8841,7 +8841,7 @@ html.bsi-cookie-consented .cookie-consent {
 }
 .single-event__venue-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 24px;
   width: 100%;

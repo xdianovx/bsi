@@ -47,11 +47,13 @@
 							</span>
 							<div class="footer-contact__links">
 
-								<a href="tel:<?php the_field('telefon', 'option'); ?>" class="footer-contact__link">
+								<a href="tel:<?php the_field('telefon', 'option'); ?>"
+									 class="footer-contact__link">
 									<?php the_field('telefon', 'option'); ?>
-									<span>ПН-ПТ 10:00-19:00</span>
+									<span>Поддержка 24/7</span>
 								</a>
-								<a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>" class="footer-contact__link">
+								<a href="tel:<?php the_field('telefon_po_rf', 'option'); ?>"
+									 class="footer-contact__link">
 									<?php the_field('telefon_po_rf', 'option'); ?>
 									<span>Бесплатно из регионов</span>
 								</a>
@@ -77,7 +79,8 @@
 								<div class="currency-select js-dropdown">
 									<button class="js-dropdown-trigger currency-select-trigger__wrap">
 										<span class="currency-current">RUB</span>
-										<img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg" alt="">
+										<img src="<?= get_template_directory_uri() ?>/img/icons/chevron-d.svg"
+												 alt="">
 									</button>
 
 									<div class="js-dropdown-panel"></div>
@@ -91,7 +94,8 @@
 							Email
 						</span>
 
-						<a href="mailto:<?php the_field('email', 'option'); ?>" class="footer-contact__link">
+						<a href="mailto:<?php the_field('email', 'option'); ?>"
+							 class="footer-contact__link">
 							<?php the_field('email', 'option'); ?>
 						</a>
 					</div>
@@ -120,7 +124,8 @@
 				<div class="footer-cookie-policy">
 					Мы используем файлы cookie, чтобы запоминать ваши предпочтения, анализировать трафик и сделать наш
 					сайт более удобным для вас. Вы можете управлять настройками куки в своем браузере или прочитать нашу
-					<a href="<?= get_permalink(47) ?>" class="policy-link footer-policy-link">
+					<a href="<?= get_permalink(47) ?>"
+						 class="policy-link footer-policy-link">
 						политику в отношении обработки персональных данных
 					</a>
 				</div>

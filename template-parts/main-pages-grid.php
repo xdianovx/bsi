@@ -10,51 +10,15 @@ $cruise_pages = get_pages(
 
 $cruise_url = ! empty($cruise_pages) ? get_permalink($cruise_pages[0]->ID) : '#';
 
-// Событийные туры: ищем страницу по шаблону (надёжнее слага).
-$event_tours_pages = get_pages(
-     [
-          'meta_key' => '_wp_page_template',
-          'meta_value' => 'page-sobytiynye-tury.php',
-          'number' => 1,
-     ]
-);
-
-$event_tours_url = ! empty($event_tours_pages) ? get_permalink($event_tours_pages[0]->ID) : '#';
+$education_page = get_page_by_path('obrazovanie-za-rubezhom');
+$education_url = $education_page ? get_permalink($education_page->ID) : '#';
 
 $main_page_items = [
-     // [
-     //      'title' => "Онлайн <br> бронирование",
-     //      'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
-     //      'target' => '_blank',
-     //      'img' => 'online.png',
-
-     // ],
      [
           'title' => 'индивидуальный запрос',
           'url' => get_permalink(2064),
           'target' => '',
           'img' => 'fit.png',
-
-     ],
-     // [
-     //      'title' => 'Круизы',
-     //      'url' => 'https://online.bsigroup.ru/default.php?page=search_tour',
-     //      'target' => '_blank',
-     //      'img' => 'cruise.png',
-
-     // ],
-     // [
-     //      'title' => 'Событийные <br> туры',
-     //      'url' => 'https://past.bsigroup.ru/tip-tura/event-tours/',
-     //      'target' => '_blank',
-     //      'img' => 'event.png',
-
-     // ],
-     [
-          'title' => 'Событийные <br> туры',
-          'url' => $event_tours_url,
-          'target' => '',
-          'img' => 'event.png',
 
      ],
      [
@@ -64,13 +28,13 @@ $main_page_items = [
           'img' => 'vip.png',
 
      ],
-     // [
-     //      'title' => "Образование <br> за рубежом",
-     //      // 'url' => get_permalink(get_page_by_path('obrazovanie-za-rubezhom')),
-     //      'url' => 'https://www.bsistudy.ru',
-     //      'target' => '_blank',
-     //      'img' => 'edu.png',
-     // ],
+     [
+          'title' => 'Образование',
+          'url' => $education_url,
+          'target' => '',
+          'img' => 'edu.png',
+
+     ],
      [
           'title' => 'Страхование',
           'url' => get_permalink(get_page_by_path('strahovanie')),
@@ -78,21 +42,6 @@ $main_page_items = [
           'img' => 'esur.png',
 
      ],
-     // [
-     //      'title' => 'Визы',
-     //      'url' => get_permalink(get_page_by_path('vizy')),
-     //      'target' => '',
-     //      'img' => 'visa.png',
-
-     // ],
-
-     // [
-     //      'title' => "Business Travel <br> & MICE",
-     //      'url' => get_permalink(get_page_by_path('mice')),
-     //      'target' => '',
-     //      'img' => 'mice.png',
-
-     // ],
      [
           'title' => 'Круизы',
           'url' => $cruise_url,

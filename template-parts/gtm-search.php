@@ -51,24 +51,33 @@
       </a>
 
       <?php
-      $education_page = get_page_by_path('obrazovanie-za-rubezhom');
-      $education_url = $education_page ? get_permalink($education_page->ID) : '#';
+      // Событийные туры: ищем страницу по шаблону (надёжнее слага).
+      $event_tours_pages = get_pages(
+           [
+                'meta_key' => '_wp_page_template',
+                'meta_value' => 'page-sobytiynye-tury.php',
+                'number' => 1,
+           ]
+      );
+      $event_tours_url = ! empty($event_tours_pages) ? get_permalink($event_tours_pages[0]->ID) : '#';
       ?>
-      <a href="<?php echo esc_url($education_url); ?>" class="gtm-search__tab-btn">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
-          xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M1.69043 6.66667C1.69043 7.78482 8.4362 10.8333 10.0122 10.8333C11.5881 10.8333 18.3339 7.78482 18.3339 6.66667C18.3339 5.54852 11.5881 2.5 10.0122 2.5C8.4362 2.5 1.69043 5.54852 1.69043 6.66667Z"
-            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path
-            d="M5.01855 9.16669L5.22281 13.8583C5.2269 13.9522 5.23705 14.0463 5.26428 14.1363C5.34842 14.4144 5.5035 14.6672 5.74011 14.837C7.59132 16.1654 12.4319 16.1654 14.2831 14.837C14.5197 14.6672 14.6748 14.4144 14.7589 14.1363C14.7861 14.0463 14.7963 13.9522 14.8004 13.8583L15.0046 9.16669"
-            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path
-            d="M17.0849 7.91669V13.75M17.0849 13.75C16.4249 14.9553 16.1331 15.601 15.8367 16.6667C15.7723 17.0459 15.8234 17.2369 16.0847 17.4066C16.1909 17.4755 16.3185 17.5 16.445 17.5H17.712C17.8467 17.5 17.9827 17.472 18.0936 17.3955C18.3365 17.228 18.399 17.0441 18.3332 16.6667C18.0733 15.6772 17.7424 15.0007 17.0849 13.75Z"
-            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <a href="<?php echo esc_url($event_tours_url); ?>" class="gtm-search__tab-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+          class="lucide lucide-calendar-days-icon lucide-calendar-days">
+          <path d="M8 2v4" />
+          <path d="M16 2v4" />
+          <rect width="18" height="18" x="3" y="4" rx="2" />
+          <path d="M3 10h18" />
+          <path d="M8 14h.01" />
+          <path d="M12 14h.01" />
+          <path d="M16 14h.01" />
+          <path d="M8 18h.01" />
+          <path d="M12 18h.01" />
+          <path d="M16 18h.01" />
         </svg>
 
-        <span>Образование за рубежом</span>
+        <span>Событийные туры</span>
       </a>
 
 
