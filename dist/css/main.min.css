@@ -12922,6 +12922,9 @@ button.single-event__dates-book {
   }
 }
 .hotel-section__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 12px;
   font-weight: 700;
   font-size: 22px;
@@ -12929,6 +12932,18 @@ button.single-event__dates-book {
 @media screen and (max-width: 768px) {
   .hotel-section__title {
     font-size: 18px;
+  }
+}
+.hotel-section__icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: #f03232;
+}
+@media screen and (max-width: 768px) {
+  .hotel-section__icon {
+    width: 20px;
+    height: 20px;
   }
 }
 .hotel-widget .single-hotel__address .single-hotel__address-flag {

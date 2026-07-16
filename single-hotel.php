@@ -236,27 +236,48 @@ get_header();
           <?php the_content() ?>
 
           <?php
-          $hotel_sections = [
-            'sec_infrastructure' => 'Инфраструктура',
-            'sec_meals'          => 'Питание',
-            'sec_restaurants'    => 'Рестораны и бары',
-            'sec_spa'            => 'Spa и оздоровление',
-            'sec_sport'          => 'Спорт и развлечения',
-            'sec_kids'           => 'Для детей',
-            'sec_mice'           => 'MICE',
-            'sec_beach'          => 'Пляж',
-            'sec_rooms'          => 'Номера',
+          // Иконки Lucide (inline SVG) для заголовков секций. Ключ — имя из lucide.dev.
+          $section_icon_paths = [
+            'building-2' => '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>',
+            'utensils'   => '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+            'wine'       => '<path d="M8 22h8"/><path d="M7 10h10"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/>',
+            'sparkles'   => '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>',
+            'dumbbell'   => '<path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/>',
+            'baby'       => '<path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/>',
+            'briefcase'  => '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
+            'umbrella'   => '<path d="M22 12a10.06 10.06 1 0 0-20 0Z"/><path d="M12 12v8a2 2 0 0 0 4 0"/><path d="M12 2v1"/>',
+            'bed-double' => '<path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 18h20"/>',
           ];
 
-          foreach ($hotel_sections as $sec_name => $sec_title):
+          $hotel_sections = [
+            'sec_infrastructure' => ['title' => 'Инфраструктура',     'icon' => 'building-2'],
+            'sec_meals'          => ['title' => 'Питание',            'icon' => 'utensils'],
+            'sec_restaurants'    => ['title' => 'Рестораны и бары',   'icon' => 'wine'],
+            'sec_spa'            => ['title' => 'Spa и оздоровление', 'icon' => 'sparkles'],
+            'sec_sport'          => ['title' => 'Спорт и развлечения', 'icon' => 'dumbbell'],
+            'sec_kids'           => ['title' => 'Для детей',          'icon' => 'baby'],
+            'sec_mice'           => ['title' => 'MICE',               'icon' => 'briefcase'],
+            'sec_beach'          => ['title' => 'Пляж',               'icon' => 'umbrella'],
+            'sec_rooms'          => ['title' => 'Номера',             'icon' => 'bed-double'],
+          ];
+
+          foreach ($hotel_sections as $sec_name => $sec):
             $sec_content = function_exists('get_field') ? get_field($sec_name) : '';
             if (empty(trim((string) $sec_content))) {
               continue;
             }
-            $sec_id = 'hotel-' . str_replace('sec_', '', $sec_name);
+            $sec_id       = 'hotel-' . str_replace('sec_', '', $sec_name);
+            $sec_title    = $sec['title'];
+            $sec_icon_svg = $section_icon_paths[$sec['icon']] ?? '';
           ?>
             <section class="hotel-section" id="<?= esc_attr($sec_id); ?>">
-              <h2 class="hotel-section__title"><?= esc_html($sec_title); ?></h2>
+              <h2 class="hotel-section__title">
+                <?php // Иконки временно скрыты
+                if (false && $sec_icon_svg): ?>
+                  <svg class="hotel-section__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $sec_icon_svg ?></svg>
+                <?php endif; ?>
+                <span><?= esc_html($sec_title); ?></span>
+              </h2>
               <div class="hotel-section__body"><?= $sec_content; ?></div>
             </section>
           <?php endforeach; ?>
