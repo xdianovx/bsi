@@ -7933,7 +7933,7 @@ html.bsi-cookie-consented .cookie-consent {
 }
 .awards-year__list {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 40px 16px;
   margin-top: 16px;
 }
