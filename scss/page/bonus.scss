@@ -129,19 +129,38 @@
   }
 }
 
+.bonus-level__bot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+
+  @media screen and (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.bonus-level__col--conditions {
+  @media screen and (min-width: 901px) {
+    border-left: 1px solid #e0e0e0;
+    padding-left: 2rem;
+  }
+}
+
+.bonus-level__bot.has-advantages .bonus-level__col--conditions {
+  @media screen and (max-width: 900px) {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 1.5rem;
+  }
+}
+
 .bonus-level__description-list {
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
   width: 100%;
-
-  @media screen and (max-width: 1280px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media screen and (max-width: 900px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
 }
 
 .bonus-level__description-item {

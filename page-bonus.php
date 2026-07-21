@@ -112,37 +112,55 @@ get_header();
                                     </div>
                                 </div>
                             </div>
-                            <?php if (have_rows('level_descriptions')): ?>
-                                <div class="bonus-level__bot">
-                                    <div class="bonus-level__description-list">
-                                        <?php while (have_rows('level_descriptions')):
-                                            the_row(); ?>
-                                            <?php
-                                            $desc_title = get_sub_field('title');
-                                            $desc_text = get_sub_field('text');
-                                            ?>
-                                            <div class="bonus-level__description-item">
-                                                <div class="top">
-                                                    <?php if ($level_description_icon): ?>
-                                                        <?php echo wp_kses($level_description_icon, [
-                                                            'svg' => ['xmlns' => [], 'width' => [], 'height' => [], 'viewbox' => [], 'viewBox' => [], 'fill' => [], 'stroke' => [], 'stroke-width' => [], 'stroke-linecap' => [], 'stroke-linejoin' => [], 'class' => []],
-                                                            'path' => ['d' => [], 'stroke' => [], 'stroke-width' => [], 'stroke-linecap' => [], 'stroke-linejoin' => []],
-                                                        ]); ?>
-                                                    <?php endif; ?>
-                                                    <?php if ($desc_title): ?>
-                                                        <div class="__item_title"><?php echo esc_html($desc_title); ?></div>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <?php if ($desc_text): ?>
-                                                    <div class="bot">
-                                                        <?php echo esc_html($desc_text); ?>
-                                                    </div>
-                                                <?php endif; ?>
+                            <?php
+                            $desc_icon_allowed = [
+                                'svg' => ['xmlns' => [], 'width' => [], 'height' => [], 'viewbox' => [], 'viewBox' => [], 'fill' => [], 'stroke' => [], 'stroke-width' => [], 'stroke-linecap' => [], 'stroke-linejoin' => [], 'class' => []],
+                                'path' => ['d' => [], 'stroke' => [], 'stroke-width' => [], 'stroke-linecap' => [], 'stroke-linejoin' => []],
+                                'circle' => ['cx' => [], 'cy' => [], 'r' => [], 'fill' => [], 'stroke' => [], 'stroke-width' => []],
+                            ];
+                            $commission_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-badge-percent"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m15 9-6 6"/><path d="M9 9h.01"/><path d="M15 15h.01"/></svg>';
+                            $conditions_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EE3145" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+
+                            $advantages = get_sub_field('level_advantages');
+                            $conditions = get_sub_field('level_descriptions');
+                            $advantages = is_array($advantages) ? $advantages : [];
+                            $conditions = is_array($conditions) ? $conditions : [];
+
+                            $render_list = function ($rows, $icon) use ($desc_icon_allowed) {
+                                foreach ($rows as $row):
+                                    $item_title = isset($row['title']) ? $row['title'] : '';
+                                    $item_text = isset($row['text']) ? $row['text'] : '';
+                                    ?>
+                                    <div class="bonus-level__description-item">
+                                        <div class="top">
+                                            <?php if ($icon): ?>
+                                                <?php echo wp_kses($icon, $desc_icon_allowed); ?>
+                                            <?php endif; ?>
+                                            <?php if ($item_title): ?>
+                                                <div class="__item_title"><?php echo esc_html($item_title); ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if ($item_text): ?>
+                                            <div class="bot">
+                                                <?php echo esc_html($item_text); ?>
                                             </div>
-                                        <?php endwhile; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach;
+                            };
+                            ?>
+                            <div class="bonus-level__bot<?php echo $advantages ? ' has-advantages' : ''; ?>">
+                                <div class="bonus-level__col bonus-level__col--advantages">
+                                    <div class="bonus-level__description-list">
+                                        <?php $render_list($advantages, $commission_icon); ?>
                                     </div>
                                 </div>
-                            <?php endif; ?>
+                                <div class="bonus-level__col bonus-level__col--conditions">
+                                    <div class="bonus-level__description-list">
+                                        <?php $render_list($conditions, $conditions_icon); ?>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     <?php endwhile; ?>
                 </div>
