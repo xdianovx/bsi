@@ -30,16 +30,6 @@ add_action('acf/init', function () {
       ],
 
       [
-        'key' => 'field_award_link',
-        'label' => 'Ссылка на источник',
-        'name' => 'award_link',
-        'type' => 'url',
-        'wrapper' => [
-          'width' => '25',
-        ],
-      ],
-
-      [
         'key' => 'field_award_file',
         'label' => 'Файл диплома / письма',
         'name' => 'award_file',
@@ -49,6 +39,18 @@ add_action('acf/init', function () {
           'width' => '25',
         ],
       ],
+      [
+        'key' => 'field_award_description',
+        'label' => 'Описание',
+        'name' => 'award_description',
+        'type' => 'textarea',
+        'rows' => 4,
+        'new_lines' => 'br',
+        'wrapper' => [
+          'width' => '100',
+        ],
+      ],
+
       [
         'key' => 'field_award_show_on_mice',
         'label' => 'Показать на странице MICE',

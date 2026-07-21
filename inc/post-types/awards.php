@@ -21,48 +21,19 @@ function bsi_register_award_cpt()
 
   $args = [
     'labels' => $labels,
-    'public' => true,
+    'public' => false,
     'hierarchical' => false,
     'show_ui' => true,
     'show_in_menu' => true,
     'show_in_rest' => true,
     'menu_position' => 21,
     'menu_icon' => 'dashicons-awards',
-    'supports' => ['title', 'thumbnail', 'editor', 'excerpt'],
-    'rewrite' => [
-      'slug' => 'nagrady',
-      'with_front' => false,
-    ],
+    'supports' => ['title', 'thumbnail'],
     'has_archive' => false,
-    'publicly_queryable' => true,
-    'query_var' => true,
+    'publicly_queryable' => false,
+    'query_var' => false,
+    'exclude_from_search' => true,
   ];
 
   register_post_type('award', $args);
 }
-
-
-add_filter('wpseo_breadcrumb_links', function ($links) {
-  if (is_singular('award')) {
-    $awards_page = get_page_by_path('nagrady');
-
-    if ($awards_page) {
-      $new_links = [];
-      $new_links[] = [
-        'url' => home_url('/'),
-        'text' => 'Главная',
-      ];
-      $new_links[] = [
-        'url' => get_permalink($awards_page->ID),
-        'text' => $awards_page->post_title,
-      ];
-      $new_links[] = [
-        'text' => get_the_title(),
-      ];
-
-      return $new_links;
-    }
-  }
-
-  return $links;
-});
