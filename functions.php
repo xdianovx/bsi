@@ -696,31 +696,6 @@ add_action('acf/init', function () {
 	acf_update_setting('show_updates', false);
 });
 
-add_action('acf/init', function () {
-	acf_add_local_field_group([
-		'key' => 'group_best_offer',
-		'title' => 'Лучшее предложение',
-		'fields' => [
-			[
-				'key' => 'field_is_best_offer',
-				'label' => 'Показывать как лучшее предложение',
-				'name' => 'is_best_offer',
-				'type' => 'true_false',
-				'ui' => 1,
-				'default_value' => 0,
-			],
-		],
-		'location' => [
-			[
-				[
-					'param' => 'post_type',
-					'operator' => '==',
-					'value' => 'hotel',
-				],
-			],
-		],
-	]);
-});
 
 
 

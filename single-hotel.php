@@ -261,9 +261,18 @@ get_header();
             'sec_rooms'          => ['title' => 'Номера',             'icon' => 'bed-double'],
           ];
 
+          $hotel_rooms = function_exists('get_field') ? get_field('hotel_rooms') : [];
+          $hotel_rooms = is_array($hotel_rooms) ? $hotel_rooms : [];
+          $rooms_booking_url = trim((string) get_field('booking_url_hotel_only', get_the_ID()));
+          if (!$rooms_booking_url) {
+            $rooms_booking_url = trim((string) get_field('booking_url', get_the_ID()));
+          }
+
           foreach ($hotel_sections as $sec_name => $sec):
-            $sec_content = function_exists('get_field') ? get_field($sec_name) : '';
-            if (empty(trim((string) $sec_content))) {
+            $is_rooms_section = ($sec_name === 'sec_rooms');
+            // sec_rooms — поле удалено, секция строится только из карточек номеров
+            $sec_content = (!$is_rooms_section && function_exists('get_field')) ? get_field($sec_name) : '';
+            if (empty(trim((string) $sec_content)) && !($is_rooms_section && $hotel_rooms)) {
               continue;
             }
             $sec_id       = 'hotel-' . str_replace('sec_', '', $sec_name);
@@ -278,7 +287,20 @@ get_header();
                 <?php endif; ?>
                 <span><?= esc_html($sec_title); ?></span>
               </h2>
-              <div class="hotel-section__body"><?= $sec_content; ?></div>
+              <?php if (!empty(trim((string) $sec_content))): ?>
+                <div class="hotel-section__body"><?= $sec_content; ?></div>
+              <?php endif; ?>
+
+              <?php if ($is_rooms_section && $hotel_rooms): ?>
+                <div class="hotel-rooms__grid">
+                  <?php foreach ($hotel_rooms as $room_index => $room):
+                    set_query_var('room', $room);
+                    set_query_var('room_index', $room_index);
+                    set_query_var('room_booking_url', $rooms_booking_url);
+                    get_template_part('template-parts/hotels/room-card');
+                  endforeach; ?>
+                </div>
+              <?php endif; ?>
             </section>
           <?php endforeach; ?>
         </div>

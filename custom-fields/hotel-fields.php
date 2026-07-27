@@ -19,11 +19,27 @@ function bsi_register_hotel_acf_groups(): void
   }
 
   acf_add_local_field_group([
-    'key' => 'group_hotel_geo',
-    'title' => 'ГЕО',
+    'key' => 'group_hotel_main',
+    'title' => 'Отель',
     'position' => 'acf_after_title',
     'menu_order' => 0,
     'fields' => [
+
+      // ================= ТАБ «ОСНОВНОЕ» =================
+      [
+        'key' => 'field_hotel_tab_main',
+        'label' => 'Основное',
+        'type' => 'tab',
+        'placement' => 'top',
+      ],
+
+      // --- ГЕО ---
+      [
+        'key' => 'field_hotel_acc_geo',
+        'label' => 'ГЕО',
+        'type' => 'accordion',
+        'open' => 1,
+      ],
       [
         'key' => 'field_hotel_geo_notice',
         'label' => '',
@@ -66,23 +82,13 @@ function bsi_register_hotel_acf_groups(): void
         'default_value' => 14,
         'wrapper' => ['width' => '33'],
       ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'hotel',
-        ],
-      ],
-    ],
-    'style' => 'seamless',
-  ]);
 
-  acf_add_local_field_group([
-    'key' => 'group_hotel_basic',
-    'title' => 'Основная информация',
-    'fields' => [
+      // --- Основная информация ---
+      [
+        'key' => 'field_hotel_acc_basic',
+        'label' => 'Основная информация',
+        'type' => 'accordion',
+      ],
       [
         'key' => 'field_hotel_rating',
         'label' => 'Рейтинг (звезды)',
@@ -126,23 +132,13 @@ function bsi_register_hotel_acf_groups(): void
         'instructions' => 'Укажите месяц и год последнего ремонта/реновации.',
         'wrapper' => ['width' => '50'],
       ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'hotel',
-        ],
-      ],
-    ],
-    'menu_order' => 1,
-  ]);
 
-  acf_add_local_field_group([
-    'key' => 'group_hotel_contacts',
-    'title' => 'Контакты и адрес',
-    'fields' => [
+      // --- Контакты и адрес ---
+      [
+        'key' => 'field_hotel_acc_contacts',
+        'label' => 'Контакты и адрес',
+        'type' => 'accordion',
+      ],
       [
         'key' => 'field_hotel_address',
         'label' => 'Адрес',
@@ -164,23 +160,13 @@ function bsi_register_hotel_acf_groups(): void
         'type' => 'url',
         'wrapper' => ['width' => '100'],
       ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'hotel',
-        ],
-      ],
-    ],
-    'menu_order' => 2,
-  ]);
 
-  acf_add_local_field_group([
-    'key' => 'group_hotel_booking',
-    'title' => 'Бронирование и цены',
-    'fields' => [
+      // --- Бронирование и цены ---
+      [
+        'key' => 'field_hotel_acc_booking',
+        'label' => 'Бронирование и цены',
+        'type' => 'accordion',
+      ],
       [
         'key' => 'field_price',
         'label' => 'Стоимость',
@@ -248,23 +234,13 @@ function bsi_register_hotel_acf_groups(): void
         'instructions' => 'Ссылка для бронирования только отеля без перелета',
         'wrapper' => ['width' => '100'],
       ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'hotel',
-        ],
-      ],
-    ],
-    'menu_order' => 3,
-  ]);
 
-  acf_add_local_field_group([
-    'key' => 'group_hotel_media',
-    'title' => 'Медиа',
-    'fields' => [
+      // --- Медиа ---
+      [
+        'key' => 'field_hotel_acc_media',
+        'label' => 'Медиа',
+        'type' => 'accordion',
+      ],
       [
         'key' => 'field_hotel_gallery',
         'label' => 'Галерея отеля',
@@ -276,23 +252,13 @@ function bsi_register_hotel_acf_groups(): void
         'library' => 'all',
         'min' => 0,
       ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'hotel',
-        ],
-      ],
-    ],
-    'menu_order' => 4,
-  ]);
 
-  acf_add_local_field_group([
-    'key' => 'group_hotel_distances',
-    'title' => 'Расстояния и дополнительная информация',
-    'fields' => [
+      // --- Расстояния и дополнительная информация ---
+      [
+        'key' => 'field_hotel_acc_distances',
+        'label' => 'Расстояния и дополнительная информация',
+        'type' => 'accordion',
+      ],
       [
         'key' => 'field_hotel_distances',
         'label' => 'Информация',
@@ -319,23 +285,13 @@ function bsi_register_hotel_acf_groups(): void
           ],
         ],
       ],
-    ],
-    'location' => [
-      [
-        [
-          'param' => 'post_type',
-          'operator' => '==',
-          'value' => 'hotel',
-        ],
-      ],
-    ],
-    'menu_order' => 5,
-  ]);
 
-  acf_add_local_field_group([
-    'key' => 'group_hotel_sections',
-    'title' => 'Секции описания',
-    'fields' => [
+      // --- Секции описания ---
+      [
+        'key' => 'field_hotel_acc_sections',
+        'label' => 'Секции описания',
+        'type' => 'accordion',
+      ],
       [
         'key' => 'field_hotel_sections_notice',
         'label' => '',
@@ -417,14 +373,92 @@ function bsi_register_hotel_acf_groups(): void
         'toolbar' => 'full',
         'media_upload' => 0,
       ],
+
       [
-        'key' => 'field_hotel_sec_rooms',
+        'key' => 'field_hotel_acc_sections_end',
+        'label' => '',
+        'type' => 'accordion',
+        'endpoint' => 1,
+      ],
+
+      // ================= ТАБ «НОМЕРА» =================
+      [
+        'key' => 'field_hotel_tab_rooms',
         'label' => 'Номера',
-        'name' => 'sec_rooms',
-        'type' => 'wysiwyg',
-        'tabs' => 'all',
-        'toolbar' => 'full',
-        'media_upload' => 0,
+        'type' => 'tab',
+        'placement' => 'top',
+      ],
+      [
+        'key' => 'field_hotel_rooms',
+        'label' => 'Карточки номеров',
+        'name' => 'hotel_rooms',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'button_label' => 'Добавить номер',
+        'instructions' => 'Выводятся сеткой в секции «Номера» после текста',
+        'sub_fields' => [
+          [
+            'key' => 'field_room_gallery',
+            'label' => 'Фото номера',
+            'name' => 'gallery',
+            'type' => 'gallery',
+            'return_format' => 'array',
+            'preview_size' => 'thumbnail',
+            'required' => 1,
+          ],
+          [
+            'key' => 'field_room_name',
+            'label' => 'Название',
+            'name' => 'name',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '40'],
+          ],
+          [
+            'key' => 'field_room_area',
+            'label' => 'Площадь, м²',
+            'name' => 'area',
+            'type' => 'number',
+            'min' => 0,
+            'wrapper' => ['width' => '20'],
+          ],
+          [
+            'key' => 'field_room_guests',
+            'label' => 'Вместимость',
+            'name' => 'guests',
+            'type' => 'text',
+            'placeholder' => 'Например: 2+1',
+            'wrapper' => ['width' => '20'],
+          ],
+          [
+            'key' => 'field_room_price_from',
+            'label' => 'Цена «от», ₽',
+            'name' => 'price_from',
+            'type' => 'number',
+            'min' => 0,
+            'wrapper' => ['width' => '20'],
+          ],
+          [
+            'key' => 'field_room_description',
+            'label' => 'Описание',
+            'name' => 'description',
+            'type' => 'textarea',
+            'rows' => 3,
+          ],
+          [
+            'key' => 'field_room_amenities',
+            'label' => 'Удобства',
+            'name' => 'amenities',
+            'type' => 'taxonomy',
+            'taxonomy' => 'amenity',
+            'field_type' => 'multi_select',
+            'return_format' => 'id',
+            'add_term' => 0,
+            'save_terms' => 0,
+            'load_terms' => 0,
+            'instructions' => 'Общий словарь: Отели → Удобства (там же иконка термина). Заполняется один раз, здесь только выбирается.',
+          ],
+        ],
       ],
     ],
     'location' => [
@@ -436,8 +470,25 @@ function bsi_register_hotel_acf_groups(): void
         ],
       ],
     ],
-    'menu_order' => 6,
   ]);
+}
+
+// Отрывок — первым блоком после заголовка (над боксом «Отель»)
+add_action('add_meta_boxes_hotel', 'bsi_hotel_remove_default_excerpt_box');
+function bsi_hotel_remove_default_excerpt_box(): void
+{
+  remove_meta_box('postexcerpt', 'hotel', 'normal');
+}
+
+add_action('edit_form_after_title', 'bsi_hotel_render_excerpt_first', 1);
+function bsi_hotel_render_excerpt_first(WP_Post $post): void
+{
+  if ($post->post_type !== 'hotel') {
+    return;
+  }
+  echo '<div class="postbox" style="margin-top:20px;"><div class="postbox-header"><h2 class="hndle">Отрывок</h2></div><div class="inside">';
+  post_excerpt_meta_box($post);
+  echo '</div></div>';
 }
 
 add_action('acf/init', 'bsi_register_amenity_term_meta');

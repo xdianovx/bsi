@@ -69,6 +69,23 @@ export const sliders = () => {
     });
   }
 
+  document.querySelectorAll(".room-card__slider").forEach((sliderEl) => {
+    const card = sliderEl.closest(".room-card");
+    new Swiper(sliderEl, {
+      slidesPerView: 1,
+      spaceBetween: 0,
+      watchOverflow: true,
+      navigation: {
+        prevEl: card?.querySelector(".room-card__slider-prev"),
+        nextEl: card?.querySelector(".room-card__slider-next"),
+      },
+      pagination: {
+        el: card?.querySelector(".room-card__slider-pagination"),
+        clickable: true,
+      },
+    });
+  });
+
   const countryGallerySlider = new Swiper(".country-page__gallery-slider", {
     slidesPerView: 4,
     spaceBetween: 10,
