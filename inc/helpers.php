@@ -544,6 +544,46 @@ function bsi_education_convert_price_to_rub($amount, $currency)
 }
 
 /**
+ * Находит минимальную цену среди номеров отеля (repeater hotel_rooms),
+ * конвертируя каждую цену в рубли по её собственной валюте (price_currency).
+ * Используется как приоритетный источник цены отеля (в карточке и сайдбаре):
+ * если у отеля заполнены номера — цена отеля берётся отсюда, а не из общего поля.
+ *
+ * @param int $hotel_id ID поста hotel
+ * @return array{rub:int,original:float,currency:string}|array{} Пусто, если цену найти не удалось
+ */
+function bsi_hotel_min_room_price(int $hotel_id): array
+{
+  if (!$hotel_id || !function_exists('get_field')) {
+    return [];
+  }
+
+  $rooms = get_field('hotel_rooms', $hotel_id);
+  $rooms = is_array($rooms) ? $rooms : [];
+
+  $best = [];
+  foreach ($rooms as $room) {
+    if (empty($room['price_from'])) {
+      continue;
+    }
+    $currency = !empty($room['price_currency']) ? strtoupper((string) $room['price_currency']) : 'RUB';
+    $rub = bsi_education_convert_price_to_rub($room['price_from'], $currency);
+    if ($rub === null) {
+      continue;
+    }
+    if (empty($best) || $rub < $best['rub']) {
+      $best = [
+        'rub' => $rub,
+        'original' => (float) $room['price_from'],
+        'currency' => $currency,
+      ];
+    }
+  }
+
+  return $best;
+}
+
+/**
  * Получает и форматирует цену образовательной программы.
  * Сначала пытается использовать новую систему (исходная цена + валюта),
  * затем fallback на старое поле.

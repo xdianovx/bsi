@@ -197,10 +197,19 @@
   }
 }
 
-.hotel-content {
+.hotel-main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
+
   @media screen and (max-width: 1024px) {
     width: 100%;
   }
+}
+
+.hotel-content {
+  min-width: 0;
 }
 
 .hotel-aside {
@@ -477,6 +486,13 @@
   margin-top: 16px;
 }
 
+.hotel-widget__price-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
 .hotel-widget__booking-price {
   text-align: right;
   font-weight: 700;
@@ -499,6 +515,17 @@
   @media screen and (max-width: 768px) {
     margin-top: 24px;
     padding-top: 24px;
+  }
+}
+
+.hotel-section__title-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 32px;
+
+  .hotel-section__title {
+    margin-bottom: 0;
   }
 }
 

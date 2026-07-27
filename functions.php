@@ -53,11 +53,13 @@ function bsi_parse_map_coordinates($str)
 }
 
 /**
- * Версия файла темы для query string (mtime); если файла нет — _S_VERSION.
+ * Версия файла темы для query string (md5 содержимого); если файла нет — _S_VERSION.
+ * md5, а не filemtime: gulp (vinyl-fs) при сборке копирует mtime исходного
+ * main.scss на итоговый файл, из-за чего mtime не меняется при правках партиалов.
  */
 function bsi_asset_version(string $absolute_path): string
 {
-	return is_readable($absolute_path) ? (string) filemtime($absolute_path) : _S_VERSION;
+	return is_readable($absolute_path) ? substr(md5_file($absolute_path), 0, 12) : _S_VERSION;
 }
 
 function bsi_setup()

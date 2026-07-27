@@ -41,6 +41,17 @@ if (!$hotel_id) {
   return;
 }
 
+// Цена номеров (repeater hotel_rooms) в приоритете над общим полем цены отеля.
+$room_min_price = function_exists('bsi_hotel_min_room_price') ? bsi_hotel_min_room_price($hotel_id) : [];
+if ($room_min_price) {
+  $price_value = format_number($room_min_price['rub']);
+  $price_original = $room_min_price['original'];
+  $price_currency = $room_min_price['currency'];
+} else {
+  $price_original = null;
+  $price_currency = 'RUB';
+}
+
 $amenities = [];
 $terms = wp_get_post_terms($hotel_id, 'amenity', ['orderby' => 'name', 'order' => 'ASC']);
 if (!is_wp_error($terms) && !empty($terms)) {
@@ -169,10 +180,10 @@ if (function_exists('get_field')) {
 ?>
 <div class="hotel-card">
 
-  <div class="hotel-card__media">
+  <a href="<?php echo esc_url($hotel_url); ?>" class="hotel-card__media">
     <img src="<?php echo esc_url($hotel_image); ?>" alt="<?php echo esc_attr($hotel_title); ?>"
       class="hotel-card__image">
-  </div>
+  </a>
 
   <div class="hotel-card__body">
 
@@ -234,7 +245,9 @@ if (function_exists('get_field')) {
       <?php endif; ?>
 
     </div>
-    <h3 class="hotel-card__title"><?php echo esc_html($hotel_title); ?></h3>
+    <h3 class="hotel-card__title">
+      <a href="<?php echo esc_url($hotel_url); ?>"><?php echo esc_html($hotel_title); ?></a>
+    </h3>
 
     <?php if (!empty($meal_plan_titles)): ?>
       <p class="hotel-card__meal-plan">Питание: <?php echo esc_html(implode(', ', $meal_plan_titles)); ?></p>
@@ -297,8 +310,19 @@ if (function_exists('get_field')) {
         Подробнее
       </a>
       <?php if ($booking_url && $price_value): ?>
-        <a href="<?php echo esc_url($booking_url); ?>" class="btn btn-accent hotel-card__btn hotel-card__btn-book"
-          target="_blank" rel="noopener nofollow">
+        <a href="<?php echo esc_url($booking_url); ?>"
+          class="btn btn-accent hotel-card__btn hotel-card__btn-book<?= $room_min_price ? ' js-hotel-price' : ''; ?>"
+          target="_blank" rel="noopener nofollow"
+          <?php if ($room_min_price): ?>
+          data-price-rub="<?= esc_attr($room_min_price['rub']); ?>"
+          data-has-from="<?= $show_from ? 'true' : 'false'; ?>"
+          data-price-suffix=" / чел"
+          <?php if ($price_currency !== 'RUB'): ?>
+          data-price-original="<?= esc_attr($price_original); ?>"
+          data-price-currency="<?= esc_attr($price_currency); ?>"
+          <?php endif; ?>
+          <?php endif; ?>
+        >
           <?php echo esc_html(format_price_with_from($price_value, $show_from)); ?> / чел
         </a>
       <?php endif; ?>

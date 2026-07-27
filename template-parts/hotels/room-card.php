@@ -19,6 +19,10 @@ $name = isset($room['name']) ? (string) $room['name'] : '';
 $area = isset($room['area']) ? $room['area'] : '';
 $guests = isset($room['guests']) ? (string) $room['guests'] : '';
 $price_from = isset($room['price_from']) ? $room['price_from'] : '';
+$price_currency = !empty($room['price_currency']) ? strtoupper((string) $room['price_currency']) : 'RUB';
+$price_rub = ($price_from && function_exists('bsi_education_convert_price_to_rub'))
+  ? bsi_education_convert_price_to_rub($price_from, $price_currency)
+  : null;
 $description = isset($room['description']) ? (string) $room['description'] : '';
 $amenities = isset($room['amenities']) && is_array($room['amenities']) ? $room['amenities'] : [];
 
@@ -27,20 +31,22 @@ $fb_group = 'hotel-room-' . $room_index;
 
 <article class="room-card">
   <?php if ($gallery): ?>
-    <div class="room-card__slider swiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($gallery as $img): ?>
-          <div class="swiper-slide">
-            <a href="<?= esc_url($img['url']); ?>"
-               class="room-card__photo"
-               data-fancybox="<?= esc_attr($fb_group); ?>"
-               aria-label="<?= esc_attr($name ?: 'Фото номера'); ?>">
-              <img src="<?= esc_url($img['sizes']['medium_large'] ?? $img['url']); ?>"
-                   alt="<?= esc_attr($img['alt'] ?: $name); ?>"
-                   loading="lazy">
-            </a>
-          </div>
-        <?php endforeach; ?>
+    <div class="room-card__slider">
+      <div class="room-card__slider-swiper swiper">
+        <div class="swiper-wrapper">
+          <?php foreach ($gallery as $img): ?>
+            <div class="swiper-slide">
+              <a href="<?= esc_url($img['url']); ?>"
+                 class="room-card__photo"
+                 data-fancybox="<?= esc_attr($fb_group); ?>"
+                 aria-label="<?= esc_attr($name ?: 'Фото номера'); ?>">
+                <img src="<?= esc_url($img['sizes']['medium_large'] ?? $img['url']); ?>"
+                     alt="<?= esc_attr($img['alt'] ?: $name); ?>"
+                     loading="lazy">
+              </a>
+            </div>
+          <?php endforeach; ?>
+        </div>
       </div>
       <?php if (count($gallery) > 1): ?>
         <div class="room-card__slider-nav">
@@ -57,10 +63,6 @@ $fb_group = 'hotel-room-' . $room_index;
   <?php endif; ?>
 
   <div class="room-card__body">
-    <?php if ($name): ?>
-      <h3 class="room-card__title"><?= esc_html($name); ?></h3>
-    <?php endif; ?>
-
     <?php if ($area || $guests): ?>
       <div class="room-card__meta">
         <?php if ($area): ?>
@@ -78,40 +80,56 @@ $fb_group = 'hotel-room-' . $room_index;
       </div>
     <?php endif; ?>
 
+    <?php if ($name): ?>
+      <h3 class="h3 room-card__title"><?= esc_html($name); ?></h3>
+    <?php endif; ?>
+
     <?php if ($description): ?>
       <div class="room-card__description"><?= esc_html($description); ?></div>
     <?php endif; ?>
 
-    <?php if ($amenities): ?>
+    <?php if ($amenities):
+      $amenities_visible = array_slice($amenities, 0, 4);
+      $amenities_hidden_count = count($amenities) - count($amenities_visible);
+      ?>
       <ul class="room-card__amenities">
-        <?php foreach ($amenities as $amenity_id):
+        <?php foreach ($amenities_visible as $amenity_id):
           $term = get_term((int) $amenity_id, 'amenity');
           if (!$term || is_wp_error($term)) {
             continue;
           }
           $icon = function_exists('get_field') ? get_field('amenity_icon', 'term_' . $term->term_id) : null;
           $icon_url = is_array($icon) && !empty($icon['url']) ? $icon['url'] : '';
+          if (!$icon_url) {
+            continue;
+          }
           ?>
-          <li class="room-card__amenity">
-            <?php if ($icon_url): ?>
-              <img class="room-card__amenity-icon" src="<?= esc_url($icon_url); ?>" alt="" loading="lazy">
-            <?php endif; ?>
-            <?= esc_html($term->name); ?>
+          <li class="room-card__amenity" aria-label="<?= esc_attr($term->name); ?>" title="<?= esc_attr($term->name); ?>">
+            <img class="room-card__amenity-icon" src="<?= esc_url($icon_url); ?>" alt="" loading="lazy">
           </li>
         <?php endforeach; ?>
+        <?php if ($amenities_hidden_count > 0): ?>
+          <li class="room-card__amenity room-card__amenity--more">+<?= (int) $amenities_hidden_count; ?></li>
+        <?php endif; ?>
       </ul>
     <?php endif; ?>
 
-    <?php if ($price_from || $booking_url): ?>
+    <?php if ($price_rub || $booking_url): ?>
       <div class="room-card__bottom">
-        <?php if ($price_from): ?>
-          <div class="room-card__price numfont">
-            от <?= function_exists('format_price_text') ? format_price_text($price_from) : esc_html(number_format((float) $price_from, 0, '', ' ')); ?> ₽
+        <?php if ($price_rub): ?>
+          <div class="room-card__price">
+            <span class="room-card__price-value numfont js-hotel-room-price"
+                  data-price-rub="<?= esc_attr($price_rub); ?>"
+                  <?php if ($price_currency !== 'RUB'): ?>
+                  data-price-original="<?= esc_attr($price_from); ?>"
+                  data-price-currency="<?= esc_attr($price_currency); ?>"
+                  <?php endif; ?>
+            ><?= esc_html(format_number($price_rub)); ?> ₽</span>
           </div>
         <?php endif; ?>
         <?php if ($booking_url): ?>
           <a href="<?= esc_url($booking_url); ?>"
-             class="btn btn-accent sm room-card__btn"
+             class="btn btn-accent room-card__btn"
              target="_blank"
              rel="noopener nofollow">Забронировать</a>
         <?php endif; ?>

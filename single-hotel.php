@@ -232,6 +232,8 @@ get_header();
 
       <div class="single-hotel__content__wrap">
 
+        <div class="hotel-main">
+
         <div class="hotel-content editor-content">
           <?php the_content() ?>
 
@@ -269,10 +271,12 @@ get_header();
           }
 
           foreach ($hotel_sections as $sec_name => $sec):
-            $is_rooms_section = ($sec_name === 'sec_rooms');
-            // sec_rooms — поле удалено, секция строится только из карточек номеров
-            $sec_content = (!$is_rooms_section && function_exists('get_field')) ? get_field($sec_name) : '';
-            if (empty(trim((string) $sec_content)) && !($is_rooms_section && $hotel_rooms)) {
+            if ($sec_name === 'sec_rooms') {
+              // Номера рендерятся отдельной секцией вне .editor-content — см. ниже.
+              continue;
+            }
+            $sec_content = function_exists('get_field') ? get_field($sec_name) : '';
+            if (empty(trim((string) $sec_content))) {
               continue;
             }
             $sec_id       = 'hotel-' . str_replace('sec_', '', $sec_name);
@@ -287,39 +291,62 @@ get_header();
                 <?php endif; ?>
                 <span><?= esc_html($sec_title); ?></span>
               </h2>
-              <?php if (!empty(trim((string) $sec_content))): ?>
-                <div class="hotel-section__body"><?= $sec_content; ?></div>
-              <?php endif; ?>
+              <div class="hotel-section__body"><?= $sec_content; ?></div>
+            </section>
+          <?php endforeach; ?>
+        </div>
 
-              <?php if ($is_rooms_section && $hotel_rooms): ?>
-                <div class="hotel-rooms__grid">
-                  <?php foreach ($hotel_rooms as $room_index => $room):
+        <?php if ($hotel_rooms):
+          $sec_rooms = $hotel_sections['sec_rooms'];
+          $rooms_has_foreign_currency = false;
+          foreach ($hotel_rooms as $room) {
+            if (!empty($room['price_currency']) && strtoupper((string) $room['price_currency']) !== 'RUB') {
+              $rooms_has_foreign_currency = true;
+              break;
+            }
+          }
+        ?>
+          <section class="hotel-section" id="hotel-rooms">
+            <div class="hotel-section__title-wrap">
+              <div class="hotel-rooms__title-left">
+                <h2 class="hotel-section__title">
+                  <span><?= esc_html($sec_rooms['title']); ?></span>
+                </h2>
+                <div class="slider-arrow-wrap hotel-rooms__arrows-wrap">
+                  <div class="slider-arrow slider-arrow-prev hotel-rooms-arrow-prev" tabindex="-1" role="button" aria-label="Предыдущий номер"></div>
+                  <div class="slider-arrow slider-arrow-next hotel-rooms-arrow-next" tabindex="0" role="button" aria-label="Следующий номер"></div>
+                </div>
+              </div>
+              <?php if ($rooms_has_foreign_currency): ?>
+                <label class="ui-checkbox hotel-rooms__currency-toggle">
+                  <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency">
+                  <span class="ui-checkbox__mark"></span>
+                  <span class="ui-checkbox__text">Показать в валюте</span>
+                </label>
+              <?php endif; ?>
+            </div>
+            <div class="swiper hotel-rooms__grid">
+              <div class="swiper-wrapper">
+                <?php foreach ($hotel_rooms as $room_index => $room): ?>
+                  <div class="swiper-slide">
+                    <?php
                     set_query_var('room', $room);
                     set_query_var('room_index', $room_index);
                     set_query_var('room_booking_url', $rooms_booking_url);
                     get_template_part('template-parts/hotels/room-card');
-                  endforeach; ?>
-                </div>
-              <?php endif; ?>
-            </section>
-          <?php endforeach; ?>
+                    ?>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </section>
+        <?php endif; ?>
+
         </div>
 
         <aside class="hotel-aside">
 
           <div class="hotel-widget">
-            <div class="hotel-widget__address"> <?php if ($address_line): ?>
-                <div class="single-hotel__address single-hotel__address--widget">
-                  <?php if ($country_flag): ?>
-                    <img class="single-hotel__address-flag" src="<?= esc_url($country_flag); ?>"
-                         alt="">
-                  <?php endif; ?>
-
-                  <div class="single-hotel__address-text"><?= esc_html($address_line); ?></div>
-                </div>
-              <?php endif; ?>
-            </div>
-
             <div class="hotel-widget__title-wrap">
 
               <p class="hotel-widget__title"><?php the_title() ?></p>
@@ -357,6 +384,8 @@ get_header();
             <?php
             $booking_url_tour = trim((string) get_field('booking_url', get_the_ID()));
             $booking_url_hotel = trim((string) get_field('booking_url_hotel_only', get_the_ID()));
+
+            $room_min_price = function_exists('bsi_hotel_min_room_price') ? bsi_hotel_min_room_price(get_the_ID()) : [];
             $price = trim((string) get_field('price', get_the_ID()));
             ?>
 
@@ -383,9 +412,27 @@ get_header();
                 </div>
               <?php endif; ?>
 
-              <?php if ($price): ?>
+              <?php if ($room_min_price): ?>
+                <div class="hotel-widget__price-row">
+                  <div class="hotel-widget__booking-price numfont js-hotel-price"
+                       data-has-from="true"
+                       data-price-rub="<?= esc_attr($room_min_price['rub']); ?>"
+                       <?php if ($room_min_price['currency'] !== 'RUB'): ?>
+                       data-price-original="<?= esc_attr($room_min_price['original']); ?>"
+                       data-price-currency="<?= esc_attr($room_min_price['currency']); ?>"
+                       <?php endif; ?>
+                  >от <?= esc_html(format_number($room_min_price['rub'])); ?> ₽</div>
+                  <?php if ($room_min_price['currency'] !== 'RUB'): ?>
+                    <label class="ui-checkbox hotel-widget__currency-toggle">
+                      <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency">
+                      <span class="ui-checkbox__mark"></span>
+                      <span class="ui-checkbox__text">Показать в валюте</span>
+                    </label>
+                  <?php endif; ?>
+                </div>
+              <?php elseif ($price): ?>
                 <div class="hotel-widget__booking-price numfont">
-                  <?= format_price_text($price); ?> ₽
+                  от <?= format_price_text($price); ?> ₽
                 </div>
               <?php endif; ?>
 

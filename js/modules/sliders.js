@@ -69,7 +69,7 @@ export const sliders = () => {
     });
   }
 
-  document.querySelectorAll(".room-card__slider").forEach((sliderEl) => {
+  document.querySelectorAll(".room-card__slider-swiper").forEach((sliderEl) => {
     const card = sliderEl.closest(".room-card");
     new Swiper(sliderEl, {
       slidesPerView: 1,
@@ -81,9 +81,61 @@ export const sliders = () => {
       },
       pagination: {
         el: card?.querySelector(".room-card__slider-pagination"),
-        clickable: true,
+        type: "fraction",
       },
     });
+  });
+
+  document.querySelectorAll(".hotel-rooms__grid").forEach((sliderEl) => {
+    const section = sliderEl.closest(".hotel-section");
+    const arrowsWrap = section?.querySelector(".hotel-rooms__arrows-wrap");
+
+    const swiperConfig = {
+      spaceBetween: 16,
+      watchOverflow: true,
+      observer: true,
+      observeParents: true,
+      navigation: {
+        prevEl: section?.querySelector(".hotel-rooms-arrow-prev"),
+        nextEl: section?.querySelector(".hotel-rooms-arrow-next"),
+      },
+      breakpoints: {
+        0: { slidesPerView: 1.1 },
+        531: { slidesPerView: 2 },
+        901: { slidesPerView: 3 },
+      },
+    };
+
+    const getSlidesPerView = () => {
+      const bps = swiperConfig.breakpoints;
+      const w = window.innerWidth;
+      let spv = 1;
+      Object.keys(bps)
+        .map((k) => parseInt(k, 10))
+        .sort((a, b) => a - b)
+        .forEach((bp) => {
+          if (w >= bp) spv = bps[bp].slidesPerView;
+        });
+      return spv;
+    };
+
+    const toggleControls = (instance) => {
+      const slidesCount = sliderEl.querySelectorAll(".swiper-slide").length;
+      const spv = getSlidesPerView();
+      const locked = slidesCount <= spv;
+
+      instance.allowTouchMove = !locked;
+      if (locked) {
+        instance.navigation?.disable?.();
+      } else {
+        instance.navigation?.enable?.();
+      }
+      arrowsWrap?.classList.toggle("is-locked", locked);
+    };
+
+    const swiper = new Swiper(sliderEl, swiperConfig);
+    toggleControls(swiper);
+    window.addEventListener("resize", () => toggleControls(swiper));
   });
 
   const countryGallerySlider = new Swiper(".country-page__gallery-slider", {
@@ -227,11 +279,12 @@ export const sliders = () => {
         allowTouchMove: !single,
         freeMode: !single,
         speed: 300,
-        pagination: !single && paginationEl
-          ? {
-              el: paginationEl,
-            }
-          : false,
+        pagination:
+          !single && paginationEl
+            ? {
+                el: paginationEl,
+              }
+            : false,
       });
     });
   }

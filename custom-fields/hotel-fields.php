@@ -432,11 +432,26 @@ function bsi_register_hotel_acf_groups(): void
           ],
           [
             'key' => 'field_room_price_from',
-            'label' => 'Цена «от», ₽',
+            'label' => 'Цена «от»',
             'name' => 'price_from',
             'type' => 'number',
             'min' => 0,
+            'wrapper' => ['width' => '30'],
+          ],
+          [
+            'key' => 'field_room_price_currency',
+            'label' => 'Валюта цены',
+            'name' => 'price_currency',
+            'type' => 'select',
             'wrapper' => ['width' => '20'],
+            'choices' => [
+              'RUB' => 'RUB (₽)',
+              'USD' => 'USD ($)',
+              'EUR' => 'EUR (€)',
+              'GBP' => 'GBP (£)',
+            ],
+            'default_value' => 'RUB',
+            'return_format' => 'value',
           ],
           [
             'key' => 'field_room_description',

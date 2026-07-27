@@ -4,12 +4,12 @@
  */
 
 export const EducationCurrencySwitcher = (() => {
-  const STORAGE_KEY = 'bsi_education_show_original_currency';
+  const STORAGE_KEY = "bsi_education_show_original_currency";
   const CURRENCY_SYMBOLS = {
-    RUB: '₽',
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
+    RUB: "₽",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
   };
 
   /**
@@ -19,15 +19,19 @@ export const EducationCurrencySwitcher = (() => {
    * @returns {string} Formatted price
    */
   const formatPrice = (value, currency) => {
-    const code = (currency || 'RUB').toString().toUpperCase();
+    const code = (currency || "RUB").toString().toUpperCase();
     const sym = CURRENCY_SYMBOLS[code] || code;
-    if (code === 'RUB') {
-      return Number(value).toLocaleString('ru-RU') + ' ' + sym;
+    if (code === "RUB") {
+      return Number(value).toLocaleString("ru-RU") + " " + sym;
     }
-    return Number(value).toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }) + ' ' + sym;
+    return (
+      Number(value).toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }) +
+      " " +
+      sym
+    );
   };
 
   /**
@@ -38,7 +42,7 @@ export const EducationCurrencySwitcher = (() => {
   const updateElementPrice = (element, showOriginal) => {
     const priceRub = element.dataset.priceRub;
     const priceOriginal = element.dataset.priceOriginal;
-    const priceCurrency = (element.dataset.priceCurrency || '').toUpperCase();
+    const priceCurrency = (element.dataset.priceCurrency || "").toUpperCase();
 
     if (!priceRub) return;
 
@@ -46,24 +50,24 @@ export const EducationCurrencySwitcher = (() => {
     let displayPrice, displayCurrency;
 
     if (showOriginal && priceOriginal && priceCurrency) {
-      displayPrice = parseFloat(String(priceOriginal).replace(/\s/g, '').replace(',', '.'));
+      displayPrice = parseFloat(String(priceOriginal).replace(/\s/g, "").replace(",", "."));
       displayCurrency = priceCurrency;
     } else {
-      displayPrice = parseInt(String(priceRub).replace(/\s/g, ''), 10);
-      displayCurrency = 'RUB';
+      displayPrice = parseInt(String(priceRub).replace(/\s/g, ""), 10);
+      displayCurrency = "RUB";
     }
 
     // Extract prefix ("от ") and suffix (duration "/ 1-5 недель")
-    const hasFrom = element.dataset.hasFrom === 'true';
-    const prefix = hasFrom ? 'от ' : '';
+    const hasFrom = element.dataset.hasFrom === "true";
+    const prefix = hasFrom ? "от " : "";
 
     // Get suffix from cached data attribute, or extract from text if not cached
-    let suffix = element.dataset.priceSuffix || '';
+    let suffix = element.dataset.priceSuffix || "";
     if (!suffix) {
       const currentText = element.textContent.trim();
       const durationMatch = currentText.match(/\s*\/\s*.+$/);
       if (durationMatch) {
-        suffix = durationMatch[0];  // " / 1-5 недель"
+        suffix = durationMatch[0]; // " / 1-5 недель"
         element.dataset.priceSuffix = suffix;
       }
     }
@@ -77,25 +81,33 @@ export const EducationCurrencySwitcher = (() => {
    */
   const updateAllPrices = (showOriginal) => {
     // Update price buttons in catalog cards
-    document.querySelectorAll('.education-card__btn-book').forEach(el => {
+    document.querySelectorAll(".education-card__btn-book").forEach((el) => {
       updateElementPrice(el, showOriginal);
     });
 
     // Update prices in program cards
-    document.querySelectorAll('.education-program-card__price').forEach(el => {
+    document.querySelectorAll(".education-program-card__price").forEach((el) => {
       updateElementPrice(el, showOriginal);
     });
 
     // Update price on education detail page
-    document.querySelectorAll('.js-education-price').forEach(el => {
+    document.querySelectorAll(".js-education-price").forEach((el) => {
       updateElementPrice(el, showOriginal);
     });
 
-    document.querySelectorAll('.js-event-price').forEach(el => {
+    document.querySelectorAll(".js-event-price").forEach((el) => {
       updateElementPrice(el, showOriginal);
     });
 
-    document.querySelectorAll('.js-excursion-price').forEach(el => {
+    document.querySelectorAll(".js-excursion-price").forEach((el) => {
+      updateElementPrice(el, showOriginal);
+    });
+
+    document.querySelectorAll(".js-hotel-room-price").forEach((el) => {
+      updateElementPrice(el, showOriginal);
+    });
+
+    document.querySelectorAll(".js-hotel-price").forEach((el) => {
       updateElementPrice(el, showOriginal);
     });
   };
@@ -105,19 +117,19 @@ export const EducationCurrencySwitcher = (() => {
    */
   const init = () => {
     // Restore saved preference
-    const savedPreference = localStorage.getItem(STORAGE_KEY) === 'true';
+    const savedPreference = localStorage.getItem(STORAGE_KEY) === "true";
 
     // Set checkbox elements to saved value and listen for changes
-    document.querySelectorAll('.js-education-show-original-currency').forEach(checkbox => {
+    document.querySelectorAll(".js-education-show-original-currency").forEach((checkbox) => {
       checkbox.checked = savedPreference;
 
-      checkbox.addEventListener('change', (e) => {
+      checkbox.addEventListener("change", (e) => {
         const isChecked = e.target.checked;
         localStorage.setItem(STORAGE_KEY, isChecked.toString());
         updateAllPrices(isChecked);
 
         // Update all checkboxes to maintain consistency
-        document.querySelectorAll('.js-education-show-original-currency').forEach(cb => {
+        document.querySelectorAll(".js-education-show-original-currency").forEach((cb) => {
           cb.checked = isChecked;
         });
       });
@@ -129,8 +141,8 @@ export const EducationCurrencySwitcher = (() => {
     }
 
     // Listen for content updates after AJAX loads (БАГ 4)
-    document.addEventListener('education:content-updated', () => {
-      const currentPreference = localStorage.getItem(STORAGE_KEY) === 'true';
+    document.addEventListener("education:content-updated", () => {
+      const currentPreference = localStorage.getItem(STORAGE_KEY) === "true";
       updateAllPrices(currentPreference);
     });
   };
