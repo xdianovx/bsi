@@ -19,6 +19,9 @@ skills-lock.json
 # Project docs (хранятся локально в docs/)
 /docs
 
+# Скриншоты проверки UI (временные, локально)
+/screenshots
+
 # Dependencies & build
 node_modules/
 build/
