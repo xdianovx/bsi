@@ -9,7 +9,8 @@ declare(strict_types=1);
  * забронировать онлайн нельзя, поэтому собираем контакты и шлём менеджеру письмом.
  */
 
-const BSI_TOUR_BOOKING_EMAIL = 'dianov.js@gmail.com';
+/** Получатели заявки. Список через запятую — wp_mail шлёт всем. */
+const BSI_TOUR_BOOKING_EMAIL = 'dianov.js@gmail.com, o.ser@bsigroup.ru';
 
 add_action('wp_ajax_tour_booking', 'bsi_handle_tour_booking');
 add_action('wp_ajax_nopriv_tour_booking', 'bsi_handle_tour_booking');
