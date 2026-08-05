@@ -194,14 +194,16 @@ if (!empty($types) && !is_wp_error($types)) {
     <div class="tour-card-row__btns">
       <a class="tour-card-row__more sm btn btn-gray" href="<?= esc_url($link); ?>">Подробнее</a>
 
+      <?php
+        // Цена: кеш Само, иначе статичная из ACF `price_from` (см. bsi_tour_card_price_text).
+        $price_text = function_exists('bsi_tour_card_price_text') ? bsi_tour_card_price_text($post_id) : '';
+        $is_price_loaded = $price_text !== '';
+      ?>
       <?php if ($booking_url): ?>
-        <?php
-          $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($post_id) : null;
-          $price_text = $cached_price ? $cached_price['price_formatted'] . ' ₽ / чел' : '';
-          $is_price_loaded = !empty($price_text);
-        ?>
         <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($booking_url); ?>" target="_blank"
           rel="nofollow noopener" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>"<?= $is_price_loaded ? ' data-price-loaded' : ''; ?>><?= $is_price_loaded ? esc_html($price_text) : 'Загрузка...'; ?></a>
+      <?php elseif ($is_price_loaded): ?>
+        <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($link); ?>"><?= esc_html($price_text); ?></a>
       <?php endif; ?>
     </div>
   </div>

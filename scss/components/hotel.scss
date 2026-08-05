@@ -164,42 +164,42 @@
 
 .hotel-card__actions {
   display: flex;
-  gap: 8px;
   flex-direction: column;
+  gap: 8px;
   margin-top: auto;
-  padding-top: 16px;
-  font-weight: 500;
-  font-size: 16px;
-  align-items: center;
+  padding-top: 12px;
+
   .hotel-card__btn {
-    width: 100%;
-    flex: 1;
-    text-align: center;
-    padding: 10px 16px;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 100%;
+    text-align: center;
+    text-decoration: none;
+    transition: $trans-text;
   }
 
   .hotel-card__btn-details {
-    width: 100%;
-    background: transparent;
-    color: #000;
     background: $bg-gray;
+    color: $text-black;
+
     &:hover {
-      background: rgba(0, 0, 0, 0.05);
-      border-color: rgba(0, 0, 0, 0.3);
+      color: $red;
     }
   }
 
   .hotel-card__btn-book {
     background: $red;
     color: #fff;
+    white-space: nowrap;
 
     &:hover {
       background: darken($red, 5%);
-      border-color: darken($red, 5%);
     }
   }
 }

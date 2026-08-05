@@ -22,6 +22,9 @@ skills-lock.json
 # Скриншоты проверки UI (временные, локально)
 /screenshots
 
+# Артефакты Playwright MCP (скрины, snapshot'ы, логи консоли)
+/.playwright-mcp
+
 # Dependencies & build
 node_modules/
 build/

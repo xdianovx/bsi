@@ -251,26 +251,21 @@ if (function_exists('get_field')) {
       <a href="<?php echo esc_url($tour_url); ?>" class="hotel-card__btn hotel-card__btn-details">
         Подробнее
       </a>
+      <?php
+        $price_text = function_exists('bsi_tour_card_price_text') ? bsi_tour_card_price_text($tour_id) : '';
+        $is_price_loaded = $price_text !== '';
+      ?>
       <?php if ($booking_url): ?>
-        <?php
-          $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($tour_id) : null;
-          $price_text = '';
-          if (is_array($cached_price) && !empty($cached_price['price_formatted'])) {
-            $price_text = $cached_price['price_formatted'] . ' ₽ / чел';
-          } elseif ($price_value !== '') {
-            // Как в сайдбаре single-tour: статичная цена из ACF, если нет transient.
-            $show_from_flag = !isset($show_from) || $show_from;
-            $prefix = $show_from_flag ? 'от ' : '';
-            $price_text = $prefix . $price_value . ' ₽ / чел';
-          }
-          $is_price_loaded = $price_text !== '';
-        ?>
-        <a href="<?php echo esc_url($booking_url); ?>" 
+        <a href="<?php echo esc_url($booking_url); ?>"
            class="btn btn-accent hotel-card__btn hotel-card__btn-book"
-           target="_blank" 
+           target="_blank"
            rel="noopener nofollow"
            data-tour-price
            data-tour-id="<?php echo esc_attr($tour_id); ?>"<?= $is_price_loaded ? ' data-price-loaded' : ''; ?>><?= $is_price_loaded ? esc_html($price_text) : 'Загрузка...'; ?></a>
+      <?php elseif ($is_price_loaded): ?>
+        <?php // Само-ссылки нет: показываем статичную цену из ACF, ведём на страницу тура. ?>
+        <a href="<?php echo esc_url($tour_url); ?>"
+           class="btn btn-accent hotel-card__btn hotel-card__btn-book"><?= esc_html($price_text); ?></a>
       <?php endif; ?>
     </div>
   </div>

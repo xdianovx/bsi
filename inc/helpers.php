@@ -1067,3 +1067,47 @@ function bsi_format_event_date_range(string $from, string $to = ''): string
 
   return date_i18n('j.m', $start_ts) . ' – ' . date_i18n('j.m.Y', $end_ts);
 }
+
+/**
+ * Текст цены для карточки тура: живая цена Само (transient PriceLoaderService),
+ * иначе статичная цена из ACF `price_from`.
+ *
+ * Префикс «от » добавляется по флагу `show_price_from` и только если его ещё нет
+ * в самом значении поля (иначе получалось «от от 99 000 руб»).
+ *
+ * @return string Пустая строка, если цены нет ни в кеше, ни в ACF.
+ */
+function bsi_tour_card_price_text(int $tour_id): string
+{
+  if ($tour_id <= 0) {
+    return '';
+  }
+
+  $cached_price = class_exists('PriceLoaderService') ? PriceLoaderService::getCachedTourPrice($tour_id) : null;
+  if (is_array($cached_price) && !empty($cached_price['price_formatted'])) {
+    return $cached_price['price_formatted'] . ' ₽ / чел';
+  }
+
+  if (!function_exists('get_field')) {
+    return '';
+  }
+
+  $price_val = get_field('price_from', $tour_id);
+  if (is_numeric($price_val)) {
+    $price_value = number_format((float) $price_val, 0, '.', ' ');
+  } elseif (is_string($price_val) && trim($price_val) !== '') {
+    $price_value = trim($price_val);
+  } else {
+    return '';
+  }
+
+  // Значение уже может содержать «от» и/или «руб» — не дублируем.
+  $has_from = (bool) preg_match('/^от\b/ui', $price_value);
+  $has_currency = (bool) preg_match('/(₽|руб)/ui', $price_value);
+
+  $show_from = get_field('show_price_from', $tour_id) !== false;
+  $prefix = ($show_from && !$has_from) ? 'от ' : '';
+  $suffix = $has_currency ? ' / чел' : ' ₽ / чел';
+
+  return $prefix . $price_value . $suffix;
+}
