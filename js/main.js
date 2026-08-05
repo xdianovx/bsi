@@ -35,6 +35,7 @@ import { initSingleEducationPrograms } from "./modules/ajax/single-education-pro
 import { initEducationProgramForm } from "./modules/forms/education-program-form";
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initExcursionBookingForm } from "./modules/forms/excursion-booking-form";
+import { initTourBookingForm } from "./modules/forms/tour-booking-form";
 import { initAgencyEventsFilter } from "./modules/ajax/agency-events";
 import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
@@ -144,6 +145,7 @@ initPopularEventToursSlider();
   initCrosstourEvent();
   initCrosstourCards();
   initExcursionBookingForm();
+  initTourBookingForm();
   initAgencyEventsFilter();
   initAgencyEventRegForm();
   initBonusMarquee();

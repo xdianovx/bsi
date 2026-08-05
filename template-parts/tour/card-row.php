@@ -202,8 +202,9 @@ if (!empty($types) && !is_wp_error($types)) {
       <?php if ($booking_url): ?>
         <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($booking_url); ?>" target="_blank"
           rel="nofollow noopener" data-tour-price data-tour-id="<?= esc_attr($post_id); ?>"<?= $is_price_loaded ? ' data-price-loaded' : ''; ?>><?= $is_price_loaded ? esc_html($price_text) : 'Загрузка...'; ?></a>
-      <?php elseif ($is_price_loaded): ?>
-        <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($link); ?>"><?= esc_html($price_text); ?></a>
+      <?php else: ?>
+        <?php // Само-ссылки нет — онлайн-бронирования не будет, ведём на страницу тура (там модалка заявки). ?>
+        <a class="tour-card-row__book sm btn btn-accent" href="<?= esc_url($link); ?>"><?= $is_price_loaded ? esc_html($price_text) : 'Оставить заявку'; ?></a>
       <?php endif; ?>
     </div>
   </div>

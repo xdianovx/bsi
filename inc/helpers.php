@@ -1111,3 +1111,22 @@ function bsi_tour_card_price_text(int $tour_id): string
 
   return $prefix . $price_value . $suffix;
 }
+
+/**
+ * Однократный вывод модалки заявки на тур (template-parts/tour/booking-modal.php) в футере.
+ *
+ * Вызывается из карточек тура — модалка нужна там, где есть кнопка `.js-tour-booking-btn`
+ * (тур без ссылки на Самотур). Повторные вызовы игнорируются.
+ */
+function bsi_enqueue_tour_booking_modal(): void
+{
+  static $queued = false;
+  if ($queued) {
+    return;
+  }
+  $queued = true;
+
+  add_action('wp_footer', static function () {
+    get_template_part('template-parts/tour/booking-modal');
+  }, 20);
+}

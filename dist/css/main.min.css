@@ -2621,11 +2621,13 @@ input.error {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 15px;
+  box-sizing: border-box;
 }
 .modal__container {
   background-color: #fff;
   max-width: 500px;
-  max-height: 100vh;
+  max-height: calc(100vh - 30px);
   border-radius: 4px;
   overflow-y: auto;
   box-sizing: border-box;
@@ -2713,8 +2715,6 @@ input.error {
 @media (max-width: 768px) {
   .modal-program-booking {
     padding: 24px 16px;
-    max-width: calc(100% - 32px);
-    max-height: calc(100vh - 32px);
   }
 }
 .modal-program-booking__close {
@@ -2900,7 +2900,7 @@ input.error {
   }
 }
 .modal-program-booking__form {
-  margin-top: 16px;
+  margin-top: 40px;
 }
 .modal-program-booking__req {
   color: #e53935;
@@ -3024,7 +3024,6 @@ input.error {
 @media (max-width: 768px) {
   .modal-program-booking-success {
     padding: 32px 24px;
-    max-width: calc(100% - 32px);
   }
 }
 .modal-program-booking-success__content {

@@ -408,6 +408,18 @@ get_header();
                 target="_blank" rel="nofollow noopener">
                 Забронировать
               </a>
+            <?php else: ?>
+              <?php // Само-ссылки нет — онлайн-бронирование недоступно, собираем заявку в модалке.
+              if (function_exists('bsi_enqueue_tour_booking_modal')) {
+                bsi_enqueue_tour_booking_modal();
+              }
+              ?>
+              <button type="button" class="btn btn-accent hotel-widget__btn-book sm js-tour-booking-btn"
+                data-tour-id="<?= esc_attr($post_id); ?>"
+                data-tour-title="<?= esc_attr(get_the_title($post_id)); ?>"
+                data-tour-price="<?= esc_attr($tour_price_display); ?>">
+                Оставить заявку
+              </button>
             <?php endif; ?>
 
           </div>

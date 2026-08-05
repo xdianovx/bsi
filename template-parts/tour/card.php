@@ -262,10 +262,10 @@ if (function_exists('get_field')) {
            rel="noopener nofollow"
            data-tour-price
            data-tour-id="<?php echo esc_attr($tour_id); ?>"<?= $is_price_loaded ? ' data-price-loaded' : ''; ?>><?= $is_price_loaded ? esc_html($price_text) : 'Загрузка...'; ?></a>
-      <?php elseif ($is_price_loaded): ?>
-        <?php // Само-ссылки нет: показываем статичную цену из ACF, ведём на страницу тура. ?>
+      <?php else: ?>
+        <?php // Само-ссылки нет — онлайн-бронирования не будет, ведём на страницу тура (там модалка заявки). ?>
         <a href="<?php echo esc_url($tour_url); ?>"
-           class="btn btn-accent hotel-card__btn hotel-card__btn-book"><?= esc_html($price_text); ?></a>
+           class="btn btn-accent hotel-card__btn hotel-card__btn-book"><?= $is_price_loaded ? esc_html($price_text) : 'Оставить заявку'; ?></a>
       <?php endif; ?>
     </div>
   </div>

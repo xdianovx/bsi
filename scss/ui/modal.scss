@@ -17,12 +17,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  // Отступы от краёв экрана — на узких вьюпортах модалка не должна прилипать к бокам.
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 .modal__container {
   background-color: #fff;
   max-width: 500px;
-  max-height: 100vh;
+  max-height: calc(100vh - 30px);
   border-radius: 4px;
   overflow-y: auto;
   box-sizing: border-box;
@@ -124,9 +127,8 @@
 }
 @media (max-width: 768px) {
   .modal-program-booking {
+    // Боковые отступы даёт .modal__overlay (padding 15px) — здесь только внутренние.
     padding: 24px 16px;
-    max-width: calc(100% - 32px);
-    max-height: calc(100vh - 32px);
   }
 }
 
@@ -338,7 +340,7 @@
 }
 
 .modal-program-booking__form {
-  margin-top: 16px;
+  margin-top: 40px;
 }
 
 .modal-program-booking__req {
@@ -473,8 +475,8 @@
   border-radius: 8px;
 
   @media (max-width: 768px) {
+    // Боковые отступы даёт .modal__overlay (padding 15px).
     padding: 32px 24px;
-    max-width: calc(100% - 32px);
   }
 
   &__content {

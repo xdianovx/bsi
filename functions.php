@@ -489,6 +489,7 @@ require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/tours-filter.php';
 require get_template_directory() . '/inc/requests/excursions-filter.php';
 require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
+require get_template_directory() . '/inc/requests/ajax-tour-booking.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
 add_filter('template_include', function ($template) {

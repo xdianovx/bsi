@@ -9,7 +9,8 @@
  * @var string $event_title
  * @var string $page_url
  * @var string $accommodation
- * @var string $booking_context 'event' | 'promo'
+ * @var string $price_line Цена, если она была показана пользователю (туры)
+ * @var string $booking_context 'event' | 'promo' | 'tour' | 'excursion'
  */
 
 if (!defined('ABSPATH')) {
@@ -18,9 +19,13 @@ if (!defined('ABSPATH')) {
 
 $site_name = get_bloginfo('name');
 $site_url = home_url();
-$is_promo = (($booking_context ?? '') === 'promo');
-$mail_heading = $is_promo ? 'Заявка по акции' : 'Заявка по событию';
-$mail_section_title = $is_promo ? 'Акция' : 'Событие';
+$context = (string) ($booking_context ?? '');
+$context_labels = [
+  'promo' => ['Заявка по акции', 'Акция'],
+  'tour' => ['Заявка на тур', 'Тур'],
+  'excursion' => ['Заявка на экскурсию', 'Экскурсия'],
+];
+[$mail_heading, $mail_section_title] = $context_labels[$context] ?? ['Заявка по событию', 'Событие'];
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -138,6 +143,12 @@ $mail_section_title = $is_promo ? 'Акция' : 'Событие';
         <div class="info-label">Название</div>
         <div class="info-value"><?php echo esc_html($event_title ?? ''); ?></div>
       </div>
+      <?php if (!empty($price_line)): ?>
+        <div class="info-row">
+          <div class="info-label">Цена</div>
+          <div class="info-value"><?php echo esc_html($price_line); ?></div>
+        </div>
+      <?php endif; ?>
       <?php if (!empty($accommodation)): ?>
         <div class="info-row">
           <div class="info-label">Вариант проживания</div>
