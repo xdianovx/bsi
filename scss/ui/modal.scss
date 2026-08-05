@@ -146,6 +146,10 @@
   cursor: pointer;
   transition: color 0.2s;
   padding: 0;
+  // iOS Safari красит <button> системным синим, а иконка идёт stroke="currentColor".
+  color: $text-gray;
+  -webkit-appearance: none;
+  appearance: none;
 
   @media screen and (max-width: 768px) {
     top: 10px;
@@ -170,7 +174,8 @@
 
   @media screen and (max-width: 768px) {
     font-weight: 600;
-    max-width: 100%;
+    // Оставляем место под крестик (40px кнопка + 10px отступ), иначе он наезжает на текст.
+    max-width: calc(100% - 50px);
     font-size: 18px;
   }
 }

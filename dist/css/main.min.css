@@ -2731,6 +2731,9 @@ input.error {
   cursor: pointer;
   transition: color 0.2s;
   padding: 0;
+  color: #5c5c5c;
+  -webkit-appearance: none;
+  appearance: none;
 }
 @media screen and (max-width: 768px) {
   .modal-program-booking__close {
@@ -2755,7 +2758,7 @@ input.error {
 @media screen and (max-width: 768px) {
   .modal-program-booking__title {
     font-weight: 600;
-    max-width: 100%;
+    max-width: calc(100% - 50px);
     font-size: 18px;
   }
 }

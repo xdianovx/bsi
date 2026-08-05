@@ -17,11 +17,7 @@ add_action('wp_ajax_nopriv_tour_booking', 'bsi_handle_tour_booking');
 
 function bsi_handle_tour_booking(): void
 {
-  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
-  if (function_exists('bsi_recaptcha_verify_or_die')) {
-    bsi_recaptcha_verify_or_die($token);
-  }
-
+  // reCAPTCHA для этой формы отключена сознательно (решение заказчика).
   $errors = BSI_Mailer::validate_contact_fields($_POST, ['require_email' => false]);
 
   if (!empty($errors)) {
