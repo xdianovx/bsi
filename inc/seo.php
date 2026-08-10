@@ -237,6 +237,20 @@ function bsi_seo_fallback_description(): string
         if ($text === '') {
             $text = bsi_seo_prepare_description((string) $post->post_content);
         }
+
+        // Записи из общих серий (туры одной линейки, программы одной
+        // школы) начинаются одинаковым текстом — обрезка даёт дубли.
+        // Заголовок у них уникален: содержит длительность, города и
+        // сезон, поэтому ставим его в начало описания.
+        if (in_array($post->post_type, ['tour', 'education', 'excursion', 'event'], true)) {
+            $prefix = trim(wp_strip_all_tags(get_the_title($post)));
+            if ($prefix !== '') {
+                $text = ($text === '')
+                    ? $prefix . ' — туроператор BSI Group.'
+                    : $prefix . '. ' . wp_trim_words($text, 22, '…');
+            }
+        }
+
         if ($text !== '') {
             return $text;
         }
@@ -537,6 +551,60 @@ add_action('init', function () {
     $wpseo_sitemaps->register_sitemap('country-sections', 'bsi_sitemap_country_sections');
 });
 
+/**
+ * Отсеивает записи country, которые на самом деле являются регионами.
+ *
+ * Для каждого региона создаётся парный пост country, но его постоянная
+ * ссылка выглядит как /country/{страна}/{регион}/. Разделы вида
+ * /country/{регион}/tours/ у таких записей отдают 404.
+ */
+function bsi_seo_country_is_top_level(WP_Post $country): bool
+{
+    $expected = trailingslashit(home_url('/country/' . $country->post_name));
+    $actual = (string) get_permalink($country->ID);
+
+    return trailingslashit($actual) === $expected;
+}
+
+/**
+ * Проверяет, есть ли у страны контент конкретного раздела.
+ *
+ * Разделы «Виза», «Памятка» и «Правила въезда» отдают 404, когда
+ * связанной записи нет, — такие URL в sitemap не place.
+ */
+function bsi_seo_country_section_exists(int $country_id, string $qv): bool
+{
+    $linked = [
+        'country_visa'        => ['visa', 'visa_country'],
+        'country_memo'        => ['tourist_memo', 'memo_country'],
+        'country_entry_rules' => ['entry_rules', 'entry_rules_country'],
+    ];
+
+    if (!isset($linked[$qv])) {
+        return true;
+    }
+
+    [$post_type, $meta_key] = $linked[$qv];
+
+    $found = get_posts([
+        'post_type'        => $post_type,
+        'post_status'      => 'publish',
+        'posts_per_page'   => 1,
+        'fields'           => 'ids',
+        'no_found_rows'    => true,
+        'suppress_filters' => false,
+        'meta_query'       => [
+            [
+                'key'     => $meta_key,
+                'value'   => $country_id,
+                'compare' => '=',
+            ],
+        ],
+    ]);
+
+    return !empty($found);
+}
+
 function bsi_sitemap_country_sections() {
     $sections = bsi_seo_virtual_sections();
 
@@ -555,7 +623,15 @@ function bsi_sitemap_country_sections() {
     $xml = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
     foreach ($countries as $country) {
-        foreach ($sections as $info) {
+        if (!bsi_seo_country_is_top_level($country)) {
+            continue;
+        }
+
+        foreach ($sections as $qv => $info) {
+            if (!bsi_seo_country_section_exists((int) $country->ID, $qv)) {
+                continue;
+            }
+
             $url = trailingslashit(
                 home_url('/country/' . $country->post_name . '/' . $info['slug'])
             );
@@ -598,4 +674,91 @@ add_filter('rest_post_dispatch', function ($response) {
     }
 
     return $response;
+}, 10, 1);
+
+// ── Служебные таксономии и CPT: вне sitemap и вне индекса ────
+// Архивы фильтрующих таксономий («Гид», «Английский», «Отель»,
+// регионы, курорты) дублируют нормальные страницы каталога:
+// /?region=parizh повторяет /country/francziya/ile-de-france/parizh/.
+// Регистрацию не трогаем — меняется только SEO-слой.
+
+function bsi_seo_excluded_taxonomies(): array
+{
+    return [
+        'region',
+        'resort',
+        'tour_include',
+        'excursion_type',
+        'excursion_include',
+        'excursion_language',
+        'education_language',
+        'education_program',
+        'education_meal_type',
+        'education_accommodation_type',
+        'visa_type',
+        'insurance_type',
+        'amenity',
+        'meal_plan',
+        'agency_event_kind',
+        'agency_event_direction',
+        'agency_item_type',
+        'event_tour_type',
+        'promo_type',
+        'news_type',
+        'offer_badge',
+    ];
+}
+
+/**
+ * CPT без самостоятельной посадочной ценности: карточки партнёров,
+ * подборки для главной, памятки и правила въезда (выводятся внутри
+ * разделов страны).
+ */
+function bsi_seo_excluded_post_types(): array
+{
+    return [
+        'partner',
+        'offer_collection',
+        'tourist_memo',
+        'entry_rules',
+    ];
+}
+
+add_filter('wpseo_sitemap_exclude_taxonomy', function ($exclude, $taxonomy) {
+    if (in_array($taxonomy, bsi_seo_excluded_taxonomies(), true)) {
+        return true;
+    }
+
+    return $exclude;
+}, 10, 2);
+
+add_filter('wpseo_sitemap_exclude_post_type', function ($exclude, $post_type) {
+    if (in_array($post_type, bsi_seo_excluded_post_types(), true)) {
+        return true;
+    }
+
+    return $exclude;
+}, 10, 2);
+
+// Те же страницы закрываем от индексации: sitemap их больше не
+// отдаёт, но робот может прийти по внутренней ссылке.
+
+add_filter('wpseo_robots_array', function ($robots) {
+    $noindex = false;
+
+    if (is_author() || is_date()) {
+        $noindex = true;
+    } elseif (is_tax(bsi_seo_excluded_taxonomies())) {
+        $noindex = true;
+    } elseif (is_singular(bsi_seo_excluded_post_types())
+        || is_post_type_archive(bsi_seo_excluded_post_types())
+    ) {
+        $noindex = true;
+    }
+
+    if ($noindex && is_array($robots)) {
+        $robots['index'] = 'noindex';
+    }
+
+    return $robots;
 }, 10, 1);
