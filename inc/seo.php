@@ -12,6 +12,23 @@
  * деактивации Yoast.
  */
 
+/**
+ * Путь текущего запроса без слешей по краям и без подкаталога установки.
+ */
+function bsi_seo_request_path(): string
+{
+    $path = trim((string) wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
+
+    $home_path = trim((string) wp_parse_url(home_url(), PHP_URL_PATH), '/');
+    if ($home_path !== '' && strpos($path, $home_path . '/') === 0) {
+        $path = substr($path, strlen($home_path) + 1);
+    } elseif ($home_path !== '' && $path === $home_path) {
+        $path = '';
+    }
+
+    return $path;
+}
+
 function bsi_seo_virtual_sections(): array
 {
     return [
@@ -789,15 +806,7 @@ add_filter('wpseo_robots_array', function ($robots) {
 // поэтому файл отдаём хуком, как и верификацию Яндекса.
 
 add_action('init', function (): void {
-    $path = trim((string) wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
-
-    // На локальной установке сайт живёт в подкаталоге — отбрасываем его.
-    $home_path = trim((string) wp_parse_url(home_url(), PHP_URL_PATH), '/');
-    if ($home_path !== '' && strpos($path, $home_path . '/') === 0) {
-        $path = substr($path, strlen($home_path) + 1);
-    }
-
-    if ($path !== 'llms.txt') {
+    if (bsi_seo_request_path() !== 'llms.txt') {
         return;
     }
 
@@ -843,3 +852,161 @@ add_action('init', function (): void {
     echo implode("\n", $lines) . "\n";
     exit;
 });
+
+// ── 301: старые URL стран с ISO-кодами ──────────────────────
+// На прежнем сайте страны жили по трёхбуквенным кодам
+// (/country/fra/, /country/irl/visa), сейчас — по транслитерации
+// (/country/francziya/). Яндекс до сих пор держит старые адреса в
+// выдаче: /country/irl/visa входит в топ-50 по 52 запросам, а сайт
+// отвечает 404. Переводим такие адреса на актуальные разделы.
+
+function bsi_seo_legacy_country_codes(): array
+{
+    return [
+        'alb' => 'albaniya',
+        'arm' => 'armeniya',
+        'aut' => 'avstriya',
+        'aze' => 'azerbajdzhan',
+        'bhr' => 'bahrejn',
+        'bel' => 'belgiya',
+        'blr' => 'belorussiya',
+        'brn' => 'brunej',
+        'btn' => 'butan',
+        'cze' => 'chehiya',
+        'mne' => 'chernogoriya',
+        'phl' => 'filippiny',
+        'fra' => 'francziya',
+        'deu' => 'germaniya',
+        'grc' => 'grecziya',
+        'geo' => 'gruziya',
+        'hrv' => 'hovatiya',
+        'ind' => 'indiya',
+        'idn' => 'indoneziya',
+        'irl' => 'irlandiya',
+        'esp' => 'ispaniya',
+        'ita' => 'italiya',
+        'khm' => 'kambodzha',
+        'qat' => 'katar',
+        'kaz' => 'kazahstan',
+        'cyp' => 'kipr',
+        'chn' => 'kitaj',
+        'kgz' => 'kyrgyzstan',
+        'lao' => 'laos',
+        'lux' => 'lyuksemburg',
+        'mys' => 'malajziya',
+        'mdv' => 'maldivy',
+        'mus' => 'mavrikij',
+        'mmr' => 'myanma',
+        'npl' => 'nepal',
+        'nld' => 'niderlandy',
+        'are' => 'oae',
+        'omn' => 'oman',
+        'pak' => 'pakistan',
+        'prt' => 'portugaliya',
+        'rus' => 'rossiya',
+        'sau' => 'saudovskaya-araviya',
+        'syc' => 'sejshely',
+        'srb' => 'serbia',
+        'lka' => 'shri-lanka',
+        'che' => 'shvejczariya',
+        'sgp' => 'singapur',
+        'svk' => 'slovakiya',
+        'svn' => 'sloveniya',
+        'usa' => 'ssha',
+        'tha' => 'tailand',
+        'tur' => 'turcziya',
+        'tkm' => 'turkmenistan',
+        'uzb' => 'uzbekistan',
+        'gbr' => 'velikobritaniya',
+        'hun' => 'vengriya',
+        'vnm' => 'vetnam',
+        'jpn' => 'yaponiya',
+        'kor' => 'yuzhnaya-koreya',
+    ];
+}
+
+/**
+ * Сопоставляет раздел старого URL с разделом нового.
+ * Неизвестный раздел ведёт на страницу страны.
+ */
+function bsi_seo_legacy_country_target(string $base, array $parts, int $country_id): string
+{
+    $section = strtolower($parts[2] ?? '');
+
+    switch ($section) {
+        case 'visa':
+            return bsi_seo_country_section_exists($country_id, 'country_visa')
+                ? $base . 'visa/'
+                : $base;
+
+        case 'tip-tura':
+        case 'tours':
+            return $base . 'tours/';
+
+        case 'hotels':
+        case 'cities':
+            return $base . 'hotel/';
+
+        case 'kurorty':
+        case 'resorts':
+            return $base . 'kurorty/';
+
+        case 'news':
+        case 'novosti':
+            return $base . 'novosti/';
+
+        case 'promo':
+        case 'akcii':
+            return $base . 'promo/';
+
+        case 'ekskursii':
+        case 'excursions':
+            return $base . 'ekskursii/';
+
+        case 'obuchenie':
+        case 'education':
+            return $base . 'obuchenie/';
+
+        default:
+            return $base;
+    }
+}
+
+add_action('template_redirect', function () {
+    if (!is_404()) {
+        return;
+    }
+
+    $path = bsi_seo_request_path();
+    if ($path === '') {
+        return;
+    }
+
+    $parts = explode('/', $path);
+
+    // Страховая страница старого сайта — единственный /static/ в выдаче.
+    if ($parts[0] === 'static' && ($parts[1] ?? '') === 'med_alfa') {
+        wp_redirect(home_url('/strahovanie/'), 301);
+        exit;
+    }
+
+    if ($parts[0] !== 'country' || count($parts) < 2) {
+        return;
+    }
+
+    $codes = bsi_seo_legacy_country_codes();
+    $code = strtolower($parts[1]);
+    if (!isset($codes[$code])) {
+        return;
+    }
+
+    $country = get_page_by_path($codes[$code], OBJECT, 'country');
+    if (!$country instanceof WP_Post || $country->post_status !== 'publish') {
+        return;
+    }
+
+    $base = trailingslashit(home_url('/country/' . $country->post_name));
+
+    wp_redirect(bsi_seo_legacy_country_target($base, $parts, (int) $country->ID), 301);
+    exit;
+}, 1);
