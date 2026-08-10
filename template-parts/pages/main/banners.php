@@ -20,7 +20,9 @@ if (empty($banners)) {
 
         <?php foreach ($banners as $i => $banner): ?>
           <?php
-          $banner_alt   = esc_attr($banner['title'] ?? 'Баннер BSI Group');
+          // ?: вместо ??: у баннера без заголовка ключ существует, но пуст,
+          // и оператор ?? отдавал пустой alt.
+          $banner_alt   = esc_attr(trim((string) ($banner['title'] ?? '')) ?: 'Баннер BSI Group');
           $is_first     = ($i === 0);
           $loading      = $is_first ? 'eager' : 'lazy';
           $fetchpriority = $is_first ? ' fetchpriority="high"' : '';

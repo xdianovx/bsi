@@ -172,7 +172,19 @@ get_header();
                      alt="флаг <?= esc_attr(get_the_title($country_id)); ?>">
               <?php endif; ?>
 
-              <h1 class="h1 h1-country">Туры в <?php the_title(); ?></h1>
+              <?php
+              // «Туры в Хорватию», а не «Туры в Хорватия».
+              $h1_country = function_exists('bsi_country_accusative_title')
+                ? trim((string) bsi_country_accusative_title($country_id))
+                : '';
+              if ($h1_country === '') {
+                $h1_country = (string) get_the_title($country_id);
+              }
+              $h1_prep = function_exists('bsi_seo_preposition_v')
+                ? bsi_seo_preposition_v($h1_country)
+                : 'в';
+              ?>
+              <h1 class="h1 h1-country">Туры <?= esc_html($h1_prep . ' ' . $h1_country); ?></h1>
             </div>
 
             <p class="page-country__descr"><?= get_the_excerpt(); ?></p>

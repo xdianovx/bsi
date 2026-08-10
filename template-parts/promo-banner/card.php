@@ -27,7 +27,7 @@ if (!$img_mobile && $img_desktop) {
       <?php endif; ?>
 
       <img src="<?= esc_url($img_desktop['url'] ?? $placeholder); ?>"
-           alt="<?= esc_attr($img_desktop['alt'] ?? get_the_title()); ?>"
+           alt="<?= esc_attr(trim((string) ($img_desktop['alt'] ?? '')) ?: get_the_title()); ?>"
            class="promo-banner-card__img"
            loading="lazy">
     </picture>

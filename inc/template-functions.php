@@ -139,3 +139,43 @@ add_filter('get_custom_logo', function ($html) {
 		1
 	);
 });
+
+/**
+ * Подставляет alt изображениям из медиатеки, у которых он не заполнен.
+ *
+ * Пустой alt допустим только для декоративных картинок; у контентных
+ * он нужен и поиску по картинкам, и скринридерам. Берём подпись,
+ * затем заголовок вложения, затем заголовок записи.
+ */
+add_filter('wp_get_attachment_image_attributes', function ($attr, $attachment) {
+	if (!empty($attr['alt']) && trim((string) $attr['alt']) !== '') {
+		return $attr;
+	}
+
+	if (!($attachment instanceof WP_Post)) {
+		return $attr;
+	}
+
+	$candidates = [
+		(string) $attachment->post_excerpt,
+		(string) $attachment->post_title,
+	];
+
+	if ($attachment->post_parent) {
+		$candidates[] = (string) get_the_title($attachment->post_parent);
+	}
+
+	foreach ($candidates as $candidate) {
+		$candidate = trim(wp_strip_all_tags($candidate));
+
+		// Имена вроде IMG_20260311_155358 смысла не несут.
+		if ($candidate === '' || preg_match('/^(img|dsc|photo|image|screenshot)[-_\s]?\d+/i', $candidate)) {
+			continue;
+		}
+
+		$attr['alt'] = $candidate;
+		break;
+	}
+
+	return $attr;
+}, 10, 2);

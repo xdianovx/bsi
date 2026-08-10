@@ -259,6 +259,29 @@ function bsi_seo_archive_descriptions(): array
 }
 
 /**
+ * Обрезает описание до длины, которую показывают поисковики.
+ *
+ * Описания страниц стран доходили до 1555 символов: Yoast берёт текст
+ * из контента целиком, а в выдаче видно около 160.
+ */
+function bsi_seo_trim_description(string $text, int $max = 170): string
+{
+    $text = trim(preg_replace('/\s+/', ' ', $text));
+
+    if ($text === '' || mb_strlen($text) <= $max) {
+        return $text;
+    }
+
+    $cut = mb_substr($text, 0, $max);
+    $space = mb_strrpos($cut, ' ');
+    if ($space !== false && $space > $max * 0.6) {
+        $cut = mb_substr($cut, 0, $space);
+    }
+
+    return rtrim($cut, " \t\n\r\0\x0B.,;:—-") . '…';
+}
+
+/**
  * Нормализует текст в описание нужной длины.
  */
 function bsi_seo_prepare_description(string $text): string
@@ -380,10 +403,10 @@ add_filter('wpseo_metadesc', function ($desc): string {
     }
 
     if ($desc !== '') {
-        return $desc;
+        return bsi_seo_trim_description($desc);
     }
 
-    return bsi_seo_fallback_description();
+    return bsi_seo_trim_description(bsi_seo_fallback_description());
 });
 
 // ── Yoast: <link rel="canonical"> ──────────────────────────
@@ -1090,3 +1113,199 @@ add_action('template_redirect', function () {
     );
     exit;
 }, 0);
+
+// ── Заголовки архивов CPT ───────────────────────────────────
+// Стандартный archive.php выводит the_archive_title(), который для
+// /hotels/ давал «Архивы: Отели» — служебная формулировка WordPress
+// попадала и в H1, и в <title>.
+
+add_filter('get_the_archive_title_prefix', '__return_empty_string');
+
+/**
+ * Человеческие заголовки архивов (ключ — post_type).
+ */
+function bsi_seo_archive_titles(): array
+{
+    return [
+        'hotel'         => 'Каталог отелей',
+        'education'     => 'Образование за рубежом',
+        'documentation' => 'Материалы для турагентств',
+        'news'          => 'Новости',
+        'promo'         => 'Акции и спецпредложения',
+        'excursion'     => 'Экскурсии',
+        'tour'          => 'Туры',
+        'country'       => 'Страны и направления',
+        'insurance'     => 'Страхование путешественников',
+        'visa'          => 'Оформление виз',
+        'agency_event'  => 'Мероприятия для турагентств',
+        'project'       => 'Проекты',
+    ];
+}
+
+add_filter('get_the_archive_title', function ($title) {
+    if (!is_post_type_archive()) {
+        return $title;
+    }
+
+    $queried_type = get_query_var('post_type');
+    if (is_array($queried_type)) {
+        $queried_type = reset($queried_type);
+    }
+
+    $map = bsi_seo_archive_titles();
+
+    return $map[(string) $queried_type] ?? $title;
+}, 20);
+
+// Тот же заголовок — в <title> выдачи, если он не задан в Yoast вручную.
+
+add_filter('wpseo_title', function ($title) {
+    if (!is_post_type_archive()) {
+        return $title;
+    }
+
+    $queried_type = get_query_var('post_type');
+    if (is_array($queried_type)) {
+        $queried_type = reset($queried_type);
+    }
+
+    $map = bsi_seo_archive_titles();
+    $custom = $map[(string) $queried_type] ?? '';
+
+    // Заменяем только служебную заготовку («Архив …»), не трогая
+    // заголовок, заданный в настройках Yoast вручную.
+    if ($custom === '' || mb_stripos((string) $title, 'Архив') !== 0) {
+        return $title;
+    }
+
+    return $custom . ' | ' . get_bloginfo('name');
+}, 20);
+
+// ── og:image для страниц без своей картинки ─────────────────
+// Главная, страны и каталоги отдавались без og:image: ссылка в
+// Telegram, ВК или WhatsApp выглядела голым текстом. Yoast выводит тег
+// только когда изображение у страницы есть, поэтому подставляем своё.
+
+/**
+ * Подбирает изображение для соцсетей под текущий контекст.
+ */
+function bsi_seo_social_image_url(): string
+{
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $cached = '';
+
+    // Главная — первый баннер из ACF-подборки.
+    if (is_front_page()) {
+        $front_id = (int) get_option('page_on_front');
+        $banners = ($front_id && function_exists('get_field')) ? get_field('banners', $front_id) : [];
+        if (is_array($banners)) {
+            foreach ($banners as $banner) {
+                $cached = bsi_seo_social_image_accept((string) ($banner['img'] ?? ''));
+                if ($cached !== '') {
+                    return $cached;
+                }
+            }
+        }
+    }
+
+    // Запись — миниатюра, галерея страны, затем картинка из контента.
+    if (is_singular()) {
+        $post_id = (int) get_queried_object_id();
+
+        if ($post_id && has_post_thumbnail($post_id)) {
+            $cached = bsi_seo_social_image_accept((string) get_the_post_thumbnail_url($post_id, 'large'));
+            if ($cached !== '') {
+                return $cached;
+            }
+        }
+
+        if (is_singular('country') && function_exists('get_field')) {
+            $gallery = get_field('galereya', $post_id);
+            if (is_array($gallery)) {
+                foreach ($gallery as $item) {
+                    $url = is_array($item) ? ($item['url'] ?? '') : (string) $item;
+                    $cached = bsi_seo_social_image_accept((string) $url);
+                    if ($cached !== '') {
+                        return $cached;
+                    }
+                }
+            }
+        }
+
+        $content = (string) get_post_field('post_content', $post_id);
+        if ($content !== '' && preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $content, $m)) {
+            $cached = bsi_seo_social_image_accept($m[1]);
+            if ($cached !== '') {
+                return $cached;
+            }
+        }
+    }
+
+    // Архивы и всё остальное — миниатюра свежей записи этого типа.
+    if (is_post_type_archive() || is_tax() || is_category()) {
+        $queried_type = get_query_var('post_type');
+        if (is_array($queried_type)) {
+            $queried_type = reset($queried_type);
+        }
+
+        $recent = get_posts([
+            'post_type'      => $queried_type ?: 'post',
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+            'meta_key'       => '_thumbnail_id',
+            'no_found_rows'  => true,
+        ]);
+
+        if (!empty($recent)) {
+            $cached = bsi_seo_social_image_accept((string) get_the_post_thumbnail_url($recent[0]->ID, 'large'));
+            if ($cached !== '') {
+                return $cached;
+            }
+        }
+    }
+
+    // Растрового изображения не нашлось. Логотип здесь не подходит:
+    // он в SVG, а соцсети такие превью не показывают. Общую картинку
+    // задают в «Yoast SEO → Соцсети → Изображение по умолчанию».
+    return $cached;
+}
+
+/**
+ * Пропускает только форматы, которые соцсети умеют показывать.
+ */
+function bsi_seo_social_image_accept(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+
+    $ext = strtolower((string) pathinfo((string) wp_parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+
+    return in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true) ? $url : '';
+}
+
+add_filter('wpseo_frontend_presentation', function ($presentation) {
+    if (!is_object($presentation) || !empty($presentation->open_graph_images)) {
+        return $presentation;
+    }
+
+    $url = bsi_seo_social_image_url();
+    if ($url === '') {
+        return $presentation;
+    }
+
+    $presentation->open_graph_images = [
+        ['url' => $url],
+    ];
+
+    if (empty($presentation->twitter_image)) {
+        $presentation->twitter_image = $url;
+    }
+
+    return $presentation;
+});
