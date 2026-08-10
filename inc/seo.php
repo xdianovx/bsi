@@ -1057,3 +1057,36 @@ add_action('template_redirect', function () {
     wp_redirect(bsi_seo_legacy_country_target($base, $parts, (int) $country->ID), 301);
     exit;
 }, 1);
+
+// ── 301: разделы страны, зарегистрированные дважды ──────────
+// «Памятка» и «Правила въезда» получили по второму адресу: разделы
+// завели повторно с другим slug, старое правило осталось. Обе пары
+// открывали один шаблон, то есть каждая страна отдавала два одинаковых
+// URL. Дублирующие правила удалены; здесь уводим уже известные
+// поисковику адреса на основные. Приоритет 0 — раньше роутеров разделов.
+
+add_action('template_redirect', function () {
+    $path = bsi_seo_request_path();
+    if ($path === '') {
+        return;
+    }
+
+    $aliases = [
+        'memo' => 'pamyatka',
+        'entry-rules' => 'pravila-vyezda',
+    ];
+
+    if (!preg_match('#^country/([^/]+)/([^/]+)/?$#', $path, $m)) {
+        return;
+    }
+
+    if (!isset($aliases[$m[2]])) {
+        return;
+    }
+
+    wp_redirect(
+        trailingslashit(home_url('/country/' . $m[1] . '/' . $aliases[$m[2]])),
+        301
+    );
+    exit;
+}, 0);
