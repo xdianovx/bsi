@@ -1122,7 +1122,8 @@ add_action('template_redirect', function () {
 add_filter('get_the_archive_title_prefix', '__return_empty_string');
 
 /**
- * Человеческие заголовки архивов (ключ — post_type).
+ * Заголовок H1 на странице архива (ключ — post_type).
+ * Короткий: рядом уже есть контекст страницы.
  */
 function bsi_seo_archive_titles(): array
 {
@@ -1139,6 +1140,31 @@ function bsi_seo_archive_titles(): array
         'visa'          => 'Оформление виз',
         'agency_event'  => 'Мероприятия для турагентств',
         'project'       => 'Проекты',
+    ];
+}
+
+/**
+ * Заголовок для <title> архива — длиннее H1.
+ *
+ * В выдаче у пользователя нет контекста страницы, поэтому «Каталог
+ * отелей» (21 символ вместе с именем сайта) не отвечает ни на один
+ * запрос. Норма — 60-70 символов.
+ */
+function bsi_seo_archive_seo_titles(): array
+{
+    return [
+        'hotel'         => 'Отели по всему миру — каталог с фото, рейтингами и ценами',
+        'education'     => 'Образование за рубежом — языковые школы, лагеря и программы',
+        'documentation' => 'Турагентствам — документы, обучение и условия работы',
+        'news'          => 'Новости туризма — направления, спецпредложения и события',
+        'promo'         => 'Акции и спецпредложения на туры — скидки и раннее бронирование',
+        'excursion'     => 'Экскурсии — программы, расписание и цены',
+        'tour'          => 'Туры по всему миру — подбор, цены и бронирование',
+        'country'       => 'Страны и направления — туры, отели, курорты и визы',
+        'insurance'     => 'Страхование путешественников — полисы и условия',
+        'visa'          => 'Оформление виз — документы, сроки и стоимость по странам',
+        'agency_event'  => 'Мероприятия для турагентств — вебинары и рекламные туры',
+        'project'       => 'Проекты BSI Group',
     ];
 }
 
@@ -1169,7 +1195,7 @@ add_filter('wpseo_title', function ($title) {
         $queried_type = reset($queried_type);
     }
 
-    $map = bsi_seo_archive_titles();
+    $map = bsi_seo_archive_seo_titles();
     $custom = $map[(string) $queried_type] ?? '';
 
     // Заменяем только служебную заготовку («Архив …»), не трогая
@@ -1309,3 +1335,35 @@ add_filter('wpseo_frontend_presentation', function ($presentation) {
 
     return $presentation;
 });
+
+// ── Служебные приписки в заголовках записей ─────────────────
+// Шаблон Yoast добавлял к заголовку тип записи: «… — образование за
+// рубежом — BSI» (24 символа) или «… — Тур». Названия туров и программ
+// и без того длинные, а в выдаче видно 60-70 символов — приписки
+// вытесняли полезный текст, ничего не сообщая пользователю.
+
+add_filter('wpseo_title', function ($title) {
+    $types = ['tour', 'education', 'excursion', 'hotel', 'event', 'visa', 'insurance'];
+
+    if (!is_singular($types)) {
+        return $title;
+    }
+
+    $post_id = (int) get_queried_object_id();
+    if (!$post_id) {
+        return $title;
+    }
+
+    // Заголовок, вписанный в Yoast вручную, оставляем как есть.
+    $manual = trim((string) get_post_meta($post_id, '_yoast_wpseo_title', true));
+    if ($manual !== '') {
+        return $title;
+    }
+
+    $post_title = trim(wp_strip_all_tags((string) get_the_title($post_id)));
+    if ($post_title === '') {
+        return $title;
+    }
+
+    return $post_title . ' | ' . get_bloginfo('name');
+}, 25);
