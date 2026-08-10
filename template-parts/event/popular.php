@@ -33,6 +33,11 @@ if (empty($event_ids)) {
   return;
 }
 
+// Слайдер показывает 2 карточки за раз — ограничиваем подборку.
+if (function_exists('bsi_homepage_slider_limit')) {
+  $event_ids = array_slice($event_ids, 0, bsi_homepage_slider_limit());
+}
+
 $event_posts = get_posts([
   'post_type' => 'event',
   'post_status' => 'publish',

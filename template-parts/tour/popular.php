@@ -16,6 +16,11 @@ $homepage_tour_ids = function_exists('bsi_get_homepage_featured_tour_ids')
   ? bsi_get_homepage_featured_tour_ids()
   : [];
 
+// Слайдер показывает 2 карточки за раз — рендерить всю подборку незачем.
+if (!empty($homepage_tour_ids) && function_exists('bsi_homepage_slider_limit')) {
+  $homepage_tour_ids = array_slice($homepage_tour_ids, 0, bsi_homepage_slider_limit());
+}
+
 $common_tour_q = [
   'post_type' => 'tour',
   'post_status' => 'publish',
@@ -48,7 +53,7 @@ if (!empty($homepage_tour_ids)) {
   $active_tour_ids = function_exists('bsi_schedule_filter_post__in_ids')
     ? bsi_schedule_filter_post__in_ids(array_map('intval', $candidate_tour_ids))
     : array_values(array_filter(array_map('intval', $candidate_tour_ids)));
-  $slice_ids = array_slice($active_tour_ids, 0, 12);
+  $slice_ids = array_slice($active_tour_ids, 0, bsi_homepage_slider_limit());
   $tour_query = new WP_Query(array_merge($common_tour_q, [
     'posts_per_page'    => $slice_ids !== [] ? count($slice_ids) : 1,
     'post__in'          => $slice_ids !== [] ? $slice_ids : [0],

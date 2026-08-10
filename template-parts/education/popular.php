@@ -20,6 +20,11 @@ if (!$use_test_data) {
     // Загрузка данных из ACF поля главной страницы
     $popular_education_ids = $acf_education_ids;
 
+    // Слайдер показывает 2 карточки за раз — ограничиваем подборку.
+    if (function_exists('bsi_homepage_slider_limit')) {
+        $popular_education_ids = array_slice($popular_education_ids, 0, bsi_homepage_slider_limit());
+    }
+
     $country_ids = [];
 
     if (!empty($popular_education_ids) && function_exists('get_field')) {

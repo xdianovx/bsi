@@ -25,6 +25,11 @@ $popular_hotel_ids = function_exists('bsi_schedule_filter_post__in_ids')
   ? bsi_schedule_filter_post__in_ids(array_map('intval', $popular_hotel_candidates))
   : array_values(array_filter(array_map('intval', $popular_hotel_candidates)));
 
+// Слайдер показывает 2 карточки за раз — ограничиваем подборку.
+if (function_exists('bsi_homepage_slider_limit')) {
+  $popular_hotel_ids = array_slice($popular_hotel_ids, 0, bsi_homepage_slider_limit());
+}
+
 $country_ids = [];
 
 if (!empty($popular_hotel_ids) && function_exists('get_field')) {

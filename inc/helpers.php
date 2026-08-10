@@ -1130,3 +1130,18 @@ function bsi_enqueue_tour_booking_modal(): void
     get_template_part('template-parts/tour/booking-modal');
   }, 20);
 }
+
+/**
+ * Сколько карточек показывать в слайдерах главной страницы.
+ *
+ * Слайдеры показывают 2 карточки за раз, но подборки «избранного»
+ * рендерились целиком: 59 туров, 28 программ обучения, 22 события —
+ * 712 тегов <img> и 843 КБ HTML на одну страницу. Ограничиваем разумным
+ * числом; фильтр bsi_homepage_slider_limit позволяет поменять.
+ */
+function bsi_homepage_slider_limit(): int
+{
+	$limit = (int) apply_filters('bsi_homepage_slider_limit', 12);
+
+	return $limit > 0 ? $limit : 12;
+}
