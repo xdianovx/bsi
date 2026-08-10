@@ -116,3 +116,26 @@ function bsi_prepare_offer_item( $row ) {
 		'post_id'        => $post_id,
 	];
 }
+
+/**
+ * Логотип в шапке — часть первого экрана и кандидат в LCP.
+ * Smush переводит все изображения на data-src и подставляет их только
+ * после выполнения JS; класс no-lazyload оставляет логотип обычным
+ * изображением, которое браузер грузит сразу.
+ */
+add_filter('get_custom_logo', function ($html) {
+	if (!is_string($html) || $html === '' || strpos($html, '<img') === false) {
+		return $html;
+	}
+
+	if (strpos($html, 'no-lazyload') !== false) {
+		return $html;
+	}
+
+	return preg_replace(
+		'/<img\s+([^>]*?)class="([^"]*)"/',
+		'<img $1class="$2 no-lazyload" fetchpriority="high" decoding="async"',
+		$html,
+		1
+	);
+});

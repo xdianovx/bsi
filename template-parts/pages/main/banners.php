@@ -24,24 +24,28 @@ if (empty($banners)) {
           $is_first     = ($i === 0);
           $loading      = $is_first ? 'eager' : 'lazy';
           $fetchpriority = $is_first ? ' fetchpriority="high"' : '';
+          // Первый слайд — кандидат в LCP. Smush переводит все картинки на
+          // data-src, из-за чего он ждёт выполнения JS; класс no-lazyload
+          // исключает его из ленивой загрузки.
+          $no_lazy      = $is_first ? ' no-lazyload' : '';
           ?>
           <div class="swiper-slide">
             <?php if (!empty($banner['url'])): ?>
               <a href="<?= esc_url($banner['url']); ?>" target="_blank" rel="noopener noreferrer" class="main-banner__slide">
                 <?php if (!empty($banner['mobilnyj_banner'])): ?>
-                  <img class="main-banner__slide_image main-banner__slide_image--desktop" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
-                  <img class="main-banner__slide_image main-banner__slide_image--mobile" src="<?= esc_url($banner['mobilnyj_banner']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
+                  <img class="main-banner__slide_image main-banner__slide_image--desktop<?= $no_lazy; ?>" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
+                  <img class="main-banner__slide_image main-banner__slide_image--mobile<?= $no_lazy; ?>" src="<?= esc_url($banner['mobilnyj_banner']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
                 <?php else: ?>
-                  <img class="main-banner__slide_image" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
+                  <img class="main-banner__slide_image<?= $no_lazy; ?>" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
                 <?php endif; ?>
               </a>
             <?php else: ?>
               <div class="main-banner__slide">
                 <?php if (!empty($banner['mobilnyj_banner'])): ?>
-                  <img class="main-banner__slide_image main-banner__slide_image--desktop" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
-                  <img class="main-banner__slide_image main-banner__slide_image--mobile" src="<?= esc_url($banner['mobilnyj_banner']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
+                  <img class="main-banner__slide_image main-banner__slide_image--desktop<?= $no_lazy; ?>" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
+                  <img class="main-banner__slide_image main-banner__slide_image--mobile<?= $no_lazy; ?>" src="<?= esc_url($banner['mobilnyj_banner']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
                 <?php else: ?>
-                  <img class="main-banner__slide_image" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
+                  <img class="main-banner__slide_image<?= $no_lazy; ?>" src="<?= esc_url($banner['img']); ?>" alt="<?= $banner_alt; ?>" loading="<?= $loading; ?>"<?= $fetchpriority; ?> decoding="async" />
                 <?php endif; ?>
               </div>
             <?php endif; ?>
