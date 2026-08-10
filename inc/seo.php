@@ -42,6 +42,7 @@ function bsi_seo_virtual_sections(): array
         'country_visa'        => ['label' => 'Виза',            'slug' => 'visa'],
         'country_news'        => ['label' => 'Новости',         'slug' => 'novosti'],
         'country_excursions'  => ['label' => 'Экскурсии',       'slug' => 'ekskursii'],
+        'country_events'      => ['label' => 'Событийные туры', 'slug' => 'sobytiynye-tury'],
     ];
 }
 
@@ -92,6 +93,28 @@ function bsi_seo_virtual_title(?array $vp): string
     return $vp['country']->post_title . ' — ' . $vp['label'] . ' | ' . $site;
 }
 
+/**
+ * Выбирает предлог «в» или «во» по началу слова:
+ * во Францию, во Вьетнам, но в Венгрию, в Италию.
+ */
+function bsi_seo_preposition_v(string $word): string
+{
+    $word = trim($word);
+    if ($word === '') {
+        return 'в';
+    }
+
+    $first = mb_strtolower(mb_substr($word, 0, 1));
+    if ($first !== 'в' && $first !== 'ф') {
+        return 'в';
+    }
+
+    $second = mb_strtolower(mb_substr($word, 1, 1));
+    $vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
+
+    return in_array($second, $vowels, true) ? 'в' : 'во';
+}
+
 function bsi_seo_virtual_description(?array $vp): string
 {
     if (!$vp || !$vp['country']) {
@@ -100,17 +123,30 @@ function bsi_seo_virtual_description(?array $vp): string
 
     $n = $vp['country']->post_title;
 
+    // Конструкции «Туры в …» требуют винительного падежа: «в Италию»,
+    // а не «в Италия». Названия после двоеточия остаются именительными.
+    $acc = $n;
+    if (function_exists('bsi_country_accusative_title')) {
+        $resolved = trim((string) bsi_country_accusative_title((int) $vp['country']->ID));
+        if ($resolved !== '') {
+            $acc = $resolved;
+        }
+    }
+
+    $v = bsi_seo_preposition_v($acc);
+
     $map = [
-        'country_tours'       => "Туры в {$n} от туроператора BSI Group. Подбор тура, бронирование онлайн, актуальные цены.",
+        'country_tours'       => "Туры {$v} {$acc} от туроператора BSI Group. Подбор тура, бронирование онлайн, актуальные цены.",
         'country_hotels'      => "Каталог отелей: {$n}. Описания, фото, рейтинги. Подбор отеля от BSI Group.",
-        'country_promos'      => "Акции и спецпредложения на туры в {$n} от BSI Group. Горящие туры, скидки.",
+        'country_promos'      => "Акции и спецпредложения на туры {$v} {$acc} от BSI Group. Горящие туры, скидки.",
         'country_resorts'     => "Курорты: {$n}. Описания курортов, лучшие отели, пляжи. BSI Group.",
         'country_memo'        => "Памятка туристу: {$n}. Полезная информация для путешественников от BSI Group.",
-        'country_entry_rules' => "Правила въезда в {$n}: актуальные требования, документы, визы. BSI Group.",
+        'country_entry_rules' => "Правила въезда {$v} {$acc}: актуальные требования, документы, визы. BSI Group.",
         'country_education'   => "Обучение за рубежом: {$n}. Языковые школы, образовательные программы. BSI Group.",
         'country_visa'        => "Оформление визы: {$n}. Требования, документы, сроки оформления. BSI Group.",
         'country_news'        => "Новости туризма: {$n}. Актуальная информация от туроператора BSI Group.",
-        'country_excursions'  => "Экскурсии в {$n}: программы, цены, расписание. Бронирование от туроператора BSI Group.",
+        'country_excursions'  => "Экскурсии {$v} {$acc}: программы, цены, расписание. Бронирование от туроператора BSI Group.",
+        'country_events'      => "Событийные туры {$v} {$acc}: поездки на концерты, спортивные и культурные события. Программы, отели, цены. BSI Group.",
     ];
 
     return $map[$vp['qv']] ?? '';
@@ -608,7 +644,8 @@ function bsi_seo_country_is_top_level(WP_Post $country): bool
  * Проверяет, есть ли у страны контент конкретного раздела.
  *
  * Разделы «Виза», «Памятка» и «Правила въезда» отдают 404, когда
- * связанной записи нет, — такие URL в sitemap не place.
+ * связанной записи нет. «Событийные туры» отдают 200 всегда, поэтому
+ * без проверки в sitemap попали бы 59 пустых каталогов.
  */
 function bsi_seo_country_section_exists(int $country_id, string $qv): bool
 {
@@ -616,6 +653,7 @@ function bsi_seo_country_section_exists(int $country_id, string $qv): bool
         'country_visa'        => ['visa', 'visa_country'],
         'country_memo'        => ['tourist_memo', 'memo_country'],
         'country_entry_rules' => ['entry_rules', 'entry_rules_country'],
+        'country_events'      => ['event', 'tour_country'],
     ];
 
     if (!isset($linked[$qv])) {
@@ -623,6 +661,15 @@ function bsi_seo_country_section_exists(int $country_id, string $qv): bool
     }
 
     [$post_type, $meta_key] = $linked[$qv];
+
+    // tour_country хранит корневую страну ветки — поднимаемся к корню.
+    if ($qv === 'country_events') {
+        $parent = wp_get_post_parent_id($country_id);
+        while ($parent) {
+            $country_id = (int) $parent;
+            $parent = wp_get_post_parent_id($country_id);
+        }
+    }
 
     $found = get_posts([
         'post_type'        => $post_type,
