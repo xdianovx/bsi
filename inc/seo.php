@@ -469,43 +469,46 @@ add_filter('robots_txt', function ($output, $public) {
         return $output;
     }
 
-    $lines = [
-        'User-agent: *',
+    // Параметры фильтрации и сортировки каталогов. Пагинация
+    // (page/paged) сюда НЕ входит: её закрытие мешает обходу
+    // каталогов, от дублей там защищает canonical.
+    $filter_params = [
+        'sort', 'orderby', 'order',
+        'region', 'resort', 'tour_type', 'program', 'accommodation',
+        'age', 'age_min', 'age_max',
+        'duration', 'duration_min', 'duration_max',
+        'date_from', 'date_to', 'group_arrival',
+        'archive', 'kind', 'direction',
+        'country', 'type', 'language',
+    ];
+
+    $common = [
         'Disallow: /wp-admin/',
         'Allow: /wp-admin/admin-ajax.php',
         'Disallow: /wp-includes/',
         'Disallow: /wp-json/',
-        '',
-        '# Фильтры, сортировка, пагинация — дубли контента',
-        'Disallow: /*?sort=',
-        'Disallow: /*?region=',
-        'Disallow: /*?resort=',
-        'Disallow: /*?tour_type=',
-        'Disallow: /*?country=',
-        'Disallow: /*?program=',
-        'Disallow: /*?language=',
-        'Disallow: /*?type=',
-        'Disallow: /*?accommodation=',
-        'Disallow: /*?age=',
-        'Disallow: /*?age_min=',
-        'Disallow: /*?age_max=',
-        'Disallow: /*?duration=',
-        'Disallow: /*?duration_min=',
-        'Disallow: /*?duration_max=',
-        'Disallow: /*?date_from=',
-        'Disallow: /*?date_to=',
-        'Disallow: /*?group_arrival=',
-        'Disallow: /*?archive=',
-        'Disallow: /*?kind=',
-        'Disallow: /*?direction=',
-        'Disallow: /*?orderby=',
-        'Disallow: /*?order=',
-        'Disallow: /*?page=',
-        'Disallow: /*?paged=',
         'Disallow: /*?s=',
-        '',
-        'Sitemap: https://bsigroup.ru/sitemap_index.xml',
     ];
+
+    $lines = ['User-agent: *'];
+    $lines = array_merge($lines, $common);
+    $lines[] = '';
+    $lines[] = '# Фильтры и сортировка — дубли контента';
+    foreach ($filter_params as $param) {
+        $lines[] = 'Disallow: /*?' . $param . '=';
+    }
+
+    // Яндекс: Clean-param склеивает URL с параметрами и без,
+    // не исключая страницы из обхода — точнее, чем Disallow.
+    $lines[] = '';
+    $lines[] = 'User-agent: Yandex';
+    $lines = array_merge($lines, $common);
+    foreach (array_chunk($filter_params, 12) as $chunk) {
+        $lines[] = 'Clean-param: ' . implode('&', $chunk);
+    }
+
+    $lines[] = '';
+    $lines[] = 'Sitemap: ' . home_url('/sitemap_index.xml');
 
     return implode("\n", $lines) . "\n";
 }, PHP_INT_MAX, 2);
@@ -575,3 +578,24 @@ function bsi_sitemap_country_sections() {
     }
 }
 
+
+// ── oEmbed: убираем служебные URL из обхода ─────────────────
+// WordPress добавляет в <head> ссылки вида
+// /wp-json/oembed/1.0/embed?url=... — поисковики идут по ним и
+// тянут в индекс JSON/XML-ответы. Тема эти ссылки не использует.
+
+add_action('init', function (): void {
+    remove_action('wp_head', 'wp_oembed_add_discovery_links');
+    remove_action('wp_head', 'wp_oembed_add_host_js');
+});
+
+// Ответы REST API не должны индексироваться, даже если робот
+// дошёл до них по внешней ссылке.
+
+add_filter('rest_post_dispatch', function ($response) {
+    if ($response instanceof WP_REST_Response) {
+        $response->header('X-Robots-Tag', 'noindex, follow');
+    }
+
+    return $response;
+}, 10, 1);
