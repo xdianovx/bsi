@@ -191,11 +191,12 @@ add_action('wp_enqueue_scripts', 'bsi_scripts');
 function bsi_preload_fonts(): void
 {
 	$fonts_uri = get_template_directory_uri() . '/fonts/';
+	// Preload форсирует загрузку до отрисовки, поэтому здесь только те
+	// начертания, которыми набран первый экран. Остальные подтянет
+	// @font-face по мере необходимости.
 	$critical_fonts = [
 		'Inter-Regular',
-		'Inter-Medium',
 		'Inter-SemiBold',
-		'Inter-Bold',
 	];
 
 	foreach ($critical_fonts as $font) {
