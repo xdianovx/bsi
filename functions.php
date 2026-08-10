@@ -749,3 +749,20 @@ add_action('admin_init', function () {
 
 
 
+
+/**
+ * Верификация Яндекс.Вебмастера: отдаём yandex_fbd4274536150bcf.html из корня сайта.
+ * Файл нельзя положить в корень через деплой (деплоится только папка темы),
+ * поэтому контент отдаётся хуком по корневому URL.
+ */
+add_action('init', function () {
+	$path = (string) wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+
+	if (trim($path, '/') !== 'yandex_fbd4274536150bcf.html') {
+		return;
+	}
+
+	header('Content-Type: text/html; charset=UTF-8');
+	echo "<html>\n    <head>\n        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n    </head>\n    <body>Verification: fbd4274536150bcf</body>\n</html>";
+	exit;
+});
