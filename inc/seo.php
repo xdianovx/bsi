@@ -459,6 +459,10 @@ add_action('template_redirect', function () {
 }, 1);
 
 // ── robots.txt: блокировка фильтров и служебных URL ─────────
+// Приоритет PHP_INT_MAX — после Yoast (99999). Yoast вырезает из вывода
+// дефолтный блок WordPress (User-agent + wp-admin) и дописывает свой,
+// из-за чего файл начинался с Disallow без User-agent и содержал
+// второй Sitemap. Отдаём файл целиком последними.
 
 add_filter('robots_txt', function ($output, $public) {
     if (!$public) {
@@ -504,7 +508,7 @@ add_filter('robots_txt', function ($output, $public) {
     ];
 
     return implode("\n", $lines) . "\n";
-}, 999, 2);
+}, PHP_INT_MAX, 2);
 
 // ── Sitemap: виртуальные подстраницы стран ───────────────────
 
