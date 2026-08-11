@@ -16,9 +16,6 @@ skills-lock.json
 /wiki
 .socraticodecontextartifacts.json
 
-# Project docs (хранятся локально в docs/)
-/docs
-
 # Скриншоты проверки UI (временные, локально)
 /screenshots
 
