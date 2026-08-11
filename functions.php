@@ -397,6 +397,7 @@ require get_template_directory() . '/inc/admin/content-schedule-block-editor.php
 require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
+require get_template_directory() . '/inc/admin/auto-slug-on-title-change.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/disable-comments.php';
 require get_template_directory() . '/inc/admin-tour-prices-cache.php';
