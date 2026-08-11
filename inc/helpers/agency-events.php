@@ -71,6 +71,53 @@ function bsi_is_agency_events_page($post_id = 0)
 }
 
 /**
+ * Архив мероприятий — дочерняя запись со слагом `arhiv`.
+ */
+function bsi_agency_events_archive_page()
+{
+  static $cached = false;
+
+  if ($cached !== false) {
+    return $cached;
+  }
+
+  $cached = null;
+  $parent = bsi_agency_events_page();
+  if ($parent) {
+    $post = get_page_by_path($parent->post_name . '/arhiv', OBJECT, 'documentation');
+    $cached = $post ?: null;
+  }
+
+  return $cached;
+}
+
+function bsi_agency_events_archive_page_url()
+{
+  $post = bsi_agency_events_archive_page();
+
+  return $post ? (string) get_permalink($post->ID) : '';
+}
+
+/**
+ * Текущая страница — архив мероприятий?
+ */
+function bsi_is_agency_events_archive_page($post_id = 0)
+{
+  $post_id = $post_id ? (int) $post_id : (int) get_queried_object_id();
+  $archive = bsi_agency_events_archive_page();
+
+  return ($post_id && $archive && $post_id === (int) $archive->ID);
+}
+
+/**
+ * Страница списка мероприятий — ближайшие или архив.
+ */
+function bsi_is_agency_events_any_page($post_id = 0)
+{
+  return bsi_is_agency_events_page($post_id) || bsi_is_agency_events_archive_page($post_id);
+}
+
+/**
  * Типы мероприятий на вкладках и в мегаменю — в порядке вывода.
  * Список закрытый: в таксономии есть служебные термы (Выставка, Конгресс,
  * Саммит, Бизнес-завтрак), которые во вкладки не выносим — их записи
@@ -157,33 +204,46 @@ function bsi_agency_event_kind_class($slug)
 }
 
 /**
- * Ссылка на вкладку страницы мероприятий.
- * $kind = '' → «Все», $kind = 'archive' → архив.
+ * Базовый адрес текущего списка: архив или ближайшие мероприятия.
  */
-function bsi_agency_events_tab_url($kind = '')
+function bsi_agency_events_base_url()
 {
-  $base = bsi_agency_events_page_url();
-
-  if ($kind === 'archive') {
-    return add_query_arg('archive', '1', $base);
+  if (bsi_is_agency_events_archive_page()) {
+    $url = bsi_agency_events_archive_page_url();
+    if ($url !== '') {
+      return $url;
+    }
   }
 
-  if ($kind !== '') {
-    return add_query_arg('kind', $kind, $base);
-  }
-
-  return $base;
+  return bsi_agency_events_page_url();
 }
 
 /**
- * Открыт ли архив мероприятий.
+ * Ссылка на вкладку типа в пределах текущего списка.
+ * Поисковый запрос сохраняется, номер страницы сбрасывается.
+ */
+function bsi_agency_events_tab_url($kind = '', $base = '')
+{
+  $url = ($base !== '') ? $base : bsi_agency_events_base_url();
+
+  $args = [];
+  if ($kind !== '') {
+    $args['kind'] = $kind;
+  }
+  $query = bsi_agency_events_search_query();
+  if ($query !== '') {
+    $args['q'] = $query;
+  }
+
+  return $args ? add_query_arg($args, $url) : $url;
+}
+
+/**
+ * Открыт ли архив мероприятий (отдельная страница `arhiv`).
  */
 function bsi_agency_events_is_archive_view()
 {
-  $archive = isset($_GET['archive']) ? sanitize_text_field(wp_unslash($_GET['archive'])) : '';
-  $kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
-
-  return ($archive === '1' || $kind === 'archive');
+  return bsi_is_agency_events_archive_page();
 }
 
 /**
@@ -191,25 +251,48 @@ function bsi_agency_events_is_archive_view()
  */
 function bsi_agency_events_current_kind()
 {
-  $kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
-
-  return ($kind === 'archive') ? '' : $kind;
+  return isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
 }
 
 /**
- * Ссылка-переключатель архива: сохраняет выбранный тип,
- * из архива возвращает к ближайшим мероприятиям.
+ * Поисковый запрос по названию мероприятия.
+ */
+function bsi_agency_events_search_query()
+{
+  $query = isset($_GET['q']) ? sanitize_text_field(wp_unslash($_GET['q'])) : '';
+
+  return trim($query);
+}
+
+/**
+ * Номер страницы списка. На singular WordPress отдаёт /page/N/ в `page`.
+ */
+function bsi_agency_events_paged()
+{
+  $paged = (int) get_query_var('page');
+  if (!$paged) {
+    $paged = (int) get_query_var('paged');
+  }
+
+  return max(1, $paged);
+}
+
+/**
+ * Ссылка на противоположный список: с ближайших — в архив и обратно.
+ * Тип и поисковый запрос сохраняются.
  */
 function bsi_agency_events_archive_toggle_url()
 {
-  $url = bsi_agency_events_page_url();
-  $kind = bsi_agency_events_current_kind();
+  $archive_url = bsi_agency_events_archive_page_url();
+  $is_archive = bsi_is_agency_events_archive_page();
 
-  if ($kind !== '') {
-    $url = add_query_arg('kind', $kind, $url);
+  if (!$is_archive && $archive_url === '') {
+    return '';
   }
 
-  return bsi_agency_events_is_archive_view() ? $url : add_query_arg('archive', '1', $url);
+  $base = $is_archive ? bsi_agency_events_page_url() : $archive_url;
+
+  return bsi_agency_events_tab_url(bsi_agency_events_current_kind(), $base);
 }
 
 /**
@@ -283,4 +366,34 @@ function bsi_migrate_agency_events_page_slug()
   }
 
   update_option('bsi_agency_events_page_renamed', 1, false);
+}
+
+/**
+ * Разовое создание дочерней записи «Архив мероприятий» (/…/meropriyatiya/arhiv/).
+ * Сайдбар раздела берёт только записи верхнего уровня, поэтому в нём не появится.
+ */
+add_action('init', 'bsi_migrate_agency_events_archive_page', 31);
+function bsi_migrate_agency_events_archive_page()
+{
+  if (get_option('bsi_agency_events_archive_page_created')) {
+    return;
+  }
+
+  $parent = bsi_agency_events_page();
+  if (!$parent) {
+    return;
+  }
+
+  if (!bsi_agency_events_archive_page()) {
+    wp_insert_post([
+      'post_type' => 'documentation',
+      'post_status' => 'publish',
+      'post_title' => 'Архив мероприятий',
+      'post_name' => 'arhiv',
+      'post_parent' => $parent->ID,
+      'menu_order' => 100,
+    ]);
+  }
+
+  update_option('bsi_agency_events_archive_page_created', 1, false);
 }

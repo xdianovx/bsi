@@ -186,6 +186,7 @@
     <li><a href="#slider">Слайдер-стрелки</a></li>
     <li><a href="#breadcrumbs">Хлебные крошки</a></li>
     <li><a href="#callout">Callout / Алерты</a></li>
+<li><a href="#pagination">Пагинация</a></li>
     <li><a href="#counter">Counter</a></li>
     <li><a href="#preloader">Preloader</a></li>
     <li><a href="#modal">Модалки</a></li>
@@ -601,6 +602,34 @@ $trans-text: all 0.3s ease-in-out;
   &lt;span class="breadcrumb-separator"&gt;&lt;/span&gt;
   Турция
 &lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ PAGINATION ============ -->
+  <section class="uikit-section" id="pagination">
+    <h2>Пагинация</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/pagination.scss</code>. Обёртка <code>.ui-pagination</code> вокруг вывода <code>paginate_links()</code> (без <code>type =&gt; 'list'</code>). Текущая страница — <code>.current</code>, многоточие — <code>.dots</code>.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <nav class="ui-pagination" aria-label="Страницы">
+        <span aria-current="page" class="page-numbers current">1</span>
+        <a class="page-numbers" href="#">2</a>
+        <a class="page-numbers" href="#">3</a>
+        <span class="page-numbers dots">…</span>
+        <a class="page-numbers" href="#">12</a>
+        <a class="next page-numbers" href="#">Вперёд</a>
+      </nav>
+    </div>
+    <pre class="uikit-snippet">&lt;?php
+$pagination = paginate_links([
+  'base' =&gt; trailingslashit($base_url) . 'page/%#%/',
+  'format' =&gt; '',
+  'current' =&gt; $paged,
+  'total' =&gt; (int) $query-&gt;max_num_pages,
+  'prev_text' =&gt; 'Назад',
+  'next_text' =&gt; 'Вперёд',
+]);
+?&gt;
+&lt;nav class="ui-pagination" aria-label="Страницы"&gt;&lt;?php echo $pagination; ?&gt;&lt;/nav&gt;</pre>
   </section>
 
   <!-- ============ CALLOUT ============ -->

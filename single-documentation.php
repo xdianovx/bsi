@@ -5,7 +5,11 @@
 
 get_header();
 
-$is_education_page = bsi_is_agency_events_page();
+$is_education_page = bsi_is_agency_events_any_page();
+$is_events_archive = bsi_is_agency_events_archive_page();
+$events_title = $is_events_archive ? 'Архив мероприятий' : 'Мероприятия для турагентств';
+$events_toggle_url = bsi_agency_events_archive_toggle_url();
+$events_toggle_label = $is_events_archive ? 'Ближайшие мероприятия' : 'Архив';
 ?>
 
 <main class="site-main agency-page">
@@ -30,11 +34,12 @@ $is_education_page = bsi_is_agency_events_page();
         <div class="agency-page__content">
           <?php if ($is_education_page): ?>
             <div class="agency-page__title-row agency-page__title-row--events">
-              <h1 class="h1 agency-page__title">Мероприятия для турагентств</h1>
-              <a href="<?php echo esc_url(bsi_agency_events_archive_toggle_url()); ?>"
-                class="agency-page__archive-link <?php echo bsi_agency_events_is_archive_view() ? 'is-active' : ''; ?>">
-                Архив
-              </a>
+              <h1 class="h1 agency-page__title"><?php echo esc_html($events_title); ?></h1>
+              <?php if ($events_toggle_url !== ''): ?>
+                <a href="<?php echo esc_url($events_toggle_url); ?>" class="agency-page__archive-link">
+                  <?php echo esc_html($events_toggle_label); ?>
+                </a>
+              <?php endif; ?>
             </div>
             <?php get_template_part('template-parts/agency/education-events'); ?>
           <?php else: ?>

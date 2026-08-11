@@ -91,30 +91,33 @@
   @media screen and (max-width: 1024px) {
     gap: 12px;
   }
+
+  @media screen and (max-width: 768px) {
+    // Заголовок в две строки — ссылка уезжает под него, но остаётся справа.
+    flex-wrap: wrap;
+
+    .agency-page__archive-link {
+      margin-left: auto;
+    }
+  }
 }
 
 // Переключатель архива в строке с заголовком.
 .agency-page__archive-link {
   display: inline-flex;
   align-items: center;
-  color: $text-gray;
+  color: $red;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: $trans-text;
 
   &:hover {
-    color: $text-black;
     border-bottom-color: currentColor;
   }
 
   &:focus-visible {
     outline: 2px solid $text-black;
     outline-offset: 2px;
-  }
-
-  &.is-active {
-    color: $red;
-    border-bottom-color: currentColor;
   }
 }
 
@@ -317,15 +320,70 @@
 .agency-education {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 40px;
 }
 
 .agency-education__head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
+}
+
+.agency-education-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.agency-education-search__input {
+  flex: 1 1 240px;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid darken($bg-gray, 8%);
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  color: $text-black;
+
+  &::placeholder {
+    color: $text-gray;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $text-black;
+  }
+}
+
+.agency-education-search__submit {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.agency-education-search__reset {
+  display: inline-flex;
+  align-items: center;
+  color: $text-gray;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: $trans-text;
+
+  &:hover {
+    color: $text-black;
+    border-bottom-color: currentColor;
+  }
+}
+
+.agency-education-pagination {
+  margin-top: 8px;
 }
 
 .agency-education-tabs {
@@ -338,12 +396,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border: 0;
   border-radius: 8px;
   background: #ececee;
   color: $text-black;
-  font-weight: 500;
+  font-weight: 400;
   font-size: inherit;
   line-height: 1;
   text-decoration: none;
@@ -367,7 +425,6 @@
   @media screen and (max-width: 768px) {
     // Тач-таргет: вкладки стали ссылками, на мобильных нужен запас по высоте.
     min-height: 44px;
-    padding: 8px 16px;
   }
 }
 
@@ -403,7 +460,7 @@
   font-size: 13px;
   line-height: 1;
   padding: 5px 10px;
-  font-weight: 600;
+  font-weight: 400;
 
   &.is-webinar {
     background: #bbe9bb;

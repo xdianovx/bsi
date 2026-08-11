@@ -2403,6 +2403,47 @@ input.error {
   opacity: 0.4;
   cursor: default;
 }
+.ui-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ui-pagination .page-numbers {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f4f4f6;
+  color: #000000;
+  font-size: 16px;
+  line-height: 100%;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+.ui-pagination .page-numbers:hover:not(.current):not(.dots) {
+  background: #e3e3e8;
+}
+.ui-pagination .page-numbers:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+.ui-pagination .page-numbers.current {
+  background: #ee3145;
+  color: #fff;
+  cursor: default;
+  pointer-events: none;
+}
+.ui-pagination .page-numbers.dots {
+  background: transparent;
+  color: #5c5c5c;
+  cursor: default;
+  pointer-events: none;
+}
 .is-loading {
   position: relative;
   pointer-events: none;
@@ -14800,25 +14841,28 @@ button.single-event__dates-book {
     gap: 12px;
   }
 }
+@media screen and (max-width: 768px) {
+  .agency-page__title-row--events {
+    flex-wrap: wrap;
+  }
+  .agency-page__title-row--events .agency-page__archive-link {
+    margin-left: auto;
+  }
+}
 .agency-page__archive-link {
   display: inline-flex;
   align-items: center;
-  color: #5c5c5c;
+  color: #ee3145;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: all 0.3s ease-in-out;
 }
 .agency-page__archive-link:hover {
-  color: #000000;
   border-bottom-color: currentColor;
 }
 .agency-page__archive-link:focus-visible {
   outline: 2px solid #000000;
   outline-offset: 2px;
-}
-.agency-page__archive-link.is-active {
-  color: #ee3145;
-  border-bottom-color: currentColor;
 }
 .agency-event-single__meta-value {
   margin-top: 2px;
@@ -14985,14 +15029,61 @@ button.single-event__dates-book {
 .agency-education {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 40px;
 }
 .agency-education__head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
+}
+.agency-education-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.agency-education-search__input {
+  flex: 1 1 240px;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #dedee4;
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  color: #000000;
+}
+.agency-education-search__input::placeholder {
+  color: #5c5c5c;
+}
+.agency-education-search__input:focus-visible {
+  outline: none;
+  border-color: #000000;
+}
+.agency-education-search__submit {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+  line-height: 1;
+}
+.agency-education-search__reset {
+  display: inline-flex;
+  align-items: center;
+  color: #5c5c5c;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease-in-out;
+}
+.agency-education-search__reset:hover {
+  color: #000000;
+  border-bottom-color: currentColor;
+}
+.agency-education-pagination {
+  margin-top: 8px;
 }
 .agency-education-tabs {
   display: flex;
@@ -15003,12 +15094,12 @@ button.single-event__dates-book {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border: 0;
   border-radius: 8px;
   background: #ececee;
   color: #000000;
-  font-weight: 500;
+  font-weight: 400;
   font-size: inherit;
   line-height: 1;
   text-decoration: none;
@@ -15029,7 +15120,6 @@ button.single-event__dates-book {
 @media screen and (max-width: 768px) {
   .agency-education-tabs__btn {
     min-height: 44px;
-    padding: 8px 16px;
   }
 }
 .agency-education__list {
@@ -15060,7 +15150,7 @@ button.single-event__dates-book {
   font-size: 13px;
   line-height: 1;
   padding: 5px 10px;
-  font-weight: 600;
+  font-weight: 400;
 }
 .agency-education-card__kind.is-webinar {
   background: #bbe9bb;
