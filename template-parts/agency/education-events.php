@@ -67,7 +67,29 @@ $query_args['meta_query'] = [
 
 $events_query = new WP_Query($query_args);
 
-$kind_terms = bsi_agency_event_kind_terms();
+// Вкладки показываем только для типов, по которым в текущем списке
+// (ближайшие или архив) есть записи; выбранный тип оставляем всегда.
+$all_ids_args = $query_args;
+$all_ids_args['posts_per_page'] = -1;
+$all_ids_args['paged'] = 1;
+$all_ids_args['fields'] = 'ids';
+unset($all_ids_args['tax_query'], $all_ids_args['s']);
+
+$all_ids = get_posts($all_ids_args);
+$used_kinds = [];
+if (!empty($all_ids)) {
+  $used_terms = wp_get_object_terms($all_ids, 'agency_event_kind', ['fields' => 'slugs']);
+  if (!is_wp_error($used_terms)) {
+    $used_kinds = array_unique($used_terms);
+  }
+}
+
+$kind_terms = array_filter(
+  bsi_agency_event_kind_terms(),
+  function ($term) use ($used_kinds, $kind) {
+    return in_array($term->slug, $used_kinds, true) || $term->slug === $kind;
+  }
+);
 
 $tabs = [
   [

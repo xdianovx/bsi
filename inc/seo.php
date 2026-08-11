@@ -1462,3 +1462,67 @@ add_filter('wpseo_title', function ($title) {
 
     return $map[$uri] . ' | ' . get_bloginfo('name');
 }, 22);
+
+// ── Записи раздела «Турагентствам» (CPT documentation) ─────
+// У страниц-списков (мероприятия, архив) нет контента, поэтому Yoast
+// нечего обрезать в описание, а <title> сводится к имени записи.
+// Ключ — путь записи (get_page_uri).
+
+function bsi_seo_documentation_meta(): array
+{
+    return [
+        'meropriyatiya' => [
+            'title' => 'Мероприятия для турагентств — вебинары, семинары, рекламные туры',
+            'description' => 'Мероприятия BSI Group для турагентств: вебинары, семинары, воркшопы, отраслевые события и рекламные туры. Расписание ближайших мероприятий и регистрация.',
+        ],
+        'meropriyatiya/arhiv' => [
+            'title' => 'Архив мероприятий для турагентств — прошедшие вебинары и туры',
+            'description' => 'Архив мероприятий BSI Group для турагентств: прошедшие вебинары, семинары, воркшопы и рекламные туры. Поиск по названию и фильтр по типу мероприятия.',
+        ],
+    ];
+}
+
+function bsi_seo_documentation_meta_current(): array
+{
+    if (!is_singular('documentation')) {
+        return [];
+    }
+
+    $post = get_queried_object();
+    if (!($post instanceof WP_Post)) {
+        return [];
+    }
+
+    $uri = untrailingslashit((string) get_page_uri($post));
+    $map = bsi_seo_documentation_meta();
+
+    return $map[$uri] ?? [];
+}
+
+add_filter('wpseo_title', function ($title) {
+    $meta = bsi_seo_documentation_meta_current();
+    if (empty($meta['title'])) {
+        return $title;
+    }
+
+    $post_id = (int) get_queried_object_id();
+    if (trim((string) get_post_meta($post_id, '_yoast_wpseo_title', true)) !== '') {
+        return $title;
+    }
+
+    return $meta['title'] . ' | ' . get_bloginfo('name');
+}, 23);
+
+add_filter('wpseo_metadesc', function ($desc) {
+    $meta = bsi_seo_documentation_meta_current();
+    if (empty($meta['description'])) {
+        return $desc;
+    }
+
+    $post_id = (int) get_queried_object_id();
+    if (trim((string) get_post_meta($post_id, '_yoast_wpseo_metadesc', true)) !== '') {
+        return $desc;
+    }
+
+    return $meta['description'];
+}, 23);

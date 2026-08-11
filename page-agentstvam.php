@@ -40,11 +40,7 @@ $documents_query = new WP_Query($documents_query_args);
 
   <section class="agency-page__section">
     <div class="container">
-      <div class="agency-page__layout">
-        <aside class="agency-page__aside">
-          <?php get_template_part('template-parts/pages/agency/sidebar'); ?>
-        </aside>
-
+      <div class="agency-page__layout agency-page__layout--full">
         <div class="agency-page__content">
           <h1 class="h1 agency-page__title">Документы</h1>
 

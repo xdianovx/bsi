@@ -37,6 +37,15 @@ $events_toggle_label = $is_events_archive ? 'Ближайшие мероприя
               <h1 class="h1 agency-page__title"><?php echo esc_html($events_title); ?></h1>
               <?php if ($events_toggle_url !== ''): ?>
                 <a href="<?php echo esc_url($events_toggle_url); ?>" class="agency-page__archive-link">
+                  <?php if ($is_events_archive): ?>
+                    <?php
+                    echo bsi_lucide_icon('arrow-left', [
+                      'width' => '18',
+                      'height' => '18',
+                      'stroke' => 'currentColor',
+                    ]);
+                    ?>
+                  <?php endif; ?>
                   <?php echo esc_html($events_toggle_label); ?>
                 </a>
               <?php endif; ?>

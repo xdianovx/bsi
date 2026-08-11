@@ -14852,13 +14852,17 @@ button.single-event__dates-book {
 .agency-page__archive-link {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   color: #ee3145;
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid currentColor;
   transition: all 0.3s ease-in-out;
 }
+.agency-page__archive-link svg {
+  flex-shrink: 0;
+}
 .agency-page__archive-link:hover {
-  border-bottom-color: currentColor;
+  color: #da1227;
 }
 .agency-page__archive-link:focus-visible {
   outline: 2px solid #000000;
@@ -15065,6 +15069,9 @@ button.single-event__dates-book {
   border-color: #000000;
 }
 .agency-education-search__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 48px;
   padding: 0 24px;
   font-size: 16px;

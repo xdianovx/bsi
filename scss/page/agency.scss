@@ -106,13 +106,18 @@
 .agency-page__archive-link {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   color: $red;
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid currentColor;
   transition: $trans-text;
 
+  svg {
+    flex-shrink: 0;
+  }
+
   &:hover {
-    border-bottom-color: currentColor;
+    color: darken($red, 10%);
   }
 
   &:focus-visible {
@@ -362,6 +367,9 @@
 }
 
 .agency-education-search__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 48px;
   padding: 0 24px;
   font-size: 16px;
