@@ -345,6 +345,7 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_excursions';
   $vars[] = 'country_events';
   $vars[] = 'country_hotels_info';
+  $vars[] = 'country_deposits';
 
   return $vars;
 });
@@ -423,10 +424,16 @@ add_action('init', function () {
     'top'
   );
 
+  add_rewrite_rule(
+    '^country/([^/]+)/depozity/?$',
+    'index.php?post_type=country&name=$matches[1]&country_deposits=$matches[1]',
+    'top'
+  );
+
 }, 20);
 
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|sobytiynye-tury|informaciya-ob-otelyah)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',

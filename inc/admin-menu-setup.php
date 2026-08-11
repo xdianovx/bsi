@@ -206,6 +206,7 @@ function bsi_admin_menu_order($menu_ord)
     'edit.php?post_type=tourist_memo',// Памятки туристам
     'edit.php?post_type=entry_rules', // Правила въезда
     'edit.php?post_type=hotel_info',  // Информация об отелях
+    'edit.php?post_type=hotel_deposit',// Депозиты в отелях
     'cpt-separator',                  // ──────
   ];
 

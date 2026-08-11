@@ -17,6 +17,7 @@ $is_news_page = false;
 $is_excursions_page = false;
 $is_events_page = false;
 $is_hotels_info_page = false;
+$is_deposits_page = false;
 
 $country_slug = '';
 $country_title = '';
@@ -248,6 +249,15 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_hotels_info_page = true;
 
+} elseif (get_query_var('country_deposits')) {
+
+  $country_slug = (string) get_query_var('country_deposits');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_deposits_page = true;
+
 } elseif (is_tax('resort')) {
 
   $term = get_queried_object();
@@ -382,6 +392,16 @@ $has_excursions = get_posts([
   ],
 ]);
 
+$has_deposits = get_posts([
+  'post_type' => 'hotel_deposit',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'fields' => 'ids',
+  'meta_query' => [
+    ['key' => 'hotel_deposit_country', 'value' => $main_parent_id, 'compare' => '='],
+  ],
+]);
+
 $has_regions = get_terms([
   'taxonomy' => 'region',
   'hide_empty' => false,
@@ -397,7 +417,8 @@ $is_country_overview = (
   !$is_hotels_page && !$is_promos_page && !$is_visas_page &&
   !$is_resorts_page && !$is_tours_page &&
   !$is_memo_page && !$is_entry_rules_page && !$is_news_page &&
-  !$is_excursions_page && !$is_events_page && !$is_hotels_info_page
+  !$is_excursions_page && !$is_events_page && !$is_hotels_info_page &&
+  !$is_deposits_page
 );
 
 $active_tour_types = [];
@@ -752,6 +773,21 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
           </svg>
         </span>
         <span>Памятка туристам</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if (!empty($has_deposits)): ?>
+      <a href="<?= esc_url(home_url("/country/{$country_slug}/depozity/")); ?>"
+        class="child-page-item <?= $is_deposits_page ? 'active' : ''; ?>">
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-wallet-icon lucide-wallet">
+            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+          </svg>
+        </span>
+        <span>Депозиты в отелях</span>
       </a>
     <?php endif; ?>
 

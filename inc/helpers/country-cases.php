@@ -73,12 +73,42 @@ if (!function_exists('bsi_country_locative_map')) {
   }
 }
 
+if (!function_exists('bsi_country_genitive_map')) {
+  /** Родительный (Депозиты в отелях ...). */
+  function bsi_country_genitive_map(): array
+  {
+    return [
+      'Австрия' => 'Австрии', 'Азербайджан' => 'Азербайджана', 'Албания' => 'Албании',
+      'Армения' => 'Армении', 'Бахрейн' => 'Бахрейна', 'Белоруссия' => 'Белоруссии',
+      'Бельгия' => 'Бельгии', 'Бруней' => 'Брунея', 'Бутан' => 'Бутана',
+      'Великобритания' => 'Великобритании', 'Венгрия' => 'Венгрии', 'Вьетнам' => 'Вьетнама',
+      'Испания' => 'Испании', 'Италия' => 'Италии', 'Греция' => 'Греции',
+      'Грузия' => 'Грузии', 'Индия' => 'Индии', 'Индонезия' => 'Индонезии',
+      'Ирландия' => 'Ирландии', 'Исландия' => 'Исландии', 'Казахстан' => 'Казахстана',
+      'Камбоджа' => 'Камбоджи', 'Катар' => 'Катара', 'Кипр' => 'Кипра',
+      'Китай' => 'Китая', 'Лаос' => 'Лаоса', 'Люксембург' => 'Люксембурга',
+      'Маврикий' => 'Маврикия', 'Малайзия' => 'Малайзии', 'Мальдивы' => 'Мальдив',
+      'Мьянма' => 'Мьянмы', 'Непал' => 'Непала', 'Нидерланды' => 'Нидерландов',
+      'ОАЭ' => 'ОАЭ', 'Оман' => 'Омана', 'Португалия' => 'Португалии',
+      'Россия' => 'России', 'Саудовская Аравия' => 'Саудовской Аравии', 'Сейшелы' => 'Сейшел',
+      'Сербия' => 'Сербии', 'Сингапур' => 'Сингапура', 'Словакия' => 'Словакии',
+      'Словения' => 'Словении', 'США' => 'США', 'Таиланд' => 'Таиланда',
+      'Турция' => 'Турции', 'Узбекистан' => 'Узбекистана', 'Филиппины' => 'Филиппин',
+      'Франция' => 'Франции', 'Хорватия' => 'Хорватии', 'Черногория' => 'Черногории',
+      'Чехия' => 'Чехии', 'Швейцария' => 'Швейцарии', 'Шри-Ланка' => 'Шри-Ланки',
+      'Южная Корея' => 'Южной Кореи', 'Япония' => 'Японии', 'Египет' => 'Египта',
+      'Германия' => 'Германии', 'Кыргызстан' => 'Кыргызстана',
+      'Пакистан' => 'Пакистана', 'Туркменистан' => 'Туркменистана',
+    ];
+  }
+}
+
 if (!function_exists('bsi_country_case_resolve')) {
   /**
    * Возвращает страну в нужном падеже.
    *
    * @param int    $country_id  ID поста CPT `country`.
-   * @param string $case        'accusative' | 'locative'.
+   * @param string $case        'accusative' | 'locative' | 'genitive'.
    */
   function bsi_country_case_resolve(int $country_id, string $case): string
   {
@@ -89,11 +119,15 @@ if (!function_exists('bsi_country_case_resolve')) {
 
     /* 1. ACF-override на стране */
     if ($country_id > 0 && function_exists('get_field')) {
-      $override_fields = $case === 'locative'
-        ? ['country_title_locative', 'country_name_locative']
-        : ['country_title_accusative', 'country_name_accusative',
-           'country_title_prepositional', 'country_name_prepositional',
-           'title_prepositional', 'name_prepositional'];
+      if ($case === 'genitive') {
+        $override_fields = ['country_title_genitive', 'country_name_genitive'];
+      } elseif ($case === 'locative') {
+        $override_fields = ['country_title_locative', 'country_name_locative'];
+      } else {
+        $override_fields = ['country_title_accusative', 'country_name_accusative',
+          'country_title_prepositional', 'country_name_prepositional',
+          'title_prepositional', 'name_prepositional'];
+      }
 
       foreach ($override_fields as $field) {
         $value = trim((string) get_field($field, $country_id));
@@ -104,7 +138,14 @@ if (!function_exists('bsi_country_case_resolve')) {
     }
 
     /* 2. Карта */
-    $map = $case === 'locative' ? bsi_country_locative_map() : bsi_country_accusative_map();
+    if ($case === 'genitive') {
+      $map = bsi_country_genitive_map();
+    } elseif ($case === 'locative') {
+      $map = bsi_country_locative_map();
+    } else {
+      $map = bsi_country_accusative_map();
+    }
+
     if (isset($map[$title])) {
       return $map[$title];
     }
@@ -125,5 +166,27 @@ if (!function_exists('bsi_country_locative_title')) {
   function bsi_country_locative_title(int $country_id): string
   {
     return bsi_country_case_resolve($country_id, 'locative');
+  }
+}
+
+if (!function_exists('bsi_country_genitive_title')) {
+  /**
+   * Родительный падеж («Депозиты в отелях Китая»).
+   *
+   * Возвращает '' если падеж не удалось определить (нет ACF-override и нет
+   * в карте) — вызывающий код должен подставить безопасную формулировку,
+   * иначе получится «Депозиты в отелях Китай».
+   */
+  function bsi_country_genitive_title(int $country_id): string
+  {
+    $resolved = bsi_country_case_resolve($country_id, 'genitive');
+    $title = $country_id > 0 ? (string) get_the_title($country_id) : '';
+
+    /* Fallback вернул исходное имя — падеж неизвестен. */
+    if ($resolved === '' || ($resolved === $title && !isset(bsi_country_genitive_map()[$title]))) {
+      return '';
+    }
+
+    return $resolved;
   }
 }

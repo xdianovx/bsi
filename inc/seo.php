@@ -43,6 +43,7 @@ function bsi_seo_virtual_sections(): array
         'country_news'        => ['label' => 'Новости',         'slug' => 'novosti'],
         'country_excursions'  => ['label' => 'Экскурсии',       'slug' => 'ekskursii'],
         'country_events'      => ['label' => 'Событийные туры', 'slug' => 'sobytiynye-tury'],
+        'country_deposits'    => ['label' => 'Депозиты в отелях', 'slug' => 'depozity'],
     ];
 }
 
@@ -61,6 +62,13 @@ function bsi_seo_detect_virtual_page(): ?array
     }
 
     $result = null;
+
+    /* На 404 (раздел есть в роутере, но контента для страны нет) SEO-мета
+       виртуального раздела не нужна — иначе «ненайденная» страница получает
+       осмысленный title и canonical. */
+    if (is_404()) {
+        return $result;
+    }
 
     foreach (bsi_seo_virtual_sections() as $qv => $info) {
         $val = (string) get_query_var($qv);
@@ -89,6 +97,18 @@ function bsi_seo_virtual_title(?array $vp): string
     }
 
     $site = get_bloginfo('name');
+
+    /* Депозиты — заголовок естественной фразой в родительном падеже:
+       «Депозиты в отелях Китая: размер залога и возврат | BSI Group». */
+    if ($vp['qv'] === 'country_deposits') {
+        $genitive = function_exists('bsi_country_genitive_title')
+            ? bsi_country_genitive_title((int) $vp['country']->ID)
+            : '';
+
+        if ($genitive !== '') {
+            return 'Депозиты в отелях ' . $genitive . ': размер залога и возврат | ' . $site;
+        }
+    }
 
     return $vp['country']->post_title . ' — ' . $vp['label'] . ' | ' . $site;
 }
@@ -147,6 +167,7 @@ function bsi_seo_virtual_description(?array $vp): string
         'country_news'        => "Новости: {$n}. Изменения правил въезда, спецпредложения, открытие направлений и полезная информация от туроператора BSI Group.",
         'country_excursions'  => "Экскурсии {$v} {$acc}: программы, расписание, цены и продолжительность. Индивидуальные и групповые — бронирование от туроператора BSI Group.",
         'country_events'      => "Событийные туры {$v} {$acc}: поездки на концерты, спортивные матчи и фестивали. Билеты, отель и трансферы под ключ от туроператора BSI Group.",
+        'country_deposits'    => "Депозиты в отелях: {$n}. Размер залога при заселении, способы оплаты и порядок возврата. Полезная информация для туристов от BSI Group.",
     ];
 
     return $map[$vp['qv']] ?? '';
@@ -688,7 +709,9 @@ function bsi_seo_country_is_top_level(WP_Post $country): bool
  *
  * Разделы «Виза», «Памятка» и «Правила въезда» отдают 404, когда
  * связанной записи нет. «Событийные туры» отдают 200 всегда, поэтому
- * без проверки в sitemap попали бы 59 пустых каталогов.
+ * без проверки в sitemap попали бы 59 пустых каталогов. «Депозиты в
+ * отелях» отдают 404 без записи, но проверяем и здесь — чтобы страны
+ * без депозитов не попадали в sitemap ссылками на 404.
  */
 function bsi_seo_country_section_exists(int $country_id, string $qv): bool
 {
@@ -697,6 +720,7 @@ function bsi_seo_country_section_exists(int $country_id, string $qv): bool
         'country_memo'        => ['tourist_memo', 'memo_country'],
         'country_entry_rules' => ['entry_rules', 'entry_rules_country'],
         'country_events'      => ['event', 'tour_country'],
+        'country_deposits'    => ['hotel_deposit', 'hotel_deposit_country'],
     ];
 
     if (!isset($linked[$qv])) {
