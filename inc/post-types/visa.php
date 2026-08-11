@@ -186,3 +186,65 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
 
   return $links;
 });
+/**
+ * Визовые направления на поддоменах: внутренняя страница не нужна.
+ *
+ * Если тип визы помечен внешней ссылкой, заход на /country/{slug}/visa/…
+ * уводится 301 на проект, иначе в индекс попадёт пустая внутренняя копия.
+ * См. wiki/docs/visa-external-projects.md
+ */
+add_action('template_redirect', function () {
+  $country_slug = (string) get_query_var('country_visa');
+  if (!$country_slug || !function_exists('bsi_visa_type_link')) {
+    return;
+  }
+
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+  if (!$country) {
+    return;
+  }
+
+  $type_slug = (string) get_query_var('visa_type_slug');
+
+  if ($type_slug) {
+    $term = get_term_by('slug', $type_slug, 'visa_type');
+    if (!$term || is_wp_error($term)) {
+      return;
+    }
+    $terms = [$term];
+  } else {
+    $visa_ids = get_posts([
+      'post_type' => 'visa',
+      'post_status' => 'publish',
+      'posts_per_page' => -1,
+      'fields' => 'ids',
+      'meta_query' => [
+        ['key' => 'visa_country', 'value' => (int) $country->ID, 'compare' => '='],
+      ],
+    ]);
+
+    if (empty($visa_ids)) {
+      return;
+    }
+
+    $terms = wp_get_object_terms($visa_ids, 'visa_type');
+    if (is_wp_error($terms) || empty($terms)) {
+      return;
+    }
+  }
+
+  // Без типа в URL уводим только когда у страны нет ни одной внутренней визы,
+  // иначе пользователь потеряет доступ к обычному списку.
+  $external = [];
+  foreach ($terms as $term) {
+    if (bsi_visa_type_external_url($term) === '') {
+      return;
+    }
+    $external[] = $term;
+  }
+
+  $link = bsi_visa_type_link($country_slug, $external[0], 'redirect');
+
+  wp_redirect($link['url'], 301);
+  exit;
+});

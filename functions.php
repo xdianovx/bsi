@@ -455,6 +455,7 @@ require get_template_directory() . '/custom-fields/banner.php';
 require get_template_directory() . '/custom-fields/banner-second.php';
 require get_template_directory() . '/custom-fields/banner-third.php';
 require get_template_directory() . '/custom-fields/visa.php';
+require get_template_directory() . '/custom-fields/visa-type.php';
 require get_template_directory() . '/custom-fields/best-offers.php';
 require get_template_directory() . '/custom-fields/resort.php';
 require get_template_directory() . '/custom-fields/pages/mice.php';

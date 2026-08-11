@@ -481,11 +481,33 @@ if (!empty($has_visas)) {
   }
 }
 
+// Часть визовых направлений ведётся на отдельных поддоменах («Золотая виза» ОАЭ).
+// Такие типы выводятся самостоятельными пунктами меню со своим названием,
+// а не внутри общего аккордеона «Виза».
+// См. wiki/docs/visa-external-projects.md
+$external_visa_types = [];
+$internal_visa_types = [];
+foreach ($visa_types_for_country as $vt) {
+  if (bsi_visa_type_external_url($vt) !== '') {
+    $external_visa_types[] = $vt;
+  } else {
+    $internal_visa_types[] = $vt;
+  }
+}
+
 $is_tours_open = $is_tours_page || !empty($active_tour_types);
 $acc_id = 'sidebar-tours-' . (int) $main_parent_id;
 
 $is_visas_open = $is_visas_page || !empty($active_visa_types);
 $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
+
+$visa_icon_svg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">'
+  . '<path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />'
+  . '<path d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />'
+  . '<path d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z" stroke-width="1.5" stroke-linecap="round" />'
+  . '<path d="M7 13H11" stroke-width="1.5" stroke-linecap="round" />'
+  . '<path d="M7 17H15" stroke-width="1.5" stroke-linecap="round" />'
+  . '</svg>';
 ?>
 
 <nav class="child-pages" data-country-aside>
@@ -522,25 +544,45 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
       </a>
     <?php endif; ?>
 
-    <?php if (!empty($has_visas)): ?>
+    <?php foreach ($external_visa_types as $ext_vt): ?>
+      <?php
+      $ext_link = bsi_visa_type_link($country_slug, $ext_vt, 'country-menu');
+      $ext_link_mobile = bsi_visa_type_link($country_slug, $ext_vt, 'country-menu-mobile');
+      $ext_acc_id = 'sidebar-visa-ext-' . (int) $ext_vt->term_id . '-' . (int) $main_parent_id;
+      ?>
+      <div class="child-page-accordion is-open" data-accordion>
+        <button type="button" class="child-page-item" data-accordion-trigger aria-expanded="true"
+          aria-controls="<?= esc_attr($ext_acc_id); ?>">
+          <span class="child-page-item__icon"><?= $visa_icon_svg; ?></span>
+          <span><?= esc_html(bsi_visa_type_menu_label($ext_vt)); ?></span>
+
+          <div class="child-page-item__icon child-page-item__chevrone">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-chevron-down-icon lucide-chevron-down">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        </button>
+
+        <div id="<?= esc_attr($ext_acc_id); ?>" class="child-page-submenu" data-accordion-content>
+          <a class="child-page-subitem" href="<?= esc_url($ext_link['url']); ?>" target="_blank" rel="noopener"
+            aria-label="<?= esc_attr($ext_vt->name . ' — откроется в новой вкладке'); ?>"><?= esc_html($ext_vt->name); ?></a>
+        </div>
+      </div>
+
+      <a href="<?= esc_url($ext_link_mobile['url']); ?>" class="child-page-item --mobile" target="_blank" rel="noopener"
+        aria-label="<?= esc_attr(bsi_visa_type_menu_label($ext_vt) . ' — откроется в новой вкладке'); ?>">
+        <span class="child-page-item__icon"><?= $visa_icon_svg; ?></span>
+        <span><?= esc_html(bsi_visa_type_menu_label($ext_vt)); ?></span>
+      </a>
+    <?php endforeach; ?>
+
+    <?php if (!empty($internal_visa_types)): ?>
       <div class="child-page-accordion <?= $is_visas_open ? 'is-open' : ''; ?>" data-accordion>
         <button type="button" class="child-page-item <?= $is_visas_page ? 'active' : ''; ?>" data-accordion-trigger
           aria-expanded="<?= $is_visas_open ? 'true' : 'false'; ?>" aria-controls="<?= esc_attr($visa_acc_id); ?>">
-          <span class="child-page-item__icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5" stroke-width="1.5" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path
-                d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
-                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-              <path
-                d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
-                stroke-width="1.5" stroke-linecap="round" />
-              <path d="M7 13H11" stroke-width="1.5" stroke-linecap="round" />
-              <path d="M7 17H15" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
-          </span>
+          <span class="child-page-item__icon"><?= $visa_icon_svg; ?></span>
           <span>Виза</span>
 
           <div class="child-page-item__icon child-page-item__chevrone">
@@ -553,38 +595,20 @@ $visa_acc_id = 'sidebar-visas-' . (int) $main_parent_id;
         </button>
 
         <div id="<?= esc_attr($visa_acc_id); ?>" class="child-page-submenu" data-accordion-content <?= $is_visas_open ? '' : 'hidden'; ?>>
-          <?php if (!empty($visa_types_for_country)): ?>
-            <?php foreach ($visa_types_for_country as $vt): ?>
-              <?php
-              $vt_id = (int) $vt->term_id;
-              $is_active_vt = in_array($vt_id, $active_visa_types, true);
-              $url = home_url("/country/{$country_slug}/visa/{$vt->slug}/");
-              ?>
-              <a class="child-page-subitem <?= $is_active_vt ? 'active' : ''; ?>"
-                href="<?= esc_url($url); ?>"><?= esc_html($vt->name); ?></a>
-            <?php endforeach; ?>
-          <?php endif; ?>
+          <?php foreach ($internal_visa_types as $vt): ?>
+            <?php
+            $vt_id = (int) $vt->term_id;
+            $is_active_vt = in_array($vt_id, $active_visa_types, true);
+            $url = home_url("/country/{$country_slug}/visa/{$vt->slug}/");
+            ?>
+            <a class="child-page-subitem <?= $is_active_vt ? 'active' : ''; ?>"
+              href="<?= esc_url($url); ?>"><?= esc_html($vt->name); ?></a>
+          <?php endforeach; ?>
         </div>
       </div>
-    <?php endif; ?>
 
-    <?php if (!empty($has_visas)): ?>
       <a href="<?= esc_url($visas_list_url); ?>" class="child-page-item --mobile <?= $is_visas_page ? 'active' : ''; ?>">
-        <span class="child-page-item__icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 7C15 7 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5" stroke-width="1.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path
-              d="M10.0144 2.00578C7.51591 1.9 5.58565 2.18782 5.58565 2.18782C4.3668 2.27496 2.03099 2.95829 2.03101 6.94898C2.03103 10.9058 2.00517 15.7837 2.03101 17.7284C2.03101 18.9164 2.76663 21.6877 5.31279 21.8363C8.40763 22.0168 13.9822 22.0552 16.54 21.8363C17.2247 21.7976 19.5042 21.2602 19.7927 18.7801C20.0915 16.2107 20.032 14.4251 20.032 14.0001"
-              stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path
-              d="M22.0194 7C22.0194 9.76142 19.7786 12 17.0146 12C14.2505 12 12.0098 9.76142 12.0098 7C12.0098 4.23858 14.2505 2 17.0146 2C19.7786 2 22.0194 4.23858 22.0194 7Z"
-              stroke-width="1.5" stroke-linecap="round" />
-            <path d="M7 13H11" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M7 17H15" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
-        </span>
+        <span class="child-page-item__icon"><?= $visa_icon_svg; ?></span>
         <span>Виза</span>
       </a>
     <?php endif; ?>

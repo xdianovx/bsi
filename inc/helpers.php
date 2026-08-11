@@ -1145,3 +1145,80 @@ function bsi_homepage_slider_limit(): int
 
 	return $limit > 0 ? $limit : 12;
 }
+
+/**
+ * Внешняя ссылка типа визы (визовые проекты на поддоменах).
+ *
+ * Возвращает базовый URL без UTM-меток или '' для обычных типов.
+ * См. wiki/docs/visa-external-projects.md
+ */
+function bsi_visa_type_external_url($term): string
+{
+	if (!function_exists('get_field')) {
+		return '';
+	}
+
+	$term_id = $term instanceof WP_Term ? (int) $term->term_id : (int) $term;
+	if ($term_id <= 0) {
+		return '';
+	}
+
+	$url = get_field('visa_type_external_url', 'visa_type_' . $term_id);
+
+	return is_string($url) ? trim($url) : '';
+}
+
+/**
+ * Название типа визы в левом меню страны.
+ *
+ * Для внешних проектов бренд отличается от названия типа:
+ * тип «Вид на жительство» показывается как «Золотая виза».
+ */
+function bsi_visa_type_menu_label(WP_Term $term): string
+{
+	$label = function_exists('get_field')
+		? get_field('visa_type_menu_label', 'visa_type_' . (int) $term->term_id)
+		: '';
+
+	$label = is_string($label) ? trim($label) : '';
+
+	return $label !== '' ? $label : (string) $term->name;
+}
+
+/**
+ * Ссылка на тип визы: внутренняя страница или внешний проект с UTM.
+ *
+ * $placement попадает в utm_content — по нему в аналитике видно,
+ * откуда пришёл клик: 'vizy-page', 'country-menu', 'country-menu-mobile',
+ * 'redirect'.
+ *
+ * @return array{url: string, external: bool}
+ */
+function bsi_visa_type_link(string $country_slug, WP_Term $term, string $placement): array
+{
+	$external = bsi_visa_type_external_url($term);
+
+	if ($external === '') {
+		return [
+			'url' => home_url("/country/{$country_slug}/visa/{$term->slug}/"),
+			'external' => false,
+		];
+	}
+
+	$campaign = function_exists('get_field')
+		? get_field('visa_type_utm_campaign', 'visa_type_' . (int) $term->term_id)
+		: '';
+	$campaign = is_string($campaign) ? trim($campaign) : '';
+	if ($campaign === '') {
+		$campaign = (string) $term->slug;
+	}
+
+	$url = add_query_arg([
+		'utm_source' => 'bsigroup.ru',
+		'utm_medium' => 'referral',
+		'utm_campaign' => $campaign,
+		'utm_content' => $placement,
+	], $external);
+
+	return ['url' => $url, 'external' => true];
+}

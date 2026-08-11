@@ -427,9 +427,11 @@ $countries = get_posts([
                 <div class="visa-country-card__types">
                   <?php foreach ($types as $t): ?>
                     <?php
-                    $url = home_url('/country/' . $country_slug . '/visa/' . $t->slug . '/');
+                    $link = bsi_visa_type_link($country_slug, $t, 'vizy-page');
                     ?>
-                    <a class="visa-country-card__type" href="<?php echo esc_url($url); ?>">
+                    <a class="visa-country-card__type" href="<?php echo esc_url($link['url']); ?>"
+                      <?php if ($link['external']): ?> target="_blank" rel="noopener"
+                        aria-label="<?php echo esc_attr($t->name . ' — откроется в новой вкладке'); ?>" <?php endif; ?>>
                       <?php echo esc_html($t->name); ?>
                       <!-- тут цены на визы -->
                       <span class="visa-country-card__price"></span>
