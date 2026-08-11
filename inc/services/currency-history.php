@@ -131,6 +131,10 @@ function bsi_currency_history_upsert_snapshot(array $payload)
 		]
 	);
 
+	if ($result !== false) {
+		bsi_currency_history_flush_latest_cache();
+	}
+
 	return $result !== false;
 }
 
@@ -169,8 +173,40 @@ function bsi_currency_history_get_snapshot_by_date($date)
 	];
 }
 
-function bsi_currency_history_get_latest_snapshot()
+/**
+ * Сбрасывает кеш последнего снимка курсов.
+ *
+ * Нужен после записи новых курсов: в том же процессе (крон, админка)
+ * дальше должны отдаваться свежие данные, а не запомненные.
+ */
+function bsi_currency_history_flush_latest_cache(): void
 {
+	bsi_currency_history_get_latest_snapshot(true);
+}
+
+/**
+ * Последний снимок курсов валют.
+ *
+ * Результат запоминается на время запроса: функция вызывается из
+ * карточек товаров, и на главной это давало 148 одинаковых обращений
+ * к базе за одну загрузку страницы (19 из карточек событий, 129 из
+ * расчёта цен обучения).
+ *
+ * @param bool $flush Сбросить запомненное значение.
+ */
+function bsi_currency_history_get_latest_snapshot($flush = false)
+{
+	static $cached = false;
+
+	if ($flush) {
+		$cached = false;
+		return null;
+	}
+
+	if ($cached !== false) {
+		return $cached;
+	}
+
 	global $wpdb;
 
 	$table_name = bsi_currency_history_table_name();
@@ -180,20 +216,24 @@ function bsi_currency_history_get_latest_snapshot()
 	);
 
 	if (!$row || empty($row['rates_json'])) {
-		return null;
+		$cached = null;
+		return $cached;
 	}
 
 	$rates = json_decode($row['rates_json'], true);
 	if (!is_array($rates)) {
-		return null;
+		$cached = null;
+		return $cached;
 	}
 
-	return [
+	$cached = [
 		'rate_date' => $row['rate_date'],
 		'source_date' => $row['source_date'],
 		'markup_percent' => floatval($row['markup_percent']),
 		'rates' => $rates,
 	];
+
+	return $cached;
 }
 
 function bsi_currency_fetch_cbr_rates_remote()
