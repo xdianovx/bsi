@@ -109,8 +109,12 @@ function bsi_agency_event_kind_menu_links()
         ['title' => 'Все мероприятия', 'url' => $page_url],
     ];
 
+    // Тип попадает в меню, только если по нему есть ближайшие мероприятия:
+    // ссылки ведут на список ближайших, а не в архив.
+    $used_kinds = bsi_agency_events_used_kind_slugs(false);
+
     foreach (bsi_agency_event_kind_terms() as $term) {
-        if ((int) $term->count === 0) {
+        if (!in_array($term->slug, $used_kinds, true)) {
             continue;
         }
 

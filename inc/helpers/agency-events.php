@@ -187,6 +187,77 @@ function bsi_agency_event_kind_terms()
 }
 
 /**
+ * Аргументы выборки мероприятий: ближайшие или прошедшие.
+ * Дата берётся из event_start_ts, для записей без метки — из ACF-поля.
+ */
+function bsi_agency_events_query_args($archive = false)
+{
+    $now_ts = (int) current_time('timestamp');
+    $today = wp_date('Y-m-d');
+    $compare = $archive ? '<' : '>=';
+
+    return [
+        'post_type' => 'agency_event',
+        'post_status' => 'publish',
+        'meta_key' => 'event_start_ts',
+        'orderby' => 'meta_value_num',
+        'order' => $archive ? 'DESC' : 'ASC',
+        'meta_query' => [
+            'relation' => 'OR',
+            [
+                'key' => 'event_start_ts',
+                'value' => $now_ts,
+                'compare' => $compare,
+                'type' => 'NUMERIC',
+            ],
+            [
+                'relation' => 'AND',
+                [
+                    'key' => 'event_start_ts',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key' => 'event_start_date',
+                    'value' => $today,
+                    'compare' => $compare,
+                    'type' => 'DATE',
+                ],
+            ],
+        ],
+    ];
+}
+
+/**
+ * Слаги типов, по которым есть мероприятия в нужном списке.
+ * Терм с одними прошедшими мероприятиями не должен попадать
+ * ни во вкладки ближайших, ни в меню.
+ */
+function bsi_agency_events_used_kind_slugs($archive = false)
+{
+    static $cache = [];
+
+    $key = $archive ? 'archive' : 'upcoming';
+    if (isset($cache[$key])) {
+        return $cache[$key];
+    }
+
+    $args = bsi_agency_events_query_args($archive);
+    $args['posts_per_page'] = -1;
+    $args['fields'] = 'ids';
+
+    $ids = get_posts($args);
+    if (empty($ids)) {
+        $cache[$key] = [];
+        return $cache[$key];
+    }
+
+    $slugs = wp_get_object_terms($ids, 'agency_event_kind', ['fields' => 'slugs']);
+    $cache[$key] = is_wp_error($slugs) ? [] : array_values(array_unique($slugs));
+
+    return $cache[$key];
+}
+
+/**
  * CSS-модификатор бейджа типа на карточке.
  */
 function bsi_agency_event_kind_class($slug)

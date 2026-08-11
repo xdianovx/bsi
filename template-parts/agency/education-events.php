@@ -11,18 +11,9 @@ $search = bsi_agency_events_search_query();
 $paged = bsi_agency_events_paged();
 $base_url = bsi_agency_events_base_url();
 
-$now_ts = (int) current_time('timestamp');
-$today = wp_date('Y-m-d');
-
-$query_args = [
-  'post_type' => 'agency_event',
-  'post_status' => 'publish',
-  'posts_per_page' => 12,
-  'paged' => $paged,
-  'meta_key' => 'event_start_ts',
-  'orderby' => 'meta_value_num',
-  'order' => $show_archive ? 'DESC' : 'ASC',
-];
+$query_args = bsi_agency_events_query_args($show_archive);
+$query_args['posts_per_page'] = 12;
+$query_args['paged'] = $paged;
 
 if ($kind !== '') {
   $query_args['tax_query'] = [
@@ -38,51 +29,11 @@ if ($search !== '') {
   $query_args['s'] = $search;
 }
 
-// Мероприятие считается прошедшим по event_start_ts; для записей без метки
-// откатываемся на дату из ACF.
-$compare = $show_archive ? '<' : '>=';
-
-$query_args['meta_query'] = [
-  'relation' => 'OR',
-  [
-    'key' => 'event_start_ts',
-    'value' => $now_ts,
-    'compare' => $compare,
-    'type' => 'NUMERIC',
-  ],
-  [
-    'relation' => 'AND',
-    [
-      'key' => 'event_start_ts',
-      'compare' => 'NOT EXISTS',
-    ],
-    [
-      'key' => 'event_start_date',
-      'value' => $today,
-      'compare' => $compare,
-      'type' => 'DATE',
-    ],
-  ],
-];
-
 $events_query = new WP_Query($query_args);
 
 // Вкладки показываем только для типов, по которым в текущем списке
 // (ближайшие или архив) есть записи; выбранный тип оставляем всегда.
-$all_ids_args = $query_args;
-$all_ids_args['posts_per_page'] = -1;
-$all_ids_args['paged'] = 1;
-$all_ids_args['fields'] = 'ids';
-unset($all_ids_args['tax_query'], $all_ids_args['s']);
-
-$all_ids = get_posts($all_ids_args);
-$used_kinds = [];
-if (!empty($all_ids)) {
-  $used_terms = wp_get_object_terms($all_ids, 'agency_event_kind', ['fields' => 'slugs']);
-  if (!is_wp_error($used_terms)) {
-    $used_kinds = array_unique($used_terms);
-  }
-}
+$used_kinds = bsi_agency_events_used_kind_slugs($show_archive);
 
 $kind_terms = array_filter(
   bsi_agency_event_kind_terms(),
