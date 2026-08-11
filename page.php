@@ -27,11 +27,14 @@ get_header();
 	}
 	?>
 
-	<!-- <section>
-		<div class="container">
-			<?php the_title('<h1 class="h1">', '</h1>'); ?>
-		</div>
-	</section> -->
+	<?php
+	/*
+	 * Заголовок выводит template-parts/content-page.php.
+	 * Раньше здесь стоял ещё один the_title() внутри HTML-комментария —
+	 * PHP в комментарии всё равно выполняется, поэтому в разметке
+	 * оказывалось два H1, и краулеры считали это ошибкой структуры.
+	 */
+	?>
 
 	<section>
 		<div class="container">
