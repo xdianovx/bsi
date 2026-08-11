@@ -48,11 +48,26 @@ get_header(); ?>
         </aside>
 
         <div class="page-country__content">
-          <?php if ($promos): ?>
-            <h1 class="h1 country-promos__title">
-              <?= esc_html($country->post_title); ?> — акции
-            </h1>
+          <?php
+          // H1 выводится всегда: раньше он был внутри проверки на наличие
+          // акций, и страны без активных предложений отдавали страницу
+          // вообще без заголовка.
+          // «Акции в Италии» — предложный падеж, отвечает на «где?».
+          $promo_country_acc = function_exists('bsi_country_locative_title')
+            ? trim((string) bsi_country_locative_title((int) $country->ID))
+            : '';
+          if ($promo_country_acc === '') {
+            $promo_country_acc = (string) $country->post_title;
+          }
+          $promo_prep = function_exists('bsi_seo_preposition_v')
+            ? bsi_seo_preposition_v($promo_country_acc)
+            : 'в';
+          ?>
+          <h1 class="h1 country-promos__title">
+            Акции <?= esc_html($promo_prep . ' ' . $promo_country_acc); ?>
+          </h1>
 
+          <?php if ($promos): ?>
             <div class="country-promos__counter">
 
               <span>Нашли акций: <span class=""><?= count($promos); ?></span>
@@ -72,6 +87,11 @@ get_header(); ?>
               wp_reset_postdata();
               ?>
             </div>
+          <?php else: ?>
+            <p class="country-promos__empty">
+              Сейчас активных акций нет. Загляните позже или посмотрите
+              <a href="<?= esc_url(trailingslashit(home_url('/country/' . $country->post_name . '/tours'))); ?>">туры<?= '' ?></a>.
+            </p>
           <?php endif; ?>
         </div>
 

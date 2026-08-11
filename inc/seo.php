@@ -441,6 +441,16 @@ add_filter('wpseo_canonical', function ($canonical): string {
 
 add_filter('wpseo_opengraph_url', function ($url): string {
     $url = (string) $url;
+
+    // На разделах страны Yoast видит контекст самой страны и ставил
+    // og:url страницы страны, тогда как canonical указывает на раздел.
+    // Расхождение этих адресов краулеры считают ошибкой.
+    $vp = bsi_seo_detect_virtual_page();
+    $custom = bsi_seo_virtual_canonical($vp);
+    if ($custom !== '') {
+        return $custom;
+    }
+
     if ($url === '') {
         return $url;
     }
