@@ -184,8 +184,10 @@ function add_cpt_separator()
  * «Информация об отелях» — не пункт меню (ACF-поле внутри каждой «Страны»),
  * поэтому в сайдбаре не размещается.
  */
-add_filter('custom_menu_order', '__return_true');
-add_filter('menu_order', 'bsi_admin_menu_order');
+// Приоритет 9999 — чтобы отработать последними: плагины (например Post Types Order)
+// тоже сортируют сайдбар админки и на приоритете 10 перебивают наш порядок.
+add_filter('custom_menu_order', '__return_true', 9999);
+add_filter('menu_order', 'bsi_admin_menu_order', 9999);
 
 function bsi_admin_menu_order($menu_ord)
 {
