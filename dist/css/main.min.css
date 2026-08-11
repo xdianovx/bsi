@@ -14791,18 +14791,34 @@ button.single-event__dates-book {
   margin: 0;
 }
 .agency-page__title-row--events .agency-archive-toggle,
+.agency-page__title-row--events .agency-page__archive-link,
 .agency-page__title-row--events .ui-checkbox {
   white-space: nowrap;
 }
 @media screen and (max-width: 1024px) {
   .agency-page__title-row--events {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
   }
-  .agency-page__title-row--events .ui-checkbox {
-    width: auto;
-  }
+}
+.agency-page__archive-link {
+  display: inline-flex;
+  align-items: center;
+  color: #5c5c5c;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease-in-out;
+}
+.agency-page__archive-link:hover {
+  color: #000000;
+  border-bottom-color: currentColor;
+}
+.agency-page__archive-link:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+.agency-page__archive-link.is-active {
+  color: #ee3145;
+  border-bottom-color: currentColor;
 }
 .agency-event-single__meta-value {
   margin-top: 2px;

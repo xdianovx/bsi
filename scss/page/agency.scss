@@ -83,18 +83,38 @@
   }
 
   .agency-archive-toggle,
+  .agency-page__archive-link,
   .ui-checkbox {
     white-space: nowrap;
   }
 
   @media screen and (max-width: 1024px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
+  }
+}
 
-    .ui-checkbox {
-      width: auto;
-    }
+// Переключатель архива в строке с заголовком.
+.agency-page__archive-link {
+  display: inline-flex;
+  align-items: center;
+  color: $text-gray;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: $trans-text;
+
+  &:hover {
+    color: $text-black;
+    border-bottom-color: currentColor;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $text-black;
+    outline-offset: 2px;
+  }
+
+  &.is-active {
+    color: $red;
+    border-bottom-color: currentColor;
   }
 }
 

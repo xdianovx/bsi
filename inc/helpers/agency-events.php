@@ -176,6 +176,43 @@ function bsi_agency_events_tab_url($kind = '')
 }
 
 /**
+ * Открыт ли архив мероприятий.
+ */
+function bsi_agency_events_is_archive_view()
+{
+  $archive = isset($_GET['archive']) ? sanitize_text_field(wp_unslash($_GET['archive'])) : '';
+  $kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
+
+  return ($archive === '1' || $kind === 'archive');
+}
+
+/**
+ * Выбранный тип мероприятий ('' — все).
+ */
+function bsi_agency_events_current_kind()
+{
+  $kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
+
+  return ($kind === 'archive') ? '' : $kind;
+}
+
+/**
+ * Ссылка-переключатель архива: сохраняет выбранный тип,
+ * из архива возвращает к ближайшим мероприятиям.
+ */
+function bsi_agency_events_archive_toggle_url()
+{
+  $url = bsi_agency_events_page_url();
+  $kind = bsi_agency_events_current_kind();
+
+  if ($kind !== '') {
+    $url = add_query_arg('kind', $kind, $url);
+  }
+
+  return bsi_agency_events_is_archive_view() ? $url : add_query_arg('archive', '1', $url);
+}
+
+/**
  * 301 со старого адреса /agentstvam/obuchenie/ на новый.
  * Штатный wp_old_slug_redirect для иерархического CPT не срабатывает,
  * поэтому ловим 404 по последнему сегменту пути.

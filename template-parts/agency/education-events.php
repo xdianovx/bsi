@@ -4,13 +4,8 @@
  * Вкладки — обычные ссылки (?kind=…, ?archive=1), страница рендерится на сервере.
  */
 
-$kind = isset($_GET['kind']) ? sanitize_key(wp_unslash($_GET['kind'])) : '';
-$archive = isset($_GET['archive']) ? sanitize_text_field(wp_unslash($_GET['archive'])) : '';
-$show_archive = ($archive === '1');
-if ($kind === 'archive') {
-  $kind = '';
-  $show_archive = true;
-}
+$kind = bsi_agency_events_current_kind();
+$show_archive = bsi_agency_events_is_archive_view();
 
 $now_ts = (int) current_time('timestamp');
 $today = wp_date('Y-m-d');
@@ -66,27 +61,24 @@ $events_query = new WP_Query($query_args);
 
 $kind_terms = function_exists('bsi_agency_event_kind_terms') ? bsi_agency_event_kind_terms() : [];
 
+// Вкладки не сбрасывают режим архива — «Архив» переключается ссылкой в шапке.
+$tab_suffix = $show_archive ? ['archive' => '1'] : [];
+
 $tabs = [
   [
     'label' => 'Все',
-    'url' => bsi_agency_events_tab_url(''),
-    'is_active' => ($kind === '' && !$show_archive),
+    'url' => add_query_arg($tab_suffix, bsi_agency_events_tab_url('')),
+    'is_active' => ($kind === ''),
   ],
 ];
 
 foreach ($kind_terms as $kind_term) {
   $tabs[] = [
     'label' => bsi_agency_event_kind_plural($kind_term->slug, $kind_term->name),
-    'url' => bsi_agency_events_tab_url($kind_term->slug),
-    'is_active' => (!$show_archive && $kind === $kind_term->slug),
+    'url' => add_query_arg($tab_suffix, bsi_agency_events_tab_url($kind_term->slug)),
+    'is_active' => ($kind === $kind_term->slug),
   ];
 }
-
-$tabs[] = [
-  'label' => 'Архив',
-  'url' => bsi_agency_events_tab_url('archive'),
-  'is_active' => $show_archive,
-];
 ?>
 
 <section class="agency-education" data-agency-education>

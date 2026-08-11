@@ -29,7 +29,13 @@ $is_education_page = bsi_is_agency_events_page();
 
         <div class="agency-page__content">
           <?php if ($is_education_page): ?>
-            <h1 class="h1 agency-page__title"><?php the_title(); ?></h1>
+            <div class="agency-page__title-row agency-page__title-row--events">
+              <h1 class="h1 agency-page__title">Мероприятия для турагентств</h1>
+              <a href="<?php echo esc_url(bsi_agency_events_archive_toggle_url()); ?>"
+                class="agency-page__archive-link <?php echo bsi_agency_events_is_archive_view() ? 'is-active' : ''; ?>">
+                Архив
+              </a>
+            </div>
             <?php get_template_part('template-parts/agency/education-events'); ?>
           <?php else: ?>
             <?php while (have_posts()): ?>
