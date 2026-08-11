@@ -14,6 +14,120 @@ function theme_register_nav_menu()
 
 
 
+/**
+ * Автоподстановка типов мероприятий в меню.
+ *
+ * Пункт меню с CSS-классом `bsi-agency-event-kinds` получает дочерние
+ * ссылки: «Все мероприятия» → типы (только непустые) → «Архив».
+ * Новый терм в админке сразу появляется в меню, править меню не нужно.
+ */
+define('BSI_AGENCY_KINDS_MENU_CLASS', 'bsi-agency-event-kinds');
+define('BSI_AGENCY_KINDS_MENU_ID_BASE', 9000000);
+
+add_filter('wp_get_nav_menu_items', 'bsi_menu_inject_agency_event_kinds', 10, 3);
+function bsi_menu_inject_agency_event_kinds($items, $menu, $args)
+{
+    if (is_admin() || !is_array($items) || !function_exists('bsi_agency_event_kind_terms')) {
+        return $items;
+    }
+
+    $parent = null;
+    foreach ($items as $item) {
+        $classes = (array) ($item->classes ?? []);
+        if (in_array(BSI_AGENCY_KINDS_MENU_CLASS, $classes, true)) {
+            $parent = $item;
+            break;
+        }
+    }
+
+    if (!$parent) {
+        return $items;
+    }
+
+    $links = bsi_agency_event_kind_menu_links();
+    if (empty($links)) {
+        return $items;
+    }
+
+    $injected = [];
+    $index = 0;
+    foreach ($links as $link) {
+        $child = new stdClass();
+        $child->ID = BSI_AGENCY_KINDS_MENU_ID_BASE + $index;
+        $child->db_id = $child->ID;
+        $child->menu_item_parent = (string) $parent->ID;
+        $child->object_id = $child->ID;
+        $child->object = 'custom';
+        $child->type = 'custom';
+        $child->type_label = 'Произвольная ссылка';
+        $child->title = $link['title'];
+        $child->url = $link['url'];
+        $child->target = '';
+        $child->attr_title = '';
+        $child->description = '';
+        $child->classes = [''];
+        $child->xfn = '';
+        $child->post_type = 'nav_menu_item';
+        $child->menu_order = (int) $parent->menu_order;
+
+        $injected[] = $child;
+        $index++;
+    }
+
+    // Ставим сгенерированные пункты сразу за родителем: массив уже
+    // отсортирован, после фильтра WordPress порядок не пересчитывает.
+    $result = [];
+    foreach ($items as $item) {
+        $result[] = $item;
+        if ((int) $item->ID === (int) $parent->ID) {
+            $result = array_merge($result, $injected);
+        }
+    }
+
+    // wp_nav_menu() индексирует пункты по menu_order ($sorted[$menu_order]),
+    // поэтому дубли порядка затирают друг друга — перенумеровываем подряд.
+    $order = 1;
+    foreach ($result as $item) {
+        $item->menu_order = $order++;
+    }
+
+    return $result;
+}
+
+/**
+ * Ссылки для автоподстановки: «Все мероприятия», типы, «Архив».
+ * Типы без записей пропускаем — пустой раздел меню бесполезен.
+ */
+function bsi_agency_event_kind_menu_links()
+{
+    $page_url = bsi_agency_events_page_url();
+    if ($page_url === '' || $page_url === home_url('/')) {
+        return [];
+    }
+
+    $links = [
+        ['title' => 'Все мероприятия', 'url' => $page_url],
+    ];
+
+    foreach (bsi_agency_event_kind_terms() as $term) {
+        if ((int) $term->count === 0) {
+            continue;
+        }
+
+        $links[] = [
+            'title' => bsi_agency_event_kind_plural($term->slug, $term->name),
+            'url' => add_query_arg('kind', $term->slug, $page_url),
+        ];
+    }
+
+    $archive_url = bsi_agency_events_archive_page_url();
+    if ($archive_url !== '') {
+        $links[] = ['title' => 'Архив', 'url' => $archive_url];
+    }
+
+    return $links;
+}
+
 class BSI_Mega_Menu_Walker extends Walker_Nav_Menu
 {
     private $in_list_without_children = false;
