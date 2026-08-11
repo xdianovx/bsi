@@ -158,9 +158,19 @@ function bsi_seo_virtual_canonical(?array $vp): string
         return '';
     }
 
-    return trailingslashit(
+    $url = trailingslashit(
         home_url('/country/' . $vp['country']->post_name . '/' . $vp['slug'])
     );
+
+    // У страниц пагинации canonical должен указывать на них самих:
+    // иначе поисковик считает их копией первой страницы и не доходит
+    // до остальных туров каталога.
+    $paged = (int) get_query_var('paged');
+    if ($paged > 1) {
+        $url = trailingslashit($url . 'page/' . $paged);
+    }
+
+    return $url;
 }
 
 // ── Yoast: <title> ──────────────────────────────────────────

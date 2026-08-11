@@ -492,6 +492,15 @@ add_action('init', function () {
     'top'
   );
 
+  // Пагинация каталога: без этого правила /tours/page/2/ попадал под
+  // правило одиночного тура и отдавал 404, из-за чего у направления
+  // были доступны только первые 12 туров из списка.
+  add_rewrite_rule(
+    '^country/([^/]+)/tours/page/([0-9]{1,})/?$',
+    'index.php?country_tours=$matches[1]&paged=$matches[2]',
+    'top'
+  );
+
   add_rewrite_rule(
     '^country/([^/]+)/tours/([^/]+)/?$',
     'index.php?post_type=tour&name=$matches[2]&country_in_path=$matches[1]',
@@ -563,6 +572,14 @@ add_action('template_redirect', function () {
     status_header(404);
     return;
   }
+
+  // На /tours/page/2/ основной запрос записей не находит, и WordPress
+  // успевает пометить его как 404 в handle_404() — до того, как мы
+  // подключим шаблон. Контент при этом отдавался верный, но со
+  // статусом 404: поисковики такие страницы выбрасывают из индекса.
+  global $wp_query;
+  $wp_query->is_404 = false;
+  status_header(200);
 
   global $country_tours_data;
   $country_tours_data = [

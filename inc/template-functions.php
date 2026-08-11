@@ -179,3 +179,25 @@ add_filter('wp_get_attachment_image_attributes', function ($attr, $attachment) {
 
 	return $attr;
 }, 10, 2);
+
+/**
+ * Сбрасывает кеш правил перезаписи при их изменении.
+ *
+ * WordPress хранит правила в опции rewrite_rules и не перечитывает их
+ * после выката кода. Новое правило (например, пагинация каталога туров)
+ * без сброса просто не работает, а зайти в «Настройки → Постоянные
+ * ссылки» после каждого деплоя никто не помнит.
+ *
+ * Значение константы меняем вручную вместе с правилами — сброс
+ * выполнится один раз на всех окружениях.
+ */
+add_action('init', function (): void {
+	$version = '2026-08-11-tours-pagination';
+
+	if (get_option('bsi_rewrite_rules_version') === $version) {
+		return;
+	}
+
+	flush_rewrite_rules(false);
+	update_option('bsi_rewrite_rules_version', $version, false);
+}, 99);
