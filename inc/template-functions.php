@@ -201,3 +201,58 @@ add_action('init', function (): void {
 	flush_rewrite_rules(false);
 	update_option('bsi_rewrite_rules_version', $version, false);
 }, 99);
+
+/**
+ * Убирает «Заголовок 1» из выпадающего списка форматов редактора.
+ *
+ * H1 на странице должен быть один и выводиться шаблоном. Когда редактор
+ * позволяет вставить ещё один в текст, на странице оказывается два-три
+ * заголовка первого уровня — поисковики считают это ошибкой структуры.
+ * Оставляем H2-H6: они для подзаголовков и нужны.
+ */
+add_filter('tiny_mce_before_init', function (array $settings): array {
+	$settings['block_formats'] = 'Абзац=p;Заголовок 2=h2;Заголовок 3=h3;'
+		. 'Заголовок 4=h4;Заголовок 5=h5;Заголовок 6=h6;Цитата=blockquote;'
+		. 'Преформатированный=pre';
+
+	return $settings;
+});
+
+/**
+ * Понижает H1 из контента до H2 при выводе.
+ *
+ * Страницы, где заголовок первого уровня уже вставлен в текст, чинить
+ * вручную не нужно: шаблон отдаёт свой H1, а лишние из контента
+ * становятся подзаголовками.
+ */
+add_filter('the_content', function ($content) {
+	if (!is_string($content) || stripos($content, '<h1') === false) {
+		return $content;
+	}
+
+	$content = preg_replace('/<h1(\s[^>]*)?>/i', '<h2$1>', $content);
+
+	return preg_replace('/<\/h1>/i', '</h2>', $content);
+}, 25);
+
+/**
+ * Дописывает mailto: ссылкам, где адрес указан без схемы.
+ *
+ * В контенте встречаются ссылки вида <a href="e.sikora@bsigroup.ru">.
+ * Браузер считает такой href относительным путём, поэтому клик ведёт
+ * на /kontakty/e.sikora%40bsigroup.ru и отдаёт 404 — в обходе таких
+ * адресов набралось четыре штуки.
+ */
+add_filter('the_content', function ($content) {
+	if (!is_string($content) || strpos($content, '@') === false) {
+		return $content;
+	}
+
+	return preg_replace_callback(
+		'/href=(["\'])(?!mailto:|tel:|https?:|ftp:|\/|#|\?)([^"\'\s]+@[^"\'\s]+\.[a-z]{2,})\1/i',
+		static function (array $m): string {
+			return 'href=' . $m[1] . 'mailto:' . $m[2] . $m[1];
+		},
+		$content
+	);
+}, 20);
