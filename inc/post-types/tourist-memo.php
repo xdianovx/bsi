@@ -46,6 +46,12 @@ add_action('init', function () {
 }, 10);
 
 /**
+ * Своей single-страницы нет: ссылка и прямой заход ведут на раздел страны.
+ * См. inc/helpers/country-section-singular.php.
+ */
+bsi_register_country_section_singular('tourist_memo', 'memo_country', 'pamyatka');
+
+/**
  * ACF: привязка к стране (под заголовком)
  */
 add_action('acf/init', function () {

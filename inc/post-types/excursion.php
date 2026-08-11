@@ -189,9 +189,6 @@ add_action('template_redirect', function () {
   }
 
   $country_in_path = (string) get_query_var('country_in_path');
-  if ($country_in_path === '') {
-    return;
-  }
 
   $excursion_id = get_queried_object_id();
   if (!$excursion_id) {
@@ -199,6 +196,33 @@ add_action('template_redirect', function () {
   }
 
   $country_id = function_exists('bsi_get_excursion_country_id') ? bsi_get_excursion_country_id((int) $excursion_id) : 0;
+
+  /* Заход мимо ЧПУ (/?excursion={slug}, /?p=ID) — 301 на канонический URL,
+     иначе экскурсия доступна по двум адресам и дефолтным шаблоном темы.
+     Страны нет — показывать экскурсию негде, 404. */
+  if ($country_in_path === '') {
+    /* Предпросмотр черновика — не редиректим, ЧПУ для него ещё не работает. */
+    if (is_preview()) {
+      return;
+    }
+
+    if (!$country_id) {
+      global $wp_query;
+      $wp_query->set_404();
+      status_header(404);
+      nocache_headers();
+      return;
+    }
+
+    $canonical = get_permalink($excursion_id);
+    if ($canonical) {
+      wp_safe_redirect($canonical, 301);
+      exit;
+    }
+
+    return;
+  }
+
   if (!$country_id) {
     return;
   }

@@ -121,3 +121,9 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
 
   return $new;
 });
+
+/**
+ * Своей single-страницы нет: ссылка и прямой заход ведут на раздел страны.
+ * См. inc/helpers/country-section-singular.php.
+ */
+bsi_register_country_section_singular('entry_rules', 'entry_rules_country', 'pravila-vyezda');

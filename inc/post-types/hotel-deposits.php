@@ -43,73 +43,10 @@ add_action('init', function () {
 }, 10);
 
 /**
- * Страна, к которой привязана запись.
+ * Своей single-страницы нет: ссылка и прямой заход ведут на раздел страны.
+ * См. inc/helpers/country-section-singular.php.
  */
-function bsi_hotel_deposit_country_id(int $post_id): int
-{
-  $country_id = function_exists('get_field')
-    ? get_field('hotel_deposit_country', $post_id)
-    : get_post_meta($post_id, 'hotel_deposit_country', true);
-
-  if ($country_id instanceof WP_Post) {
-    return (int) $country_id->ID;
-  }
-
-  if (is_array($country_id)) {
-    $country_id = reset($country_id);
-  }
-
-  return (int) $country_id;
-}
-
-/**
- * Ссылка на запись = раздел страны.
- *
- * Своей single-страницы у депозитов нет: контент выводит country-deposits.php.
- * Без этого фильтра кнопка «Просмотреть» в админке и любые get_permalink()
- * ведут на /?hotel_deposit={slug} с дефолтным шаблоном темы.
- */
-add_filter('post_type_link', function ($url, $post) {
-  if (!($post instanceof WP_Post) || $post->post_type !== 'hotel_deposit') {
-    return $url;
-  }
-
-  $country_id = bsi_hotel_deposit_country_id((int) $post->ID);
-  if (!$country_id) {
-    return $url;
-  }
-
-  $country_slug = (string) get_post_field('post_name', $country_id);
-  if ($country_slug === '') {
-    return $url;
-  }
-
-  return trailingslashit(home_url('/country/' . $country_slug . '/depozity/'));
-}, 10, 2);
-
-/**
- * Прямой заход на /?hotel_deposit={slug} — 301 на раздел страны.
- * Страна не выбрана — 404, показывать запись отдельно нечем.
- */
-add_action('template_redirect', function () {
-  if (!is_singular('hotel_deposit')) {
-    return;
-  }
-
-  $country_id = bsi_hotel_deposit_country_id((int) get_queried_object_id());
-  $country_slug = $country_id ? (string) get_post_field('post_name', $country_id) : '';
-
-  if ($country_slug === '') {
-    global $wp_query;
-    $wp_query->set_404();
-    status_header(404);
-    nocache_headers();
-    return;
-  }
-
-  wp_safe_redirect(trailingslashit(home_url('/country/' . $country_slug . '/depozity/')), 301);
-  exit;
-});
+bsi_register_country_section_singular('hotel_deposit', 'hotel_deposit_country', 'depozity');
 
 /**
  * ACF: привязка к стране (под заголовком)
