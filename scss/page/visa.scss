@@ -566,9 +566,9 @@
 }
 
 .visa-country-card__flag {
-  width: 32px;
+  @include lazy-fixed-size(32px);
+
   border-radius: 100%;
-  height: 32px;
   overflow: hidden;
   object-fit: cover;
   flex: 0 0 auto;

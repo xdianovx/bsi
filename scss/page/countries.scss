@@ -52,9 +52,9 @@
 }
 
 .countries-letter__flag {
+  @include lazy-fixed-size(36px);
+
   display: block;
-  width: 36px;
-  height: 36px;
   object-fit: cover;
   border-radius: 100%;
 }

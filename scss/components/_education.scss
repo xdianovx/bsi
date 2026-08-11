@@ -346,8 +346,8 @@
 }
 
 .single-education__flag {
-  width: 24px;
-  height: 18px;
+  @include lazy-fixed-size(24px, 18px);
+
   object-fit: cover;
   border-radius: 2px;
 }
