@@ -36,7 +36,6 @@ import { initEducationProgramForm } from "./modules/forms/education-program-form
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initExcursionBookingForm } from "./modules/forms/excursion-booking-form";
 import { initTourBookingForm } from "./modules/forms/tour-booking-form";
-import { initAgencyEventsFilter } from "./modules/ajax/agency-events";
 import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
@@ -47,8 +46,7 @@ import { initCookieConsent } from "./modules/cookie-consent";
 
 function initYmReachGoals() {
   const isVisaPage =
-    document.body.classList.contains("page-template-page-visa-php") ||
-    document.body.classList.contains("page-template-page-visa");
+    document.body.classList.contains("page-template-page-visa-php") || document.body.classList.contains("page-template-page-visa");
   if (isVisaPage && typeof ym === "function") {
     ym(108341897, "reachGoal", "page-visa");
   }
@@ -80,12 +78,12 @@ function initYmReachGoals() {
     const location = link.closest("header")
       ? "header"
       : link.closest("footer")
-        ? "footer"
-        : link.closest(".subscribe-section")
-          ? "subscribe"
-          : link.closest(".single-promo__ended")
-            ? "promo-ended"
-            : "other";
+      ? "footer"
+      : link.closest(".subscribe-section")
+      ? "subscribe"
+      : link.closest(".single-promo__ended")
+      ? "promo-ended"
+      : "other";
 
     ym(108341897, "reachGoal", "social_click", {
       network: {
@@ -131,7 +129,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initPopularHotelsSlider();
   initPopularToursSlider();
   initPopularEducationSlider();
-initPopularEventToursSlider();
+  initPopularEventToursSlider();
   archiveProjects();
   tourPrices();
   initEducationFilter();
@@ -146,7 +144,6 @@ initPopularEventToursSlider();
   initCrosstourCards();
   initExcursionBookingForm();
   initTourBookingForm();
-  initAgencyEventsFilter();
   initAgencyEventRegForm();
   initBonusMarquee();
   // Карта инициализируется после загрузки API Яндекс.Карт (скрипт в footer)

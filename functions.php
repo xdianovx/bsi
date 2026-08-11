@@ -394,6 +394,7 @@ require get_template_directory() . '/inc/helpers.php';
 require get_template_directory() . '/inc/helpers/content-schedule.php';
 // Раньше CPT: файлы записей-разделов страны вызывают регистратор при подключении.
 require get_template_directory() . '/inc/helpers/country-section-singular.php';
+require get_template_directory() . '/inc/helpers/agency-events.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
 require get_template_directory() . '/inc/lucide-icons.php';
@@ -432,7 +433,6 @@ require get_template_directory() . '/inc/helpers/event-price.php';
 require get_template_directory() . '/inc/helpers/crosstour.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
-require get_template_directory() . '/inc/requests/agency-events-filter.php';
 require get_template_directory() . '/inc/requests/agency-event-registration.php';
 require get_template_directory() . '/inc/requests/batch-prices.php';
 

@@ -29,14 +29,7 @@ $kind_terms = get_the_terms($post_id, 'agency_event_kind');
 $kind = (!empty($kind_terms) && !is_wp_error($kind_terms)) ? $kind_terms[0] : null;
 $kind_label = $kind ? $kind->name : 'Событие';
 $kind_slug = $kind ? $kind->slug : '';
-$kind_class = 'is-default';
-if ('webinar' === $kind_slug) {
-  $kind_class = 'is-webinar';
-} elseif ('event' === $kind_slug) {
-  $kind_class = 'is-event';
-} elseif ('promo-tour' === $kind_slug) {
-  $kind_class = 'is-promo';
-}
+$kind_class = bsi_agency_event_kind_class($kind_slug);
 ?>
 
 <a href="<?php echo esc_url($permalink); ?>" class="agency-sidebar-event">

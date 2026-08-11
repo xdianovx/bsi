@@ -13,6 +13,11 @@
     gap: 20px;
     display: block;
   }
+
+  // Страница мероприятий: без сайдбара, контент во всю ширину.
+  &--full {
+    grid-template-columns: 1fr;
+  }
 }
 
 .agency-page__aside {
@@ -321,6 +326,7 @@
   font-weight: 500;
   font-size: inherit;
   line-height: 1;
+  text-decoration: none;
   cursor: pointer;
   transition: $trans-text;
 
@@ -328,9 +334,20 @@
     background: darken(#ececee, 6%);
   }
 
+  &:focus-visible {
+    outline: 2px solid $text-black;
+    outline-offset: 2px;
+  }
+
   &.is-active {
     background: $red;
     color: #fff;
+  }
+
+  @media screen and (max-width: 768px) {
+    // Тач-таргет: вкладки стали ссылками, на мобильных нужен запас по высоте.
+    min-height: 44px;
+    padding: 8px 16px;
   }
 }
 

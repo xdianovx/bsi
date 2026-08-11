@@ -50,14 +50,7 @@ if ($content_raw !== '') {
   $excerpt = wp_trim_words(wp_strip_all_tags($content_raw), 25, '…');
 }
 
-$kind_class = 'is-default';
-if ('webinar' === $kind_slug) {
-  $kind_class = 'is-webinar';
-} elseif ('event' === $kind_slug) {
-  $kind_class = 'is-event';
-} elseif ('promo-tour' === $kind_slug) {
-  $kind_class = 'is-promo';
-}
+$kind_class = bsi_agency_event_kind_class($kind_slug);
 ?>
 
 <article class="agency-education-card">

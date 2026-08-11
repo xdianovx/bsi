@@ -7,8 +7,7 @@ $section_page = get_page_by_path('turagenstvam');
 $section_url = $section_page ? get_permalink($section_page->ID) : home_url('/turagenstvam/');
 $section_path = untrailingslashit((string) wp_parse_url($section_url, PHP_URL_PATH));
 
-$is_education_page = is_singular('documentation')
-  && get_post_field('post_name', get_queried_object_id()) === 'obuchenie';
+$is_education_page = is_singular('documentation') && bsi_is_agency_events_page();
 
 $is_single_event = is_singular('agency_event');
 
@@ -24,17 +23,12 @@ if ($is_education_page) {
 
 $is_education_context = $is_education_page || $is_single_event;
 
-$kind_terms_raw = get_terms([
-  'taxonomy' => 'agency_event_kind',
-  'hide_empty' => true,
-  'orderby' => 'name',
-  'order' => 'ASC',
-]);
 $education_kinds = [];
-if (!is_wp_error($kind_terms_raw) && is_array($kind_terms_raw)) {
-  foreach ($kind_terms_raw as $kt) {
-    $education_kinds[] = ['slug' => $kt->slug, 'label' => $kt->name];
-  }
+foreach (bsi_agency_event_kind_terms() as $kt) {
+  $education_kinds[] = [
+    'slug' => $kt->slug,
+    'label' => bsi_agency_event_kind_plural($kt->slug, $kt->name),
+  ];
 }
 
 $items = [
@@ -73,7 +67,7 @@ if (!empty($sidebar_posts)) {
     $permalink = get_permalink($sidebar_post->ID);
     $children = [];
 
-    if ($sidebar_post->post_name === 'obuchenie') {
+    if (bsi_is_agency_events_page($sidebar_post->ID)) {
       foreach ($education_kinds as $ek) {
         $children[] = [
           'label' => $ek['label'],
@@ -169,8 +163,7 @@ if ($current_document_id && taxonomy_exists('agency_item_type')) {
     ],
   ]);
 
-  $education_post = get_page_by_path('obuchenie', OBJECT, 'documentation');
-  $education_url = $education_post ? get_permalink($education_post->ID) : '#';
+  $education_url = bsi_agency_events_page_url();
   ?>
 
   <?php if ($sidebar_events->have_posts()): ?>

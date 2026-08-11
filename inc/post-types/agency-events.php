@@ -85,8 +85,10 @@ function bsi_ensure_agency_event_kind_terms()
 
   $default_terms = [
     'webinar' => 'Вебинар',
-    'event' => 'Мероприятие',
+    'seminar' => 'Семинар',
+    'otraslevye' => 'Отраслевое',
     'promo-tour' => 'Рекламный тур',
+    'event' => 'Мероприятие',
   ];
 
   foreach ($default_terms as $slug => $name) {

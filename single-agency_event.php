@@ -46,25 +46,13 @@ $kind = (!empty($kind_terms) && !is_wp_error($kind_terms)) ? $kind_terms[0] : nu
 $kind_label = $kind ? $kind->name : 'Событие';
 $kind_slug = $kind ? $kind->slug : '';
 
-$kind_class = 'is-default';
-if ('webinar' === $kind_slug) {
-  $kind_class = 'is-webinar';
-} elseif ('event' === $kind_slug) {
-  $kind_class = 'is-event';
-} elseif ('promo-tour' === $kind_slug) {
-  $kind_class = 'is-promo';
-}
+$kind_class = bsi_agency_event_kind_class($kind_slug);
 
-$kind_plural_map = [
-  'webinar' => 'Вебинары',
-  'event' => 'Мероприятия',
-  'promo-tour' => 'Рекламные туры',
-];
-$kind_breadcrumb_label = isset($kind_plural_map[$kind_slug]) ? $kind_plural_map[$kind_slug] : 'Обучение';
+$kind_breadcrumb_label = $kind_slug
+  ? bsi_agency_event_kind_plural($kind_slug, $kind_label)
+  : 'Мероприятия';
 
-$education_post = get_page_by_path('obuchenie', OBJECT, 'documentation');
-$education_url = $education_post ? get_permalink($education_post->ID) : home_url('/');
-$kind_url = $kind_slug ? add_query_arg('kind', $kind_slug, $education_url) : $education_url;
+$kind_url = bsi_agency_events_tab_url($kind_slug);
 ?>
 
 <main class="site-main agency-page">
