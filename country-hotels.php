@@ -102,12 +102,29 @@ get_header(); ?>
           <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
         </aside>
 
+        <?php
+        // H1 выводится всегда: раньше он был внутри проверки на наличие
+        // отелей, и страны с пустым каталогом отдавали страницу без
+        // заголовка вовсе.
+        $hotels_country = function_exists('bsi_country_locative_title')
+          ? trim((string) bsi_country_locative_title((int) $country->ID))
+          : '';
+        if ($hotels_country === '') {
+          $hotels_country = (string) $country->post_title;
+        }
+        $hotels_prep = function_exists('bsi_seo_preposition_v')
+          ? bsi_seo_preposition_v($hotels_country)
+          : 'в';
+        ?>
+
+        <div class="page-country__content">
+          <h1 class="h1 country-hotels__title">
+            Отели <?= esc_html($hotels_prep . ' ' . $hotels_country); ?>
+          </h1>
+        </div>
+
         <?php if (!empty($hotels)): ?>
           <div class="">
-            <h1 class="h1 country-hotels__title">
-              <?= esc_html($country->post_title); ?> список отелей
-            </h1>
-
             <div class="country-hotels__counter">
               Нашли отелей: <?= (int) count($hotels); ?>
             </div>
@@ -149,7 +166,7 @@ get_header(); ?>
           </div>
         <?php else: ?>
           <div class="page-country__content">
-            <p>Отелей пока нет.</p>
+            <p>Каталог отелей для этого направления пока пуст — подберём вариант по запросу.</p>
           </div>
         <?php endif; ?>
 

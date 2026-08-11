@@ -52,9 +52,10 @@ get_header(); ?>
           // H1 выводится всегда: раньше он был внутри проверки на наличие
           // акций, и страны без активных предложений отдавали страницу
           // вообще без заголовка.
-          // «Акции в Италии» — предложный падеж, отвечает на «где?».
-          $promo_country_acc = function_exists('bsi_country_locative_title')
-            ? trim((string) bsi_country_locative_title((int) $country->ID))
+          // Раздел собирает акции на туры, поэтому «Акции на туры в
+          // Италию» — винительный падеж.
+          $promo_country_acc = function_exists('bsi_country_accusative_title')
+            ? trim((string) bsi_country_accusative_title((int) $country->ID))
             : '';
           if ($promo_country_acc === '') {
             $promo_country_acc = (string) $country->post_title;
@@ -64,7 +65,7 @@ get_header(); ?>
             : 'в';
           ?>
           <h1 class="h1 country-promos__title">
-            Акции <?= esc_html($promo_prep . ' ' . $promo_country_acc); ?>
+            Акции на туры <?= esc_html($promo_prep . ' ' . $promo_country_acc); ?>
           </h1>
 
           <?php if ($promos): ?>
