@@ -517,7 +517,17 @@ add_filter('wpseo_opengraph_desc', function ($desc): string {
         return $custom;
     }
 
-    return $desc !== '' ? $desc : bsi_seo_fallback_description();
+    if ($desc === '') {
+        $desc = bsi_seo_fallback_description();
+    }
+
+    // Yoast подставляет сюда весь текст записи: у страниц стран это
+    // 800–1500 знаков, и соцсети обрезают превью на середине фразы.
+    if (mb_strlen($desc) > 300) {
+        $desc = bsi_seo_trim_description($desc);
+    }
+
+    return $desc;
 });
 
 // ── WordPress core fallback (если Yoast деактивирован) ──────
