@@ -117,27 +117,6 @@ function bsi_crosstour_event_enabled(int $event_id): bool
 }
 
 /**
- * Имя тура по TOURINC (для фильтра отелей при ручной ссылке).
- */
-function bsi_crosstour_tour_name(int $townfrom, int $state, int $tour): string
-{
-  if (!$state || !$tour) {
-    return '';
-  }
-  $resp = SamoService::endpoints()->searchCrosstourTours([
-    'TOWNFROMINC' => $townfrom,
-    'STATEINC' => $state,
-  ]);
-  $tours = ($resp['ok'] ?? false) ? ($resp['data']['SearchCrosstour_TOURS'] ?? []) : [];
-  foreach ($tours as $t) {
-    if ((int) ($t['id'] ?? 0) === $tour) {
-      return (string) ($t['name'] ?? '');
-    }
-  }
-  return '';
-}
-
-/**
  * Ref из ручной ссылки search_crosstour (нужны STATEINC + TOURINC/TOURS).
  *
  * @return array|null
@@ -241,34 +220,6 @@ function bsi_crosstour_valid_dates($checkin_node): array
     }
   }
   return $dates;
-}
-
-/**
- * Мин. цена из массива prices (per-person; ADULT=2 → /2, как у экскурсий).
- */
-function bsi_crosstour_min_price(array $prices): ?int
-{
-  $min = null;
-  foreach ($prices as $row) {
-    if (!is_array($row)) {
-      continue;
-    }
-    $val = $row['convertedPriceNumber'] ?? $row['convertedPrice'] ?? $row['price'] ?? null;
-    if ($val === null || $val === '') {
-      continue;
-    }
-    $num = (float) preg_replace('/[^\d.]/', '', (string) $val);
-    if ($num <= 0) {
-      continue;
-    }
-    if ($min === null || $num < $min) {
-      $min = $num;
-    }
-  }
-  if ($min === null) {
-    return null;
-  }
-  return (int) round($min / 2);
 }
 
 /**

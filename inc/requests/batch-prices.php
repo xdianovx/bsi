@@ -76,56 +76,6 @@ function get_batch_tour_prices()
 }
 
 /**
- * Получить цену одного тура
- * 
- * POST параметры:
- * - tour_id: ID тура
- * - date_from: дата начала (необязательно)
- * - date_to: дата окончания (необязательно)
- * - adults: количество взрослых (по умолчанию 2)
- * - children: количество детей (по умолчанию 0)
- */
-add_action('wp_ajax_get_tour_price', 'get_tour_price_single');
-add_action('wp_ajax_nopriv_get_tour_price', 'get_tour_price_single');
-
-function get_tour_price_single()
-{
-  $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
-  
-  if (!$tour_id) {
-    wp_send_json_error(['message' => 'tour_id parameter is required']);
-  }
-
-  // Получаем дополнительные параметры
-  $params = [];
-  
-  if (!empty($_POST['date_from'])) {
-    $params['date_from'] = sanitize_text_field(wp_unslash($_POST['date_from']));
-  }
-  
-  if (!empty($_POST['date_to'])) {
-    $params['date_to'] = sanitize_text_field(wp_unslash($_POST['date_to']));
-  }
-  
-  if (isset($_POST['adults'])) {
-    $params['adults'] = absint($_POST['adults']);
-  }
-  
-  if (isset($_POST['children'])) {
-    $params['children'] = absint($_POST['children']);
-  }
-
-  // Загружаем цену
-  $price_data = PriceLoaderService::getTourPrice($tour_id, $params);
-
-  if ($price_data === null) {
-    wp_send_json_error(['message' => 'Failed to load tour price']);
-  }
-
-  wp_send_json_success($price_data);
-}
-
-/**
  * Очистить кэш цен
  * 
  * POST параметры:

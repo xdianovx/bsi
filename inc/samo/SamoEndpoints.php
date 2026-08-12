@@ -6,16 +6,6 @@ class SamoEndpoints
   {
   }
 
-  public function searchTourAll(array $params): array
-  {
-    return $this->client->request('SearchTour_ALL', $params);
-  }
-
-  public function searchTourPrices(array $params): array
-  {
-    return $this->client->request('SearchTour_PRICES', $params);
-  }
-
   public function searchTownFroms(): array
   {
     return $this->client->request('SearchTour_TOWNFROMS');
@@ -78,12 +68,6 @@ class SamoEndpoints
     return $this->client->request('SearchCrosstour_STATES', $params);
   }
 
-  public function searchCrosstourTownFroms(array $params = []): array
-  {
-    $params['type'] = 'api';
-    return $this->client->request('SearchCrosstour_TOWNFROMS', $params);
-  }
-
   public function searchCrosstourTours(array $params): array
   {
     $params['type'] = 'api';
@@ -112,12 +96,6 @@ class SamoEndpoints
   {
     $params['type'] = 'api';
     return $this->client->request('SearchCrosstour_PRICES', $params);
-  }
-
-  public function searchCrosstourCurrencies(array $params = []): array
-  {
-    $params['type'] = 'api';
-    return $this->client->request('SearchCrosstour_CURRENCIES', $params);
   }
 
   public function ticketsTransportTypes(array $params = []): array

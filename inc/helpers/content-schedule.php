@@ -102,19 +102,6 @@ function bsi_content_schedule_supports_block_editor(string $post_type): bool
 }
 
 /**
- * Типы с полями bsi_active_* в ACF (promo — свои promo_date_*).
- *
- * @return string[]
- */
-function bsi_content_schedule_acf_post_types(): array
-{
-  return array_values(array_filter(
-    bsi_content_schedule_post_types(),
-    static fn(string $post_type): bool => $post_type !== 'promo'
-  ));
-}
-
-/**
  * @return bool
  */
 function bsi_content_schedule_applies_to_post_type(string $post_type): bool

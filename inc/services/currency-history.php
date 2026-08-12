@@ -73,20 +73,6 @@ function bsi_currency_apply_markup_to_rates(array $rates, float $markup_percent)
 	return $rates;
 }
 
-function bsi_currency_extract_rate_date($source_date)
-{
-	if (!is_string($source_date) || $source_date === '') {
-		return current_time('Y-m-d');
-	}
-
-	$timestamp = strtotime($source_date);
-	if (!$timestamp) {
-		return current_time('Y-m-d');
-	}
-
-	return wp_date('Y-m-d', $timestamp, wp_timezone());
-}
-
 function bsi_currency_history_upsert_snapshot(array $payload)
 {
 	global $wpdb;

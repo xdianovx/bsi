@@ -2,24 +2,6 @@
 /*
 Template Name: Награды
 */
-function bsi_get_awards_count_by_year($year)
-{
-  if (!$year) {
-    return 0;
-  }
-
-  $q = new WP_Query([
-    'post_type' => 'award',
-    'post_status' => 'publish',
-    'posts_per_page' => 1,
-    'fields' => 'ids',
-    'meta_key' => 'award_year',
-    'meta_value' => (int) $year,
-    'meta_compare' => '=',
-  ]);
-
-  return (int) $q->found_posts;
-}
 get_header();
 ?>
 

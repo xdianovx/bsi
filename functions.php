@@ -323,23 +323,6 @@ function bsi_add_noreferrer_to_external_links($content)
 add_filter('the_content', 'bsi_add_noreferrer_to_external_links', 99);
 add_filter('widget_text', 'bsi_add_noreferrer_to_external_links', 99);
 
-// Функция для преобразования URL bsistudy.ru в SSO flow через tokens_exchange.php
-function bsi_convert_bsistudy_url($url)
-{
-	if (empty($url)) {
-		return $url;
-	}
-
-	// Проверяем, является ли это ссылкой на bsistudy.ru
-	if (strpos($url, 'bsistudy.ru') !== false) {
-		// Преобразуем в SSO flow через tokens_exchange.php
-		$encoded_url = urlencode($url);
-		return 'https://bsigroup.ru/auth/tokens_exchange.php?ret_path=' . $encoded_url;
-	}
-
-	return $url;
-}
-
 // Обработка прямого доступа к шаблону редиректа для bsistudy.ru
 add_action('template_redirect', function () {
 	if (isset($_GET['url']) && basename($_SERVER['REQUEST_URI']) === 'redirect-bsistudy.php') {
@@ -438,7 +421,6 @@ require get_template_directory() . '/inc/requests/batch-prices.php';
 
 require_once get_template_directory() . '/inc/samo/config.php';
 require_once get_template_directory() . '/inc/samo/SamoClient.php';
-require_once get_template_directory() . '/inc/samo/SamoParams.php';
 require_once get_template_directory() . '/inc/samo/SamoEndpoints.php';
 require_once get_template_directory() . '/inc/samo/SamoService.php';
 require_once get_template_directory() . '/inc/samo/ajax/routes.php';
@@ -463,7 +445,6 @@ require get_template_directory() . '/custom-fields/pages/bsimice.php';
 require get_template_directory() . '/custom-fields/pages/delovoy.php';
 require get_template_directory() . '/custom-fields/mice-settings.php';
 require get_template_directory() . '/inc/mice-reviews-slider-defaults.php';
-require get_template_directory() . '/inc/mice-aggregate-reviews.php';
 require get_template_directory() . '/inc/mice-parent-page-reviews.php';
 require get_template_directory() . '/custom-fields/pages/visa.php';
 require get_template_directory() . '/custom-fields/pages/main-banners.php';
@@ -475,9 +456,7 @@ require get_template_directory() . '/custom-fields/pages/event-tours.php';
 require get_template_directory() . '/custom-fields/currency-settings.php';
 require get_template_directory() . '/custom-fields/maintenance-modal.php';
 
-require get_template_directory() . '/inc/requests/ajax.php';
 require get_template_directory() . '/inc/requests/ajax-fit.php';
-require get_template_directory() . '/inc/requests/ajax-visa-types.php';
 require get_template_directory() . '/inc/requests/ajax-visa-form.php';
 require get_template_directory() . '/inc/requests/ajax-single-visa-form.php';
 require get_template_directory() . '/inc/bsimice-lead-recipients.php';

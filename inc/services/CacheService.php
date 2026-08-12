@@ -125,38 +125,4 @@ class CacheService
     return self::PREFIX . $group . '_' . $key;
   }
 
-  /**
-   * Получить информацию о кэше (для отладки)
-   * 
-   * @param string $group Группа кэша
-   * @return array Статистика по кэшу группы
-   */
-  public static function getStats(string $group = ''): array
-  {
-    global $wpdb;
-
-    $pattern = self::PREFIX . ($group ? $group . '_%' : '%');
-    $transient_pattern = '_transient_' . $pattern;
-
-    $results = $wpdb->get_results(
-      $wpdb->prepare(
-        "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE %s",
-        $transient_pattern
-      ),
-      ARRAY_A
-    );
-
-    $stats = [
-      'total' => count($results),
-      'group' => $group ?: 'all',
-      'items' => [],
-    ];
-
-    foreach ($results as $row) {
-      $key = str_replace('_transient_' . self::PREFIX, '', $row['option_name']);
-      $stats['items'][$key] = strlen($row['option_value']);
-    }
-
-    return $stats;
-  }
 }
