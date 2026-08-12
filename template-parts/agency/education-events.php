@@ -31,16 +31,9 @@ if ($search !== '') {
 
 $events_query = new WP_Query($query_args);
 
-// Вкладки показываем только для типов, по которым в текущем списке
-// (ближайшие или архив) есть записи; выбранный тип оставляем всегда.
-$used_kinds = bsi_agency_events_used_kind_slugs($show_archive);
-
-$kind_terms = array_filter(
-  bsi_agency_event_kind_terms(),
-  function ($term) use ($used_kinds, $kind) {
-    return in_array($term->slug, $used_kinds, true) || $term->slug === $kind;
-  }
-);
+// Показываем вкладки всех типов, даже пустых: набор вкладок совпадает
+// с пунктами мегаменю, а пустой список объясняется текстом ниже.
+$kind_terms = bsi_agency_event_kind_terms();
 
 $tabs = [
   [
@@ -59,6 +52,13 @@ foreach ($kind_terms as $kind_term) {
 }
 
 $empty_text = $show_archive ? 'В архиве пока пусто.' : 'Пока нет мероприятий.';
+if ($kind !== '') {
+  $active_term = get_term_by('slug', $kind, 'agency_event_kind');
+  $kind_label = bsi_agency_event_kind_plural($kind, $active_term ? $active_term->name : '');
+  $empty_text = $show_archive
+    ? 'В архиве пока нет мероприятий в разделе «' . $kind_label . '».'
+    : 'Пока нет мероприятий в разделе «' . $kind_label . '».';
+}
 if ($search !== '') {
   $empty_text = 'По запросу ничего не найдено.';
 }

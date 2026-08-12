@@ -118,14 +118,12 @@ function bsi_is_agency_events_any_page($post_id = 0)
 }
 
 /**
- * Типы мероприятий на вкладках и в мегаменю — в порядке вывода.
- * Список закрытый: в таксономии есть служебные термы (Выставка, Конгресс,
- * Саммит, Бизнес-завтрак), которые во вкладки не выносим — их записи
- * попадают на вкладку «Все».
+ * Порядок типов мероприятий на вкладках и в мегаменю.
+ * Термы вне списка идут следом по алфавиту.
  */
 function bsi_agency_event_kind_order()
 {
-  return ['webinar', 'seminar', 'vorkshop', 'otraslevye', 'promo-tour', 'event'];
+  return ['webinar', 'seminar', 'vorkshop', 'event', 'promo-tour'];
 }
 
 /**
@@ -138,9 +136,9 @@ function bsi_agency_event_kind_plural($slug, $fallback = '')
     'webinar' => 'Вебинары',
     'seminar' => 'Семинары',
     'vorkshop' => 'Воркшопы',
-    'otraslevye' => 'Отраслевые',
+    // Слаг `event` исторический — тип называется «Отраслевое».
+    'event' => 'Отраслевые',
     'promo-tour' => 'Рекламные туры',
-    'event' => 'Мероприятия',
   ];
 
   if (isset($map[$slug])) {
@@ -228,36 +226,6 @@ function bsi_agency_events_query_args($archive = false)
 }
 
 /**
- * Слаги типов, по которым есть мероприятия в нужном списке.
- * Терм с одними прошедшими мероприятиями не должен попадать
- * ни во вкладки ближайших, ни в меню.
- */
-function bsi_agency_events_used_kind_slugs($archive = false)
-{
-    static $cache = [];
-
-    $key = $archive ? 'archive' : 'upcoming';
-    if (isset($cache[$key])) {
-        return $cache[$key];
-    }
-
-    $args = bsi_agency_events_query_args($archive);
-    $args['posts_per_page'] = -1;
-    $args['fields'] = 'ids';
-
-    $ids = get_posts($args);
-    if (empty($ids)) {
-        $cache[$key] = [];
-        return $cache[$key];
-    }
-
-    $slugs = wp_get_object_terms($ids, 'agency_event_kind', ['fields' => 'slugs']);
-    $cache[$key] = is_wp_error($slugs) ? [] : array_values(array_unique($slugs));
-
-    return $cache[$key];
-}
-
-/**
  * CSS-модификатор бейджа типа на карточке.
  */
 function bsi_agency_event_kind_class($slug)
@@ -267,7 +235,6 @@ function bsi_agency_event_kind_class($slug)
     'seminar' => 'is-webinar',
     'vorkshop' => 'is-webinar',
     'event' => 'is-event',
-    'otraslevye' => 'is-event',
     'promo-tour' => 'is-promo',
   ];
 
@@ -437,6 +404,38 @@ function bsi_migrate_agency_events_page_slug()
   }
 
   update_option('bsi_agency_events_page_renamed', 1, false);
+}
+
+/**
+ * Разовое приведение типов мероприятий к согласованному списку:
+ * терм `event` переименовывается в «Отраслевое» (слаг не трогаем — он в URL),
+ * пустые дубли `otraslevye` и `workshop` удаляются.
+ */
+add_action('init', 'bsi_migrate_agency_event_kind_terms', 32);
+function bsi_migrate_agency_event_kind_terms()
+{
+  if (get_option('bsi_agency_event_kinds_normalized')) {
+    return;
+  }
+
+  if (!taxonomy_exists('agency_event_kind')) {
+    return;
+  }
+
+  $event = get_term_by('slug', 'event', 'agency_event_kind');
+  if ($event && $event->name !== 'Отраслевое') {
+    wp_update_term($event->term_id, 'agency_event_kind', ['name' => 'Отраслевое']);
+  }
+
+  // `otraslevye` дублировал `event`, `workshop` — существующий `vorkshop`.
+  foreach (['otraslevye', 'workshop'] as $duplicate_slug) {
+    $duplicate = get_term_by('slug', $duplicate_slug, 'agency_event_kind');
+    if ($duplicate && (int) $duplicate->count === 0) {
+      wp_delete_term($duplicate->term_id, 'agency_event_kind');
+    }
+  }
+
+  update_option('bsi_agency_event_kinds_normalized', 1, false);
 }
 
 /**

@@ -83,12 +83,13 @@ function bsi_ensure_agency_event_kind_terms()
     return;
   }
 
+  // Слаг `event` исторический: тип называется «Отраслевое».
   $default_terms = [
     'webinar' => 'Вебинар',
     'seminar' => 'Семинар',
-    'otraslevye' => 'Отраслевое',
+    'vorkshop' => 'Воркшоп',
+    'event' => 'Отраслевое',
     'promo-tour' => 'Рекламный тур',
-    'event' => 'Мероприятие',
   ];
 
   foreach ($default_terms as $slug => $name) {
