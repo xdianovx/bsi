@@ -24,6 +24,9 @@ if (!$tour_id) {
   return;
 }
 
+// Карточки вне первых слайдов не грузят картинку сразу (слайдер главной, до 60 туров).
+$image_loading = (!empty($tour['lazy_image'])) ? 'lazy' : 'eager';
+
 $tour_url = !empty($tour['url']) ? (string) $tour['url'] : get_permalink($tour_id);
 $tour_image = !empty($tour['image']) ? (string) $tour['image'] : (get_the_post_thumbnail_url($tour_id, 'large') ?: '');
 $tour_title = !empty($tour['title']) ? (string) $tour['title'] : get_the_title($tour_id);
@@ -135,7 +138,8 @@ if (function_exists('get_field')) {
 ?>
 <div class="hotel-card tour-card">
   <a href="<?php echo esc_url($tour_url); ?>" class="hotel-card__media">
-    <img src="<?php echo esc_url($tour_image); ?>" alt="<?php echo esc_attr($tour_title); ?>" class="hotel-card__image">
+    <img src="<?php echo esc_url($tour_image); ?>" alt="<?php echo esc_attr($tour_title); ?>" class="hotel-card__image"
+      loading="<?php echo esc_attr($image_loading); ?>" decoding="async">
   </a>
 
   <div class="hotel-card__body">
@@ -144,7 +148,7 @@ if (function_exists('get_field')) {
         <div class="hotel-card__flags">
           <?php foreach ($tour_flag_rows as $flag_row): ?>
             <div class="hotel-card__flag">
-              <img src="<?php echo esc_url($flag_row['url']); ?>" alt="<?php echo esc_attr($flag_row['alt']); ?>" width="24" height="24" loading="eager" decoding="async">
+              <img src="<?php echo esc_url($flag_row['url']); ?>" alt="<?php echo esc_attr($flag_row['alt']); ?>" width="24" height="24" loading="<?php echo esc_attr($image_loading); ?>" decoding="async">
             </div>
           <?php endforeach; ?>
         </div>

@@ -1138,12 +1138,24 @@ function bsi_enqueue_tour_booking_modal(): void
  * рендерились целиком: 59 туров, 28 программ обучения, 22 события —
  * 712 тегов <img> и 843 КБ HTML на одну страницу. Ограничиваем разумным
  * числом; фильтр bsi_homepage_slider_limit позволяет поменять.
+ *
+ * У экскурсионных туров лимит выше: над слайдером есть фильтр по странам,
+ * и его список строится только из отрендеренных карточек — при лимите 12
+ * страны из хвоста подборки (например Филиппины) пропадали из фильтра.
+ * Картинки карточек вне первых слайдов грузятся лениво (см. tour/card.php).
+ *
+ * @param string $context Слайдер: 'tour', 'education', 'hotel', 'event' или ''.
  */
-function bsi_homepage_slider_limit(): int
+function bsi_homepage_slider_limit(string $context = ''): int
 {
-	$limit = (int) apply_filters('bsi_homepage_slider_limit', 12);
+	$defaults = [
+		'tour' => 60,
+	];
 
-	return $limit > 0 ? $limit : 12;
+	$default = $defaults[$context] ?? 12;
+	$limit = (int) apply_filters('bsi_homepage_slider_limit', $default, $context);
+
+	return $limit > 0 ? $limit : $default;
 }
 
 /**

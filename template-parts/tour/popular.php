@@ -16,9 +16,10 @@ $homepage_tour_ids = function_exists('bsi_get_homepage_featured_tour_ids')
   ? bsi_get_homepage_featured_tour_ids()
   : [];
 
-// Слайдер показывает 2 карточки за раз — рендерить всю подборку незачем.
+// Лимит выше, чем у остальных слайдеров: фильтр по странам над слайдером
+// строится из отрендеренных карточек (см. bsi_homepage_slider_limit()).
 if (!empty($homepage_tour_ids) && function_exists('bsi_homepage_slider_limit')) {
-  $homepage_tour_ids = array_slice($homepage_tour_ids, 0, bsi_homepage_slider_limit());
+  $homepage_tour_ids = array_slice($homepage_tour_ids, 0, bsi_homepage_slider_limit('tour'));
 }
 
 $common_tour_q = [
@@ -53,7 +54,7 @@ if (!empty($homepage_tour_ids)) {
   $active_tour_ids = function_exists('bsi_schedule_filter_post__in_ids')
     ? bsi_schedule_filter_post__in_ids(array_map('intval', $candidate_tour_ids))
     : array_values(array_filter(array_map('intval', $candidate_tour_ids)));
-  $slice_ids = array_slice($active_tour_ids, 0, bsi_homepage_slider_limit());
+  $slice_ids = array_slice($active_tour_ids, 0, bsi_homepage_slider_limit('tour'));
   $tour_query = new WP_Query(array_merge($common_tour_q, [
     'posts_per_page'    => $slice_ids !== [] ? count($slice_ids) : 1,
     'post__in'          => $slice_ids !== [] ? $slice_ids : [0],
@@ -115,12 +116,16 @@ if (!empty($country_ids)) {
 
 $items = [];
 
+// Видно 2 карточки за раз: всё после первых четырёх грузит картинки лениво.
+$eager_slides = 4;
+
 foreach ($tour_posts as $tour_post) {
   $tour_id = (int) $tour_post->ID;
   $tour_data = function_exists('bsi_get_tour_card_query_var') ? bsi_get_tour_card_query_var($tour_id) : [];
   if (empty($tour_data)) {
     continue;
   }
+  $tour_data['lazy_image'] = count($items) >= $eager_slides;
   $items[] = $tour_data;
 }
 ?>
