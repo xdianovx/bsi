@@ -12,56 +12,32 @@ if (!empty($tours_pages)) {
   $tours_page_url = get_permalink($tours_pages[0]->ID);
 }
 
+// Единственный источник подборки — поле «Экскурсионные туры (слайдер)» на «Главной».
 $homepage_tour_ids = function_exists('bsi_get_homepage_featured_tour_ids')
   ? bsi_get_homepage_featured_tour_ids()
   : [];
 
+if (empty($homepage_tour_ids)) {
+  return;
+}
+
 // Лимит выше, чем у остальных слайдеров: фильтр по странам над слайдером
 // строится из отрендеренных карточек (см. bsi_homepage_slider_limit()).
-if (!empty($homepage_tour_ids) && function_exists('bsi_homepage_slider_limit')) {
+if (function_exists('bsi_homepage_slider_limit')) {
   $homepage_tour_ids = array_slice($homepage_tour_ids, 0, bsi_homepage_slider_limit('tour'));
 }
 
-$common_tour_q = [
+$tour_query = new WP_Query(bsi_query_args_append_schedule([
   'post_type' => 'tour',
   'post_status' => 'publish',
   'ignore_sticky_posts' => true,
   'no_found_rows' => true,
   'update_post_meta_cache' => false,
   'update_post_term_cache' => false,
-];
-
-if (!empty($homepage_tour_ids)) {
-  $tour_query = new WP_Query(bsi_query_args_append_schedule(array_merge($common_tour_q, [
-    'posts_per_page' => -1,
-    'post__in' => $homepage_tour_ids,
-    'orderby' => 'post__in',
-  ])));
-} else {
-  $candidate_tour_ids = get_posts(array_merge($common_tour_q, [
-    'posts_per_page' => -1,
-    'fields'         => 'ids',
-    'orderby'        => ['menu_order' => 'ASC', 'date' => 'DESC'],
-    'meta_query'     => [
-      [
-        'key'     => 'is_popular',
-        'value'   => '1',
-        'compare' => '=',
-      ],
-    ],
-    'bsi_skip_schedule' => true,
-  ]));
-  $active_tour_ids = function_exists('bsi_schedule_filter_post__in_ids')
-    ? bsi_schedule_filter_post__in_ids(array_map('intval', $candidate_tour_ids))
-    : array_values(array_filter(array_map('intval', $candidate_tour_ids)));
-  $slice_ids = array_slice($active_tour_ids, 0, bsi_homepage_slider_limit('tour'));
-  $tour_query = new WP_Query(array_merge($common_tour_q, [
-    'posts_per_page'    => $slice_ids !== [] ? count($slice_ids) : 1,
-    'post__in'          => $slice_ids !== [] ? $slice_ids : [0],
-    'orderby'           => 'post__in',
-    'bsi_skip_schedule' => true,
-  ]));
-}
+  'posts_per_page' => -1,
+  'post__in' => $homepage_tour_ids,
+  'orderby' => 'post__in',
+]));
 
 $tour_posts = $tour_query->posts;
 wp_reset_postdata();

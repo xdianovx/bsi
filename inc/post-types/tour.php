@@ -651,16 +651,6 @@ add_action('acf/init', function () {
         'instructions' => 'Код тура в системе SamoTour',
       ],
       [
-        'key' => 'field_tour_is_popular',
-        'label' => 'Популярный',
-        'name' => 'is_popular',
-        'type' => 'true_false',
-        'ui' => 1,
-        'default_value' => 0,
-        'instructions' => 'Слайдер на главной: список задаётся на странице «Главная»; эта галочка синхронизируется с ним. Если слайдер на главной пуст, показываются туры только с этой галочкой.',
-        'wrapper' => ['width' => '50'],
-      ],
-      [
         'key' => 'field_tour_price_from',
         'label' => 'Цена от',
         'name' => 'price_from',

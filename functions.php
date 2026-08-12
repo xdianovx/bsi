@@ -470,7 +470,6 @@ require get_template_directory() . '/custom-fields/pages/main-banners.php';
 require get_template_directory() . '/custom-fields/pages/gde-kupit.php';
 require get_template_directory() . '/custom-fields/education-fields.php';
 require get_template_directory() . '/custom-fields/pages/front-page.php';
-require get_template_directory() . '/inc/acf-sync-homepage-tours.php';
 require get_template_directory() . '/custom-fields/pages/education.php';
 require get_template_directory() . '/custom-fields/pages/event-tours.php';
 require get_template_directory() . '/custom-fields/currency-settings.php';

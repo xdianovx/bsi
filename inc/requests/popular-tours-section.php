@@ -10,37 +10,26 @@ function bsi_ajax_popular_tours_by_country()
     ? bsi_get_homepage_featured_tour_ids()
     : [];
 
+  // Подборка задаётся только полем «Экскурсионные туры (слайдер)» на «Главной».
+  if (empty($homepage_tour_ids)) {
+    wp_send_json_success(['html' => '', 'total' => 0]);
+  }
+
   $args = [
     'post_type' => 'tour',
     'post_status' => 'publish',
     'ignore_sticky_posts' => true,
     'no_found_rows' => true,
+    'post__in' => $homepage_tour_ids,
+    'posts_per_page' => -1,
+    'orderby' => 'post__in',
   ];
 
-  if (!empty($homepage_tour_ids)) {
-    $args['post__in'] = $homepage_tour_ids;
-    $args['posts_per_page'] = -1;
-    $args['orderby'] = 'post__in';
-    if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
-      $args['meta_query'] = [
-        'relation' => 'AND',
-        bsi_build_tour_country_meta_query((int) $country_id),
-      ];
-    }
-  } else {
-    $args['posts_per_page'] = 12;
-    $args['orderby'] = ['menu_order' => 'ASC', 'date' => 'DESC'];
+  if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
     $args['meta_query'] = [
       'relation' => 'AND',
-      [
-        'key' => 'is_popular',
-        'value' => '1',
-        'compare' => '=',
-      ],
+      bsi_build_tour_country_meta_query((int) $country_id),
     ];
-    if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
-      $args['meta_query'][] = bsi_build_tour_country_meta_query((int) $country_id);
-    }
   }
 
   $q = new WP_Query(bsi_query_args_append_schedule($args));
