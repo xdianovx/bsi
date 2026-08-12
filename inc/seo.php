@@ -1315,6 +1315,22 @@ function bsi_seo_social_image_url(): string
         }
     }
 
+    // Каталог на шаблоне страницы (образование) своей картинки не имеет:
+    // карточки берут изображение из миниатюры или ACF-галереи записи.
+    if (is_page()) {
+        $uri = untrailingslashit((string) get_page_uri((int) get_queried_object_id()));
+        $catalog_types = [
+            'obrazovanie-za-rubezhom' => 'education',
+        ];
+
+        if (isset($catalog_types[$uri])) {
+            $cached = bsi_seo_catalog_preview_image($catalog_types[$uri]);
+            if ($cached !== '') {
+                return $cached;
+            }
+        }
+    }
+
     // Архивы и всё остальное — миниатюра свежей записи этого типа.
     if (is_post_type_archive() || is_tax() || is_category()) {
         $queried_type = get_query_var('post_type');
@@ -1342,6 +1358,56 @@ function bsi_seo_social_image_url(): string
     // он в SVG, а соцсети такие превью не показывают. Общую картинку
     // задают в «Yoast SEO → Соцсети → Изображение по умолчанию».
     return $cached;
+}
+
+/**
+ * Первая подходящая картинка из свежих записей каталога.
+ * У школ миниатюра заполнена не всегда — тогда берём галерею.
+ */
+function bsi_seo_catalog_preview_image(string $post_type): string
+{
+    $posts = get_posts([
+        'post_type'      => $post_type,
+        'post_status'    => 'publish',
+        'posts_per_page' => 5,
+        'no_found_rows'  => true,
+        'fields'         => 'ids',
+    ]);
+
+    foreach ($posts as $post_id) {
+        $url = bsi_seo_social_image_accept((string) get_the_post_thumbnail_url($post_id, 'large'));
+        if ($url !== '') {
+            return $url;
+        }
+
+        if ($post_type !== 'education' || !function_exists('get_field')) {
+            continue;
+        }
+
+        $gallery = get_field('education_gallery', $post_id);
+        if (!is_array($gallery)) {
+            continue;
+        }
+
+        foreach ($gallery as $item) {
+            if (is_array($item) && !empty($item['ID'])) {
+                $item_url = (string) wp_get_attachment_image_url((int) $item['ID'], 'large');
+            } elseif (is_array($item)) {
+                $item_url = (string) ($item['url'] ?? '');
+            } elseif (is_numeric($item)) {
+                $item_url = (string) wp_get_attachment_image_url((int) $item, 'large');
+            } else {
+                $item_url = (string) $item;
+            }
+
+            $url = bsi_seo_social_image_accept($item_url);
+            if ($url !== '') {
+                return $url;
+            }
+        }
+    }
+
+    return '';
 }
 
 /**
@@ -1526,3 +1592,205 @@ add_filter('wpseo_metadesc', function ($desc) {
 
     return $meta['description'];
 }, 23);
+
+// ── Пагинация каталогов на шаблонах страниц ─────────────────
+// Каталог образования листается через /page/N/, но для страницы Yoast
+// отдаёт канонический адрес первой страницы и тот же <title>. Страницы
+// 2+ схлопывались в дубль, а школы с них (47 из 58) теряли шанс попасть
+// в индекс: ссылок на них больше нигде нет.
+
+/**
+ * Номер текущей страницы пагинации (1 — первая).
+ */
+function bsi_seo_page_number(): int
+{
+    $paged = (int) get_query_var('paged');
+    if ($paged < 2) {
+        $paged = (int) get_query_var('page');
+    }
+
+    return $paged > 1 ? $paged : 1;
+}
+
+add_filter('wpseo_canonical', function ($canonical) {
+    $canonical = (string) $canonical;
+    if (!is_page() || $canonical === '') {
+        return $canonical;
+    }
+
+    $page = bsi_seo_page_number();
+    if ($page < 2 || strpos($canonical, '/page/') !== false) {
+        return $canonical;
+    }
+
+    return trailingslashit(trailingslashit($canonical) . 'page/' . $page);
+}, 20);
+
+add_filter('wpseo_title', function ($title) {
+    $title = (string) $title;
+    if (!is_page()) {
+        return $title;
+    }
+
+    $page = bsi_seo_page_number();
+    if ($page < 2) {
+        return $title;
+    }
+
+    $suffix = ' — страница ' . $page;
+    $brand  = ' | ' . get_bloginfo('name');
+
+    if ($brand !== ' | ' && substr($title, -strlen($brand)) === $brand) {
+        return substr($title, 0, -strlen($brand)) . $suffix . $brand;
+    }
+
+    return $title . $suffix;
+}, 30);
+
+add_filter('wpseo_metadesc', function ($desc) {
+    $desc = (string) $desc;
+    if (!is_page() || $desc === '') {
+        return $desc;
+    }
+
+    $page = bsi_seo_page_number();
+    if ($page < 2) {
+        return $desc;
+    }
+
+    return bsi_seo_trim_description('Страница ' . $page . '. ' . $desc);
+}, 30);
+
+// ── Программы образования: страна в заголовке и своё описание ─
+// Заголовок школы («ENFOREX Мадрид – летний лагерь») не содержал
+// страны, а описание Yoast обрезал из контента на полуслове и одинаково
+// начинал у всех программ одной школы.
+
+/**
+ * Название страны программы образования.
+ */
+function bsi_seo_education_country_name(int $post_id): string
+{
+    if (!$post_id || !function_exists('get_field')) {
+        return '';
+    }
+
+    $country = get_field('education_country', $post_id);
+    if ($country instanceof WP_Post) {
+        $country = $country->ID;
+    } elseif (is_array($country)) {
+        $country = reset($country);
+        if ($country instanceof WP_Post) {
+            $country = $country->ID;
+        }
+    }
+
+    $country_id = (int) $country;
+
+    return $country_id ? trim(wp_strip_all_tags((string) get_the_title($country_id))) : '';
+}
+
+add_filter('wpseo_title', function ($title) {
+    if (!is_singular('education')) {
+        return $title;
+    }
+
+    $post_id = (int) get_queried_object_id();
+    if (!$post_id || trim((string) get_post_meta($post_id, '_yoast_wpseo_title', true)) !== '') {
+        return $title;
+    }
+
+    $country = bsi_seo_education_country_name($post_id);
+    if ($country === '') {
+        return $title;
+    }
+
+    $title = (string) $title;
+    if (mb_stripos($title, $country) !== false) {
+        return $title;
+    }
+
+    $brand = ' | ' . get_bloginfo('name');
+    if ($brand !== ' | ' && substr($title, -strlen($brand)) === $brand) {
+        return substr($title, 0, -strlen($brand)) . ', ' . $country . $brand;
+    }
+
+    return $title . ', ' . $country;
+}, 26);
+
+/**
+ * Описание программы образования из полей: страна, возраст, цена.
+ * Возвращает пустую строку, если данных не хватает на осмысленный текст.
+ */
+function bsi_seo_education_description(int $post_id): string
+{
+    if (!$post_id || !function_exists('get_field')) {
+        return '';
+    }
+
+    $title   = trim(wp_strip_all_tags((string) get_the_title($post_id)));
+    $country = bsi_seo_education_country_name($post_id);
+    if ($title === '') {
+        return '';
+    }
+
+    $facts = [];
+
+    $programs = get_field('education_programs', $post_id);
+    $programs = is_array($programs) ? $programs : [];
+
+    $ages_min = [];
+    $ages_max = [];
+    foreach ($programs as $program) {
+        if (!is_array($program)) {
+            continue;
+        }
+        if (!empty($program['program_age_min'])) {
+            $ages_min[] = (int) $program['program_age_min'];
+        }
+        if (!empty($program['program_age_max'])) {
+            $ages_max[] = (int) $program['program_age_max'];
+        }
+    }
+
+    // Названия программ («испанский язык без мероприятий, без
+    // проживания») в описание не годятся: длинные и служебные.
+    $languages = wp_get_post_terms($post_id, 'education_language', ['fields' => 'names']);
+    if (!is_wp_error($languages) && $languages) {
+        $facts[] = 'языковые курсы (' . mb_strtolower(implode(', ', array_slice($languages, 0, 3))) . ')';
+    }
+
+    if ($ages_min && $ages_max) {
+        $facts[] = 'возраст ' . min($ages_min) . '–' . max($ages_max) . ' лет';
+    }
+
+    $price = function_exists('bsi_education_display_price_rub')
+        ? bsi_education_display_price_rub($post_id)
+        : 0;
+    if ($price > 0) {
+        $facts[] = 'от ' . number_format($price, 0, ',', ' ') . ' ₽ за неделю';
+    }
+
+    if (!$facts) {
+        return '';
+    }
+
+    $head = $country !== '' ? $title . ', ' . $country : $title;
+
+    return $head . ': ' . implode(', ', $facts) . '. Даты заездов, размещение и заявка — BSI Group.';
+}
+
+add_filter('wpseo_metadesc', function ($desc) {
+    if (!is_singular('education')) {
+        return $desc;
+    }
+
+    $post_id = (int) get_queried_object_id();
+    if (!$post_id || trim((string) get_post_meta($post_id, '_yoast_wpseo_metadesc', true)) !== '') {
+        return $desc;
+    }
+
+    $custom = bsi_seo_education_description($post_id);
+
+    return $custom !== '' ? bsi_seo_trim_description($custom) : $desc;
+}, 26);

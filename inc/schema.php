@@ -349,6 +349,95 @@ function bsi_schema_education(): void
         ];
     }
 
+    // Цена и очный формат: без offers и hasCourseInstance поисковики не
+    // показывают программу в блоке курсов.
+    $price = function_exists('bsi_education_display_price_rub')
+        ? bsi_education_display_price_rub($id)
+        : 0;
+
+    $instance = [
+        '@type'      => 'CourseInstance',
+        'courseMode' => 'Onsite',
+    ];
+
+    $city = function_exists('get_field') ? trim((string) get_field('education_resort', $id)) : '';
+    if ($country_name || $city) {
+        $instance['location'] = [
+            '@type' => 'Place',
+            'name'  => $city ?: $country_name,
+        ];
+        if ($country_name) {
+            $instance['location']['address'] = [
+                '@type'          => 'PostalAddress',
+                'addressCountry' => $country_name,
+            ];
+        }
+    }
+
+    if ($price > 0) {
+        $instance['offers'] = [
+            '@type'         => 'Offer',
+            'price'         => $price,
+            'priceCurrency' => 'RUB',
+            'category'      => 'Paid',
+            'availability'  => 'https://schema.org/InStock',
+            'url'           => $url,
+        ];
+        $schema['offers'] = $instance['offers'];
+    }
+
+    $schema['hasCourseInstance'] = $instance;
+
     bsi_schema_json($schema);
+}
+
+// ── ItemList (каталог образования) ──────────────────────────
+
+/**
+ * Список программ текущей страницы каталога.
+ * Вызывается из шаблона: данные карточек уже собраны, повторный
+ * запрос к ACF не нужен.
+ *
+ * @param array $items    Карточки из page-education.php
+ * @param int   $paged    Номер страницы пагинации
+ * @param int   $per_page Карточек на странице
+ */
+function bsi_schema_education_list(array $items, int $paged = 1, int $per_page = 12): void
+{
+    if (!$items) {
+        return;
+    }
+
+    $offset = max(0, $paged - 1) * $per_page;
+    $elements = [];
+
+    foreach (array_values($items) as $i => $item) {
+        $url = (string) ($item['url'] ?? '');
+        if ($url === '') {
+            continue;
+        }
+
+        $element = [
+            '@type'    => 'ListItem',
+            'position' => $offset + $i + 1,
+            'url'      => $url,
+            'name'     => (string) ($item['title'] ?? ''),
+        ];
+
+        $elements[] = array_filter($element, fn($v) => $v !== '' && $v !== null);
+    }
+
+    if (!$elements) {
+        return;
+    }
+
+    bsi_schema_json([
+        '@context'        => 'https://schema.org',
+        '@type'           => 'ItemList',
+        'name'            => 'Образование за рубежом — программы BSI Group',
+        'itemListOrder'   => 'https://schema.org/ItemListOrderAscending',
+        'numberOfItems'   => count($elements),
+        'itemListElement' => $elements,
+    ]);
 }
 

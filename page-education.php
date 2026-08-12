@@ -796,6 +796,11 @@ if ($all_edu_for_sort->have_posts()) {
             ?>
           </div>
         <?php endforeach; ?>
+        <?php
+        if (function_exists('bsi_schema_education_list')) {
+          bsi_schema_education_list($items, $paged, $per_page_initial);
+        }
+        ?>
       <?php else: ?>
         <div class="education-page__empty">
           Школы не найдены.

@@ -693,6 +693,47 @@ function bsi_education_build_price_data_attrs(array $program): array {
 }
 
 /**
+ * Минимальная цена школы в рублях так, как её видит посетитель.
+ *
+ * Карточки и страница школы считают цену по программам, а legacy-поле
+ * education_price берут только когда программ нет: в нём попадаются
+ * значения за весь курс, а не за неделю. Для мета-описаний и schema.org
+ * цена должна совпадать с той, что показана на странице.
+ *
+ * @param int $education_id ID школы (post ID)
+ * @return int Цена в рублях или 0
+ */
+function bsi_education_display_price_rub(int $education_id): int {
+  if (!function_exists('get_field')) {
+    return 0;
+  }
+
+  $programs = get_field('education_programs', $education_id);
+  if (is_array($programs)) {
+    $min_price = 0;
+    foreach ($programs as $program) {
+      if (!is_array($program)) {
+        continue;
+      }
+      $price = bsi_education_get_program_price_numeric_rub($program);
+      if ($price > 0 && ($min_price === 0 || $price < $min_price)) {
+        $min_price = $price;
+      }
+    }
+    if ($min_price > 0) {
+      return $min_price;
+    }
+  }
+
+  $price_val = get_field('education_price', $education_id);
+  if (!empty($price_val)) {
+    return (int) preg_replace('/[^\d]/', '', (string) $price_val);
+  }
+
+  return 0;
+}
+
+/**
  * Получает минимальную цену школы в рублях для сортировки.
  * Учитывает и старое поле education_price и новую систему программ.
  *
