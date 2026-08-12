@@ -309,7 +309,13 @@ function bsi_seo_trim_description(string $text, int $max = 170): string
         $cut = mb_substr($cut, 0, $space);
     }
 
-    return rtrim($cut, " \t\n\r\0\x0B.,;:—-") . '…';
+    // rtrim() режет байты, а не символы: тире «—» в списке (E2 80 94)
+    // отрывало хвост от кириллической буквы, строка переставала быть
+    // валидным UTF-8, и esc_attr() отдавал пустоту — описание Кипра
+    // выводилось как content="". Тот же набор символов, но посимвольно.
+    $cut = preg_replace('/[\s\p{Pd}.,;:]+$/u', '', $cut);
+
+    return $cut . '…';
 }
 
 /**
@@ -1426,7 +1432,31 @@ function bsi_seo_social_image_accept(string $url): string
 }
 
 add_filter('wpseo_frontend_presentation', function ($presentation) {
-    if (!is_object($presentation) || !empty($presentation->open_graph_images)) {
+    if (!is_object($presentation)) {
+        return $presentation;
+    }
+
+    // Описание. Фильтр wpseo_metadesc правит то, что Yoast уже собрал, но
+    // у части записей (Кипр, Пакистан) он собирает пустую строку: шаблон
+    // описания для типа записи не задан, ручного значения нет. Тогда в
+    // <head> печатается content="" — фильтр до этого не доходит.
+    if (trim((string) ($presentation->meta_description ?? '')) === '') {
+        $fallback = bsi_seo_trim_description(bsi_seo_fallback_description());
+        if ($fallback !== '') {
+            $presentation->meta_description = $fallback;
+        }
+    }
+
+    // og:description Yoast заполняет полным текстом записи: у стран это
+    // 800–1500 знаков, соцсети режут превью на середине фразы. Берём то
+    // же описание, что и в <meta name="description">.
+    $og_description = trim((string) ($presentation->open_graph_description ?? ''));
+    $meta_description = trim((string) ($presentation->meta_description ?? ''));
+    if ($meta_description !== '' && ($og_description === '' || mb_strlen($og_description) > 300)) {
+        $presentation->open_graph_description = $meta_description;
+    }
+
+    if (!empty($presentation->open_graph_images)) {
         return $presentation;
     }
 
