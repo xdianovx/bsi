@@ -708,6 +708,11 @@ function bsi_education_display_price_rub(int $education_id): int {
     return 0;
   }
 
+  // Цены ниже этого порога — опечатка в поле (встречались значения вроде
+  // «91»). В описании и в schema.org такая цена становится обещанием,
+  // которого никто не выполнит, поэтому лучше не показывать ничего.
+  $min_sane_price = 1000;
+
   $programs = get_field('education_programs', $education_id);
   if (is_array($programs)) {
     $min_price = 0;
@@ -716,7 +721,7 @@ function bsi_education_display_price_rub(int $education_id): int {
         continue;
       }
       $price = bsi_education_get_program_price_numeric_rub($program);
-      if ($price > 0 && ($min_price === 0 || $price < $min_price)) {
+      if ($price >= $min_sane_price && ($min_price === 0 || $price < $min_price)) {
         $min_price = $price;
       }
     }
@@ -727,7 +732,10 @@ function bsi_education_display_price_rub(int $education_id): int {
 
   $price_val = get_field('education_price', $education_id);
   if (!empty($price_val)) {
-    return (int) preg_replace('/[^\d]/', '', (string) $price_val);
+    $legacy_price = (int) preg_replace('/[^\d]/', '', (string) $price_val);
+    if ($legacy_price >= $min_sane_price) {
+      return $legacy_price;
+    }
   }
 
   return 0;

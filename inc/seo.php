@@ -1781,6 +1781,7 @@ function bsi_seo_education_description(int $post_id): string
 
     $ages_min = [];
     $ages_max = [];
+    $durations = [];
     foreach ($programs as $program) {
         if (!is_array($program)) {
             continue;
@@ -1790,6 +1791,9 @@ function bsi_seo_education_description(int $post_id): string
         }
         if (!empty($program['program_age_max'])) {
             $ages_max[] = (int) $program['program_age_max'];
+        }
+        if (!empty($program['program_duration'])) {
+            $durations[] = (int) $program['program_duration'];
         }
     }
 
@@ -1804,11 +1808,22 @@ function bsi_seo_education_description(int $post_id): string
         $facts[] = 'возраст ' . min($ages_min) . '–' . max($ages_max) . ' лет';
     }
 
+    // Поле называется program_price_per_week, но у части школ (Emerald
+    // Cultural Institute и другие ирландские) в нём лежит цена за всю
+    // программу: 236 422 / 339 978 / 437 673 ₽ для 2, 3 и 4 недель.
+    // Писать «за неделю» нельзя — это обещание вдвое-вчетверо дешевле
+    // фактического. Карточка каталога тоже пишет просто «от X ₽».
     $price = function_exists('bsi_education_display_price_rub')
         ? bsi_education_display_price_rub($post_id)
         : 0;
     if ($price > 0) {
-        $facts[] = 'от ' . number_format($price, 0, ',', ' ') . ' ₽ за неделю';
+        $price_fact = 'от ' . number_format($price, 0, ',', ' ') . ' ₽';
+        if ($durations) {
+            $min_duration = min($durations);
+            $word = $min_duration === 1 ? 'недели' : 'недель';
+            $price_fact .= ' за программу от ' . $min_duration . ' ' . $word;
+        }
+        $facts[] = $price_fact;
     }
 
     if (!$facts) {
