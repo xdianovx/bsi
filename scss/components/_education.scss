@@ -17,11 +17,10 @@
 .education-filter__row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 16px;
 
   @media screen and (max-width: 1024px) {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
 }
 
