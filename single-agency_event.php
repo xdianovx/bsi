@@ -20,9 +20,7 @@ $price = $price_raw;
 if ($price !== '' && function_exists('format_price_text')) {
   $price = format_price_text($price);
 }
-if ($price !== '' && function_exists('format_price_with_from')) {
-  $price = format_price_with_from($price, false);
-}
+// Знак рубля не подставляем: менеджер пишет цену как есть («Бесплатно», «5000 руб», «€300»).
 
 $start_date_label = '';
 if ($start_date !== '') {
