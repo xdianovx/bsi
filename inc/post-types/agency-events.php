@@ -138,7 +138,6 @@ function bsi_register_agency_event_fields()
         'name' => 'event_start_time',
         'type' => 'text',
         'placeholder' => '13:00',
-        'instructions' => 'Необязательно. Пусто — время на сайте не показывается.',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -149,7 +148,6 @@ function bsi_register_agency_event_fields()
         'display_format' => 'd.m.Y',
         'return_format' => 'Y-m-d',
         'first_day' => 1,
-        'instructions' => 'Только для мероприятий длиннее одного дня. На сайте даты покажутся диапазоном: «16–18 августа 2026».',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -193,7 +191,6 @@ function bsi_register_agency_event_fields()
         'name' => 'event_price',
         'type' => 'text',
         'placeholder' => '198 888 ₽',
-        'instructions' => 'Пишется как есть: «Бесплатно», «590 $», «12 000 ₽».',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -203,7 +200,6 @@ function bsi_register_agency_event_fields()
         'type' => 'true_false',
         'ui' => 1,
         'default_value' => 0,
-        'instructions' => 'Вместо кнопки «Регистрация» покажется «Запись закрыта».',
         'wrapper' => ['width' => '50'],
       ],
       [
@@ -211,7 +207,6 @@ function bsi_register_agency_event_fields()
         'label' => 'Внешняя ссылка регистрации',
         'name' => 'event_registration_url',
         'type' => 'url',
-        'instructions' => 'Если заполнено — кнопка «Регистрация» откроет эту ссылку в новой вкладке вместо формы.',
         'placeholder' => 'https://',
         'wrapper' => ['width' => '50'],
       ],
@@ -220,7 +215,6 @@ function bsi_register_agency_event_fields()
         'label' => 'Email для заявок',
         'name' => 'event_notify_email',
         'type' => 'email',
-        'instructions' => 'Дополнительный email для заявок с этого мероприятия. Основной (agent@bsigroup.ru) получает всегда.',
         'placeholder' => 'email@example.com',
         'wrapper' => ['width' => '50'],
       ],
