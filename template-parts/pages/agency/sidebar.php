@@ -67,7 +67,9 @@ if (!empty($sidebar_posts)) {
     $permalink = get_permalink($sidebar_post->ID);
     $children = [];
 
-    if (bsi_is_agency_events_page($sidebar_post->ID)) {
+    $is_events_page = bsi_is_agency_events_page($sidebar_post->ID);
+
+    if ($is_events_page) {
       foreach ($education_kinds as $ek) {
         $children[] = [
           'label' => $ek['label'],
@@ -78,12 +80,20 @@ if (!empty($sidebar_posts)) {
     }
 
     $items[] = [
-      'label' => (string) get_the_title($sidebar_post->ID),
+      'label' => $is_events_page && $is_education_context ? 'Все мероприятия' : (string) get_the_title($sidebar_post->ID),
       'url' => $permalink,
       'is_docs_tab' => false,
+      'is_events_page' => $is_events_page,
       'children' => $children,
     ];
   }
+}
+
+// В контексте мероприятий сайдбар — только сами мероприятия и их категории.
+if ($is_education_context) {
+  $items = array_values(array_filter($items, static function (array $item): bool {
+    return !empty($item['is_events_page']);
+  }));
 }
 
 $current_document_id = is_singular('documentation') ? (int) get_queried_object_id() : 0;
