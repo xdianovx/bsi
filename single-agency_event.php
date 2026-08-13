@@ -22,21 +22,16 @@ if ($price !== '' && function_exists('format_price_text')) {
 }
 // Знак рубля не подставляем: менеджер пишет цену как есть («Бесплатно», «5000 руб», «€300»).
 
-$start_date_label = '';
-if ($start_date !== '') {
-  $ts = strtotime($start_date);
-  if ($ts) {
-    $start_date_label = date_i18n('j F Y', $ts);
-  }
-}
+$end_date = function_exists('get_field') ? trim((string) get_field('event_end_date', $post_id)) : '';
+$start_date_label = bsi_agency_event_date_label($start_date, $end_date);
 
-$event_start_ts = (int) get_post_meta($post_id, 'event_start_ts', true);
-if (!$event_start_ts && $start_date !== '' && $start_time !== '') {
-  $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i', $start_date . ' ' . $start_time, wp_timezone());
-  $event_start_ts = $dt ? $dt->getTimestamp() : 0;
+// Мероприятие считается прошедшим после конца последнего дня.
+$event_end_ts = (int) get_post_meta($post_id, 'event_end_ts', true);
+if (!$event_end_ts) {
+  $event_end_ts = bsi_agency_event_calc_end_ts($start_date, $end_date);
 }
 $now_ts = (int) current_time('timestamp');
-$is_past = ($event_start_ts > 0 && $event_start_ts < $now_ts);
+$is_past = ($event_end_ts > 0 && $event_end_ts < $now_ts);
 $is_registration_closed = ($registration_closed || $is_past);
 
 $kind_terms = get_the_terms($post_id, 'agency_event_kind');

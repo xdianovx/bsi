@@ -185,6 +185,74 @@ function bsi_agency_event_kind_terms()
 }
 
 /**
+ * Метка времени начала мероприятия. Время необязательно: без него берётся начало дня.
+ */
+function bsi_agency_event_calc_start_ts($start_date, $start_time = '')
+{
+    $start_date = trim((string) $start_date);
+    if ($start_date === '') {
+        return 0;
+    }
+
+    $start_time = trim((string) $start_time);
+    $format = $start_time === '' ? 'Y-m-d H:i' : 'Y-m-d H:i';
+    $value = $start_date . ' ' . ($start_time === '' ? '00:00' : $start_time);
+
+    $dt = DateTimeImmutable::createFromFormat($format, $value, wp_timezone());
+
+    return $dt ? $dt->getTimestamp() : 0;
+}
+
+/**
+ * Метка времени окончания: конец дня окончания, а если его нет — конец дня начала.
+ */
+function bsi_agency_event_calc_end_ts($start_date, $end_date = '')
+{
+    $last_day = trim((string) $end_date);
+    if ($last_day === '') {
+        $last_day = trim((string) $start_date);
+    }
+    if ($last_day === '') {
+        return 0;
+    }
+
+    $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $last_day . ' 23:59:59', wp_timezone());
+
+    return $dt ? $dt->getTimestamp() : 0;
+}
+
+/**
+ * Подпись даты мероприятия: одиночная дата или диапазон («24–26 марта 2026»).
+ */
+function bsi_agency_event_date_label($start_date, $end_date = '')
+{
+    $start_ts = $start_date !== '' ? strtotime((string) $start_date) : false;
+    if (!$start_ts) {
+        return '';
+    }
+
+    $end_ts = $end_date !== '' ? strtotime((string) $end_date) : false;
+    if (!$end_ts || $end_ts <= $start_ts) {
+        return date_i18n('j F Y', $start_ts);
+    }
+
+    $same_year = date('Y', $start_ts) === date('Y', $end_ts);
+    $same_month = $same_year && date('m', $start_ts) === date('m', $end_ts);
+
+    if ($same_month) {
+        // 24–26 марта 2026
+        return date_i18n('j', $start_ts) . '–' . date_i18n('j F Y', $end_ts);
+    }
+
+    if ($same_year) {
+        // 28 марта — 2 апреля 2026
+        return date_i18n('j F', $start_ts) . ' — ' . date_i18n('j F Y', $end_ts);
+    }
+
+    return date_i18n('j F Y', $start_ts) . ' — ' . date_i18n('j F Y', $end_ts);
+}
+
+/**
  * Аргументы выборки мероприятий: ближайшие или прошедшие.
  * Дата берётся из event_start_ts, для записей без метки — из ACF-поля.
  */
@@ -194,6 +262,8 @@ function bsi_agency_events_query_args($archive = false)
     $today = wp_date('Y-m-d');
     $compare = $archive ? '<' : '>=';
 
+    // Многодневное мероприятие остаётся «ближайшим» до конца последнего дня,
+    // поэтому сравниваем по event_end_ts; сортировка — по дате начала.
     return [
         'post_type' => 'agency_event',
         'post_status' => 'publish',
@@ -203,13 +273,30 @@ function bsi_agency_events_query_args($archive = false)
         'meta_query' => [
             'relation' => 'OR',
             [
-                'key' => 'event_start_ts',
+                'key' => 'event_end_ts',
                 'value' => $now_ts,
                 'compare' => $compare,
                 'type' => 'NUMERIC',
             ],
             [
                 'relation' => 'AND',
+                [
+                    'key' => 'event_end_ts',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key' => 'event_start_ts',
+                    'value' => $now_ts,
+                    'compare' => $compare,
+                    'type' => 'NUMERIC',
+                ],
+            ],
+            [
+                'relation' => 'AND',
+                [
+                    'key' => 'event_end_ts',
+                    'compare' => 'NOT EXISTS',
+                ],
                 [
                     'key' => 'event_start_ts',
                     'compare' => 'NOT EXISTS',

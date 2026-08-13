@@ -124,12 +124,23 @@ function bsi_register_agency_event_fields()
         'wrapper' => ['width' => '25'],
       ],
       [
+        'key' => 'field_agency_event_end_date',
+        'label' => 'Дата окончания',
+        'name' => 'event_end_date',
+        'type' => 'date_picker',
+        'display_format' => 'd.m.Y',
+        'return_format' => 'Y-m-d',
+        'first_day' => 1,
+        'instructions' => 'Только для мероприятий длиннее одного дня.',
+        'wrapper' => ['width' => '25'],
+      ],
+      [
         'key' => 'field_agency_event_start_time',
         'label' => 'Время начала',
         'name' => 'event_start_time',
         'type' => 'text',
         'placeholder' => 'Например: 13:00',
-        'required' => 1,
+        'instructions' => 'Можно не указывать.',
         'wrapper' => ['width' => '25'],
       ],
       [
@@ -209,19 +220,24 @@ function bsi_agency_event_sync_start_ts($post_id, $post, $update)
 
   $start_date = function_exists('get_field') ? trim((string) get_field('event_start_date', $post_id)) : '';
   $start_time = function_exists('get_field') ? trim((string) get_field('event_start_time', $post_id)) : '';
+  $end_date = function_exists('get_field') ? trim((string) get_field('event_end_date', $post_id)) : '';
 
-  if ($start_date === '' || $start_time === '') {
+  // Время необязательно: без него началом считается начало дня.
+  $start_ts = bsi_agency_event_calc_start_ts($start_date, $start_time);
+  // Мероприятие «идёт» до конца последнего дня — дня окончания либо дня начала.
+  $end_ts = bsi_agency_event_calc_end_ts($start_date, $end_date);
+
+  if ($start_ts > 0) {
+    update_post_meta($post_id, 'event_start_ts', (string) $start_ts);
+  } else {
     delete_post_meta($post_id, 'event_start_ts');
-    return;
   }
 
-  $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i', $start_date . ' ' . $start_time, wp_timezone());
-  if (!$dt) {
-    delete_post_meta($post_id, 'event_start_ts');
-    return;
+  if ($end_ts > 0) {
+    update_post_meta($post_id, 'event_end_ts', (string) $end_ts);
+  } else {
+    delete_post_meta($post_id, 'event_end_ts');
   }
-
-  update_post_meta($post_id, 'event_start_ts', (string) $dt->getTimestamp());
 }
 
 add_action('init', 'bsi_agency_events_backfill_start_ts');
@@ -230,10 +246,11 @@ function bsi_agency_events_backfill_start_ts()
   if (!is_user_logged_in() || !current_user_can('edit_posts')) {
     return;
   }
-  if (get_option('bsi_agency_events_start_ts_backfilled')) {
+  if (get_option('bsi_agency_events_end_ts_backfilled')) {
     return;
   }
 
+  // Записи без event_end_ts: метка появилась вместе с полем «Дата окончания».
   $q = new WP_Query([
     'post_type' => 'agency_event',
     'post_status' => 'any',
@@ -242,7 +259,7 @@ function bsi_agency_events_backfill_start_ts()
     'no_found_rows' => true,
     'meta_query' => [
       [
-        'key' => 'event_start_ts',
+        'key' => 'event_end_ts',
         'compare' => 'NOT EXISTS',
       ],
     ],
@@ -254,5 +271,5 @@ function bsi_agency_events_backfill_start_ts()
     }
   }
 
-  update_option('bsi_agency_events_start_ts_backfilled', 1, false);
+  update_option('bsi_agency_events_end_ts_backfilled', 1, false);
 }

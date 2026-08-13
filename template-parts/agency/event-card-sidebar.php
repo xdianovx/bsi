@@ -17,13 +17,8 @@ $city = function_exists('get_field') ? trim((string) get_field('event_city', $po
 $place = function_exists('get_field') ? trim((string) get_field('event_place', $post_id)) : '';
 $place_display = implode(', ', array_filter([$city, $place]));
 
-$start_date_label = '';
-if ($start_date !== '') {
-  $ts = strtotime($start_date);
-  if ($ts) {
-    $start_date_label = date_i18n('j F', $ts);
-  }
-}
+$end_date = function_exists('get_field') ? trim((string) get_field('event_end_date', $post_id)) : '';
+$start_date_label = bsi_agency_event_date_label($start_date, $end_date);
 
 $kind_terms = get_the_terms($post_id, 'agency_event_kind');
 $kind = (!empty($kind_terms) && !is_wp_error($kind_terms)) ? $kind_terms[0] : null;
