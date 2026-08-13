@@ -119,28 +119,32 @@ $kind_url = bsi_agency_events_tab_url($kind_slug);
             <?php endif; ?>
           </div>
 
-          <div class="agency-education-card__bottom">
-            <?php if ($price !== ''): ?>
-              <div class="agency-education-card__price numfont"><?php echo esc_html($price); ?></div>
-            <?php endif; ?>
-            <?php if ($is_registration_closed): ?>
-              <button type="button" class="btn btn-gray agency-education-card__cta" disabled>Запись закрыта</button>
-            <?php elseif ($registration_url !== ''): ?>
-              <a href="<?php echo esc_url($registration_url); ?>" target="_blank" rel="noopener"
-                class="btn sm btn-accent agency-education-card__cta">Регистрация</a>
-            <?php else: ?>
-              <button type="button" class="btn sm btn-accent agency-education-card__cta js-agency-event-reg-btn"
-                data-event-id="<?php echo esc_attr($post_id); ?>" data-event-title="<?php echo esc_attr($title); ?>"
-                data-event-kind="<?php echo esc_attr($kind_label); ?>">
-                Регистрация
-              </button>
-            <?php endif; ?>
-          </div>
+          <?php
+          $cta_args = [
+            'post_id' => $post_id,
+            'title' => $title,
+            'kind_label' => $kind_label,
+            'price' => $price,
+            'registration_url' => $registration_url,
+            'registration_closed' => $is_registration_closed,
+          ];
+          ?>
+
+          <?php get_template_part('template-parts/agency/event-cta', null, $cta_args); ?>
 
           <?php if (trim((string) get_post_field('post_content', $post_id)) !== ''): ?>
             <div class="editor-content agency-page__editor" style="margin-top: 24px;">
               <?php the_content(); ?>
             </div>
+
+            <?php
+            // Тот же CTA после описания — чтобы не листать обратно наверх.
+            get_template_part(
+              'template-parts/agency/event-cta',
+              null,
+              $cta_args + ['modifier' => 'agency-education-card__bottom--repeat']
+            );
+            ?>
           <?php endif; ?>
         </div>
       </div>
