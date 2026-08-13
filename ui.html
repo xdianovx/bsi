@@ -186,6 +186,7 @@
     <li><a href="#slider">Слайдер-стрелки</a></li>
     <li><a href="#breadcrumbs">Хлебные крошки</a></li>
     <li><a href="#callout">Callout / Алерты</a></li>
+    <li><a href="#numbered-content">Нумерация текста</a></li>
 <li><a href="#pagination">Пагинация</a></li>
     <li><a href="#counter">Counter</a></li>
     <li><a href="#preloader">Preloader</a></li>
@@ -630,6 +631,35 @@ $pagination = paginate_links([
 ]);
 ?&gt;
 &lt;nav class="ui-pagination" aria-label="Страницы"&gt;&lt;?php echo $pagination; ?&gt;&lt;/nav&gt;</pre>
+  </section>
+
+  <!-- ============ NUMBERED CONTENT ============ -->
+  <section class="uikit-section" id="numbered-content">
+    <h2>Нумерация текста (как в Word)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/numbered-content.scss</code>. Класс <code>.editor-content--numbered</code> на контейнере контента из редактора: списки любой вложенности получают сквозные номера <code>1.1</code>, <code>1.2.3</code>, <code>1.2.3.4</code>. Номер раздела берётся из счётчика заголовков <code>&lt;h2&gt;</code>. Если разделов нет — добавить <code>.editor-content--numbered-flat</code>, счёт пойдёт с первого уровня. Списки в редакторе остаются обычными <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code>, номера рисует CSS. На экранах ≤768px с третьего уровня отступ не растёт — вложенность видно по номеру.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="editor-content editor-content--numbered">
+        <h2>Страховой случай</h2>
+        <ul>
+          <li>Страховщик обеспечивает защиту по договору от следующих рисков:
+            <ul>
+              <li>«Медицинская помощь» — непредвиденные расходы при обращении в медицинское учреждение.</li>
+              <li>«Депортация» — расходы, связанные с депортацией застрахованного.
+                <ul>
+                  <li>В поездках за границу.</li>
+                  <li>В поездках по территории России.</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>Не признаются страховыми случаями расходы, указанные в договоре.</li>
+        </ul>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="editor-content read-content editor-content--numbered"&gt;
+  &lt;?php the_content(); ?&gt;
+&lt;/div&gt;</pre>
   </section>
 
   <!-- ============ CALLOUT ============ -->

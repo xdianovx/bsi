@@ -1,0 +1,111 @@
+// Многоуровневая нумерация списков в тексте из редактора — как в Word: 1.1, 1.2.3, 1.2.3.4.
+// Включается классом .editor-content--numbered на контейнере контента.
+// Списки в редакторе остаются обычными <ul>/<ol> — номера рисует CSS.
+
+$numbered-indent: 3.4em;
+$numbered-prefix: 2.9em;
+$numbered-indent-deep: 4.6em;
+$numbered-prefix-deep: 4.1em;
+
+.editor-content--numbered {
+  counter-reset: bsi-section;
+
+  h2 {
+    counter-increment: bsi-section;
+    counter-reset: bsi-item;
+  }
+
+  ul,
+  ol {
+    padding-left: $numbered-indent;
+  }
+
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol {
+    counter-reset: bsi-item;
+    margin: 10px 0;
+  }
+
+  // В editor-styles.scss маркеры заданы как `.editor-content ul li { list-style-type: disc !important }` —
+  // перебиваем более специфичным селектором.
+  &.editor-content ul li,
+  &.editor-content ol li {
+    list-style-type: none !important;
+  }
+
+  li {
+    counter-increment: bsi-item;
+
+    &::before {
+      content: counter(bsi-section) '.' counters(bsi-item, '.') '.';
+      display: inline-block;
+      min-width: $numbered-prefix;
+      margin-left: -$numbered-indent;
+      padding-right: 0.5em;
+      color: $text-gray;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  // С третьего уровня номер длиннее — больше места под него.
+  ul ul ul,
+  ul ul ol,
+  ul ol ul,
+  ul ol ol,
+  ol ul ul,
+  ol ul ol,
+  ol ol ul,
+  ol ol ol {
+    padding-left: $numbered-indent-deep;
+
+    > li::before {
+      min-width: $numbered-prefix-deep;
+      margin-left: -$numbered-indent-deep;
+    }
+  }
+}
+
+// На узких экранах отступы съедают ширину: с третьего уровня вложенность
+// показывает только номер, висячий отступ отключён.
+@media screen and (max-width: 768px) {
+  .editor-content--numbered {
+    ul,
+    ol {
+      padding-left: 2.6em;
+    }
+
+    li::before {
+      min-width: 2.2em;
+      margin-left: -2.6em;
+      padding-right: 0.4em;
+    }
+
+    ul ul ul,
+    ul ul ol,
+    ul ol ul,
+    ul ol ol,
+    ol ul ul,
+    ol ul ol,
+    ol ol ul,
+    ol ol ol {
+      padding-left: 0;
+
+      > li::before {
+        min-width: 0;
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+// Контент без разделов <h2> — нумерация начинается с первого уровня: 1, 1.1, 1.1.1.
+.editor-content--numbered.editor-content--numbered-flat {
+  counter-reset: bsi-item;
+
+  li::before {
+    content: counters(bsi-item, '.') '.';
+  }
+}

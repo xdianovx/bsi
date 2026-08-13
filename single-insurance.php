@@ -87,10 +87,18 @@ get_header();
 		/**
 		 * Контент из редактора
 		 */
-		if (get_the_content()): ?>
+		if (get_the_content()):
+			// Правила страхования — списки нумеруются сквозной вложенной нумерацией (1.1, 1.2.3).
+			// Разделы задаются заголовками <h2>; если их нет, счёт идёт с первого уровня.
+			$insurance_content = (string) get_the_content();
+			$insurance_content_classes = 'editor-content read-content editor-content--numbered';
+			if (stripos($insurance_content, '<h2') === false) {
+				$insurance_content_classes .= ' editor-content--numbered-flat';
+			}
+			?>
 			<section class="insurance-content-section">
 				<div class="container">
-					<div class="editor-content read-content">
+					<div class="<?php echo esc_attr($insurance_content_classes); ?>">
 						<?php the_content(); ?>
 					</div>
 				</div>
