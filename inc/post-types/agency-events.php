@@ -121,7 +121,7 @@ function bsi_register_agency_event_fields()
         'return_format' => 'Y-m-d',
         'first_day' => 1,
         'required' => 1,
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_agency_event_end_date',
@@ -132,7 +132,7 @@ function bsi_register_agency_event_fields()
         'return_format' => 'Y-m-d',
         'first_day' => 1,
         'instructions' => 'Только для мероприятий длиннее одного дня.',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_agency_event_start_time',
@@ -141,7 +141,7 @@ function bsi_register_agency_event_fields()
         'type' => 'text',
         'placeholder' => 'Например: 13:00',
         'instructions' => 'Можно не указывать.',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_agency_event_city',
@@ -150,7 +150,7 @@ function bsi_register_agency_event_fields()
         'type' => 'text',
         'placeholder' => 'Например: Москва',
         'required' => 1,
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_agency_event_place',
@@ -158,7 +158,7 @@ function bsi_register_agency_event_fields()
         'name' => 'event_place',
         'type' => 'text',
         'placeholder' => 'Адрес или онлайн-площадка',
-        'wrapper' => ['width' => '25'],
+        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_agency_event_registration_closed',
