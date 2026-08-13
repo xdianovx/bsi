@@ -55,8 +55,15 @@ $kind_class = bsi_agency_event_kind_class($kind_slug);
   <div class="agency-education-card__top">
     <span
       class="agency-education-card__kind <?php echo esc_attr($kind_class); ?>"><?php echo esc_html($kind_label); ?></span>
-    <h3 class="agency-education-card__title"><?php echo esc_html($title); ?></h3>
+    <h3 class="agency-education-card__title">
+      <a href="<?php echo esc_url($permalink); ?>"
+        class="agency-education-card__title-link"><?php echo esc_html($title); ?></a>
+    </h3>
   </div>
+
+  <?php if ($excerpt !== ''): ?>
+    <p class="agency-education-card__excerpt"><?php echo esc_html($excerpt); ?></p>
+  <?php endif; ?>
 
   <div class="agency-education-card__meta">
     <?php if ($start_date_label !== ''): ?>
@@ -93,10 +100,6 @@ $kind_class = bsi_agency_event_kind_class($kind_slug);
       </span>
     <?php endif; ?>
   </div>
-
-  <?php if ($excerpt !== ''): ?>
-    <p class="agency-education-card__excerpt"><?php echo esc_html($excerpt); ?></p>
-  <?php endif; ?>
 
   <div class="agency-education-card__bottom">
     <a href="<?php echo esc_url($permalink); ?>" class="btn sm btn-white agency-education-card__link">Подробнее</a>
