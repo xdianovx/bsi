@@ -92,32 +92,63 @@ export const initEventToursFilters = async () => {
     if (perPage) body.set("per_page", perPage);
   };
 
+  /* Номера страниц как у paginate_links: первая, последняя, ±2 вокруг текущей, между ними «…». */
+  const buildPageList = (paged, maxPages) => {
+    const midSize = 2;
+    const pages = [];
+    let lastShown = 0;
+
+    for (let i = 1; i <= maxPages; i++) {
+      const isEdge = i === 1 || i === maxPages;
+      const isNear = Math.abs(i - paged) <= midSize;
+      if (!isEdge && !isNear) continue;
+      if (lastShown && i - lastShown > 1) pages.push("dots");
+      pages.push(i);
+      lastShown = i;
+    }
+
+    return pages;
+  };
+
   const renderPagination = (total, maxPages, paged) => {
     if (!paginationEl) return;
     if (maxPages <= 1) {
       paginationEl.innerHTML = "";
       return;
     }
-    const prevDisabled = paged <= 1;
-    const nextDisabled = paged >= maxPages;
-    paginationEl.innerHTML = `
-      <div class="country-tours__pagination-inner">
-        <button type="button" class="btn btn-gray country-tours__page-btn" data-et-prev ${prevDisabled ? "disabled" : ""}>Назад</button>
-        <span class="country-tours__page-num numfont">${paged} / ${maxPages}</span>
-        <span class="country-tours__page-total">всего ${total}</span>
-        <button type="button" class="btn btn-gray country-tours__page-btn" data-et-next ${nextDisabled ? "disabled" : ""}>Вперёд</button>
-      </div>`;
-    paginationEl.querySelector("[data-et-prev]")?.addEventListener("click", async () => {
-      if (currentPage > 1) {
-        currentPage--;
-        await loadTours();
+
+    const parts = [];
+    if (paged > 1) {
+      parts.push('<button type="button" class="prev page-numbers" data-et-page="' + (paged - 1) + '">Назад</button>');
+    }
+
+    buildPageList(paged, maxPages).forEach((item) => {
+      if (item === "dots") {
+        parts.push('<span class="page-numbers dots">&hellip;</span>');
+        return;
       }
+      parts.push(
+        item === paged
+          ? '<span aria-current="page" class="page-numbers current">' + item + "</span>"
+          : '<button type="button" class="page-numbers" data-et-page="' + item + '">' + item + "</button>"
+      );
     });
-    paginationEl.querySelector("[data-et-next]")?.addEventListener("click", async () => {
-      if (currentPage < maxPages) {
-        currentPage++;
+
+    if (paged < maxPages) {
+      parts.push('<button type="button" class="next page-numbers" data-et-page="' + (paged + 1) + '">Вперёд</button>');
+    }
+
+    paginationEl.innerHTML = parts.join("");
+
+    paginationEl.querySelectorAll("[data-et-page]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const target = parseInt(btn.dataset.etPage, 10);
+        if (!target || target === currentPage || target < 1 || target > maxPages) return;
+        currentPage = target;
         await loadTours();
-      }
+        // После подгрузки возвращаем пользователя к началу списка.
+        if (list) list.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
   };
 

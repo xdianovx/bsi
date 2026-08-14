@@ -11,7 +11,7 @@
  * country → tour_country (=).
  *
  * Управление: счётчик, переключатель валюты, сортировка, пагинация
- * (по умолчанию 4 карточки на страницу через data-per-page).
+ * (12 карточек на страницу через data-per-page).
  *
  * Использует функции из inc/requests/event-tours-filter.php:
  *  - bsi_event_tours_parse_request_filters()
@@ -49,8 +49,8 @@ $events_h1 = $country_locative !== ''
   ? 'Событийные туры в ' . $country_locative
   : 'Событийные туры';
 
-/* По умолчанию — 4 карточки на страницу. */
-$per_page = 4;
+/* 12 карточек на страницу — как в остальных каталогах. */
+$per_page = 12;
 
 /* Начальный набор — все событийные туры страны, сортировка «сначала ближайшие». */
 $event_tours_total = 0;
@@ -153,7 +153,7 @@ get_header(); ?>
               <?php wp_reset_postdata(); ?>
             </div>
 
-            <nav class="country-tours__pagination" data-event-tours-pagination
+            <nav class="ui-pagination country-tours__pagination" data-event-tours-pagination
               aria-label="Навигация по страницам каталога"></nav>
 
           </div>

@@ -191,25 +191,10 @@
   border-radius: 12px;
 }
 
+// Разметку рисует js/modules/ajax/event-tours.js в классах .ui-pagination
+// (scss/ui/pagination.scss) — здесь только отступ от списка.
 .country-tours__pagination {
   margin-top: 24px;
-}
-
-.country-tours__pagination-inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.country-tours__page-num {
-  font-weight: 600;
-}
-
-.country-tours__page-total {
-  color: #666;
-  font-size: 14px;
 }
 
 // Каталог «Событийные туры» — фильтры по Figma 1671:1465 (TalkToFigma chhy536f)

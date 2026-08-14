@@ -275,7 +275,7 @@ $tour_type_terms = get_terms([
             <?php wp_reset_postdata(); ?>
           </div>
 
-          <nav class="country-tours__pagination" data-event-tours-pagination
+          <nav class="ui-pagination country-tours__pagination" data-event-tours-pagination
             aria-label="Навигация по страницам каталога"></nav>
 
         </div>
