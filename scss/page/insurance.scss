@@ -18,7 +18,7 @@
 }
 
 .insurance_item {
-  background: $bg-gray;
+  border: 1px solid $gray-light;
   border-radius: 8px;
   padding: 8px;
   display: flex;
@@ -146,8 +146,8 @@
 
 // ─── Страница страхового продукта ──────────────────────────────────────────
 
-$insurance-gap: 64px;
-$insurance-gap-mob: 40px;
+$insurance-gap: 80px;
+$insurance-gap-mob: 48px;
 $insurance-success: #2e9e4f;
 
 .insurance-single {
@@ -191,10 +191,73 @@ $insurance-success: #2e9e4f;
   flex-shrink: 0;
 }
 
+// Общие блоки раздела (шаги, FAQ) выводятся и в каталоге, и на продукте
+.insurance-page {
+  .insurance-steps,
+  .faq-section {
+    margin-top: $insurance-gap;
+
+    @media screen and (max-width: 768px) {
+      margin-top: $insurance-gap-mob;
+    }
+  }
+
+  .faq__inner {
+    gap: 24px;
+  }
+
+  .faq__title {
+    font-weight: 700;
+    font-size: 24px;
+
+    @media screen and (max-width: 1024px) {
+      font-size: 20px;
+    }
+  }
+
+  .h2 {
+    margin-bottom: 24px;
+  }
+}
+
 // ─── Шапка ─────────────────────────────────────────────────────────────────
 
 .insurance-hero {
   margin-top: 32px;
+}
+
+// Две колонки: текст + иллюстрация записи
+.insurance-hero__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: center;
+  gap: 40px;
+
+  @media screen and (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+.insurance-hero__media {
+  border-radius: 8px;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: 280px;
+    object-fit: contain;
+  }
+
+  @media screen and (max-width: 900px) {
+    order: -1;
+
+    img {
+      max-height: 200px;
+    }
+  }
 }
 
 .insurance-hero__inner {
@@ -224,7 +287,7 @@ $insurance-success: #2e9e4f;
   font-size: 14px;
   line-height: 100%;
   color: $text-gray;
-  background: $bg-gray;
+  border: 1px solid $gray-light;
   border-radius: 4px;
   padding: 6px 10px;
   white-space: nowrap;
@@ -274,13 +337,6 @@ $insurance-success: #2e9e4f;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: $bg-gray;
-  border-radius: 8px;
-  padding: 20px;
-
-  @media screen and (max-width: 768px) {
-    padding: 16px;
-  }
 }
 
 // Иконка стоит в одной строке с подписью параметра
@@ -323,16 +379,12 @@ $insurance-success: #2e9e4f;
 
 .insurance-benefits__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px 16px;
 
   @media screen and (max-width: 560px) {
     grid-template-columns: repeat(1, 1fr);
+    gap: 24px;
   }
 }
 
@@ -340,13 +392,6 @@ $insurance-success: #2e9e4f;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: $bg-gray;
-  border-radius: 8px;
-  padding: 24px;
-
-  @media screen and (max-width: 768px) {
-    padding: 20px;
-  }
 }
 
 // Иконка и заголовок — на одной линии
@@ -357,21 +402,15 @@ $insurance-success: #2e9e4f;
 }
 
 .insurance-benefit__icon {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   border-radius: 8px;
-  background: #fff;
+  border: 1px solid $gray-light;
   color: $red;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  img {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-  }
 }
 
 .insurance-benefit__title {
@@ -452,54 +491,13 @@ $insurance-success: #2e9e4f;
   flex-grow: 1;
 }
 
-// На узких экранах лимит уходит под текст, чтобы не сжимать колонку
-@media screen and (max-width: 560px) {
-  .insurance-list__item {
-    display: grid;
-    grid-template-columns: 20px 1fr;
-    column-gap: 12px;
-    row-gap: 4px;
-    align-items: start;
-  }
-
-  .insurance-list__marker {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .insurance-list__text,
-  .insurance-list__limit {
-    grid-column: 2;
-  }
-
-  .insurance-list__limit {
-    justify-self: start;
-  }
-}
-
-.insurance-list__limit {
-  flex-shrink: 0;
-  max-width: 100%;
-  font-size: 14px;
-  color: $text-gray;
-  background: $bg-gray;
-  border-radius: 4px;
-  padding: 2px 8px;
-  // Пометка программы бывает длинной («Отказ в визе или болезнь», «Все включено»),
-  // поэтому перенос разрешён — иначе строка распирает страницу на мобильных.
-  overflow-wrap: anywhere;
-}
-
-// ─── Как оформить ──────────────────────────────────────────────────────────
-
 .insurance-steps__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 8px;
 
   @media screen and (max-width: 900px) {
     grid-template-columns: repeat(1, 1fr);
-    gap: 16px;
   }
 }
 
@@ -509,11 +507,7 @@ $insurance-success: #2e9e4f;
   gap: 12px;
   border: 1px solid $gray-light;
   border-radius: 8px;
-  padding: 24px;
-
-  @media screen and (max-width: 768px) {
-    padding: 20px;
-  }
+  padding: 16px;
 }
 
 // Номер, иконка и заголовок шага — одной строкой
@@ -524,16 +518,9 @@ $insurance-success: #2e9e4f;
 }
 
 .insurance-step__num {
-  font-size: 28px;
   font-weight: 700;
   line-height: 100%;
   color: $red;
-  flex-shrink: 0;
-}
-
-.insurance-step__icon {
-  display: flex;
-  color: $gray;
   flex-shrink: 0;
 }
 
@@ -569,7 +556,7 @@ $insurance-success: #2e9e4f;
 }
 
 .insurance-rules__item {
-  background: $bg-gray;
+  border: 1px solid $gray-light;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -605,19 +592,6 @@ $insurance-success: #2e9e4f;
     font-size: 16px;
     padding: 16px;
   }
-}
-
-.insurance-rules__question {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.insurance-rules__ref {
-  font-size: 14px;
-  font-weight: 400;
-  color: $text-gray;
 }
 
 .insurance-rules__icon {
@@ -664,55 +638,64 @@ $insurance-success: #2e9e4f;
 
 // ─── Документы ─────────────────────────────────────────────────────────────
 
-.insurance-docs__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+.insurance-docs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+// Документ — одной строкой: название · Скачать · формат · вес
+.insurance-doc {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 145%;
+  color: $text-black;
 
-  @media screen and (max-width: 560px) {
-    grid-template-columns: repeat(1, 1fr);
+  @media screen and (max-width: 768px) {
+    font-size: 14px;
   }
 }
 
-.insurance-doc {
+// Скачать / формат / вес — прижаты к правому краю строки
+.insurance-doc__actions {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  border: 1px solid $gray-light;
-  border-radius: 8px;
-  padding: 16px 20px;
-  text-decoration: none;
-  color: $text-black;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+
+  @media screen and (max-width: 560px) {
+    margin-left: 0;
+  }
+}
+
+.insurance-doc__link {
+  color: $red;
+  text-decoration: underline;
+  text-underline-offset: 3px;
   transition: $trans-text;
 
   &:hover {
-    color: $red;
+    color: $red-hover;
   }
-}
-
-.insurance-doc__icon {
-  color: $red;
-}
-
-.insurance-doc__body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.insurance-doc__title {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 130%;
 }
 
 .insurance-doc__meta {
   font-size: 14px;
   color: $text-gray;
+
+  // Разделитель перед форматом и весом
+  &::before {
+    content: '·';
+    margin-right: 8px;
+    color: $gray-light;
+  }
 }
 
 // ─── Форма консультации ────────────────────────────────────────────────────

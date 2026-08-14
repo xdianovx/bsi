@@ -38,7 +38,8 @@ get_header();
 			<div class="container">
 				<div class="insurance-hero__inner">
 
-					<div class="insurance-hero__head">
+					<div class="insurance-hero__main">
+						<div class="insurance-hero__head">
 						<?php if (!empty($insurance_types)): ?>
 							<div class="insurance-hero__badges">
 								<?php foreach ($insurance_types as $type): ?>
@@ -54,8 +55,18 @@ get_header();
 						<?php endif; ?>
 
 						<div class="insurance-hero__actions">
-							<a href="#insurance-consultation" class="btn btn-accent">Получить консультацию</a>
+								<a href="#insurance-consultation" class="btn btn-accent">Получить консультацию</a>
+							</div>
 						</div>
+
+						<?php if (has_post_thumbnail($insurance_id)): ?>
+							<div class="insurance-hero__media">
+								<?php echo get_the_post_thumbnail($insurance_id, 'medium_large', [
+									'alt' => esc_attr(get_the_title($insurance_id)),
+									'loading' => 'eager',
+								]); ?>
+							</div>
+						<?php endif; ?>
 					</div>
 
 					<?php if ($has_info): ?>
@@ -108,7 +119,6 @@ get_header();
 						<?php while (have_rows('insurance_benefits', $insurance_id)):
 							the_row();
 							$icon = get_sub_field('icon');
-							$img = get_sub_field('image');
 							$title = (string) get_sub_field('title');
 							$desc = (string) get_sub_field('description');
 
@@ -119,11 +129,7 @@ get_header();
 							<div class="insurance-benefit">
 								<div class="insurance-benefit__head">
 									<div class="insurance-benefit__icon">
-										<?php if (!empty($img['url'])): ?>
-											<img src="<?php echo esc_url($img['url']); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
-										<?php else: ?>
-											<?php get_template_part('template-parts/ui/icon', null, ['name' => $icon ?: 'shield-check', 'size' => 24]); ?>
-										<?php endif; ?>
+										<?php get_template_part('template-parts/ui/icon', null, ['name' => $icon ?: 'shield-check', 'size' => 24]); ?>
 									</div>
 
 									<?php if ($title): ?>
@@ -157,7 +163,6 @@ get_header();
 									<?php while (have_rows('insurance_coverage', $insurance_id)):
 										the_row();
 										$title = (string) get_sub_field('title');
-										$limit = (string) get_sub_field('limit');
 
 										if (!$title) {
 											continue;
@@ -168,9 +173,6 @@ get_header();
 												<?php get_template_part('template-parts/ui/icon', null, ['name' => 'circle-check', 'size' => 20]); ?>
 											</span>
 											<span class="insurance-list__text"><?php echo esc_html($title); ?></span>
-											<?php if ($limit): ?>
-												<span class="insurance-list__limit numfont"><?php echo esc_html($limit); ?></span>
-											<?php endif; ?>
 										</li>
 									<?php endwhile; ?>
 								</ul>
@@ -205,47 +207,7 @@ get_header();
 			</section>
 		<?php endif; ?>
 
-		<?php if (function_exists('have_rows') && have_rows('insurance_conditions', $insurance_id)): ?>
-			<section class="insurance-steps">
-				<div class="container">
-					<h2 class="h2">Как оформить</h2>
-
-					<div class="insurance-steps__grid">
-						<?php
-						$step_index = 0;
-						while (have_rows('insurance_conditions', $insurance_id)):
-							the_row();
-							$step_index++;
-							$icon = get_sub_field('icon');
-							$num = get_sub_field('order');
-							$title = (string) get_sub_field('title');
-							$descr = (string) get_sub_field('description');
-							$num = ($num === null || $num === '') ? $step_index : $num;
-							?>
-							<div class="insurance-step">
-								<div class="insurance-step__top">
-									<span class="insurance-step__num numfont"><?php echo esc_html((string) $num); ?></span>
-
-									<?php if ($icon): ?>
-										<span class="insurance-step__icon">
-											<?php get_template_part('template-parts/ui/icon', null, ['name' => $icon, 'size' => 22]); ?>
-										</span>
-									<?php endif; ?>
-
-									<?php if ($title): ?>
-										<h3 class="insurance-step__title"><?php echo esc_html($title); ?></h3>
-									<?php endif; ?>
-								</div>
-
-								<?php if ($descr): ?>
-									<p class="insurance-step__desc"><?php echo wp_kses_post(nl2br($descr)); ?></p>
-								<?php endif; ?>
-							</div>
-						<?php endwhile; ?>
-					</div>
-				</div>
-			</section>
-		<?php endif; ?>
+		<?php get_template_part('template-parts/insurance/steps'); ?>
 
 		<?php
 		/**
@@ -272,7 +234,6 @@ get_header();
 							while (have_rows('insurance_rules', $insurance_id)):
 								the_row();
 								$title = (string) get_sub_field('title');
-								$ref = (string) get_sub_field('ref');
 								$content = (string) get_sub_field('content');
 
 								if (!$title && !$content) {
@@ -285,12 +246,7 @@ get_header();
 								<div class="accordion__item insurance-rules__item">
 									<button class="accordion__btn insurance-rules__btn" type="button" aria-expanded="false"
 										aria-controls="<?php echo esc_attr($panel_id); ?>">
-										<span class="insurance-rules__question">
-											<?php echo esc_html($title); ?>
-											<?php if ($ref): ?>
-												<span class="insurance-rules__ref"><?php echo esc_html($ref); ?></span>
-											<?php endif; ?>
-										</span>
+										<span class="insurance-rules__question"><?php echo esc_html($title); ?></span>
 										<span class="accordion__icon insurance-rules__icon" aria-hidden="true">
 											<img src="<?php echo esc_url(get_template_directory_uri() . '/img/icons/chevron-d.svg'); ?>" alt="">
 										</span>
@@ -347,7 +303,7 @@ get_header();
 				<div class="container">
 					<h2 class="h2">Документы</h2>
 
-					<div class="insurance-docs__grid">
+					<ul class="insurance-docs__list">
 						<?php while (have_rows('insurance_docs', $insurance_id)):
 							the_row();
 							$title = (string) get_sub_field('title');
@@ -357,50 +313,35 @@ get_header();
 								continue;
 							}
 
-							$subtype = isset($file['subtype']) ? strtoupper((string) $file['subtype']) : '';
+							// Формат берём из расширения файла: subtype у ACF бывает вида «vnd.openxml…».
+							$extension = strtoupper((string) pathinfo((string) $file['url'], PATHINFO_EXTENSION));
 							$filesize = isset($file['filesize']) ? size_format((int) $file['filesize']) : '';
-							$meta = trim($subtype . ($filesize ? ', ' . $filesize : ''), ', ');
 							?>
-							<a class="insurance-doc" href="<?php echo esc_url($file['url']); ?>" target="_blank" rel="noopener">
-								<span class="insurance-doc__icon">
-									<?php get_template_part('template-parts/ui/icon', null, ['name' => 'file-text', 'size' => 24]); ?>
+							<li class="insurance-doc">
+								<span class="insurance-doc__title">
+									<?php echo esc_html($title ?: ($file['title'] ?? 'Документ')); ?>
 								</span>
-								<span class="insurance-doc__body">
-									<span class="insurance-doc__title">
-										<?php echo esc_html($title ?: ($file['title'] ?? 'Документ')); ?>
-									</span>
-									<?php if ($meta): ?>
-										<span class="insurance-doc__meta numfont"><?php echo esc_html($meta); ?></span>
+
+								<div class="insurance-doc__actions">
+									<a class="insurance-doc__link" href="<?php echo esc_url($file['url']); ?>" target="_blank"
+										rel="noopener" download>Скачать</a>
+
+									<?php if ($extension): ?>
+										<span class="insurance-doc__meta"><?php echo esc_html($extension); ?></span>
 									<?php endif; ?>
-								</span>
-							</a>
+
+									<?php if ($filesize): ?>
+										<span class="insurance-doc__meta numfont"><?php echo esc_html($filesize); ?></span>
+									<?php endif; ?>
+								</div>
+							</li>
 						<?php endwhile; ?>
-					</div>
+					</ul>
 				</div>
 			</section>
 		<?php endif; ?>
 
-		<?php
-		if (function_exists('have_rows') && have_rows('insurance_faq', $insurance_id)):
-			$faq_items = [];
-			while (have_rows('insurance_faq', $insurance_id)):
-				the_row();
-				$question = (string) get_sub_field('question');
-				$answer = (string) get_sub_field('answer');
-
-				if ($question && $answer) {
-					$faq_items[] = ['question' => $question, 'answer' => $answer];
-				}
-			endwhile;
-
-			if (!empty($faq_items)) {
-				get_template_part('template-parts/faq/faq', null, [
-					'title' => 'Частые вопросы',
-					'items' => $faq_items,
-				]);
-			}
-		endif;
-		?>
+		<?php get_template_part('template-parts/insurance/faq'); ?>
 
 		<?php get_template_part('template-parts/insurance/consultation-form', null, [
 			'insurance_title' => get_the_title($insurance_id),

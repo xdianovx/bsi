@@ -10,7 +10,7 @@ declare(strict_types=1);
 get_header();
 ?>
 
-<main class="site-main">
+<main class="site-main insurance-page">
 
 	<?php if (function_exists('yoast_breadcrumb')) {
 		yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>');
@@ -256,6 +256,10 @@ get_header();
 			</div>
 		</section>
 	<?php endif; ?>
+
+	<?php get_template_part('template-parts/insurance/steps'); ?>
+
+	<?php get_template_part('template-parts/insurance/faq'); ?>
 
 	<?php get_template_part('template-parts/insurance/consultation-form'); ?>
 

@@ -374,6 +374,7 @@ if (!defined('BSI_CONTENT_SCHEDULE_DISABLED')) {
 
 require get_template_directory() . '/inc/services/DateFormatter.php';
 require get_template_directory() . '/inc/helpers.php';
+require get_template_directory() . '/inc/helpers/insurance.php';
 require get_template_directory() . '/inc/helpers/content-schedule.php';
 // Раньше CPT: файлы записей-разделов страны вызывают регистратор при подключении.
 require get_template_directory() . '/inc/helpers/country-section-singular.php';

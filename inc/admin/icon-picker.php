@@ -17,7 +17,21 @@ add_action('admin_enqueue_scripts', function (string $hook): void {
 
 	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
 
-	if (!$screen || $screen->post_type !== 'insurance') {
+	if (!$screen) {
+		return;
+	}
+
+	// CPT «Страхование» и страница раздела (общий блок «Как оформить»).
+	$is_insurance_post = $screen->post_type === 'insurance';
+	$is_insurance_page = false;
+
+	if ($screen->post_type === 'page') {
+		$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
+		$is_insurance_page = $post_id > 0
+			&& get_post_meta($post_id, '_wp_page_template', true) === 'page-insurance.php';
+	}
+
+	if (!$is_insurance_post && !$is_insurance_page) {
 		return;
 	}
 

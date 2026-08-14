@@ -139,15 +139,6 @@ add_action('acf/init', function () {
 						'rows' => 3,
 						'new_lines' => '',
 					],
-					[
-						'key' => 'field_insurance_benefit_image',
-						'label' => 'Своя картинка вместо иконки',
-						'name' => 'image',
-						'type' => 'image',
-						'return_format' => 'array',
-						'preview_size' => 'thumbnail',
-						'instructions' => 'Необязательно. Если загружена — используется вместо иконки.',
-					],
 				],
 			],
 
@@ -173,14 +164,6 @@ add_action('acf/init', function () {
 						'type' => 'text',
 						'placeholder' => 'Стоматологическая помощь',
 					],
-					[
-						'key' => 'field_insurance_coverage_limit',
-						'label' => 'Лимит',
-						'name' => 'limit',
-						'type' => 'text',
-						'placeholder' => 'до 150 у.е.',
-						'wrapper' => ['width' => '25'],
-					],
 				],
 			],
 			[
@@ -197,47 +180,6 @@ add_action('acf/init', function () {
 						'label' => 'Пункт',
 						'name' => 'title',
 						'type' => 'text',
-					],
-				],
-			],
-
-			// ─── Как оформить ─────────────────────────────────────────────
-			[
-				'key' => 'field_insurance_tab_conditions',
-				'label' => 'Как оформить',
-				'type' => 'tab',
-				'placement' => 'top',
-			],
-			[
-				'key' => 'field_insurance_conditions',
-				'label' => 'Шаги оформления',
-				'name' => 'insurance_conditions',
-				'type' => 'repeater',
-				'layout' => 'block',
-				'button_label' => 'Добавить шаг',
-				'sub_fields' => [
-					[
-						'key' => 'field_insurance_condition_order',
-						'label' => 'Номер шага',
-						'name' => 'order',
-						'type' => 'number',
-						'wrapper' => ['width' => '20'],
-					],
-					[
-						'key' => 'field_insurance_condition_title',
-						'label' => 'Заголовок',
-						'name' => 'title',
-						'type' => 'text',
-						'wrapper' => ['width' => '80'],
-					],
-					$fill_icons($icon_field('field_insurance_condition_icon')),
-					[
-						'key' => 'field_insurance_condition_desc',
-						'label' => 'Описание',
-						'name' => 'description',
-						'type' => 'textarea',
-						'rows' => 3,
-						'new_lines' => 'br',
 					],
 				],
 			],
@@ -266,21 +208,12 @@ add_action('acf/init', function () {
 						'placeholder' => 'Что не является страховым случаем',
 					],
 					[
-						'key' => 'field_insurance_rule_ref',
-						'label' => 'Ссылка на пункт Правил',
-						'name' => 'ref',
-						'type' => 'text',
-						'placeholder' => 'п. 14.2 Правил',
-						'wrapper' => ['width' => '30'],
-					],
-					[
 						'key' => 'field_insurance_rule_content',
 						'label' => 'Текст',
 						'name' => 'content',
 						'type' => 'wysiwyg',
 						'tabs' => 'all',
 						'media_upload' => 0,
-						'delay' => 1,
 					],
 				],
 			],
@@ -332,18 +265,77 @@ add_action('acf/init', function () {
 				],
 			],
 
-			// ─── Вопросы ──────────────────────────────────────────────────
+		],
+	]);
+
+	/**
+	 * Общий блок «Как оформить» — один на весь раздел.
+	 * Живёт на странице с шаблоном «Страхование», выводится и в каталоге,
+	 * и на страницах продуктов.
+	 */
+	acf_add_local_field_group([
+		'key' => 'group_insurance_page_fields',
+		'title' => 'Раздел «Страхование» — общие блоки',
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'location' => [
 			[
-				'key' => 'field_insurance_tab_faq',
-				'label' => 'Вопросы',
-				'type' => 'tab',
-				'placement' => 'top',
+				[
+					'param' => 'page_template',
+					'operator' => '==',
+					'value' => 'page-insurance.php',
+				],
+			],
+		],
+		'fields' => [
+			[
+				'key' => 'field_insurance_steps_title',
+				'label' => 'Заголовок блока',
+				'name' => 'insurance_steps_title',
+				'type' => 'text',
+				'placeholder' => 'Как оформить',
+				'instructions' => 'По умолчанию — «Как оформить».',
+			],
+			[
+				'key' => 'field_insurance_steps',
+				'label' => 'Шаги оформления',
+				'name' => 'insurance_steps',
+				'type' => 'repeater',
+				'instructions' => 'Общие для всего раздела: выводятся и в каталоге, и на страницах страховых продуктов.',
+				'layout' => 'block',
+				'button_label' => 'Добавить шаг',
+				'sub_fields' => [
+					[
+						'key' => 'field_insurance_step_order',
+						'label' => 'Номер шага',
+						'name' => 'order',
+						'type' => 'number',
+						'wrapper' => ['width' => '20'],
+					],
+					[
+						'key' => 'field_insurance_step_title',
+						'label' => 'Заголовок',
+						'name' => 'title',
+						'type' => 'text',
+						'wrapper' => ['width' => '80'],
+					],
+					[
+						'key' => 'field_insurance_step_desc',
+						'label' => 'Описание',
+						'name' => 'description',
+						'type' => 'textarea',
+						'rows' => 3,
+						'new_lines' => 'br',
+					],
+				],
 			],
 			[
 				'key' => 'field_insurance_faq',
 				'label' => 'Частые вопросы',
 				'name' => 'insurance_faq',
 				'type' => 'repeater',
+				'instructions' => 'Общие для всего раздела: выводятся и в каталоге, и на страницах страховых продуктов.',
 				'layout' => 'block',
 				'button_label' => 'Добавить вопрос',
 				'sub_fields' => [
