@@ -666,7 +666,7 @@ $pagination = paginate_links([
   <!-- ============ INDENT ============ -->
   <section class="uikit-section" id="indent">
     <h2>Красная строка</h2>
-    <p class="uikit-section__hint">Источник: <code>scss/components/editor-styles.scss</code> + <code>inc/admin/paragraph-indent.php</code>. В редакторе выбирается в панели <b>Стили</b> у блоков «Абзац» и «Группа»: «Красная строка» (<code>.is-style-indent</code>) и «Красная строка + по ширине» (<code>.is-style-indent-justify</code>, добавляет выключку по ширине и переносы). У «Группы» отступ получают все абзацы внутри — удобно для оферт, политик и правил. Руками класс вписывать не нужно.</p>
+    <p class="uikit-section__hint">Источник: <code>scss/components/editor-styles.scss</code> + <code>inc/admin/paragraph-indent.php</code>. В классическом редакторе — кнопка-иконка в панели (после выравниваний), хоткей <code>Alt+Shift+Z</code>: ставит на абзац класс <code>.is-style-indent</code>. Выключку по ширине даёт родная кнопка «По ширине». В Gutenberg (если Classic Editor отключат) — стили блоков «Красная строка» / «Красная строка + по ширине» у «Абзаца» и «Группы»; у группы отступ получают все абзацы внутри.</p>
 
     <p class="uikit-label">.is-style-indent-justify</p>
     <div class="uikit-demo uikit-demo--block">
