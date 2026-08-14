@@ -199,6 +199,7 @@
     <li><a href="#cards-education">Карточка обучения</a></li>
     <li><a href="#cards-news">Карточка новости</a></li>
     <li><a href="#cards-promo">Карточка акции</a></li>
+<li><a href="#insurance-blocks">Блоки страхования</a></li>
   </ul>
 </aside>
 
@@ -1262,6 +1263,124 @@ get_template_part('template-parts/hotels/room-card');
         <span class="single-excursion__fact-value">русский, английский</span>
       </li>
     </ul>
+  </section>
+
+  <section style="margin:40px 0" id="insurance-blocks">
+    <h2 class="h2" style="margin-bottom:16px">Страхование — блоки мини-лендинга</h2>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:16px">
+      Шаблон <code>single-insurance.php</code>, стили <code>scss/page/insurance.scss</code>, поля
+      <code>custom-fields/insurance.php</code>. Иконки — инлайновые SVG из
+      <code>template-parts/ui/icon.php</code> (белый список <code>bsi_ui_icons()</code>), цвет наследуется
+      через <code>currentColor</code>.
+    </p>
+
+    <h3 class="h3" style="margin-bottom:12px">Ключевые параметры (.insurance-facts)</h3>
+    <div class="insurance-facts" style="margin-bottom:32px">
+      <div class="insurance-fact">
+        <div class="insurance-fact__head">
+          <span class="insurance-fact__icon">
+          <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+          </span>
+          <span class="insurance-fact__key">Страховая сумма</span>
+        </div>
+        <span class="insurance-fact__value numfont">от 40 000 у.е.</span>
+      </div>
+      <div class="insurance-fact">
+        <div class="insurance-fact__head">
+          <span class="insurance-fact__key">Страховая премия</span>
+        </div>
+        <span class="insurance-fact__value numfont">от 0.67 у.е./сутки</span>
+      </div>
+    </div>
+
+    <h3 class="h3" style="margin-bottom:12px">Преимущество (.insurance-benefit)</h3>
+    <div class="insurance-benefits__grid" style="margin-bottom:32px">
+      <div class="insurance-benefit">
+        <div class="insurance-benefit__head">
+          <div class="insurance-benefit__icon">
+          <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 11v4" />
+            <path d="M14 13h-4" />
+            <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+            <rect width="20" height="14" x="2" y="6" rx="2" />
+          </svg>
+          </div>
+          <h3 class="insurance-benefit__title">Амбулаторное и стационарное лечение</h3>
+        </div>
+        <p class="insurance-benefit__desc">Врачебные услуги, операции, диагностика и назначенные медикаменты.</p>
+      </div>
+    </div>
+
+    <h3 class="h3" style="margin-bottom:12px">Списки покрытия (.insurance-list)</h3>
+    <div class="insurance-coverage__grid" style="margin-bottom:32px">
+      <ul class="insurance-list insurance-list--yes">
+        <li class="insurance-list__item">
+          <span class="insurance-list__marker">
+            <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+          </span>
+          <span class="insurance-list__text">Стоматологическая помощь</span>
+          <span class="insurance-list__limit numfont">без лимита</span>
+        </li>
+      </ul>
+      <ul class="insurance-list insurance-list--no">
+        <li class="insurance-list__item">
+          <span class="insurance-list__marker">
+            <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="m4.9 4.9 14.2 14.2" />
+            </svg>
+          </span>
+          <span class="insurance-list__text">Плановое лечение и обследования</span>
+        </li>
+      </ul>
+    </div>
+
+    <h3 class="h3" style="margin-bottom:12px">Шаг оформления (.insurance-step)</h3>
+    <div class="insurance-steps__grid" style="margin-bottom:32px">
+      <div class="insurance-step">
+        <div class="insurance-step__top">
+          <span class="insurance-step__num numfont">1</span>
+        </div>
+        <h3 class="insurance-step__title">Оставьте заявку</h3>
+        <p class="insurance-step__desc">Укажите даты поездки, страну и возраст туристов.</p>
+      </div>
+    </div>
+
+    <h3 class="h3" style="margin-bottom:12px">Аккордеон правил (.insurance-rules__list)</h3>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:12px">
+      Разметка общего аккордеона (<code>.accordion</code>, <code>js/modules/accordition.js</code>): длинные
+      юридические тексты свёрнуты, внутри — <code>.editor-content--numbered</code>.
+    </p>
+    <div class="accordion insurance-rules__list">
+      <div class="accordion__item insurance-rules__item">
+        <button class="accordion__btn insurance-rules__btn" type="button" aria-expanded="false"
+          aria-controls="uikit-rule-1">
+          <span class="insurance-rules__question">
+            Что не является страховым случаем
+            <span class="insurance-rules__ref">п. 14.2 Правил</span>
+          </span>
+          <span class="accordion__icon insurance-rules__icon" aria-hidden="true">
+            <img src="img/icons/chevron-d.svg" alt="">
+          </span>
+        </button>
+        <div class="accordion__panel insurance-rules__panel" id="uikit-rule-1" hidden aria-hidden="true">
+          <div class="editor-content read-content">
+            <p>Полный перечень исключений — в разделе 2 Правил страхования.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <p style="text-align:center;color:var(--uikit-muted);font-size:13px;margin:40px 0 20px">
