@@ -641,8 +641,14 @@ add_action('template_redirect', function () {
 		}
 	}
 
-	// Если это 404 или путь не соответствует, но есть параметры фильтров - загружаем страницу
-	if ($wp_query->is_404 || !$path_matches) {
+	// Guard применяется только на URL страницы образования: иначе любой чужой
+	// адрес с ?country=/?sort=/?type= отдавал каталог образования (дубли в индексе).
+	if (!$path_matches) {
+		return;
+	}
+
+	// На своём пути параметры фильтров не должны приводить к 404 — подставляем страницу.
+	if ($wp_query->is_404) {
 		// Устанавливаем правильный post объект
 		$wp_query->queried_object = $education_page_obj;
 		$wp_query->queried_object_id = $education_page_id;
