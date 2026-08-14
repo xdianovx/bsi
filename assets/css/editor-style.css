@@ -1,25 +1,34 @@
 /**
- * Стили для редактора Gutenberg.
+ * Стили для редактора WordPress.
  * Дублируют часть фронтовых правил, чтобы автор видел результат в админке.
  * Фронтовые версии — scss/components/editor-styles.scss.
+ *
+ * Голые селекторы работают в классическом редакторе (TinyMCE, iframe),
+ * префикс .editor-styles-wrapper — в Gutenberg.
  */
 
 /* Красная строка */
+p.is-style-indent,
+p.is-style-indent-justify,
 .editor-styles-wrapper p.is-style-indent,
 .editor-styles-wrapper p.is-style-indent-justify {
 	text-indent: 2em;
 }
 
+p.is-style-indent-justify,
 .editor-styles-wrapper p.is-style-indent-justify {
 	text-align: justify;
 }
 
-/* Группа: отступ получают все абзацы внутри */
+/* Группа (Gutenberg): отступ получают все абзацы внутри */
+.wp-block-group.is-style-indent p,
+.wp-block-group.is-style-indent-justify p,
 .editor-styles-wrapper .wp-block-group.is-style-indent p,
 .editor-styles-wrapper .wp-block-group.is-style-indent-justify p {
 	text-indent: 2em;
 }
 
+.wp-block-group.is-style-indent-justify p,
 .editor-styles-wrapper .wp-block-group.is-style-indent-justify p {
 	text-align: justify;
 }
