@@ -40,7 +40,27 @@ export const initEventToursFilters = async () => {
   // /page/N/ (каталог страны) — тогда пагинация рисуется ссылками,
   // и страницы каталога доступны краулеру и по прямому адресу.
   const pageBase = (root.dataset.pageBase || "").trim();
-  const pageUrl = (n) => (n > 1 ? `${pageBase}page/${n}/` : pageBase);
+  const pageUrl = (n) => {
+    const base = n > 1 ? `${pageBase}page/${n}/` : pageBase;
+    const qs = buildQuery();
+    return qs ? `${base}?${qs}` : base;
+  };
+
+  // Выбранное состояние живёт в адресной строке: ссылку можно скопировать,
+  // а перезагрузка/«назад» возвращают тот же набор фильтров.
+  const urlState = new URLSearchParams(window.location.search);
+  const SORT_VALUES = ["date_asc", "date_desc", "price_asc", "price_desc"];
+
+  /* Значения селектов из URL применяются не сразу: списки стран/городов/типов
+     приходят по AJAX, поэтому держим их «в ожидании», пока опции не отрисованы. */
+  const pending = {
+    country: urlState.get("et_country") || "",
+    region: urlState.get("et_region") || "",
+    resort: urlState.get("et_resort") || "",
+    tour_type: urlState.get("et_tour_type") || "",
+  };
+
+  const valOf = (select, key) => (select ? select.value : "") || pending[key] || "";
 
   const list = document.querySelector("[data-tours-list]");
   const counter = root.querySelector(".js-tours-counter");
@@ -63,23 +83,67 @@ export const initEventToursFilters = async () => {
   let datePickerInstance = null;
   let availableDatesSet = new Set();
   let currentPage = 1;
-  let sortValue = "date_asc";
+  let sortValue = SORT_VALUES.includes(urlState.get("et_sort")) ? urlState.get("et_sort") : "date_asc";
   let viewValue = "tiles";
+
+  /* Ровно то, что выбрал пользователь. Значения по умолчанию в URL не пишем,
+     чтобы адрес чистого каталога оставался без «хвоста».
+     Префикс et_ обязателен: голые country/region/resort — публичные query vars
+     WordPress, с ними страница уходит на другой шаблон. */
+  const buildQuery = () => {
+    const p = new URLSearchParams();
+    if (!lockedCountry && valOf(countrySelect, "country")) p.set("et_country", valOf(countrySelect, "country"));
+    if (valOf(regionSelect, "region")) p.set("et_region", valOf(regionSelect, "region"));
+    if (valOf(resortSelect, "resort")) p.set("et_resort", valOf(resortSelect, "resort"));
+    if (valOf(tourTypeSelect, "tour_type")) p.set("et_tour_type", valOf(tourTypeSelect, "tour_type"));
+    const q = (searchInput?.value || "").trim();
+    if (q) p.set("et_q", q);
+    const range = selectedRange();
+    if (range) {
+      p.set("et_date_from", range.from);
+      p.set("et_date_to", range.to);
+    }
+    if (sortValue !== "date_asc") p.set("et_sort", sortValue);
+    // Там, где номер страницы живёт в пути (/page/N/), в query его не дублируем.
+    if (!pageBase && currentPage > 1) p.set("et_page", String(currentPage));
+    return p.toString();
+  };
+
+  const syncUrl = () => {
+    const qs = buildQuery();
+    const path = window.location.pathname;
+    window.history.replaceState(window.history.state, "", qs ? `${path}?${qs}` : path);
+  };
 
   const setLoading = (on) => list.classList.toggle("is-loading", !!on);
 
+  /* Диапазон дат: из календаря, а до его инициализации — из URL. */
+  const selectedRange = () => {
+    if (datePickerInstance) {
+      const picked = datePickerInstance.selectedDates || [];
+      if (picked.length !== 2) return null;
+      const dates = picked.map((d) => datePickerInstance.formatDate(d, "Y-m-d")).sort();
+      return { from: dates[0], to: dates[1] };
+    }
+    if (!departureDateInput) return null;
+    const iso = /^\d{4}-\d{2}-\d{2}$/;
+    const from = urlState.get("et_date_from") || "";
+    const to = urlState.get("et_date_to") || "";
+    return iso.test(from) && iso.test(to) ? { from, to } : null;
+  };
+
   const appendFilterBody = (body) => {
     if (lockedCountry) body.set("country", lockedCountry);
-    else if (countrySelect?.value) body.set("country", countrySelect.value);
-    if (regionSelect?.value) body.set("region", regionSelect.value);
-    if (resortSelect?.value) body.set("resort", resortSelect.value);
-    if (tourTypeSelect?.value) body.set("tour_type", tourTypeSelect.value);
+    else if (valOf(countrySelect, "country")) body.set("country", valOf(countrySelect, "country"));
+    if (valOf(regionSelect, "region")) body.set("region", valOf(regionSelect, "region"));
+    if (valOf(resortSelect, "resort")) body.set("resort", valOf(resortSelect, "resort"));
+    if (valOf(tourTypeSelect, "tour_type")) body.set("tour_type", valOf(tourTypeSelect, "tour_type"));
     const q = (searchInput?.value || "").trim();
     if (q) body.set("search", q);
-    if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length === 2) {
-      const dates = datePickerInstance.selectedDates.map((d) => datePickerInstance.formatDate(d, "Y-m-d")).sort();
-      body.set("date_from", dates[0]);
-      body.set("date_to", dates[1]);
+    const range = selectedRange();
+    if (range) {
+      body.set("date_from", range.from);
+      body.set("date_to", range.to);
     }
     body.set("sort", sortValue);
     body.set("view", viewValue);
@@ -198,7 +262,8 @@ export const initEventToursFilters = async () => {
       const tourTypes = json.data.tour_types || [];
 
       if (resortChoice && resortSelect) {
-        const cur = resortSelect.value || "";
+        const cur = valOf(resortSelect, "resort");
+        pending.resort = "";
         let valid = !cur;
         resortChoice.clearStore();
         const rchoices = [{ value: "", label: "Все города", selected: true }];
@@ -218,7 +283,8 @@ export const initEventToursFilters = async () => {
       }
 
       if (tourTypeChoice && tourTypeSelect) {
-        const cur = tourTypeSelect.value || "";
+        const cur = valOf(tourTypeSelect, "tour_type");
+        pending.tour_type = "";
         let valid = !cur;
         tourTypeChoice.clearStore();
         const tchoices = [{ value: "", label: "Все типы", selected: true }];
@@ -303,6 +369,7 @@ export const initEventToursFilters = async () => {
       if (counter) counter.textContent = `Найдено: ${total}`;
       renderPagination(total, maxPages, paged);
       updateResetButton();
+      syncUrl();
       document.dispatchEvent(new CustomEvent("education:content-updated"));
     } catch (_e) {
       /* Error handling */
@@ -343,12 +410,25 @@ export const initEventToursFilters = async () => {
       })
     : null;
 
+  if (searchInput && urlState.get("et_q")) {
+    searchInput.value = urlState.get("et_q");
+  }
+
   if (departureDateInput) {
+    // Даты в URL — в ISO (Y-m-d), а инпут показывает d.m.Y, поэтому передаём объекты Date.
+    const toDate = (s) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(s || "")) return null;
+      const d = new Date(`${s}T00:00:00`);
+      return Number.isNaN(d.getTime()) ? null : d;
+    };
+    const urlFrom = toDate(urlState.get("et_date_from"));
+    const urlTo = toDate(urlState.get("et_date_to"));
     datePickerInstance = flatpickr(departureDateInput, {
       mode: "range",
       locale: Russian,
       dateFormat: "d.m.Y",
       disableMobile: true,
+      defaultDate: urlFrom && urlTo ? [urlFrom, urlTo] : null,
       onDayCreate: (_dObj, _dStr, fp, dayElem) => {
         // Подсветка дней, у которых есть событие (event_dates / event_hero_date).
         const ymd = fp.formatDate(dayElem.dateObj, "Y-m-d");
@@ -378,7 +458,7 @@ export const initEventToursFilters = async () => {
     try {
       const body = new URLSearchParams();
       body.set("action", "event_tours_regions");
-      body.set("country_id", countrySelect.value || "");
+      body.set("country_id", valOf(countrySelect, "country"));
 
       const res = await fetch(ajaxUrl, {
         method: "POST",
@@ -393,16 +473,22 @@ export const initEventToursFilters = async () => {
       if (!json || !json.success) throw new Error("AJAX error");
 
       if (regionChoice) {
+        const cur = valOf(regionSelect, "region");
+        pending.region = "";
         regionChoice.clearStore();
-        const choices = [{ value: "", label: "Все регионы", selected: true }];
+        let valid = !cur;
+        const choices = [{ value: "", label: "Все регионы", selected: !cur }];
         if (json.data.items && json.data.items.length > 0) {
           choices.push(
-            ...json.data.items.map((it) => ({
-              value: String(it.id),
-              label: it.text,
-            }))
+            ...json.data.items.map((it) => {
+              const sel = cur === String(it.id);
+              if (sel) valid = true;
+              return { value: String(it.id), label: it.text, selected: sel };
+            })
           );
         }
+        // Регион из прежней страны в новом списке не существует — сбрасываем.
+        if (!valid) choices[0].selected = true;
         regionChoice.setChoices(choices, "value", "label", true);
       }
     } catch (_e) {
@@ -431,7 +517,8 @@ export const initEventToursFilters = async () => {
       if (!json || !json.success) throw new Error("AJAX error");
 
       if (countryChoice) {
-        const currentValue = countrySelect.value || "";
+        const currentValue = valOf(countrySelect, "country");
+        pending.country = "";
         countryChoice.clearStore();
         const choices = [{ value: "", label: "Все страны", selected: !currentValue }];
         if (json.data.items && json.data.items.length > 0) {
@@ -468,6 +555,12 @@ export const initEventToursFilters = async () => {
     if (datePickerInstance) datePickerInstance.clear();
     else if (departureDateInput) departureDateInput.value = "";
 
+    Object.keys(pending).forEach((k) => {
+      pending[k] = "";
+    });
+    urlState.delete("et_date_from");
+    urlState.delete("et_date_to");
+
     currentPage = 1;
 
     if (regionChoice && countrySelect) await loadRegions();
@@ -497,6 +590,14 @@ export const initEventToursFilters = async () => {
     dropdown(sortEl);
     const sortText = sortEl.querySelector(".country-tours__sort-text");
     const sortOptions = sortEl.querySelectorAll(".country-tours__sort-option");
+
+    // Сортировка из URL — подсветить активный пункт и подпись триггера.
+    sortOptions.forEach((opt) => {
+      const active = (opt.dataset.value || "date_asc") === sortValue;
+      opt.classList.toggle("is-active", active);
+      if (active && sortText) sortText.textContent = opt.textContent.trim();
+    });
+
     sortOptions.forEach((opt) => {
       opt.addEventListener("click", async () => {
         const val = opt.dataset.value || "date_asc";
@@ -582,7 +683,9 @@ export const initEventToursFilters = async () => {
   }
 
   const initFromServer = async () => {
-    currentPage = initialPaged;
+    // Номер страницы: в каталоге страны — из пути (/page/N/), иначе — из ?pg=.
+    currentPage = pageBase ? initialPaged : Math.max(1, parseInt(urlState.get("et_page") || "1", 10) || 1);
+    if (regionSelect && countrySelect) await loadRegions();
     await loadFacets();
     await loadCountries();
     await loadAvailableDates();
