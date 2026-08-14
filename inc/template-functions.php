@@ -192,7 +192,7 @@ add_filter('wp_get_attachment_image_attributes', function ($attr, $attachment) {
  * выполнится один раз на всех окружениях.
  */
 add_action('init', function (): void {
-	$version = '2026-08-11-country-deposits';
+	$version = '2026-08-14-country-events-pagination';
 
 	if (get_option('bsi_rewrite_rules_version') === $version) {
 		return;

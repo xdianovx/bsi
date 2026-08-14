@@ -110,7 +110,15 @@ function bsi_seo_virtual_title(?array $vp): string
         }
     }
 
-    return $vp['country']->post_title . ' — ' . $vp['label'] . ' | ' . $site;
+    $title = $vp['country']->post_title . ' — ' . $vp['label'];
+
+    /* Страницы пагинации с одинаковым title поисковик считает дублями. */
+    $paged = (int) get_query_var('paged');
+    if ($paged > 1) {
+        $title .= ' — страница ' . $paged;
+    }
+
+    return $title . ' | ' . $site;
 }
 
 /**
@@ -528,6 +536,117 @@ add_filter('wpseo_opengraph_desc', function ($desc): string {
     }
 
     return $desc;
+});
+
+// ── Yoast: хлебные крошки виртуальных разделов ──────────────
+// Yoast видит контекст самой страны, поэтому цепочка обрывалась на
+// «Сингапур» — раздел («Событийные туры») не попадал ни в видимые
+// крошки, ни в BreadcrumbList. Последний элемент страны становится
+// ссылкой, раздел добавляется хвостом.
+
+add_filter('wpseo_breadcrumb_links', function ($links) {
+    if (!is_array($links) || empty($links)) {
+        return $links;
+    }
+
+    $vp = bsi_seo_detect_virtual_page();
+    if (!$vp || !$vp['country']) {
+        return $links;
+    }
+
+    $last = end($links);
+    reset($links);
+
+    // Раздел уже добавлен (например, фильтром для новостей в country.php).
+    if (is_array($last) && isset($last['text']) && $last['text'] === $vp['label']) {
+        return $links;
+    }
+
+    $last_key = array_key_last($links);
+    if (is_array($links[$last_key]) && empty($links[$last_key]['url'])) {
+        $links[$last_key]['url'] = get_permalink($vp['country']->ID);
+    }
+
+    /* Ключ url обязателен: Yoast считает крошку без него «сломанной» и
+       выбрасывает из графа весь BreadcrumbList (Schema\Breadcrumb::is_broken).
+       У последней крошки он всё равно удаляется по спецификации Google. */
+    $links[] = ['url' => bsi_seo_virtual_canonical($vp), 'text' => $vp['label']];
+
+    return $links;
+}, 20);
+
+// ── Yoast: schema-граф виртуальных разделов ─────────────────
+// Yoast строит граф по запрошенной записи — странице страны. В итоге
+// на /country/singapur/sobytiynye-tury/ WebPage@id, url, name и
+// description описывали /country/singapur/ («Сингапур — отдых и туры»),
+// то есть страница объявляла себя дублем родителя.
+
+add_filter('wpseo_schema_graph', function (array $graph): array {
+    $vp = bsi_seo_detect_virtual_page();
+    if (!$vp || !$vp['country']) {
+        return $graph;
+    }
+
+    $new_url = bsi_seo_virtual_canonical($vp);
+    $old_url = trailingslashit((string) get_permalink($vp['country']->ID));
+    if ($new_url === '' || $old_url === '' || $new_url === $old_url) {
+        return $graph;
+    }
+
+    /* Идентификаторы узлов (@id и ссылки на них из breadcrumb, isPartOf,
+       primaryImageOfPage) строятся от URL страны — переносим на URL раздела.
+       Правим только ключи @id: обычные URL (item у крошек) ведут на страну
+       по делу, и подменять их нельзя. */
+    $rebase = function ($node) use (&$rebase, $old_url, $new_url) {
+        if (!is_array($node)) {
+            return $node;
+        }
+
+        foreach ($node as $key => $value) {
+            if (is_array($value)) {
+                $node[$key] = $rebase($value);
+                continue;
+            }
+            if ($key === '@id' && is_string($value) && strpos($value, $old_url) === 0) {
+                $node[$key] = $new_url . substr($value, strlen($old_url));
+            }
+        }
+
+        return $node;
+    };
+
+    $graph = $rebase($graph);
+
+    $title = bsi_seo_virtual_title($vp);
+    $name = $title !== '' ? preg_replace('/\s*\|\s*' . preg_quote(get_bloginfo('name'), '/') . '$/u', '', $title) : '';
+    $desc = bsi_seo_virtual_description($vp);
+
+    foreach ($graph as &$piece) {
+        $types = isset($piece['@type']) ? (array) $piece['@type'] : [];
+        if (!in_array('WebPage', $types, true) && !in_array('CollectionPage', $types, true)) {
+            continue;
+        }
+
+        $piece['url'] = $new_url;
+        if ($name !== '') {
+            $piece['name'] = $name;
+        }
+        if ($desc !== '') {
+            $piece['description'] = $desc;
+        }
+
+        /* Каталоги — это списки записей, а не текстовые страницы. */
+        $catalogs = ['country_tours', 'country_hotels', 'country_promos', 'country_events', 'country_excursions', 'country_education', 'country_news', 'country_resorts'];
+        if (in_array($vp['qv'], $catalogs, true)) {
+            $piece['@type'] = 'CollectionPage';
+        }
+
+        /* Даты правки страны к разделу отношения не имеют. */
+        unset($piece['datePublished'], $piece['dateModified']);
+    }
+    unset($piece);
+
+    return $graph;
 });
 
 // ── WordPress core fallback (если Yoast деактивирован) ──────

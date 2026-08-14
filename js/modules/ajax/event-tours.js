@@ -27,10 +27,7 @@ export const initEventToursFilters = async () => {
   const root = document.querySelector("[data-event-tours-filter]");
   if (!root) return;
 
-  const initialPaged = Math.max(
-    1,
-    parseInt(root.dataset.initialPaged || "1", 10) || 1,
-  );
+  const initialPaged = Math.max(1, parseInt(root.dataset.initialPaged || "1", 10) || 1);
 
   // Каталог в рамках страны (/country/{slug}/sobytiynye-tury/): страна «залочена»,
   // фильтр по стране не выводится, но во все запросы подставляем её id.
@@ -38,6 +35,12 @@ export const initEventToursFilters = async () => {
 
   // Переопределение количества карточек на страницу (по умолчанию на бэке — 12).
   const perPage = (root.dataset.perPage || "").trim();
+
+  // Базовый URL раздела. Есть только там, где сервер умеет отдавать
+  // /page/N/ (каталог страны) — тогда пагинация рисуется ссылками,
+  // и страницы каталога доступны краулеру и по прямому адресу.
+  const pageBase = (root.dataset.pageBase || "").trim();
+  const pageUrl = (n) => (n > 1 ? `${pageBase}page/${n}/` : pageBase);
 
   const list = document.querySelector("[data-tours-list]");
   const counter = root.querySelector(".js-tours-counter");
@@ -52,9 +55,7 @@ export const initEventToursFilters = async () => {
   const resortSelect = root.querySelector('select[name="resort"]');
   const tourTypeSelect = root.querySelector('select[name="tour_type"]');
   const searchInput = root.querySelector('input[name="event_search"]');
-  const departureDateInput = root.querySelector(
-    'input[name="departure_date"]',
-  );
+  const departureDateInput = root.querySelector('input[name="departure_date"]');
   const resetBtn = root.querySelector(".js-tours-reset");
   const sortEl = root.querySelector("[data-tours-sort]");
   const viewToggleEl = root.querySelector("[data-view-toggle]");
@@ -75,14 +76,8 @@ export const initEventToursFilters = async () => {
     if (tourTypeSelect?.value) body.set("tour_type", tourTypeSelect.value);
     const q = (searchInput?.value || "").trim();
     if (q) body.set("search", q);
-    if (
-      datePickerInstance &&
-      datePickerInstance.selectedDates &&
-      datePickerInstance.selectedDates.length === 2
-    ) {
-      const dates = datePickerInstance.selectedDates
-        .map((d) => datePickerInstance.formatDate(d, "Y-m-d"))
-        .sort();
+    if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length === 2) {
+      const dates = datePickerInstance.selectedDates.map((d) => datePickerInstance.formatDate(d, "Y-m-d")).sort();
       body.set("date_from", dates[0]);
       body.set("date_to", dates[1]);
     }
@@ -117,9 +112,16 @@ export const initEventToursFilters = async () => {
       return;
     }
 
+    /* Со ссылками страница каталога открывается и без JS, и по прямому
+       адресу; без pageBase сервер /page/N/ не отдаёт — остаются кнопки. */
+    const link = (n, cls, text) =>
+      pageBase
+        ? '<a class="' + cls + '" href="' + pageUrl(n) + '" data-et-page="' + n + '">' + text + "</a>"
+        : '<button type="button" class="' + cls + '" data-et-page="' + n + '">' + text + "</button>";
+
     const parts = [];
     if (paged > 1) {
-      parts.push('<button type="button" class="prev page-numbers" data-et-page="' + (paged - 1) + '">Назад</button>');
+      parts.push(link(paged - 1, "prev page-numbers", "Назад"));
     }
 
     buildPageList(paged, maxPages).forEach((item) => {
@@ -130,21 +132,26 @@ export const initEventToursFilters = async () => {
       parts.push(
         item === paged
           ? '<span aria-current="page" class="page-numbers current">' + item + "</span>"
-          : '<button type="button" class="page-numbers" data-et-page="' + item + '">' + item + "</button>"
+          : link(item, "page-numbers", String(item))
       );
     });
 
     if (paged < maxPages) {
-      parts.push('<button type="button" class="next page-numbers" data-et-page="' + (paged + 1) + '">Вперёд</button>');
+      parts.push(link(paged + 1, "next page-numbers", "Вперёд"));
     }
 
     paginationEl.innerHTML = parts.join("");
 
     paginationEl.querySelectorAll("[data-et-page]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+      btn.addEventListener("click", async (e) => {
         const target = parseInt(btn.dataset.etPage, 10);
         if (!target || target === currentPage || target < 1 || target > maxPages) return;
+        e.preventDefault();
         currentPage = target;
+        // Адрес в строке браузера соответствует показанной странице.
+        if (pageBase) {
+          window.history.pushState({ etPage: target }, "", pageUrl(target));
+        }
         await loadTours();
         // После подгрузки возвращаем пользователя к началу списка.
         if (list) list.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -159,12 +166,7 @@ export const initEventToursFilters = async () => {
     if (resortSelect && resortSelect.value) c++;
     if (tourTypeSelect && tourTypeSelect.value) c++;
     if (searchInput && (searchInput.value || "").trim()) c++;
-    if (
-      datePickerInstance &&
-      datePickerInstance.selectedDates &&
-      datePickerInstance.selectedDates.length > 0
-    )
-      c++;
+    if (datePickerInstance && datePickerInstance.selectedDates && datePickerInstance.selectedDates.length > 0) c++;
     return c;
   };
 
@@ -398,7 +400,7 @@ export const initEventToursFilters = async () => {
             ...json.data.items.map((it) => ({
               value: String(it.id),
               label: it.text,
-            })),
+            }))
           );
         }
         regionChoice.setChoices(choices, "value", "label", true);
@@ -431,16 +433,14 @@ export const initEventToursFilters = async () => {
       if (countryChoice) {
         const currentValue = countrySelect.value || "";
         countryChoice.clearStore();
-        const choices = [
-          { value: "", label: "Все страны", selected: !currentValue },
-        ];
+        const choices = [{ value: "", label: "Все страны", selected: !currentValue }];
         if (json.data.items && json.data.items.length > 0) {
           choices.push(
             ...json.data.items.map((it) => ({
               value: String(it.id),
               label: it.text,
               selected: currentValue === String(it.id),
-            })),
+            }))
           );
         }
         countryChoice.setChoices(choices, "value", "label", true);
@@ -565,8 +565,20 @@ export const initEventToursFilters = async () => {
       "input",
       debounce(async () => {
         await onFacetChange();
-      }, 400),
+      }, 400)
     );
+  }
+
+  // Кнопка «назад» после pushState должна возвращать прежнюю страницу
+  // каталога, а не уводить с раздела.
+  if (pageBase) {
+    window.addEventListener("popstate", async () => {
+      const m = window.location.pathname.match(/\/page\/(\d+)\/?$/);
+      const target = m ? parseInt(m[1], 10) : 1;
+      if (!target || target === currentPage) return;
+      currentPage = target;
+      await loadTours();
+    });
   }
 
   const initFromServer = async () => {

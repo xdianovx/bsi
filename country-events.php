@@ -52,8 +52,13 @@ $events_h1 = $country_locative !== ''
 /* 12 карточек на страницу — как в остальных каталогах. */
 $per_page = 12;
 
+/* Пагинация рендерится на сервере: краулер не исполняет JS, и без
+   ссылок /page/N/ в индекс попадали только первые 12 туров страны. */
+$paged = max(1, (int) get_query_var('paged'));
+
 /* Начальный набор — все событийные туры страны, сортировка «сначала ближайшие». */
 $event_tours_total = 0;
+$event_tours_total_pages = 0;
 $event_tours_slice_ids = [];
 if (function_exists('bsi_event_tours_get_matching_post_ids') && function_exists('bsi_event_tours_sort_ids')) {
   $f = function_exists('bsi_event_tours_parse_request_filters')
@@ -64,8 +69,30 @@ if (function_exists('bsi_event_tours_get_matching_post_ids') && function_exists(
   $country_event_ids = bsi_event_tours_get_matching_post_ids($f, [], false);
   $country_event_ids = bsi_event_tours_sort_ids($country_event_ids, 'date_asc');
   $event_tours_total = count($country_event_ids);
-  $event_tours_slice_ids = array_slice($country_event_ids, 0, $per_page);
+  $event_tours_total_pages = $event_tours_total > 0 ? (int) ceil($event_tours_total / $per_page) : 0;
+
+  /* Запрошенной страницы нет — 404, иначе несуществующий /page/N/
+     отдаёт содержимое первой страницы со своим canonical. */
+  if ($paged > 1 && $paged > $event_tours_total_pages) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    nocache_headers();
+    get_template_part('404');
+    return;
+  }
+
+  if ($event_tours_total_pages === 0) {
+    $paged = 1;
+  }
+
+  $event_tours_slice_ids = array_slice($country_event_ids, ($paged - 1) * $per_page, $per_page);
 }
+
+/* Базовый URL раздела — для ссылок пагинации и для JS (data-page-base). */
+$event_tours_base_url = trailingslashit(
+  home_url('/country/' . ($country ? $country->post_name : $country_slug) . '/sobytiynye-tury')
+);
 
 $tours_query = new WP_Query([
   'post_type' => 'event',
@@ -103,7 +130,8 @@ get_header(); ?>
             <h1 class="h1"><?= esc_html($events_h1); ?></h1>
           </div>
 
-          <div class="country-tours country-tours--country-events" data-event-tours-filter data-initial-paged="1"
+          <div class="country-tours country-tours--country-events" data-event-tours-filter
+            data-initial-paged="<?= (int) $paged; ?>" data-page-base="<?= esc_url($event_tours_base_url); ?>"
             data-locked-country="<?= (int) $country_root_id; ?>" data-per-page="<?= (int) $per_page; ?>">
 
             <div class="country-tours__head">
@@ -154,7 +182,22 @@ get_header(); ?>
             </div>
 
             <nav class="ui-pagination country-tours__pagination" data-event-tours-pagination
-              aria-label="Навигация по страницам каталога"></nav>
+              aria-label="Навигация по страницам каталога">
+              <?php
+              if ($event_tours_total_pages > 1) {
+                echo paginate_links([
+                  /* %_% → format: первая страница остаётся без /page/1/. */
+                  'base'      => $event_tours_base_url . '%_%',
+                  'format'    => 'page/%#%/',
+                  'total'     => $event_tours_total_pages,
+                  'current'   => $paged,
+                  'prev_text' => 'Назад',
+                  'next_text' => 'Вперёд',
+                  'mid_size'  => 2,
+                ]);
+              }
+              ?>
+            </nav>
 
           </div>
 

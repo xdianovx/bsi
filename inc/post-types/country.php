@@ -412,6 +412,14 @@ add_action('init', function () {
     'top'
   );
 
+  // Пагинация каталога событийных туров: без правила /page/2/ уходила
+  // в 404, и в индекс попадали только первые 12 туров страны.
+  add_rewrite_rule(
+    '^country/([^/]+)/sobytiynye-tury/page/([0-9]{1,})/?$',
+    'index.php?post_type=country&name=$matches[1]&country_events=$matches[1]&paged=$matches[2]',
+    'top'
+  );
+
   add_rewrite_rule(
     '^country/([^/]+)/sobytiynye-tury/?$',
     'index.php?post_type=country&name=$matches[1]&country_events=$matches[1]',
@@ -787,7 +795,12 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
       $new_links = [];
       $new_links[] = ['url' => home_url('/'), 'text' => 'Главная'];
       $new_links[] = ['url' => get_permalink($country->ID), 'text' => get_the_title($country->ID)];
-      $new_links[] = ['text' => 'Новости'];
+      // url обязателен: без него Yoast выбрасывает весь BreadcrumbList
+      // из schema-графа (Schema\Breadcrumb::is_broken).
+      $new_links[] = [
+        'url' => trailingslashit(home_url('/country/' . $country->post_name . '/novosti')),
+        'text' => 'Новости',
+      ];
       return $new_links;
     }
   }
