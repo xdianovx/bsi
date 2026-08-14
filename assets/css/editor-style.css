@@ -1,0 +1,25 @@
+/**
+ * Стили для редактора Gutenberg.
+ * Дублируют часть фронтовых правил, чтобы автор видел результат в админке.
+ * Фронтовые версии — scss/components/editor-styles.scss.
+ */
+
+/* Красная строка */
+.editor-styles-wrapper p.is-style-indent,
+.editor-styles-wrapper p.is-style-indent-justify {
+	text-indent: 2em;
+}
+
+.editor-styles-wrapper p.is-style-indent-justify {
+	text-align: justify;
+}
+
+/* Группа: отступ получают все абзацы внутри */
+.editor-styles-wrapper .wp-block-group.is-style-indent p,
+.editor-styles-wrapper .wp-block-group.is-style-indent-justify p {
+	text-indent: 2em;
+}
+
+.editor-styles-wrapper .wp-block-group.is-style-indent-justify p {
+	text-align: justify;
+}

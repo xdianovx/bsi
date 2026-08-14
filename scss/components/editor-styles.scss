@@ -375,6 +375,28 @@
   }
 }
 
+// Красная строка (стили блоков «Красная строка» / «Красная строка + по ширине»)
+p.is-style-indent,
+p.is-style-indent-justify {
+  text-indent: 2em;
+}
+
+p.is-style-indent-justify {
+  text-align: justify;
+  hyphens: auto;
+}
+
+// Группа: отступ получают все абзацы внутри
+.wp-block-group.is-style-indent p,
+.wp-block-group.is-style-indent-justify p {
+  text-indent: 2em;
+}
+
+.wp-block-group.is-style-indent-justify p {
+  text-align: justify;
+  hyphens: auto;
+}
+
 // Responsive
 @media (max-width: 768px) {
   .editor-content {

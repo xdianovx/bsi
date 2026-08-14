@@ -380,6 +380,7 @@ require get_template_directory() . '/inc/helpers/country-section-singular.php';
 require get_template_directory() . '/inc/helpers/agency-events.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
+require get_template_directory() . '/inc/admin/paragraph-indent.php';
 require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
