@@ -18,7 +18,7 @@
 }
 
 .insurance_item {
-  border: 1px solid $gray-light;
+  background: $bg-gray;
   border-radius: 8px;
   padding: 8px;
   display: flex;
@@ -146,8 +146,8 @@
 
 // ─── Страница страхового продукта ──────────────────────────────────────────
 
-$insurance-gap: 80px;
-$insurance-gap-mob: 48px;
+$insurance-gap: 120px;
+$insurance-gap-mob: 64px;
 $insurance-success: #2e9e4f;
 
 .insurance-single {
@@ -329,7 +329,7 @@ $insurance-success: #2e9e4f;
 
   @media screen and (max-width: 560px) {
     grid-template-columns: repeat(1, 1fr);
-    gap: 12px;
+    gap: 20px;
   }
 }
 
@@ -358,13 +358,13 @@ $insurance-success: #2e9e4f;
 }
 
 .insurance-fact__value {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 120%;
   color: $text-black;
 
   @media screen and (max-width: 768px) {
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 
@@ -402,11 +402,8 @@ $insurance-success: #2e9e4f;
 }
 
 .insurance-benefit__icon {
-  width: 40px;
-  height: 40px;
   flex-shrink: 0;
   border-radius: 8px;
-  border: 1px solid $gray-light;
   color: $red;
   display: flex;
   align-items: center;
@@ -428,12 +425,8 @@ $insurance-success: #2e9e4f;
 .insurance-benefit__desc {
   margin: 0;
   font-size: 16px;
-  line-height: 145%;
+  line-height: 160%;
   color: $text-gray;
-
-  @media screen and (max-width: 768px) {
-    font-size: 14px;
-  }
 }
 
 // ─── Что покрывает / не покрывает ──────────────────────────────────────────
@@ -442,6 +435,12 @@ $insurance-success: #2e9e4f;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 40px;
+
+  // Заполнена только одна колонка («что покрывает» или «что не покрывает») —
+  // она занимает всю ширину
+  .insurance-coverage__col:only-child {
+    grid-column: 1 / -1;
+  }
 
   @media screen and (max-width: 900px) {
     grid-template-columns: repeat(1, 1fr);

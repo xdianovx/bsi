@@ -140,20 +140,24 @@
     }
   }
 
+  // Списки — дефолтные маркеры браузера.
+  // list-style задаём на li: глобальный reset снимает маркеры и с ul, и с li,
+  // поэтому правила на ul одного li не перекрывают.
   ul {
-    // list-style-type: disc !important;
+    list-style: disc outside;
 
     li {
-      list-style-type: disc !important;
+      list-style: disc outside;
       margin: 0.5em 0;
     }
   }
 
   ol {
-    // list-style-type: latin !important;asd
+    list-style: decimal outside;
 
     li {
-      list-style-type: latin !important;
+      list-style: decimal outside;
+      margin: 0.5em 0;
     }
   }
 

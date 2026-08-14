@@ -174,7 +174,7 @@ get_header();
 			if (get_the_content()): ?>
 				<section class="insurance-content-section">
 					<div class="container">
-						<div class="editor-content read-content">
+						<div class="editor-content">
 							<?php the_content(); ?>
 						</div>
 					</div>

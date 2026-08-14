@@ -254,7 +254,7 @@ get_header();
 
 									<div class="accordion__panel insurance-rules__panel" id="<?php echo esc_attr($panel_id); ?>" hidden
 										aria-hidden="true">
-										<div class="editor-content read-content editor-content--numbered">
+										<div class="editor-content">
 											<?php echo wp_kses_post($content); ?>
 										</div>
 									</div>
@@ -265,10 +265,6 @@ get_header();
 						<?php if ($editor_content):
 							$rule_index++;
 							$panel_id = 'insurance-rule-' . $rule_index;
-							$content_classes = 'editor-content read-content editor-content--numbered';
-							if (stripos($editor_content, '<h2') === false) {
-								$content_classes .= ' editor-content--numbered-flat';
-							}
 							?>
 							<div class="accordion__item insurance-rules__item">
 								<button class="accordion__btn insurance-rules__btn" type="button" aria-expanded="false"
@@ -281,7 +277,7 @@ get_header();
 
 								<div class="accordion__panel insurance-rules__panel" id="<?php echo esc_attr($panel_id); ?>" hidden
 									aria-hidden="true">
-									<div class="<?php echo esc_attr($content_classes); ?>">
+									<div class="editor-content">
 										<?php the_content(); ?>
 									</div>
 								</div>
