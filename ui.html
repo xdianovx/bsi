@@ -187,6 +187,7 @@
     <li><a href="#breadcrumbs">Хлебные крошки</a></li>
     <li><a href="#callout">Callout / Алерты</a></li>
     <li><a href="#numbered-content">Нумерация текста</a></li>
+        <li><a href="#indent">Красная строка</a></li>
 <li><a href="#pagination">Пагинация</a></li>
     <li><a href="#counter">Counter</a></li>
     <li><a href="#preloader">Preloader</a></li>
@@ -659,6 +660,25 @@ $pagination = paginate_links([
     </div>
     <pre class="uikit-snippet">&lt;div class="editor-content read-content editor-content--numbered"&gt;
   &lt;?php the_content(); ?&gt;
+&lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ INDENT ============ -->
+  <section class="uikit-section" id="indent">
+    <h2>Красная строка</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/components/editor-styles.scss</code> + <code>inc/admin/paragraph-indent.php</code>. В редакторе выбирается в панели <b>Стили</b> у блоков «Абзац» и «Группа»: «Красная строка» (<code>.is-style-indent</code>) и «Красная строка + по ширине» (<code>.is-style-indent-justify</code>, добавляет выключку по ширине и переносы). У «Группы» отступ получают все абзацы внутри — удобно для оферт, политик и правил. Руками класс вписывать не нужно.</p>
+
+    <p class="uikit-label">.is-style-indent-justify</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="editor-content">
+        <p class="is-style-indent-justify">Страховщик осуществляет оценку страхового риска, получает страховые премии (страховые взносы), определяет размер убытков (ущерба, вреда), производит страховые выплаты, осуществляет иные действия, связанные с исполнением обязательств по договору страхования.</p>
+        <p class="is-style-indent-justify">Сайт Компании — официальный сайт страховой компании в информационно-телекоммуникационной сети «Интернет».</p>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;p class="is-style-indent"&gt;Абзац с красной строкой.&lt;/p&gt;
+
+&lt;div class="wp-block-group is-style-indent-justify"&gt;
+  &lt;p&gt;Все абзацы внутри группы — с отступом и выключкой по ширине.&lt;/p&gt;
 &lt;/div&gt;</pre>
   </section>
 
