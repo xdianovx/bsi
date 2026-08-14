@@ -376,6 +376,9 @@ get_header();
         <?php foreach ($hero_type_terms as $t): ?>
           <span class="single-event__hero-tag"><?= esc_html($t->name); ?></span>
         <?php endforeach; ?>
+        <?php if ($event_venue !== ''): ?>
+          <span class="single-event__hero-tag"><?= esc_html($event_venue); ?></span>
+        <?php endif; ?>
       </div>
 
       <h1 class="h1 single-event__hero-title" id="event-hero-title"><?= esc_html($event_title); ?></h1>
@@ -821,6 +824,18 @@ get_header();
                     <?= implode(', ', $items); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                   </div>
                 </div>
+              </div>
+            <?php endif; ?>
+
+            <?php if ($event_venue !== ''): ?>
+              <div class="single-event__booking-widget-venue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-map-pin" aria-hidden="true">
+                  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span><?= esc_html($event_venue); ?></span>
               </div>
             <?php endif; ?>
 
