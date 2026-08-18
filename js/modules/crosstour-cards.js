@@ -40,7 +40,12 @@ const fetchCrosstourQuickPrice = async (params) => {
       credentials: "same-origin",
     });
     const json = await res.json();
-    return json?.success ? (json.data?.price_rub ?? null) : null;
+    if (!json?.success) return null;
+    return {
+      price_rub: json.data?.price_rub ?? null,
+      price_original: json.data?.price_original ?? null,
+      price_currency: json.data?.price_currency ?? null,
+    };
   } catch {
     return null;
   }
@@ -48,7 +53,10 @@ const fetchCrosstourQuickPrice = async (params) => {
 
 const fetchBatch = async (ids) => {
   const ajaxUrl = window.ajax?.url || window.ajaxurl;
-  if (!ajaxUrl) { console.warn("[crosstour-cards] no ajaxUrl"); return {}; }
+  if (!ajaxUrl) {
+    console.warn("[crosstour-cards] no ajaxUrl");
+    return {};
+  }
   console.log("[crosstour-cards] batch request →", ids);
   const body = new URLSearchParams();
   body.set("action", "bsi_samo");
@@ -67,9 +75,7 @@ const fetchBatch = async (ids) => {
 };
 
 const run = async () => {
-  const cards = [...document.querySelectorAll("[data-crosstour-card]")].filter(
-    (el) => !processed.has(el.dataset.crosstourCard),
-  );
+  const cards = [...document.querySelectorAll("[data-crosstour-card]")].filter((el) => !processed.has(el.dataset.crosstourCard));
   if (!cards.length) return;
 
   const ids = [...new Set(cards.map((c) => c.dataset.crosstourCard))];
@@ -99,6 +105,11 @@ const run = async () => {
     if (d.price_original && d.price_currency) {
       el.dataset.priceOriginal = String(d.price_original);
       el.dataset.priceCurrency = String(d.price_currency);
+    } else {
+      // Иначе останется валюта от серверного рендера — переключатель покажет цену
+      // от старого предложения.
+      delete el.dataset.priceOriginal;
+      delete el.dataset.priceCurrency;
     }
     el.textContent = `от ${fmtPrice(d.price_rub)} ₽`;
     changed = true;
@@ -114,8 +125,13 @@ const run = async () => {
         if (!params) return;
         const isCrosstour = bookingUrl.includes("search_crosstour");
         let priceRub = null;
+        let priceOriginal = null;
+        let priceCurrency = null;
         if (isCrosstour) {
-          priceRub = await fetchCrosstourQuickPrice(params);
+          const quick = await fetchCrosstourQuickPrice(params);
+          priceRub = quick?.price_rub ?? null;
+          priceOriginal = quick?.price_original ?? null;
+          priceCurrency = quick?.price_currency ?? null;
           console.log("[crosstour-cards] crosstour fallback event", el.dataset.crosstourCard, "price_rub:", priceRub);
         } else {
           const minPrice = await fetchTourMinPrice(params);
@@ -127,6 +143,13 @@ const run = async () => {
           el.dataset.priceRub = String(priceRub);
           el.dataset.hasFrom = "true";
           delete el.dataset.priceSuffix;
+          if (priceOriginal && priceCurrency) {
+            el.dataset.priceOriginal = String(priceOriginal);
+            el.dataset.priceCurrency = String(priceCurrency);
+          } else {
+            delete el.dataset.priceOriginal;
+            delete el.dataset.priceCurrency;
+          }
           el.textContent = `от ${fmtPrice(priceRub)} ₽`;
           changed = true;
         }

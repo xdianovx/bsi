@@ -710,11 +710,24 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
  */
 function bsi_crosstour_quick_price(array $ref, bool $force = false): ?int
 {
+  return bsi_crosstour_quick_price_full($ref, $force)['rub'];
+}
+
+/**
+ * То же, но с оригинальной валютой контракта — нужна переключателю валют
+ * (data-price-original / data-price-currency). Кеш ~3ч.
+ *
+ * @return array{rub:?int,original:?float,currency:?string}
+ */
+function bsi_crosstour_quick_price_full(array $ref, bool $force = false): array
+{
+  $empty = ['rub' => null, 'original' => null, 'currency' => null];
+
   $state = (int) ($ref['STATEINC'] ?? 0);
   $tour = (int) ($ref['TOURINC'] ?? 0);
   $townfrom = (int) ($ref['TOWNFROMINC'] ?? BSI_CROSSTOUR_TOWNFROM);
   if (!$state) {
-    return null;
+    return $empty;
   }
 
   $checkin = (string) ($ref['CHECKIN_BEG'] ?? '');
@@ -724,15 +737,20 @@ function bsi_crosstour_quick_price(array $ref, bool $force = false): ?int
   // Нет точных данных в ссылке → полный offer (он сам подберёт даты/ночи/тур).
   if (!$tour || $checkin === '' || !$nf) {
     $offer = bsi_crosstour_event_offer($ref, $force);
-    return $offer['price_rub'] ?? null;
+    return [
+      'rub' => $offer['price_rub'] ?? null,
+      'original' => $offer['price_original'] ?? null,
+      'currency' => $offer['price_currency'] ?? null,
+    ];
   }
 
-  $cache_key = 'crosstour_qprice_v2_' . $townfrom . '_' . $state . '_' . $tour
+  // v3: в кеше массив {rub,original,currency}, а не голое число (нужна валюта).
+  $cache_key = 'crosstour_qprice_v3_' . $townfrom . '_' . $state . '_' . $tour
     . '_' . $checkin . '_' . (string) ($ref['CHECKIN_END'] ?? $checkin) . '_' . $nf . '_' . ($nt > 0 ? $nt : $nf);
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
-    if ($cached !== false) {
-      return $cached === '' ? null : (int) $cached;
+    if (is_array($cached)) {
+      return $cached;
     }
   }
 
@@ -756,10 +774,14 @@ function bsi_crosstour_quick_price(array $ref, bool $force = false): ?int
   ]);
   $node = ($resp['ok'] ?? false) ? ($resp['data']['SearchCrosstour_PRICES'] ?? []) : [];
   $price = bsi_crosstour_price_from_rows($node['prices'] ?? []);
-  $rub = $price['rub'];
+  $result = [
+    'rub' => $price['rub'],
+    'original' => $price['original'],
+    'currency' => $price['currency'],
+  ];
 
-  CacheService::set($cache_key, $rub === null ? '' : $rub, 3 * HOUR_IN_SECONDS, 'samotour');
-  return $rub;
+  CacheService::set($cache_key, $result, 3 * HOUR_IN_SECONDS, 'samotour');
+  return $result;
 }
 
 /**

@@ -421,8 +421,14 @@ function samo_ajax()
         'NIGHTS_FROM' => isset($_POST['NIGHTS_FROM']) ? (int) $_POST['NIGHTS_FROM'] : 0,
         'NIGHTS_TILL' => isset($_POST['NIGHTS_TILL']) ? (int) $_POST['NIGHTS_TILL'] : 0,
       ];
-      $price = function_exists('bsi_crosstour_quick_price') ? bsi_crosstour_quick_price($ref) : null;
-      wp_send_json_success(['price_rub' => $price]);
+      $price = function_exists('bsi_crosstour_quick_price_full')
+        ? bsi_crosstour_quick_price_full($ref)
+        : ['rub' => null, 'original' => null, 'currency' => null];
+      wp_send_json_success([
+        'price_rub' => $price['rub'],
+        'price_original' => $price['original'],
+        'price_currency' => $price['currency'],
+      ]);
 
     case 'crosstour_batch':
       $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];

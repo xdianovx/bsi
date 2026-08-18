@@ -23,13 +23,17 @@ function bsi_event_card_price(int $post_id): array
   if ($booking_url !== ''
     && stripos($booking_url, 'search_crosstour') !== false
     && function_exists('bsi_crosstour_ref_from_url')
-    && function_exists('bsi_crosstour_quick_price')
+    && function_exists('bsi_crosstour_quick_price_full')
   ) {
     $ct_ref = bsi_crosstour_ref_from_url($booking_url);
     if ($ct_ref) {
-      $ct_rub = bsi_crosstour_quick_price($ct_ref);
-      if ($ct_rub !== null && (int) $ct_rub > 0) {
-        $result['rub'] = (int) $ct_rub;
+      // Именно _full: нужна валюта контракта, иначе карточка каталога рендерится
+      // без data-price-original и переключатель валют её не трогает.
+      $ct = bsi_crosstour_quick_price_full($ct_ref);
+      if ($ct['rub'] !== null && (int) $ct['rub'] > 0) {
+        $result['rub'] = (int) $ct['rub'];
+        $result['original'] = $ct['original'];
+        $result['currency'] = $ct['currency'];
         return $result;
       }
     }
