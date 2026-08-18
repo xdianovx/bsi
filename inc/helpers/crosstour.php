@@ -486,6 +486,39 @@ function bsi_crosstour_row_booking_url(array $ref, array $row): string
 }
 
 /**
+ * Слот ссылки: даты/ночи из ref (нормализованные). Пустые значения — «не задано».
+ *
+ * @return array{cb:string,ce:string,nf:int,nt:int}
+ */
+function bsi_crosstour_ref_slot(array $ref): array
+{
+  $cb = preg_replace('/\D/', '', (string) ($ref['CHECKIN_BEG'] ?? ''));
+  $ce = preg_replace('/\D/', '', (string) ($ref['CHECKIN_END'] ?? ''));
+  $nf = (int) ($ref['NIGHTS_FROM'] ?? 0);
+  $nt = (int) ($ref['NIGHTS_TILL'] ?? 0);
+  if ($nf > 0 && $nt < $nf) {
+    $nt = $nf;
+  }
+  if ($cb !== '' && $ce === '') {
+    $ce = $cb;
+  }
+
+  return ['cb' => $cb, 'ce' => $ce, 'nf' => $nf, 'nt' => $nt];
+}
+
+/**
+ * Ключ кеша оффера. Включает слот ссылки — иначе события с одним TOURINC,
+ * но разной длительностью/датами делят один кеш и показывают одну цену.
+ */
+function bsi_crosstour_offer_cache_key(array $ref, int $townfrom, int $state, int $tour): string
+{
+  $slot = bsi_crosstour_ref_slot($ref);
+
+  return 'crosstour_offer_v8_' . $townfrom . '_' . $state . '_' . $tour
+    . '_' . $slot['cb'] . '_' . $slot['ce'] . '_' . $slot['nf'] . '_' . $slot['nt'];
+}
+
+/**
  * Оффер: мин. цена + отели + даты + ночи + ссылка брони. Кеш ~3ч.
  *
  * @return array{price_rub:?int,currency:string,hotels:array,dates:array,nights:array,booking_url:string}
@@ -526,9 +559,10 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
     return $empty;
   }
 
-  // Кэш на уровне тура — показываем ВСЕ доступные комбинации (даты/ночи/номера),
-  // а не только узкий слот из ссылки. Узкие даты ссылки идут лишь в booking_url.
-  $cache_key = 'crosstour_offer_v7_' . $townfrom . '_' . $state . '_' . $tour;
+  // Слот из ссылки (даты/ночи) — если задан, оффер строго по нему: Само отдаёт
+  // разные цены/предложения для разной длительности. Не задан — весь набор тура.
+  $slot = bsi_crosstour_ref_slot($ref);
+  $cache_key = bsi_crosstour_offer_cache_key($ref, $townfrom, $state, $tour);
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
     if (is_array($cached)) {
@@ -547,31 +581,51 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
     'FREIGHT' => 1,
   ];
 
-  // Ночи — весь набор тура (min..max из NIGHTS.nights), НЕ default (может быть вне диапазона).
-  $nights_resp = $endpoints->searchCrosstourNights($base);
-  $nights_node = ($nights_resp['ok'] ?? false) ? ($nights_resp['data']['SearchCrosstour_NIGHTS'] ?? []) : [];
-  $nights_list = (isset($nights_node['nights']) && is_array($nights_node['nights']))
-    ? array_values(array_filter(array_map('intval', $nights_node['nights'])))
-    : [];
-  if (!empty($nights_list)) {
-    $n_from = min($nights_list);
-    $n_till = max($nights_list);
+  // Ночи: из ссылки, если заданы; иначе весь набор тура (min..max из NIGHTS.nights),
+  // НЕ default (может быть вне диапазона).
+  if ($slot['nf'] > 0) {
+    $n_from = $slot['nf'];
+    $n_till = $slot['nt'] > 0 ? $slot['nt'] : $slot['nf'];
   } else {
-    $n_from = (int) ($nights_node['default']['from'] ?? 1);
-    $n_till = (int) ($nights_node['default']['till'] ?? max($n_from, 30));
+    $nights_resp = $endpoints->searchCrosstourNights($base);
+    $nights_node = ($nights_resp['ok'] ?? false) ? ($nights_resp['data']['SearchCrosstour_NIGHTS'] ?? []) : [];
+    $nights_list = (isset($nights_node['nights']) && is_array($nights_node['nights']))
+      ? array_values(array_filter(array_map('intval', $nights_node['nights'])))
+      : [];
+    if (!empty($nights_list)) {
+      $n_from = min($nights_list);
+      $n_till = max($nights_list);
+    } else {
+      $n_from = (int) ($nights_node['default']['from'] ?? 1);
+      $n_till = (int) ($nights_node['default']['till'] ?? max($n_from, 30));
+    }
   }
 
-  // Даты — все валидные из ALL (полный диапазон), не узкий слот ссылки.
-  $all_resp = $endpoints->searchCrosstourAll(array_merge($base, $flags, [
+  // Даты — валидные из ALL, ограниченные окном ссылки (если задано).
+  $all_params = array_merge($base, $flags, [
     'TOURS' => $tour,
     'ADULT' => 2,
     'CHILD' => 0,
     'CURRENCY' => 1,
     'NIGHTS_FROM' => $n_from,
     'NIGHTS_TILL' => $n_till,
-  ]));
+  ]);
+  if ($slot['cb'] !== '') {
+    $all_params['CHECKIN_BEG'] = $slot['cb'];
+    $all_params['CHECKIN_END'] = $slot['ce'];
+  }
+  $all_resp = $endpoints->searchCrosstourAll($all_params);
   $all = ($all_resp['ok'] ?? false) ? ($all_resp['data']['SearchCrosstour_ALL'] ?? []) : [];
   $dates = bsi_crosstour_valid_dates($all['CHECKIN_BEG'] ?? []);
+  if ($slot['cb'] !== '') {
+    $dates = array_values(array_filter($dates, static function ($d) use ($slot) {
+      $d = preg_replace('/\D/', '', (string) $d);
+      return $d !== '' && $d >= $slot['cb'] && $d <= $slot['ce'];
+    }));
+    if (empty($dates)) {
+      $dates = [$slot['cb']];
+    }
+  }
   $checkin_beg = $dates[0] ?? '';
   $checkin_end = !empty($dates) ? (string) end($dates) : $checkin_beg;
 
@@ -673,7 +727,8 @@ function bsi_crosstour_quick_price(array $ref, bool $force = false): ?int
     return $offer['price_rub'] ?? null;
   }
 
-  $cache_key = 'crosstour_qprice_' . $townfrom . '_' . $state . '_' . $tour . '_' . $checkin . '_' . $nf;
+  $cache_key = 'crosstour_qprice_v2_' . $townfrom . '_' . $state . '_' . $tour
+    . '_' . $checkin . '_' . (string) ($ref['CHECKIN_END'] ?? $checkin) . '_' . $nf . '_' . ($nt > 0 ? $nt : $nf);
   if (!$force) {
     $cached = CacheService::get($cache_key, 'samotour');
     if ($cached !== false) {
@@ -757,7 +812,7 @@ function bsi_crosstour_event_data(int $event_id, bool $force = false): ?array
           $offer['price_currency'] = null;
           // Обновляем кеш offer — тот же ключ, что в bsi_crosstour_event_offer.
           // Иначе каждый crosstour_batch будет делать лишний excursion API call.
-          $fb_cache_key = 'crosstour_offer_v7_' . $fb_townfrom . '_' . $fb_state . '_' . $fb_tour;
+          $fb_cache_key = bsi_crosstour_offer_cache_key($ref, $fb_townfrom, $fb_state, $fb_tour);
           if (class_exists('CacheService')) {
             CacheService::set($fb_cache_key, $offer, 3 * HOUR_IN_SECONDS, 'samotour');
           }
