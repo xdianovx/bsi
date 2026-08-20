@@ -29,7 +29,7 @@ $main_page_items = [
 
      ],
      [
-          'title' => 'Образование',
+          'title' => 'Образование <br> за рубежом',
           'url' => $education_url,
           'target' => '',
           'img' => 'edu.png',
@@ -62,7 +62,7 @@ $main_page_items = [
                               <?php $item_img_src = preg_match('#^https?://#i', $item['img']) ? $item['img'] : get_template_directory_uri() . '/img/page-grid/' . $item['img']; ?>
                               <img class="main-pages__item-img"
                                    src="<?= esc_url($item_img_src); ?>"
-                                   alt="<?= esc_attr(strip_tags($item['title'])); ?>">
+                                   alt="<?= esc_attr(trim(preg_replace('/\s+/u', ' ', strip_tags($item['title'])))); ?>">
                               <p class="main-pages__item_title"><?= $item['title']; ?></p>
                          </div>
 
