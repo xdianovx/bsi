@@ -2,13 +2,12 @@
 /**
  * Template Name: Событийные туры
  */
-get_header();
-
 $paged = max(1, (int) get_query_var('paged'));
 $per_page = (int) BSI_EVENT_TOURS_CATALOG_PER_PAGE;
 
 // Начальный запрос событийных туров — порядок «сначала ближайшие» (как дефолтная сортировка).
 $event_tours_total = 0;
+$event_tours_total_pages = 0;
 $event_tours_slice_ids = [];
 if (function_exists('bsi_event_tours_get_matching_post_ids') && function_exists('bsi_event_tours_sort_ids')) {
   $event_tours_default_f = function_exists('bsi_event_tours_parse_request_filters')
@@ -17,8 +16,30 @@ if (function_exists('bsi_event_tours_get_matching_post_ids') && function_exists(
   $event_tours_all_ids = bsi_event_tours_get_matching_post_ids($event_tours_default_f, [], false);
   $event_tours_all_ids = bsi_event_tours_sort_ids($event_tours_all_ids, 'date_asc');
   $event_tours_total = count($event_tours_all_ids);
+  $event_tours_total_pages = $per_page > 0 ? (int) ceil($event_tours_total / $per_page) : 0;
+
+  /* Страница за пределами каталога — 404, иначе /page/99/ отдаёт содержимое
+     первой страницы со своим canonical (как в country-events.php). */
+  if ($paged > 1 && $paged > $event_tours_total_pages) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    nocache_headers();
+    get_template_part('404');
+    return;
+  }
+
+  if ($event_tours_total_pages === 0) {
+    $paged = 1;
+  }
+
   $event_tours_slice_ids = array_slice($event_tours_all_ids, ($paged - 1) * $per_page, $per_page);
 }
+
+/* Базовый URL каталога — для ссылок пагинации и для JS (data-page-base). */
+$event_tours_base_url = trailingslashit(get_permalink(get_queried_object_id()));
+
+get_header();
 
 $tours_query = new WP_Query([
   'post_type' => 'event',
@@ -119,69 +140,73 @@ $tour_type_terms = get_terms([
           }
         }
         ?>
-        <?php if (!empty($evt_banners_active)): ?>
-          <?php $evt_is_slider = count($evt_banners_active) > 1; ?>
-          <div class="promo-banner__wrap promo-banner__wrap--events">
-            <div class="<?php echo $evt_is_slider ? 'swiper promo-banner-slider' : ''; ?>">
-              <div class="<?php echo $evt_is_slider ? 'swiper-wrapper' : ''; ?>">
-                <?php foreach ($evt_banners_active as $banner): ?>
-                  <?php
-                  $img_desktop = $banner['evt_banner_image_desktop'];
-                  $img_mobile  = $banner['evt_banner_image_mobile'];
-                  if (!$img_mobile && $img_desktop) $img_mobile = $img_desktop;
-                  $link   = $banner['evt_banner_link'];
-                  $target = !empty($banner['evt_banner_target']) ? '_blank' : '_self';
-                  ?>
-                  <div class="<?php echo $evt_is_slider ? 'swiper-slide' : ''; ?>">
-                    <div class="promo-banner-card">
-                      <?php if ($link): ?>
-                        <a href="<?php echo esc_url($link); ?>"
-                           target="<?php echo esc_attr($target); ?>"
-                           class="promo-banner-card__link">
-                      <?php endif; ?>
-                        <picture class="promo-banner-card__picture">
-                          <?php if (!empty($img_mobile['url'])): ?>
-                            <source srcset="<?php echo esc_url($img_mobile['url']); ?>"
-                                    media="(max-width: 767px)">
-                          <?php endif; ?>
-                          <img src="<?php echo esc_url($img_desktop['url'] ?? ''); ?>"
-                               alt="<?php echo esc_attr($img_desktop['alt'] ?? ''); ?>"
-                               class="promo-banner-card__img"
-                               loading="lazy">
-                        </picture>
-                      <?php if ($link): ?>
-                        </a>
-                      <?php endif; ?>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
+        <!-- <?php if (!empty($evt_banners_active)): ?>
+      <?php $evt_is_slider = count($evt_banners_active) > 1; ?>
+      <div class="promo-banner__wrap promo-banner__wrap--events">
+        <div class="<?php echo $evt_is_slider ? 'swiper promo-banner-slider' : ''; ?>">
+          <div class="<?php echo $evt_is_slider ? 'swiper-wrapper' : ''; ?>">
+            <?php foreach ($evt_banners_active as $banner): ?>
+            <?php
+            $img_desktop = $banner['evt_banner_image_desktop'];
+            $img_mobile = $banner['evt_banner_image_mobile'];
+            if (!$img_mobile && $img_desktop)
+              $img_mobile = $img_desktop;
+            $link = $banner['evt_banner_link'];
+            $target = !empty($banner['evt_banner_target']) ? '_blank' : '_self';
+            ?>
+            <div class="<?php echo $evt_is_slider ? 'swiper-slide' : ''; ?>">
+              <div class="promo-banner-card">
+                <?php if ($link): ?>
+                <a href="<?php echo esc_url($link); ?>"
+                   target="<?php echo esc_attr($target); ?>"
+                   class="promo-banner-card__link">
+                  <?php endif; ?>
+                  <picture class="promo-banner-card__picture">
+                    <?php if (!empty($img_mobile['url'])): ?>
+                    <source srcset="<?php echo esc_url($img_mobile['url']); ?>"
+                            media="(max-width: 767px)">
+                    <?php endif; ?>
+                    <img src="<?php echo esc_url($img_desktop['url'] ?? ''); ?>"
+                         alt="<?php echo esc_attr($img_desktop['alt'] ?? ''); ?>"
+                         class="promo-banner-card__img"
+                         loading="lazy">
+                  </picture>
+                  <?php if ($link): ?>
+                </a>
+                <?php endif; ?>
               </div>
-              <?php if ($evt_is_slider): ?>
-                <div class="swiper-pagination promo-banner-slider-pag"></div>
-              <?php endif; ?>
             </div>
+            <?php endforeach; ?>
           </div>
-        <?php endif; ?>
+          <?php if ($evt_is_slider): ?>
+          <div class="swiper-pagination promo-banner-slider-pag"></div>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endif; ?> -->
 
-        <?php if (get_the_content()): ?>
-          <div class="page-content">
-            <?php the_content(); ?>
-          </div>
-        <?php endif; ?>
+        <div class="country-tours"
+             data-event-tours-filter
+             data-initial-paged="<?= (int) $paged; ?>"
+             data-page-base="<?= esc_url($event_tours_base_url); ?>">
 
-        <div class="country-tours" data-event-tours-filter data-initial-paged="<?= (int) $paged; ?>">
-
-          <form class="country-tours__filters" data-tours-form>
+          <form class="country-tours__filters"
+                data-tours-form>
             <div class="country-tours__filters-row --events">
               <div class="tours-filter__field tours-filter__field--search">
                 <div class="tours-filter__label">Поиск</div>
-                <input type="search" class="tours-filter__input" name="event_search" autocomplete="off"
-                  placeholder="Название или описание">
+                <input type="search"
+                       class="tours-filter__input"
+                       name="event_search"
+                       autocomplete="off"
+                       placeholder="Название или описание">
               </div>
 
               <div class="tours-filter__field">
                 <div class="tours-filter__label">Направление</div>
-                <select class="tours-filter__select" name="country" data-choice="single">
+                <select class="tours-filter__select"
+                        name="country"
+                        data-choice="single">
                   <option value="">Все страны</option>
                   <?php if (!empty($countries)): ?>
                     <?php foreach ($countries as $country): ?>
@@ -193,14 +218,18 @@ $tour_type_terms = get_terms([
 
               <div class="tours-filter__field">
                 <div class="tours-filter__label">Город</div>
-                <select class="tours-filter__select" name="resort" data-choice="single">
+                <select class="tours-filter__select"
+                        name="resort"
+                        data-choice="single">
                   <option value="">Все города</option>
                 </select>
               </div>
 
               <div class="tours-filter__field">
                 <div class="tours-filter__label">Тип</div>
-                <select class="tours-filter__select" name="tour_type" data-choice="single">
+                <select class="tours-filter__select"
+                        name="tour_type"
+                        data-choice="single">
                   <option value="">Все типы</option>
                   <?php if (!is_wp_error($tour_type_terms) && !empty($tour_type_terms)): ?>
                     <?php foreach ($tour_type_terms as $t): ?>
@@ -212,8 +241,12 @@ $tour_type_terms = get_terms([
 
               <div class="tours-filter__field">
                 <div class="tours-filter__label">Даты событий</div>
-                <input type="text" class="tours-filter__input" name="departure_date" data-departure-date
-                  placeholder="Выберите даты" readonly>
+                <input type="text"
+                       class="tours-filter__input"
+                       name="departure_date"
+                       data-departure-date
+                       placeholder="Выберите даты"
+                       readonly>
               </div>
 
             </div>
@@ -226,33 +259,54 @@ $tour_type_terms = get_terms([
               </div>
 
               <label class="ui-checkbox country-tours__currency-toggle">
-                <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency"
-                  name="show_original_currency_event_catalog" value="1">
+                <input type="checkbox"
+                       class="ui-checkbox__input js-education-show-original-currency"
+                       name="show_original_currency_event_catalog"
+                       value="1">
                 <span class="ui-checkbox__mark"></span>
                 <span class="ui-checkbox__text">Показать в валюте</span>
               </label>
 
-              <button type="button" class="tours-page__reset-btn js-tours-reset" style="display: none;">
+              <button type="button"
+                      class="tours-page__reset-btn js-tours-reset"
+                      style="display: none;">
                 Сбросить фильтры
               </button>
             </div>
 
             <div class="country-tours__head-right">
               <!-- Сортировка -->
-              <div class="country-tours__sort js-dropdown" data-tours-sort>
-                <button type="button" class="js-dropdown-trigger country-tours__sort-trigger">
+              <div class="country-tours__sort js-dropdown"
+                   data-tours-sort>
+                <button type="button"
+                        class="js-dropdown-trigger country-tours__sort-trigger">
                   <span class="country-tours__sort-text">По дате (сначала ближайшие)</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       width="20"
+                       height="20"
+                       viewBox="0 0 20 20"
+                       fill="none">
                     <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
-                          stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                          stroke="black"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round" />
                   </svg>
                 </button>
                 <div class="js-dropdown-panel country-tours__sort-panel">
                   <div class="country-tours__sort-options">
-                    <button type="button" class="country-tours__sort-option is-active" data-value="date_asc">По дате (сначала ближайшие)</button>
-                    <button type="button" class="country-tours__sort-option" data-value="date_desc">По дате (сначала поздние)</button>
-                    <button type="button" class="country-tours__sort-option" data-value="price_asc">По цене (возрастание)</button>
-                    <button type="button" class="country-tours__sort-option" data-value="price_desc">По цене (убывание)</button>
+                    <button type="button"
+                            class="country-tours__sort-option is-active"
+                            data-value="date_asc">По дате (сначала ближайшие)</button>
+                    <button type="button"
+                            class="country-tours__sort-option"
+                            data-value="date_desc">По дате (сначала поздние)</button>
+                    <button type="button"
+                            class="country-tours__sort-option"
+                            data-value="price_asc">По цене (возрастание)</button>
+                    <button type="button"
+                            class="country-tours__sort-option"
+                            data-value="price_desc">По цене (убывание)</button>
                   </div>
                 </div>
               </div>
@@ -261,7 +315,8 @@ $tour_type_terms = get_terms([
           </div>
 
 
-          <div class="country-tours__list is-tiles" data-tours-list>
+          <div class="country-tours__list is-tiles"
+               data-tours-list>
             <?php if ($tours_query->have_posts()): ?>
               <?php while ($tours_query->have_posts()):
                 $tours_query->the_post(); ?>
@@ -275,15 +330,37 @@ $tour_type_terms = get_terms([
             <?php wp_reset_postdata(); ?>
           </div>
 
-          <nav class="ui-pagination country-tours__pagination" data-event-tours-pagination
-            aria-label="Навигация по страницам каталога"></nav>
+          <nav class="ui-pagination country-tours__pagination"
+               data-event-tours-pagination
+               aria-label="Навигация по страницам каталога">
+            <?php
+            if ($event_tours_total_pages > 1) {
+              echo paginate_links([
+                /* %_% → format: первая страница остаётся без /page/1/. */
+                'base' => $event_tours_base_url . '%_%',
+                'format' => 'page/%#%/',
+                'total' => $event_tours_total_pages,
+                'current' => $paged,
+                'prev_text' => 'Назад',
+                'next_text' => 'Вперёд',
+                'mid_size' => 2,
+              ]);
+            }
+            ?>
+          </nav>
 
         </div>
+
+        <?php if (get_the_content()): ?>
+          <div class="page-content">
+            <?php the_content(); ?>
+          </div>
+        <?php endif; ?>
 
       </div>
     </section>
 
-  <?php
+    <?php
   endwhile; ?>
 
 </main>
