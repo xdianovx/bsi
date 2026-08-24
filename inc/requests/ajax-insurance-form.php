@@ -51,7 +51,7 @@ function handle_insurance_form()
   $date = sanitize_text_field($_POST['date'] ?? '');
 
   // Формируем HTML сообщение для email
-  $recipient_email = 'v.ivanova@bsigroup.ru';
+  $recipient_email = 'dianov.js@gmail.com';
 
   // Формируем HTML письмо
   $html_message = '<!DOCTYPE html>
