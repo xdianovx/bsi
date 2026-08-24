@@ -96,11 +96,32 @@ if ($country_id) {
   $widget_country_flag = (is_array($flag) && !empty($flag['url'])) ? $flag['url'] : (string) $flag;
 }
 
+$venue_scheme_type = function_exists('get_field') ? trim((string) get_field('venue_scheme_type', $post_id)) : '';
+if ($venue_scheme_type === '') {
+  $venue_scheme_type = 'stadium';
+}
+$venue_scheme_titles = [
+  'stadium' => 'Схема стадиона',
+  'hall' => 'Схема зала',
+  'arena' => 'Схема арены',
+  'theatre' => 'Схема театра',
+  'track' => 'Схема трассы',
+  'court' => 'Схема корта',
+];
+$venue_scheme_heading = $venue_scheme_titles[$venue_scheme_type] ?? '';
+if ($venue_scheme_type === 'custom') {
+  $custom_scheme_title = function_exists('get_field') ? trim((string) get_field('venue_scheme_title', $post_id)) : '';
+  $venue_scheme_heading = $custom_scheme_title !== '' ? $custom_scheme_title : 'Схема площадки';
+}
+if ($venue_scheme_heading === '') {
+  $venue_scheme_heading = 'Схема стадиона';
+}
+
 $venue_scheme_url = '';
 $venue_scheme_alt = '';
 if (is_array($venue_scheme) && !empty($venue_scheme['url'])) {
   $venue_scheme_url = (string) $venue_scheme['url'];
-  $venue_scheme_alt = !empty($venue_scheme['alt']) ? (string) $venue_scheme['alt'] : 'Схема зала';
+  $venue_scheme_alt = !empty($venue_scheme['alt']) ? (string) $venue_scheme['alt'] : $venue_scheme_heading;
 }
 
 $event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
@@ -508,7 +529,7 @@ get_header();
           if ($venue_scheme_url || $has_scheme_legend):
             ?>
             <section class="single-event__venue-scheme<?= $venue_scheme_url ? '' : ' single-event__venue-scheme--no-image'; ?>">
-              <h2 class="h2">Схема зала</h2>
+              <h2 class="h2"><?= esc_html($venue_scheme_heading); ?></h2>
               <div class="single-event__venue-layout">
                 <?php if ($venue_scheme_url): ?>
                   <figure class="single-event__venue-figure">
