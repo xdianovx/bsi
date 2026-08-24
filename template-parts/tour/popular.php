@@ -47,9 +47,28 @@ wp_reset_postdata();
 
 $country_ids = [];
 
+// Мета выключена в запросе выше — греем её одним запросом на всю подборку,
+// иначе bsi_get_tour_country_ids() читает tour_country по одному туру.
+if (!empty($tour_posts)) {
+  update_meta_cache('post', wp_list_pluck($tour_posts, 'ID'));
+}
+
+// Все страны тура, а не только первая: у мультистрановых туров (например
+// «Италия, Армения, Бельгия») вторая и последующие страны иначе не попадают
+// в фильтр, хотя AJAX по клику их находит (bsi_build_tour_country_meta_query).
 if (!empty($tour_posts)) {
   foreach ($tour_posts as $tour_post) {
     $tour_id = (int) $tour_post->ID;
+
+    if (function_exists('bsi_get_tour_country_ids')) {
+      foreach (bsi_get_tour_country_ids($tour_id) as $c) {
+        if ((int) $c > 0) {
+          $country_ids[] = (int) $c;
+        }
+      }
+      continue;
+    }
+
     $c = function_exists('bsi_get_tour_primary_country_id') ? bsi_get_tour_primary_country_id($tour_id) : 0;
     if ($c > 0) {
       $country_ids[] = $c;
