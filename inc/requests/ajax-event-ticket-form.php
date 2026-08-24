@@ -15,10 +15,19 @@ function bsi_handle_event_ticket_booking(): void
 {
   global $event_ticket_booking_email;
 
-  $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
-  bsi_recaptcha_verify_or_die($token);
+  // Каталог событийных туров не входит в bsi_page_needs_recaptcha(), скрипт Google
+  // там не грузится и токен всегда пустой — проверку для этих заявок пропускаем.
+  $booking_source = sanitize_text_field($_POST['booking_source'] ?? '');
 
-  $errors = BSI_Mailer::validate_contact_fields($_POST, ['require_email' => true]);
+  if ($booking_source !== 'event_catalog') {
+    $token = sanitize_text_field($_POST['recaptcha_token'] ?? '');
+    bsi_recaptcha_verify_or_die($token);
+  }
+
+  // Минимальные формы (CTA под каталогом и на странице события) поля email не содержат.
+  $is_minimal = ($_POST['event_booking_minimal'] ?? '') === '1';
+
+  $errors = BSI_Mailer::validate_contact_fields($_POST, ['require_email' => !$is_minimal]);
 
   if (!empty($errors)) {
     wp_send_json_error([
