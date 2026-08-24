@@ -33,9 +33,12 @@ if (empty($event_ids)) {
   return;
 }
 
-// Слайдер показывает 2 карточки за раз — ограничиваем подборку.
+// По умолчанию лимита нет; вернуть его можно фильтром bsi_homepage_slider_limit.
 if (function_exists('bsi_homepage_slider_limit')) {
-  $event_ids = array_slice($event_ids, 0, bsi_homepage_slider_limit());
+  $event_limit = bsi_homepage_slider_limit('event');
+  if ($event_limit > 0) {
+    $event_ids = array_slice($event_ids, 0, $event_limit);
+  }
 }
 
 $event_posts = get_posts([

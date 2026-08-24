@@ -21,10 +21,13 @@ if (empty($homepage_tour_ids)) {
   return;
 }
 
-// Лимит выше, чем у остальных слайдеров: фильтр по странам над слайдером
-// строится из отрендеренных карточек (см. bsi_homepage_slider_limit()).
+// По умолчанию лимита нет: фильтр по странам над слайдером строится
+// из отрендеренных карточек (см. bsi_homepage_slider_limit()).
 if (function_exists('bsi_homepage_slider_limit')) {
-  $homepage_tour_ids = array_slice($homepage_tour_ids, 0, bsi_homepage_slider_limit('tour'));
+  $tour_limit = bsi_homepage_slider_limit('tour');
+  if ($tour_limit > 0) {
+    $homepage_tour_ids = array_slice($homepage_tour_ids, 0, $tour_limit);
+  }
 }
 
 $tour_query = new WP_Query(bsi_query_args_append_schedule([

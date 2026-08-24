@@ -25,9 +25,12 @@ $popular_hotel_ids = function_exists('bsi_schedule_filter_post__in_ids')
   ? bsi_schedule_filter_post__in_ids(array_map('intval', $popular_hotel_candidates))
   : array_values(array_filter(array_map('intval', $popular_hotel_candidates)));
 
-// Слайдер показывает 2 карточки за раз — ограничиваем подборку.
+// По умолчанию лимита нет; вернуть его можно фильтром bsi_homepage_slider_limit.
 if (function_exists('bsi_homepage_slider_limit')) {
-  $popular_hotel_ids = array_slice($popular_hotel_ids, 0, bsi_homepage_slider_limit());
+  $hotel_limit = bsi_homepage_slider_limit('hotel');
+  if ($hotel_limit > 0) {
+    $popular_hotel_ids = array_slice($popular_hotel_ids, 0, $hotel_limit);
+  }
 }
 
 $country_ids = [];
@@ -93,10 +96,7 @@ if (!empty($country_ids)) {
   }
 }
 
-$display_hotel_ids = [];
-if (!empty($popular_hotel_ids)) {
-  $display_hotel_ids = array_slice($popular_hotel_ids, 0, 12);
-}
+$display_hotel_ids = $popular_hotel_ids;
 
 $hotel_posts = [];
 if ($display_hotel_ids !== []) {
