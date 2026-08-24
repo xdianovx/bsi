@@ -203,9 +203,31 @@
   padding-bottom: 48px;
 }
 
-// SEO-текст под каталогом, перед подвалом
-.event-tours-page .page-content {
-  margin-top: 40px;
+// SEO-текст под формой CTA, перед подвалом
+.event-tours-page__content {
+  margin-top: 48px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 32px;
+  }
+
+  // Комфортная длина строки для SEO-текста
+  .page-content {
+    max-width: 900px;
+  }
+}
+
+// CTA «Не нашли нужное событие?» под каталогом событийных туров
+.single-event__booking-cta.event-tours-cta {
+  margin-top: 48px;
+
+  @media screen and (max-width: 768px) {
+    margin-top: 32px;
+  }
+}
+
+.event-tours-cta__field--full {
+  flex: 1 1 100%;
 }
 
 .event-tours-page .country-tours {

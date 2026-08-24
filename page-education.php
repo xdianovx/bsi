@@ -219,7 +219,7 @@ if ($all_edu_for_sort->have_posts()) {
       <?php while (have_posts()):
         the_post(); ?>
         <?php if (get_the_content()): ?>
-          <div class="page-content">
+          <div class="page-content editor-content">
             <?php the_content(); ?>
           </div>
         <?php endif; ?>

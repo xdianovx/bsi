@@ -351,14 +351,75 @@ $tour_type_terms = get_terms([
 
         </div>
 
-        <?php if (get_the_content()): ?>
-          <div class="page-content">
-            <?php the_content(); ?>
-          </div>
-        <?php endif; ?>
-
       </div>
     </section>
+
+    <section class="single-event__booking-cta event-tours-cta" aria-labelledby="event-tours-cta-title">
+      <div class="container">
+        <div class="single-event__booking-cta-inner">
+          <div class="single-event__booking-cta-head">
+            <h2 class="single-event__booking-cta-title" id="event-tours-cta-title">Не нашли нужное событие?</h2>
+            <p class="single-event__booking-cta-lead">Напишите, куда и на что хотите попасть. Подберём билеты, рассчитаем перелёт, отель и трансфер.</p>
+          </div>
+
+          <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate>
+            <input type="hidden" name="action" value="event_ticket_booking">
+            <input type="hidden" name="event_booking_minimal" value="1">
+            <input type="hidden" name="event_title" value="Подбор события (каталог событийных туров)">
+            <input type="hidden" name="page_url" value="<?= esc_url(get_permalink()); ?>">
+
+            <div class="single-event__booking-cta-row">
+              <div class="single-event__booking-cta-field event-tours-cta__field--full">
+                <label class="screen-reader-text" for="event-tours-cta-comment">Какое событие вас интересует</label>
+                <input id="event-tours-cta-comment" type="text" name="comment" class="single-event__booking-cta-input"
+                  placeholder="Какое событие вас интересует?" data-field="comment">
+                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="comment"></span>
+              </div>
+            </div>
+
+            <div class="single-event__booking-cta-row">
+              <div class="single-event__booking-cta-field">
+                <label class="screen-reader-text" for="event-tours-cta-name">Имя</label>
+                <input id="event-tours-cta-name" type="text" name="name" class="single-event__booking-cta-input"
+                  placeholder="Имя" autocomplete="name" required data-field="name">
+                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="name"></span>
+              </div>
+              <div class="single-event__booking-cta-field">
+                <label class="screen-reader-text" for="event-tours-cta-phone">Телефон</label>
+                <input id="event-tours-cta-phone" type="tel" name="phone"
+                  class="single-event__booking-cta-input js-phone-mask" placeholder="Телефон" autocomplete="tel"
+                  required data-field="phone">
+                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="phone"></span>
+              </div>
+              <button type="submit" class="single-event__booking-cta-submit" data-default-label="Отправить заявку">
+                Отправить заявку
+              </button>
+            </div>
+
+            <?php
+            if (function_exists('bsi_render_privacy_consent_checkbox')) {
+              bsi_render_privacy_consent_checkbox([
+                'variant' => 'event-booking-cta',
+                'checkbox_id' => 'event-tours-cta-privacy',
+              ]);
+            }
+            ?>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <?php if (get_the_content()): ?>
+      <section class="event-tours-page__content">
+        <div class="container">
+          <div class="page-content editor-content">
+            <?php the_content(); ?>
+          </div>
+        </div>
+      </section>
+    <?php endif; ?>
+
+    <?php get_template_part('template-parts/event/ticket-booking-modal'); ?>
 
     <?php
   endwhile; ?>
