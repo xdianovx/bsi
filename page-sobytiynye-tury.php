@@ -362,7 +362,8 @@ $tour_type_terms = get_terms([
             <p class="single-event__booking-cta-lead">Напишите, куда и на что хотите попасть. Подберём билеты, рассчитаем перелёт, отель и трансфер.</p>
           </div>
 
-          <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate>
+          <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate
+            data-ym-goal="event_catalog_request">
             <input type="hidden" name="action" value="event_ticket_booking">
             <input type="hidden" name="event_booking_minimal" value="1">
             <input type="hidden" name="event_title" value="Подбор события (каталог событийных туров)">

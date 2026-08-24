@@ -4,7 +4,7 @@ import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 
 /**
  * Заявка по событию: модалка и inline-форма (имя + телефон обязательны; почта и комментарий — нет).
- * Метрика: ym(108341897, "reachGoal", "event_tour_submited").
+ * Метрика: ym(108341897, "reachGoal", "event_tour_submited") — или цель из data-ym-goal формы.
  */
 
 const YM_ID = 108341897;
@@ -127,14 +127,15 @@ function populateModal(ticketData) {
   );
 }
 
-function reachEventTourBookingGoal(params) {
+function reachEventTourBookingGoal(params, goal) {
   if (typeof ym === "undefined") {
     return;
   }
+  const goalName = goal || EVENT_TOUR_GOAL;
   if (params && Object.keys(params).length > 0) {
-    ym(YM_ID, "reachGoal", EVENT_TOUR_GOAL, params);
+    ym(YM_ID, "reachGoal", goalName, params);
   } else {
-    ym(YM_ID, "reachGoal", EVENT_TOUR_GOAL);
+    ym(YM_ID, "reachGoal", goalName);
   }
 }
 
@@ -297,7 +298,10 @@ async function submitForm(e) {
     if (result.success) {
       const accommodationParam = (form.dataset.accommodation
         || (form.querySelector('.js-form-accommodation')?.value || '')).trim();
-      reachEventTourBookingGoal(accommodationParam ? { accommodation: accommodationParam } : null);
+      reachEventTourBookingGoal(
+        accommodationParam ? { accommodation: accommodationParam } : null,
+        form.dataset.ymGoal,
+      );
 
       if (!isMinimal) {
         MicroModal.close("modal-event-ticket-booking");
