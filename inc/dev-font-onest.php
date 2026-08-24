@@ -22,6 +22,11 @@
  * Иконочные шрифты (swiper-icons, fancybox) объявлены на псевдоэлементах,
  * селектор «*» их не задевает — стрелки слайдеров работают.
  *
+ * font-display:block, а не swap: со swap первый кадр рисуется системным
+ * шрифтом и текст потом заметно скачет. Block придерживает отрисовку до
+ * загрузки, а файлы локальные и мелкие, поэтому пауза незаметна.
+ * Все четыре подреза уходят в preload, чтобы сократить её до минимума.
+ *
  * Совсем убрать примерку: закомментировать require в functions.php
  * и удалить этот файл вместе с папкой fonts/onest.
  *
@@ -89,6 +94,29 @@ add_action('init', function (): void {
 }, 20);
 
 /**
+ * Preload — приоритет 1, до всего остального в <head>. Чем раньше начнётся
+ * загрузка, тем короче пауза, которую держит font-display:block.
+ */
+add_action('wp_head', function (): void {
+    if (!bsi_preview_font_enabled()) {
+        return;
+    }
+
+    $uri = get_template_directory_uri() . '/fonts/onest/';
+
+    echo "<!-- ВРЕМЕННО: примерка Onest, inc/dev-font-onest.php -->\n";
+
+    // Все четыре подреза: суммарно 64 КБ с того же домена — дешевле,
+    // чем задержка отрисовки на догрузке недостающего подреза.
+    foreach (bsi_preview_font_subsets() as $subset) {
+        printf(
+            '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin="anonymous">' . "\n",
+            esc_url($uri . $subset['file'])
+        );
+    }
+}, 1);
+
+/**
  * Приоритет 20 — после wp_print_styles() (8), чтобы правило перебило
  * @font-face из main.min.css.
  */
@@ -106,7 +134,7 @@ add_action('wp_head', function (): void {
     foreach (['Inter', 'Onest'] as $family) {
         foreach ($subsets as $subset) {
             $css .= sprintf(
-                '@font-face{font-family:"%s";font-style:normal;font-weight:200 900;font-display:swap;src:url(%s) format("woff2");unicode-range:%s}',
+                '@font-face{font-family:"%s";font-style:normal;font-weight:200 900;font-display:block;src:url(%s) format("woff2");unicode-range:%s}',
                 $family,
                 esc_url($uri . $subset['file']),
                 $subset['range']
@@ -117,16 +145,6 @@ add_action('wp_head', function (): void {
     // Селектор «*» намеренно тотальный: задача примерки — не оставить
     // ни одного участка со старым шрифтом, включая инлайновые стили.
     $css .= '*{font-family:"Onest",sans-serif !important}';
-
-    echo "<!-- ВРЕМЕННО: примерка Onest, inc/dev-font-onest.php -->\n";
-
-    // Кириллица и латиница нужны на первом экране всегда.
-    foreach (['cyrillic', 'latin'] as $key) {
-        printf(
-            '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin="anonymous">' . "\n",
-            esc_url($uri . $subsets[$key]['file'])
-        );
-    }
 
     echo '<style id="bsi-preview-font">' . $css . '</style>' . "\n";
 }, 20);
