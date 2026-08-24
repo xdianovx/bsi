@@ -77,7 +77,7 @@ class BSI_Mailer
     }
 
     // Заголовки
-    $site_name = get_bloginfo('name') ?: 'BSI';
+    $site_name = get_bloginfo('name') ?: 'BSI Group';
     $site_host = parse_url(home_url(), PHP_URL_HOST) ?: 'bsi.ru';
 
     $headers = [
