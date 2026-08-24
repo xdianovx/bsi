@@ -9,8 +9,7 @@
 @import "config/base";
 @import "config/lazyload";
 
-* {
-}
+* {}
 
 // ui
 @import "./ui/breadcrumbs.scss";
@@ -89,6 +88,7 @@
   span {
     color: $text-gray;
     font-size: 12px;
+    font-weight: 500;
   }
 
   &:hover {
@@ -106,8 +106,7 @@
   color: $text-gray;
 }
 
-.currency-item__value {
-}
+.currency-item__value {}
 
 .swiper {
   max-width: 100%;
@@ -137,12 +136,13 @@
   border-bottom: 1px solid #dbdbdb;
 }
 
-.archive-page__title {
-}
+.archive-page__title {}
+
 .archive-page__excerpt {
   margin-top: 8px;
   color: #5c5c5c;
   margin-bottom: 0;
+
   p {
     margin-bottom: 0;
   }
@@ -163,8 +163,7 @@
   margin-top: 64px;
 }
 
-.archive-page__content {
-}
+.archive-page__content {}
 
 .read-content {
   margin: 0 auto;
