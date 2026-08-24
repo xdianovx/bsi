@@ -366,7 +366,6 @@ $tour_type_terms = get_terms([
             data-ym-goal="event_catalog_request">
             <input type="hidden" name="action" value="event_ticket_booking">
             <input type="hidden" name="event_booking_minimal" value="1">
-            <input type="hidden" name="booking_source" value="event_catalog">
             <input type="hidden" name="event_title" value="Подбор события (каталог событийных туров)">
             <input type="hidden" name="page_url" value="<?= esc_url(get_permalink()); ?>">
 

@@ -18,10 +18,21 @@ function bsi_recaptcha_site_key(): string
 }
 
 /**
- * Проверяет, включена ли reCAPTCHA (заданы оба ключа).
+ * ВРЕМЕННО: reCAPTCHA отключена на всём сайте.
+ * Причина и план возврата — https://github.com/xdianovx/bsi/issues/118
+ * Чтобы включить обратно: убрать константу или задать BSI_RECAPTCHA_FORCE_DISABLED = false.
+ */
+const BSI_RECAPTCHA_FORCE_DISABLED = true;
+
+/**
+ * Проверяет, включена ли reCAPTCHA (заданы оба ключа и не выключена принудительно).
  */
 function bsi_recaptcha_enabled(): bool
 {
+  if (BSI_RECAPTCHA_FORCE_DISABLED) {
+    return false;
+  }
+
   $secret = defined('BSI_RECAPTCHA_SECRET_KEY') ? (string) BSI_RECAPTCHA_SECRET_KEY : '';
   return $secret !== '' && bsi_recaptcha_site_key() !== '';
 }

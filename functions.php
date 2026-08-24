@@ -151,6 +151,8 @@ function bsi_scripts()
 	wp_enqueue_script('main', get_template_directory_uri() . '/dist/js/main.min.js', array(), bsi_asset_version($main_js_path), true);
 	$recaptcha_site_key = function_exists('bsi_recaptcha_site_key') ? bsi_recaptcha_site_key() : '';
 	$load_recaptcha = $recaptcha_site_key !== ''
+		&& function_exists('bsi_recaptcha_enabled')
+		&& bsi_recaptcha_enabled()
 		&& function_exists('bsi_page_needs_recaptcha')
 		&& bsi_page_needs_recaptcha();
 	wp_localize_script('main', 'ajax', array(
