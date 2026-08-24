@@ -333,6 +333,10 @@ add_action('template_redirect', function () {
 	}
 });
 
+// ВРЕМЕННО: примерка шрифта Onest вместо Inter. Отключается комментированием
+// этой строки или параметром ?font=inter. Удалить после решения.
+require get_template_directory() . '/inc/dev-font-onest.php';
+
 require get_template_directory() . '/inc/seo.php';
 require get_template_directory() . '/inc/schema.php';
 require get_template_directory() . '/inc/custom-header.php';
