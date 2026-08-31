@@ -359,7 +359,7 @@ function bsi_seo_fallback_description(): string
             'page', 'post',
             'tour', 'hotel', 'country', 'news', 'event', 'education',
             'promo', 'visa', 'insurance', 'project',
-            'agency_event', 'documentation', 'excursion',
+            'agency_event', 'documentation', 'excursion', 'vacancy',
         ];
         if (!in_array($post->post_type, $public_types, true)) {
             return '';
@@ -372,6 +372,23 @@ function bsi_seo_fallback_description(): string
             if (isset($map[$uri])) {
                 return $map[$uri];
             }
+        }
+
+        // У вакансии основной текст лежит в ACF-списках, post_content часто пуст —
+        // описание собираем из параметров, иначе получаем дубли по всем вакансиям.
+        if ($post->post_type === 'vacancy' && function_exists('bsi_vacancy_salary_label')) {
+            $parts = [];
+            $schedule = trim((string) get_field('schedule', $post->ID));
+            if ($schedule !== '') {
+                $parts[] = $schedule;
+            }
+            $parts[] = 'зарплата ' . mb_strtolower(bsi_vacancy_salary_label((int) $post->ID));
+
+            return sprintf(
+                'Вакансия «%s» в BSI Group: %s. Обязанности, требования и форма отклика.',
+                trim(wp_strip_all_tags(get_the_title($post))),
+                implode(', ', $parts)
+            );
         }
 
         $text = bsi_seo_prepare_description((string) $post->post_excerpt);

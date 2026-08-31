@@ -43,7 +43,7 @@ button {
     label {
       padding: 0 4px;
       background: $bg-gray;
-      border-radius: 4px;
+      border-radius: 8px;
       line-height: 120%;
     }
   }
@@ -65,6 +65,7 @@ button {
   font-size: 14px;
   background: white;
   padding: 0 8px;
+  border-radius: 8px;
 }
 
 .input-item input {
@@ -96,6 +97,7 @@ input.error {
   font-size: 14px;
   background: white;
   padding: 0 8px;
+  border-radius: 8px;
   color: #dc2626;
 }
 

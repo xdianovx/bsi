@@ -54,6 +54,7 @@ class BSI_Mailer
    *   @type string $template Имя шаблона (без .php)
    *   @type array  $data     Данные для шаблона
    *   @type string $reply_to Reply-To адрес (опционально)
+   *   @type array  $attachments Абсолютные пути к файлам-вложениям (опционально)
    * }
    * @return array ['success' => bool, 'message' => string]
    */
@@ -64,6 +65,12 @@ class BSI_Mailer
     $template = $args['template'] ?? 'default';
     $data = $args['data'] ?? [];
     $reply_to = $args['reply_to'] ?? '';
+    $attachments = isset($args['attachments']) && is_array($args['attachments']) ? $args['attachments'] : [];
+
+    // Вложения: только существующие читаемые файлы, иначе wp_mail отдаст false целиком.
+    $attachments = array_values(array_filter($attachments, static function ($path): bool {
+      return is_string($path) && $path !== '' && is_readable($path);
+    }));
 
     // Генерируем HTML из шаблона
     $html_message = self::render_template($template, $data);
@@ -93,7 +100,7 @@ class BSI_Mailer
     error_log("BSI_Mailer: Sending to {$to}, subject: {$subject}");
 
     // Отправляем
-    $sent = wp_mail($to, $subject, $html_message, $headers);
+    $sent = wp_mail($to, $subject, $html_message, $headers, $attachments);
 
     if ($sent) {
       return [

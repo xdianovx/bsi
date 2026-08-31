@@ -420,6 +420,8 @@ require get_template_directory() . '/inc/post-types/hotel-info.php';
 require get_template_directory() . '/inc/post-types/hotel-deposits.php';
 require get_template_directory() . '/inc/post-types/project.php';
 require get_template_directory() . '/inc/post-types/insurance.php';
+require get_template_directory() . '/inc/post-types/vacancy.php';
+require get_template_directory() . '/inc/helpers/vacancy.php';
 require get_template_directory() . '/inc/helpers/country-cases.php';
 require get_template_directory() . '/inc/helpers/event-price.php';
 require get_template_directory() . '/inc/helpers/crosstour.php';
@@ -465,6 +467,8 @@ require get_template_directory() . '/custom-fields/pages/education.php';
 require get_template_directory() . '/custom-fields/pages/event-tours.php';
 require get_template_directory() . '/custom-fields/currency-settings.php';
 require get_template_directory() . '/custom-fields/maintenance-modal.php';
+require get_template_directory() . '/custom-fields/vacancy.php';
+require get_template_directory() . '/inc/requests/ajax-vacancy-apply.php';
 
 require get_template_directory() . '/inc/requests/ajax-fit.php';
 require get_template_directory() . '/inc/requests/ajax-visa-form.php';

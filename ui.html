@@ -1379,6 +1379,101 @@ get_template_part('template-parts/hotels/room-card');
     </div>
   </section>
 
+  <section>
+    <h2 class="h2" style="margin-bottom:16px">Вакансии — карточка каталога (.vacancy-card)</h2>
+    <div class="vacancies-grid">
+      <article class="vacancy-card">
+        <div class="vacancy-card__head">
+          <h2 class="vacancy-card__title"><a class="vacancy-card__link" href="#">Бухгалтер</a></h2>
+          <span class="vacancy-card__badge">Срочно</span>
+        </div>
+        <ul class="vacancy-card__facts">
+                    <li class="vacancy-card__fact"><svg class="bsi-icon vacancy-card__fact-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <path d="M12 6v6l4 2" /></svg><span>5/2 с 10:00 до 19:00</span></li>
+        </ul>
+        <p class="vacancy-card__excerpt">Приём, проверка и обработка входящих первичных документов. Внесение данных в
+          учётную базу 1С, регулярные акты сверки с контрагентами.</p>
+        <div class="vacancy-card__bottom">
+          <a class="btn btn-accent vacancy-card__more" href="#">Подробнее</a>
+          <p class="vacancy-card__salary">от 120 000 ₽</p>
+        </div>
+      </article>
+
+      <article class="vacancy-card">
+        <div class="vacancy-card__head">
+          <h2 class="vacancy-card__title"><a class="vacancy-card__link" href="#">Менеджер по туризму</a></h2>
+        </div>
+        <ul class="vacancy-card__facts">
+          <li class="vacancy-card__fact"><svg class="bsi-icon vacancy-card__fact-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></svg><span>Полная занятость</span></li>
+        </ul>
+        <p class="vacancy-card__excerpt">Подбор и продажа туров, ведение клиентской базы, работа с системами
+          бронирования.</p>
+        <div class="vacancy-card__bottom">
+          <a class="btn btn-accent vacancy-card__more" href="#">Подробнее</a>
+          <p class="vacancy-card__salary">от 120 000 ₽</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="h2" style="margin-bottom:16px">Вакансии — sticky-блок отклика с фактами</h2>
+    <div class="single-vacancy__layout">
+      <div class="single-vacancy__main">
+        <section class="single-vacancy__block">
+          <h2 class="h3 single-vacancy__block-title">Обязанности</h2>
+          <ul class="single-vacancy__list">
+            <li class="single-vacancy__list-item">Приём, проверка и обработка первичных документов.</li>
+            <li class="single-vacancy__list-item">Внесение данных в учётную базу 1С.</li>
+          </ul>
+        </section>
+      </div>
+
+      <aside class="single-vacancy__aside">
+        <div class="single-vacancy__cta">
+          <p class="single-vacancy__cta-label">Зарплата</p>
+          <p class="single-vacancy__cta-salary">По договорённости</p>
+          <a class="btn btn-accent single-vacancy__cta-btn" href="#">Откликнуться</a>
+          <a class="single-vacancy__cta-hh" href="#">Открыть на hh.ru</a>
+          <ul class="single-vacancy__facts">
+            <li class="single-vacancy__fact">
+              <span class="single-vacancy__fact-body">
+                <span class="single-vacancy__fact-label">Занятость</span>
+                <span class="single-vacancy__fact-value">Полная занятость</span>
+              </span>
+            </li>
+            <li class="single-vacancy__fact">
+              <span class="single-vacancy__fact-body">
+                <span class="single-vacancy__fact-label">График</span>
+                <span class="single-vacancy__fact-value">5/2 с 10:00 до 19:00</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="h2" style="margin-bottom:16px">Вакансии — поле загрузки резюме (.vacancy-apply__file)</h2>
+    <div class="vacancy-apply">
+      <div class="vacancy-apply__inner">
+        <div class="vacancy-apply__file-item">
+          <span class="vacancy-apply__file-label">Резюме</span>
+          <input type="file" id="uikit-resume" accept=".pdf,.doc,.docx">
+          <label class="vacancy-apply__file" for="uikit-resume">
+            <span class="vacancy-apply__file-btn">Выбрать файл</span>
+            <span class="vacancy-apply__file-name">Файл не выбран</span>
+          </label>
+          <p class="vacancy-apply__hint">PDF, DOC, DOCX, RTF или ODT, до 5 МБ.</p>
+        </div>
+        <div class="vacancy-apply__actions">
+          <button type="button" class="btn btn-accent">Отправить отклик</button>
+          <a class="btn btn-white" href="#">Откликнуться на hh.ru</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <p style="text-align:center;color:var(--uikit-muted);font-size:13px;margin:40px 0 20px">
     Витрина обновляется вручную. Добавил новый общий элемент в <code>scss/ui/</code> — допиши пример сюда.
   </p>

@@ -36,6 +36,7 @@ import { initEducationProgramForm } from "./modules/forms/education-program-form
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initExcursionBookingForm } from "./modules/forms/excursion-booking-form";
 import { initTourBookingForm } from "./modules/forms/tour-booking-form";
+import { initVacancyApplyForm } from "./modules/forms/vacancy-apply-form";
 import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
@@ -144,6 +145,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initCrosstourCards();
   initExcursionBookingForm();
   initTourBookingForm();
+  initVacancyApplyForm();
   initAgencyEventRegForm();
   initBonusMarquee();
   // Карта инициализируется после загрузки API Яндекс.Карт (скрипт в footer)

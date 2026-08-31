@@ -1,0 +1,486 @@
+// ── Вакансии: каталог /vakansii/ и карточка /vakansii/{slug}/ ──
+// Hover без теней и сдвигов — только цвет (wiki/docs/design-guidelines.md).
+
+.vacancies-page__content {
+  padding-bottom: 64px;
+}
+
+.vacancies-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+// ── Карточка ──────────────────────────────────────────────
+
+.vacancy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid $gray-light;
+  border-radius: 16px;
+  background: $bg-color;
+}
+
+.vacancy-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vacancy-card__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 130%;
+}
+
+.vacancy-card__link {
+  color: $text-black;
+  text-decoration: none;
+  transition: $trans-text;
+
+  &:hover,
+  &:focus-visible {
+    color: $red;
+  }
+}
+
+.vacancy-card__badge,
+.single-vacancy__badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: $red;
+  color: $text-white;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 140%;
+  white-space: nowrap;
+}
+
+.vacancy-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vacancy-card__fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.vacancy-card__fact-icon {
+  flex-shrink: 0;
+  color: $gray;
+}
+
+.vacancy-card__excerpt {
+  margin: 0;
+  font-size: 16px;
+  line-height: 150%;
+  color: $text-gray;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vacancy-card__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.vacancy-card__salary {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 130%;
+}
+
+.vacancy-card__more {
+  flex-shrink: 0;
+}
+
+// ── Пустое состояние ──────────────────────────────────────
+
+.vacancies-empty {
+  padding: 32px;
+  border: 1px solid $gray-light;
+  border-radius: 12px;
+  background: $bg-gray;
+}
+
+.vacancies-empty__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.vacancies-empty__text {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 150%;
+  color: $text-gray;
+
+  a {
+    color: $red;
+  }
+}
+
+// ── Single ────────────────────────────────────────────────
+
+.single-vacancy {
+  padding-bottom: 64px;
+}
+
+.single-vacancy__head {
+  margin-bottom: 24px;
+}
+
+.single-vacancy__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.single-vacancy__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 32px;
+  align-items: start;
+}
+
+.single-vacancy__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0 0;
+  padding: 20px 0 0;
+  list-style: none;
+  border-top: 1px solid $gray-light;
+}
+
+.single-vacancy__fact {
+  display: flex;
+}
+
+.single-vacancy__fact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.single-vacancy__fact-label {
+  font-size: 14px;
+  line-height: 120%;
+  color: $text-gray;
+}
+
+.single-vacancy__fact-value {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.single-vacancy__intro {
+  margin-bottom: 32px;
+}
+
+.single-vacancy__block {
+  margin-bottom: 32px;
+}
+
+.single-vacancy__block-title {
+  margin: 0 0 12px;
+}
+
+.single-vacancy__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.single-vacancy__list-item {
+  position: relative;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 155%;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $red;
+  }
+}
+
+// ── Sticky-блок отклика ───────────────────────────────────
+
+.single-vacancy__aside {
+  position: sticky;
+  top: 24px;
+}
+
+.single-vacancy__cta {
+  padding: 16px;
+  border-radius: 16px;
+  background: $bg-gray;
+}
+
+.single-vacancy__cta-label {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.single-vacancy__cta-salary {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 130%;
+}
+
+.single-vacancy__cta-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.single-vacancy__cta-hh {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 16px;
+  color: $text-gray;
+  text-decoration: underline;
+  transition: $trans-text;
+
+  &:hover,
+  &:focus-visible {
+    color: $red;
+  }
+}
+
+.single-vacancy__other {
+  margin-top: 48px;
+}
+
+.single-vacancy__other-title {
+  margin-bottom: 16px;
+}
+
+// ── Форма отклика ─────────────────────────────────────────
+
+.vacancy-apply {
+  margin-top: 48px;
+  padding: 32px;
+  border-radius: 12px;
+  background: $bg-gray;
+}
+
+.vacancy-apply__inner {}
+
+.vacancy-apply__title {
+  margin: 0 0 8px;
+}
+
+.vacancy-apply__lead {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 150%;
+  color: $text-gray;
+}
+
+.vacancy-apply__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 20px;
+  align-items: start;
+}
+
+.vacancy-apply__field--wide {
+  grid-column: 1 / -1;
+}
+
+.vacancy-apply__req {
+  color: $red;
+}
+
+// Ловушка для ботов: убрана из потока, но остаётся в DOM.
+.vacancy-apply__trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.vacancy-apply__file-item {
+
+  input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  // Клавиатурный фокус на скрытом input подсвечивает видимую «кнопку».
+  input[type="file"]:focus-visible+.vacancy-apply__file .vacancy-apply__file-btn {
+    outline: 2px solid $red;
+    outline-offset: 2px;
+  }
+}
+
+.vacancy-apply__file-item {
+  position: relative;
+}
+
+// Тот же floating-label, что у .input-item — иначе поле выбивается из формы.
+.vacancy-apply__file-label {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  z-index: 1;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: $bg-gray;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vacancy-apply__file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 51px;
+  padding: 6px 6px 6px 16px;
+  border: 1px solid #bebebe;
+  border-radius: 8px;
+  background: $bg-color;
+  cursor: pointer;
+  transition: $trans-text;
+
+  &:hover {
+    border-color: $text-black;
+  }
+}
+
+.vacancy-apply__file-btn {
+  order: 2;
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  border-radius: 6px;
+  background: $bg-gray;
+  font-size: 16px;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: $trans-text;
+}
+
+.vacancy-apply__file:hover .vacancy-apply__file-btn {
+  color: $red;
+}
+
+.vacancy-apply__file-name {
+  order: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  color: $text-gray;
+}
+
+.vacancy-apply__hint {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 145%;
+  color: $text-gray;
+}
+
+.vacancy-apply__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.vacancy-apply__status {
+  grid-column: 1 / -1;
+  margin: -16px 0 0;
+
+  &:empty {
+    display: none;
+  }
+}
+
+// ── Адаптив ───────────────────────────────────────────────
+
+@media screen and (max-width: 1024px) {
+  .single-vacancy__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .single-vacancy__aside {
+    position: static;
+    order: -1;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .vacancies-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vacancy-apply__form {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .vacancy-card,
+  .single-vacancy__facts,
+  .single-vacancy__cta,
+  .vacancies-empty {
+    padding: 20px;
+  }
+
+  .single-vacancy__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .vacancy-apply {
+    padding: 24px 20px;
+  }
+
+  .vacancy-apply__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

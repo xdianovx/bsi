@@ -39,6 +39,8 @@ add_action('wp_head', function () {
         bsi_schema_hotel();
     } elseif (is_singular('education')) {
         bsi_schema_education();
+    } elseif (is_singular('vacancy')) {
+        bsi_schema_vacancy();
     }
 }, 99);
 
@@ -441,3 +443,122 @@ function bsi_schema_education_list(array $items, int $paged = 1, int $per_page =
     ]);
 }
 
+
+// ── JobPosting (вакансия) ───────────────────────────────────
+
+/**
+ * schema.org JobPosting для /vakansii/{slug}/.
+ *
+ * datePosted / validThrough берутся из срока показа (bsi_active_from / bsi_active_until),
+ * потому что именно он определяет, актуальна ли вакансия на сайте.
+ */
+function bsi_schema_vacancy(): void
+{
+    $id = (int) get_the_ID();
+    $title = get_the_title($id);
+    $url = get_permalink($id);
+
+    $duties = function_exists('bsi_vacancy_list') ? bsi_vacancy_list('duties', $id) : [];
+    $requirements = function_exists('bsi_vacancy_list') ? bsi_vacancy_list('requirements', $id) : [];
+
+    $desc = trim(wp_strip_all_tags(get_the_content(null, false, $id)));
+    if ($desc === '' && $duties) {
+        $desc = implode(' ', $duties);
+    }
+    if ($desc === '') {
+        $desc = $title;
+    }
+
+    $employment_map = [
+        'full' => 'FULL_TIME',
+        'part' => 'PART_TIME',
+        'project' => 'CONTRACTOR',
+        'internship' => 'INTERN',
+    ];
+    $employment = (string) get_field('employment_type', $id);
+
+    $experience_map = [
+        'none' => '',
+        '1-3' => 'Опыт работы от 1 года',
+        '3-6' => 'Опыт работы от 3 лет',
+        '6+' => 'Опыт работы от 6 лет',
+    ];
+
+    // Дата хранится как Ymd (ACF datepicker) — schema.org требует ISO 8601.
+    $valid_through_raw = function_exists('bsi_schedule_normalize_date')
+        ? bsi_schedule_normalize_date(get_post_meta($id, 'bsi_active_until', true))
+        : null;
+    $valid_through = $valid_through_raw !== null && strlen($valid_through_raw) === 8
+        ? substr($valid_through_raw, 0, 4) . '-' . substr($valid_through_raw, 4, 2) . '-' . substr($valid_through_raw, 6, 2)
+        : '';
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'JobPosting',
+        'title' => $title,
+        'description' => wp_trim_words($desc, 120, '…'),
+        'url' => $url,
+        'datePosted' => get_the_date('Y-m-d', $id),
+        'employmentType' => $employment_map[$employment] ?? 'FULL_TIME',
+        'hiringOrganization' => [
+            '@type' => 'Organization',
+            'name' => 'BSI Group',
+            'sameAs' => home_url('/'),
+        ],
+        // Офис у компании один — адрес не заводим полем вакансии.
+        'jobLocation' => [
+            '@type' => 'Place',
+            'address' => [
+                '@type' => 'PostalAddress',
+                'addressLocality' => 'Москва',
+                'addressCountry' => 'RU',
+                'streetAddress' => 'ул. Долгоруковская, д. 36, стр. 3',
+            ],
+        ],
+    ];
+
+    if ($valid_through !== '') {
+        $schema['validThrough'] = $valid_through;
+    }
+
+    $experience_text = $experience_map[(string) get_field('experience', $id)] ?? '';
+    if ($experience_text !== '') {
+        $schema['experienceRequirements'] = $experience_text;
+    }
+
+    if ($requirements) {
+        $schema['qualifications'] = implode(' ', $requirements);
+    }
+
+    if ($duties) {
+        $schema['responsibilities'] = implode(' ', $duties);
+    }
+
+    $salary_type = (string) get_field('salary_type', $id);
+    $salary_from = (int) get_field('salary_from', $id);
+    $salary_to = (int) get_field('salary_to', $id);
+
+    if ($salary_type !== 'negotiable' && $salary_from > 0) {
+        $value = [
+            '@type' => 'QuantitativeValue',
+            'unitText' => 'MONTH',
+        ];
+
+        if ($salary_type === 'range' && $salary_to > 0) {
+            $value['minValue'] = $salary_from;
+            $value['maxValue'] = $salary_to;
+        } elseif ($salary_type === 'exact') {
+            $value['value'] = $salary_from;
+        } else {
+            $value['minValue'] = $salary_from;
+        }
+
+        $schema['baseSalary'] = [
+            '@type' => 'MonetaryAmount',
+            'currency' => 'RUB',
+            'value' => $value,
+        ];
+    }
+
+    bsi_schema_json($schema);
+}
