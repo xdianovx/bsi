@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 const BSI_CLAIM_CHECK_URL = 'https://online.bsigroup.ru/check_confirm';
 
-/** Кеш ответа Само по заявке: статусы меняются редко, менеджеры жмут «проверить» часто. */
-const BSI_CLAIM_CHECK_CACHE_TTL = 2 * MINUTE_IN_SECONDS;
-
 /** Лимит запросов с одного IP в минуту — страница публичная, а мы ходим к Само от своего имени. */
 const BSI_CLAIM_CHECK_RATE_LIMIT = 30;
 
@@ -63,12 +60,6 @@ function bsi_handle_check_claim(): void
  */
 function bsi_claim_check_fetch(int $claim): array
 {
-  $cache_key = 'bsi_claim_check_' . $claim;
-  $cached = get_transient($cache_key);
-  if (is_array($cached)) {
-    return $cached;
-  }
-
   $url = add_query_arg([
     'samo_action' => 'check_popup',
     'CLAIM' => $claim,
@@ -87,11 +78,8 @@ function bsi_claim_check_fetch(int $claim): array
     return ['ok' => false, 'error' => 'Сервис проверки временно недоступен (HTTP ' . $code . ')'];
   }
 
-  $result = ['ok' => true, 'data' => bsi_claim_check_parse($body, $claim)];
-
-  set_transient($cache_key, $result, BSI_CLAIM_CHECK_CACHE_TTL);
-
-  return $result;
+  // Без кеша: менеджеру нужен актуальный статус на момент запроса.
+  return ['ok' => true, 'data' => bsi_claim_check_parse($body, $claim)];
 }
 
 /**

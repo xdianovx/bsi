@@ -59,7 +59,7 @@ $page_content = trim((string) get_post_field('post_content', $page_id));
                 pattern="[0-9]*"
                 autocomplete="off"
                 maxlength="10"
-                placeholder="Например, 4593"
+                placeholder="Введите номер заявки"
                 class="js-claim-check-input">
               <span class="error-message js-field-error" data-error-for="claim"></span>
             </div>
