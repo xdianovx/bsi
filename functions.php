@@ -469,6 +469,7 @@ require get_template_directory() . '/custom-fields/currency-settings.php';
 require get_template_directory() . '/custom-fields/maintenance-modal.php';
 require get_template_directory() . '/custom-fields/vacancy.php';
 require get_template_directory() . '/inc/requests/ajax-vacancy-apply.php';
+require get_template_directory() . '/inc/requests/ajax-check-claim.php';
 
 require get_template_directory() . '/inc/requests/ajax-fit.php';
 require get_template_directory() . '/inc/requests/ajax-visa-form.php';

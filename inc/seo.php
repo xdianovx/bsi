@@ -1027,6 +1027,32 @@ function bsi_seo_excluded_post_types(): array
     ];
 }
 
+/** Шаблоны служебных страниц: noindex + вне sitemap. */
+function bsi_seo_noindex_page_templates(): array
+{
+    return [
+        'page-check-claim.php',
+    ];
+}
+
+add_filter('wpseo_exclude_from_sitemap_by_post_ids', function ($ids) {
+    $ids = is_array($ids) ? $ids : [];
+
+    $pages = get_posts([
+        'post_type' => 'page',
+        'post_status' => 'any',
+        'fields' => 'ids',
+        'posts_per_page' => -1,
+        'meta_query' => [[
+            'key' => '_wp_page_template',
+            'value' => bsi_seo_noindex_page_templates(),
+            'compare' => 'IN',
+        ]],
+    ]);
+
+    return array_values(array_unique(array_merge($ids, array_map('intval', $pages))));
+});
+
 add_filter('wpseo_sitemap_exclude_taxonomy', function ($exclude, $taxonomy) {
     if (in_array($taxonomy, bsi_seo_excluded_taxonomies(), true)) {
         return true;
@@ -1049,7 +1075,10 @@ add_filter('wpseo_sitemap_exclude_post_type', function ($exclude, $post_type) {
 add_filter('wpseo_robots_array', function ($robots) {
     $noindex = false;
 
-    if (is_author() || is_date()) {
+    if (is_page_template(bsi_seo_noindex_page_templates())) {
+        // Служебные страницы для менеджеров (проверка заявки) — не для поиска.
+        $noindex = true;
+    } elseif (is_author() || is_date()) {
         $noindex = true;
     } elseif (is_tax(bsi_seo_excluded_taxonomies())) {
         $noindex = true;

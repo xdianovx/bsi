@@ -1,0 +1,131 @@
+// ── Проверка статуса заявки: page-check-claim.php ──
+// Служебная страница для менеджеров. Hover без теней и сдвигов (wiki/docs/design-guidelines.md).
+
+.claim-check-page__content {
+  padding-bottom: 64px;
+}
+
+.claim-check {
+  width: 100%;
+}
+
+.claim-check__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  @media screen and (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.claim-check__field {
+  flex: 1 1 auto;
+
+  input {
+    font-variant-numeric: tabular-nums;
+    // На случай, если браузер всё же покажет спиннер (inputmode="numeric" их не даёт, но страхуемся).
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+.claim-check__submit {
+  flex: 0 0 auto;
+  min-width: 200px;
+  white-space: nowrap;
+}
+
+.claim-check__result {
+  margin-top: 24px;
+}
+
+.claim-check__card {
+  padding: 20px 24px;
+  border: 1px solid $gray-light;
+  border-radius: 16px;
+  background: $bg-color;
+
+  &--empty {
+    background: $bg-gray;
+    border-color: transparent;
+    color: $text-gray;
+  }
+
+  &--error {
+    border-color: $red;
+    color: $red;
+  }
+}
+
+.claim-check__head {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 130%;
+  margin-bottom: 16px;
+}
+
+.claim-check__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.claim-check__item {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid $bg-gray;
+  line-height: 140%;
+
+  @media screen and (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.claim-check__label {
+  color: $text-gray;
+}
+
+.claim-check__value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+
+  &--success {
+    color: #1a8f4a;
+  }
+
+  &--warning {
+    color: #a66300;
+  }
+
+  &--error {
+    color: $red;
+  }
+}
+
+.claim-check__note {
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.claim-check__details {
+  display: inline-block;
+  margin-top: 12px;
+  color: $red;
+  font-weight: 600;
+  transition: $trans-text;
+
+  &:hover {
+    color: $text-black;
+  }
+}

@@ -1474,6 +1474,41 @@ get_template_part('template-parts/hotels/room-card');
     </div>
   </section>
 
+  <section>
+    <h2 class="h2" style="margin-bottom:16px">Проверка заявки — форма и карточка результата (.claim-check)</h2>
+    <p class="uikit-label">Страница page-check-claim.php. Поле — type="text" + inputmode="numeric" (без стрелок number), JS режет нецифры. Значение со статусом красится через .claim-check__value--success / --warning / --error (класс span в HTML Само).</p>
+    <div class="claim-check">
+      <form class="claim-check__form" onsubmit="return false">
+        <div class="claim-check__row">
+          <div class="input-item claim-check__field">
+            <label>Номер заявки</label>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" value="4593">
+            <span class="error-message"></span>
+          </div>
+          <button type="submit" class="btn btn-accent claim-check__submit">Проверить</button>
+        </div>
+      </form>
+      <div class="claim-check__result">
+        <div class="claim-check__card">
+          <div class="claim-check__head">Заявка № 4593</div>
+          <div class="claim-check__list">
+            <div class="claim-check__item"><div class="claim-check__label">Статус заявки</div><div class="claim-check__value claim-check__value--success">Подтверждена<br>28.08.2026 09:30</div></div>
+            <div class="claim-check__item"><div class="claim-check__label">Статус оплаты</div><div class="claim-check__value">Оплачена</div></div>
+            <div class="claim-check__item"><div class="claim-check__label">Стоимость заявки</div><div class="claim-check__value">130.93 USD</div></div>
+          </div>
+          <p class="claim-check__note">Данные по заявке будут доступны за 0 дней до начала тура</p>
+          <a class="claim-check__details" href="#">Подробная информация в личном кабинете</a>
+        </div>
+      </div>
+      <div class="claim-check__result">
+        <div class="claim-check__card claim-check__card--empty">Заявка № 99999999 не найдена</div>
+      </div>
+      <div class="claim-check__result">
+        <div class="claim-check__card claim-check__card--error">Сервис проверки временно недоступен</div>
+      </div>
+    </div>
+  </section>
+
   <p style="text-align:center;color:var(--uikit-muted);font-size:13px;margin:40px 0 20px">
     Витрина обновляется вручную. Добавил новый общий элемент в <code>scss/ui/</code> — допиши пример сюда.
   </p>
