@@ -15,11 +15,22 @@ if (!defined('ABSPATH')) {
 /**
  * Meta keys to exclude from duplication (e.g. view counters).
  *
+ * _wp_old_slug and _wp_old_date belong to the source post's URL history: copied
+ * over, the duplicate starts answering to the original's former addresses.
+ * _bsi_manual_slug would freeze the copy on the "-2" slug WordPress gives it,
+ * since inc/admin/auto-slug-on-title-change.php leaves hand-written slugs alone.
+ * _edit_lock and _edit_last describe an editing session, not the content.
+ *
  * @return array<string>
  */
 function bsi_duplicate_post_excluded_meta_keys(): array {
 	return apply_filters('bsi_duplicate_post_excluded_meta_keys', [
 		'news_views',
+		'_wp_old_slug',
+		'_wp_old_date',
+		'_bsi_manual_slug',
+		'_edit_lock',
+		'_edit_last',
 	]);
 }
 
