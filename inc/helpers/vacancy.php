@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 /** Адрес, на который уходят отклики по всем вакансиям. */
 if (!defined('BSI_VACANCY_APPLY_EMAIL')) {
-	// TODO: заменить на рабочий HR-адрес, когда его дадут.
-	define('BSI_VACANCY_APPLY_EMAIL', 'dianov.js@gmail.com');
+	define('BSI_VACANCY_APPLY_EMAIL', 'e.dushina@bsigroup.ru');
 }
 
 /**
