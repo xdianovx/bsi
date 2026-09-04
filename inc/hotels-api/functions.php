@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/HotelsApiClient.php';
+require_once __DIR__ . '/hotel-page.php';
 
 /**
  * Общий экземпляр клиента. null, если API не настроен.
