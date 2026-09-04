@@ -75,7 +75,7 @@
 
 .country-hotels__message-debug {
   margin-top: 8px;
-  color: #8a8a8a;
+  color: $gray;
   font-size: 14px;
 }
 
@@ -88,7 +88,7 @@
 
 .country-resorts-filter__item {
   padding: 6px 12px;
-  border: 1px solid #dedede;
+  border: 1px solid $gray-light;
   border-radius: 4px;
   font-size: 14px;
   line-height: 130%;
@@ -105,7 +105,7 @@
 
 .country-resorts-filter__count {
   margin-left: 4px;
-  color: #8a8a8a;
+  color: $gray;
 }
 
 .country-hotels__resort-title {
@@ -168,7 +168,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a5a5a5;
+  color: $gray;
   font-size: 14px;
 }
 
@@ -199,7 +199,7 @@
 
 .api-hotel__city {
   margin-top: 4px;
-  color: #6b6b6b;
+  color: $text-gray;
   font-size: 14px;
 }
 
@@ -213,7 +213,7 @@
 
 .api-hotel__price--empty {
   font-weight: 400;
-  color: #6b6b6b;
+  color: $text-gray;
   font-size: 14px;
 }
 
