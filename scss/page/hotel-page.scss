@@ -821,6 +821,63 @@ $hp-nav-offset: 76px;
   }
 }
 
+.hp-policies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px 32px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    object-fit: contain;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  &__flag {
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: $bg-gray;
+    color: $text-gray;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  &__item.is-denied &__flag {
+    color: $red;
+  }
+
+  &__text {
+    color: $text-gray;
+    font-size: 14px;
+  }
+}
+
 .hp-location {
   &__note {
     max-width: 900px;

@@ -35,6 +35,7 @@ function bsi_hotel_view_defaults(): array
     'sections' => [],       // [['id' => '', 'title' => '', 'html' => ''], ...]
     'map' => null,          // ['lat' => float, 'lng' => float, 'zoom' => int]
     'location_note' => '',  // текст о расположении; выводится в секции с картой
+    'policies' => [],       // [['icon' => '', 'title' => '', 'text' => '', 'allowed' => ?bool], ...]
     'back' => null,         // ['url' => '', 'label' => '']
     'pdf_modal' => '',      // id модалки печати, если она есть у источника
   ];
@@ -92,15 +93,19 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
       continue;
     }
 
+    $group = $amenity['group'] ?? '';
+
     $view['amenities'][] = [
       'name' => $name,
       'icon' => (string) ($amenity['icon'] ?? ''),
-      'group' => (string) ($amenity['group'] ?? ''),
+      // Раньше группа приходила строкой, теперь объектом {name, slug, icon}.
+      'group' => is_array($group) ? (string) ($group['name'] ?? '') : (string) $group,
       'popular' => !empty($amenity['is_popular']),
     ];
   }
 
   $view['facts'] = bsi_hotel_view_api_facts($hotel);
+  $view['policies'] = bsi_hotel_view_api_policies($hotel);
 
   if (!empty($hotel['description'])) {
     $view['sections'][] = [
@@ -170,25 +175,49 @@ function bsi_hotel_view_api_facts(array $hotel): array
     'airport_m' => 'До аэропорта',
   ];
 
-  foreach ((array) ($hotel['distances'] ?? []) as $key => $distance) {
-    // Хаб отдаёт расстояние числом. Когда он начнёт присылать объект
-    // с подписью и иконкой, строка соберётся из него — правок здесь не потребуется.
-    $meters = is_array($distance)
-      ? (int) ($distance['value'] ?? $distance['meters'] ?? 0)
-      : (int) $distance;
+  foreach ((array) ($hotel['nearby'] ?? []) as $point) {
+    $meters = (int) ($point['distance_m'] ?? 0);
+    $type = is_array($point['type'] ?? null) ? $point['type'] : [];
+    $label = trim((string) ($type['name'] ?? ''));
 
-    if ($meters <= 0) {
+    if ($label === '') {
       continue;
+    }
+
+    // Уточнение места («Пляж Кута») дополняет тип объекта.
+    $name = trim((string) ($point['name'] ?? ''));
+    if ($name !== '') {
+      $label .= ', ' . $name;
     }
 
     $facts[] = [
       'kind' => 'distance',
-      'icon' => is_array($distance) ? (string) ($distance['icon'] ?? '') : '',
-      'label' => is_array($distance) && !empty($distance['label'])
-        ? (string) $distance['label']
-        : ($labels[$key] ?? $key),
-      'value' => bsi_hotel_view_distance($meters),
+      'icon' => (string) ($type['icon'] ?? ''),
+      'label' => $label,
+      'value' => $meters > 0 ? bsi_hotel_view_distance($meters) : 'рядом',
     ];
+  }
+
+  // Прежние три расстояния — запасной вариант, пока отель не заполнен через nearby.
+  if (!$facts) {
+    foreach ((array) ($hotel['distances'] ?? []) as $key => $distance) {
+      $meters = is_array($distance)
+        ? (int) ($distance['value'] ?? $distance['meters'] ?? 0)
+        : (int) $distance;
+
+      if ($meters <= 0) {
+        continue;
+      }
+
+      $facts[] = [
+        'kind' => 'distance',
+        'icon' => is_array($distance) ? (string) ($distance['icon'] ?? '') : '',
+        'label' => is_array($distance) && !empty($distance['label'])
+          ? (string) $distance['label']
+          : ($labels[$key] ?? $key),
+        'value' => bsi_hotel_view_distance($meters),
+      ];
+    }
   }
 
   if (!empty($hotel['beach_line'])) {
@@ -208,6 +237,36 @@ function bsi_hotel_view_api_facts(array $hotel): array
   }
 
   return $facts;
+}
+
+/**
+ * Правила отеля из хаба: заселение с животными, курение, документы.
+ * `allowed` отдельно от текста — по нему рисуется отметка «можно / нельзя».
+ */
+function bsi_hotel_view_api_policies(array $hotel): array
+{
+  $policies = [];
+
+  foreach ((array) ($hotel['policies'] ?? []) as $policy) {
+    $type = is_array($policy['type'] ?? null) ? $policy['type'] : [];
+    $title = trim((string) ($policy['title'] ?? '')) ?: trim((string) ($type['name'] ?? ''));
+    $text = trim((string) ($policy['text'] ?? ''));
+
+    if ($title === '' && $text === '') {
+      continue;
+    }
+
+    $policies[] = [
+      'icon' => (string) ($type['icon'] ?? ''),
+      'title' => $title,
+      'text' => $text,
+      'allowed' => array_key_exists('allowed', $policy) && $policy['allowed'] !== null
+        ? (bool) $policy['allowed']
+        : null,
+    ];
+  }
+
+  return $policies;
 }
 
 /**
@@ -261,6 +320,7 @@ function bsi_hotel_view_api_rooms(array $hotel): array
       'max_adults' => (int) ($room['max_adults'] ?? 0),
       'max_children' => (int) ($room['max_children'] ?? 0),
       'max_total' => (int) ($room['max_total'] ?? 0),
+      'view' => (string) ($room['view'] ?? ''),
       'photos' => $photos,
       'offers' => $offers,
       'price_from' => bsi_hotel_view_offers_min($offers),
@@ -536,7 +596,7 @@ function bsi_hotel_view_nav(array $view): array
     $nav[] = ['id' => 'hotel-distances', 'label' => 'Расстояния'];
   }
 
-  if (bsi_hotel_view_facts_of($view['facts'], 'note')) {
+  if (bsi_hotel_view_facts_of($view['facts'], 'note') || $view['policies']) {
     $nav[] = ['id' => 'hotel-facts', 'label' => 'Важно знать'];
   }
 
@@ -945,6 +1005,7 @@ function bsi_hotel_view_post_rooms(int $post_id): array
       'max_adults' => 0,
       'max_children' => 0,
       'max_total' => (int) ($room['guests'] ?? 0),
+      'view' => '',
       'photos' => $photos,
       'offers' => [],
       'price_from' => $price,

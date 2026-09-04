@@ -152,6 +152,9 @@ $payload = array_map(static function (array $room): array {
                 <?php if ($room['max_children']): ?>
                   <li>дети: до <?= (int) $room['max_children']; ?></li>
                 <?php endif; ?>
+                <?php if (!empty($room['view'])): ?>
+                  <li><?= esc_html($room['view']); ?></li>
+                <?php endif; ?>
               </ul>
 
               <?php if ($room['description'] !== ''): ?>
