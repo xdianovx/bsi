@@ -39,7 +39,7 @@ function bsi_hotels_api_hotel_page(): void
   }
 
   // Отель другой страны по этому адресу — не наша страница.
-  if (($hotel['country']['slug'] ?? '') !== $api_country) {
+  if (!bsi_hotels_api_hotel_belongs_to_country($hotel, $api_country, $country)) {
     return;
   }
 
@@ -182,4 +182,26 @@ function bsi_hotels_api_validate_resort(): void
 
   include get_404_template();
   exit;
+}
+
+/**
+ * Тот ли это отель, что должен открываться по адресу страны.
+ *
+ * Обычно хватает слага страны. Но в хабе встречаются задвоенные страны
+ * (`italiya` и `italy`), и тогда отель, привязанный ко второй записи,
+ * терял бы свою страницу. Поэтому засчитываем и совпадение названия страны
+ * с названием страны в WordPress.
+ */
+function bsi_hotels_api_hotel_belongs_to_country(array $hotel, string $api_country, WP_Post $country): bool
+{
+  if (($hotel['country']['slug'] ?? '') === $api_country) {
+    return true;
+  }
+
+  $hotel_country = trim((string) ($hotel['country']['name'] ?? ''));
+  if ($hotel_country === '') {
+    return false;
+  }
+
+  return mb_strtolower($hotel_country) === mb_strtolower(trim((string) $country->post_title));
 }
