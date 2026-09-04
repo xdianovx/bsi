@@ -148,7 +148,7 @@ get_header(); ?>
           <?php // каталог отрисован выше, внутри колонки контента ?>
 
         <?php elseif (!empty($hotels)): ?>
-          <div class="">
+          <div class="page-country__content">
             <div class="country-hotels__counter">
               Нашли отелей: <?= (int) count($hotels); ?>
             </div>

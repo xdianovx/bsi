@@ -294,14 +294,22 @@ $child_pages = get_posts([
   'order' => 'ASC',
 ]);
 
-$has_hotels = get_posts([
-  'post_type' => 'hotel',
-  'posts_per_page' => 1,
-  'fields' => 'ids',
-  'meta_query' => [
-    ['key' => 'hotel_country', 'value' => $main_parent_id, 'compare' => '='],
-  ],
-]);
+// Каталог отелей есть, если страна связана с хабом BSIHOTELS либо
+// отели заведены в WordPress. Раньше считались только вторые, и у страны
+// с сотнями отелей в хабе пункт меню не показывался вовсе.
+$has_hotels = function_exists('bsi_hotels_api_enabled_for_country')
+  && bsi_hotels_api_enabled_for_country((int) $main_parent_id);
+
+if (!$has_hotels) {
+  $has_hotels = get_posts([
+    'post_type' => 'hotel',
+    'posts_per_page' => 1,
+    'fields' => 'ids',
+    'meta_query' => [
+      ['key' => 'hotel_country', 'value' => $main_parent_id, 'compare' => '='],
+    ],
+  ]);
+}
 
 $has_promos = get_posts(bsi_query_args_append_schedule([
   'post_type' => 'promo',

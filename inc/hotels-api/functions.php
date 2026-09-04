@@ -214,10 +214,48 @@ function bsi_hotels_api_catalog_query(WP_Post $country): array
       'order' => 'asc',
     ]));
 
+    $result['list']['items'] = bsi_hotels_api_filter_items($result['list']['items']);
     $result['resorts'] = $client->cities($api_country);
   } catch (HotelsApiException $e) {
     $result['error'] = $e->getMessage();
   }
 
   return $cache[$key] = $result;
+}
+
+/**
+ * Служебные записи поставщика, приезжающие в хаб под видом отелей:
+ * «По программе тура: …», «Отели по программе рекламного тура».
+ * Это не объекты размещения, показывать их в каталоге нечем.
+ */
+function bsi_hotels_api_is_service_record(array $hotel): bool
+{
+  $name = trim((string) ($hotel['name'] ?? ''));
+  if ($name === '') {
+    return true;
+  }
+
+  $patterns = apply_filters('bsi_hotels_api_service_name_patterns', [
+    '~^по\s+программе\s+тура~iu',
+    '~^отели\s+по\s+программе~iu',
+  ]);
+
+  foreach ($patterns as $pattern) {
+    if (preg_match($pattern, $name)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Отсеивает служебные записи из выборки отелей.
+ */
+function bsi_hotels_api_filter_items(array $items): array
+{
+  return array_values(array_filter(
+    $items,
+    static fn($hotel) => is_array($hotel) && !bsi_hotels_api_is_service_record($hotel)
+  ));
 }
