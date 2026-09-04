@@ -170,15 +170,24 @@ function bsi_hotel_view_api_facts(array $hotel): array
     'airport_m' => 'До аэропорта',
   ];
 
-  foreach ((array) ($hotel['distances'] ?? []) as $key => $meters) {
-    if ((int) $meters <= 0) {
+  foreach ((array) ($hotel['distances'] ?? []) as $key => $distance) {
+    // Хаб отдаёт расстояние числом. Когда он начнёт присылать объект
+    // с подписью и иконкой, строка соберётся из него — правок здесь не потребуется.
+    $meters = is_array($distance)
+      ? (int) ($distance['value'] ?? $distance['meters'] ?? 0)
+      : (int) $distance;
+
+    if ($meters <= 0) {
       continue;
     }
+
     $facts[] = [
       'kind' => 'distance',
-      'icon' => '', // иконку расстояния ждём от хаба
-      'label' => $labels[$key] ?? $key,
-      'value' => bsi_hotel_view_distance((int) $meters),
+      'icon' => is_array($distance) ? (string) ($distance['icon'] ?? '') : '',
+      'label' => is_array($distance) && !empty($distance['label'])
+        ? (string) $distance['label']
+        : ($labels[$key] ?? $key),
+      'value' => bsi_hotel_view_distance($meters),
     ];
   }
 
