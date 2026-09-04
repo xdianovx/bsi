@@ -282,3 +282,122 @@ function bsi_hotels_api_hotel_url(string $catalog_url, array $hotel): string
 
   return $key !== '' ? trailingslashit($catalog_url) . $key . '/' : '';
 }
+
+/**
+ * Курорт хаба, привязанный к терму `resort`.
+ *
+ * @return array{slug: string, name: string, country: array}|null
+ */
+function bsi_hotels_api_resort_city(int $term_id): ?array
+{
+  if ($term_id <= 0 || !function_exists('get_field')) {
+    return null;
+  }
+
+  static $cache = [];
+  if (array_key_exists($term_id, $cache)) {
+    return $cache[$term_id];
+  }
+
+  $slug = trim((string) get_field('hotels_api_city', 'term_' . $term_id));
+  if ($slug === '') {
+    return $cache[$term_id] = null;
+  }
+
+  $client = bsi_hotels_api();
+  if (!$client) {
+    return $cache[$term_id] = null;
+  }
+
+  try {
+    foreach ($client->cities() as $city) {
+      if (($city['slug'] ?? '') === $slug) {
+        return $cache[$term_id] = [
+          'slug' => $slug,
+          'name' => (string) ($city['name'] ?? $slug),
+          'country' => is_array($city['country'] ?? null) ? $city['country'] : [],
+        ];
+      }
+    }
+  } catch (HotelsApiException $e) {
+    return $cache[$term_id] = null;
+  }
+
+  return $cache[$term_id] = null;
+}
+
+/**
+ * Страна WordPress по слагу страны в хабе — нужна, чтобы построить адреса
+ * каталога и карточек от курорта.
+ */
+function bsi_hotels_api_country_post(string $api_country_slug): ?WP_Post
+{
+  if ($api_country_slug === '') {
+    return null;
+  }
+
+  static $cache = [];
+  if (array_key_exists($api_country_slug, $cache)) {
+    return $cache[$api_country_slug];
+  }
+
+  $countries = get_posts([
+    'post_type' => 'country',
+    'post_status' => 'publish',
+    'post_parent' => 0,
+    'posts_per_page' => -1,
+    'no_found_rows' => true,
+  ]);
+
+  foreach ($countries as $country) {
+    if (bsi_hotels_api_country_slug((int) $country->ID) === $api_country_slug) {
+      return $cache[$api_country_slug] = $country;
+    }
+  }
+
+  return $cache[$api_country_slug] = null;
+}
+
+/**
+ * Отели курорта из хаба для страницы терма.
+ *
+ * @return array{items: array, total: int, catalog_url: string, city: array}|null
+ */
+function bsi_hotels_api_resort_hotels(int $term_id, int $limit = 12): ?array
+{
+  $city = bsi_hotels_api_resort_city($term_id);
+  if (!$city) {
+    return null;
+  }
+
+  $country = bsi_hotels_api_country_post((string) ($city['country']['slug'] ?? ''));
+  if (!$country) {
+    return null;
+  }
+
+  $client = bsi_hotels_api();
+  if (!$client) {
+    return null;
+  }
+
+  try {
+    $list = $client->hotels([
+      'city' => $city['slug'],
+      'limit' => $limit,
+      'sort' => 'name',
+      'order' => 'asc',
+    ]);
+  } catch (HotelsApiException $e) {
+    return null;
+  }
+
+  $catalog_url = bsi_hotels_api_catalog_url($country);
+
+  return [
+    'items' => bsi_hotels_api_filter_items($list['items']),
+    'total' => (int) $list['total'],
+    'catalog_url' => $catalog_url,
+    'resort_url' => bsi_hotels_api_resort_url($catalog_url, $city['slug']),
+    'city' => $city,
+  ];
+}

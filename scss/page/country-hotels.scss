@@ -246,3 +246,19 @@
 .api-hotels-selection__grid {
   margin-top: 24px;
 }
+
+.resort-hotels--api {
+  margin-top: 40px;
+}
+
+.resort-hotels__all {
+  margin-top: 24px;
+
+  a {
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
