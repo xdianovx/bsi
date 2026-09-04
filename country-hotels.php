@@ -16,8 +16,12 @@ if (!$country instanceof WP_Post) {
   return;
 }
 
+// Каталог берётся из хаба BSIHOTELS, если страна с ним связана.
+// Иначе остаётся прежний источник — отели, заведённые в WordPress.
+$hotels_from_api = bsi_hotels_api_enabled_for_country((int) $country->ID) && bsi_hotels_api() !== null;
+
 // 1) Получаем все отели страны
-$hotels = get_posts([
+$hotels = $hotels_from_api ? [] : get_posts([
   'post_type' => 'hotel',
   'post_status' => 'publish',
   'posts_per_page' => -1,
@@ -121,9 +125,18 @@ get_header(); ?>
           <h1 class="h1 country-hotels__title">
             Отели <?= esc_html($hotels_prep . ' ' . $hotels_country); ?>
           </h1>
+
+          <?php if ($hotels_from_api): ?>
+            <?php get_template_part('template-parts/pages/country/hotels-api', null, [
+              'country' => $country,
+            ]); ?>
+          <?php endif; ?>
         </div>
 
-        <?php if (!empty($hotels)): ?>
+        <?php if ($hotels_from_api): ?>
+          <?php // каталог отрисован выше, внутри колонки контента ?>
+
+        <?php elseif (!empty($hotels)): ?>
           <div class="">
             <div class="country-hotels__counter">
               Нашли отелей: <?= (int) count($hotels); ?>

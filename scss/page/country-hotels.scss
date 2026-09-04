@@ -62,3 +62,179 @@
     color: $red;
   }
 }
+
+/* Каталог отелей из хаба BSIHOTELS */
+
+.country-hotels__api {
+  margin-top: 16px;
+}
+
+.country-hotels__message {
+  margin-top: 24px;
+}
+
+.country-hotels__message-debug {
+  margin-top: 8px;
+  color: #8a8a8a;
+  font-size: 14px;
+}
+
+.country-resorts-filter {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.country-resorts-filter__item {
+  padding: 6px 12px;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 130%;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+
+  &.is-active {
+    background: $bg-gray;
+  }
+}
+
+.country-resorts-filter__count {
+  margin-left: 4px;
+  color: #8a8a8a;
+}
+
+.country-hotels__resort-title {
+  margin-top: 32px;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.country-hotels__grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px 16px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.api-hotel {
+  display: flex;
+  flex-direction: column;
+}
+
+.api-hotel__media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+  background: $bg-gray;
+}
+
+.api-hotel__media-link {
+  display: block;
+  height: 100%;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+}
+
+.api-hotel__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.api-hotel__media-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a5a5a5;
+  font-size: 14px;
+}
+
+.api-hotel__body {
+  margin-top: 12px;
+}
+
+.api-hotel__title {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 130%;
+
+  a {
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
+
+.api-hotel__stars {
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.api-hotel__city {
+  margin-top: 4px;
+  color: #6b6b6b;
+  font-size: 14px;
+}
+
+.api-hotel__footer {
+  margin-top: 8px;
+}
+
+.api-hotel__price {
+  font-weight: 700;
+}
+
+.api-hotel__price--empty {
+  font-weight: 400;
+  color: #6b6b6b;
+  font-size: 14px;
+}
+
+.country-resorts-filter__more {
+  summary {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  &[open] summary {
+    background: $bg-gray;
+  }
+}
+
+.country-resorts-filter__tail {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

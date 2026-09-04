@@ -96,3 +96,32 @@ function bsi_hotels_api_enabled_for_country(int $country_id): bool
 {
   return bsi_hotels_api_country_slug($country_id) !== '';
 }
+
+/**
+ * Цена за ночь из хаба. Валюта — контракта поставщика, без нашего курса
+ * и наценки, поэтому показываем её как есть.
+ */
+function bsi_hotels_api_format_price($price): string
+{
+  if (!is_array($price) || !isset($price['amount'])) {
+    return '';
+  }
+
+  $amount = (float) $price['amount'];
+  if ($amount <= 0) {
+    return '';
+  }
+
+  $symbols = ['USD' => '$', 'EUR' => '€', 'RUB' => '₽'];
+  $currency = (string) ($price['currency'] ?? '');
+
+  return number_format($amount, 0, ',', ' ') . ' ' . ($symbols[$currency] ?? $currency);
+}
+
+/**
+ * Ссылка на каталог отелей страны: /country/{slug}/hotel/
+ */
+function bsi_hotels_api_catalog_url(WP_Post $country): string
+{
+  return home_url('/country/' . $country->post_name . '/hotel/');
+}
