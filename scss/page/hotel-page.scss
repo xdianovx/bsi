@@ -130,6 +130,23 @@
     }
   }
 
+  &__rooms-link {
+    align-self: flex-end;
+    font-size: 14px;
+    color: $text-black;
+    border-bottom: 1px solid $gray-light;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+      border-color: transparent;
+    }
+
+    @media (max-width: 900px) {
+      align-self: flex-start;
+    }
+  }
+
   &__print {
     align-self: flex-end;
     white-space: nowrap;

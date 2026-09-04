@@ -92,6 +92,10 @@ $amenities = array_slice($view['amenities'], 0, 8);
           <a class="btn btn-accent hp-head__cta" href="#hotel-request">Уточнить цену</a>
         <?php endif; ?>
 
+        <?php if ($view['booking'] && $view['rooms']): ?>
+          <a class="hp-head__rooms-link" href="#hotel-rooms">Смотреть номера и цены</a>
+        <?php endif; ?>
+
         <?php if ($view['pdf_modal']): ?>
           <button class="print-btn hp-head__print" data-micromodal-trigger="<?= esc_attr($view['pdf_modal']); ?>" type="button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>

@@ -54,7 +54,11 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
   $view['name'] = (string) ($hotel['name'] ?? '');
   $view['stars'] = (int) ($hotel['stars'] ?? 0);
   $view['address'] = (string) ($hotel['address'] ?? '');
-  $view['booking_url'] = (string) ($hotel['booking'] ?? '');
+  $view['booking_url'] = bsi_hotel_view_booking_url($hotel['booking'] ?? null);
+
+  if ($view['booking_url'] !== '') {
+    $view['booking'][] = ['label' => 'Бронирование отеля', 'url' => $view['booking_url']];
+  }
 
   $view['place'][] = [
     'label' => get_the_title($country),
@@ -129,6 +133,25 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
 }
 
 /**
+ * Ссылка на бронирование из хаба.
+ *
+ * Хаб отдаёт её объектом `{provider, url}` — у карточки отеля (без дат) и у номера.
+ * Строку тоже принимаем: так поле выглядело в ранних ответах.
+ */
+function bsi_hotel_view_booking_url($booking): string
+{
+  if (is_string($booking)) {
+    return trim($booking);
+  }
+
+  if (is_array($booking)) {
+    return trim((string) ($booking['url'] ?? ''));
+  }
+
+  return '';
+}
+
+/**
  * Факты отеля из хаба: расстояния, линия пляжа, время заезда.
  */
 function bsi_hotel_view_api_facts(array $hotel): array
@@ -199,7 +222,7 @@ function bsi_hotel_view_api_rooms(array $hotel): array
       'photos' => $photos,
       'offers' => $offers,
       'price_from' => bsi_hotel_view_offers_min($offers),
-      'booking_url' => (string) ($room['booking'] ?? ''),
+      'booking_url' => bsi_hotel_view_booking_url($room['booking'] ?? null),
     ];
   }
 
@@ -235,7 +258,7 @@ function bsi_hotel_view_api_offers(array $room): array
       'price' => $price,
       'currency' => (string) ($offer['currency'] ?? ''),
       'status' => bsi_hotel_view_offer_status($offer['available'] ?? null),
-      'booking_url' => (string) ($offer['booking'] ?? ''),
+      'booking_url' => bsi_hotel_view_booking_url($offer['booking'] ?? null),
     ];
   }
 
