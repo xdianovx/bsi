@@ -44,6 +44,9 @@ get_header();
   ?>
   <!-- <?= get_template_part('template-parts/sections/features') ?> -->
   <?= get_template_part('template-parts/hotels/popular') ?>
+
+  <?php /* Подборка отелей из хаба BSIHOTELS, задаётся в «Подборка отелей» */ ?>
+  <?php get_template_part('template-parts/hotels/api-selection'); ?>
   <?= get_template_part('template-parts/news/news-slider') ?>
   <?= get_template_part('template-parts/partners/partners-slider') ?>
   <?= get_template_part('template-parts/sections/subscribe') ?>

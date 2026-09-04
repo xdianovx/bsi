@@ -440,6 +440,7 @@ require_once get_template_directory() . '/inc/samo/ajax/routes.php';
 
 require get_template_directory() . '/custom-fields/hotel-fields.php';
 require get_template_directory() . '/custom-fields/country-hotels-api.php';
+require get_template_directory() . '/custom-fields/hotels-api-selection.php';
 require get_template_directory() . '/custom-fields/news.php';
 require get_template_directory() . '/custom-fields/promo.php';
 require get_template_directory() . '/custom-fields/content-schedule.php';
