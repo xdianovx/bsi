@@ -123,8 +123,8 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
   $lat = $hotel['lat'] ?? null;
   $lng = $hotel['lng'] ?? null;
   if ($lat !== null && $lng !== null && (float) $lat !== 0.0) {
-    // 16 — уровень улиц и зданий: видно сам отель и что вокруг него.
-    $view['map'] = ['lat' => (float) $lat, 'lng' => (float) $lng, 'zoom' => 16];
+    // 18 — вплотную к зданию отеля.
+    $view['map'] = ['lat' => (float) $lat, 'lng' => (float) $lng, 'zoom' => 18];
   }
 
   $view['rooms'] = bsi_hotel_view_api_rooms($hotel);
@@ -175,28 +175,55 @@ function bsi_hotel_view_api_facts(array $hotel): array
       continue;
     }
     $facts[] = [
+      'kind' => 'distance',
+      'icon' => '', // иконку расстояния ждём от хаба
       'label' => $labels[$key] ?? $key,
-      'value' => number_format((int) $meters, 0, ',', ' ') . ' м',
+      'value' => bsi_hotel_view_distance((int) $meters),
     ];
   }
 
   if (!empty($hotel['beach_line'])) {
-    $facts[] = ['label' => 'Линия пляжа', 'value' => (string) (int) $hotel['beach_line']];
+    $facts[] = ['kind' => 'distance', 'icon' => '', 'label' => 'Линия пляжа', 'value' => (string) (int) $hotel['beach_line']];
   }
 
   if (!empty($hotel['check_in_time'])) {
-    $facts[] = ['label' => 'Заезд', 'value' => (string) $hotel['check_in_time']];
+    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Заезд', 'value' => (string) $hotel['check_in_time']];
   }
 
   if (!empty($hotel['check_out_time'])) {
-    $facts[] = ['label' => 'Выезд', 'value' => (string) $hotel['check_out_time']];
+    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Выезд', 'value' => (string) $hotel['check_out_time']];
   }
 
   if (!empty($hotel['adults_only'])) {
-    $facts[] = ['label' => 'Только для взрослых', 'value' => 'да'];
+    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Только для взрослых', 'value' => 'да'];
   }
 
   return $facts;
+}
+
+/**
+ * Расстояние человеческим языком: до километра — метры, дальше километры.
+ */
+function bsi_hotel_view_distance(int $meters): string
+{
+  if ($meters < 1000) {
+    return number_format($meters, 0, ',', ' ') . ' м';
+  }
+
+  $km = $meters / 1000;
+
+  return rtrim(rtrim(number_format($km, 1, ',', ' '), '0'), ',') . ' км';
+}
+
+/**
+ * Факты одного вида: 'distance' — расстояния, 'note' — правила заселения.
+ */
+function bsi_hotel_view_facts_of(array $facts, string $kind): array
+{
+  return array_values(array_filter(
+    $facts,
+    static fn(array $fact) => ($fact['kind'] ?? 'note') === $kind
+  ));
 }
 
 /**
@@ -496,7 +523,11 @@ function bsi_hotel_view_nav(array $view): array
     $nav[] = ['id' => 'hotel-amenities', 'label' => 'Удобства'];
   }
 
-  if ($view['facts']) {
+  if (bsi_hotel_view_facts_of($view['facts'], 'distance')) {
+    $nav[] = ['id' => 'hotel-distances', 'label' => 'Расстояния'];
+  }
+
+  if (bsi_hotel_view_facts_of($view['facts'], 'note')) {
     $nav[] = ['id' => 'hotel-facts', 'label' => 'Важно знать'];
   }
 
@@ -753,7 +784,12 @@ function bsi_hotel_view_post_facts(int $post_id): array
   ] as $field => $label) {
     $value = trim((string) get_field($field, $post_id));
     if ($value !== '') {
-      $facts[] = ['label' => $label, 'value' => $value];
+      $facts[] = [
+        'kind' => 'note',
+        'icon' => '',
+        'label' => $label,
+        'value' => $value,
+      ];
     }
   }
 
@@ -763,7 +799,7 @@ function bsi_hotel_view_post_facts(int $post_id): array
   ] as $field => $label) {
     $value = bsi_hotel_view_month_year(trim((string) get_field($field, $post_id)));
     if ($value !== '') {
-      $facts[] = ['label' => $label, 'value' => $value];
+      $facts[] = ['kind' => 'note', 'icon' => '', 'label' => $label, 'value' => $value];
     }
   }
 
@@ -774,7 +810,12 @@ function bsi_hotel_view_post_facts(int $post_id): array
       $value = trim((string) get_sub_field('value'));
 
       if ($key !== '' || $value !== '') {
-        $facts[] = ['label' => $key, 'value' => $value];
+        $facts[] = [
+          'kind' => 'distance',
+          'icon' => '',
+          'label' => $key,
+          'value' => $value,
+        ];
       }
     }
   }
@@ -928,6 +969,6 @@ function bsi_hotel_view_post_map(int $post_id): ?array
   return [
     'lat' => (float) $lat,
     'lng' => (float) $lng,
-    'zoom' => max(1, min(17, (int) (get_field('map_zoom', $post_id) ?: 16))),
+    'zoom' => max(1, min(19, (int) (get_field('map_zoom', $post_id) ?: 18))),
   ];
 }
