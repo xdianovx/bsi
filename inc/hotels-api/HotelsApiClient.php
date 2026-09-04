@@ -4,18 +4,26 @@
  * Клиент публичного API BSIHOTELS (хаб отелей).
  *
  * Читает только: список отелей, карточку, справочники стран/городов/удобств.
- * Токена нет. Ответы кешируются в transients — холодная карточка на стороне API
- * тянет цены у поставщика и отвечает медленно.
+ * Токена нет. Своего кеша нет — хаб кеширует сам, и его ответ всегда свежее
+ * нашей копии.
  */
 class HotelsApiClient
 {
   private string $baseUrl;
   private int $timeout;
 
-  /** Сколько живёт кеш ответа, секунды. */
-  private const CACHE_LIST = 10 * MINUTE_IN_SECONDS;
-  private const CACHE_HOTEL = 30 * MINUTE_IN_SECONDS;
-  private const CACHE_DICT = HOUR_IN_SECONDS;
+  /**
+   * Своего кеша нет: 0 — не кешировать.
+   *
+   * Хаб держит собственный кэш и отвечает на тёплых данных за десятки
+   * миллисекунд, а цены обновляет по спросу. Второй слой кеша поверх только
+   * добавлял бы ценам возраст и показывал бы не то, что в хабе.
+   *
+   * Значения меняются фильтром bsi_hotels_api_cache_ttl.
+   */
+  private const CACHE_LIST = 0;
+  private const CACHE_HOTEL = 0;
+  private const CACHE_DICT = 0;
 
   /** Версия ключа кеша: поднять, если поменялась форма ответа. */
   private const CACHE_VERSION = 'v1';
@@ -99,11 +107,21 @@ class HotelsApiClient
       $url .= '?' . http_build_query($params);
     }
 
+    /**
+     * Время жизни кеша конкретного запроса.
+     *
+     * @param int $ttl секунды; 0 — не кешировать
+     * @param string $path путь запроса
+     */
+    $ttl = (int) apply_filters('bsi_hotels_api_cache_ttl', $ttl, $path, $params);
+
     $cacheKey = 'bsi_hotels_' . self::CACHE_VERSION . '_' . md5($url);
 
-    $cached = get_transient($cacheKey);
-    if (is_array($cached)) {
-      return $cached;
+    if ($ttl > 0) {
+      $cached = get_transient($cacheKey);
+      if (is_array($cached)) {
+        return $cached;
+      }
     }
 
     $response = wp_remote_get($url, [
@@ -130,7 +148,9 @@ class HotelsApiClient
       throw new HotelsApiException('Некорректный JSON от API', 0);
     }
 
-    set_transient($cacheKey, $data, $ttl);
+    if ($ttl > 0) {
+      set_transient($cacheKey, $data, $ttl);
+    }
 
     return $data;
   }
