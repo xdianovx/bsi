@@ -394,6 +394,7 @@ require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
 require get_template_directory() . '/inc/admin/auto-slug-on-title-change.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
+require get_template_directory() . '/inc/hotel-page/view.php';
 require get_template_directory() . '/inc/hotels-api/functions.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/disable-comments.php';
@@ -494,6 +495,7 @@ require get_template_directory() . '/inc/requests/tours-filter.php';
 require get_template_directory() . '/inc/requests/excursions-filter.php';
 require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
 require get_template_directory() . '/inc/requests/ajax-tour-booking.php';
+require get_template_directory() . '/inc/requests/ajax-hotel-request.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
 add_filter('template_include', function ($template) {

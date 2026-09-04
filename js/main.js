@@ -42,6 +42,12 @@ import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
 import { initMaps } from "./modules/maps";
+import {
+  initHotelOffers,
+  initHotelNav,
+  initHotelAmenities,
+} from "./modules/hotel-offers";
+import { initHotelRequestForm } from "./modules/forms/hotel-request-form";
 import { EducationCurrencySwitcher } from "./modules/education-currency-switcher";
 
 import { initCookieConsent } from "./modules/cookie-consent";
@@ -111,6 +117,10 @@ window.addEventListener("DOMContentLoaded", () => {
   if (datepick) {
   }
   initAccordion();
+  initHotelOffers();
+  initHotelNav();
+  initHotelAmenities();
+  initHotelRequestForm();
   initCurrency();
   tabs(".tabs", ".tab-button", ".tab-content__item");
   sliders();

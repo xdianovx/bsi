@@ -1567,14 +1567,131 @@ get_template_part('template-parts/hotels/room-card');
       </article>
     </div>
 
-    <h3>Карточка номера на странице отеля</h3>
-    <div class="api-hotel-page__rooms">
-      <article class="api-room">
-        <h3 class="api-room__title">Economy room</h3>
-        <p class="api-room__meta">18 м², до 2 гостей</p>
-        <p class="api-room__price">от 44 € за ночь</p>
+  </section>
+
+  <!-- ============ HOTEL PAGE (hp-*) ============ -->
+  <section class="uikit-section" id="hotel-page">
+    <h2>Страница отеля (hp-*)</h2>
+    <p class="uikit-section__hint">
+      Общая вёрстка страницы отеля для двух источников: пост WordPress (<code>single-hotel.php</code>) и карточка хаба
+      BSIHOTELS (<code>country-hotel-api.php</code>). Оба шаблона собирают view-модель
+      (<code>inc/hotel-page/view.php</code>) и отдают её партиалам <code>template-parts/hotel-page/*</code>.
+      Стили — <code>scss/page/hotel-page.scss</code>, поведение — <code>js/modules/hotel-offers.js</code>.
+      Секции, для которых нет данных, не выводятся: страница честно сжимается до «шапка + номера».
+    </p>
+
+    <h3>Панель подбора тарифов (hp-search)</h3>
+    <form class="hp-search">
+      <label class="hp-search__field">
+        <span class="hp-search__label">Заезд</span>
+        <select class="hp-search__select">
+          <option>12 сентября, сб</option>
+        </select>
+      </label>
+      <label class="hp-search__field">
+        <span class="hp-search__label">Длительность</span>
+        <select class="hp-search__select">
+          <option>7 ночей</option>
+        </select>
+      </label>
+      <label class="hp-search__field">
+        <span class="hp-search__label">Питание</span>
+        <select class="hp-search__select">
+          <option>Любое</option>
+        </select>
+      </label>
+      <p class="hp-search__note">Найдено тарифов: 25</p>
+    </form>
+
+    <h3>Номер с тарифами (hp-room + hp-offer)</h3>
+    <div class="hp-rooms__list">
+      <article class="hp-room">
+        <div class="hp-room__info">
+          <span class="hp-room__photo hp-room__photo--empty">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11h20v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="M6 11V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </span>
+          <div class="hp-room__text">
+            <h3 class="hp-room__title">Overwater Villa</h3>
+            <ul class="hp-room__meta">
+              <li>120 м²</li>
+              <li>до 3 гостей</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="hp-room__offers">
+          <div class="hp-offer">
+            <div class="hp-offer__terms">
+              <span class="hp-offer__meal">Завтрак и ужин</span>
+              <span class="hp-offer__placement">2 взрослых</span>
+              <span class="hp-offer__badge">под запрос</span>
+            </div>
+            <div class="hp-offer__price">
+              <b>1 515 $</b>
+              <span>3 ночи</span>
+            </div>
+            <a class="btn btn-accent sm hp-offer__cta" href="#">Забронировать</a>
+          </div>
+
+          <div class="hp-offer">
+            <div class="hp-offer__terms">
+              <span class="hp-offer__meal">Всё включено</span>
+              <span class="hp-offer__placement">2 взрослых</span>
+            </div>
+            <div class="hp-offer__price">
+              <b>2 267 $</b>
+              <span>3 ночи</span>
+            </div>
+            <a class="btn btn-white sm hp-offer__cta" href="#">Оставить заявку</a>
+          </div>
+
+          <button class="btn-expand hp-room__more" type="button">Ещё 9 тарифов</button>
+        </div>
+      </article>
+
+      <article class="hp-room is-empty">
+        <div class="hp-room__info">
+          <div class="hp-room__text">
+            <h3 class="hp-room__title">Beach Villa</h3>
+            <ul class="hp-room__meta">
+              <li>до 2 гостей</li>
+            </ul>
+          </div>
+        </div>
+        <div class="hp-room__offers">
+          <p class="hp-room__empty">На выбранные даты мест нет</p>
+        </div>
       </article>
     </div>
+
+    <h3>Липкая навигация по секциям (hp-nav)</h3>
+    <nav class="hp-nav" style="position:static">
+      <ul class="hp-nav__list">
+        <li><a class="hp-nav__link is-active" href="#hotel-page">Номера и цены</a></li>
+        <li><a class="hp-nav__link" href="#hotel-page">Об отеле</a></li>
+        <li><a class="hp-nav__link" href="#hotel-page">Удобства</a></li>
+        <li><a class="hp-nav__link" href="#hotel-page">На карте</a></li>
+      </ul>
+    </nav>
+
+    <h3>Теги удобств в шапке (hp-tag)</h3>
+    <ul class="hp-head__tags">
+      <li class="hp-tag">Собственный пляж</li>
+      <li class="hp-tag">Бассейн</li>
+      <li class="hp-tag hp-tag--more"><a href="#hotel-page">Ещё 6</a></li>
+    </ul>
+
+    <h3>Факты (hp-facts)</h3>
+    <ul class="hp-facts__list">
+      <li class="hp-facts__item">
+        <span class="hp-facts__label">До пляжа</span>
+        <b class="hp-facts__value">50 м</b>
+      </li>
+      <li class="hp-facts__item">
+        <span class="hp-facts__label">Заезд</span>
+        <b class="hp-facts__value">14:00</b>
+      </li>
+    </ul>
   </section>
 
   <p style="text-align:center;color:var(--uikit-muted);font-size:13px;margin:40px 0 20px">
