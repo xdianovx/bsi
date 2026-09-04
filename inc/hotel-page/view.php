@@ -34,6 +34,7 @@ function bsi_hotel_view_defaults(): array
     'rooms' => [],          // см. bsi_hotel_view_room()
     'sections' => [],       // [['id' => '', 'title' => '', 'html' => ''], ...]
     'map' => null,          // ['lat' => float, 'lng' => float, 'zoom' => int]
+    'location_note' => '',  // текст о расположении; выводится в секции с картой
     'back' => null,         // ['url' => '', 'label' => '']
     'pdf_modal' => '',      // id модалки печати, если она есть у источника
   ];
@@ -102,18 +103,15 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
     ];
   }
 
-  foreach ([
-    'location_note' => 'Расположение',
-    'transfer_note' => 'Трансфер',
-  ] as $key => $title) {
-    if (!empty($hotel[$key])) {
-      $view['sections'][] = [
-        'id' => 'hotel-' . str_replace('_', '-', $key),
-        'title' => $title,
-        'html' => wpautop(esc_html((string) $hotel[$key])),
-      ];
-    }
+  if (!empty($hotel['transfer_note'])) {
+    $view['sections'][] = [
+      'id' => 'hotel-transfer',
+      'title' => 'Трансфер',
+      'html' => wpautop(esc_html((string) $hotel['transfer_note'])),
+    ];
   }
+
+  $view['location_note'] = (string) ($hotel['location_note'] ?? '');
 
   $lat = $hotel['lat'] ?? null;
   $lng = $hotel['lng'] ?? null;
@@ -494,8 +492,8 @@ function bsi_hotel_view_nav(array $view): array
     $nav[] = ['id' => 'hotel-facts', 'label' => 'Важно знать'];
   }
 
-  if ($view['map']) {
-    $nav[] = ['id' => 'hotel-map', 'label' => 'На карте'];
+  if ($view['map'] || trim((string) $view['location_note']) !== '') {
+    $nav[] = ['id' => 'hotel-location', 'label' => 'Расположение'];
   }
 
   $nav[] = ['id' => 'hotel-request', 'label' => 'Заявка'];

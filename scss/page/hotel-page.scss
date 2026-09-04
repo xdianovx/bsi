@@ -790,7 +790,12 @@ $hp-nav-offset: 76px;
   }
 }
 
-.hp-map {
+.hp-location {
+  &__note {
+    max-width: 900px;
+    margin-bottom: 16px;
+  }
+
   &__canvas {
     width: 100%;
     height: 400px;

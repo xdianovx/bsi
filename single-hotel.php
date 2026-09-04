@@ -29,7 +29,7 @@ get_header();
   get_template_part('template-parts/hotel-page/amenities', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/facts', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/contacts', null, ['view' => $view]);
-  get_template_part('template-parts/hotel-page/map', null, ['view' => $view]);
+  get_template_part('template-parts/hotel-page/location', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/request', null, ['view' => $view]);
   ?>
 
