@@ -121,9 +121,20 @@ get_header(); ?>
           : 'в';
         ?>
 
+        <?php
+        // На странице курорта заголовок про курорт: «Отели в Стамбуле».
+        $hotels_resort = $hotels_from_api
+          ? bsi_hotels_api_current_resort((int) $country->ID)
+          : null;
+
+        $hotels_h1 = $hotels_resort
+          ? 'Отели: ' . $hotels_resort['name'] . ', ' . $country->post_title
+          : 'Отели ' . $hotels_prep . ' ' . $hotels_country;
+        ?>
+
         <div class="page-country__content">
           <h1 class="h1 country-hotels__title">
-            Отели <?= esc_html($hotels_prep . ' ' . $hotels_country); ?>
+            <?= esc_html($hotels_h1); ?>
           </h1>
 
           <?php if ($hotels_from_api): ?>

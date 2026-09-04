@@ -142,5 +142,43 @@ function bsi_hotels_api_hotel_is_thin(array $hotel): bool
     return false;
   }
 
+  // Номера — уже содержание: цены к ним подтянутся при первом обращении,
+  // хаб держит их pull-through кэшем и наполняет по спросу.
+  if (!empty($hotel['room_types'])) {
+    return false;
+  }
+
   return bsi_hotels_api_min_rate($hotel) === null;
+}
+
+/**
+ * Курорт, которого нет в хабе, не должен отдавать пустую страницу с кодом 200 —
+ * иначе в индекс попадают адреса вида /hotel/kurort/чтоугодно/.
+ */
+add_action('template_redirect', 'bsi_hotels_api_validate_resort', 6);
+function bsi_hotels_api_validate_resort(): void
+{
+  $slug = sanitize_title((string) get_query_var('country_hotel_resort'));
+  if ($slug === '') {
+    return;
+  }
+
+  $country_slug = (string) get_query_var('country_hotels');
+  $country = $country_slug !== '' ? get_page_by_path($country_slug, OBJECT, 'country') : null;
+
+  if (!$country instanceof WP_Post) {
+    return;
+  }
+
+  if (bsi_hotels_api_current_resort((int) $country->ID) !== null) {
+    return;
+  }
+
+  global $wp_query;
+  $wp_query->set_404();
+  status_header(404);
+  nocache_headers();
+
+  include get_404_template();
+  exit;
 }

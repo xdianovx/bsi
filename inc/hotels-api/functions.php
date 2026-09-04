@@ -3,6 +3,8 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/HotelsApiClient.php';
 require_once __DIR__ . '/hotel-page.php';
+require_once __DIR__ . '/seo.php';
+require_once __DIR__ . '/sitemap.php';
 
 /**
  * Общий экземпляр клиента. null, если API не настроен.
@@ -125,4 +127,97 @@ function bsi_hotels_api_format_price($price): string
 function bsi_hotels_api_catalog_url(WP_Post $country): string
 {
   return home_url('/country/' . $country->post_name . '/hotel/');
+}
+
+/**
+ * Адрес каталога по курорту: /country/{страна}/hotel/kurort/{курорт}/
+ */
+function bsi_hotels_api_resort_url(string $catalog_url, string $resort_slug): string
+{
+  return trailingslashit($catalog_url) . 'kurort/' . $resort_slug . '/';
+}
+
+/**
+ * Курорт текущего запроса: слаг и название из хаба.
+ * Название нужно заголовку и мета-тегам, поэтому берётся из справочника.
+ *
+ * @return array{slug: string, name: string}|null
+ */
+function bsi_hotels_api_current_resort(int $country_id): ?array
+{
+  $slug = sanitize_title((string) get_query_var('country_hotel_resort'));
+  if ($slug === '') {
+    return null;
+  }
+
+  $api_country = bsi_hotels_api_country_slug($country_id);
+  $client = bsi_hotels_api();
+
+  if ($api_country === '' || !$client) {
+    return null;
+  }
+
+  try {
+    foreach ($client->cities($api_country) as $city) {
+      if (($city['slug'] ?? '') === $slug) {
+        return ['slug' => $slug, 'name' => (string) ($city['name'] ?? $slug)];
+      }
+    }
+  } catch (HotelsApiException $e) {
+    return null;
+  }
+
+  return null;
+}
+
+/**
+ * Список отелей для текущего запроса каталога. Результат мемоизируется:
+ * его читают и шаблон, и мета-теги в wp_head, которые собираются раньше.
+ *
+ * @return array{list: array, resorts: array, error: string, per_page: int, resort: string}
+ */
+function bsi_hotels_api_catalog_query(WP_Post $country): array
+{
+  static $cache = [];
+
+  $paged = max(1, (int) get_query_var('paged'));
+  $resort = sanitize_title((string) get_query_var('country_hotel_resort'));
+  $key = $country->ID . ':' . $paged . ':' . $resort;
+
+  if (isset($cache[$key])) {
+    return $cache[$key];
+  }
+
+  $per_page = 24;
+  $result = [
+    'list' => ['items' => [], 'total' => 0, 'page' => $paged, 'limit' => $per_page, 'pages' => 0],
+    'resorts' => [],
+    'error' => '',
+    'per_page' => $per_page,
+    'resort' => $resort,
+  ];
+
+  $api_country = bsi_hotels_api_country_slug((int) $country->ID);
+  $client = bsi_hotels_api();
+
+  if ($api_country === '' || !$client) {
+    return $cache[$key] = $result;
+  }
+
+  try {
+    $result['list'] = $client->hotels(array_filter([
+      'country' => $api_country,
+      'city' => $resort,
+      'page' => $paged,
+      'limit' => $per_page,
+      'sort' => 'name',
+      'order' => 'asc',
+    ]));
+
+    $result['resorts'] = $client->cities($api_country);
+  } catch (HotelsApiException $e) {
+    $result['error'] = $e->getMessage();
+  }
+
+  return $cache[$key] = $result;
 }

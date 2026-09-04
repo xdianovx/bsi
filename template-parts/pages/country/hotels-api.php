@@ -11,34 +11,16 @@ if (!$country instanceof WP_Post) {
   return;
 }
 
-$api_country = bsi_hotels_api_country_slug((int) $country->ID);
-$client = bsi_hotels_api();
 $catalog_url = bsi_hotels_api_catalog_url($country);
 
+$catalog = bsi_hotels_api_catalog_query($country);
+
+$list = $catalog['list'];
+$resorts = $catalog['resorts'];
+$error = $catalog['error'];
+$resort = $catalog['resort'];
+$per_page = $catalog['per_page'];
 $paged = max(1, (int) get_query_var('paged'));
-$per_page = 24;
-
-// Фильтр по курорту — слаг города из хаба.
-$resort = sanitize_title((string) ($_GET['kurort'] ?? ''));
-
-$error = '';
-$list = ['items' => [], 'total' => 0, 'pages' => 0];
-$resorts = [];
-
-try {
-  $list = $client->hotels(array_filter([
-    'country' => $api_country,
-    'city' => $resort,
-    'page' => $paged,
-    'limit' => $per_page,
-    'sort' => 'name',
-    'order' => 'asc',
-  ]));
-
-  $resorts = $client->cities($api_country);
-} catch (HotelsApiException $e) {
-  $error = $e->getMessage();
-}
 
 $resort_name = '';
 foreach ($resorts as $city) {
@@ -94,7 +76,7 @@ foreach ($resorts as $city) {
       printf(
         '<a class="country-resorts-filter__item%s" href="%s">%s <span class="country-resorts-filter__count">%d</span></a>',
         $resort === $city_slug ? ' is-active' : '',
-        esc_url(add_query_arg('kurort', $city_slug, $catalog_url)),
+        esc_url(bsi_hotels_api_resort_url($catalog_url, $city_slug)),
         esc_html((string) ($city['name'] ?? $city_slug)),
         (int) ($city['hotels'] ?? 0)
       );
@@ -118,10 +100,6 @@ foreach ($resorts as $city) {
     </nav>
   <?php endif; ?>
 
-  <?php if ($resort_name !== ''): ?>
-    <h2 class="country-hotels__resort-title">Курорт <?= esc_html($resort_name); ?></h2>
-  <?php endif; ?>
-
   <div class="country-hotels__grid">
     <?php foreach ($list['items'] as $hotel): ?>
       <?php get_template_part('template-parts/hotels/api-card', null, [
@@ -136,11 +114,10 @@ foreach ($resorts as $city) {
       <?php
       echo paginate_links([
         /* %_% → format: первая страница остаётся без /page/1/. */
-        'base' => $catalog_url . '%_%',
+        'base' => ($resort !== '' ? bsi_hotels_api_resort_url($catalog_url, $resort) : $catalog_url) . '%_%',
         'format' => 'page/%#%/',
         'total' => (int) $list['pages'],
         'current' => $paged,
-        'add_args' => $resort !== '' ? ['kurort' => $resort] : false,
         'prev_text' => 'Назад',
         'next_text' => 'Вперёд',
         'mid_size' => 2,
