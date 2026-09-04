@@ -321,15 +321,15 @@ function bsi_hotels_api_seo_itemlist_schema(): void
 
   $list = [];
   foreach (array_values($items) as $i => $hotel) {
-    $slug = (string) ($hotel['slug'] ?? '');
-    if ($slug === '') {
+    $url = bsi_hotels_api_hotel_url($catalog_url, $hotel);
+    if ($url === '') {
       continue;
     }
 
     $list[] = [
       '@type' => 'ListItem',
       'position' => $offset + $i + 1,
-      'url' => trailingslashit($catalog_url) . $slug . '/',
+      'url' => $url,
       'name' => (string) ($hotel['name'] ?? ''),
     ];
   }

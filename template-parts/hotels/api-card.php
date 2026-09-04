@@ -13,8 +13,7 @@ if (!is_array($hotel) || empty($hotel['name'])) {
   return;
 }
 
-$slug = (string) ($hotel['slug'] ?? '');
-$url = $slug !== '' && $country_url !== '' ? trailingslashit($country_url) . $slug . '/' : '';
+$url = $country_url !== '' ? bsi_hotels_api_hotel_url($country_url, $hotel) : '';
 $photo = (string) ($hotel['photo'] ?? '');
 $stars = (int) ($hotel['stars'] ?? 0);
 $city = (string) ($hotel['city']['name'] ?? '');

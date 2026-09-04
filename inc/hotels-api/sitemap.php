@@ -166,13 +166,14 @@ function bsi_hotels_api_sitemap_urls(): array
           'sort' => 'id',
         ]);
 
-        foreach ($list['items'] as $hotel) {
-          $slug = (string) ($hotel['slug'] ?? '');
-          if ($slug !== '' && (int) ($hotel['room_types'] ?? 0) > 0) {
-            $urls[] = [
-              'loc' => trailingslashit($catalog_url) . $slug . '/',
-              'changefreq' => 'weekly',
-            ];
+        foreach (bsi_hotels_api_filter_items($list['items']) as $hotel) {
+          if ((int) ($hotel['room_types'] ?? 0) <= 0) {
+            continue;
+          }
+
+          $url = bsi_hotels_api_hotel_url($catalog_url, $hotel);
+          if ($url !== '') {
+            $urls[] = ['loc' => $url, 'changefreq' => 'weekly'];
           }
         }
 

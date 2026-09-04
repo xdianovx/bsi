@@ -259,3 +259,26 @@ function bsi_hotels_api_filter_items(array $items): array
     static fn($hotel) => is_array($hotel) && !bsi_hotels_api_is_service_record($hotel)
   ));
 }
+
+/**
+ * Адрес карточки отеля. Слаг есть не у всех записей хаба, поэтому запасной
+ * ключ — числовой идентификатор: по нему API отдаёт ту же карточку.
+ */
+function bsi_hotels_api_hotel_key(array $hotel): string
+{
+  $slug = trim((string) ($hotel['slug'] ?? ''));
+  if ($slug !== '') {
+    return $slug;
+  }
+
+  $id = (int) ($hotel['id'] ?? 0);
+
+  return $id > 0 ? (string) $id : '';
+}
+
+function bsi_hotels_api_hotel_url(string $catalog_url, array $hotel): string
+{
+  $key = bsi_hotels_api_hotel_key($hotel);
+
+  return $key !== '' ? trailingslashit($catalog_url) . $key . '/' : '';
+}
