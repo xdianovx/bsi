@@ -116,7 +116,8 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
   $lat = $hotel['lat'] ?? null;
   $lng = $hotel['lng'] ?? null;
   if ($lat !== null && $lng !== null && (float) $lat !== 0.0) {
-    $view['map'] = ['lat' => (float) $lat, 'lng' => (float) $lng, 'zoom' => 14];
+    // 16 — уровень улиц и зданий: видно сам отель и что вокруг него.
+    $view['map'] = ['lat' => (float) $lat, 'lng' => (float) $lng, 'zoom' => 16];
   }
 
   $view['rooms'] = bsi_hotel_view_api_rooms($hotel);
@@ -883,6 +884,6 @@ function bsi_hotel_view_post_map(int $post_id): ?array
   return [
     'lat' => (float) $lat,
     'lng' => (float) $lng,
-    'zoom' => max(1, min(17, (int) (get_field('map_zoom', $post_id) ?: 14))),
+    'zoom' => max(1, min(17, (int) (get_field('map_zoom', $post_id) ?: 16))),
   ];
 }

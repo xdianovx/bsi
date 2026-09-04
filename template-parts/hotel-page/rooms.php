@@ -75,12 +75,8 @@ $payload = array_map(static function (array $room): array {
   <div class="container">
     <div class="hp-rooms__head">
       <h2 class="h2">Номера и цены</h2>
-      <?php if ($has_offers): ?>
-        <p class="hp-rooms__hint">
-          <?= $all_request
-            ? 'Цены туроператора, наличие мест менеджер подтверждает по запросу'
-            : 'Цены за размещение целиком, по данным туроператора'; ?>
-        </p>
+      <?php if ($has_offers && !$all_request): ?>
+        <p class="hp-rooms__hint">Цены за размещение целиком, по данным туроператора</p>
       <?php endif; ?>
     </div>
 
