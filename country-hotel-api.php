@@ -35,19 +35,13 @@ get_header();
 
 <main class="site-main">
 
-  <div id="breadcrumbs" class="breadcrumbs">
-    <div class="container">
-      <p>
-        <a href="<?= esc_url(home_url('/')); ?>">Главная</a>
-        <span class="breadcrumbs__sep">·</span>
-        <a href="<?= esc_url(get_permalink($country)); ?>"><?= esc_html(get_the_title($country)); ?></a>
-        <span class="breadcrumbs__sep">·</span>
-        <a href="<?= esc_url($catalog_url); ?>">Отели</a>
-        <span class="breadcrumbs__sep">·</span>
-        <span><?= esc_html($hotel['name']); ?></span>
-      </p>
-    </div>
-  </div>
+  <?php
+  /* Крошки — общим механизмом темы; цепочку подставляет
+     фильтр wpseo_breadcrumb_links в inc/hotels-api/seo.php. */
+  if (function_exists('yoast_breadcrumb')) {
+    yoast_breadcrumb('<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>', '</p></div></div>');
+  }
+  ?>
 
   <section>
     <div class="container">

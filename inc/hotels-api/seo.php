@@ -234,11 +234,16 @@ add_filter('wpseo_breadcrumb_links', function (array $links): array {
 
   $country = $hotel ? $hotel['country'] : $resort['country'];
 
-  $trail = [
-    ['url' => home_url('/'), 'text' => 'Главная'],
-    ['url' => get_permalink($country), 'text' => get_the_title($country)],
-    ['url' => bsi_hotels_api_catalog_url($country), 'text' => 'Отели'],
-  ];
+  $trail = [['url' => home_url('/'), 'text' => 'Главная']];
+
+  // «Страны» — как в остальных крошках сайта.
+  $countries_archive = get_post_type_archive_link('country');
+  if ($countries_archive) {
+    $trail[] = ['url' => $countries_archive, 'text' => 'Страны'];
+  }
+
+  $trail[] = ['url' => get_permalink($country), 'text' => get_the_title($country)];
+  $trail[] = ['url' => bsi_hotels_api_catalog_url($country), 'text' => 'Отели'];
 
   if ($hotel) {
     $trail[] = ['url' => bsi_hotels_api_seo_current_url(), 'text' => (string) $hotel['hotel']['name']];
