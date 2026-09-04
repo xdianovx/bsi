@@ -29,7 +29,7 @@ function bsi_hotel_view_defaults(): array
     'booking' => [],        // [['label' => '', 'url' => ''], ...] — кнопки брони
     'contacts' => [],       // ['phone' => '', 'address' => '', 'website' => '']
     'photos' => [],         // [['url' => '', 'caption' => ''], ...]
-    'amenities' => [],      // [['name' => '', 'icon' => ''], ...]
+    'amenities' => [],      // [['name' => '', 'icon' => '', 'group' => '', 'popular' => bool], ...]
     'facts' => [],          // [['label' => '', 'value' => ''], ...]
     'rooms' => [],          // см. bsi_hotel_view_room()
     'sections' => [],       // [['id' => '', 'title' => '', 'html' => ''], ...]
@@ -88,9 +88,16 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
 
   foreach ((array) ($hotel['amenities'] ?? []) as $amenity) {
     $name = (string) ($amenity['name'] ?? '');
-    if ($name !== '') {
-      $view['amenities'][] = ['name' => $name, 'icon' => ''];
+    if ($name === '') {
+      continue;
     }
+
+    $view['amenities'][] = [
+      'name' => $name,
+      'icon' => (string) ($amenity['icon'] ?? ''),
+      'group' => (string) ($amenity['group'] ?? ''),
+      'popular' => !empty($amenity['is_popular']),
+    ];
   }
 
   $view['facts'] = bsi_hotel_view_api_facts($hotel);
@@ -686,10 +693,47 @@ function bsi_hotel_view_post_amenities(int $post_id): array
     $amenities[] = [
       'name' => $term->name,
       'icon' => is_array($icon) && !empty($icon['url']) ? $icon['url'] : '',
+      'group' => '',
+      'popular' => false,
     ];
   }
 
   return $amenities;
+}
+
+/**
+ * Удобства по группам хаба («Пляж и бассейн», «Для детей»…). Без группы — в конец
+ * под общим заголовком, чтобы список не рассыпался.
+ *
+ * @return array<string, array> группа => удобства
+ */
+function bsi_hotel_view_amenity_groups(array $amenities): array
+{
+  $groups = [];
+
+  foreach ($amenities as $amenity) {
+    $group = trim((string) ($amenity['group'] ?? ''));
+    $groups[$group][] = $amenity;
+  }
+
+  // Безымянная группа всегда последняя.
+  if (isset($groups[''])) {
+    $rest = $groups[''];
+    unset($groups['']);
+    $groups[''] = $rest;
+  }
+
+  return $groups;
+}
+
+/**
+ * Удобства для шапки: сначала популярные, потом остальные.
+ */
+function bsi_hotel_view_popular_amenities(array $amenities, int $limit): array
+{
+  usort($amenities, static fn(array $a, array $b) => (int) !empty($b['popular']) <=> (int) !empty($a['popular']));
+
+  return array_slice($amenities, 0, $limit);
 }
 
 /**

@@ -12,7 +12,7 @@ if (!$view) {
 }
 
 $stars = (int) $view['stars'];
-$amenities = array_slice($view['amenities'], 0, 8);
+$amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
 ?>
 
 <section class="hp-head">

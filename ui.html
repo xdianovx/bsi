@@ -1675,11 +1675,29 @@ get_template_part('template-parts/hotels/room-card');
     </nav>
 
     <h3>Теги удобств в шапке (hp-tag)</h3>
+    <p class="uikit-section__hint">Первыми идут популярные удобства (флаг <code>is_popular</code> из хаба), иконка — SVG оттуда же.</p>
     <ul class="hp-head__tags">
       <li class="hp-tag">Собственный пляж</li>
       <li class="hp-tag">Бассейн</li>
       <li class="hp-tag hp-tag--more"><a href="#hotel-page">Ещё 6</a></li>
     </ul>
+
+    <h3>Удобства по группам (hp-amenities)</h3>
+    <div class="hp-amenities__groups">
+      <div class="hp-amenities__group">
+        <h3 class="hp-amenities__group-title">Пляж и бассейн</h3>
+        <ul class="hp-amenities__list">
+          <li class="hp-amenities__item">Собственный пляж</li>
+          <li class="hp-amenities__item">Бассейн</li>
+        </ul>
+      </div>
+      <div class="hp-amenities__group">
+        <h3 class="hp-amenities__group-title">Для детей</h3>
+        <ul class="hp-amenities__list">
+          <li class="hp-amenities__item">Детский клуб</li>
+        </ul>
+      </div>
+    </div>
 
     <h3>Факты (hp-facts)</h3>
     <ul class="hp-facts__list">
