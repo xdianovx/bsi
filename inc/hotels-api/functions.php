@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/HotelsApiClient.php';
+require_once __DIR__ . '/filters.php';
 require_once __DIR__ . '/hotel-page.php';
 require_once __DIR__ . '/seo.php';
 require_once __DIR__ . '/sitemap.php';
@@ -179,13 +180,18 @@ function bsi_hotels_api_current_resort(int $country_id): ?array
  *
  * @return array{list: array, resorts: array, error: string, per_page: int, resort: string}
  */
-function bsi_hotels_api_catalog_query(WP_Post $country, ?int $paged = null, ?string $resort = null): array
-{
+function bsi_hotels_api_catalog_query(
+  WP_Post $country,
+  ?int $paged = null,
+  ?string $resort = null,
+  ?array $filters = null
+): array {
   static $cache = [];
 
   $paged = max(1, $paged ?? (int) get_query_var('paged'));
   $resort = sanitize_title($resort ?? (string) get_query_var('country_hotel_resort'));
-  $key = $country->ID . ':' . $paged . ':' . $resort;
+  $filters = $filters ?? bsi_hotels_api_catalog_filters();
+  $key = $country->ID . ':' . $paged . ':' . $resort . ':' . md5(serialize($filters));
 
   if (isset($cache[$key])) {
     return $cache[$key];
@@ -198,6 +204,7 @@ function bsi_hotels_api_catalog_query(WP_Post $country, ?int $paged = null, ?str
     'error' => '',
     'per_page' => $per_page,
     'resort' => $resort,
+    'filters' => $filters,
   ];
 
   $api_country = bsi_hotels_api_country_slug((int) $country->ID);
@@ -208,14 +215,15 @@ function bsi_hotels_api_catalog_query(WP_Post $country, ?int $paged = null, ?str
   }
 
   try {
-    $result['list'] = $client->hotels(array_filter([
-      'country' => $api_country,
-      'city' => $resort,
-      'page' => $paged,
-      'limit' => $per_page,
-      'sort' => 'name',
-      'order' => 'asc',
-    ]));
+    $result['list'] = $client->hotels(array_filter(array_merge(
+      [
+        'country' => $api_country,
+        'city' => $resort,
+        'page' => $paged,
+        'limit' => $per_page,
+      ],
+      bsi_hotels_api_filters_to_params($filters)
+    )));
 
     $result['list']['items'] = bsi_hotels_api_filter_items($result['list']['items']);
   } catch (HotelsApiException $e) {
@@ -242,7 +250,7 @@ function bsi_hotels_api_catalog_query(WP_Post $country, ?int $paged = null, ?str
  * @param array $fallback_items выдача текущей страницы каталога
  * @return array{points: array, total: int, returned: int, partial: bool}
  */
-function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fallback_items): array
+function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fallback_items, ?array $filters = null): array
 {
   $catalog_url = bsi_hotels_api_catalog_url($country);
   $api_country = bsi_hotels_api_country_slug((int) $country->ID);
@@ -273,10 +281,14 @@ function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fall
 
   if ($api_country !== '' && $client) {
     try {
-      $map = $client->hotelsMap(array_filter([
-        'country' => $api_country,
-        'city' => $resort,
-      ]));
+      $map = $client->hotelsMap(array_filter(array_merge(
+        ['country' => $api_country, 'city' => $resort],
+        // Карта показывает ту же выборку, что и список: сортировка ей не нужна.
+        array_diff_key(
+          bsi_hotels_api_filters_to_params($filters ?? bsi_hotels_api_catalog_filters()),
+          ['sort' => 1, 'order' => 1]
+        )
+      )));
 
       foreach ($map['items'] as $hotel) {
         $point = $to_point($hotel);

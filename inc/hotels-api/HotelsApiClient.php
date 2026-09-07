@@ -110,6 +110,20 @@ class HotelsApiClient
     return is_array($data['items'] ?? null) ? $data['items'] : [];
   }
 
+  /** Справочник удобств: слаг, иконка, группа, область применения. */
+  public function amenities(): array
+  {
+    $data = $this->get('/v1/amenities', [], self::CACHE_DICT);
+    return is_array($data['items'] ?? null) ? $data['items'] : [];
+  }
+
+  /** Справочник видов объектов: апарт-отель, вилла, курортный отель. */
+  public function hotelTypes(): array
+  {
+    $data = $this->get('/v1/hotel-types', [], self::CACHE_DICT);
+    return is_array($data['items'] ?? null) ? $data['items'] : [];
+  }
+
   /** Города, в которых есть отели. $country — слаг страны. */
   public function cities(string $country = ''): array
   {
