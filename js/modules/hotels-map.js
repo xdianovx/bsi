@@ -40,6 +40,9 @@ const markerElement = (point) => {
   return el;
 };
 
+/** Начиная со скольких точек метки группируются в кластеры. */
+const CLUSTER_FROM = 40;
+
 /** Слушатели прошлой карты: каталог перерисовывается, старые надо снимать. */
 let listeners = null;
 
@@ -83,6 +86,20 @@ export const initHotelsMap = async () => {
     YMapZoomControl = null;
   }
 
+  /* Точек бывает больше тысячи: без группировки они сливаются в пятно.
+     Пакет внешний — не загрузился, рисуем метки поштучно. */
+  let clusterer = null;
+  if (points.length > CLUSTER_FROM) {
+    try {
+      if (typeof ymaps3.import.registerCdn === "function") {
+        ymaps3.import.registerCdn("https://cdn.jsdelivr.net/npm/{package}", "@yandex/ymaps3-clusterer@0.0");
+      }
+      clusterer = await ymaps3.import("@yandex/ymaps3-clusterer");
+    } catch (error) {
+      clusterer = null;
+    }
+  }
+
   // Наведённая метка встаёт над соседними — иначе они закрывают её карточку.
   const BASE_Z = 1000;
   const HOVER_Z = 9999;
@@ -114,7 +131,7 @@ export const initHotelsMap = async () => {
       { signal },
     );
 
-    points.forEach((point) => {
+    const createMarker = (point) => {
       const element = markerElement(point);
       const marker = new YMapMarker(
         { coordinates: [point.lng, point.lat], mapFollowsOnClick: false, zIndex: BASE_Z },
@@ -134,8 +151,36 @@ export const initHotelsMap = async () => {
       element.addEventListener("mouseenter", () => lift(true), { signal });
       element.addEventListener("mouseleave", () => lift(false), { signal });
 
-      map.addChild(marker);
-    });
+      return marker;
+    };
+
+    if (clusterer) {
+      map.addChild(
+        new clusterer.YMapClusterer({
+          method: clusterer.clusterByGrid({ gridSize: 64 }),
+          features: points.map((point, index) => ({
+            type: "Feature",
+            id: String(index),
+            geometry: { type: "Point", coordinates: [point.lng, point.lat] },
+            properties: point,
+          })),
+          marker: (feature) => createMarker(feature.properties),
+          cluster: (coordinates, features) => {
+            const element = document.createElement("div");
+            element.className = "hotels-map__cluster";
+            element.textContent = String(features.length);
+
+            element.addEventListener("click", () => {
+              map.setLocation({ center: coordinates, zoom: map.zoom + 2, duration: 300 });
+            });
+
+            return new YMapMarker({ coordinates, zIndex: BASE_Z }, element);
+          },
+        }),
+      );
+    } else {
+      points.forEach((point) => map.addChild(createMarker(point)));
+    }
 
     container.dataset.ready = "1";
   } catch (error) {

@@ -82,6 +82,27 @@ class HotelsApiClient
     return $this->get('/v1/hotels/' . rawurlencode($idOrSlug), [], self::CACHE_HOTEL);
   }
 
+  /**
+   * Отели направления с координатами — для карты каталога.
+   *
+   * Без пагинации и без тяжёлых полей: одна выдача на всю страну или курорт.
+   * Фильтры те же, что у /v1/hotels.
+   *
+   * @return array{items: array, total: int, returned: int, truncated: bool}
+   * @throws HotelsApiException
+   */
+  public function hotelsMap(array $params = []): array
+  {
+    $data = $this->get('/v1/hotels/map', $params, self::CACHE_LIST);
+
+    return [
+      'items' => is_array($data['items'] ?? null) ? $data['items'] : [],
+      'total' => (int) ($data['total'] ?? 0),
+      'returned' => (int) ($data['returned'] ?? 0),
+      'truncated' => (bool) ($data['truncated'] ?? false),
+    ];
+  }
+
   /** Страны, в которых есть отели. */
   public function countries(): array
   {

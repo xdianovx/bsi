@@ -234,6 +234,81 @@ function bsi_hotels_api_catalog_query(WP_Post $country, ?int $paged = null, ?str
 }
 
 /**
+ * Точки для карты каталога: все отели направления с координатами.
+ *
+ * Пока хаб не отдаёт /v1/hotels/map, карта строится по отелям текущей страницы —
+ * тогда она показывает часть направления, о чём честно говорит подпись.
+ *
+ * @param array $fallback_items выдача текущей страницы каталога
+ * @return array{points: array, total: int, returned: int, partial: bool}
+ */
+function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fallback_items): array
+{
+  $catalog_url = bsi_hotels_api_catalog_url($country);
+  $api_country = bsi_hotels_api_country_slug((int) $country->ID);
+  $client = bsi_hotels_api();
+
+  $result = ['points' => [], 'total' => 0, 'returned' => 0, 'partial' => false];
+
+  $to_point = static function (array $hotel) use ($catalog_url): ?array {
+    $lat = (float) ($hotel['lat'] ?? 0);
+    $lng = (float) ($hotel['lng'] ?? 0);
+
+    if ($lat === 0.0 || $lng === 0.0) {
+      return null;
+    }
+
+    $price = bsi_hotels_api_format_price($hotel['price_from'] ?? null);
+
+    return [
+      'lat' => $lat,
+      'lng' => $lng,
+      'name' => (string) ($hotel['name'] ?? ''),
+      'stars' => (int) ($hotel['stars'] ?? 0),
+      'city' => (string) ($hotel['city']['name'] ?? ''),
+      'price' => $price !== '' ? 'от ' . $price . ' за ночь' : '',
+      'url' => bsi_hotels_api_hotel_url($catalog_url, $hotel),
+    ];
+  };
+
+  if ($api_country !== '' && $client) {
+    try {
+      $map = $client->hotelsMap(array_filter([
+        'country' => $api_country,
+        'city' => $resort,
+      ]));
+
+      foreach ($map['items'] as $hotel) {
+        $point = $to_point($hotel);
+        if ($point) {
+          $result['points'][] = $point;
+        }
+      }
+
+      $result['total'] = $map['total'];
+      $result['returned'] = $map['returned'] ?: count($result['points']);
+
+      return $result;
+    } catch (HotelsApiException $e) {
+      // Ручки ещё нет или хаб молчит — рисуем то, что уже на странице.
+    }
+  }
+
+  foreach ($fallback_items as $hotel) {
+    $point = $to_point($hotel);
+    if ($point) {
+      $result['points'][] = $point;
+    }
+  }
+
+  $result['total'] = count($fallback_items);
+  $result['returned'] = count($result['points']);
+  $result['partial'] = true;
+
+  return $result;
+}
+
+/**
  * Служебные записи поставщика, приезжающие в хаб под видом отелей:
  * «По программе тура: …», «Отели по программе рекламного тура».
  * Это не объекты размещения, показывать их в каталоге нечем.

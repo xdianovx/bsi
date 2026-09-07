@@ -381,3 +381,20 @@
 .hotels-map__pin:hover .hotels-map__pin-card {
   display: flex;
 }
+
+/* Кластер меток: число отелей в группе. */
+.hotels-map__cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: $red;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
