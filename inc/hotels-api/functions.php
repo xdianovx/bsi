@@ -192,13 +192,6 @@ function bsi_hotels_api_catalog_query(
   $resort = sanitize_title($resort ?? (string) get_query_var('country_hotel_resort'));
   $filters = $filters ?? bsi_hotels_api_catalog_filters();
 
-  // Сегмент адреса перевешивает галочку: у курорта своя страница и свои мета-теги.
-  if ($resort !== '') {
-    $filters['city'] = '';
-  } elseif (!empty($filters['city'])) {
-    $resort = $filters['city'];
-  }
-
   $key = $country->ID . ':' . $paged . ':' . $resort . ':' . md5(serialize($filters));
 
   if (isset($cache[$key])) {

@@ -47,8 +47,8 @@ function bsi_hotels_api_beach_options(): array
  * уходит одно и то же представление.
  *
  * @param array|null $source обычно $_GET; в AJAX — разобранная строка запроса
- * @return array{city: string, stars: int[], amenities: string[], type: string,
- *               beach_line: int, flags: string[], q: string, sort: string}
+ * @return array{stars: int[], amenities: string[], type: string, beach_line: int,
+ *               flags: string[], q: string, sort: string}
  */
 function bsi_hotels_api_catalog_filters(?array $source = null): array
 {
@@ -95,19 +95,7 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
 
   $beach = (int) ($source['beach_line'] ?? 0);
 
-  /* Курорт приходит либо сегментом /kurort/{slug}/, либо галочкой в фильтрах.
-     Хаб отбирает по одному городу (city=a,b отдаёт пустоту), поэтому берём
-     первый выбранный; галочки в интерфейсе ведут себя соответственно. */
-  $cities = [];
-  foreach ($as_list($source['city'] ?? '') as $slug) {
-    $slug = sanitize_title(trim($slug));
-    if ($slug !== '') {
-      $cities[$slug] = $slug;
-    }
-  }
-
   return [
-    'city' => (string) (reset($cities) ?: ''),
     'stars' => array_values($stars),
     'amenities' => array_values($amenities),
     'type' => sanitize_title((string) ($source['type'] ?? '')),
@@ -120,21 +108,14 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
 
 /**
  * Фильтры в виде параметров запроса к хабу.
- *
- * Набор звёзд превращается в диапазон: у хаба нет списка, а разрывы вроде
- * «3 и 5 звёзд» на практике не встречаются — каталог отдаёт 3–5.
  */
 function bsi_hotels_api_filters_to_params(array $filters): array
 {
   $params = [];
 
-  if (!empty($filters['city'])) {
-    $params['city'] = $filters['city'];
-  }
-
   if ($filters['stars']) {
-    $params['min_stars'] = min($filters['stars']);
-    $params['max_stars'] = max($filters['stars']);
+    // Хаб принимает список: «5 и 3 звезды» — это две категории, а не диапазон.
+    $params['stars'] = implode(',', $filters['stars']);
   }
 
   if ($filters['amenities']) {
@@ -168,10 +149,6 @@ function bsi_hotels_api_filters_to_params(array $filters): array
 function bsi_hotels_api_filters_to_query(array $filters): array
 {
   $query = [];
-
-  if (!empty($filters['city'])) {
-    $query['city'] = $filters['city'];
-  }
 
   if ($filters['stars']) {
     $query['stars'] = implode(',', $filters['stars']);

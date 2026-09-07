@@ -1,9 +1,12 @@
 <?php
 /**
- * Колонка фильтров каталога: курорты, звёзды, вид объекта, удобства, пляж.
+ * Колонка фильтров каталога: курорты, звёзды, удобства, вид объекта, пляж.
  *
  * Форма настоящая: без JS она отправляется обычным GET и отбор делает сервер.
  * С JS отправка перехватывается и меняются только список с картой.
+ *
+ * Групп немного нарочно: у хаба удобства разложены по четырнадцати категориям,
+ * и каждая отдельной шторкой превращает панель в частокол заголовков.
  *
  * @var array  $args['filters']     разобранные фильтры текущего запроса
  * @var string $args['action']      адрес каталога с учётом курорта
@@ -20,24 +23,71 @@ $resorts = is_array($args['resorts'] ?? null) ? $args['resorts'] : [];
 $resort = (string) ($args['resort'] ?? '');
 $total = (int) ($args['total'] ?? 0);
 
-$amenity_groups = bsi_hotels_api_amenity_groups();
 $types = bsi_hotels_api_hotel_types();
 $beach_options = bsi_hotels_api_beach_options();
 $flag_options = bsi_hotels_api_flag_options();
-
 $active = bsi_hotels_api_filters_active($filters);
 
-// Крупные курорты сразу, длинный хвост — под раскрытие. Ссылки есть в обоих
-// случаях, поэтому поисковик видит все курорты страны.
+// Удобства одним списком: сначала выбранные и популярные, остальные под «ещё».
+$amenities = [];
+foreach (bsi_hotels_api_amenity_groups() as $group) {
+  foreach ($group as $amenity) {
+    $amenities[] = $amenity;
+  }
+}
+
+usort($amenities, static function (array $a, array $b) use ($filters) {
+  $weight = static fn(array $x) => (in_array($x['slug'], $filters['amenities'], true) ? 2 : 0)
+    + ($x['popular'] ? 1 : 0);
+
+  return [$weight($b), $b['hotels']] <=> [$weight($a), $a['hotels']];
+});
+
+$amenities_head = array_slice($amenities, 0, 6);
+$amenities_tail = array_slice($amenities, 6);
+
 usort($resorts, static fn($a, $b) => (int) ($b['hotels'] ?? 0) <=> (int) ($a['hotels'] ?? 0));
-$resorts_head = array_slice($resorts, 0, 8);
-$resorts_tail = array_slice($resorts, 8);
+$resorts_head = array_slice($resorts, 0, 6);
+$resorts_tail = array_slice($resorts, 6);
+
+$render_resort = static function (array $city) use ($resort, $catalog_url) {
+  $slug = (string) ($city['slug'] ?? '');
+  if ($slug === '') {
+    return;
+  }
+  printf(
+    '<a class="hotels-filters__resort%s" href="%s">%s <i>%d</i></a>',
+    $resort === $slug ? ' is-active' : '',
+    esc_url(bsi_hotels_api_resort_url($catalog_url, $slug)),
+    esc_html((string) ($city['name'] ?? $slug)),
+    (int) ($city['hotels'] ?? 0)
+  );
+};
+
+$render_amenity = static function (array $amenity) use ($filters) { ?>
+  <label class="ui-checkbox">
+    <input type="checkbox" class="ui-checkbox__input" name="amenities[]" value="<?= esc_attr($amenity['slug']); ?>"
+      <?php checked(in_array($amenity['slug'], $filters['amenities'], true)); ?>>
+    <span class="ui-checkbox__mark"></span>
+    <span class="ui-checkbox__text">
+      <?php if ($amenity['icon']): ?>
+        <img class="hotels-filters__icon" src="<?= esc_url($amenity['icon']); ?>" alt="" loading="lazy">
+      <?php endif; ?>
+      <?= esc_html($amenity['name']); ?>
+    </span>
+  </label>
+<?php };
 ?>
 
 <aside class="hotels-filters js-hotels-filters-panel">
   <form class="hotels-filters__form js-hotels-filters" id="hotels-filters-form" action="<?= esc_url($action); ?>" method="get">
     <div class="hotels-filters__head">
-      <b>Фильтры</b>
+      <b class="hotels-filters__head-title">Фильтры</b>
+
+      <?php if ($active): ?>
+        <a class="hotels-filters__reset" href="<?= esc_url($action); ?>">Сбросить</a>
+      <?php endif; ?>
+
       <button class="hotels-filters__close js-hotels-filters-close" type="button" aria-label="Закрыть фильтры">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
@@ -49,35 +99,16 @@ $resorts_tail = array_slice($resorts, 8);
     </label>
 
     <?php if (count($resorts) > 1): ?>
-      <?php
-      /* Хаб отбирает по одному городу, поэтому выбранным остаётся один курорт:
-         клик по другому снимает прежний (js/modules/ajax/hotels-filters.js). */
-      $render_resort = static function (array $city) use ($resort) {
-        $slug = (string) ($city['slug'] ?? '');
-        if ($slug === '') {
-          return;
-        }
-        ?>
-        <label class="ui-checkbox hotels-filters__resort">
-          <input type="checkbox" class="ui-checkbox__input js-hotels-city" name="city[]" value="<?= esc_attr($slug); ?>"
-            <?php checked($resort, $slug); ?>>
-          <span class="ui-checkbox__mark"></span>
-          <span class="ui-checkbox__text">
-            <?= esc_html((string) ($city['name'] ?? $slug)); ?>
-            <i class="hotels-filters__count"><?= (int) ($city['hotels'] ?? 0); ?></i>
-          </span>
-        </label>
-        <?php
-      };
-      ?>
-
-      <details class="hotels-filters__group" open>
-        <summary>Курорт</summary>
+      <div class="hotels-filters__group">
+        <p class="hotels-filters__group-title">Курорт</p>
         <div class="hotels-filters__group-body">
+          <a class="hotels-filters__resort<?= $resort === '' ? ' is-active' : ''; ?>"
+             href="<?= esc_url($catalog_url); ?>">Все курорты</a>
+
           <?php array_map($render_resort, $resorts_head); ?>
 
           <?php if ($resorts_tail): ?>
-            <details class="hotels-filters__resorts-more">
+            <details class="hotels-filters__more">
               <summary>Ещё курорты (<?= count($resorts_tail); ?>)</summary>
               <div class="hotels-filters__group-body">
                 <?php array_map($render_resort, $resorts_tail); ?>
@@ -85,11 +116,11 @@ $resorts_tail = array_slice($resorts, 8);
             </details>
           <?php endif; ?>
         </div>
-      </details>
+      </div>
     <?php endif; ?>
 
-    <details class="hotels-filters__group" open>
-      <summary>Звёзды</summary>
+    <div class="hotels-filters__group">
+      <p class="hotels-filters__group-title">Звёзды</p>
       <div class="hotels-filters__group-body">
         <?php for ($star = 5; $star >= 1; $star--): ?>
           <label class="ui-checkbox">
@@ -100,11 +131,29 @@ $resorts_tail = array_slice($resorts, 8);
           </label>
         <?php endfor; ?>
       </div>
-    </details>
+    </div>
+
+    <?php if ($amenities): ?>
+      <div class="hotels-filters__group">
+        <p class="hotels-filters__group-title">Удобства</p>
+        <div class="hotels-filters__group-body">
+          <?php array_map($render_amenity, $amenities_head); ?>
+
+          <?php if ($amenities_tail): ?>
+            <details class="hotels-filters__more" <?= array_intersect(array_column($amenities_tail, 'slug'), $filters['amenities']) ? 'open' : ''; ?>>
+              <summary>Ещё удобства (<?= count($amenities_tail); ?>)</summary>
+              <div class="hotels-filters__group-body">
+                <?php array_map($render_amenity, $amenities_tail); ?>
+              </div>
+            </details>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <?php if ($types): ?>
-      <details class="hotels-filters__group" <?= $filters['type'] !== '' ? 'open' : ''; ?>>
-        <summary>Вид объекта</summary>
+      <div class="hotels-filters__group">
+        <p class="hotels-filters__group-title">Вид объекта</p>
         <div class="hotels-filters__group-body">
           <label class="ui-checkbox">
             <input type="radio" class="ui-checkbox__input" name="type" value="" <?php checked($filters['type'], ''); ?>>
@@ -124,33 +173,11 @@ $resorts_tail = array_slice($resorts, 8);
             </label>
           <?php endforeach; ?>
         </div>
-      </details>
+      </div>
     <?php endif; ?>
 
-    <?php foreach ($amenity_groups as $group => $amenities): ?>
-      <?php $group_active = (bool) array_intersect(array_column($amenities, 'slug'), $filters['amenities']); ?>
-      <details class="hotels-filters__group" <?= $group_active ? 'open' : ''; ?>>
-        <summary><?= esc_html($group); ?></summary>
-        <div class="hotels-filters__group-body">
-          <?php foreach ($amenities as $amenity): ?>
-            <label class="ui-checkbox">
-              <input type="checkbox" class="ui-checkbox__input" name="amenities[]" value="<?= esc_attr($amenity['slug']); ?>"
-                <?php checked(in_array($amenity['slug'], $filters['amenities'], true)); ?>>
-              <span class="ui-checkbox__mark"></span>
-              <span class="ui-checkbox__text">
-                <?php if ($amenity['icon']): ?>
-                  <img class="hotels-filters__icon" src="<?= esc_url($amenity['icon']); ?>" alt="" loading="lazy">
-                <?php endif; ?>
-                <?= esc_html($amenity['name']); ?>
-              </span>
-            </label>
-          <?php endforeach; ?>
-        </div>
-      </details>
-    <?php endforeach; ?>
-
-    <details class="hotels-filters__group" <?= $filters['beach_line'] ? 'open' : ''; ?>>
-      <summary>Пляж</summary>
+    <div class="hotels-filters__group">
+      <p class="hotels-filters__group-title">Пляж</p>
       <div class="hotels-filters__group-body">
         <label class="ui-checkbox">
           <input type="radio" class="ui-checkbox__input" name="beach_line" value="" <?php checked($filters['beach_line'], 0); ?>>
@@ -167,10 +194,10 @@ $resorts_tail = array_slice($resorts, 8);
           </label>
         <?php endforeach; ?>
       </div>
-    </details>
+    </div>
 
-    <details class="hotels-filters__group" open>
-      <summary>Показывать</summary>
+    <div class="hotels-filters__group hotels-filters__group--last">
+      <p class="hotels-filters__group-title">Показывать</p>
       <div class="hotels-filters__group-body">
         <?php foreach ($flag_options as $flag => $label): ?>
           <label class="ui-checkbox">
@@ -181,17 +208,11 @@ $resorts_tail = array_slice($resorts, 8);
           </label>
         <?php endforeach; ?>
       </div>
-    </details>
-
-    <div class="hotels-filters__actions">
-      <?php /* Отбор применяется сразу при выборе; кнопка нужна там, где JS нет. */ ?>
-      <noscript>
-        <button class="btn btn-accent sm" type="submit">Показать<?= $total ? ' (' . $total . ')' : ''; ?></button>
-      </noscript>
-
-      <?php if ($active): ?>
-        <a class="hotels-filters__reset" href="<?= esc_url($action); ?>">Сбросить фильтры</a>
-      <?php endif; ?>
     </div>
+
+    <?php /* Отбор применяется сразу при выборе; кнопка нужна там, где JS нет. */ ?>
+    <noscript>
+      <button class="btn btn-accent sm" type="submit">Показать<?= $total ? ' (' . $total . ')' : ''; ?></button>
+    </noscript>
   </form>
 </aside>
