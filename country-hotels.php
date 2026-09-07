@@ -98,13 +98,15 @@ get_header(); ?>
   }
   ?>
 
-  <section>
-    <div class="container">
-      <div class="coutry-page__wrap">
+  <section class="<?= $hotels_from_api ? 'country-hotels-api' : ''; ?>">
+    <div class="<?= $hotels_from_api ? 'country-hotels-api__top' : 'container'; ?>">
+      <div class="<?= $hotels_from_api ? '' : 'coutry-page__wrap'; ?>">
 
-        <aside class="coutry-page__aside">
-          <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
-        </aside>
+        <?php if (!$hotels_from_api): ?>
+          <aside class="coutry-page__aside">
+            <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
+          </aside>
+        <?php endif; ?>
 
         <?php
         // H1 выводится всегда: раньше он был внутри проверки на наличие
@@ -132,16 +134,10 @@ get_header(); ?>
           : 'Отели ' . $hotels_prep . ' ' . $hotels_country;
         ?>
 
-        <div class="page-country__content">
+        <div class="<?= $hotels_from_api ? 'country-hotels-api__title-wrap' : 'page-country__content'; ?>">
           <h1 class="h1 country-hotels__title">
             <?= esc_html($hotels_h1); ?>
           </h1>
-
-          <?php if ($hotels_from_api): ?>
-            <?php get_template_part('template-parts/pages/country/hotels-api', null, [
-              'country' => $country,
-            ]); ?>
-          <?php endif; ?>
         </div>
 
         <?php if ($hotels_from_api): ?>
@@ -196,6 +192,12 @@ get_header(); ?>
 
       </div>
     </div>
+
+    <?php if ($hotels_from_api): ?>
+      <?php get_template_part('template-parts/pages/country/hotels-api', null, [
+        'country' => $country,
+      ]); ?>
+    <?php endif; ?>
   </section>
 
 </main>

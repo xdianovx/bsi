@@ -1,9 +1,10 @@
 <?php
 /**
- * Содержимое каталога отелей страны: счётчик, фильтр курортов, сетка и пагинация.
+ * Каталог отелей страны: фильтры слева, список в центре, карта справа.
  *
- * Тот же файл рисует и первый заход, и AJAX-подгрузку страницы или курорта
- * (inc/requests/ajax-hotels-api-catalog.php), поэтому разметка одна на оба пути.
+ * Тот же файл рисует и первый заход, и AJAX-подгрузку (inc/requests/ajax-hotels-api-catalog.php),
+ * поэтому разметка одна на оба пути. Каркас — фильтры и карта — стоит всегда:
+ * пустая выдача убирает только карточки, чтобы было чем поправить отбор.
  *
  * @var WP_Post $args['country']
  * @var array   $args['catalog'] результат bsi_hotels_api_catalog_query()
@@ -25,6 +26,10 @@ $error = $catalog['error'];
 $resort = $catalog['resort'];
 $paged = max(1, (int) ($args['paged'] ?? 1));
 
+$filters = $catalog['filters'] ?? bsi_hotels_api_catalog_filters();
+$filters_query = bsi_hotels_api_filters_to_query($filters);
+$base_url = $resort !== '' ? bsi_hotels_api_resort_url($catalog_url, $resort) : $catalog_url;
+
 $resort_name = '';
 foreach ($resorts as $city) {
   if (($city['slug'] ?? '') === $resort) {
@@ -32,139 +37,106 @@ foreach ($resorts as $city) {
     break;
   }
 }
+
+// Карта показывает ту же выборку, что и список.
+$map = bsi_hotels_api_map_points($country, $resort, $list['items'], $filters);
+$has_more = $paged < (int) $list['pages'];
 ?>
 
-  <?php if (count($resorts) > 1): ?>
-    <?php
-    // Крупные курорты сразу, длинный хвост — под раскрытие. Ссылки в разметке
-    // есть в обоих случаях, поэтому поисковик видит все курорты страны.
-    $visible_resorts = 11;
-    $sorted_resorts = $resorts;
-    usort($sorted_resorts, static fn($a, $b) => (int) ($b['hotels'] ?? 0) <=> (int) ($a['hotels'] ?? 0));
+<div class="hotels-catalog<?= $map['points'] ? '' : ' hotels-catalog--no-map'; ?>">
+  <div class="hotels-catalog__inner">
 
-    $head = array_slice($sorted_resorts, 0, $visible_resorts);
-    $tail = array_slice($sorted_resorts, $visible_resorts);
+    <?php get_template_part('template-parts/pages/country/hotels-api-filters', null, [
+      'filters' => $filters,
+      'action' => $base_url,
+      'catalog_url' => $catalog_url,
+      'resorts' => $resorts,
+      'resort' => $resort,
+      'total' => (int) ($list['total'] ?? 0),
+    ]); ?>
 
-    $render_resort = static function (array $city) use ($resort, $catalog_url) {
-      $city_slug = (string) ($city['slug'] ?? '');
-      if ($city_slug === '') {
-        return;
-      }
-      printf(
-        '<a class="country-resorts-filter__item%s" href="%s">%s <span class="country-resorts-filter__count">%d</span></a>',
-        $resort === $city_slug ? ' is-active' : '',
-        esc_url(bsi_hotels_api_resort_url($catalog_url, $city_slug)),
-        esc_html((string) ($city['name'] ?? $city_slug)),
-        (int) ($city['hotels'] ?? 0)
-      );
-    };
-    ?>
+    <div class="hotels-catalog__list">
+      <div class="hotels-catalog__head">
+        <div class="hotels-catalog__counter">
+          <?php if ($error !== ''): ?>
+            Подбираем отели…
+          <?php else: ?>
+            Нашли отелей: <?= (int) $list['total']; ?>
+          <?php endif; ?>
+        </div>
 
-    <nav class="country-resorts-filter" aria-label="Курорты">
-      <a class="country-resorts-filter__item<?= $resort === '' ? ' is-active' : ''; ?>"
-         href="<?= esc_url($catalog_url); ?>">Все курорты</a>
+        <button class="btn btn-gray sm hotels-catalog__filters-open js-hotels-filters-toggle" type="button">
+          Фильтры
+        </button>
+      </div>
 
-      <?php array_map($render_resort, $head); ?>
-
-      <?php if ($tail): ?>
-        <details class="country-resorts-filter__more">
-          <summary class="country-resorts-filter__item">Ещё курорты (<?= count($tail); ?>)</summary>
-          <div class="country-resorts-filter__tail">
-            <?php array_map($render_resort, $tail); ?>
+      <?php if ($error !== ''): ?>
+        <?php /* Хаб не ответил в отведённые секунды. Страницу не держим: показываем
+                 заглушки и просим каталог ещё раз через AJAX, где ждать не жалко.
+                 Разметку повтора видит js/modules/ajax/hotels-api-catalog.js. */ ?>
+        <div class="country-hotels__pending js-hotels-retry"
+             data-page="<?= (int) $paged; ?>"
+             data-resort="<?= esc_attr($resort); ?>">
+          <div class="hotels-catalog__rows">
+            <?php for ($i = 0; $i < 5; $i++): ?>
+              <div class="hotels-catalog__skeleton"></div>
+            <?php endfor; ?>
           </div>
-        </details>
-      <?php endif; ?>
-    </nav>
-  <?php endif; ?>
 
-<?php if ($error !== ''): ?>
-  <?php /* Хаб не ответил в отведённые секунды. Страницу не держим: показываем
-           заглушки и просим каталог ещё раз через AJAX, где ждать не жалко.
-           Разметку повтора видит js/modules/ajax/hotels-api-catalog.js. */ ?>
-  <div class="country-hotels__pending js-hotels-retry"
-       data-page="<?= (int) $paged; ?>"
-       data-resort="<?= esc_attr($resort); ?>">
-    <p class="country-hotels__pending-note">Подбираем отели…</p>
+          <noscript>
+            <p>Каталог отелей сейчас недоступен. Подберём отель по запросу — напишите нам.</p>
+          </noscript>
 
-    <div class="country-hotels__grid">
-      <?php for ($i = 0; $i < 6; $i++): ?>
-        <div class="country-hotels__skeleton"></div>
-      <?php endfor; ?>
-    </div>
+          <?php if (current_user_can('manage_options')): ?>
+            <p class="country-hotels__message-debug">Хаб отелей: <?= esc_html($error); ?></p>
+          <?php endif; ?>
+        </div>
 
-    <noscript>
-      <p>Каталог отелей сейчас недоступен. Подберём отель по запросу — напишите нам.</p>
-    </noscript>
+      <?php elseif (empty($list['items'])): ?>
+        <div class="hotels-catalog__empty">
+          <?php if (bsi_hotels_api_filters_active($filters)): ?>
+            <p>По выбранным условиям отелей нет.</p>
+            <a class="btn btn-gray sm" href="<?= esc_url($base_url); ?>">Сбросить фильтры</a>
+          <?php elseif ($resort_name !== ''): ?>
+            <p>В курорте «<?= esc_html($resort_name); ?>» отелей пока нет.</p>
+            <a class="btn btn-gray sm" href="<?= esc_url($catalog_url); ?>">Показать все отели</a>
+          <?php else: ?>
+            <p>Каталог отелей для этого направления пока пуст — подберём вариант по запросу.</p>
+          <?php endif; ?>
+        </div>
 
-    <?php if (current_user_can('manage_options')): ?>
-      <p class="country-hotels__message-debug">Хаб отелей: <?= esc_html($error); ?></p>
-    <?php endif; ?>
-  </div>
-
-<?php elseif (empty($list['items'])): ?>
-  <div class="country-hotels__message">
-    <p>
-      <?php if ($resort_name !== ''): ?>
-        В курорте «<?= esc_html($resort_name); ?>» отелей пока нет.
-        <a href="<?= esc_url($catalog_url); ?>">Показать все отели</a>.
       <?php else: ?>
-        Каталог отелей для этого направления пока пуст — подберём вариант по запросу.
+        <div class="hotels-catalog__rows js-hotels-rows">
+          <?php foreach ($list['items'] as $hotel): ?>
+            <?php get_template_part('template-parts/hotels/api-row', null, [
+              'hotel' => $hotel,
+              'country_url' => $catalog_url,
+            ]); ?>
+          <?php endforeach; ?>
+        </div>
+
+        <?php if ($has_more): ?>
+          <?php
+          $next_url = trailingslashit($base_url) . 'page/' . ($paged + 1) . '/';
+          if ($filters_query) {
+            $next_url = add_query_arg($filters_query, $next_url);
+          }
+          ?>
+          <div class="hotels-catalog__more js-hotels-more" data-next="<?= esc_url($next_url); ?>">
+            <a class="btn btn-gray hotels-catalog__more-btn" href="<?= esc_url($next_url); ?>">Показать ещё</a>
+          </div>
+        <?php endif; ?>
+
       <?php endif; ?>
-    </p>
+    </div>
   </div>
-
-<?php else: ?>
-
-  <div class="country-hotels__counter">
-    Нашли отелей: <?= (int) $list['total']; ?>
-  </div>
-
-  <?php
-  // Все отели направления с координатами — одной выдачей хаба. Пока её нет,
-  // на карту попадают отели текущей страницы, и подпись об этом говорит.
-  $map = bsi_hotels_api_map_points($country, $resort, $list['items']);
-  ?>
 
   <?php if ($map['points']): ?>
-    <section class="country-hotels__map-section">
-      <h2 class="h2 country-hotels__map-title">Отели на карте</h2>
-      <p class="country-hotels__map-note">
-        <?php if ($map['partial']): ?>
-          <?= count($map['points']); ?> из <?= count($list['items']); ?> отелей этой страницы с известным адресом
-        <?php else: ?>
-          <?= (int) $map['returned']; ?> из <?= (int) $map['total']; ?> отелей направления с известным адресом
-        <?php endif; ?>
-      </p>
-
+    <aside class="hotels-catalog__map-side">
       <div class="country-hotels__map js-hotels-map"></div>
       <script type="application/json" class="js-hotels-map-data"><?= wp_json_encode($map['points']); ?></script>
-    </section>
+    </aside>
   <?php endif; ?>
 
-  <div class="country-hotels__grid">
-    <?php foreach ($list['items'] as $hotel): ?>
-      <?php get_template_part('template-parts/hotels/api-card', null, [
-        'hotel' => $hotel,
-        'country_url' => $catalog_url,
-      ]); ?>
-    <?php endforeach; ?>
-  </div>
-
-  <?php if ((int) $list['pages'] > 1): ?>
-    <nav class="ui-pagination country-hotels__pagination" aria-label="Навигация по страницам каталога отелей">
-      <?php
-      echo paginate_links([
-        /* %_% → format: первая страница остаётся без /page/1/. */
-        'base' => ($resort !== '' ? bsi_hotels_api_resort_url($catalog_url, $resort) : $catalog_url) . '%_%',
-        'format' => 'page/%#%/',
-        'total' => (int) $list['pages'],
-        'current' => $paged,
-        'prev_text' => 'Назад',
-        'next_text' => 'Вперёд',
-        'mid_size' => 2,
-      ]);
-      ?>
-    </nav>
-  <?php endif; ?>
-
-<?php endif; ?>
+  <button class="btn btn-accent hotels-catalog__map-open js-hotels-map-open" type="button">На карте</button>
+</div>

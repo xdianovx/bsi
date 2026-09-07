@@ -1,4 +1,5 @@
 import { initHotelsMap } from "../hotels-map";
+import { initHotelsFilters, initHotelsMapToggle } from "./hotels-filters";
 
 /**
  * Каталог отелей страны из хаба: смена страницы и курорта без перезагрузки.
@@ -10,9 +11,10 @@ import { initHotelsMap } from "../hotels-map";
  * Обработчик — inc/requests/ajax-hotels-api-catalog.php (action bsi_hotels_api_catalog).
  */
 
-/** Страница и курорт из адреса каталога: /country/{c}/hotel/kurort/{r}/page/2/ */
+/** Страница, курорт и фильтры из адреса каталога: /country/{c}/hotel/kurort/{r}/page/2/?stars=5 */
 const parseUrl = (href, baseUrl) => {
-  const path = new URL(href, window.location.origin).pathname;
+  const url = new URL(href, window.location.origin);
+  const path = url.pathname;
   const base = new URL(baseUrl, window.location.origin).pathname;
 
   if (!path.startsWith(base)) return null;
@@ -33,7 +35,7 @@ const parseUrl = (href, baseUrl) => {
     }
   }
 
-  return { resort, page };
+  return { resort, page, query: url.search.replace(/^\?/, "") };
 };
 
 export const initHotelsApiCatalog = () => {
@@ -44,13 +46,14 @@ export const initHotelsApiCatalog = () => {
   const baseUrl = root.dataset.url;
   let request = 0;
 
-  /** Запрос каталога к серверу; страницу и курорт передаём явно. */
-  const fetchCatalog = async (page, resort) => {
+  /** Запрос каталога к серверу; страницу, курорт и фильтры передаём явно. */
+  const fetchCatalog = async (page, resort, query = "") => {
     const body = new URLSearchParams({
       action: "bsi_hotels_api_catalog",
       country_id: countryId,
       page: String(page),
       resort: resort || "",
+      filters: query,
     });
 
     const response = await fetch(ajax.url, {
@@ -83,7 +86,11 @@ export const initHotelsApiCatalog = () => {
     if (!pending) return;
 
     try {
-      const json = await fetchCatalog(pending.dataset.page || 1, pending.dataset.resort);
+      const json = await fetchCatalog(
+        pending.dataset.page || 1,
+        pending.dataset.resort,
+        window.location.search.replace(/^\?/, ""),
+      );
 
       if (json?.success && json.data?.html) {
         root.innerHTML = json.data.html;
@@ -115,7 +122,7 @@ export const initHotelsApiCatalog = () => {
     root.classList.add("is-loading");
 
     try {
-      const json = await fetchCatalog(target.page, target.resort);
+      const json = await fetchCatalog(target.page, target.resort, target.query);
 
       // Пока ждали ответ, пользователь мог кликнуть дальше — старый ответ не нужен.
       if (ticket !== request) return true;
@@ -148,7 +155,73 @@ export const initHotelsApiCatalog = () => {
     }
   };
 
+  /**
+   * Следующая страница добавляется к показанным, а не заменяет их: так работает
+   * и кнопка «Показать ещё», и автоподгрузка при подходе к концу списка.
+   */
+  const appendNext = async () => {
+    const more = root.querySelector(".js-hotels-more");
+    if (!more || more.classList.contains("is-loading")) return;
+
+    const target = parseUrl(more.dataset.next, baseUrl);
+    if (!target) return;
+
+    more.classList.add("is-loading");
+
+    try {
+      const json = await fetchCatalog(target.page, target.resort, target.query);
+      if (!json?.success || !json.data?.html) throw new Error("empty response");
+
+      const parsed = new DOMParser().parseFromString(json.data.html, "text/html");
+      const rows = parsed.querySelector(".js-hotels-rows");
+      const list = root.querySelector(".js-hotels-rows");
+
+      if (!rows || !list) throw new Error("no rows");
+
+      list.append(...rows.children);
+
+      // Кнопку и пагинацию заменяем на пришедшие: в них следующий адрес.
+      const nextMore = parsed.querySelector(".js-hotels-more");
+      if (nextMore) {
+        more.replaceWith(nextMore);
+      } else {
+        more.remove();
+      }
+
+      const pagination = root.querySelector(".country-hotels__pagination");
+      const nextPagination = parsed.querySelector(".country-hotels__pagination");
+      if (pagination && nextPagination) pagination.replaceWith(nextPagination);
+
+      window.history.replaceState({ hotelsCatalog: true }, "", more.dataset.next || window.location.href);
+    } catch (error) {
+      more.classList.remove("is-loading");
+    }
+  };
+
+  // Автоподгрузка: следим за кнопкой, она стоит в конце списка.
+  const watcher = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) appendNext();
+    },
+    { rootMargin: "400px" },
+  );
+
+  const watchMore = () => {
+    const more = root.querySelector(".js-hotels-more");
+    if (more) watcher.observe(more);
+  };
+
+  new MutationObserver(watchMore).observe(root, { childList: true, subtree: true });
+  watchMore();
+
   root.addEventListener("click", (event) => {
+    const more = event.target.closest(".hotels-catalog__more-btn");
+    if (more) {
+      event.preventDefault();
+      appendNext();
+      return;
+    }
+
     const link = event.target.closest(".country-hotels__pagination a, .country-resorts-filter a, .country-resorts-filter__item");
 
     if (!link || !link.href || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) {
@@ -166,6 +239,9 @@ export const initHotelsApiCatalog = () => {
   window.addEventListener("popstate", () => {
     load(window.location.href, false);
   });
+
+  initHotelsFilters(root, load);
+  initHotelsMapToggle(root.parentElement || document.body);
 
   retryPending();
 };

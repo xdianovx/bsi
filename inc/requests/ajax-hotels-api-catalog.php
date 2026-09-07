@@ -25,6 +25,10 @@ function bsi_hotels_api_catalog_ajax(): void
   $paged = max(1, isset($_POST['page']) ? absint($_POST['page']) : 1);
   $resort = sanitize_title((string) ($_POST['resort'] ?? ''));
 
+  // Фильтры едут той же строкой, что стоит в адресе каталога.
+  parse_str((string) ($_POST['filters'] ?? ''), $query);
+  $filters = bsi_hotels_api_catalog_filters(is_array($query) ? $query : []);
+
   /**
    * Ждать хаб одним длинным запросом нельзя: веб-сервер рвёт соединение
    * на тридцатой секунде и отдаёт 500. Поэтому ждём заведомо меньше лимита,
@@ -34,7 +38,7 @@ function bsi_hotels_api_catalog_ajax(): void
    */
   add_filter('bsi_hotels_api_timeout', static fn() => 20);
 
-  $catalog = bsi_hotels_api_catalog_query($country, $paged, $resort);
+  $catalog = bsi_hotels_api_catalog_query($country, $paged, $resort, $filters);
 
   ob_start();
   get_template_part('template-parts/pages/country/hotels-api-list', null, [

@@ -47,15 +47,25 @@ function bsi_hotels_api_beach_options(): array
  * уходит одно и то же представление.
  *
  * @param array|null $source обычно $_GET; в AJAX — разобранная строка запроса
- * @return array{stars: int[], amenities: string[], type: string, beach_line: int,
- *               flags: string[], q: string, sort: string}
+ * @return array{city: string, stars: int[], amenities: string[], type: string,
+ *               beach_line: int, flags: string[], q: string, sort: string}
  */
 function bsi_hotels_api_catalog_filters(?array $source = null): array
 {
   $source = $source ?? $_GET;
 
+  /* Форма шлёт наборы массивами (stars[]=4&stars[]=5), адрес — строкой
+     (?stars=4,5). Принимаем оба вида: ссылками делятся, форму отправляют. */
+  $as_list = static function ($value): array {
+    if (is_array($value)) {
+      return $value;
+    }
+
+    return explode(',', (string) $value);
+  };
+
   $stars = [];
-  foreach (explode(',', (string) ($source['stars'] ?? '')) as $star) {
+  foreach ($as_list($source['stars'] ?? '') as $star) {
     $star = (int) trim($star);
     if ($star >= 1 && $star <= 5) {
       $stars[$star] = $star;
@@ -64,7 +74,7 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
   sort($stars);
 
   $amenities = [];
-  foreach (explode(',', (string) ($source['amenities'] ?? '')) as $slug) {
+  foreach ($as_list($source['amenities'] ?? '') as $slug) {
     $slug = sanitize_title(trim($slug));
     if ($slug !== '') {
       $amenities[$slug] = $slug;
@@ -85,7 +95,19 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
 
   $beach = (int) ($source['beach_line'] ?? 0);
 
+  /* Курорт приходит либо сегментом /kurort/{slug}/, либо галочкой в фильтрах.
+     Хаб отбирает по одному городу (city=a,b отдаёт пустоту), поэтому берём
+     первый выбранный; галочки в интерфейсе ведут себя соответственно. */
+  $cities = [];
+  foreach ($as_list($source['city'] ?? '') as $slug) {
+    $slug = sanitize_title(trim($slug));
+    if ($slug !== '') {
+      $cities[$slug] = $slug;
+    }
+  }
+
   return [
+    'city' => (string) (reset($cities) ?: ''),
     'stars' => array_values($stars),
     'amenities' => array_values($amenities),
     'type' => sanitize_title((string) ($source['type'] ?? '')),
@@ -105,6 +127,10 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
 function bsi_hotels_api_filters_to_params(array $filters): array
 {
   $params = [];
+
+  if (!empty($filters['city'])) {
+    $params['city'] = $filters['city'];
+  }
 
   if ($filters['stars']) {
     $params['min_stars'] = min($filters['stars']);
@@ -142,6 +168,10 @@ function bsi_hotels_api_filters_to_params(array $filters): array
 function bsi_hotels_api_filters_to_query(array $filters): array
 {
   $query = [];
+
+  if (!empty($filters['city'])) {
+    $query['city'] = $filters['city'];
+  }
 
   if ($filters['stars']) {
     $query['stars'] = implode(',', $filters['stars']);
