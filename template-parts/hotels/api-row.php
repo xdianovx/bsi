@@ -82,7 +82,7 @@ $id = (string) ($hotel['id'] ?? '');
       </div>
 
       <?php if ($url): ?>
-        <a class="btn btn-accent sm api-row__cta" href="<?= esc_url($url); ?>">Смотреть отель</a>
+        <a class="btn btn-accent sm api-row__cta" href="<?= esc_url($url); ?>">Забронировать</a>
       <?php endif; ?>
     </div>
   </div>

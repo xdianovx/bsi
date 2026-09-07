@@ -334,8 +334,33 @@
   width: 16px;
   height: 16px;
 
+  &--price {
+    width: auto;
+    height: auto;
+  }
+
   &:hover {
     z-index: 9999;
+  }
+}
+
+/* Метка с ценой: её видно, не наводя курсор. */
+.hotels-map__pin-label {
+  display: block;
+  padding: 4px 9px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: $red;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  transition: $trans-text;
+
+  .hotels-map__pin:hover & {
+    background: $text-black;
   }
 }
 
@@ -900,5 +925,62 @@ body.is-hotels-map-open {
   /* Отель, на метку которого навели на карте. */
   &.is-highlighted {
     background: $bg-gray-light;
+  }
+}
+
+/* Список отелей, стоящих в одной точке: увеличение такую группу не разбивает. */
+.hotels-map__popup {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  width: 280px;
+  max-height: 60%;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+
+  &-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    color: $gray;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  &-title {
+    margin: 0 0 10px;
+    padding-right: 20px;
+    color: $text-gray;
+    font-size: 13px;
+  }
+
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+  }
+
+  &-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: $text-black;
+    font-size: 14px;
+    transition: $trans-text;
+
+    span {
+      color: $text-gray;
+      font-size: 13px;
+    }
+
+    &:hover {
+      color: $red;
+    }
   }
 }

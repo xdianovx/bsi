@@ -108,7 +108,7 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
           <?php array_map($render_resort, $resorts_head); ?>
 
           <?php if ($resorts_tail): ?>
-            <details class="hotels-filters__more">
+            <details class="hotels-filters__more" data-key="resorts">
               <summary>Ещё курорты (<?= count($resorts_tail); ?>)</summary>
               <div class="hotels-filters__group-body">
                 <?php array_map($render_resort, $resorts_tail); ?>
@@ -140,7 +140,7 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
           <?php array_map($render_amenity, $amenities_head); ?>
 
           <?php if ($amenities_tail): ?>
-            <details class="hotels-filters__more" <?= array_intersect(array_column($amenities_tail, 'slug'), $filters['amenities']) ? 'open' : ''; ?>>
+            <details class="hotels-filters__more" data-key="amenities" <?= array_intersect(array_column($amenities_tail, 'slug'), $filters['amenities']) ? 'open' : ''; ?>>
               <summary>Ещё удобства (<?= count($amenities_tail); ?>)</summary>
               <div class="hotels-filters__group-body">
                 <?php array_map($render_amenity, $amenities_tail); ?>

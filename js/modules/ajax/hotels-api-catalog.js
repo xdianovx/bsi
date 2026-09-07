@@ -2,6 +2,37 @@ import { initHotelsMap } from "../hotels-map";
 import { initHotelsFilters, initHotelsMapToggle } from "./hotels-filters";
 
 /**
+ * Панель фильтров приезжает с сервера заново, поэтому перед подменой запоминаем,
+ * что было раскрыто и куда прокручено: иначе выбор галочки схлопывает открытый
+ * список курортов и отматывает панель наверх.
+ */
+const keepPanelState = (root) => {
+  const panel = root.querySelector(".js-hotels-filters-panel");
+
+  const state = {
+    open: [...root.querySelectorAll(".hotels-filters__more[data-key]")]
+      .filter((details) => details.open)
+      .map((details) => details.dataset.key),
+    scroll: panel ? panel.scrollTop : 0,
+    focus: document.activeElement?.closest(".js-hotels-filters") ? document.activeElement.name : "",
+  };
+
+  return () => {
+    state.open.forEach((key) => {
+      const details = root.querySelector(`.hotels-filters__more[data-key="${key}"]`);
+      if (details) details.open = true;
+    });
+
+    const next = root.querySelector(".js-hotels-filters-panel");
+    if (next) next.scrollTop = state.scroll;
+
+    if (state.focus) {
+      root.querySelector(`.js-hotels-filters [name="${state.focus}"]`)?.focus();
+    }
+  };
+};
+
+/**
  * Каталог отелей страны из хаба: смена страницы и курорта без перезагрузки.
  *
  * Ссылки в разметке настоящие — поисковик и переход по прямому адресу работают
@@ -93,7 +124,9 @@ export const initHotelsApiCatalog = () => {
       );
 
       if (json?.success && json.data?.html) {
+        const restore = keepPanelState(root);
         root.innerHTML = json.data.html;
+        restore();
         initHotelsMap();
         return;
       }
@@ -131,7 +164,9 @@ export const initHotelsApiCatalog = () => {
         throw new Error("empty response");
       }
 
+      const restore = keepPanelState(root);
       root.innerHTML = json.data.html;
+      restore();
       initHotelsMap();
 
       // Сервер вернул заглушки — доспрашиваем каталог тем же путём.

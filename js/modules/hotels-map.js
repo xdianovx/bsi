@@ -13,6 +13,17 @@ const escapeHtml = (value) =>
     return map[char];
   });
 
+/** Точки ближе этого считаем одной: примерно десяток метров. */
+const SAME_SPOT = 0.0002;
+
+/** Разброс координат в наборе — по нему видно, распадётся ли кластер. */
+const spread = (features) => {
+  const lngs = features.map((f) => f.geometry.coordinates[0]);
+  const lats = features.map((f) => f.geometry.coordinates[1]);
+
+  return Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats));
+};
+
 /** Прямоугольник, в который попадают все метки. */
 const boundsOf = (points) => {
   const lats = points.map((p) => p.lat);
@@ -24,12 +35,22 @@ const boundsOf = (points) => {
   ];
 };
 
+/** Короткая цена для метки: «от 94 $ за ночь» → «94 $». */
+const shortPrice = (price) => String(price || "").replace(/^от\s*/, "").replace(/\s*за ночь$/, "");
+
 const markerElement = (point) => {
   const el = document.createElement("a");
-  el.className = "hotels-map__pin";
+  el.className = point.price ? "hotels-map__pin hotels-map__pin--price" : "hotels-map__pin";
   el.href = point.url || "#";
+
+  // Цена стоит прямо на метке, пока метки не сгрудились: плотные группы
+  // прячет кластеризация, поэтому отдельная метка почти всегда свободна.
+  const label = point.price
+    ? `<span class="hotels-map__pin-label">${escapeHtml(shortPrice(point.price))}</span>`
+    : '<span class="hotels-map__pin-dot"></span>';
+
   el.innerHTML = `
-    <span class="hotels-map__pin-dot"></span>
+    ${label}
     <span class="hotels-map__pin-card">
       <b>${escapeHtml(point.name)}${point.stars ? ` ${point.stars}*` : ""}</b>
       ${point.city ? `<span>${escapeHtml(point.city)}</span>` : ""}
@@ -72,7 +93,16 @@ export const initHotelsMap = async () => {
   }
 
   const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker, YMapControls } = ymaps3;
-  const single = points.length === 1;
+
+  /* Карта охватывает все метки выборки: одна точка — крупный план, разбросаны
+     по стране — общий. Отступы, чтобы крайние метки не липли к краю. */
+  const lngs = points.map((point) => point.lng);
+  const lats = points.map((point) => point.lat);
+  const tight = Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats)) < SAME_SPOT;
+
+  const location = tight
+    ? { center: [points[0].lng, points[0].lat], zoom: 15 }
+    : { bounds: boundsOf(points), padding: { top: 48, bottom: 48, left: 48, right: 48 } };
 
   // Кнопки зума живут в отдельном пакете темы — без них останется только
   // перетаскивание и двойной клик.
@@ -109,11 +139,37 @@ export const initHotelsMap = async () => {
   const CALM = ["drag", "dblClick", "pinchZoom"];
   const ACTIVE = ["drag", "dblClick", "pinchZoom", "scrollZoom"];
 
+  /* Список отелей кластера, который не разъезжается по зуму. */
+  const popup = document.createElement("div");
+  popup.className = "hotels-map__popup";
+  popup.hidden = true;
+  container.append(popup);
+
+  const showList = (list) => {
+    popup.innerHTML = `
+      <button class="hotels-map__popup-close" type="button" aria-label="Закрыть">&times;</button>
+      <p class="hotels-map__popup-title">Отелей в этой точке: ${list.length}</p>
+      <div class="hotels-map__popup-list">
+        ${list
+          .map(
+            (point) => `
+          <a class="hotels-map__popup-item" href="${escapeHtml(point.url || "#")}">
+            <b>${escapeHtml(point.name)}${point.stars ? ` ${point.stars}*` : ""}</b>
+            ${point.price ? `<span>${escapeHtml(point.price)}</span>` : ""}
+          </a>`,
+          )
+          .join("")}
+      </div>
+    `;
+    popup.hidden = false;
+  };
+
+  popup.addEventListener("click", (event) => {
+    if (event.target.closest(".hotels-map__popup-close")) popup.hidden = true;
+  });
+
   try {
-    const map = new YMap(container, {
-      location: single ? { center: [points[0].lng, points[0].lat], zoom: 14 } : { bounds: boundsOf(points) },
-      behaviors: CALM,
-    });
+    const map = new YMap(container, { location, behaviors: CALM });
 
     map.addChild(new YMapDefaultSchemeLayer());
     map.addChild(new YMapDefaultFeaturesLayer());
@@ -171,6 +227,13 @@ export const initHotelsMap = async () => {
             element.textContent = String(features.length);
 
             element.addEventListener("click", () => {
+              /* Отели одного комплекса стоят в одной точке, и увеличение такую
+                 группу не разбивает — показываем список прямо на карте. */
+              if (spread(features) < SAME_SPOT) {
+                showList(features.map((feature) => feature.properties));
+                return;
+              }
+
               map.setLocation({ center: coordinates, zoom: map.zoom + 2, duration: 300 });
             });
 
@@ -179,7 +242,7 @@ export const initHotelsMap = async () => {
         }),
       );
     } else {
-      points.forEach((point) => map.addChild(createMarker(point)));
+        points.forEach((point) => map.addChild(createMarker(point)));
     }
 
     container.dataset.ready = "1";

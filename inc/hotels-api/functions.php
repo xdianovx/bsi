@@ -257,7 +257,7 @@ function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fall
   $api_country = bsi_hotels_api_country_slug((int) $country->ID);
   $client = bsi_hotels_api();
 
-  $result = ['points' => [], 'total' => 0, 'returned' => 0, 'partial' => false];
+  $result = ['points' => [], 'total' => 0, 'returned' => 0, 'partial' => false, 'unfiltered' => false];
 
   $to_point = static function (array $hotel) use ($catalog_url): ?array {
     $lat = (float) ($hotel['lat'] ?? 0);
@@ -300,6 +300,21 @@ function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fall
 
       $result['total'] = $map['total'];
       $result['returned'] = $map['returned'] ?: count($result['points']);
+
+      /* Отбор ничего не нашёл — карту не убираем, иначе макет схлопывается
+         и страница прыгает. Показываем все отели направления. */
+      if (!$result['points'] && bsi_hotels_api_filters_active($filters ?? bsi_hotels_api_catalog_filters())) {
+        $all = $client->hotelsMap(array_filter(['country' => $api_country, 'city' => $resort]));
+
+        foreach ($all['items'] as $hotel) {
+          $point = $to_point($hotel);
+          if ($point) {
+            $result['points'][] = $point;
+          }
+        }
+
+        $result['unfiltered'] = true;
+      }
 
       return $result;
     } catch (HotelsApiException $e) {
