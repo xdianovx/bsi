@@ -880,6 +880,12 @@ $hp-nav-offset: 76px;
 }
 
 .hp-location {
+  // Свой слой: у контролов Яндекса высокий z-index, без изоляции кнопка
+  // «Открыть Яндекс Карты» вылезает поверх липкой навигации.
+  isolation: isolate;
+  position: relative;
+  z-index: 0;
+
   &__note {
     max-width: 900px;
     margin-bottom: 16px;
