@@ -119,6 +119,43 @@ foreach ($resorts as $city) {
     Нашли отелей: <?= (int) $list['total']; ?>
   </div>
 
+  <?php
+  // Координаты приезжают вместе с карточками списка, отдельный запрос не нужен.
+  $points = [];
+  foreach ($list['items'] as $hotel) {
+    $lat = (float) ($hotel['lat'] ?? 0);
+    $lng = (float) ($hotel['lng'] ?? 0);
+
+    if ($lat === 0.0 || $lng === 0.0) {
+      continue;
+    }
+
+    $price = bsi_hotels_api_format_price($hotel['price_from'] ?? null);
+
+    $points[] = [
+      'lat' => $lat,
+      'lng' => $lng,
+      'name' => (string) $hotel['name'],
+      'stars' => (int) ($hotel['stars'] ?? 0),
+      'city' => (string) ($hotel['city']['name'] ?? ''),
+      'price' => $price !== '' ? 'от ' . $price . ' за ночь' : '',
+      'url' => bsi_hotels_api_hotel_url($catalog_url, $hotel),
+    ];
+  }
+  ?>
+
+  <?php if ($points): ?>
+    <section class="country-hotels__map-section">
+      <h2 class="h2 country-hotels__map-title">Отели на карте</h2>
+      <p class="country-hotels__map-note">
+        <?= count($points); ?> из <?= count($list['items']); ?> отелей этой страницы с известным адресом
+      </p>
+
+      <div class="country-hotels__map js-hotels-map"></div>
+      <script type="application/json" class="js-hotels-map-data"><?= wp_json_encode($points); ?></script>
+    </section>
+  <?php endif; ?>
+
   <div class="country-hotels__grid">
     <?php foreach ($list['items'] as $hotel): ?>
       <?php get_template_part('template-parts/hotels/api-card', null, [

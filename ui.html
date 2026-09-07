@@ -1569,6 +1569,23 @@ get_template_part('template-parts/hotels/room-card');
 
   </section>
 
+  <!-- ============ CATALOG MAP PIN ============ -->
+  <section class="uikit-section" id="hotels-map-pin">
+    <h2>Метка отеля на карте каталога (hotels-map__pin)</h2>
+    <p class="uikit-section__hint">Ставится на карту Яндекса в <code>js/modules/hotels-map.js</code>; карточка раскрывается по наведению. Данные — координаты из карточек списка хаба.</p>
+
+    <div style="position:relative;height:120px;background:var(--uikit-muted-bg,#f4f4f6);border-radius:12px">
+      <a class="hotels-map__pin" href="#" style="position:absolute;top:70px;left:80px">
+        <span class="hotels-map__pin-dot"></span>
+        <span class="hotels-map__pin-card" style="display:flex">
+          <b>Adagio Doha 4*</b>
+          <span>Аль Мунтаза</span>
+          <span class="hotels-map__pin-price">от 94 $ за ночь</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
   <!-- ============ HOTEL PAGE (hp-*) ============ -->
   <section class="uikit-section" id="hotel-page">
     <h2>Страница отеля (hp-*)</h2>

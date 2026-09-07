@@ -15,6 +15,7 @@ import { promoPageAjax } from "./modules/ajax/promo-sort";
 import { burger, mobileNavAccordion } from "./modules/burger";
 import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
 import { initHotelsApiCatalog } from "./modules/ajax/hotels-api-catalog";
+import { initHotelsMap } from "./modules/hotels-map";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initEventToursFilters } from "./modules/ajax/event-tours";
@@ -123,6 +124,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initHotelAmenities();
   initHotelRequestForm();
   initHotelsApiCatalog();
+  window.addEventListener("load", () => initHotelsMap());
   initCurrency();
   tabs(".tabs", ".tab-button", ".tab-content__item");
   sliders();

@@ -1,3 +1,5 @@
+import { initHotelsMap } from "../hotels-map";
+
 /**
  * Каталог отелей страны из хаба: смена страницы и курорта без перезагрузки.
  *
@@ -85,6 +87,7 @@ export const initHotelsApiCatalog = () => {
 
       if (json?.success && json.data?.html) {
         root.innerHTML = json.data.html;
+        initHotelsMap();
         return;
       }
 
@@ -122,6 +125,7 @@ export const initHotelsApiCatalog = () => {
       }
 
       root.innerHTML = json.data.html;
+      initHotelsMap();
 
       // Сервер вернул заглушки — доспрашиваем каталог тем же путём.
       if (root.querySelector(".js-hotels-retry")) {
