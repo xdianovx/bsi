@@ -262,3 +262,13 @@
     }
   }
 }
+
+/* Каталог отелей хаба подгружается без перезагрузки — на время запроса гасим сетку. */
+.country-hotels__catalog {
+  transition: opacity 0.2s ease-in-out;
+
+  &.is-loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}

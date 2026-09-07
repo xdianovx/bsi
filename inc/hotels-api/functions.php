@@ -174,14 +174,17 @@ function bsi_hotels_api_current_resort(int $country_id): ?array
  * Список отелей для текущего запроса каталога. Результат мемоизируется:
  * его читают и шаблон, и мета-теги в wp_head, которые собираются раньше.
  *
+ * Страницу и курорт можно передать явно — так их задаёт AJAX-подгрузка каталога,
+ * где query vars текущего запроса не относятся к делу.
+ *
  * @return array{list: array, resorts: array, error: string, per_page: int, resort: string}
  */
-function bsi_hotels_api_catalog_query(WP_Post $country): array
+function bsi_hotels_api_catalog_query(WP_Post $country, ?int $paged = null, ?string $resort = null): array
 {
   static $cache = [];
 
-  $paged = max(1, (int) get_query_var('paged'));
-  $resort = sanitize_title((string) get_query_var('country_hotel_resort'));
+  $paged = max(1, $paged ?? (int) get_query_var('paged'));
+  $resort = sanitize_title($resort ?? (string) get_query_var('country_hotel_resort'));
   $key = $country->ID . ':' . $paged . ':' . $resort;
 
   if (isset($cache[$key])) {
@@ -215,9 +218,16 @@ function bsi_hotels_api_catalog_query(WP_Post $country): array
     ]));
 
     $result['list']['items'] = bsi_hotels_api_filter_items($result['list']['items']);
-    $result['resorts'] = $client->cities($api_country);
   } catch (HotelsApiException $e) {
     $result['error'] = $e->getMessage();
+  }
+
+  // Курорты просим отдельно: список отелей может отвалиться по таймауту,
+  // но фильтр курортов должен остаться — иначе из пустой выдачи не выбраться.
+  try {
+    $result['resorts'] = $client->cities($api_country);
+  } catch (HotelsApiException $e) {
+    // Фильтра не будет, каталог из-за этого не ломается.
   }
 
   return $cache[$key] = $result;
