@@ -20,12 +20,12 @@
   gap: 32px 16px;
 }
 
-.country-hotels__item {
-}
+.country-hotels__item {}
 
 .country-hotels__counter {
   margin-top: 8px;
 }
+
 .country-hotels__item-title {
   font-weight: 700;
   font-size: 24px;
@@ -38,11 +38,9 @@
   gap: 8px;
 }
 
-.country-hotel {
-}
+.country-hotel {}
 
-.country-hotel__image {
-}
+.country-hotel__image {}
 
 .hotel-rating {
   background: #dedede;
@@ -58,6 +56,7 @@
 
 .country-hotel__title {
   transition: $trans-text;
+
   &:hover {
     color: $red;
   }
@@ -352,9 +351,9 @@
   border-radius: 999px;
   background: $red;
   color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
   white-space: nowrap;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   transition: $trans-text;
@@ -716,7 +715,7 @@ body.is-hotels-map-open {
       }
     }
 
-    > .hotels-filters__group-body {
+    >.hotels-filters__group-body {
       padding-top: 10px;
     }
   }
@@ -749,7 +748,7 @@ body.is-hotels-map-open {
 
     &.is-active {
       color: $red;
-      font-weight: 600;
+      font-weight: 400;
     }
   }
 

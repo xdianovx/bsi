@@ -24,14 +24,27 @@ const spread = (features) => {
   return Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats));
 };
 
-/** Прямоугольник, в который попадают все метки. */
+/**
+ * Прямоугольник вокруг всех меток с запасом по краям.
+ *
+ * Запас берём долей самого прямоугольника: иначе метки у границы упираются
+ * в край карты, а подпись с ценой уезжает за него.
+ */
 const boundsOf = (points) => {
-  const lats = points.map((p) => p.lat);
-  const lngs = points.map((p) => p.lng);
+  const lats = points.map((point) => point.lat);
+  const lngs = points.map((point) => point.lng);
+
+  const north = Math.max(...lats);
+  const south = Math.min(...lats);
+  const east = Math.max(...lngs);
+  const west = Math.min(...lngs);
+
+  const padLat = Math.max((north - south) * 0.12, 0.004);
+  const padLng = Math.max((east - west) * 0.12, 0.004);
 
   return [
-    [Math.min(...lngs), Math.max(...lats)],
-    [Math.max(...lngs), Math.min(...lats)],
+    [west - padLng, north + padLat],
+    [east + padLng, south - padLat],
   ];
 };
 
@@ -170,6 +183,17 @@ export const initHotelsMap = async () => {
 
   try {
     const map = new YMap(container, { location, behaviors: CALM });
+
+    /* Пока карта строится, контейнер может ещё не знать своей высоты — в этот
+       момент охват считается по нулевому размеру и метки уезжают из кадра.
+       Повторяем установку, когда размеры уже известны и при их изменении. */
+    const fit = () => map.setLocation({ ...location, duration: 0 });
+
+    requestAnimationFrame(fit);
+
+    const resizer = new ResizeObserver(fit);
+    resizer.observe(container);
+    signal.addEventListener("abort", () => resizer.disconnect());
 
     map.addChild(new YMapDefaultSchemeLayer());
     map.addChild(new YMapDefaultFeaturesLayer());
