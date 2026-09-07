@@ -4,8 +4,13 @@
  * Клиент публичного API BSIHOTELS (хаб отелей).
  *
  * Читает только: список отелей, карточку, справочники стран/городов/удобств.
- * Токена нет. Своего кеша нет — хаб кеширует сам, и его ответ всегда свежее
- * нашей копии.
+ * Токена нет.
+ *
+ * Своего кеша нет и не будет: кеш держит хаб, его ответ всегда свежее нашей
+ * копии. Единственная защита на нашей стороне — время ожидания: на холодных
+ * данных хаб уходит в минуты, и страница страны не должна за него висеть.
+ * Поэтому при рендере ждём секунды, а каталог догружается запросом, которому
+ * ждать не жалко (см. inc/requests/ajax-hotels-api-catalog.php).
  */
 class HotelsApiClient
 {
@@ -25,13 +30,21 @@ class HotelsApiClient
   private const CACHE_HOTEL = 0;
   private const CACHE_DICT = 0;
 
+
   /** Версия ключа кеша: поднять, если поменялась форма ответа. */
   private const CACHE_VERSION = 'v1';
 
   public function __construct(array $config)
   {
     $this->baseUrl = rtrim((string) ($config['base_url'] ?? ''), '/');
-    $this->timeout = max(1, (int) ($config['timeout'] ?? 15));
+    /**
+     * Столько ждём хаб. На странице это секунды — дольше уже висящая страница,
+     * а не медленный ответ; в AJAX-догрузке каталога ожидание никого не держит,
+     * поэтому там фильтр поднимает предел.
+     *
+     * @param int $timeout секунды
+     */
+    $this->timeout = max(1, (int) apply_filters('bsi_hotels_api_timeout', (int) ($config['timeout'] ?? 2)));
 
     if ($this->baseUrl === '') {
       throw new RuntimeException('BSIHOTELS: не задан BSI_HOTELS_API_URL');

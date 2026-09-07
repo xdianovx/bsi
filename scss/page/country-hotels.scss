@@ -272,3 +272,27 @@
     pointer-events: none;
   }
 }
+
+/* Хаб не успел ответить — вместо каталога заглушки, список догружается сам. */
+.country-hotels__pending-note {
+  margin: 0 0 16px;
+  color: $text-gray;
+}
+
+.country-hotels__skeleton {
+  min-height: 320px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, $bg-gray 25%, #ececf0 37%, $bg-gray 63%);
+  background-size: 400% 100%;
+  animation: country-hotels-skeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes country-hotels-skeleton {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}

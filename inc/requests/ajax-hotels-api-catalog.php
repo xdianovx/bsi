@@ -25,6 +25,15 @@ function bsi_hotels_api_catalog_ajax(): void
   $paged = max(1, isset($_POST['page']) ? absint($_POST['page']) : 1);
   $resort = sanitize_title((string) ($_POST['resort'] ?? ''));
 
+  /**
+   * Ждать хаб одним длинным запросом нельзя: веб-сервер рвёт соединение
+   * на тридцатой секунде и отдаёт 500. Поэтому ждём заведомо меньше лимита,
+   * а если хаб не успел — честно говорим об этом клиенту, и тот спрашивает
+   * снова. Холодная выдача у хаба доходит до двух минут, за несколько таких
+   * подходов она успевает прогреться.
+   */
+  add_filter('bsi_hotels_api_timeout', static fn() => 20);
+
   $catalog = bsi_hotels_api_catalog_query($country, $paged, $resort);
 
   ob_start();
@@ -37,6 +46,8 @@ function bsi_hotels_api_catalog_ajax(): void
 
   wp_send_json_success([
     'html' => $html,
+    // Хаб не успел — в разметке заглушки, клиент переспросит.
+    'pending' => $catalog['error'] !== '',
     'total' => (int) ($catalog['list']['total'] ?? 0),
     'pages' => (int) ($catalog['list']['pages'] ?? 0),
   ]);

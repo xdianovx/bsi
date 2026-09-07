@@ -78,8 +78,24 @@ foreach ($resorts as $city) {
   <?php endif; ?>
 
 <?php if ($error !== ''): ?>
-  <div class="country-hotels__message">
-    <p>Каталог отелей сейчас недоступен. Подберём отель по запросу — напишите нам.</p>
+  <?php /* Хаб не ответил в отведённые секунды. Страницу не держим: показываем
+           заглушки и просим каталог ещё раз через AJAX, где ждать не жалко.
+           Разметку повтора видит js/modules/ajax/hotels-api-catalog.js. */ ?>
+  <div class="country-hotels__pending js-hotels-retry"
+       data-page="<?= (int) $paged; ?>"
+       data-resort="<?= esc_attr($resort); ?>">
+    <p class="country-hotels__pending-note">Подбираем отели…</p>
+
+    <div class="country-hotels__grid">
+      <?php for ($i = 0; $i < 6; $i++): ?>
+        <div class="country-hotels__skeleton"></div>
+      <?php endfor; ?>
+    </div>
+
+    <noscript>
+      <p>Каталог отелей сейчас недоступен. Подберём отель по запросу — напишите нам.</p>
+    </noscript>
+
     <?php if (current_user_can('manage_options')): ?>
       <p class="country-hotels__message-debug">Хаб отелей: <?= esc_html($error); ?></p>
     <?php endif; ?>

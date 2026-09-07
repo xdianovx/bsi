@@ -42,6 +42,68 @@ export const initHotelsApiCatalog = () => {
   const baseUrl = root.dataset.url;
   let request = 0;
 
+  /** Запрос каталога к серверу; страницу и курорт передаём явно. */
+  const fetchCatalog = async (page, resort) => {
+    const body = new URLSearchParams({
+      action: "bsi_hotels_api_catalog",
+      country_id: countryId,
+      page: String(page),
+      resort: resort || "",
+    });
+
+    const response = await fetch(ajax.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+      body: body.toString(),
+      credentials: "same-origin",
+    });
+
+    return response.json();
+  };
+
+  // Сколько раз переспрашиваем каталог и с какой паузой между подходами.
+  const RETRY_LIMIT = 8;
+  const RETRY_PAUSE = 3000;
+
+  const giveUp = (pending) => {
+    pending.innerHTML =
+      '<p class="country-hotels__message">Каталог отелей сейчас недоступен. ' +
+      "Подберём отель по запросу — напишите нам.</p>";
+  };
+
+  /**
+   * Хаб не успел ответить при рендере страницы — вместо каталога стоят заглушки.
+   * Спрашиваем снова: сервер отвечает `pending`, пока хаб греет выдачу, и одним
+   * длинным запросом это не переждать — веб-сервер рвёт соединение.
+   */
+  const retryPending = async (attempt = 1) => {
+    const pending = root.querySelector(".js-hotels-retry");
+    if (!pending) return;
+
+    try {
+      const json = await fetchCatalog(pending.dataset.page || 1, pending.dataset.resort);
+
+      if (json?.success && json.data?.html) {
+        root.innerHTML = json.data.html;
+        return;
+      }
+
+      if (json?.success && json.data?.pending && attempt < RETRY_LIMIT) {
+        window.setTimeout(() => retryPending(attempt + 1), RETRY_PAUSE);
+        return;
+      }
+
+      giveUp(pending);
+    } catch (error) {
+      if (attempt < RETRY_LIMIT) {
+        window.setTimeout(() => retryPending(attempt + 1), RETRY_PAUSE);
+        return;
+      }
+
+      giveUp(pending);
+    }
+  };
+
   const load = async (href, push) => {
     const target = parseUrl(href, baseUrl);
     if (!target) return false;
@@ -50,21 +112,7 @@ export const initHotelsApiCatalog = () => {
     root.classList.add("is-loading");
 
     try {
-      const body = new URLSearchParams({
-        action: "bsi_hotels_api_catalog",
-        country_id: countryId,
-        page: String(target.page),
-        resort: target.resort,
-      });
-
-      const response = await fetch(ajax.url, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
-        body: body.toString(),
-        credentials: "same-origin",
-      });
-
-      const json = await response.json();
+      const json = await fetchCatalog(target.page, target.resort);
 
       // Пока ждали ответ, пользователь мог кликнуть дальше — старый ответ не нужен.
       if (ticket !== request) return true;
@@ -74,6 +122,11 @@ export const initHotelsApiCatalog = () => {
       }
 
       root.innerHTML = json.data.html;
+
+      // Сервер вернул заглушки — доспрашиваем каталог тем же путём.
+      if (root.querySelector(".js-hotels-retry")) {
+        retryPending();
+      }
 
       if (push) {
         window.history.pushState({ hotelsCatalog: true }, "", href);
@@ -109,4 +162,6 @@ export const initHotelsApiCatalog = () => {
   window.addEventListener("popstate", () => {
     load(window.location.href, false);
   });
+
+  retryPending();
 };
