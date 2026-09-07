@@ -40,6 +40,9 @@ const markerElement = (point) => {
   return el;
 };
 
+/** Слушатели прошлой карты: каталог перерисовывается, старые надо снимать. */
+let listeners = null;
+
 export const initHotelsMap = async () => {
   const container = document.querySelector(".js-hotels-map");
   const data = document.querySelector(".js-hotels-map-data");
@@ -55,23 +58,57 @@ export const initHotelsMap = async () => {
 
   if (!points.length || typeof ymaps3 === "undefined") return;
 
+  listeners?.abort();
+  listeners = new AbortController();
+  const { signal } = listeners;
+
   try {
     await ymaps3.ready;
   } catch (error) {
     return;
   }
 
-  const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker } = ymaps3;
+  const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker, YMapControls } = ymaps3;
   const single = points.length === 1;
+
+  // Кнопки зума живут в отдельном пакете темы — без них останется только
+  // перетаскивание и двойной клик.
+  let YMapZoomControl;
+  try {
+    if (typeof ymaps3.import.registerCdn === "function") {
+      ymaps3.import.registerCdn("https://cdn.jsdelivr.net/npm/{package}", "@yandex/ymaps3-default-ui-theme@0.0");
+    }
+    ({ YMapZoomControl } = await ymaps3.import("@yandex/ymaps3-default-ui-theme"));
+  } catch (error) {
+    YMapZoomControl = null;
+  }
+
+  // Колесо перехватываем только после клика по карте, иначе страница
+  // перестаёт прокручиваться над ней.
+  const CALM = ["drag", "dblClick", "pinchZoom"];
+  const ACTIVE = ["drag", "dblClick", "pinchZoom", "scrollZoom"];
 
   try {
     const map = new YMap(container, {
       location: single ? { center: [points[0].lng, points[0].lat], zoom: 14 } : { bounds: boundsOf(points) },
-      behaviors: ["drag", "dblClick"],
+      behaviors: CALM,
     });
 
     map.addChild(new YMapDefaultSchemeLayer());
     map.addChild(new YMapDefaultFeaturesLayer());
+
+    if (YMapZoomControl && YMapControls) {
+      map.addChild(new YMapControls({ position: "right" }).addChild(new YMapZoomControl({})));
+    }
+
+    container.addEventListener("mousedown", () => map.setBehaviors?.(ACTIVE), { signal });
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (!container.contains(event.target)) map.setBehaviors?.(CALM);
+      },
+      { signal },
+    );
 
     points.forEach((point) => {
       map.addChild(new YMapMarker({ coordinates: [point.lng, point.lat], mapFollowsOnClick: false }, markerElement(point)));
