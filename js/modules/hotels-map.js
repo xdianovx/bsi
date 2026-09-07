@@ -83,6 +83,10 @@ export const initHotelsMap = async () => {
     YMapZoomControl = null;
   }
 
+  // Наведённая метка встаёт над соседними — иначе они закрывают её карточку.
+  const BASE_Z = 1000;
+  const HOVER_Z = 9999;
+
   // Колесо перехватываем только после клика по карте, иначе страница
   // перестаёт прокручиваться над ней.
   const CALM = ["drag", "dblClick", "pinchZoom"];
@@ -111,7 +115,26 @@ export const initHotelsMap = async () => {
     );
 
     points.forEach((point) => {
-      map.addChild(new YMapMarker({ coordinates: [point.lng, point.lat], mapFollowsOnClick: false }, markerElement(point)));
+      const element = markerElement(point);
+      const marker = new YMapMarker(
+        { coordinates: [point.lng, point.lat], mapFollowsOnClick: false, zIndex: BASE_Z },
+        element,
+      );
+
+      /* Метки лежат в общем слое карты: соседние точки перекрывают раскрытую
+         карточку. Поднимаем наведённую метку над остальными — и в слое карты,
+         и в самом DOM, потому что каждый маркер сидит в своей обёртке. */
+      const lift = (up) => {
+        marker.update({ zIndex: up ? HOVER_Z : BASE_Z });
+        if (element.parentElement) {
+          element.parentElement.style.zIndex = up ? String(HOVER_Z) : "";
+        }
+      };
+
+      element.addEventListener("mouseenter", () => lift(true), { signal });
+      element.addEventListener("mouseleave", () => lift(false), { signal });
+
+      map.addChild(marker);
     });
 
     container.dataset.ready = "1";
