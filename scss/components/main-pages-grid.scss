@@ -4,11 +4,13 @@
 
 .main-pages-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 4px;
+
   &::-webkit-scrollbar {
     display: none; // Chrome / Safari / Opera
   }
+
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -35,12 +37,14 @@
   align-items: flex-end;
   position: relative;
   transition: all 0.3s ease-in-out;
+
   p {
     margin-bottom: 0;
   }
 
   &:hover {
     background: $red;
+
     .main-pages__item-button {
       color: #fff;
     }
