@@ -138,12 +138,12 @@ $excerpt_raw = preg_replace('/\s+/u', ' ', trim(wp_strip_all_tags($excerpt_raw))
     <?php endif; ?>
 
     <div class="catalog-card__actions">
-      <a href="<?= esc_url($link); ?>" class="catalog-card__btn catalog-card__btn-details">
+      <a href="<?= esc_url($link); ?>" class="btn btn-gray sm catalog-card__btn">
         Подробнее
       </a>
       <?php if ($price_rub !== null && $price_rub > 0): ?>
         <button type="button"
-                class="btn btn-accent catalog-card__btn catalog-card__btn-book js-excursion-booking-btn js-excursion-price"
+                class="btn btn-accent sm catalog-card__btn js-excursion-booking-btn js-excursion-price"
                 data-excursion-id="<?= esc_attr((string) $post_id); ?>"
                 data-excursion-title="<?= esc_attr($title); ?>"
                 data-price-rub="<?= esc_attr((string) (int) $price_rub); ?>"
@@ -154,7 +154,7 @@ $excerpt_raw = preg_replace('/\s+/u', ' ', trim(wp_strip_all_tags($excerpt_raw))
                 data-has-from="true">от <?= esc_html(number_format((int) $price_rub, 0, ',', ' ')); ?> ₽</button>
       <?php else: ?>
         <button type="button"
-                class="btn btn-accent catalog-card__btn catalog-card__btn-book js-excursion-booking-btn"
+                class="btn btn-accent sm catalog-card__btn js-excursion-booking-btn"
                 data-excursion-id="<?= esc_attr((string) $post_id); ?>"
                 data-excursion-title="<?= esc_attr($title); ?>">Забронировать</button>
       <?php endif; ?>

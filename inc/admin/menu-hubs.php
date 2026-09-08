@@ -165,12 +165,6 @@ add_action('admin_menu', function () {
       $item = $menu[$by_slug[$item_slug]];
       $submenu[$hub_slug][] = [$item[0], $item[1], $item[2]];
       unset($menu[$by_slug[$item_slug]]);
-
-      /* Собственное подменю пункта убираем: get_admin_page_parent() ищет
-         родителя по первому совпадению в $submenu и иначе подсвечивает
-         исходный пункт вместо хаба. Ссылки «Добавить» и таксономии
-         показываем на странице хаба. */
-      unset($submenu[$item_slug]);
     }
 
     foreach ($registered as $registered_item) {
@@ -181,6 +175,24 @@ add_action('admin_menu', function () {
       unset($submenu[$hub_slug]);
     }
   }
+
+  /* Подменю хабов — первыми в $submenu: get_admin_page_parent() возвращает
+     первого найденного родителя, и без этого он находил бы собственное
+     подменю типа записи. Сами подменю типов сохраняем — иначе WP отдаёт 403
+     на их страницах (например «Re-Order» плагина Post Types Order). */
+    $hub_keys = array_keys(bsi_admin_menu_hubs());
+  $reordered = [];
+  foreach ($hub_keys as $hub_key) {
+    if (isset($submenu[$hub_key])) {
+      $reordered[$hub_key] = $submenu[$hub_key];
+    }
+  }
+  foreach ($submenu as $key => $items) {
+    if (!isset($reordered[$key])) {
+      $reordered[$key] = $items;
+    }
+  }
+  $submenu = $reordered;
 
   $menu['58.9'] = ['', 'read', 'bsi-separator-bottom', '', 'wp-menu-separator'];
 
@@ -292,6 +304,19 @@ function bsi_render_menu_hub(): void
               $taxonomy->labels->name,
               'edit-tags.php?taxonomy=' . $taxonomy->name . '&post_type=' . $post_type,
             ];
+          }
+
+          /* Страницы, которые плагины вешают подпунктом типа записи
+             (например «Re-Order» у Post Types Order): в сайдбаре их нет,
+             показываем здесь. */
+          foreach (($submenu[$item_slug] ?? []) as $sub) {
+            if ($sub[2] === $item_slug || !str_contains($sub[2], 'page=')) {
+              continue;
+            }
+            if (!current_user_can($sub[1])) {
+              continue;
+            }
+            $links[] = [trim(wp_strip_all_tags($sub[0])), $sub[2]];
           }
         }
         ?>

@@ -110,9 +110,6 @@
 
 
           <div class="header-old-btns">
-            <a href="https://past.bsigroup.ru/"
-               target="_blank"
-               class="button-login header__button-login button-old-site">Старый сайт</a>
             <a href="https://online.bsigroup.ru/cl_refer"
                target="_blank"
                class="button-login header__button-login">
@@ -171,13 +168,6 @@
           ]);
           ?>
 
-        </div>
-
-        <div class="mobile-nav__old-site">
-          <a href="https://past.bsigroup.ru/"
-             target="_blank"
-             rel="noopener noreferrer"
-             class="button-login mobile-nav__old-site-link">Старый сайт</a>
         </div>
 
         <div class="mobile-nav__currencies">
