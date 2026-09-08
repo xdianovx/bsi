@@ -1,5 +1,6 @@
 .header {
   // padding: 0 0 16px;
+  background: #fff;
 
   @media screen and (max-width: 768px) {
     position: sticky;
@@ -14,6 +15,7 @@
       top: 46px;
     }
   }
+
   .socials {
     display: none;
   }
@@ -29,15 +31,17 @@
     height: 40px;
     border-radius: 8px;
     background: #fff;
+
     &:hover {
       svg {
         transform: scale(1.1);
       }
     }
-    &.--tg {
-    }
-    &.--vk {
-    }
+
+    &.--tg {}
+
+    &.--vk {}
+
     svg {
       // margin-top: 2px;
       transition: $trans-text;
@@ -97,6 +101,7 @@
     }
   }
 }
+
 .header-top__wrap {
   padding: 4px 0;
   background: #f4f4f6;
@@ -118,6 +123,7 @@
   align-items: center;
   gap: 64px;
   margin-top: 8px;
+
   @media screen and (max-width: 768px) {
     margin-top: 0;
   }
@@ -138,6 +144,7 @@
     object-fit: contain;
   }
 }
+
 .header__div {
   display: none;
   height: 98px;
@@ -216,6 +223,7 @@
     background: none;
     width: 24px;
     height: 24px;
+
     span {
       display: none;
     }
