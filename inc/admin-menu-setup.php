@@ -16,9 +16,6 @@ function remove_admin_menu_items()
   );
 
 
-  remove_menu_page('edit.php');
-
-  remove_menu_page('tools.php');
 }
 
 function render_sections_page()
@@ -165,10 +162,12 @@ function add_cpt_separator()
 {
   global $menu;
 
-  // Три линии-разделителя для групп (см. bsi_admin_menu_order).
-  $menu[58] = ['', 'read', 'bsi-separator-1', '', 'wp-menu-separator'];
-  $menu[59] = ['', 'read', 'cpt-separator', '', 'wp-menu-separator'];
-  $menu[60] = ['', 'read', 'bsi-separator-2', '', 'wp-menu-separator'];
+  /* Три линии-разделителя для групп (см. bsi_admin_menu_order).
+     Позиции — дробные строки: целые слоты заняты ядром (60 — «Внешний вид»,
+     65 — «Плагины», 75 — «Инструменты»), запись в них удаляет пункт. */
+  $menu['58.1'] = ['', 'read', 'bsi-separator-1', '', 'wp-menu-separator'];
+  $menu['58.2'] = ['', 'read', 'cpt-separator', '', 'wp-menu-separator'];
+  $menu['58.3'] = ['', 'read', 'bsi-separator-2', '', 'wp-menu-separator'];
 
   ksort($menu);
 }
@@ -226,7 +225,16 @@ function bsi_admin_menu_order($menu_ord)
   ];
 
   // Дефолтные WP-разделители убираем — используем только свои.
-  $default_seps = ['separator1', 'separator2', 'separator-last'];
+  // Свои тоже исключаем из середины: они расставляются вручную ниже,
+  // иначе `bsi-separator-2` попадёт в список дважды.
+  $default_seps = [
+    'separator1',
+    'separator2',
+    'separator-last',
+    'bsi-separator-1',
+    'cpt-separator',
+    'bsi-separator-2',
+  ];
 
   // Середина: контентные пункты (Секции, MICE, прочие CPT) — в исходном порядке.
   $middle = array_values(array_diff($menu_ord, $desired, $bottom, $default_seps));

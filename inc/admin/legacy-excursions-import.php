@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Инструменты → «Импорт экскурсий» — заливка JSON старого сайта на проде,
+ * Экскурсии → «Импорт со старого сайта» — заливка JSON на проде,
  * где есть только FTP (CLI недоступен).
  *
  * Файлы берутся из tools/legacy-excursions/data/*.json (кладутся по FTP).
@@ -18,15 +18,18 @@ const BSI_LEGACY_IMPORT_CAP = 'manage_options';
 
 require_once get_template_directory() . '/tools/legacy-excursions/importer.php';
 
+/* Меню «Инструменты» тема скрывает (inc/admin-menu-setup.php), поэтому
+   страница живёт подпунктом CPT «Экскурсии». */
 add_action('admin_menu', function () {
-  add_management_page(
-    'Импорт экскурсий',
-    'Импорт экскурсий',
+  add_submenu_page(
+    'edit.php?post_type=excursion',
+    'Импорт со старого сайта',
+    'Импорт со старого сайта',
     BSI_LEGACY_IMPORT_CAP,
     'bsi-legacy-excursions',
     'bsi_legacy_import_page'
   );
-});
+}, 20);
 
 function bsi_legacy_import_page(): void
 {
