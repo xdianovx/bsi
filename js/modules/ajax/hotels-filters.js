@@ -20,7 +20,10 @@ export const filtersUrl = (form) => {
   const amenities = data.getAll("amenities[]").filter(Boolean);
   if (amenities.length) params.set("amenities", amenities.join(","));
 
-  ["type", "beach_line", "q"].forEach((name) => {
+  const types = data.getAll("type[]").filter(Boolean);
+  if (types.length) params.set("type", types.join(","));
+
+  ["beach_line", "q"].forEach((name) => {
     const value = (data.get(name) || "").toString().trim();
     if (value) params.set(name, value);
   });
@@ -42,6 +45,40 @@ export const filtersUrl = (form) => {
    один запрос вместо очереди. Для набора текста пауза длиннее. */
 const CLICK_DELAY = 400;
 const TYPE_DELAY = 700;
+
+/**
+ * Отбор курортов по подстроке прямо в панели: все курорты уже в разметке,
+ * спрашивать сервер не о чем.
+ *
+ * Пока в поле что-то набрано, хвост под «Ещё курорты» раскрыт и сама шторка
+ * спрятана — иначе половина совпадений осталась бы за ней.
+ */
+const filterResorts = (input) => {
+  const group = input.closest(".js-hotels-resorts");
+  if (!group) return;
+
+  const query = input.value.trim().toLowerCase();
+  const tail = group.querySelector(".hotels-filters__more");
+  let found = 0;
+
+  group.querySelectorAll(".hotels-filters__resort").forEach((link) => {
+    // «Все курорты» — сброс, а не курорт: в отборе не участвует.
+    const reset = !link.querySelector("i");
+    const name = (link.textContent || "").trim().toLowerCase();
+    const hit = query === "" || name.includes(query);
+
+    link.hidden = query !== "" && (reset || !hit);
+    if (hit && !reset) found += 1;
+  });
+
+  if (tail) {
+    tail.open = query !== "" ? true : tail.open;
+    tail.classList.toggle("is-searching", query !== "");
+  }
+
+  const empty = group.querySelector(".js-hotels-resorts-empty");
+  if (empty) empty.hidden = !(query !== "" && found === 0);
+};
 
 /**
  * @param {(href: string) => Promise<boolean>} load подмена каталога из hotels-api-catalog.js
@@ -89,6 +126,12 @@ export const initHotelsFilters = (root, load) => {
   });
 
   root.addEventListener("input", (event) => {
+    // Поиск по курортам отбирает готовый список на месте, выдачу не трогает.
+    if (event.target.classList.contains("js-hotels-resort-find")) {
+      filterResorts(event.target);
+      return;
+    }
+
     const form = event.target.closest(".js-hotels-filters");
     if (!form || event.target.type !== "search") return;
 

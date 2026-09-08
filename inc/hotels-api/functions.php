@@ -259,7 +259,19 @@ function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fall
 
   $result = ['points' => [], 'total' => 0, 'returned' => 0, 'partial' => false, 'unfiltered' => false];
 
-  $to_point = static function (array $hotel) use ($catalog_url): ?array {
+  /* Фото у ручки карты нет — берём его у отелей текущей страницы каталога.
+     Для остальных меток карточка обходится значком: снимок в подсказке нужен,
+     чтобы узнать отель, а не чтобы рассмотреть его. */
+  $photos = [];
+  foreach ($fallback_items as $item) {
+    $item_id = (int) ($item['id'] ?? 0);
+    $item_photo = (string) ($item['photo'] ?? '');
+    if ($item_id && $item_photo !== '') {
+      $photos[$item_id] = $item_photo;
+    }
+  }
+
+  $to_point = static function (array $hotel) use ($catalog_url, $photos): ?array {
     $lat = (float) ($hotel['lat'] ?? 0);
     $lng = (float) ($hotel['lng'] ?? 0);
 
@@ -276,6 +288,7 @@ function bsi_hotels_api_map_points(WP_Post $country, string $resort, array $fall
       'stars' => (int) ($hotel['stars'] ?? 0),
       'city' => (string) ($hotel['city']['name'] ?? ''),
       'price' => $price !== '' ? 'от ' . $price . ' за ночь' : '',
+      'photo' => (string) ($hotel['photo'] ?? $photos[(int) ($hotel['id'] ?? 0)] ?? ''),
       'url' => bsi_hotels_api_hotel_url($catalog_url, $hotel),
     ];
   };

@@ -65,6 +65,13 @@ $has_more = $paged < (int) $list['pages'];
           <?php endif; ?>
         </div>
 
+        <?php if (bsi_hotels_api_filters_active($filters)): ?>
+          <?php /* Сброс стоит напротив счётчика: строка «нашли 106» и есть тот
+                   результат, который сбрасывают. В панели он дублируется только
+                   на телефоне, где панель занимает весь экран. */ ?>
+          <a class="hotels-catalog__reset" href="<?= esc_url($base_url); ?>">Сбросить фильтры</a>
+        <?php endif; ?>
+
         <button class="btn btn-gray sm hotels-catalog__filters-open js-hotels-filters-toggle" type="button">
           Фильтры
         </button>

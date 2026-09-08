@@ -51,6 +51,16 @@ const boundsOf = (points) => {
 /** Короткая цена для метки: «от 94 $ за ночь» → «94 $». */
 const shortPrice = (price) => String(price || "").replace(/^от\s*/, "").replace(/\s*за ночь$/, "");
 
+/**
+ * Снимок отеля в карточке метки. Фото приходит только у отелей текущей
+ * страницы каталога — у остальных на его месте тот же значок, что и в списке.
+ */
+const NO_PHOTO = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.564 14.558a3 3 0 1 1-4.122-4.121"/><path d="m2 2 20 20"/><path d="M20 20H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 .819-.175"/><path d="M9.695 4.024A2 2 0 0 1 10.004 4h3.993a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v7.344"/></svg>';
+
+const photo = (point) => (point.photo
+  ? `<img src="${escapeHtml(point.photo)}" alt="" loading="lazy" decoding="async">`
+  : NO_PHOTO);
+
 const markerElement = (point) => {
   const el = document.createElement("a");
   el.className = point.price ? "hotels-map__pin hotels-map__pin--price" : "hotels-map__pin";
@@ -65,9 +75,12 @@ const markerElement = (point) => {
   el.innerHTML = `
     ${label}
     <span class="hotels-map__pin-card">
-      <b>${escapeHtml(point.name)}${point.stars ? ` ${point.stars}*` : ""}</b>
-      ${point.city ? `<span>${escapeHtml(point.city)}</span>` : ""}
-      ${point.price ? `<span class="hotels-map__pin-price">${escapeHtml(point.price)}</span>` : ""}
+      <span class="hotels-map__pin-photo">${photo(point)}</span>
+      <span class="hotels-map__pin-text">
+        <b>${escapeHtml(point.name)}${point.stars ? ` ${point.stars}*` : ""}</b>
+        ${point.city ? `<span>${escapeHtml(point.city)}</span>` : ""}
+        ${point.price ? `<span class="hotels-map__pin-price">${escapeHtml(point.price)}</span>` : ""}
+      </span>
     </span>
   `;
 

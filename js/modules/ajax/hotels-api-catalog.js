@@ -147,7 +147,12 @@ export const initHotelsApiCatalog = () => {
     }
   };
 
-  const load = async (href, push) => {
+  /**
+   * @param {boolean} [scroll] подвести список под верх окна. Нужно переходу по
+   *   страницам, где новые карточки начинаются выше экрана. Смена фильтров
+   *   этого не делает: панель и карта должны остаться там, где на них смотрят.
+   */
+  const load = async (href, push, scroll = false) => {
     const target = parseUrl(href, baseUrl);
     if (!target) return false;
 
@@ -178,8 +183,10 @@ export const initHotelsApiCatalog = () => {
         window.history.pushState({ hotelsCatalog: true }, "", href);
       }
 
-      const top = root.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: "smooth" });
+      if (scroll) {
+        const top = root.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
 
       return true;
     } catch (error) {
@@ -266,7 +273,7 @@ export const initHotelsApiCatalog = () => {
     if (!parseUrl(link.href, baseUrl)) return;
 
     event.preventDefault();
-    load(link.href, true).then((ok) => {
+    load(link.href, true, true).then((ok) => {
       if (!ok) window.location.href = link.href;
     });
   });

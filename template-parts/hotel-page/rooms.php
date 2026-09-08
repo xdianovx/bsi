@@ -3,9 +3,11 @@
 /**
  * Номера и тарифы — главный блок страницы.
  *
- * Панель подбора (дата заезда, ночи, питание) фильтрует тарифы на клиенте:
- * все офферы уже пришли вместе со страницей и лежат в JSON рядом со списком.
- * Без JS страница остаётся рабочей — сервер отдаёт тарифы ближайшего заезда.
+ * Цены считает хаб: по календарю мы знаем стоимость ночи, а точную сумму
+ * заезда и ссылку брони с датами отдаёт `/v1/hotels/{id}/quote` — до него
+ * страница ходит через `bsi_hotels_api_quote` (inc/requests/ajax-hotels-api-quote.php).
+ *
+ * Без JS остаётся серверная выдача: варианты питания с ценой за ночь.
  *
  * @var array $args ['view' => view-модель]
  */
@@ -19,92 +21,87 @@ if (!$rooms) {
 
 $filters = bsi_hotel_view_offer_filters($rooms);
 $default_date = $filters['dates'][0] ?? '';
-$default_nights = 0;
 
-foreach ($rooms as $room) {
-  foreach ($room['offers'] as $offer) {
-    if ($offer['check_in'] === $default_date && ($default_nights === 0 || $offer['nights'] < $default_nights)) {
-      $default_nights = $offer['nights'];
-    }
-  }
-}
+/* Три ночи — минимальная длительность, которую хаб считает своими ставками,
+   без похода к поставщику. С неё и начинаем. */
+$default_nights = 3;
 
 $has_offers = (bool) $filters['dates'];
+$hotel_booking = (string) ($view['booking_url'] ?? '');
+$hotel_id = (int) ($view['id'] ?? 0);
 
-$all_request = true;
+/* Календарь подписывает каждый день ценой за ночь и числом свободных номеров.
+   Дни, которых здесь нет, не заняты — про них хаб ещё не спрашивал, поэтому
+   витрина оставляет их доступными и считает цену по клику. */
+$calendar = [];
 foreach ($rooms as $room) {
-  foreach ($room['offers'] as $offer) {
-    if ($offer['status'] !== 'request') {
-      $all_request = false;
-      break 2;
+  foreach ($room['availability']['days'] as $day) {
+    $date = $day['date'];
+    $amount = (float) $day['price']['amount'];
+
+    if (!isset($calendar[$date]) || $amount < $calendar[$date]['amount']) {
+      $calendar[$date] = [
+        'amount' => $amount,
+        'price' => bsi_hotel_view_price($day['price']),
+        'rooms' => $day['rooms'],
+      ];
     }
   }
 }
+ksort($calendar);
 
-/** Тарифы номера под текущий фильтр, дешёвые сверху. */
-$select_offers = static function (array $room) use ($default_date, $default_nights): array {
-  $rows = array_filter(
-    $room['offers'],
-    static fn(array $offer) => $offer['check_in'] === $default_date && $offer['nights'] === $default_nights
-  );
-
-  usort($rows, static fn(array $a, array $b) => $a['price'] <=> $b['price']);
-
-  return $rows;
-};
-
-$payload = array_map(static function (array $room): array {
-  return [
-    'id' => $room['id'],
-    'offers' => array_map(static fn(array $offer) => [
-      'date' => $offer['check_in'],
-      'nights' => $offer['nights'],
-      'meal' => $offer['meal'],
-      'mealLabel' => $offer['meal_label'],
-      'placementLabel' => $offer['placement_label'],
-      'price' => bsi_hotel_view_price(['amount' => $offer['price'], 'currency' => $offer['currency']]),
-      'priceValue' => $offer['price'],
-      'status' => $offer['status'],
-      'url' => $offer['booking_url'],
-    ], $room['offers']),
-  ];
-}, $rooms);
+$calendar_data = [];
+foreach ($calendar as $date => $entry) {
+  $calendar_data[$date] = ['price' => $entry['price'], 'rooms' => $entry['rooms']];
+}
 ?>
 
 <section class="hp-rooms" id="hotel-rooms">
   <div class="container">
     <div class="hp-rooms__head">
       <h2 class="h2">Номера и цены</h2>
-      <?php if ($has_offers && !$all_request): ?>
+      <?php if ($has_offers): ?>
         <p class="hp-rooms__hint">Цены за размещение целиком, по данным туроператора</p>
       <?php endif; ?>
     </div>
 
     <?php if ($has_offers): ?>
       <form class="hp-search js-hotel-search"
+            data-hotel="<?= esc_attr((string) $hotel_id); ?>"
             data-default-date="<?= esc_attr($default_date); ?>"
-            data-default-nights="<?= esc_attr((string) $default_nights); ?>">
-        <label class="hp-search__field">
+            data-default-nights="<?= esc_attr((string) $default_nights); ?>"
+            data-prices="<?= esc_attr(wp_json_encode($calendar_data)); ?>">
+        <?php /* Календарь подписывает известные дни ценой за ночь. Остальные
+                 дни тоже выбираются: они не заняты — про них просто ещё не
+                 спрашивали, цену посчитает хаб по клику. */ ?>
+        <div class="hp-search__field js-hotel-range-field" hidden>
           <span class="hp-search__label">Заезд</span>
-          <select class="hp-search__select js-hotel-date" name="date">
-            <?php foreach ($filters['dates'] as $date): ?>
-              <option value="<?= esc_attr($date); ?>" <?php selected($date, $default_date); ?>>
-                <?= esc_html(bsi_hotel_view_date_label($date)); ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </label>
+          <input class="hp-search__date js-hotel-range" type="text" readonly placeholder="Выберите дату">
+        </div>
 
-        <label class="hp-search__field">
-          <span class="hp-search__label">Длительность</span>
-          <select class="hp-search__select js-hotel-nights" name="nights">
-            <?php foreach ($filters['nights'] as $nights): ?>
-              <option value="<?= esc_attr((string) $nights); ?>" <?php selected($nights, $default_nights); ?>>
-                <?= esc_html(bsi_hotel_view_nights_label((int) $nights)); ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </label>
+        <div class="hp-search__pair">
+          <label class="hp-search__field js-hotel-date-field">
+            <span class="hp-search__label">Заезд</span>
+            <select class="hp-search__select js-hotel-date" name="date">
+              <?php foreach ($filters['dates'] as $date): ?>
+                <option value="<?= esc_attr($date); ?>" <?php selected($date, $default_date); ?>>
+                  <?= esc_html(bsi_hotel_view_date_label($date)); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+
+          <label class="hp-search__field">
+            <span class="hp-search__label">Длительность</span>
+            <select class="hp-search__select js-hotel-nights" name="nights">
+              <?php foreach ($filters['nights'] as $nights): ?>
+                <option value="<?= esc_attr((string) $nights); ?>" <?php selected($nights, $default_nights); ?>>
+                  <?= esc_html(bsi_hotel_view_nights_label((int) $nights)); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+        </div>
 
         <label class="hp-search__field">
           <span class="hp-search__label">Питание</span>
@@ -116,17 +113,26 @@ $payload = array_map(static function (array $room): array {
           </select>
         </label>
 
-        <p class="hp-search__note js-hotel-search-note"></p>
+        <div class="hp-search__foot">
+          <p class="hp-search__note js-hotel-search-note"></p>
+
+          <?php /* Сброс возвращает ближайший заезд и любое питание — то, с чем
+                   страница открывается. Без JS его не показываем: там отбор и
+                   так уходит на сервер. */ ?>
+          <button class="hp-search__reset js-hotel-reset" type="button" hidden>Сбросить</button>
+        </div>
       </form>
     <?php endif; ?>
 
-    <div class="hp-rooms__list js-hotel-rooms" data-all-request="<?= $all_request ? '1' : '0'; ?>">
+    <div class="hp-rooms__list js-hotel-rooms">
       <?php foreach ($rooms as $room):
-        $offers = $select_offers($room);
         $photo = $room['photos'][0]['url'] ?? '';
         ?>
         <article class="hp-room" data-room="<?= esc_attr($room['id']); ?>">
-          <div class="hp-room__info">
+          <?php /* Слева треть карточки под фото: крупный снимок и до трёх
+                   миниатюр под ним. Остальные снимки открываются в галерее
+                   с любой миниатюры. */ ?>
+          <div class="hp-room__media">
             <?php if ($photo): ?>
               <a class="hp-room__photo"
                  href="<?= esc_url($photo); ?>"
@@ -139,83 +145,148 @@ $payload = array_map(static function (array $room): array {
               </span>
             <?php endif; ?>
 
-            <div class="hp-room__text">
-              <h3 class="hp-room__title"><?= esc_html($room['name']); ?></h3>
+            <?php $thumbs = array_slice($room['photos'], 1); ?>
+            <?php if ($thumbs): ?>
+              <ul class="hp-room__thumbs">
+                <?php foreach (array_slice($thumbs, 0, 3) as $index => $thumb): ?>
+                  <?php $rest = ($index === 2) ? count($thumbs) - 3 : 0; ?>
+                  <li class="hp-room__thumb">
+                    <a href="<?= esc_url($thumb['url']); ?>" data-fancybox="room-<?= esc_attr($room['id']); ?>">
+                      <img src="<?= esc_url($thumb['url']); ?>" alt="<?= esc_attr($room['name']); ?>" loading="lazy" decoding="async">
+                      <?php if ($rest > 0): ?>
+                        <span class="hp-room__thumb-rest">+<?= (int) $rest; ?></span>
+                      <?php endif; ?>
+                    </a>
+                  </li>
+                <?php endforeach; ?>
 
-              <ul class="hp-room__meta">
-                <?php if (!empty($room['area'])): ?>
-                  <li><?= esc_html((string) $room['area']); ?> м²</li>
-                <?php endif; ?>
-                <?php if ($room['max_total']): ?>
-                  <li>до <?= (int) $room['max_total']; ?> гостей</li>
-                <?php endif; ?>
-                <?php if ($room['max_children']): ?>
-                  <li>дети: до <?= (int) $room['max_children']; ?></li>
-                <?php endif; ?>
-                <?php if (!empty($room['view'])): ?>
-                  <li><?= esc_html($room['view']); ?></li>
-                <?php endif; ?>
+                <?php /* Снимки сверх четвёртого в галерее есть, но плитки им не нужно. */ ?>
+                <?php foreach (array_slice($thumbs, 3) as $hidden): ?>
+                  <a class="hp-room__thumb-hidden" href="<?= esc_url($hidden['url']); ?>" data-fancybox="room-<?= esc_attr($room['id']); ?>"></a>
+                <?php endforeach; ?>
               </ul>
-
-              <?php if ($room['description'] !== ''): ?>
-                <p class="hp-room__descr"><?= esc_html($room['description']); ?></p>
-              <?php endif; ?>
-            </div>
+            <?php endif; ?>
           </div>
 
+          <div class="hp-room__body">
+            <h3 class="hp-room__title"><?= esc_html($room['name']); ?></h3>
+
+            <ul class="hp-room__meta">
+              <?php if (!empty($room['area'])): ?>
+                <li><?= esc_html((string) $room['area']); ?> м²</li>
+              <?php endif; ?>
+              <?php if ($room['max_total']): ?>
+                <li>до <?= (int) $room['max_total']; ?> гостей</li>
+              <?php endif; ?>
+              <?php if ($room['max_children']): ?>
+                <li>дети: до <?= (int) $room['max_children']; ?></li>
+              <?php endif; ?>
+              <?php if (!empty($room['view'])): ?>
+                <li><?= esc_html($room['view']); ?></li>
+              <?php endif; ?>
+            </ul>
+
+            <?php if ($room['description'] !== ''): ?>
+              <p class="hp-room__descr"><?= esc_html($room['description']); ?></p>
+            <?php endif; ?>
+
+            <?php /* Удобства номера — иконкой с подписью: их немного, и они
+                     отличают один тип номера от другого. */ ?>
+            <?php if (!empty($room['amenities'])): ?>
+              <ul class="hp-room__amenities">
+                <?php foreach (array_slice($room['amenities'], 0, 8) as $amenity): ?>
+                  <li class="hp-room__amenity">
+                    <?php if ($amenity['icon']): ?>
+                      <img src="<?= esc_url($amenity['icon']); ?>" alt="" loading="lazy" decoding="async">
+                    <?php endif; ?>
+                    <?= esc_html($amenity['name']); ?>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            <?php endif; ?>
+
+            <?php /* Календарь цен из `availability`: на какие числа номер открыт
+                     и где ночь дешевле. */ ?>
+            <?php $days = $room['availability']['days'] ?? []; ?>
+            <?php if ($days): ?>
+              <div class="hp-room__dates">
+                <p class="hp-room__dates-title">Свободные даты:</p>
+
+                <ul class="hp-room__days">
+                  <?php foreach ($days as $day): ?>
+                    <li class="hp-room__day" title="<?= esc_attr($day['label']); ?>">
+                      <span class="hp-room__day-date"><?= esc_html($day['day']); ?></span>
+                      <span class="hp-room__day-price"><?= esc_html(bsi_hotel_view_price($day['price'])); ?></span>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            <?php endif; ?>
+
           <div class="hp-room__offers js-room-offers">
-            <?php if ($offers): ?>
-              <?php foreach ($offers as $offer): ?>
+            <?php if ($room['meals']): ?>
+              <?php foreach ($room['meals'] as $meal): ?>
                 <div class="hp-offer">
                   <div class="hp-offer__terms">
-                    <span class="hp-offer__meal"><?= esc_html($offer['meal_label']); ?></span>
-                    <?php if ($offer['placement_label'] !== ''): ?>
-                      <span class="hp-offer__placement"><?= esc_html($offer['placement_label']); ?></span>
-                    <?php endif; ?>
-                    <?php if (!$all_request && $offer['status'] === 'request'): ?>
-                      <span class="hp-offer__badge">под запрос</span>
+                    <span class="hp-offer__meal"><?= esc_html($meal['label']); ?></span>
+                    <?php if ($meal['placement_label'] !== ''): ?>
+                      <span class="hp-offer__placement"><?= esc_html($meal['placement_label']); ?></span>
                     <?php endif; ?>
                   </div>
 
-                  <div class="hp-offer__price">
-                    <b><?= esc_html(bsi_hotel_view_price(['amount' => $offer['price'], 'currency' => $offer['currency']])); ?></b>
-                    <span><?= esc_html(bsi_hotel_view_nights_label((int) $offer['nights'])); ?></span>
-                  </div>
-
-                  <?php if ($offer['booking_url'] !== ''): ?>
-                    <a class="btn btn-accent sm hp-offer__cta" href="<?= esc_url($offer['booking_url']); ?>" target="_blank" rel="nofollow noopener">Забронировать</a>
-                  <?php else: ?>
-                    <a class="btn btn-white sm hp-offer__cta" href="#hotel-request">Оставить заявку</a>
+                  <?php if ($meal['price_from']): ?>
+                    <div class="hp-offer__price">
+                      <b><?= esc_html(bsi_hotel_view_price($meal['price_from'])); ?></b>
+                      <span>за ночь</span>
+                    </div>
                   <?php endif; ?>
                 </div>
               <?php endforeach; ?>
-            <?php elseif ($room['price_from'] || $room['booking_url']): ?>
+            <?php elseif ($room['price_from']): ?>
               <div class="hp-offer">
                 <div class="hp-offer__terms">
                   <span class="hp-offer__meal">Размещение в номере</span>
                 </div>
 
-                <?php if ($room['price_from']): ?>
-                  <div class="hp-offer__price">
-                    <b><?= esc_html(bsi_hotel_view_price($room['price_from'])); ?></b>
-                    <span>за ночь</span>
-                  </div>
-                <?php endif; ?>
-
-                <?php if ($room['booking_url'] !== ''): ?>
-                  <a class="btn btn-accent sm hp-offer__cta" href="<?= esc_url($room['booking_url']); ?>" target="_blank" rel="nofollow noopener">Забронировать</a>
-                <?php else: ?>
-                  <a class="btn btn-white sm hp-offer__cta" href="#hotel-request">Оставить заявку</a>
-                <?php endif; ?>
+                <div class="hp-offer__price">
+                  <b><?= esc_html(bsi_hotel_view_price($room['price_from'])); ?></b>
+                  <span>за ночь</span>
+                </div>
               </div>
             <?php else: ?>
-              <p class="hp-room__empty">На выбранные даты мест нет</p>
+              <p class="hp-room__empty">Цены уточняются</p>
+            <?php endif; ?>
+            </div>
+
+            <?php /* Одна кнопка на номер: у тарифов своей ссылки хаб не даёт,
+                     а ссылка отеля ведёт в Само на тот же отель. */ ?>
+            <?php $room_booking = $room['booking_url'] !== '' ? $room['booking_url'] : $hotel_booking; ?>
+            <?php if ($room_booking !== ''): ?>
+              <a class="btn btn-accent sm hp-room__cta"
+                 href="<?= esc_url($room_booking); ?>"
+                 target="_blank"
+                 rel="nofollow noopener">Забронировать</a>
+            <?php else: ?>
+              <a class="btn btn-gray sm hp-room__cta" href="#hotel-request">Забронировать</a>
             <?php endif; ?>
           </div>
         </article>
       <?php endforeach; ?>
     </div>
 
+    <?php
+    /* Календарь и питание каждого номера: по ним витрина рисует цены сразу,
+       не дожидаясь расчёта заезда. */
+    $payload = array_map(static fn(array $room): array => [
+      'id' => $room['id'],
+      'meals' => array_map(static fn(array $meal): array => [
+        'code' => $meal['code'],
+        'label' => $meal['label'],
+        'placement_label' => $meal['placement_label'],
+        'price' => $meal['price_from'] ? bsi_hotel_view_price($meal['price_from']) : '',
+      ], $room['meals']),
+    ], $rooms);
+    ?>
     <script type="application/json" class="js-hotel-offers"><?= wp_json_encode($payload); ?></script>
   </div>
 </section>

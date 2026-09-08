@@ -47,7 +47,7 @@ function bsi_hotels_api_beach_options(): array
  * уходит одно и то же представление.
  *
  * @param array|null $source обычно $_GET; в AJAX — разобранная строка запроса
- * @return array{stars: int[], amenities: string[], type: string, beach_line: int,
+ * @return array{stars: int[], amenities: string[], type: string[], beach_line: int,
  *               flags: string[], q: string, sort: string}
  */
 function bsi_hotels_api_catalog_filters(?array $source = null): array
@@ -63,6 +63,14 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
 
     return explode(',', (string) $value);
   };
+
+  $types = [];
+  foreach ($as_list($source['type'] ?? '') as $slug) {
+    $slug = sanitize_title(trim($slug));
+    if ($slug !== '') {
+      $types[$slug] = $slug;
+    }
+  }
 
   $stars = [];
   foreach ($as_list($source['stars'] ?? '') as $star) {
@@ -98,7 +106,7 @@ function bsi_hotels_api_catalog_filters(?array $source = null): array
   return [
     'stars' => array_values($stars),
     'amenities' => array_values($amenities),
-    'type' => sanitize_title((string) ($source['type'] ?? '')),
+    'type' => array_values($types),
     'beach_line' => isset(bsi_hotels_api_beach_options()[$beach]) ? $beach : 0,
     'flags' => $flags,
     'q' => trim(wp_strip_all_tags((string) ($source['q'] ?? ''))),
@@ -122,8 +130,9 @@ function bsi_hotels_api_filters_to_params(array $filters): array
     $params['amenities'] = implode(',', $filters['amenities']);
   }
 
-  if ($filters['type'] !== '') {
-    $params['type'] = $filters['type'];
+  if ($filters['type']) {
+    // Несколько видов — это «или»: подойдёт вилла ИЛИ апарт-отель.
+    $params['type'] = implode(',', $filters['type']);
   }
 
   if ($filters['beach_line'] > 0) {
@@ -158,8 +167,8 @@ function bsi_hotels_api_filters_to_query(array $filters): array
     $query['amenities'] = implode(',', $filters['amenities']);
   }
 
-  if ($filters['type'] !== '') {
-    $query['type'] = $filters['type'];
+  if ($filters['type']) {
+    $query['type'] = implode(',', $filters['type']);
   }
 
   if ($filters['beach_line'] > 0) {

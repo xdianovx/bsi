@@ -132,6 +132,22 @@ class HotelsApiClient
     return is_array($data['items'] ?? null) ? $data['items'] : [];
   }
 
+  /**
+   * Цена конкретного заезда: хаб считает её по своим ночным ставкам, а на
+   * холодных датах спрашивает поставщика. Здесь же приезжает ссылка брони
+   * с датами — той, что лежит у отеля, дат не знает.
+   *
+   * @return array{quotes: array, booking: array, priced_by: string, nights: int}
+   * @throws HotelsApiException 501 — заезд короче трёх ночей у поставщика без тарифов
+   */
+  public function quote(int $hotelId, string $checkIn, int $nights): array
+  {
+    return $this->get('/v1/hotels/' . $hotelId . '/quote', [
+      'check_in' => $checkIn,
+      'nights' => $nights,
+    ], self::CACHE_LIST);
+  }
+
   /** Живо ли API. Без кеша и с коротким таймаутом — для диагностики. */
   public function isAlive(): bool
   {
@@ -174,7 +190,11 @@ class HotelsApiClient
 
     $response = wp_remote_get($url, [
       'timeout' => $this->timeout,
-      'headers' => ['Accept' => 'application/json'],
+      'headers' => [
+        'Accept' => 'application/json',
+        // Выдача карты по стране сжимается втрое, разжимает сам WordPress.
+        'Accept-Encoding' => 'gzip',
+      ],
     ]);
 
     if (is_wp_error($response)) {

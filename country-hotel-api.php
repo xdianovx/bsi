@@ -31,8 +31,9 @@ get_header();
     yoast_breadcrumb('<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>', '</p></div></div>');
   }
 
-  get_template_part('template-parts/hotel-page/head', null, ['view' => $view]);
+  /* Галерея первой: сначала показываем отель, потом называем его. */
   get_template_part('template-parts/hotel-page/gallery', null, ['view' => $view]);
+  get_template_part('template-parts/hotel-page/head', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/nav', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/rooms', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/sections', null, ['view' => $view]);

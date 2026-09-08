@@ -20,9 +20,10 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
     <div class="hp-head__top">
       <div class="hp-head__main">
         <?php if ($stars): ?>
-          <div class="hp-head__stars">
-            <?php for ($i = 0; $i < $stars; $i++): ?>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <?php /* Звёздность всегда пятью иконками — как в карточке каталога. */ ?>
+          <div class="hp-head__stars" title="<?= (int) $stars; ?> из 5">
+            <?php for ($i = 1; $i <= 5; $i++): ?>
+              <?= sprintf('<svg class="hp-head__star%s" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>', $i <= $stars ? ' is-on' : ''); ?>
             <?php endfor; ?>
           </div>
         <?php endif; ?>
@@ -31,7 +32,14 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
 
         <?php if ($view['place'] || $view['address']): ?>
           <p class="hp-head__place">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <?php /* Флаг страны вместо значка метки: он и так есть у страны
+                     в админке, и место читается быстрее. Пина держим как запас,
+                     когда флаг не залит. */ ?>
+            <?php if ($view['flag']): ?>
+              <img class="hp-head__flag" src="<?= esc_url($view['flag']); ?>" alt="" loading="lazy" decoding="async">
+            <?php else: ?>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <?php endif; ?>
             <?php
             $chunks = [];
             foreach ($view['place'] as $place) {
@@ -78,22 +86,17 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
 
         <?php if ($view['booking']): ?>
           <?php foreach ($view['booking'] as $booking): ?>
-            <span class="hp-head__booking">
-              <span class="hp-head__booking-label"><?= esc_html($booking['label']); ?></span>
-              <a class="btn btn-accent hp-head__cta"
-                 href="<?= esc_url($booking['url']); ?>"
-                 target="_blank"
-                 rel="nofollow noopener">Забронировать</a>
-            </span>
+            <?php /* Подпись у кнопки не нужна: «Бронирование отеля» повторяет
+                     то, что и так написано на самой кнопке. */ ?>
+            <a class="btn btn-accent hp-head__cta"
+               href="<?= esc_url($booking['url']); ?>"
+               target="_blank"
+               rel="nofollow noopener">Забронировать</a>
           <?php endforeach; ?>
         <?php elseif ($view['rooms']): ?>
           <a class="btn btn-accent hp-head__cta" href="#hotel-rooms">Выбрать номер</a>
         <?php else: ?>
           <a class="btn btn-accent hp-head__cta" href="#hotel-request">Уточнить цену</a>
-        <?php endif; ?>
-
-        <?php if ($view['booking'] && $view['rooms']): ?>
-          <a class="hp-head__rooms-link" href="#hotel-rooms">Смотреть номера и цены</a>
         <?php endif; ?>
 
         <?php if ($view['pdf_modal']): ?>

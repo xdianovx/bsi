@@ -497,6 +497,7 @@ require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
 require get_template_directory() . '/inc/requests/ajax-tour-booking.php';
 require get_template_directory() . '/inc/requests/ajax-hotel-request.php';
 require get_template_directory() . '/inc/requests/ajax-hotels-api-catalog.php';
+require get_template_directory() . '/inc/requests/ajax-hotels-api-quote.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
 add_filter('template_include', function ($template) {

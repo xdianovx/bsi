@@ -22,8 +22,10 @@ function bsi_hotel_view_defaults(): array
     'name' => '',
     'stars' => 0,
     'place' => [],          // [['label' => '', 'url' => ''], ...]
+    'flag' => '',           // флаг страны из ACF-поля `flag` у CPT country
     'address' => '',
     'excerpt' => '',
+    'id' => 0,              // id отеля в хабе; 0 — отель из WordPress
     'price_from' => null,   // ['amount' => float, 'currency' => 'USD']
     'booking_url' => '',
     'booking' => [],        // [['label' => '', 'url' => ''], ...] — кнопки брони
@@ -56,6 +58,7 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
   $view['name'] = (string) ($hotel['name'] ?? '');
   $view['stars'] = (int) ($hotel['stars'] ?? 0);
   $view['address'] = (string) ($hotel['address'] ?? '');
+  $view['id'] = (int) ($hotel['id'] ?? 0);
   $view['booking_url'] = bsi_hotel_view_booking_url($hotel['booking'] ?? null);
 
   if ($view['booking_url'] !== '') {
@@ -66,6 +69,11 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
     'label' => get_the_title($country),
     'url' => get_permalink($country),
   ];
+
+  /* Флаг берём у страны в WordPress: хаб его не отдаёт, а в админке он уже есть. */
+  if (function_exists('bsi_get_country_flag_url')) {
+    $view['flag'] = bsi_get_country_flag_url((int) $country->ID);
+  }
 
   $city = (string) ($hotel['city']['name'] ?? '');
   $city_slug = (string) ($hotel['city']['slug'] ?? '');
@@ -133,7 +141,10 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
   }
 
   $view['rooms'] = bsi_hotel_view_api_rooms($hotel);
-  $view['price_from'] = bsi_hotel_view_price_from($view['rooms']);
+  /* Хаб считает минимум по всему отелю сам; свой расчёт по номерам остаётся
+     запасным — у отелей без календаря поля нет. */
+  $view['price_from'] = bsi_hotel_view_price_value($hotel['price_from'] ?? null)
+    ?? bsi_hotel_view_price_from($view['rooms']);
 
   $view['back'] = [
     'url' => $catalog_url,
@@ -224,12 +235,15 @@ function bsi_hotel_view_api_facts(array $hotel): array
     $facts[] = ['kind' => 'distance', 'icon' => '', 'label' => 'Линия пляжа', 'value' => (string) (int) $hotel['beach_line']];
   }
 
+  /* Хаб отдаёт время с секундами («15:00:00»), гостю нужны часы и минуты. */
+  $clock = static fn(string $time): string => substr($time, 0, 5);
+
   if (!empty($hotel['check_in_time'])) {
-    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Заезд', 'value' => (string) $hotel['check_in_time']];
+    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Заезд', 'value' => $clock((string) $hotel['check_in_time'])];
   }
 
   if (!empty($hotel['check_out_time'])) {
-    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Выезд', 'value' => (string) $hotel['check_out_time']];
+    $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Выезд', 'value' => $clock((string) $hotel['check_out_time'])];
   }
 
   if (!empty($hotel['adults_only'])) {
@@ -302,8 +316,6 @@ function bsi_hotel_view_api_rooms(array $hotel): array
   $rooms = [];
 
   foreach ((array) ($hotel['room_types'] ?? []) as $room) {
-    $offers = bsi_hotel_view_api_offers($room);
-
     $photos = [];
     foreach ((array) ($room['photos'] ?? []) as $photo) {
       $url = (string) ($photo['url'] ?? '');
@@ -322,8 +334,10 @@ function bsi_hotel_view_api_rooms(array $hotel): array
       'max_total' => (int) ($room['max_total'] ?? 0),
       'view' => (string) ($room['view'] ?? ''),
       'photos' => $photos,
-      'offers' => $offers,
-      'price_from' => bsi_hotel_view_offers_min($offers),
+      'amenities' => bsi_hotel_view_api_room_amenities($room),
+      'meals' => bsi_hotel_view_api_room_meals($room),
+      'availability' => bsi_hotel_view_api_availability($room),
+      'price_from' => bsi_hotel_view_price_value($room['price_from'] ?? null),
       'booking_url' => bsi_hotel_view_booking_url($room['booking'] ?? null),
     ];
   }
@@ -332,91 +346,156 @@ function bsi_hotel_view_api_rooms(array $hotel): array
 }
 
 /**
- * Тарифы номера: только доступные, отсортированы по дате и цене.
+ * Удобства номера: имя и иконка. Хаб отдаёт их той же формой, что у отеля,
+ * но группы номеру не нужны — их всего несколько строк.
  */
-function bsi_hotel_view_api_offers(array $room): array
+function bsi_hotel_view_api_room_amenities(array $room): array
 {
-  $offers = [];
+  $amenities = [];
 
-  foreach ((array) ($room['offers'] ?? []) as $offer) {
-    $price = (float) ($offer['price'] ?? 0);
-    $check_in = (string) ($offer['check_in'] ?? '');
-
-    if ($price <= 0 || $check_in === '') {
+  foreach ((array) ($room['amenities'] ?? []) as $amenity) {
+    $name = (string) ($amenity['name'] ?? '');
+    if ($name === '') {
       continue;
     }
 
-    if (!bsi_hotel_view_offer_available($offer['available'] ?? null)) {
-      continue;
-    }
-
-    $offers[] = [
-      'check_in' => $check_in,
-      'nights' => (int) ($offer['nights'] ?? 0),
-      'meal' => (string) ($offer['meal'] ?? ''),
-      'meal_label' => bsi_hotel_view_meal_label((string) ($offer['meal'] ?? '')),
-      'placement' => (string) ($offer['placement'] ?? ''),
-      'placement_label' => bsi_hotel_view_placement_label((string) ($offer['placement'] ?? '')),
-      'price' => $price,
-      'currency' => (string) ($offer['currency'] ?? ''),
-      'status' => bsi_hotel_view_offer_status($offer['available'] ?? null),
-      'booking_url' => bsi_hotel_view_booking_url($offer['booking'] ?? null),
+    $amenities[] = [
+      'name' => $name,
+      'icon' => (string) ($amenity['icon'] ?? ''),
+      'popular' => !empty($amenity['is_popular']),
     ];
   }
 
-  usort($offers, static function (array $a, array $b): int {
-    return [$a['check_in'], $a['nights'], $a['price']] <=> [$b['check_in'], $b['nights'], $b['price']];
-  });
-
-  return $offers;
+  return $amenities;
 }
 
 /**
- * Наличие мест. Хаб отдаёт строку статусов по дням заезда в кодах Само:
- * Y — свободно, F — свободная продажа, R — по запросу, N — мест нет.
- * Хотя бы один день с N делает оффер непродаваемым.
+ * Календарь номера: цена дня и варианты питания на него.
+ *
+ * Хаб отдаёт по каждой дате `options` — цену за ночь по паре «питание +
+ * размещение». Ключ именно пара: у одного BB бывают разные цены для 2ADL и DBL.
+ *
+ * @return array{days: array, from: string, to: string, min: ?array}
  */
-function bsi_hotel_view_offer_available($available): bool
+function bsi_hotel_view_api_availability(array $room): array
 {
-  if (is_numeric($available)) {
-    return (int) $available > 0;
-  }
-
-  if (!is_string($available) || $available === '') {
-    return false;
-  }
-
-  return !str_contains(strtoupper($available), 'N');
-}
-
-/**
- * Статус оффера: 'free' — можно бронировать, 'request' — только по запросу.
- */
-function bsi_hotel_view_offer_status($available): string
-{
-  return is_string($available) && str_contains(strtoupper($available), 'R')
-    ? 'request'
-    : 'free';
-}
-
-/**
- * @return array{amount: float, currency: string}|null
- */
-function bsi_hotel_view_offers_min(array $offers): ?array
-{
+  $days = [];
   $min = null;
 
-  foreach ($offers as $offer) {
-    $nights = max(1, (int) $offer['nights']);
-    $per_night = $offer['price'] / $nights;
+  foreach ((array) ($room['availability'] ?? []) as $entry) {
+    $date = (string) ($entry['date'] ?? '');
+    $stamp = $date !== '' ? strtotime($date) : false;
 
-    if ($min === null || $per_night < $min['amount']) {
-      $min = ['amount' => $per_night, 'currency' => $offer['currency']];
+    if ($stamp === false) {
+      continue;
+    }
+
+    $options = [];
+    foreach ((array) ($entry['options'] ?? []) as $option) {
+      $price = (float) ($option['price'] ?? 0);
+      if ($price <= 0 || empty($option['available'])) {
+        continue;
+      }
+
+      $meal = (string) ($option['meal'] ?? '');
+      $placement = (string) ($option['placement'] ?? '');
+
+      $options[] = [
+        'meal' => $meal,
+        'meal_label' => bsi_hotel_view_meal_label($meal),
+        'placement' => $placement,
+        'placement_label' => bsi_hotel_view_placement_label($placement),
+        'price' => $price,
+        'currency' => (string) ($entry['currency'] ?? ''),
+      ];
+    }
+
+    $price = (float) ($entry['price'] ?? 0);
+    if ($price <= 0 && !$options) {
+      continue;
+    }
+
+    $money = ['amount' => $price ?: $options[0]['price'], 'currency' => (string) ($entry['currency'] ?? '')];
+
+    $days[] = [
+      'date' => $date,
+      'label' => bsi_hotel_view_date_label($date),
+      'day' => wp_date('j M', $stamp),
+      'rooms' => (int) ($entry['rooms'] ?? 0),
+      'price' => $money,
+      'options' => $options,
+    ];
+
+    if ($min === null || $money['amount'] < $min['amount']) {
+      $min = $money;
     }
   }
 
-  return $min;
+  usort($days, static fn(array $a, array $b) => $a['date'] <=> $b['date']);
+
+  return [
+    'days' => $days,
+    'from' => $days ? $days[0]['date'] : '',
+    'to' => $days ? end($days)['date'] : '',
+    'min' => $min,
+  ];
 }
+
+/**
+ * Варианты питания номера: готовый переключатель от хаба.
+ *
+ * `nights` — на скольких датах вариант жив: их меньше, чем дат в календаре,
+ * если часть дней по этому питанию закрыта.
+ */
+function bsi_hotel_view_api_room_meals(array $room): array
+{
+  $meals = [];
+
+  foreach ((array) ($room['meals'] ?? []) as $meal) {
+    $code = (string) ($meal['code'] ?? '');
+    if ($code === '') {
+      continue;
+    }
+
+    $placement = (string) ($meal['placement'] ?? '');
+
+    $meals[] = [
+      'code' => $code,
+      'label' => bsi_hotel_view_meal_label($code),
+      'icon' => (string) ($meal['icon'] ?? ''),
+      'placement' => $placement,
+      'placement_label' => bsi_hotel_view_placement_label($placement),
+      'price_from' => bsi_hotel_view_price_value($meal['price_from'] ?? null),
+      'nights' => (int) ($meal['nights'] ?? 0),
+    ];
+  }
+
+  return $meals;
+}
+
+/**
+ * Денежное поле хаба («{amount, currency}») в форму, понятную шаблонам.
+ *
+ * @return array{amount: float, currency: string}|null
+ */
+function bsi_hotel_view_price_value($price): ?array
+{
+  if (!is_array($price)) {
+    return null;
+  }
+
+  $amount = (float) ($price['amount'] ?? 0);
+  if ($amount <= 0) {
+    return null;
+  }
+
+  return ['amount' => $amount, 'currency' => (string) ($price['currency'] ?? '')];
+}
+
+
+
+
+
 
 /**
  * @return array{amount: float, currency: string}|null
@@ -610,33 +689,35 @@ function bsi_hotel_view_nav(array $view): array
 }
 
 /**
- * Данные панели подбора: доступные даты заезда и длительности.
+ * Данные панели подбора: даты из календарей номеров и варианты питания.
+ *
+ * Даты — это дни, на которые хаб уже знает цену. Остальные дни витрина тоже
+ * даёт выбрать: там цену считает `/quote`, поэтому «нет в списке» не значит
+ * «занято».
  */
 function bsi_hotel_view_offer_filters(array $rooms): array
 {
   $dates = [];
-  $nights = [];
   $meals = [];
 
   foreach ($rooms as $room) {
-    foreach ($room['offers'] as $offer) {
-      $dates[$offer['check_in']] = true;
-      $nights[$offer['nights']] = true;
-      if ($offer['meal'] !== '') {
-        $meals[$offer['meal']] = $offer['meal_label'];
-      }
+    foreach ($room['availability']['days'] as $day) {
+      $dates[$day['date']] = true;
+    }
+
+    foreach ($room['meals'] as $meal) {
+      $meals[$meal['code']] = $meal['label'];
     }
   }
 
   $dates = array_keys($dates);
   sort($dates);
-
-  $nights = array_keys($nights);
-  sort($nights);
-
   asort($meals);
 
-  return ['dates' => $dates, 'nights' => $nights, 'meals' => $meals];
+  /* Длительности, на которые хаб точно посчитает цену сам: от трёх ночей он
+     складывает свои ставки, короче — спрашивает поставщика и может ответить
+     отказом. Полный список всё равно предлагаем: отказ виден сразу. */
+  return ['dates' => $dates, 'nights' => [1, 2, 3, 4, 5, 7, 10, 14], 'meals' => $meals];
 }
 
 /**
@@ -1007,7 +1088,9 @@ function bsi_hotel_view_post_rooms(int $post_id): array
       'max_total' => (int) ($room['guests'] ?? 0),
       'view' => '',
       'photos' => $photos,
-      'offers' => [],
+      'amenities' => [],
+      'meals' => [],
+      'availability' => ['days' => [], 'from' => '', 'to' => '', 'min' => null],
       'price_from' => $price,
       'booking_url' => $booking,
     ];

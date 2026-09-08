@@ -74,6 +74,7 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
         <img class="hotels-filters__icon" src="<?= esc_url($amenity['icon']); ?>" alt="" loading="lazy">
       <?php endif; ?>
       <?= esc_html($amenity['name']); ?>
+      <?php if ($amenity['hotels']): ?><i class="hotels-filters__count"><?= (int) $amenity['hotels']; ?></i><?php endif; ?>
     </span>
   </label>
 <?php };
@@ -99,8 +100,20 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
     </label>
 
     <?php if (count($resorts) > 1): ?>
-      <div class="hotels-filters__group">
+      <div class="hotels-filters__group js-hotels-resorts">
         <p class="hotels-filters__group-title">Курорт</p>
+
+        <?php /* Курортов бывает под сотню. Поиск отбирает список на месте, без
+                 запроса: курорты уже все в разметке, и выдачу он не меняет —
+                 её меняет клик по найденному курорту. Поле не в форме, чтобы
+                 не попасть в адрес фильтров, поэтому без name. */ ?>
+        <?php if (count($resorts) > 8): ?>
+          <label class="hotels-filters__find">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" class="js-hotels-resort-find" placeholder="Поиск курорта" autocomplete="off">
+          </label>
+        <?php endif; ?>
+
         <div class="hotels-filters__group-body">
           <a class="hotels-filters__resort<?= $resort === '' ? ' is-active' : ''; ?>"
              href="<?= esc_url($catalog_url); ?>">Все курорты</a>
@@ -109,25 +122,34 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
 
           <?php if ($resorts_tail): ?>
             <details class="hotels-filters__more" data-key="resorts">
-              <summary>Ещё курорты (<?= count($resorts_tail); ?>)</summary>
+              <summary>
+                <span class="hotels-filters__more-open">Ещё курорты (<?= count($resorts_tail); ?>)</span>
+                <span class="hotels-filters__more-close">Свернуть</span>
+              </summary>
               <div class="hotels-filters__group-body">
                 <?php array_map($render_resort, $resorts_tail); ?>
               </div>
             </details>
           <?php endif; ?>
+
+          <p class="hotels-filters__empty js-hotels-resorts-empty" hidden>Курорт не найден</p>
         </div>
       </div>
     <?php endif; ?>
 
     <div class="hotels-filters__group">
       <p class="hotels-filters__group-title">Звёзды</p>
-      <div class="hotels-filters__group-body">
-        <?php for ($star = 5; $star >= 1; $star--): ?>
-          <label class="ui-checkbox">
-            <input type="checkbox" class="ui-checkbox__input" name="stars[]" value="<?= $star; ?>"
+      <?php /* Набором, а не столбцом галочек: пять строк на пять цифр — перерасход
+               высоты в узкой панели, и выбор «4 и 5» читается одним взглядом. */ ?>
+      <div class="hotels-filters__stars">
+        <?php for ($star = 1; $star <= 5; $star++): ?>
+          <label class="hotels-filters__chip">
+            <input type="checkbox" name="stars[]" value="<?= $star; ?>"
               <?php checked(in_array($star, $filters['stars'], true)); ?>>
-            <span class="ui-checkbox__mark"></span>
-            <span class="ui-checkbox__text"><?= $star; ?> звёзд<?= $star === 1 ? 'а' : ''; ?></span>
+            <span>
+              <?= $star; ?>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+            </span>
           </label>
         <?php endfor; ?>
       </div>
@@ -141,7 +163,10 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
 
           <?php if ($amenities_tail): ?>
             <details class="hotels-filters__more" data-key="amenities" <?= array_intersect(array_column($amenities_tail, 'slug'), $filters['amenities']) ? 'open' : ''; ?>>
-              <summary>Ещё удобства (<?= count($amenities_tail); ?>)</summary>
+              <summary>
+                <span class="hotels-filters__more-open">Ещё удобства (<?= count($amenities_tail); ?>)</span>
+                <span class="hotels-filters__more-close">Свернуть</span>
+              </summary>
               <div class="hotels-filters__group-body">
                 <?php array_map($render_amenity, $amenities_tail); ?>
               </div>
@@ -155,16 +180,12 @@ $render_amenity = static function (array $amenity) use ($filters) { ?>
       <div class="hotels-filters__group">
         <p class="hotels-filters__group-title">Вид объекта</p>
         <div class="hotels-filters__group-body">
-          <label class="ui-checkbox">
-            <input type="radio" class="ui-checkbox__input" name="type" value="" <?php checked($filters['type'], ''); ?>>
-            <span class="ui-checkbox__mark"></span>
-            <span class="ui-checkbox__text">Любой</span>
-          </label>
-
+          <?php /* Виды объектов набором: «вилла или апарт-отель» — обычный запрос,
+                   а хаб принимает несколько значений списком. */ ?>
           <?php foreach ($types as $type): ?>
             <label class="ui-checkbox">
-              <input type="radio" class="ui-checkbox__input" name="type" value="<?= esc_attr($type['slug']); ?>"
-                <?php checked($filters['type'], $type['slug']); ?>>
+              <input type="checkbox" class="ui-checkbox__input" name="type[]" value="<?= esc_attr($type['slug']); ?>"
+                <?php checked(in_array($type['slug'], $filters['type'], true)); ?>>
               <span class="ui-checkbox__mark"></span>
               <span class="ui-checkbox__text">
                 <?= esc_html($type['name']); ?>
