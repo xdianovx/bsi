@@ -394,6 +394,9 @@ require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
 require get_template_directory() . '/inc/admin/auto-slug-on-title-change.php';
 
+/* Временно скрытые разделы сайта (сейчас — круизы). */
+require get_template_directory() . '/inc/hidden-sections.php';
+
 /* Группировка админ-меню по хабам. */
 require get_template_directory() . '/inc/admin/menu-hubs.php';
 
