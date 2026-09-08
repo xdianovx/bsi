@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Экскурсии → «Импорт со старого сайта» — заливка JSON на проде,
+ * Настройки сайта → «Импорт экскурсий» — заливка JSON на проде,
  * где есть только FTP (CLI недоступен).
  *
  * Файлы берутся из tools/legacy-excursions/data/*.json (кладутся по FTP).
@@ -18,18 +18,18 @@ const BSI_LEGACY_IMPORT_CAP = 'manage_options';
 
 require_once get_template_directory() . '/tools/legacy-excursions/importer.php';
 
-/* Меню «Инструменты» тема скрывает (inc/admin-menu-setup.php), поэтому
-   страница живёт подпунктом CPT «Экскурсии». */
+/* Страница живёт в хабе «Настройки сайта» (inc/admin/menu-hubs.php).
+   Приоритет 998.5 — хабы уже созданы, но пункты по ним ещё не разложены. */
 add_action('admin_menu', function () {
   add_submenu_page(
-    'edit.php?post_type=excursion',
-    'Импорт со старого сайта',
-    'Импорт со старого сайта',
+    'bsi-hub-settings',
+    'Импорт экскурсий',
+    'Импорт экскурсий',
     BSI_LEGACY_IMPORT_CAP,
     'bsi-legacy-excursions',
     'bsi_legacy_import_page'
   );
-}, 20);
+}, 998.5);
 
 function bsi_legacy_import_page(): void
 {
