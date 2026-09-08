@@ -92,23 +92,13 @@ if ($project_date_human === '') {
 
           <div class="page-country__title-left">
 
-            <?php if ($country_id): ?>
-              <div class="single-hotel__address single-project-country">
-                <?php if ($flag_url): ?>
-                  <img class="page-country__subtitle-flag" src="<?php echo esc_url($flag_url); ?>"
-                    alt="<?php echo esc_attr($country_title); ?>">
-                <?php endif; ?>
-
-
-                <?php if ($country_url): ?>
-                  <a class="page-country__link" href="<?php echo esc_url($country_url); ?>">
-                    <?php echo esc_html($country_title); ?>
-                  </a>
-                <?php else: ?>
-                  <?php echo esc_html($country_title); ?>
-                <?php endif; ?>
-              </div>
-            <?php endif; ?>
+            <?php
+            get_template_part('template-parts/ui/location-line', null, [
+              'country_id' => $country_id,
+              'flag_url' => $flag_url,
+              'class' => 'single-project-country',
+            ]);
+            ?>
 
 
             <div class="single-project-div"></div>

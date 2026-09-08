@@ -393,6 +393,9 @@ require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
 require get_template_directory() . '/inc/admin/auto-slug-on-title-change.php';
+
+/* Инструменты → «Импорт экскурсий»: заливка JSON старого сайта (на проде только FTP). */
+require get_template_directory() . '/inc/admin/legacy-excursions-import.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/disable-comments.php';

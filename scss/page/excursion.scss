@@ -599,7 +599,40 @@
     margin-top: 40px;
   }
 
-  &__related {
-    margin: 48px 0;
+}
+
+/* Похожие экскурсии — грид карточек, как в каталоге страны. */
+.single-excursion-related {
+  margin: 56px 0 72px;
+}
+
+.single-excursion-related-head {
+  margin-bottom: 24px;
+}
+
+.single-excursion-related-title {
+  margin: 0;
+}
+
+.single-excursion-related-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .single-excursion-related-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .single-excursion-related {
+    margin: 40px 0 48px;
+  }
+
+  .single-excursion-related-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }

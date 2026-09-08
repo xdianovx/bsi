@@ -185,6 +185,7 @@
     <li><a href="#dropdown">Dropdown</a></li>
     <li><a href="#slider">Слайдер-стрелки</a></li>
     <li><a href="#breadcrumbs">Хлебные крошки</a></li>
+      <li><a href="#location-line">Строка локации</a></li>
     <li><a href="#callout">Callout / Алерты</a></li>
     <li><a href="#numbered-content">Нумерация текста</a></li>
         <li><a href="#indent">Красная строка</a></li>
@@ -605,6 +606,30 @@ $trans-text: all 0.3s ease-in-out;
   &lt;span class="breadcrumb-separator"&gt;&lt;/span&gt;
   Турция
 &lt;/div&gt;</pre>
+  </section>
+
+  <!-- ============ LOCATION LINE ============ -->
+  <section class="uikit-section" id="location-line">
+    <h2>Строка локации</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/location-line.scss</code>, разметка — <code>template-parts/ui/location-line.php</code>. Один блок «флаг + Страна, Регион, Курорт» для всех single-страниц (экскурсия, образование, отель, тур, проект). Одинаковые уровни (регион = курорт) схлопываются, ссылки необязательны.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="location-line">
+        <span class="location-line-flag">
+          <img src="img/flags/gb.svg" alt="">
+        </span>
+        <span class="location-line-text"><a class="location-line-link" href="#">Великобритания</a>, <span class="location-line-item">Лондон</span></span>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;?php
+get_template_part('template-parts/ui/location-line', null, [
+  'country_id' =&gt; $country_id,
+  'parts' =&gt; [
+    ['label' =&gt; $region_name],
+    ['label' =&gt; $resort_name, 'url' =&gt; $resort_link],
+  ],
+]);
+?&gt;</pre>
   </section>
 
   <!-- ============ PAGINATION ============ -->

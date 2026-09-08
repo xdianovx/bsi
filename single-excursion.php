@@ -138,16 +138,42 @@ if ($country_id > 0 && function_exists('bsi_get_country_excursion_candidate_ids_
     static fn($id) => $id > 0 && $id !== $post_id
   ));
   if (!empty($candidate_ids)) {
-    $related_excursions = get_posts([
+    $related_args = [
       'post_type'              => 'excursion',
       'post_status'            => 'publish',
-      'posts_per_page'         => 8,
+      'posts_per_page'         => 3,
       'post__in'               => $candidate_ids,
       'orderby'                => 'rand',
       'no_found_rows'          => true,
       'bsi_skip_schedule'      => true,
       'update_post_meta_cache' => false,
-    ]);
+    ];
+
+    /* Сначала экскурсии того же курорта, добор — по стране. */
+    $resort_terms = get_the_terms($post_id, 'resort');
+    if (!is_wp_error($resort_terms) && !empty($resort_terms)) {
+      $related_excursions = get_posts($related_args + [
+        'tax_query' => [
+          [
+            'taxonomy' => 'resort',
+            'field' => 'term_id',
+            'terms' => [(int) $resort_terms[0]->term_id],
+          ],
+        ],
+      ]);
+    }
+
+    $missing = 3 - count($related_excursions);
+    if ($missing > 0) {
+      $exclude_ids = array_map(static fn($rel) => (int) $rel->ID, $related_excursions);
+      $rest_ids = array_values(array_diff($candidate_ids, $exclude_ids));
+      if (!empty($rest_ids)) {
+        $related_excursions = array_merge($related_excursions, get_posts(array_merge($related_args, [
+          'posts_per_page' => $missing,
+          'post__in' => $rest_ids,
+        ])));
+      }
+    }
   }
 }
 
@@ -170,35 +196,16 @@ get_header();
         <div class="title-rating__wrap">
           <h1 class="h1 single-education__title"><?= esc_html($excursion_title); ?></h1>
 
-          <?php if ($country_title || $region_name || $resort_name): ?>
-            <div class="single-education__country single-hotel__address">
-              <?php if ($country_flag): ?>
-                <img src="<?= esc_url($country_flag); ?>" alt="<?= esc_attr($country_title); ?>"
-                     class="single-education__flag">
-              <?php endif; ?>
-              <div class="single-education__location-text">
-                <?php if ($country_title): ?>
-                  <?php if ($country_permalink): ?>
-                    <a href="<?= esc_url($country_permalink); ?>" class="single-education__country-link">
-                      <?= esc_html($country_title); ?><?= ($region_name || $resort_name) ? ',' : ''; ?>
-                    </a>
-                  <?php else: ?>
-                    <span class="single-education__country-text">
-                      <?= esc_html($country_title); ?><?= ($region_name || $resort_name) ? ',' : ''; ?>
-                    </span>
-                  <?php endif; ?>
-                <?php endif; ?>
-                <?php if ($region_name): ?>
-                  <span class="single-education__region-text">
-                    <?= esc_html($region_name); ?><?= $resort_name ? ',' : ''; ?>
-                  </span>
-                <?php endif; ?>
-                <?php if ($resort_name): ?>
-                  <span class="single-education__resort-text"><?= esc_html($resort_name); ?></span>
-                <?php endif; ?>
-              </div>
-            </div>
-          <?php endif; ?>
+          <?php
+          get_template_part('template-parts/ui/location-line', null, [
+            'country_id' => $country_id,
+            'flag_url' => $country_flag,
+            'parts' => [
+              ['label' => $region_name],
+              ['label' => $resort_name],
+            ],
+          ]);
+          ?>
 
           <?php if (has_excerpt()): ?>
             <div class="single-education__excerpt page-country__descr">
@@ -458,7 +465,7 @@ get_header();
   <?php
   if (!empty($related_excursions)) {
     set_query_var('related_excursions', $related_excursions);
-    get_template_part('template-parts/excursion/related-slider');
+    get_template_part('template-parts/excursion/related');
   }
   ?>
 

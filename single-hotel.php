@@ -135,46 +135,35 @@ get_header();
       </div>
 
       <div class="single-hotel__top-line">
-        <?php if ($country_title || $region_term || $resort_term || $city): ?>
-          <?php
-          $items = [];
+        <?php
+        $location_parts = [];
 
-          if ($country_title) {
-            $items[] = $country_permalink
-              ? '<a class="single-hotel__address-link" href="' . esc_url($country_permalink) . '">' . esc_html($country_title) . '</a>'
-              : '<span>' . esc_html($country_title) . '</span>';
-          }
+        if ($region_term) {
+          $region_link = get_term_link($region_term);
+          $location_parts[] = [
+            'label' => $region_term->name,
+            'url' => is_wp_error($region_link) ? '' : $region_link,
+          ];
+        }
 
-          if ($region_term) {
-            $region_link = get_term_link($region_term);
-            $items[] = !is_wp_error($region_link)
-              ? '<a class="single-hotel__address-link" href="' . esc_url($region_link) . '">' . esc_html($region_term->name) . '</a>'
-              : '<span>' . esc_html($region_term->name) . '</span>';
-          }
+        if ($resort_term) {
+          $resort_link = get_term_link($resort_term);
+          $location_parts[] = [
+            'label' => $resort_term->name,
+            'url' => is_wp_error($resort_link) ? '' : $resort_link,
+          ];
+        }
 
-          if ($resort_term) {
-            $resort_link = get_term_link($resort_term);
-            $items[] = !is_wp_error($resort_link)
-              ? '<a class="single-hotel__address-link" href="' . esc_url($resort_link) . '">' . esc_html($resort_term->name) . '</a>'
-              : '<span>' . esc_html($resort_term->name) . '</span>';
-          }
+        if ($city) {
+          $location_parts[] = ['label' => $city];
+        }
 
-          if ($city) {
-            $items[] = '<span>' . esc_html($city) . '</span>';
-          }
-          ?>
-
-          <div class="single-hotel__address">
-            <?php if (!empty($country_flag)): ?>
-              <img src="<?= esc_url($country_flag); ?>"
-                   alt="">
-            <?php endif; ?>
-
-            <div class="single-hotel__address-text">
-              <?= implode(', ', $items); ?>
-            </div>
-          </div>
-        <?php endif; ?>
+        get_template_part('template-parts/ui/location-line', null, [
+          'country_id' => $country_id,
+          'flag_url' => $country_flag,
+          'parts' => $location_parts,
+        ]);
+        ?>
 
 
       </div>

@@ -393,32 +393,16 @@ get_header();
         <div class="title-rating__wrap">
           <h1 class="h1 single-education__title"><?php the_title(); ?></h1>
 
-          <?php if ($country_title || $region_name || $resort_name): ?>
-            <div class="single-education__country single-hotel__address">
-              <?php if ($country_flag): ?>
-                <img src="<?php echo esc_url($country_flag); ?>" alt="<?php echo esc_attr($country_title); ?>"
-                  class="single-education__flag">
-              <?php endif; ?>
-              <div class="single-education__location-text">
-                <?php if ($country_title): ?>
-                  <?php if ($country_permalink): ?>
-                    <a href="<?php echo esc_url($country_permalink); ?>"
-                      class="single-education__country-link"><?php echo esc_html($country_title); ?><?php if ($region_name || $resort_name): ?>,<?php endif; ?></a>
-                  <?php else: ?>
-                    <span
-                      class="single-education__country-text"><?php echo esc_html($country_title); ?><?php if ($region_name || $resort_name): ?>,<?php endif; ?></span>
-                  <?php endif; ?>
-                <?php endif; ?>
-                <?php if ($region_name): ?>
-                  <span
-                    class="single-education__region-text"><?php echo esc_html($region_name); ?><?php if ($resort_name): ?>,<?php endif; ?></span>
-                <?php endif; ?>
-                <?php if ($resort_name): ?>
-                  <span class="single-education__resort-text"><?php echo esc_html($resort_name); ?></span>
-                <?php endif; ?>
-              </div>
-            </div>
-          <?php endif; ?>
+          <?php
+          get_template_part('template-parts/ui/location-line', null, [
+            'country_id' => $country_id,
+            'flag_url' => $country_flag,
+            'parts' => [
+              ['label' => $region_name],
+              ['label' => $resort_name],
+            ],
+          ]);
+          ?>
 
           <?php if (has_excerpt()): ?>
             <div class="single-education__excerpt page-country__descr">
