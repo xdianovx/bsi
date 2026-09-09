@@ -121,6 +121,10 @@ function createMarkerElement(point, icons) {
   return link;
 }
 
+// pinchZoom/oneFingerZoom — зум на тачах: без них на мобилке карту не масштабировать.
+const BEHAVIORS_NO_SCROLL = ["drag", "dblClick", "pinchZoom", "oneFingerZoom"];
+const BEHAVIORS_WITH_SCROLL = [...BEHAVIORS_NO_SCROLL, "scrollZoom"];
+
 export const initSightsMap = async () => {
   const containers = document.querySelectorAll("[data-sights-map]");
   if (!containers.length) return;
@@ -149,7 +153,7 @@ export const initSightsMap = async () => {
     try {
       const map = new YMap(el, {
         location: { center, zoom },
-        behaviors: ["drag", "dblClick"],
+        behaviors: BEHAVIORS_NO_SCROLL,
       });
 
       map.addChild(new YMapDefaultSchemeLayer());
@@ -170,13 +174,13 @@ export const initSightsMap = async () => {
       // Зум колёсиком — только после клика по карте, чтобы не перехватывать скролл страницы
       el.addEventListener("mousedown", () => {
         if (typeof map.setBehaviors === "function") {
-          map.setBehaviors(["drag", "dblClick", "scrollZoom"]);
+          map.setBehaviors(BEHAVIORS_WITH_SCROLL);
         }
       });
 
       document.addEventListener("click", (e) => {
         if (!el.contains(e.target) && typeof map.setBehaviors === "function") {
-          map.setBehaviors(["drag", "dblClick"]);
+          map.setBehaviors(BEHAVIORS_NO_SCROLL);
         }
       });
     } catch (err) {

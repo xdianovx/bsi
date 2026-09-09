@@ -45,8 +45,10 @@ export const initMaps = async () => {
 
   const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker } = ymaps3;
 
-  const BEHAVIORS_NO_SCROLL = ["drag", "dblClick"];
-  const BEHAVIORS_WITH_SCROLL = ["drag", "dblClick", "scrollZoom"];
+  // pinchZoom/oneFingerZoom — зум на тачах: без них на мобилке карту не масштабировать.
+  // scrollZoom подключается только после клика по карте, чтобы не перехватывать скролл страницы.
+  const BEHAVIORS_NO_SCROLL = ["drag", "dblClick", "pinchZoom", "oneFingerZoom"];
+  const BEHAVIORS_WITH_SCROLL = [...BEHAVIORS_NO_SCROLL, "scrollZoom"];
 
   const mapInstances = [];
 
