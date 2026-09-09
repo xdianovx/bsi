@@ -45,6 +45,21 @@ if ($country_excursions_slug) {
   exit;
 }
 
+$country_sights_slug = get_query_var('country_sights');
+
+if ($country_sights_slug) {
+  $country = get_page_by_path($country_sights_slug, OBJECT, 'country');
+
+  global $country_sights_data;
+  $country_sights_data = [
+    'country' => $country,
+    'country_slug' => $country_sights_slug,
+  ];
+
+  get_template_part('country-sights');
+  exit;
+}
+
 $country_events_slug = get_query_var('country_events');
 
 if ($country_events_slug) {

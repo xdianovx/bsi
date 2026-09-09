@@ -137,15 +137,10 @@ $posts_query = new WP_Query([
               <?php endwhile; ?>
             </div>
 
-            <div class="region-posts-pagination">
-              <?= paginate_links([
-                'total' => $posts_query->max_num_pages,
-                'current' => $paged,
-                'prev_text' => '&larr; Назад',
-                'next_text' => 'Вперёд &rarr;',
-                'mid_size' => 2,
-              ]); ?>
-            </div>
+            <?php bsi_pagination([
+              'total' => $posts_query->max_num_pages,
+              'current' => $paged,
+            ], ['class' => 'region-posts-pagination']); ?>
 
           <?php endif; ?>
 

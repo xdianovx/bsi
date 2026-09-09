@@ -808,19 +808,10 @@ if ($all_edu_for_sort->have_posts()) {
       <?php endif; ?>
     </div>
 
-    <div class="news-pagination js-education-pagination">
-      <?php if ($initial_query->max_num_pages > 1): ?>
-        <?php
-        echo paginate_links([
-          'total' => $initial_query->max_num_pages,
-          'current' => $paged,
-          'prev_text' => '&larr; Назад',
-          'next_text' => 'Вперед &rarr;',
-          'mid_size' => 2,
-        ]);
-        ?>
-      <?php endif; ?>
-    </div>
+    <?php bsi_pagination([
+      'total' => $initial_query->max_num_pages,
+      'current' => $paged,
+    ], ['class' => 'js-education-pagination', 'always' => true]); ?>
   </div>
 </section>
 

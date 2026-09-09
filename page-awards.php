@@ -75,17 +75,10 @@ get_header();
       </section>
     <?php endif; ?>
 
-    <div class="awards-archive__pagination">
-      <?php
-      echo paginate_links([
-        'total' => $awards_query->max_num_pages,
-        'current' => $paged,
-        'prev_text' => '&larr; Назад',
-        'next_text' => 'Вперёд &rarr;',
-        'mid_size' => 2,
-      ]);
-      ?>
-    </div>
+    <?php bsi_pagination([
+      'total' => $awards_query->max_num_pages,
+      'current' => $paged,
+    ], ['class' => 'awards-archive__pagination']); ?>
 
   <?php else: ?>
     <div class="awards-archive__empty">

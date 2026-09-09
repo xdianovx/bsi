@@ -143,7 +143,6 @@
   font-weight: 400;
   transition: all 0.3s ease;
   color: #ff0000;
-  font-weight: 500;
 
   &:hover {
     opacity: 0.8;
@@ -372,78 +371,10 @@
   font-size: 16px;
 }
 
-.tours-pagination {
+/* Разметка — общий .ui-pagination (scss/ui/pagination.scss), здесь только отступ */
+.tours-pagination,
+.js-tours-pagination {
   margin-top: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-
-  .page-numbers {
-    padding: 10px 14px;
-    min-width: 40px;
-    height: 40px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #dbdbdb;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    background: #fff;
-
-    &:hover {
-      border-color: #333;
-      background: #f9f9f9;
-    }
-
-    &.current {
-      background: #333;
-      color: #fff;
-      border-color: #333;
-      cursor: default;
-      font-weight: 500;
-
-      &:hover {
-        background: #333;
-      }
-    }
-
-    &.dots {
-      border: none;
-      padding: 10px 6px;
-      cursor: default;
-      color: #999;
-
-      &:hover {
-        border: none;
-        background: transparent;
-      }
-    }
-
-    &.prev,
-    &.next {
-      font-weight: 500;
-      gap: 4px;
-
-      &:hover {
-        background: #f9f9f9;
-      }
-    }
-
-    &.prev {
-      margin-right: 8px;
-    }
-
-    &.next {
-      margin-left: 8px;
-    }
-  }
 }
 
 .tours-page__title-description {

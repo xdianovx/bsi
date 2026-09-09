@@ -15,6 +15,7 @@ $is_memo_page = false;
 $is_entry_rules_page = false;
 $is_news_page = false;
 $is_excursions_page = false;
+$is_sights_page = false;
 $is_events_page = false;
 $is_hotels_info_page = false;
 $is_deposits_page = false;
@@ -94,6 +95,23 @@ if (is_singular('tour')) {
     $country_slug = (string) get_post_field('post_name', $main_parent_id);
     $country_title = (string) get_the_title($main_parent_id);
     $is_excursions_page = true;
+  } else {
+    $main_parent_id = $parent_id ?: $current_id;
+    $country_slug = (string) get_post_field('post_name', $main_parent_id);
+    $country_title = (string) get_the_title($main_parent_id);
+  }
+
+} elseif (is_singular('sight')) {
+
+  $sight_country_id = function_exists('bsi_get_sight_country_id')
+    ? bsi_get_sight_country_id((int) $current_id)
+    : 0;
+
+  if ($sight_country_id) {
+    $main_parent_id = $sight_country_id;
+    $country_slug = (string) get_post_field('post_name', $main_parent_id);
+    $country_title = (string) get_the_title($main_parent_id);
+    $is_sights_page = true;
   } else {
     $main_parent_id = $parent_id ?: $current_id;
     $country_slug = (string) get_post_field('post_name', $main_parent_id);
@@ -230,6 +248,15 @@ if (is_singular('tour')) {
   $main_parent_id = $country ? (int) $country->ID : $current_id;
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_excursions_page = true;
+
+} elseif (get_query_var('country_sights')) {
+
+  $country_slug = (string) get_query_var('country_sights');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_sights_page = true;
 
 } elseif (get_query_var('country_events')) {
 
@@ -392,6 +419,16 @@ $has_excursions = get_posts([
   ],
 ]);
 
+$has_sights = get_posts([
+  'post_type' => 'sight',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'fields' => 'ids',
+  'meta_query' => [
+    ['key' => 'sight_country', 'value' => $main_parent_id, 'compare' => '='],
+  ],
+]);
+
 $has_deposits = get_posts([
   'post_type' => 'hotel_deposit',
   'post_status' => 'publish',
@@ -417,7 +454,7 @@ $is_country_overview = (
   !$is_hotels_page && !$is_promos_page && !$is_visas_page &&
   !$is_resorts_page && !$is_tours_page &&
   !$is_memo_page && !$is_entry_rules_page && !$is_news_page &&
-  !$is_excursions_page && !$is_events_page && !$is_hotels_info_page &&
+  !$is_excursions_page && !$is_sights_page && !$is_events_page && !$is_hotels_info_page &&
   !$is_deposits_page
 );
 
@@ -729,6 +766,25 @@ $visa_icon_svg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" st
           </svg>
         </span>
         <span>Экскурсии</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if (!empty($has_sights)): ?>
+      <a href="<?= esc_url(home_url("/country/{$country_slug}/dostoprimechatelnosti/")); ?>"
+        class="child-page-item <?= $is_sights_page ? 'active' : ''; ?>">
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-landmark-icon lucide-landmark">
+            <path d="M10 18v-7" />
+            <path d="M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z" />
+            <path d="M14 18v-7" />
+            <path d="M18 18v-7" />
+            <path d="M3 22h18" />
+            <path d="M6 18v-7" />
+          </svg>
+        </span>
+        <span>Достопримечательности</span>
       </a>
     <?php endif; ?>
 

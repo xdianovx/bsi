@@ -1,3 +1,4 @@
+import { PAGINATION_PREV, PAGINATION_NEXT } from "../services/pagination-arrows";
 import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
@@ -185,7 +186,7 @@ export const initEventToursFilters = async () => {
 
     const parts = [];
     if (paged > 1) {
-      parts.push(link(paged - 1, "prev page-numbers", "Назад"));
+      parts.push(link(paged - 1, "prev page-numbers", PAGINATION_PREV));
     }
 
     buildPageList(paged, maxPages).forEach((item) => {
@@ -201,7 +202,7 @@ export const initEventToursFilters = async () => {
     });
 
     if (paged < maxPages) {
-      parts.push(link(paged + 1, "next page-numbers", "Вперёд"));
+      parts.push(link(paged + 1, "next page-numbers", PAGINATION_NEXT));
     }
 
     paginationEl.innerHTML = parts.join("");

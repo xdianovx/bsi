@@ -189,6 +189,7 @@
     <li><a href="#callout">Callout / Алерты</a></li>
     <li><a href="#numbered-content">Нумерация текста</a></li>
         <li><a href="#indent">Красная строка</a></li>
+<li><a href="#filter-chips">Чипы фильтров</a></li>
 <li><a href="#pagination">Пагинация</a></li>
     <li><a href="#counter">Counter</a></li>
     <li><a href="#preloader">Preloader</a></li>
@@ -588,7 +589,7 @@ $trans-text: all 0.3s ease-in-out;
   <!-- ============ BREADCRUMBS ============ -->
   <section class="uikit-section" id="breadcrumbs">
     <h2>Хлебные крошки</h2>
-    <p class="uikit-section__hint">Источник: <code>scss/ui/breadcrumbs.scss</code>. Разделитель — <code>.breadcrumb-separator</code>.</p>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/breadcrumbs.scss</code>. Разделитель — <code>.breadcrumb-separator</code>. Разметка одна на все шаблоны: <code>&lt;div id="breadcrumbs" class="breadcrumbs"&gt;&lt;div class="container"&gt;</code> — на страницах с серым фоном (<code>body.single-country</code>, <code>body.single-insurance</code>) внешний блок красится в белый и даёт полосу во всю ширину.</p>
 
     <div class="uikit-demo uikit-demo--block">
       <div class="breadcrumbs">
@@ -632,32 +633,64 @@ get_template_part('template-parts/ui/location-line', null, [
 ?&gt;</pre>
   </section>
 
+  <!-- ============ FILTER CHIPS ============ -->
+  <section class="uikit-section" id="filter-chips">
+    <h2>Чипы фильтров</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/page/sight.scss</code>. Показывают выбранные значения фильтра под селектами: клик по чипу снимает один фильтр, «Сбросить всё» — ссылка на базовый URL. Рендерит <code>js/modules/sights-filters.js</code> из значений селектов, крестик — псевдоэлемент, отдельной иконки не нужно.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="country-sights-filters-bottom">
+        <div class="country-sights-chips">
+          <button type="button" class="country-sights-chip">Лондон</button>
+          <button type="button" class="country-sights-chip">Замки и дворцы</button>
+        </div>
+        <a class="country-sights-reset" href="#">Сбросить всё</a>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="country-sights-filters-bottom"&gt;
+  &lt;div class="country-sights-chips" data-sights-chips hidden&gt;&lt;/div&gt;
+  &lt;a class="country-sights-reset" href="&lt;?= esc_url($base_url); ?&gt;"&gt;Сбросить всё&lt;/a&gt;
+&lt;/div&gt;</pre>
+  </section>
+
   <!-- ============ PAGINATION ============ -->
   <section class="uikit-section" id="pagination">
     <h2>Пагинация</h2>
-    <p class="uikit-section__hint">Источник: <code>scss/ui/pagination.scss</code>. Обёртка <code>.ui-pagination</code> вокруг вывода <code>paginate_links()</code> (без <code>type =&gt; 'list'</code>). Текущая страница — <code>.current</code>, многоточие — <code>.dots</code>.</p>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/pagination.scss</code>, разметку печатает <code>bsi_pagination()</code> (<code>inc/helpers/pagination.php</code>). Одна пагинация на весь сайт: обёртка <code>.ui-pagination</code>, ссылки <code>.page-numbers</code> от <code>paginate_links()</code>. Текущая страница — <code>.current</code> (красная, hover отключён), многоточие — <code>.dots</code>, наведение на остальные — чёрный фон с белым текстом. «Назад»/«Вперёд» — шеврон Lucide <code>.ui-pagination__icon</code> плюс подпись <code>.ui-pagination__label</code>. Каталоги, которые рисуют пагинацию на клиенте, берут те же стрелки из <code>js/modules/services/pagination-arrows.js</code>.</p>
 
     <div class="uikit-demo uikit-demo--block">
       <nav class="ui-pagination" aria-label="Страницы">
+        <a class="prev page-numbers" href="#">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-pagination__icon"><path d="m15 18-6-6 6-6"/></svg>
+          <span class="ui-pagination__label">Назад</span>
+        </a>
         <span aria-current="page" class="page-numbers current">1</span>
         <a class="page-numbers" href="#">2</a>
         <a class="page-numbers" href="#">3</a>
         <span class="page-numbers dots">…</span>
         <a class="page-numbers" href="#">12</a>
-        <a class="next page-numbers" href="#">Вперёд</a>
+        <a class="next page-numbers" href="#">
+          <span class="ui-pagination__label">Вперёд</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ui-pagination__icon"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
       </nav>
     </div>
     <pre class="uikit-snippet">&lt;?php
-$pagination = paginate_links([
-  'base' =&gt; trailingslashit($base_url) . 'page/%#%/',
-  'format' =&gt; '',
+bsi_pagination([
+  'total'   =&gt; (int) $query-&gt;max_num_pages,
   'current' =&gt; $paged,
-  'total' =&gt; (int) $query-&gt;max_num_pages,
-  'prev_text' =&gt; 'Назад',
-  'next_text' =&gt; 'Вперёд',
+], ['class' =&gt; 'country-sights-pagination']);
+
+// AJAX-каталог: контейнер нужен всегда, даже на одной странице
+bsi_pagination($args, [
+  'class'  =&gt; 'js-news-pagination',
+  'attrs'  =&gt; ['data-tours-pagination' =&gt; ''],
+  'always' =&gt; true,
 ]);
-?&gt;
-&lt;nav class="ui-pagination" aria-label="Страницы"&gt;&lt;?php echo $pagination; ?&gt;&lt;/nav&gt;</pre>
+
+// Ответ AJAX — только ссылки, обёртка уже на странице
+echo bsi_pagination_links(['total' =&gt; $max_pages, 'current' =&gt; $paged]);
+?&gt;</pre>
   </section>
 
   <!-- ============ NUMBERED CONTENT ============ -->
@@ -1299,29 +1332,135 @@ get_template_part('template-parts/hotels/room-card');
       через <code>currentColor</code>.
     </p>
 
-    <h3 class="h3" style="margin-bottom:12px">Ключевые параметры (.insurance-facts)</h3>
-    <div class="insurance-facts" style="margin-bottom:32px">
-      <div class="insurance-fact">
-        <div class="insurance-fact__head">
-          <span class="insurance-fact__icon">
-          <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-            <path d="m9 12 2 2 4-4" />
-          </svg>
-          </span>
-          <span class="insurance-fact__key">Страховая сумма</span>
+    <h3 class="h3" style="margin-bottom:12px">Шапка-лендинг (.insurance-hero)</h3>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:12px">
+      Одна колонка на всю ширину, контент по центру: иллюстрация → бейдж возраста → H1 → лид →
+      строка доверия → две кнопки → полоса ключевых параметров. Фон секции — <code>$bg-gray</code>,
+      плитки параметров — белые.
+    </p>
+    <section class="insurance-hero" style="margin-bottom:0">
+      <div class="container">
+        <div class="insurance-hero__inner">
+          <div class="insurance-hero__badges">
+            <span class="insurance-badge">Для всех</span>
+          </div>
+
+          <h1 class="h1 insurance-hero__title">Страхование багажа</h1>
+
+          <p class="insurance-hero__excerpt">Поможет компенсировать затраты в случае утраты багажа</p>
+
+          <p class="insurance-hero__provider">
+            <span class="insurance-hero__provider-icon">
+              <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            Страховщик — СПАО «Ингосстрах», обслуживание туристов круглосуточно
+          </p>
+
+          <div class="insurance-hero__actions">
+            <a href="#" class="btn btn-accent">Получить консультацию</a>
+            <a href="#" class="btn btn-white">Что покрывает полис</a>
+          </div>
         </div>
-        <span class="insurance-fact__value numfont">от 40 000 у.е.</span>
       </div>
-      <div class="insurance-fact">
-        <div class="insurance-fact__head">
-          <span class="insurance-fact__key">Страховая премия</span>
+    </section>
+
+    <h3 class="h3" style="margin-bottom:12px">Якорная навигация (.insurance-anchors)</h3>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:12px">
+      Липкая строка под шапкой. Пункты собираются только для заполненных секций.
+    </p>
+    <nav class="insurance-anchors" aria-label="Разделы страницы" style="margin-bottom:32px">
+      <div class="container">
+        <ul class="insurance-anchors__list">
+          <li><a class="insurance-anchors__link" href="#">Преимущества</a></li>
+          <li><a class="insurance-anchors__link" href="#">Что покрывает</a></li>
+          <li><a class="insurance-anchors__link" href="#">Условия и правила</a></li>
+          <li><a class="insurance-anchors__link" href="#">Документы</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <h3 class="h3" style="margin-bottom:12px">Общие блоки раздела</h3>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:16px">
+      Заполняются один раз на странице «Страхование» (шаблон <code>page-insurance.php</code>) и выводятся
+      и в каталоге, и на страницах продуктов. Партиалы — <code>template-parts/insurance/</code>:
+      <code>steps.php</code> (как оформить), <code>claim.php</code> (что делать при страховом случае
+      + телефон сервисного центра), <code>why.php</code> (почему через BSI), <code>faq.php</code> (вопросы),
+      <code>related.php</code> (другие полисы — собирается автоматически из CPT),
+      <code>consultation-form.php</code> (форма).
+    </p>
+
+    <h4 style="margin:0 0 8px;font-size:15px">Карточка шага (.insurance-claim__step)</h4>
+    <ul class="insurance-claim__list" style="margin-bottom:24px">
+      <li class="insurance-claim__step">
+        <div class="insurance-claim__step-head">
+          <span class="insurance-claim__step-icon">
+            <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true"><path d="M13 2a9 9 0 0 1 9 9"/><path d="M13 6a5 5 0 0 1 5 5"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </span>
+          <h3 class="insurance-claim__step-title">Позвоните до визита к врачу</h3>
         </div>
-        <span class="insurance-fact__value numfont">от 0.67 у.е./сутки</span>
+        <p class="insurance-claim__step-desc">При страховом случае нужно обратиться в сервисный центр до визита к врачу.</p>
+      </li>
+    </ul>
+
+    <h4 style="margin:0 0 8px;font-size:15px">Карточка «Почему через нас» (.insurance-why__item)</h4>
+    <div class="insurance-why__grid" style="margin-bottom:24px">
+      <div class="insurance-why__item">
+        <span class="insurance-why__icon">
+          <svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+        </span>
+        <h3 class="insurance-why__title">83 филиала по России</h3>
+        <p class="insurance-why__desc">Офисы страховщика действуют в 310 населённых пунктах.</p>
       </div>
     </div>
+
+    <h3 class="h3" style="margin-bottom:12px">Ключевые параметры (.insurance-facts)</h3>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:12px">
+      Полоса плиток внутри шапки: 4 колонки на десктопе, 2 на планшете, 1 на мобильном.
+    </p>
+    <ul class="insurance-facts" style="margin-bottom:32px">
+      <li class="insurance-fact">
+        <span class="insurance-fact__head">
+          <span class="insurance-fact__icon"><svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="insurance-fact__key">Страховая сумма</span>
+        </span>
+        <span class="insurance-fact__value numfont">1 000 у.е.</span>
+      </li>
+      <li class="insurance-fact">
+        <span class="insurance-fact__head">
+          <span class="insurance-fact__icon"><svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="insurance-fact__key">Страховая премия</span>
+        </span>
+        <span class="insurance-fact__value numfont">2 у.е. за поездку</span>
+      </li>
+      <li class="insurance-fact">
+        <span class="insurance-fact__head">
+          <span class="insurance-fact__icon"><svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="insurance-fact__key">Выплата</span>
+        </span>
+        <span class="insurance-fact__value numfont">50 у.е. за килограмм</span>
+      </li>
+      <li class="insurance-fact">
+        <span class="insurance-fact__head">
+          <span class="insurance-fact__icon"><svg class="bsi-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="insurance-fact__key">Франшиза</span>
+        </span>
+        <span class="insurance-fact__value numfont">0</span>
+      </li>
+    </ul>
 
     <h3 class="h3" style="margin-bottom:12px">Преимущество (.insurance-benefit)</h3>
     <div class="insurance-benefits__grid" style="margin-bottom:32px">

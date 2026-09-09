@@ -28,3 +28,14 @@
     margin: 0 4px 2px;
   }
 }
+
+/* На страницах с серым фоном крошки лежат в белой полосе во всю ширину —
+   иначе строка висит на сером и читается как часть шапки.
+   Список повторяет страницы с $bg-page на body. */
+body.single-country #breadcrumbs.breadcrumbs,
+body.single-insurance #breadcrumbs.breadcrumbs {
+  margin-top: 0;
+  margin-bottom: 24px;
+  padding: 12px 0;
+  background: $bg-color;
+}

@@ -46,12 +46,9 @@ function bsi_filter_news()
     // Генерируем пагинацию
     if ($query->max_num_pages > 1) {
       ob_start();
-      echo paginate_links([
+      echo bsi_pagination_links([
         'total' => $query->max_num_pages,
         'current' => $paged,
-        'prev_text' => '&larr; Назад',
-        'next_text' => 'Вперед &rarr;',
-        'mid_size' => 2,
       ]);
       $response['pagination'] = ob_get_clean();
     }

@@ -2,11 +2,23 @@
 // Разметка: .ui-pagination > .page-numbers — <a>/<span> от paginate_links
 // либо <button> у каталогов, которые перелистываются без перезагрузки.
 .ui-pagination {
+  margin-top: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+
+  // Стрелки: шеврон + подпись
+  .page-numbers.prev,
+  .page-numbers.next {
+    gap: 6px;
+    padding: 8px 14px;
+  }
+
+  .ui-pagination__icon {
+    flex-shrink: 0;
+  }
 
   .page-numbers {
     // Сброс для <button>: у ссылок и span этих свойств нет.
@@ -30,7 +42,8 @@
     transition: $trans-text;
 
     &:hover:not(.current):not(.dots) {
-      background: darken($bg-gray, 6%);
+      background: $black;
+      color: #fff;
     }
 
     &:focus-visible {
@@ -51,5 +64,31 @@
       cursor: default;
       pointer-events: none;
     }
+  }
+}
+/* На страницах с серым фоном кнопки красим в белый: $bg-gray почти сливается с $bg-page */
+body.single-country,
+body.single-insurance {
+
+  .ui-pagination .page-numbers,
+  .news-pagination .page-numbers {
+    background: $bg-color;
+  }
+
+  .ui-pagination .page-numbers:hover:not(.current):not(.dots),
+  .news-pagination .page-numbers:hover:not(.current):not(.dots) {
+    background: $black;
+    color: #fff;
+  }
+
+  .ui-pagination .page-numbers.current,
+  .news-pagination .page-numbers.current {
+    background: $red;
+    color: #fff;
+  }
+
+  .ui-pagination .page-numbers.dots,
+  .news-pagination .page-numbers.dots {
+    background: transparent;
   }
 }

@@ -248,19 +248,14 @@ get_header(); ?>
               <?php wp_reset_postdata(); ?>
             </div>
 
-            <div class="country-excursions__pagination news-pagination" data-excursions-pagination>
-              <?php if ($excursions_query->max_num_pages > 1): ?>
-                <?php
-                echo paginate_links([
-                  'total'   => $excursions_query->max_num_pages,
-                  'current' => $paged,
-                  'prev_text' => '&larr; Назад',
-                  'next_text' => 'Вперед &rarr;',
-                  'mid_size' => 2,
-                ]);
-                ?>
-              <?php endif; ?>
-            </div>
+            <?php bsi_pagination([
+              'total'   => $excursions_query->max_num_pages,
+              'current' => $paged,
+            ], [
+              'class' => 'country-excursions__pagination',
+              'attrs' => ['data-excursions-pagination' => ''],
+              'always' => true,
+            ]); ?>
 
           </div>
 

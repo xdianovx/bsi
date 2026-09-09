@@ -343,6 +343,7 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_education';
   $vars[] = 'country_news';
   $vars[] = 'country_excursions';
+  $vars[] = 'country_sights';
   $vars[] = 'country_events';
   $vars[] = 'country_hotels_info';
   $vars[] = 'country_deposits';
@@ -412,6 +413,19 @@ add_action('init', function () {
     'top'
   );
 
+  // Пагинация каталога достопримечательностей: без правила /page/2/ уходит в 404.
+  add_rewrite_rule(
+    '^country/([^/]+)/dostoprimechatelnosti/page/([0-9]{1,})/?$',
+    'index.php?post_type=country&name=$matches[1]&country_sights=$matches[1]&paged=$matches[2]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/dostoprimechatelnosti/?$',
+    'index.php?post_type=country&name=$matches[1]&country_sights=$matches[1]',
+    'top'
+  );
+
   // Пагинация каталога событийных туров: без правила /page/2/ уходила
   // в 404, и в индекс попадали только первые 12 туров страны.
   add_rewrite_rule(
@@ -441,7 +455,7 @@ add_action('init', function () {
 }, 20);
 
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|dostoprimechatelnosti|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',

@@ -47,6 +47,8 @@ function bsi_admin_menu_hubs(): array
         ['Регионы', 'manage_categories', 'edit-tags.php?taxonomy=region&post_type=country'],
         ['Курорты', 'manage_categories', 'edit-tags.php?taxonomy=resort&post_type=country'],
         'edit.php?post_type=excursion',
+        'edit.php?post_type=sight',
+        ['Типы достопримечательностей', 'manage_categories', 'edit-tags.php?taxonomy=sight_type&post_type=sight'],
         'edit.php?post_type=tourist_memo',
         'edit.php?post_type=entry_rules',
         'edit.php?post_type=hotel_info',

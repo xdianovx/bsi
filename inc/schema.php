@@ -41,6 +41,8 @@ add_action('wp_head', function () {
         bsi_schema_education();
     } elseif (is_singular('vacancy')) {
         bsi_schema_vacancy();
+    } elseif (is_singular('insurance')) {
+        bsi_schema_insurance();
     }
 }, 99);
 
@@ -557,6 +559,99 @@ function bsi_schema_vacancy(): void
             '@type' => 'MonetaryAmount',
             'currency' => 'RUB',
             'value' => $value,
+        ];
+    }
+
+    bsi_schema_json($schema);
+}
+
+// ── FinancialProduct (insurance) ────────────────────────────
+
+/**
+ * Разметка страхового продукта.
+ *
+ * Тип FinancialProduct (подтип Service) — ближайший к страховому полису.
+ * Страховщик указывается провайдером услуги, BSI Group — продавцом.
+ * Цена и страховая сумма берутся из ACF-поля insurance_info: значения там
+ * записаны текстом («от 0.67 у.е./сутки», «3 000 у.е.»), поэтому уходят
+ * в termsOfService/description, а не в числовой Offer с price.
+ */
+function bsi_schema_insurance(): void
+{
+    $id = get_the_ID();
+    $title = get_the_title($id);
+    $url = get_permalink($id);
+
+    $desc = get_the_excerpt($id);
+    if (!$desc) {
+        $desc = wp_trim_words(wp_strip_all_tags(get_the_content(null, false, $id)), 30, '…');
+    }
+
+    $thumb = get_the_post_thumbnail_url($id, 'large');
+
+    // Ключевые параметры полиса — в featureList: страховая сумма, премия, франшиза
+    $features = [];
+    if (function_exists('have_rows') && have_rows('insurance_info', $id)) {
+        while (have_rows('insurance_info', $id)) {
+            the_row();
+            $key = trim((string) get_sub_field('key'));
+            $value = trim((string) get_sub_field('value'));
+
+            if ($key !== '' && $value !== '') {
+                $features[] = $key . ': ' . $value;
+            }
+        }
+    }
+
+    // Что покрывает полис — отдельным перечнем услуг
+    $coverage = [];
+    if (function_exists('have_rows') && have_rows('insurance_coverage', $id)) {
+        while (have_rows('insurance_coverage', $id)) {
+            the_row();
+            $item = trim((string) get_sub_field('title'));
+
+            if ($item !== '') {
+                $coverage[] = $item;
+            }
+        }
+    }
+
+    $schema = [
+        '@context'    => 'https://schema.org',
+        '@type'       => 'FinancialProduct',
+        'name'        => $title,
+        'description' => wp_strip_all_tags((string) $desc),
+        'url'         => $url,
+        'category'    => 'Страхование путешественников',
+        'image'       => $thumb ?: '',
+        'provider'    => [
+            '@type' => 'Organization',
+            'name'  => 'СПАО «Ингосстрах»',
+            'url'   => 'https://www.ingos.ru/',
+        ],
+        'offeredBy'   => [
+            '@type' => ['Organization', 'TravelAgency'],
+            'name'  => 'BSI Group',
+            'url'   => home_url('/'),
+        ],
+        'areaServed'  => [
+            '@type' => 'Country',
+            'name'  => 'Россия',
+        ],
+        'featureList' => $features,
+    ];
+
+    if ($coverage) {
+        $schema['serviceOutput'] = [
+            '@type' => 'ItemList',
+            'name'  => 'Что покрывает полис',
+            'itemListElement' => array_map(static function (string $item, int $i): array {
+                return [
+                    '@type'    => 'ListItem',
+                    'position' => $i + 1,
+                    'name'     => $item,
+                ];
+            }, $coverage, array_keys($coverage)),
         ];
     }
 

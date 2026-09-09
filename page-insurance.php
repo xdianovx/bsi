@@ -13,7 +13,10 @@ get_header();
 <main class="site-main insurance-page">
 
 	<?php if (function_exists('yoast_breadcrumb')) {
-		yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>');
+		yoast_breadcrumb(
+			'<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
+			'</p></div></div>'
+		);
 	} ?>
 
 	<section class="page-head archive-page-head">
@@ -258,6 +261,10 @@ get_header();
 	<?php endif; ?>
 
 	<?php get_template_part('template-parts/insurance/steps'); ?>
+
+	<?php get_template_part('template-parts/insurance/claim'); ?>
+
+	<?php get_template_part('template-parts/insurance/why'); ?>
 
 	<?php get_template_part('template-parts/insurance/faq'); ?>
 

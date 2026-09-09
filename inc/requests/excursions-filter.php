@@ -157,12 +157,9 @@ function bsi_excursions_filter()
 
   ob_start();
   if ($max_pages > 1) {
-    echo paginate_links([
+    echo bsi_pagination_links([
       'total'     => $max_pages,
       'current'   => $paged,
-      'prev_text' => '&larr; Назад',
-      'next_text' => 'Вперед &rarr;',
-      'mid_size'  => 2,
     ]);
   }
   $pagination = ob_get_clean();

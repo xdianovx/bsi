@@ -341,8 +341,8 @@ $tour_type_terms = get_terms([
                 'format' => 'page/%#%/',
                 'total' => $event_tours_total_pages,
                 'current' => $paged,
-                'prev_text' => 'Назад',
-                'next_text' => 'Вперёд',
+                'prev_text' => bsi_pagination_arrow('prev'),
+                'next_text' => bsi_pagination_arrow('next'),
                 'mid_size' => 2,
               ]);
             }

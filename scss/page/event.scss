@@ -151,7 +151,6 @@
   width: 100%;
   text-align: center;
   font-size: 16px;
-  font-weight: 500;
   line-height: 100%;
   border: none;
   border-radius: 8px;
@@ -724,7 +723,7 @@
   color: $text-black;
 
   &:hover {
-    color: $red;
+    background: darken($bg-gray, 5%);
   }
 }
 

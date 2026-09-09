@@ -40,6 +40,8 @@ if (!function_exists('bsi_lucide_icon_library')) {
 			'wrench' => '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
 			'globe' => '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
 			'arrow-left' => '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+			'chevron-left' => '<path d="m15 18-6-6 6-6"/>',
+			'chevron-right' => '<path d="m9 18 6-6-6-6"/>',
 			'bus' =>'<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.5"/><path d="M18 18h3s1 0 1-1v-6s0-1-1-1h-19s-1 0-1 1v6s0 1 1 1h3"/><path d="M6 18h12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
 		];
 	}

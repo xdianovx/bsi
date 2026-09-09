@@ -1,7 +1,12 @@
 .gtm-search__section {
   position: relative;
   z-index: 2;
-  margin-top: 16px;
+  margin-top: 0;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  /* Блок лежит вне <header>, поэтому белый фон задаём ему отдельно —
+     иначе на страницах с серым фоном он серый. */
+  background: $bg-color;
 }
 
 .tab-content {
@@ -280,7 +285,7 @@
 .gtm-search__tab-btn {
   padding: 8px 12px;
   line-height: 100%;
-  background: $bg-gray;
+  background: #f7f7f7;
   cursor: pointer;
   border-radius: 8px;
   display: flex;
@@ -294,6 +299,7 @@
 
   &.active {
     background: $red;
+    border-color: $red;
     color: #fff;
   }
 

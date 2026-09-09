@@ -15,6 +15,7 @@
   width: 100%;
   gap: 16px;
 }
+
 .news-grid {
   margin-top: 32px;
   display: grid;
@@ -31,6 +32,7 @@
 .archive-page__content-section.news-page__content-section {
   margin-top: 32px;
 }
+
 .news-page__top {
   flex-direction: column;
   align-items: flex-start !important;
@@ -39,6 +41,7 @@
     margin-bottom: 8px;
   }
 }
+
 .news-card {
   display: flex;
   flex-direction: column;
@@ -122,6 +125,7 @@
   font-size: 14px;
   color: $text-gray;
 }
+
 .news-card__date {
   margin-top: auto;
   display: flex;
@@ -193,66 +197,16 @@
 
 .news-slider__buttons-mob {
   display: none;
+
   a {
     display: block;
   }
 }
 
-.news-pagination {
+/* Разметка — общий .ui-pagination (scss/ui/pagination.scss), здесь только отступ */
+.news-pagination,
+.js-news-pagination {
   margin-top: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  .page-numbers {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: $bg-gray;
-    color: $text-black;
-    font-size: 16px;
-    line-height: 100%;
-    font-weight: 500;
-    transition: $trans-text;
-    text-decoration: none;
-
-    &:hover:not(.current):not(.dots) {
-      background: $red;
-      color: #fff;
-    }
-
-    &.current {
-      background: $red;
-      color: #fff;
-      cursor: default;
-      pointer-events: none;
-    }
-
-    &.dots {
-      background: transparent;
-      color: $text-gray;
-      cursor: default;
-      pointer-events: none;
-      min-width: auto;
-      padding: 8px 4px;
-
-      &:hover {
-        background: transparent;
-        color: $text-gray;
-      }
-    }
-
-    &.prev,
-    &.next {
-      padding: 8px 16px;
-    }
-  }
 }
 
 @media screen and (max-width: 1200px) {
@@ -273,6 +227,7 @@
   .news-slider__section {
     margin-top: 80px;
   }
+
   .news-slider-slider {
     margin-top: 20px;
   }
@@ -307,21 +262,8 @@
     height: 148px;
   }
 
-  .news-pagination {
+  .news-pagination,
+  .js-news-pagination {
     margin-top: 32px;
-    gap: 4px;
-
-    .page-numbers {
-      min-width: 36px;
-      height: 36px;
-      padding: 6px 10px;
-      font-size: 14px;
-
-      &.prev,
-      &.next {
-        padding: 6px 12px;
-        font-size: 14px;
-      }
-    }
   }
 }

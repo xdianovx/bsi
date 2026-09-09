@@ -137,6 +137,7 @@
   @media screen and (max-width: 1200px) {
     flex-wrap: wrap;
     flex-direction: row;
+    gap: 8px;
   }
 
   @media screen and (max-width: 768px) {
@@ -190,7 +191,7 @@
   font-weight: 500;
 
   &.active {
-    color: $red;
+    // color: $red;
   }
 
   &::before {
@@ -216,22 +217,24 @@
   cursor: pointer;
   line-height: 100%;
   border-radius: 8px;
+  background: #fff;
 
   &.--mobile {
     display: none;
 
     @media screen and (max-width: 1200px) {
       display: flex;
+
     }
   }
 
   &:hover {
     background: $bg-gray;
-    color: $red;
+    // color: $red;
     // color: #fff;
 
     .child-page-item__icon {
-      color: $red;
+      // color: $red;
     }
   }
 
@@ -248,9 +251,7 @@
     }
   }
 
-  >span {
-    font-weight: 500;
-  }
+
 
   @media screen and (max-width: 1200px) {
     padding: 8px 12px;
@@ -279,8 +280,8 @@
 
 .coutry-page__wrap {
   display: grid;
-  grid-template-columns: 1fr 4fr;
-  gap: 32px;
+  grid-template-columns: 2fr 7fr;
+  gap: 16px;
   align-items: flex-start;
 
   @media screen and (max-width: 1200px) {
@@ -292,7 +293,6 @@
 .coutry-page__aside {
   position: sticky;
   top: 40px;
-  margin-top: 8px;
 
   @media screen and (max-width: 1200px) {
     margin-top: 0;
@@ -458,5 +458,65 @@
     color: $text-gray;
     background: $bg-gray;
     border-radius: 12px;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Серый фон + белые поверхности — постепенный редизайн.
+
+   Включается только для страницы страны и её дочерних экранов
+   (экскурсии, достопримечательности, событийные туры, курорты, депозиты —
+   все идут под body.single-country). Остальные разделы не затронуты:
+   переключаем их шаблон за шаблоном.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.single-country {
+  background: $bg-page;
+}
+
+/* Боковое меню — белая панель. На мобильном меню превращается в строку
+   чипов, панель там не нужна. */
+@media screen and (min-width: 1201px) {
+  body.single-country .coutry-page__aside {
+    align-self: start;
+    padding: 8px;
+    background: $bg-color;
+    border-radius: 12px;
+  }
+}
+
+/* Смысловые блоки контента — отдельные белые карточки */
+body.single-country .page-country__about,
+body.single-country .page-country__editor-content,
+body.single-country .page-country__news,
+body.single-country .country-sights-filters,
+body.single-country .country-sights-empty,
+body.single-country .country-excursions__filters {
+  padding: 16px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+body.single-country .page-country__editor-content,
+body.single-country .page-country__news {
+  margin-top: 20px;
+}
+
+/* Плитки характеристик и региональные блоки лежат внутри белых карточек —
+   им нужен серый фон страницы, иначе белое на белом. */
+body.single-country .country-attr,
+body.single-country .country-attr-item,
+body.single-country .country-regions {
+  background: $bg-page;
+}
+
+@media screen and (max-width: 600px) {
+
+  body.single-country .page-country__about,
+  body.single-country .page-country__editor-content,
+  body.single-country .page-country__news,
+  body.single-country .country-sights-filters,
+  body.single-country .country-excursions__filters {
+    padding: 16px;
   }
 }

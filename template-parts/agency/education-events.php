@@ -115,8 +115,8 @@ if ($search !== '') {
       'kind' => $kind !== '' ? $kind : null,
       'q' => $search !== '' ? $search : null,
     ]),
-    'prev_text' => 'Назад',
-    'next_text' => 'Вперёд',
+    'prev_text' => bsi_pagination_arrow('prev'),
+    'next_text' => bsi_pagination_arrow('next'),
   ]);
   ?>
   <?php if ($pagination): ?>

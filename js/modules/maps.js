@@ -1,3 +1,5 @@
+import { waitYmaps3 } from "./services/ymaps-loader";
+
 function showMapFallback(container, lat, lng, zoom) {
   const z = Math.min(17, Math.max(1, parseInt(zoom, 10) || 14));
   const yandexMapUrl = `https://yandex.ru/maps/?ll=${lng}%2C${lat}&z=${z}&pt=${lng},${lat}`;
@@ -28,23 +30,8 @@ export const initMaps = async () => {
     return;
   }
 
-  if (typeof ymaps3 === "undefined") {
-    console.warn("Yandex Maps API v3 is not loaded");
-    mapElements.forEach((el) => {
-      const lng = parseFloat(el.dataset.lng);
-      const lat = parseFloat(el.dataset.lat);
-      const zoom = el.dataset.zoom || "14";
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        showMapFallback(el, lat, lng, zoom);
-      }
-    });
-    return;
-  }
-
-  try {
-    await ymaps3.ready;
-  } catch (e) {
-    console.warn("Yandex Maps API failed to load", e);
+  const ymaps3 = await waitYmaps3();
+  if (!ymaps3) {
     mapElements.forEach((el) => {
       const lng = parseFloat(el.dataset.lng);
       const lat = parseFloat(el.dataset.lat);

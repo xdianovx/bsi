@@ -1,5 +1,8 @@
 .header {
   // padding: 0 0 16px;
+  /* Шапка всегда белая: страницы постепенно переезжают на серый фон,
+     и прозрачная шапка на них подхватывала серый. */
+  background: $bg-color;
 
   @media screen and (max-width: 768px) {
     position: sticky;
@@ -14,6 +17,7 @@
       top: 46px;
     }
   }
+
   .socials {
     display: none;
   }
@@ -29,15 +33,17 @@
     height: 40px;
     border-radius: 8px;
     background: #fff;
+
     &:hover {
       svg {
         transform: scale(1.1);
       }
     }
-    &.--tg {
-    }
-    &.--vk {
-    }
+
+    &.--tg {}
+
+    &.--vk {}
+
     svg {
       // margin-top: 2px;
       transition: $trans-text;
@@ -97,9 +103,10 @@
     }
   }
 }
+
 .header-top__wrap {
   padding: 4px 0;
-  background: #f4f4f6;
+  background: #f7f7f7;
   line-height: 100%;
 
   @media screen and (max-width: 1200px) {
@@ -118,6 +125,7 @@
   align-items: center;
   gap: 64px;
   margin-top: 8px;
+
   @media screen and (max-width: 768px) {
     margin-top: 0;
   }
@@ -130,7 +138,7 @@
   // ниже страхует от искажения, если логотип заменят на другой формат.
   display: block;
   aspect-ratio: 300 / 67;
-  width: 220px;
+  width: 180px;
 
   img {
     width: 100%;
@@ -138,6 +146,7 @@
     object-fit: contain;
   }
 }
+
 .header__div {
   display: none;
   height: 98px;
@@ -210,6 +219,7 @@
     background: none;
     width: 24px;
     height: 24px;
+
     span {
       display: none;
     }
