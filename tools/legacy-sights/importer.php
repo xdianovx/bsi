@@ -202,6 +202,24 @@ function bsi_legacy_import_sights(array $items, int $country_id, string $status,
       update_field('sight_short', $short, $post_id);
     }
 
+    /* Координаты приезжают уже посчитанными: геокодер — CLI-скрипт, на проде
+       его запустить негде, поэтому точки складываются в JSON вместе с текстом.
+       Заполненные вручную координаты (без меты источника) импорт не трогает. */
+    $coords = trim((string) ($item['coordinates'] ?? ''));
+    if ($coords !== '') {
+      $existing = trim((string) get_field('sight_map_coordinates', $post_id));
+      $existing_source = (string) get_post_meta($post_id, 'bsi_sight_coords_source', true);
+
+      if ($existing === '' || $existing_source !== '') {
+        update_field('sight_map_coordinates', $coords, $post_id);
+
+        $coords_source = trim((string) ($item['coordinates_source'] ?? ''));
+        if ($coords_source !== '') {
+          update_post_meta($post_id, 'bsi_sight_coords_source', $coords_source);
+        }
+      }
+    }
+
     if ($resort_id > 0) {
       wp_set_object_terms($post_id, [$resort_id], 'resort', false);
     }

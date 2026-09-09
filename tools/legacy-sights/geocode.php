@@ -20,7 +20,7 @@
  * это машинная догадка, её нужно проверять глазами. Записи с уже заполненными
  * координатами скрипт не трогает (если не передан --force).
  *
- *   php geocode.php --country=velikobritaniya --cc=gb [--source=wiki|osm|both]
+ *   php geocode.php --country=velikobritaniya --cc=gb [--source=wiki|osm|latin|both]
  *                    [--dry-run] [--limit=10] [--force]
  *
  * По умолчанию --source=wiki: быстро. Медленный добор по OSM — отдельным
@@ -216,8 +216,8 @@ function bsi_geocode_cli_input(): array
   $options = getopt('', ['country:', 'cc:', 'wp:', 'limit:', 'source:', 'dry-run', 'force']);
 
   $source = (string) ($options['source'] ?? 'wiki');
-  if (!in_array($source, ['wiki', 'osm', 'both'], true)) {
-    exit("--source: wiki, osm или both\n");
+  if (!in_array($source, ['wiki', 'osm', 'latin', 'both'], true)) {
+    exit("--source: wiki, osm, latin или both\n");
   }
 
   $country_slug = (string) ($options['country'] ?? 'velikobritaniya');
@@ -277,6 +277,61 @@ function bsi_geocode_query(string $query, string $cc): ?array
     'lng' => (float) $data[0]['lon'],
     'display' => (string) ($data[0]['display_name'] ?? ''),
   ];
+}
+
+/**
+ * Запросы латиницей: русское название Nominatim знает плохо, зато у записей
+ * со старого сайта латиница есть в трёх местах — почтовый индекс в тексте,
+ * английское имя в скобках и slug (он же S_URLCODE Битрикса).
+ *
+ * Порядок — от точного к грубому: индекс адресует дом, имя в скобках — объект,
+ * slug выручает, когда в тексте нет ни того, ни другого.
+ *
+ * @return string[]
+ */
+function bsi_geocode_latin_queries(int $post_id, string $country_en): array
+{
+  $queries = [];
+
+  $post = get_post($post_id);
+  $content = $post ? wp_strip_all_tags((string) $post->post_content) : '';
+  $title = $post ? (string) $post->post_title : '';
+
+  /* Британский почтовый индекс: «SA32 8QH». Улицу к нему не добавляем —
+     Nominatim по индексу находит точнее, чем по кривому адресу из 2008 года. */
+  if ($country_en === 'UK' && preg_match('/\b[A-Z]{1,2}[0-9][0-9A-Z]?\s*[0-9][A-Z]{2}\b/', $content, $m)) {
+    $queries[] = trim($m[0]) . ', ' . $country_en;
+  }
+
+  /* Английское имя в скобках: «Абергласни (Aberglasney)». */
+  if (preg_match_all('/\(([A-Za-z][A-Za-z\'\-\. ]{3,40})\)/u', $title . ' ' . $content, $mm)) {
+    foreach ($mm[1] as $latin) {
+      $latin = trim($latin);
+      if ($latin !== '') {
+        $queries[] = $latin . ', ' . $country_en;
+      }
+    }
+  }
+
+  /* Латиница прямо в названии без скобок: «Висковарня Glenkinchie», «Королевская яхта Britannia». */
+  if (preg_match_all('/\b[A-Z][A-Za-z\'\-]{3,}(?:\s+[A-Z][A-Za-z\'\-]{2,}){0,3}\b/u', $title, $tt)) {
+    foreach ($tt[0] as $latin) {
+      $latin = trim($latin);
+      if ($latin !== '') {
+        $queries[] = $latin . ', ' . $country_en;
+      }
+    }
+  }
+
+  /* Slug: «marblearch», «sch_thirst» — служебные префиксы и подчёркивания убираем. */
+  $slug = $post ? (string) $post->post_name : '';
+  $slug = preg_replace('/^(sch|st|mus)_/', '', $slug);
+  $slug = trim(str_replace(['_', '-'], ' ', (string) $slug));
+  if ($slug !== '' && preg_match('/^[a-z0-9 ]+$/i', $slug)) {
+    $queries[] = $slug . ', ' . $country_en;
+  }
+
+  return array_values(array_unique($queries));
 }
 
 /**
@@ -356,7 +411,17 @@ function bsi_geocode_run(array $input): void
        (--source=wiki) он выключен и включается отдельным медленным проходом. */
     $hit = null;
 
-    if ($input['source'] !== 'osm') {
+    if ($input['source'] === 'latin') {
+      /* Латинские запросы идут в Nominatim по очереди: индекс → имя в скобках → slug. */
+      foreach (bsi_geocode_latin_queries($post_id, strtoupper($input['cc']) === 'GB' ? 'UK' : $country_title) as $query) {
+        $hit = bsi_geocode_query($query, $input['cc']);
+        if ($hit !== null) {
+          break;
+        }
+      }
+    }
+
+    if ($hit === null && !in_array($input['source'], ['osm', 'latin'], true)) {
       $hit = bsi_geocode_wiki(
         $title . ' ' . ($city !== '' ? $city : $country_title),
         $title,
@@ -364,7 +429,7 @@ function bsi_geocode_run(array $input): void
       );
     }
 
-    if ($hit === null && $input['source'] !== 'wiki') {
+    if ($hit === null && !in_array($input['source'], ['wiki', 'latin'], true)) {
       foreach ($queries as $query) {
         $hit = bsi_geocode_query($query, $input['cc']);
         if ($hit !== null) {
@@ -398,7 +463,9 @@ function bsi_geocode_run(array $input): void
       continue;
     }
 
-    $source = str_starts_with($hit['display'], 'Википедия: ') ? 'wikipedia' : 'nominatim';
+    $source = str_starts_with($hit['display'], 'Википедия: ')
+      ? 'wikipedia'
+      : ($input['source'] === 'latin' ? 'nominatim-latin' : 'nominatim');
 
     update_field('sight_map_coordinates', $coords, $post_id);
     update_post_meta($post_id, 'bsi_sight_coords_source', $source);
