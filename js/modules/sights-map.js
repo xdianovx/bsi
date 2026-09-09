@@ -96,6 +96,28 @@ function createMarkerElement(point, icons) {
 
   link.appendChild(card);
 
+  // Ymaps кладёт каждый маркер в свою обёртку со своим z-index, поэтому
+  // z-index внутри маркера не спасает: поднимаем саму обёртку на время ховера
+  const markerHolder = () => {
+    const parent = link.parentElement;
+    if (!parent) return null;
+    return parent.closest('[class*="ymaps3"]') || parent;
+  };
+
+  link.addEventListener("mouseenter", () => {
+    const holder = markerHolder();
+    if (!holder) return;
+    holder.dataset.prevZIndex = holder.style.zIndex || "";
+    holder.style.zIndex = "1000";
+  });
+
+  link.addEventListener("mouseleave", () => {
+    const holder = markerHolder();
+    if (!holder) return;
+    holder.style.zIndex = holder.dataset.prevZIndex || "";
+    delete holder.dataset.prevZIndex;
+  });
+
   return link;
 }
 

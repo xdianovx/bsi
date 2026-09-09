@@ -1578,6 +1578,19 @@
     }
   }
 
+  // Ссылки из редактора — красные с подчёркиванием
+  a {
+    color: $red;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red-hover;
+    }
+  }
+
   // Вложенные списки: свой отступ, без сброса маркера родителя
   li > ul,
   li > ol {
