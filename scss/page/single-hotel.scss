@@ -100,14 +100,23 @@
 }
 
 .hotel-gallery-main-slide {
-  border-radius: 8px;
+  height: 100%;
   overflow: hidden;
-  aspect-ratio: 16/9;
+  border-radius: 8px;
 }
 
 .hotel-gallery-main-slide img {
+  display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+@media screen and (max-width: 1200px) {
+  .hotel-gallery-main-slide {
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
 }
 
 .hotel-gallery-thumb-slide {
@@ -368,18 +377,37 @@
   margin-left: auto;
 }
 
+/* Весь блок галереи — 16:9 независимо от ширины колонки: в узкой
+   колонке страны фиксированная высота давала другие пропорции. */
 .js-gallery {
   display: grid;
   grid-template-columns: 5fr 1fr;
   gap: 8px;
+  aspect-ratio: 16 / 9;
 
   @media screen and (max-width: 1200px) {
     grid-template-columns: repeat(1, 1fr);
+    /* В одну колонку пропорция уже не работает: высоту задают слайды */
+    aspect-ratio: auto;
+  }
+}
+
+/* Слайдеры тянутся на всю высоту блока, а не задают её сами.
+   Радиус ставим и на сам swiper: он обрезает по своим границам
+   (overflow: hidden), из-за чего скругление слайда пропадало. */
+.js-gallery-main {
+  min-height: 0;
+  height: 100%;
+  border-radius: 8px;
+
+  @media screen and (max-width: 1200px) {
+    height: auto;
   }
 }
 
 .js-gallery-thumbs {
-  height: 600px;
+  height: 100%;
+  min-height: 0;
   position: relative;
 
   @media screen and (max-width: 1200px) {

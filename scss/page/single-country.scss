@@ -7,19 +7,19 @@
   margin-bottom: 16px;
   line-height: 100%;
 
+  /* Круглый флаг по высоте заголовка (H1 — 28px) */
   img {
-    height: 42px;
-    width: 42px;
     display: block;
-    border-radius: 100%;
-    border: 1px solid #cecece;
+    width: 32px;
+    height: 32px;
     object-fit: cover;
+    border-radius: 50%;
   }
 
   @media screen and (max-width: 1200px) {
     img {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
     }
   }
 }
@@ -82,52 +82,18 @@
 
 .country-attr__value {}
 
-.country-attr-item {
-  display: flex;
-  align-items: center;
-  font-weight: 400;
-  gap: 8px;
-  line-height: 100%;
-  background: $bg-gray;
-  padding: 6px 12px;
-  border-radius: 8px;
-
-  p {
-    margin-bottom: 0;
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-  }
-}
-
+/* Плитки фактов страны — общий компонент .fact-tiles (scss/ui/fact-tiles.scss).
+   Раскладку и оформление задаёт он, здесь остаётся только отступ сверху. */
 .country-page__top-info {
-  margin-top: 24px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  margin-top: 12px;
 }
 
 .page-country__descr {
-  color: $text-gray;
-  padding-left: 16px;
   position: relative;
   margin-top: 16px;
   margin-bottom: 0;
 
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 2px;
-    height: 100%;
-    background: $red;
-    border-radius: 4px;
-  }
+
 }
 
 .child-pages__list {
@@ -382,22 +348,8 @@
   font-size: 18px;
 }
 
-.hotel-gallery-main-slide {
-  aspect-ratio: 19/9;
-  display: block;
-  height: 600px;
-
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  @media screen and (max-width: 1024px) {
-    height: auto;
-  }
-}
+/* Пропорции и высоту слайда задаёт общий компонент галереи
+   (scss/page/single-hotel.scss): блок целиком 16:9. */
 
 .js-gallery {}
 
@@ -473,6 +425,14 @@ body.single-country {
   background: $bg-page;
 }
 
+/* На сером фоне страницы чипы меню должны быть белыми: базовый $bg-gray
+   сливается с подложкой. Активный чип остаётся красным. */
+@media screen and (max-width: 768px) {
+  body.single-country .child-page-item:not(.active) {
+    background: $bg-color;
+  }
+}
+
 /* Боковое меню — белая панель. На мобильном меню превращается в строку
    чипов, панель там не нужна. */
 @media screen and (min-width: 1201px) {
@@ -484,8 +444,9 @@ body.single-country {
   }
 }
 
-/* Смысловые блоки контента — отдельные белые карточки */
-body.single-country .page-country__about,
+/* Смысловые блоки контента — отдельные белые карточки.
+   Шапка (.page-country__about) сюда не входит: заголовок, лид и галерея
+   лежат прямо на сером фоне, как на странице курорта. */
 body.single-country .page-country__editor-content,
 body.single-country .page-country__news,
 body.single-country .country-sights-filters,
@@ -504,14 +465,12 @@ body.single-country .page-country__news {
 /* Плитки характеристик и региональные блоки лежат внутри белых карточек —
    им нужен серый фон страницы, иначе белое на белом. */
 body.single-country .country-attr,
-body.single-country .country-attr-item,
 body.single-country .country-regions {
   background: $bg-page;
 }
 
 @media screen and (max-width: 600px) {
 
-  body.single-country .page-country__about,
   body.single-country .page-country__editor-content,
   body.single-country .page-country__news,
   body.single-country .country-sights-filters,

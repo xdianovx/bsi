@@ -139,6 +139,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 16px;
+  padding-bottom: 16px;
   margin-top: 12px;
 }
 
@@ -175,12 +176,17 @@
   color: $text-gray;
 }
 
+/* Чип — кнопка, поэтому на hover инвертируется (чёрная заливка,
+   белый текст), а не подсвечивается красным: красный оставлен
+   текстовым ссылкам. См. wiki/docs/design-guidelines.md. */
 .country-sights-chip:hover {
-  color: $red;
+  color: $text-white;
+  background: $bg-black;
+  border-color: $bg-black;
 }
 
 .country-sights-chip:hover::after {
-  color: $red;
+  color: $text-white;
 }
 
 .country-sights-reset {
@@ -245,12 +251,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
 }
 
-.sight-card-media:hover .sight-card-image {
-  transform: scale(1.04);
-}
+/* Зум картинки убран: бейдж типа лежит поверх неё и на ховере «плыл» */
 
 .sight-card-placeholder {
   display: flex;
@@ -286,10 +289,10 @@
   display: -webkit-box;
   overflow: hidden;
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.3;
   margin-top: 8px;
-  font-weight: 500;
+  font-weight: 600;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
