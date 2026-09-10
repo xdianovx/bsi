@@ -43,6 +43,8 @@ add_action('wp_head', function () {
         bsi_schema_vacancy();
     } elseif (is_singular('insurance')) {
         bsi_schema_insurance();
+    } elseif (is_tax('resort')) {
+        bsi_schema_resort();
     }
 }, 99);
 
@@ -656,4 +658,147 @@ function bsi_schema_insurance(): void
     }
 
     bsi_schema_json($schema);
+}
+
+
+// ── Курорт (страница-гид по городу) ─────────────────────────
+
+/**
+ * TouristDestination курорта + ItemList достопримечательностей.
+ *
+ * Координаты берём как центр точек достопримечательностей: своих
+ * координат у терма нет, а средняя точка по объектам города достаточно
+ * точна для карточки места.
+ */
+function bsi_schema_resort(): void
+{
+    $term_id = (int) get_queried_object_id();
+    $term = get_term($term_id, 'resort');
+
+    if (!($term instanceof WP_Term) || !function_exists('bsi_resort_context')) {
+        return;
+    }
+
+    /* Раздел курорта — это список, а не место: своя схема */
+    $section = (string) get_query_var('resort_section');
+    if ($section !== '') {
+        bsi_schema_resort_section($term, $section);
+
+        return;
+    }
+
+    if (!bsi_resort_is_indexable($term_id)) {
+        return;
+    }
+
+    $context = bsi_resort_context($term_id);
+    $url = (string) get_term_link($term);
+
+    $description = function_exists('get_field')
+        ? trim((string) get_field('resort_excerpt', 'resort_' . $term_id))
+        : '';
+    if ($description === '') {
+        $description = trim(wp_strip_all_tags(bsi_resort_description_text($term_id)));
+    }
+
+    $sight_ids = bsi_resort_posts($term_id, 'sight');
+    $map = bsi_resort_map_points($sight_ids);
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'TouristDestination',
+        'name' => $term->name,
+        'description' => $description !== '' ? wp_trim_words($description, 40, '…') : '',
+        'url' => $url,
+    ];
+
+    if ($context['country_title'] !== '') {
+        $schema['containedInPlace'] = [
+            '@type' => 'Country',
+            'name' => $context['country_title'],
+        ];
+    }
+
+    if (!empty($map['points'])) {
+        $lat = array_sum(array_column($map['points'], 'lat')) / count($map['points']);
+        $lng = array_sum(array_column($map['points'], 'lng')) / count($map['points']);
+
+        $schema['geo'] = [
+            '@type' => 'GeoCoordinates',
+            'latitude' => round((float) $lat, 5),
+            'longitude' => round((float) $lng, 5),
+        ];
+    }
+
+    bsi_schema_json($schema);
+
+    /* Список достопримечательностей — отдельным ItemList, как на каталоге */
+    if (empty($sight_ids)) {
+        return;
+    }
+
+    $items = [];
+    foreach (array_slice($sight_ids, 0, 20) as $index => $sight_id) {
+        $items[] = [
+            '@type' => 'ListItem',
+            'position' => $index + 1,
+            'url' => get_permalink((int) $sight_id),
+            'name' => get_the_title((int) $sight_id),
+        ];
+    }
+
+    bsi_schema_json([
+        '@context' => 'https://schema.org',
+        '@type' => 'ItemList',
+        'name' => 'Достопримечательности: ' . $term->name,
+        'numberOfItems' => count($sight_ids),
+        'itemListElement' => $items,
+    ]);
+}
+
+
+/**
+ * ItemList раздела курорта — записи текущей страницы выдачи.
+ */
+function bsi_schema_resort_section(WP_Term $term, string $section): void
+{
+    $sections = bsi_resort_sections();
+    if (!isset($sections[$section])) {
+        return;
+    }
+
+    $term_id = (int) $term->term_id;
+    $all_ids = bsi_resort_posts($term_id, (string) $sections[$section]['post_type']);
+
+    if (count($all_ids) < bsi_resort_section_min_items()) {
+        return;
+    }
+
+    $per_page = 24;
+    $paged = max(1, (int) get_query_var('paged'));
+    $offset = ($paged - 1) * $per_page;
+    $page_ids = array_slice($all_ids, $offset, $per_page);
+
+    if (empty($page_ids)) {
+        return;
+    }
+
+    $items = [];
+    foreach ($page_ids as $index => $post_id) {
+        $items[] = [
+            '@type' => 'ListItem',
+            // Позиция сквозная по разделу, а не по странице
+            'position' => $offset + $index + 1,
+            'url' => get_permalink((int) $post_id),
+            'name' => get_the_title((int) $post_id),
+        ];
+    }
+
+    bsi_schema_json([
+        '@context' => 'https://schema.org',
+        '@type' => 'ItemList',
+        'name' => bsi_resort_section_h1($term_id, $section),
+        'numberOfItems' => count($all_ids),
+        'itemListElement' => $items,
+    ]);
 }

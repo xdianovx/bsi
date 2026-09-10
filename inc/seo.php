@@ -949,12 +949,65 @@ function bsi_sitemap_country_sections() {
         }
     }
 
+    $xml .= bsi_sitemap_resort_sections_urls();
+
     $xml .= '</urlset>';
 
     global $wpseo_sitemaps;
     if (isset($wpseo_sitemaps)) {
         $wpseo_sitemaps->set_sitemap($xml);
     }
+}
+
+/**
+ * URL разделов курортов — /country/{c}/{region}/{resort}/{section}/.
+ *
+ * Сами курорты Yoast отдаёт в sitemap таксономий, а разделы — виртуальные
+ * страницы, о которых он не знает. Отдаём только те, что реально
+ * открываются: раздел ниже порога записей возвращает 404.
+ */
+function bsi_sitemap_resort_sections_urls(): string
+{
+    if (!function_exists('bsi_resort_sections')) {
+        return '';
+    }
+
+    $terms = get_terms([
+        'taxonomy' => 'resort',
+        'hide_empty' => false,
+        'fields' => 'ids',
+    ]);
+
+    if (is_wp_error($terms) || empty($terms)) {
+        return '';
+    }
+
+    $thin = bsi_resort_thin_term_ids();
+    $xml = '';
+
+    foreach ($terms as $term_id) {
+        $term_id = (int) $term_id;
+
+        // Пустой курорт закрыт от индекса — его разделы тем более
+        if (in_array($term_id, $thin, true)) {
+            continue;
+        }
+
+        foreach (array_keys(bsi_resort_sections()) as $section) {
+            $url = bsi_resort_section_url($term_id, $section);
+            if ($url === '') {
+                continue;
+            }
+
+            $xml .= '  <url>' . "\n";
+            $xml .= '    <loc>' . esc_url($url) . '</loc>' . "\n";
+            $xml .= '    <changefreq>weekly</changefreq>' . "\n";
+            $xml .= '    <priority>0.6</priority>' . "\n";
+            $xml .= '  </url>' . "\n";
+        }
+    }
+
+    return $xml;
 }
 
 
@@ -989,7 +1042,9 @@ function bsi_seo_excluded_taxonomies(): array
 {
     return [
         'region',
-        'resort',
+        /* `resort` убран из списка: у курорта своя страница-гид
+           (taxonomy-resort.php). Наполненные курорты индексируются,
+           пустые закрываются точечно — см. bsi_resort_is_indexable(). */
         'tour_include',
         'excursion_type',
         'excursion_include',
@@ -1082,6 +1137,9 @@ add_filter('wpseo_robots_array', function ($robots) {
         $noindex = true;
     } elseif (is_tax(bsi_seo_excluded_taxonomies())) {
         $noindex = true;
+    } elseif (is_tax('resort')) {
+        // Курорт без описания и почти без карточек — тонкая страница
+        $noindex = !bsi_resort_is_indexable((int) get_queried_object_id());
     } elseif (is_singular(bsi_seo_excluded_post_types())
         || is_post_type_archive(bsi_seo_excluded_post_types())
     ) {
@@ -2011,3 +2069,261 @@ add_filter('wpseo_metadesc', function ($desc) {
 
     return $custom !== '' ? bsi_seo_trim_description($custom) : $desc;
 }, 26);
+
+
+// ── Страница курорта: заголовок, описание, sitemap ───────────
+// Yoast для терма без своих настроек отдаёт «Архивы Лондон» —
+// бесполезный тайтл. Собираем осмысленный из контекста курорта.
+
+/**
+ * Строка вида «Отдых в Лондоне: 41 достопримечательность, 117 экскурсий».
+ */
+function bsi_seo_resort_facts(int $term_id): string
+{
+    $facts = [];
+
+    $sights = bsi_resort_count($term_id, 'sight');
+    if ($sights > 0) {
+        $facts[] = $sights . ' ' . bsi_seo_plural($sights, 'достопримечательность', 'достопримечательности', 'достопримечательностей');
+    }
+
+    $excursions = bsi_resort_count($term_id, 'excursion');
+    if ($excursions > 0) {
+        $facts[] = $excursions . ' ' . bsi_seo_plural($excursions, 'экскурсия', 'экскурсии', 'экскурсий');
+    }
+
+    $hotels = bsi_resort_count($term_id, 'hotel');
+    if ($hotels > 0) {
+        $facts[] = $hotels . ' ' . bsi_seo_plural($hotels, 'отель', 'отеля', 'отелей');
+    }
+
+    return implode(', ', $facts);
+}
+
+if (!function_exists('bsi_seo_plural')) {
+    /**
+     * Форма слова по числу: 1 отель, 2 отеля, 5 отелей.
+     */
+    function bsi_seo_plural(int $count, string $one, string $few, string $many): string
+    {
+        $mod10 = $count % 10;
+        $mod100 = $count % 100;
+
+        if ($mod10 === 1 && $mod100 !== 11) {
+            return $one;
+        }
+
+        if (in_array($mod10, [2, 3, 4], true) && !in_array($mod100, [12, 13, 14], true)) {
+            return $few;
+        }
+
+        return $many;
+    }
+}
+
+add_filter('wpseo_title', function ($title) {
+    if (!is_tax('resort')) {
+        return $title;
+    }
+
+    $term_id = (int) get_queried_object_id();
+
+    // Свой заголовок в Yoast важнее автоматики
+    if (trim((string) get_term_meta($term_id, '_yoast_wpseo_title', true)) !== '') {
+        return $title;
+    }
+
+    $locative = bsi_resort_locative($term_id);
+    $term = get_term($term_id, 'resort');
+    $name = ($term instanceof WP_Term) ? $term->name : '';
+
+    if ($name === '') {
+        return $title;
+    }
+
+    $context = bsi_resort_context($term_id);
+    $country = (string) $context['country_title'];
+
+    // Раздел курорта — свой заголовок под свой запрос
+    $section = (string) get_query_var('resort_section');
+    $sections = bsi_resort_sections();
+
+    if ($section !== '' && isset($sections[$section])) {
+        // Заголовок, заданный на терме, важнее автоматики
+        $manual = bsi_resort_section_field($term_id, $section, 'seo_title');
+        if ($manual !== '') {
+            return $manual;
+        }
+
+        $subject = $locative !== '' ? $locative : $name;
+
+        $head = sprintf((string) $sections[$section]['title'], $subject);
+        $count = bsi_resort_count($term_id, (string) $sections[$section]['post_type']);
+
+        if ($count > 0) {
+            $head .= ' — ' . $count . ' ' . bsi_seo_plural($count, ...$sections[$section]['plural']);
+        }
+
+        return $head . ' | ' . get_bloginfo('name');
+    }
+
+    $head = $locative !== '' ? 'Отдых в ' . $locative : $name;
+    if ($country !== '') {
+        $head .= ' (' . $country . ')';
+    }
+
+    return $head . ': что посмотреть и куда съездить | ' . get_bloginfo('name');
+}, 26);
+
+add_filter('wpseo_metadesc', function ($desc) {
+    if (!is_tax('resort')) {
+        return $desc;
+    }
+
+    $term_id = (int) get_queried_object_id();
+
+    if (trim((string) get_term_meta($term_id, '_yoast_wpseo_metadesc', true)) !== '') {
+        return $desc;
+    }
+
+    $term = get_term($term_id, 'resort');
+    if (!($term instanceof WP_Term)) {
+        return $desc;
+    }
+
+    $section = (string) get_query_var('resort_section');
+    $sections = bsi_resort_sections();
+
+    if ($section !== '' && isset($sections[$section])) {
+        $manual = bsi_resort_section_field($term_id, $section, 'seo_desc');
+        if ($manual !== '') {
+            return bsi_seo_trim_description($manual);
+        }
+
+        $term = get_term($term_id, 'resort');
+        $locative = bsi_resort_locative($term_id);
+        $subject = $locative !== '' ? $locative : (($term instanceof WP_Term) ? $term->name : '');
+        $count = bsi_resort_count($term_id, (string) $sections[$section]['post_type']);
+
+        if ($subject === '' || $count === 0) {
+            return $desc;
+        }
+
+        return bsi_seo_trim_description(sprintf(
+            '%d %s в %s: описания, цены и бронирование. Подбор и заявка — BSI Group.',
+            $count,
+            bsi_seo_plural($count, ...$sections[$section]['plural']),
+            $subject
+        ));
+    }
+
+    // Описание курорта — лучший источник, если оно есть
+    $own = function_exists('get_field') ? trim((string) get_field('resort_excerpt', 'resort_' . $term_id)) : '';
+    if ($own === '') {
+        $own = trim(wp_strip_all_tags(bsi_resort_description_text($term_id)));
+    }
+
+    if ($own !== '') {
+        return bsi_seo_trim_description($own);
+    }
+
+    $locative = bsi_resort_locative($term_id);
+    $facts = bsi_seo_resort_facts($term_id);
+
+    if ($facts === '') {
+        return $desc;
+    }
+
+    $head = $locative !== '' ? 'Отдых в ' . $locative : $term->name;
+
+    return bsi_seo_trim_description($head . ': ' . $facts . '. Карта, описания и бронирование — BSI Group.');
+}, 26);
+
+// Пустые курорты в sitemap не отдаём — там нечего индексировать
+add_filter('wpseo_exclude_from_sitemap_by_term_ids', function ($excluded) {
+    $thin = bsi_resort_thin_term_ids();
+
+    if (empty($thin)) {
+        return $excluded;
+    }
+
+    return array_merge(is_array($excluded) ? $excluded : [], $thin);
+});
+
+
+// ── Раздел курорта: крошки и canonical ──────────────────────
+// Yoast знает только терм курорта, поэтому раздел («Экскурсии»)
+// не попадал ни в видимые крошки, ни в BreadcrumbList.
+
+add_filter('wpseo_breadcrumb_links', function ($links) {
+    $section = (string) get_query_var('resort_section');
+    if ($section === '' || !is_array($links) || empty($links)) {
+        return $links;
+    }
+
+    $sections = bsi_resort_sections();
+    if (!isset($sections[$section])) {
+        return $links;
+    }
+
+    $term_id = (int) get_queried_object_id();
+    $term = get_term($term_id, 'resort');
+    if (!($term instanceof WP_Term)) {
+        return $links;
+    }
+
+    /* Крошка курорта была последней — ей нужна ссылка */
+    $last_key = array_key_last($links);
+    if (is_array($links[$last_key]) && empty($links[$last_key]['url'])) {
+        $links[$last_key]['url'] = bsi_resort_url($term_id);
+    }
+
+    /* В крошке — короткое имя раздела: город уже стоит предыдущей крошкой */
+    $links[] = [
+        'url' => bsi_resort_section_url($term_id, $section),
+        'text' => (string) $sections[$section]['crumb'],
+    ];
+
+    return $links;
+}, 21);
+
+add_filter('wpseo_canonical', function ($canonical) {
+    $section = (string) get_query_var('resort_section');
+
+    if ($section !== '') {
+        // Yoast отдаёт адрес самого терма — для раздела это дубль
+        $url = bsi_resort_section_url((int) get_queried_object_id(), $section);
+        if ($url === '') {
+            return $canonical;
+        }
+
+        $paged = max(1, (int) get_query_var('paged'));
+
+        return $paged > 1 ? trailingslashit($url) . 'page/' . $paged . '/' : $url;
+    }
+
+    /* Каталог страны, отфильтрованный по курорту, дублирует раздел курорта:
+       /country/velikobritaniya/ekskursii/?resort=174 → страница Лондона. */
+    $resort_id = isset($_GET['resort']) ? (int) $_GET['resort'] : 0;
+    if ($resort_id <= 0) {
+        return $canonical;
+    }
+
+    $map = [
+        'country_excursions' => 'ekskursii',
+        'country_sights' => 'dostoprimechatelnosti',
+    ];
+
+    foreach ($map as $query_var => $section_slug) {
+        if (get_query_var($query_var) === '') {
+            continue;
+        }
+
+        $url = bsi_resort_section_url($resort_id, $section_slug);
+        if ($url !== '') {
+            return $url;
+        }
+    }
+
+    return $canonical;
+}, 20);
