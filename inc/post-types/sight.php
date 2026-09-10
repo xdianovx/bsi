@@ -447,6 +447,73 @@ if (!function_exists('bsi_sight_type_icon_fallback')) {
   }
 }
 
+if (!function_exists('bsi_sight_icon_svg_allowed_html')) {
+  /**
+   * Белый список тегов и атрибутов для внутренностей <svg>.
+   * Ни script, ни style, ни image/use, ни on*-обработчиков: SVG из админки
+   * выводится инлайном, поэтому всё исполняемое режем на входе.
+   *
+   * @return array<string, array<string, bool>>
+   */
+  function bsi_sight_icon_svg_allowed_html(): array
+  {
+    $transform = ['transform' => true, 'fill-rule' => true, 'clip-rule' => true];
+
+    return [
+      'path' => $transform + ['d' => true],
+      'circle' => $transform + ['cx' => true, 'cy' => true, 'r' => true],
+      'rect' => $transform + ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true],
+      'line' => $transform + ['x1' => true, 'y1' => true, 'x2' => true, 'y2' => true],
+      'polyline' => $transform + ['points' => true],
+      'polygon' => $transform + ['points' => true],
+      'ellipse' => $transform + ['cx' => true, 'cy' => true, 'rx' => true, 'ry' => true],
+      'g' => $transform,
+    ];
+  }
+}
+
+if (!function_exists('bsi_sight_sanitize_icon_svg')) {
+  /**
+   * Приводит вставленный код к внутренностям <svg>: снимает обёртку и
+   * прогоняет содержимое через белый список тегов.
+   */
+  function bsi_sight_sanitize_icon_svg(string $raw): string
+  {
+    $raw = trim($raw);
+    if ($raw === '') {
+      return '';
+    }
+
+    // Вставляют обычно целиком <svg ...>…</svg> — обёртку рисуем сами
+    if (preg_match('~<svg[^>]*>(.*)</svg>~is', $raw, $matches)) {
+      $raw = $matches[1];
+    }
+
+    // wp_kses снимает такие теги, но оставляет их текст — вырезаем вместе с содержимым
+    $raw = preg_replace('~<(script|style|foreignObject)\b[^>]*>.*?</\1>~is', '', $raw);
+
+    $clean = wp_kses((string) $raw, bsi_sight_icon_svg_allowed_html());
+
+    return trim($clean);
+  }
+}
+
+if (!function_exists('bsi_sight_type_custom_svg')) {
+  /**
+   * Свой SVG термина `sight_type` — уже очищенные внутренности <svg>.
+   */
+  function bsi_sight_type_custom_svg(int $term_id): string
+  {
+    if ($term_id <= 0 || !function_exists('get_field')) {
+      return '';
+    }
+
+    $svg = (string) get_field('sight_type_icon_svg', 'sight_type_' . $term_id);
+
+    return trim($svg);
+  }
+}
+
 if (!function_exists('bsi_sight_type_icon')) {
   /**
    * Slug иконки для термина `sight_type`.
@@ -455,6 +522,12 @@ if (!function_exists('bsi_sight_type_icon')) {
   {
     if ($term_id <= 0) {
       return 'map-pin';
+    }
+
+    /* Свой SVG перекрывает выпадашку: его ключ — term-{id}, чтобы
+       bsi_sight_icon_inner() отличил его от иконки-файла. */
+    if (bsi_sight_type_custom_svg($term_id) !== '') {
+      return 'term-' . $term_id;
     }
 
     $icon = function_exists('get_field') ? (string) get_field('sight_type_icon', 'sight_type_' . $term_id) : '';
@@ -481,6 +554,13 @@ if (!function_exists('bsi_sight_icon_inner')) {
     static $cache = [];
 
     if (isset($cache[$slug])) {
+      return $cache[$slug];
+    }
+
+    // Свой SVG термина: term-{id}, лежит в мете, а не в файле
+    if (str_starts_with($slug, 'term-')) {
+      $cache[$slug] = bsi_sight_type_custom_svg((int) substr($slug, 5));
+
       return $cache[$slug];
     }
 
@@ -544,7 +624,101 @@ add_action('acf/init', function () {
         'ui' => 1,
         'instructions' => 'Маркер этого типа на карте и значок на карточке. Пусто — подберётся по названию типа.',
       ],
+      [
+        'key' => 'field_sight_type_icon_svg',
+        'label' => 'Свой SVG',
+        'name' => 'sight_type_icon_svg',
+        'type' => 'textarea',
+        'rows' => 4,
+        'new_lines' => '',
+        'instructions' => 'Нужной иконки нет в списке — открой lucide.dev/icons, нажми «Copy SVG» и вставь код сюда. '
+          . 'Перекрывает выбор выше. Цвет и размер задаёт сайт, поэтому из кода остаётся только форма.',
+      ],
     ],
     'location' => [[['param' => 'taxonomy', 'operator' => '==', 'value' => 'sight_type']]],
   ]);
+});
+
+/* Чистка на входе: в базу попадают только внутренности <svg> из белого списка тегов */
+add_filter('acf/update_value/name=sight_type_icon_svg', function ($value) {
+  return bsi_sight_sanitize_icon_svg((string) $value);
+}, 10, 1);
+
+/* ───────────────────────────────────────────────────────────────────
+ * Колонка «Иконка» в списке типов: видно и выбранные вручную,
+ * и подобранные по названию термина.
+ * ─────────────────────────────────────────────────────────────────── */
+
+add_filter('manage_edit-sight_type_columns', function ($columns) {
+  $with_icon = [];
+
+  foreach ($columns as $key => $label) {
+    if ($key === 'name') {
+      $with_icon['sight_type_icon'] = 'Иконка';
+    }
+    $with_icon[$key] = $label;
+  }
+
+  return $with_icon;
+});
+
+add_filter('manage_sight_type_custom_column', function ($content, $column, $term_id) {
+  if ($column !== 'sight_type_icon') {
+    return $content;
+  }
+
+  $markup = bsi_sight_icon_markup(bsi_sight_type_icon((int) $term_id), 24);
+
+  return $markup !== '' ? $markup : '—';
+}, 10, 3);
+
+add_action('admin_head', function () {
+  $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+  if (!$screen || $screen->taxonomy !== 'sight_type') {
+    return;
+  }
+
+  echo '<style>'
+    . '.column-sight_type_icon{width:56px;text-align:center}'
+    . '.column-sight_type_icon svg{color:#ee3145;vertical-align:middle}'
+    . '.bsi-icon-preview{display:flex;align-items:center;gap:8px;margin-top:8px;color:#ee3145}'
+    . '.bsi-icon-preview-empty{color:#8c8f94}'
+    . '</style>';
+});
+
+/* Живое превью под полем: без него вставленный код проверить нечем */
+add_action('admin_footer', function () {
+  $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+  if (!$screen || $screen->taxonomy !== 'sight_type') {
+    return;
+  }
+  ?>
+  <script>
+    (function () {
+      var field = document.querySelector('[data-name="sight_type_icon_svg"] textarea');
+      if (!field) return;
+
+      var preview = document.createElement('div');
+      preview.className = 'bsi-icon-preview';
+      field.parentNode.appendChild(preview);
+
+      function render() {
+        var code = field.value.trim();
+        if (!code) {
+          preview.innerHTML = '<span class="bsi-icon-preview-empty">Превью появится после вставки кода</span>';
+          return;
+        }
+
+        // Рисуем в своей обёртке — ровно так же, как на сайте
+        var inner = code.replace(/^[\s\S]*?<svg[^>]*>/i, '').replace(/<\/svg>[\s\S]*$/i, '');
+        preview.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" ' +
+          'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+      }
+
+      field.addEventListener('input', render);
+      render();
+    })();
+  </script>
+  <?php
 });
