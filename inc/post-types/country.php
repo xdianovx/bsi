@@ -351,6 +351,27 @@ add_filter('query_vars', function ($vars) {
   return $vars;
 });
 
+/**
+ * Разделы страны с собственной пагинацией (`/page/N/`) висят на singular-странице
+ * страны, поэтому redirect_canonical считает `paged` лишним и 301-м срезает его
+ * на первую страницу. Для этих разделов канонический редирект отключаем.
+ */
+add_filter('redirect_canonical', function ($redirect_url) {
+  if ((int) get_query_var('paged') < 2) {
+    return $redirect_url;
+  }
+
+  $paged_sections = ['country_sights', 'country_events'];
+
+  foreach ($paged_sections as $var) {
+    if (get_query_var($var)) {
+      return false;
+    }
+  }
+
+  return $redirect_url;
+});
+
 add_action('init', function () {
 
   add_rewrite_rule(
