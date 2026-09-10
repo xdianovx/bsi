@@ -348,6 +348,8 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_hotels_info';
   $vars[] = 'country_deposits';
 
+  $vars[] = 'resort_section';
+
   return $vars;
 });
 
@@ -477,6 +479,25 @@ add_action('init', function () {
 
 add_action('init', function () {
   $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|dostoprimechatelnosti|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
+
+  /* Разделы курорта: /country/{c}/{region}/{resort}/{section}/ и /page/N/.
+     Правила добавляются раньше правила самого курорта — иначе четвёртый
+     сегмент съедается таксономией resort. */
+  $sections = implode('|', array_keys(bsi_resort_sections()));
+
+  add_rewrite_rule(
+    '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(' . $sections . ')/page/([0-9]{1,})/?$',
+    'index.php?taxonomy=resort&term=$matches[3]&country_in_path=$matches[1]&region_in_path=$matches[2]'
+      . '&resort_section=$matches[4]&paged=$matches[5]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(' . $sections . ')/?$',
+    'index.php?taxonomy=resort&term=$matches[3]&country_in_path=$matches[1]&region_in_path=$matches[2]'
+      . '&resort_section=$matches[4]',
+    'top'
+  );
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',

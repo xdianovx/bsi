@@ -1,0 +1,512 @@
+/* ───────────────────────────────────────────────────────────────────
+   Страница курорта — /country/{country}/{region}/{resort}/
+
+   Серый фон страницы, содержимое — белые карточки (см.
+   wiki/docs/design-guidelines.md, раздел про постепенный переход).
+   Скоуп — body.tax-resort: другие таксономии не задеваются.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.tax-resort {
+  background: $bg-page;
+  scroll-behavior: smooth;
+}
+
+/* Вводный текст раздела — редактируется на терме курорта */
+
+.resort-hero-intro {
+  max-width: 760px;
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: $text-gray;
+}
+
+.resort-hero-intro p:last-child {
+  margin-bottom: 0;
+}
+
+/* Плитки фактов ведут к секциям якорями — под липкой шапкой */
+.resort-section[id] {
+  scroll-margin-top: 96px;
+}
+
+@media screen and (max-width: 900px) {
+  .resort-section[id] {
+    scroll-margin-top: 24px;
+  }
+}
+
+/* Чипы меню на мобильном — белые: серый базовый цвет сливается с фоном */
+@media screen and (max-width: 768px) {
+  body.tax-resort .child-page-item:not(.active) {
+    background: $bg-color;
+  }
+}
+
+@media screen and (min-width: 1201px) {
+  body.tax-resort .coutry-page__aside {
+    align-self: start;
+    padding: 8px;
+    background: $bg-color;
+    border-radius: 12px;
+  }
+}
+
+/* Шапка. Секции целиком в белый не красим — белыми остаются только
+   карточки, плитки и карта, всё остальное лежит прямо на сером фоне. */
+
+.resort-hero {
+  padding: 0;
+}
+
+.resort-hero-location {
+  margin-bottom: 12px;
+}
+
+.resort-hero-title {
+  margin: 0;
+  font-size: 28px;
+}
+
+.resort-hero-text {
+  max-width: 760px;
+  margin: 12px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: $text-gray;
+}
+
+/* Секции */
+
+.resort-section {
+  margin-top: 40px;
+}
+
+.resort-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.resort-section-title {
+  margin: 0;
+}
+
+.resort-section-tools {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* «Смотреть все» — слева от стрелок слайдера, в одну строку с ними */
+
+.resort-section-all {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  font-size: 15px;
+  color: $text-black;
+  text-decoration: none;
+  white-space: nowrap;
+  background: $bg-color;
+  border-radius: 20px;
+  transition: $trans-text;
+}
+
+.resort-section-all svg {
+  transition: $trans-text;
+}
+
+/* Белая кнопка на hover — чёрная заливка и белый текст, как у .btn-white.
+   Красным подсвечиваются только текстовые ссылки, не кнопки. */
+.resort-section-all:hover {
+  color: $text-white;
+  background: $bg-black;
+}
+
+.resort-section-all:hover svg {
+  transform: translate(2px, -2px);
+}
+
+/* Стрелки слайдера — в шапке секции, а не поверх карточек */
+
+.resort-slider-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.resort-slider-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: $text-black;
+  cursor: pointer;
+  background: $bg-color;
+  border: none;
+  border-radius: 50%;
+  transition: $trans-text;
+}
+
+.resort-slider-btn:hover {
+  color: $text-white;
+  background: $bg-black;
+}
+
+.resort-slider-btn.swiper-button-disabled {
+  color: $gray-light;
+  cursor: default;
+}
+
+.resort-slider {
+  overflow: hidden;
+}
+
+/* Карточки внутри слайдера тянутся на всю высоту слайда */
+.resort-slider .swiper-slide {
+  height: auto;
+}
+
+.resort-slider .swiper-slide>* {
+  height: 100%;
+}
+
+/* Сетка карточек на странице раздела */
+
+.resort-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.resort-grid-item {
+  display: flex;
+}
+
+.resort-grid-item>* {
+  width: 100%;
+}
+
+/* Список раздела: сетка сразу, без слайдера */
+.resort-section-list .resort-grid {
+  margin-top: 0;
+}
+
+.resort-section-pagination {
+  margin-top: 32px;
+}
+
+/* Возврат на хаб курорта — над локацией, чтобы не искать выход внизу списка */
+
+.resort-back {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px 14px 8px 10px;
+  font-size: 15px;
+  color: $text-black;
+  text-decoration: none;
+  background: $bg-color;
+  border-radius: 8px;
+  transition: $trans-text;
+}
+
+.resort-back:hover {
+  color: $text-white;
+  background: $bg-black;
+}
+
+/* Карта достопримечательностей курорта */
+
+.resort-map {
+  height: 420px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Отели — AJAX-список */
+
+.resort-hotels__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.resort-hotels__list:empty {
+  display: none;
+}
+
+.resort-hotels__more {
+  margin-top: 20px;
+}
+
+/* Заявка — секция с формой прямо на странице.
+   Скругления крупнее общетемовых (12/16px вместо 8px): пока только здесь,
+   это проба нового стиля форм. */
+
+.resort-request {
+  margin-top: 32px;
+  padding: 16px;
+  background: $bg-color;
+  border-radius: 16px;
+}
+
+.resort-request-intro {
+  max-width: 620px;
+  margin-bottom: 28px;
+}
+
+.resort-request-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.resort-request-text {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: $text-gray;
+}
+
+.resort-request-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.resort-request-form .input-item {
+  margin-bottom: 24px;
+}
+
+/* Отступ задаёт сам ряд, а не поля внутри него */
+.resort-request-row {
+  margin-bottom: 24px;
+}
+
+.resort-request-row .input-item {
+  margin-bottom: 0;
+}
+
+/* Поля: подпись сверху обычной строкой, без «вырезанной» в рамке метки */
+.resort-request-form .input-item label {
+  position: static;
+  display: block;
+  margin-bottom: 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: $text-gray;
+  background: none;
+}
+
+.resort-request-form .input-item input,
+.resort-request-form .input-item textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: $text-black;
+  background: $bg-page;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: $trans-text;
+}
+
+.resort-request-form .input-item textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.resort-request-form .input-item input::placeholder,
+.resort-request-form .input-item textarea::placeholder {
+  color: $gray;
+}
+
+.resort-request-form .input-item input:focus,
+.resort-request-form .input-item textarea:focus {
+  background: $bg-color;
+  border-color: $black;
+  outline: none;
+}
+
+.resort-request-form .input-item.err input,
+.resort-request-form .input-item.err textarea {
+  border-color: $red;
+}
+
+.resort-request-req {
+  color: $red;
+}
+
+.resort-request-error {
+  display: block;
+  margin-top: 0;
+  font-size: 14px;
+  color: $red;
+}
+
+/* Подвал прижат к последнему полю: своего отступа не даёт,
+   расстояние держит margin-bottom комментария. */
+.resort-request-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0;
+}
+
+.resort-request-footer .input-item {
+  flex: 1 1 320px;
+  margin-bottom: 0;
+}
+
+.resort-request-submit {
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+
+.resort-request-success {
+  margin: 20px 0 0;
+  padding: 14px 16px;
+  font-size: 15px;
+  color: $text-black;
+  background: $bg-page;
+  border-radius: 12px;
+}
+
+/* Текст о городе — единственный блок, которому белая подложка нужна:
+   это сплошная простыня, а не набор карточек */
+
+.resort-text {
+  margin-top: 40px;
+  padding: 24px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+/* Соседние курорты — перелинковка */
+
+.resort-siblings-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resort-siblings-link {
+  display: inline-flex;
+  padding: 8px 14px;
+  font-size: 15px;
+  color: $text-black;
+  text-decoration: none;
+  background: $bg-color;
+  border-radius: 8px;
+  transition: $trans-text;
+}
+
+.resort-siblings-link:hover {
+  color: $text-white;
+  background: $bg-black;
+}
+
+/* Карточки — единственные белые поверхности на сером фоне, поэтому
+   у карточки экскурсии здесь появляются подложка и внутренний отступ:
+   в каталоге она лежит на белом и обходится без них. */
+
+body.tax-resort .catalog-card,
+body.tax-resort .sight-card {
+  background: $bg-color;
+}
+
+body.tax-resort .catalog-card {
+  padding: 8px;
+  border-radius: 12px;
+}
+
+/* Плейсхолдер картинки внутри белой карточки: серый фона страницы,
+   а не $bg-gray — иначе рядом два почти одинаковых серых */
+body.tax-resort .catalog-card__img-placeholder,
+body.tax-resort .sight-card-placeholder {
+  background: $bg-page;
+}
+
+@media screen and (max-width: 1024px) {
+
+  /* Пальцем по стрелке — цель не меньше 44px */
+  .resort-slider-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .resort-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resort-hotels__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resort-map {
+    height: 340px;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .resort-request-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media screen and (max-width: 600px) {
+
+  .resort-text,
+  .resort-request {
+    padding: 16px;
+  }
+
+
+
+  .resort-request-submit {
+    width: 100%;
+  }
+
+  .resort-request-title {
+    font-size: 19px;
+  }
+
+  .resort-section {
+    margin-top: 32px;
+  }
+
+  .resort-grid,
+  .resort-hotels__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* На узком экране стрелки не нужны — слайдер листается пальцем,
+     а «Смотреть все» остаётся */
+  .resort-slider-nav {
+    display: none;
+  }
+
+  .resort-section-all {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+}

@@ -386,6 +386,7 @@ require get_template_directory() . '/inc/helpers/content-schedule.php';
 require get_template_directory() . '/inc/helpers/country-section-singular.php';
 require get_template_directory() . '/inc/helpers/agency-events.php';
 require get_template_directory() . '/inc/helpers/pagination.php';
+require get_template_directory() . '/inc/helpers/resort.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
 require get_template_directory() . '/inc/admin/paragraph-indent.php';
@@ -502,6 +503,7 @@ require get_template_directory() . '/inc/requests/tours-filter.php';
 require get_template_directory() . '/inc/requests/excursions-filter.php';
 require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
 require get_template_directory() . '/inc/requests/ajax-sight-request.php';
+require get_template_directory() . '/inc/requests/ajax-resort-request.php';
 require get_template_directory() . '/inc/requests/ajax-tour-booking.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
