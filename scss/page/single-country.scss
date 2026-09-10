@@ -267,8 +267,8 @@
 }
 
 .page-country__about {
-  padding-bottom: 40px;
-  margin-bottom: 32px;
+  // padding-bottom: 40px;
+  // margin-bottom: 32px;
 }
 
 .country-page__gallery {}
@@ -448,7 +448,6 @@ body.single-country {
    Шапка (.page-country__about) сюда не входит: заголовок, лид и галерея
    лежат прямо на сером фоне, как на странице курорта. */
 body.single-country .page-country__editor-content,
-body.single-country .page-country__news,
 body.single-country .country-sights-filters,
 body.single-country .country-sights-empty,
 body.single-country .country-excursions__filters {
@@ -462,6 +461,14 @@ body.single-country .page-country__news {
   margin-top: 20px;
 }
 
+/* Новости — белые карточки прямо на сером фоне, без подложки у секции:
+   секция из карточек не должна быть ещё одной карточкой. */
+body.single-country .news-card {
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
 /* Плитки характеристик и региональные блоки лежат внутри белых карточек —
    им нужен серый фон страницы, иначе белое на белом. */
 body.single-country .country-attr,
@@ -472,7 +479,6 @@ body.single-country .country-regions {
 @media screen and (max-width: 600px) {
 
   body.single-country .page-country__editor-content,
-  body.single-country .page-country__news,
   body.single-country .country-sights-filters,
   body.single-country .country-excursions__filters {
     padding: 16px;
