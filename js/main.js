@@ -37,6 +37,7 @@ import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initExcursionBookingForm } from "./modules/forms/excursion-booking-form";
 import { initTourBookingForm } from "./modules/forms/tour-booking-form";
 import { initSightRequestForm } from "./modules/forms/sight-request-form";
+import { initResortRequestForm } from "./modules/forms/resort-request-form";
 import { initClaimCheckForm } from "./modules/forms/claim-check-form";
 import { initVacancyApplyForm } from "./modules/forms/vacancy-apply-form";
 import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
@@ -150,6 +151,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initExcursionBookingForm();
   initTourBookingForm();
 initSightRequestForm();
+initResortRequestForm();
   initSightsFilters();
   initClaimCheckForm();
   initVacancyApplyForm();
