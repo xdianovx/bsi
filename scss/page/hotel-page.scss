@@ -720,6 +720,16 @@ $hp-nav-offset: 76px;
   border-color: $gray-light;
 }
 
+/* Общие для всех номеров условия — строкой под заголовком блока. */
+.hp-rooms__terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .hp-room__head {
   display: flex;
   align-items: baseline;

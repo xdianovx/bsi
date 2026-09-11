@@ -26,6 +26,10 @@ $default_date = $filters['dates'][0] ?? '';
    без похода к поставщику. С неё и начинаем. */
 $default_nights = 3;
 
+/* Подтверждение и срок предложения чаще всего одинаковы у всех номеров отеля.
+   Общее показываем один раз в шапке блока, на карточках — только отличия. */
+$common = bsi_hotel_view_rooms_common($rooms);
+
 $has_offers = (bool) $filters['dates'];
 $hotel_booking = (string) ($view['booking_url'] ?? '');
 $hotel_id = (int) ($view['id'] ?? 0);
@@ -62,6 +66,26 @@ foreach ($calendar as $date => $entry) {
       <h2 class="h2">Номера и цены</h2>
       <?php if ($has_offers): ?>
         <p class="hp-rooms__hint">Цены за размещение целиком, по данным туроператора</p>
+      <?php endif; ?>
+
+      <?php
+      $common_confirmation = bsi_hotel_view_confirmation_label($common['confirmation']);
+      $common_until = $common['offer_until'] !== ''
+        ? bsi_hotel_view_offer_until_label($common['offer_until'])
+        : '';
+      ?>
+      <?php if ($common_confirmation !== '' || $common_until !== '' || $common['early_booking']): ?>
+        <ul class="hp-rooms__terms">
+          <?php if ($common_confirmation !== ''): ?>
+            <li class="hp-badge hp-badge--<?= esc_attr($common['confirmation']); ?>"><?= esc_html($common_confirmation); ?></li>
+          <?php endif; ?>
+          <?php if ($common['early_booking']): ?>
+            <li class="hp-badge hp-badge--deal">Раннее бронирование</li>
+          <?php endif; ?>
+          <?php if ($common_until !== ''): ?>
+            <li class="hp-badge hp-badge--until"><?= esc_html($common_until); ?></li>
+          <?php endif; ?>
+        </ul>
       <?php endif; ?>
     </div>
 
@@ -180,17 +204,21 @@ foreach ($calendar as $date => $entry) {
             <div class="hp-room__head">
               <h3 class="hp-room__title"><?= esc_html($room['name']); ?></h3>
 
-              <?php if ($confirmation_label !== ''): ?>
+              <?php if ($confirmation_label !== '' && $confirmation !== $common['confirmation']): ?>
                 <span class="hp-badge hp-badge--<?= esc_attr($confirmation); ?>"><?= esc_html($confirmation_label); ?></span>
               <?php endif; ?>
             </div>
 
-            <?php if ($deals['early_booking'] || $deals['offer_until'] !== ''): ?>
+            <?php
+            $show_early = $deals['early_booking'] && !$common['early_booking'];
+            $show_until = $deals['offer_until'] !== '' && $deals['offer_until'] !== $common['offer_until'];
+            ?>
+            <?php if ($show_early || $show_until): ?>
               <ul class="hp-room__deals">
-                <?php if ($deals['early_booking']): ?>
+                <?php if ($show_early): ?>
                   <li class="hp-badge hp-badge--deal">Раннее бронирование</li>
                 <?php endif; ?>
-                <?php if ($deals['offer_until'] !== ''): ?>
+                <?php if ($show_until): ?>
                   <li class="hp-badge hp-badge--until"><?= esc_html(bsi_hotel_view_offer_until_label($deals['offer_until'])); ?></li>
                 <?php endif; ?>
               </ul>

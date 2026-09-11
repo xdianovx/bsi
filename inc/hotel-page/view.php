@@ -744,6 +744,39 @@ function bsi_hotel_view_room_deals(array $room): array
 }
 
 /**
+ * Что у всех номеров одинаково: подтверждение и срок спецпредложения.
+ *
+ * Когда отель продаётся целиком под запрос и по одному сроку — а так чаще
+ * всего и бывает, — повторять это у каждого из дюжины номеров бессмысленно.
+ * Общее выносится в шапку блока, на карточках остаётся только то, чем номер
+ * отличается от соседей.
+ *
+ * @return array{confirmation: string, offer_until: string, early_booking: bool}
+ */
+function bsi_hotel_view_rooms_common(array $rooms): array
+{
+  $confirmations = [];
+  $untils = [];
+  $early = [];
+
+  foreach ($rooms as $room) {
+    $confirmations[] = bsi_hotel_view_room_confirmation($room);
+
+    $deals = bsi_hotel_view_room_deals($room);
+    $untils[] = $deals['offer_until'];
+    $early[] = $deals['early_booking'];
+  }
+
+  $same = static fn(array $values) => count(array_unique($values, SORT_REGULAR)) === 1;
+
+  return [
+    'confirmation' => ($confirmations && $same($confirmations)) ? $confirmations[0] : '',
+    'offer_until' => ($untils && $same($untils)) ? $untils[0] : '',
+    'early_booking' => ($early && $same($early)) ? (bool) $early[0] : false,
+  ];
+}
+
+/**
  * Срок действия спецпредложения: «до 30 июня 2027».
  */
 function bsi_hotel_view_offer_until_label(string $date): string
