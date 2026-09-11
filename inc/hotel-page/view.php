@@ -676,7 +676,7 @@ function bsi_hotel_view_price(array $price): string
 function bsi_hotel_view_confirmation_label(string $code): string
 {
   return match ($code) {
-    'instant' => 'Подтверждение сразу',
+    'instant' => 'Мгновенное подтверждение',
     'request' => 'Под запрос',
     default => '',
   };

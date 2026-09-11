@@ -118,6 +118,8 @@ $has_more = $paged < (int) $list['pages'];
             <?php get_template_part('template-parts/hotels/api-row', null, [
               'hotel' => $hotel,
               'country_url' => $catalog_url,
+              /* Выдача отобрана по мгновенному подтверждению — отмечаем карточки. */
+              'instant' => in_array('instant', $filters['flags'] ?? [], true),
             ]); ?>
           <?php endforeach; ?>
         </div>

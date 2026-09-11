@@ -245,7 +245,7 @@ foreach ($calendar as $date => $entry) {
                     $day_instant = !empty($day['instant_price']) || (int) $day['instant_rooms'] > 0;
                     $day_title = $day['label'];
                     if ($day_instant) {
-                      $day_title .= ' — подтверждение сразу';
+                      $day_title .= ' — мгновенное подтверждение';
                       if (!empty($day['instant_price'])) {
                         $day_title .= ', от ' . bsi_hotel_view_price($day['instant_price']);
                       }
@@ -274,7 +274,7 @@ foreach ($calendar as $date => $entry) {
 
                   <?php if (!empty($meal['instant_nights'])): ?>
                     <span class="hp-offer__instant">
-                      подтверждение сразу: <?= (int) $meal['instant_nights']; ?>
+                      мгновенное подтверждение: <?= (int) $meal['instant_nights']; ?>
                       <?php if (!empty($meal['nights'])): ?>из <?= (int) $meal['nights']; ?><?php endif; ?>
                     </span>
                   <?php endif; ?>
@@ -307,7 +307,7 @@ foreach ($calendar as $date => $entry) {
                      а ссылка отеля ведёт в Само на тот же отель. */ ?>
             <?php if (!empty($room['instant_price_from'])): ?>
               <p class="hp-room__instant-price">
-                С подтверждением сразу — от <b><?= esc_html(bsi_hotel_view_price($room['instant_price_from'])); ?></b> за ночь
+                Мгновенное подтверждение — от <b><?= esc_html(bsi_hotel_view_price($room['instant_price_from'])); ?></b> за ночь
               </p>
             <?php endif; ?>
 

@@ -87,7 +87,7 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
                    показываем отдельной строкой, а не вместо основной. */ ?>
           <?php if (!empty($view['instant_price_from'])): ?>
             <p class="hp-head__price-instant">
-              <span class="hp-badge hp-badge--instant">Подтверждение сразу</span>
+              <span class="hp-badge hp-badge--instant">Мгновенное подтверждение</span>
               от <?= esc_html(bsi_hotel_view_price($view['instant_price_from'])); ?>
             </p>
           <?php endif; ?>

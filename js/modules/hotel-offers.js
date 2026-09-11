@@ -118,7 +118,7 @@ export const initHotelOffers = () => {
         <div class="hp-offer__terms">
           <span class="hp-offer__meal">${escapeHtml(meal.label)}</span>
           ${meal.placement_label ? `<span class="hp-offer__placement">${escapeHtml(meal.placement_label)}</span>` : ""}
-          ${meal.instant_nights ? `<span class="hp-offer__instant">подтверждение сразу: ${meal.instant_nights}${meal.nights ? ` из ${meal.nights}` : ""}</span>` : ""}
+          ${meal.instant_nights ? `<span class="hp-offer__instant">мгновенное подтверждение: ${meal.instant_nights}${meal.nights ? ` из ${meal.nights}` : ""}</span>` : ""}
         </div>
         ${meal.price ? `<div class="hp-offer__price"><b>${escapeHtml(meal.price)}</b><span>за ночь</span></div>` : ""}
       </div>
@@ -179,9 +179,13 @@ export const initHotelOffers = () => {
       note.classList.remove("is-empty");
     }
 
-    // Пока ждём хаб, показываем известные цены за ночь — не пустой список.
+    /* Пока ждём хаб, показываем известные цены за ночь — не пустой список, —
+       а спиннер ставим в блок цен каждого номера: у общего списка он уезжает
+       за экран, и на длинной странице загрузку видно только по приглушению. */
     list.querySelectorAll(".hp-room").forEach((room) => {
-      renderKnown(byRoom.get(String(room.dataset.room)), room.querySelector(".js-room-offers"));
+      const offers = room.querySelector(".js-room-offers");
+      renderKnown(byRoom.get(String(room.dataset.room)), offers);
+      offers.classList.add("is-loading");
     });
 
     let payload = null;
@@ -210,6 +214,7 @@ export const initHotelOffers = () => {
     if (ticket !== request) return;
 
     list.classList.remove("is-loading");
+    list.querySelectorAll(".js-room-offers").forEach((offers) => offers.classList.remove("is-loading"));
 
     if (!payload?.success) {
       if (note) {
