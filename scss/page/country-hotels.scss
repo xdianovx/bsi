@@ -487,11 +487,16 @@
 
 .hotels-catalog--no-map {
   grid-template-columns: 1fr;
+}
 
-  .hotels-catalog__inner {
-    max-width: $container;
-    margin: 0 auto;
-  }
+/* Без карты колонка со списком центрируется в контейнере.
+   Центрировать через `margin: 0 auto` нельзя: авто-поля отключают растяжение
+   grid-элемента, блок сжимается до содержимого, и колонка списка
+   `minmax(0, 1fr)` схлопывается в ноль — карточки уезжают в узкий столбец. */
+.hotels-catalog--no-map .hotels-catalog__inner {
+  width: 100%;
+  max-width: $container;
+  justify-self: center;
 }
 
 /* Фон колонки со списком: карточки белые на светло-сером, без единой линии.

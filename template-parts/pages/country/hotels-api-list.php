@@ -155,7 +155,9 @@ $has_more = $paged < (int) $list['pages'];
       <div class="country-hotels__map js-hotels-map"></div>
       <script type="application/json" class="js-hotels-map-data"><?= wp_json_encode($map['points']); ?></script>
     </aside>
-  <?php endif; ?>
 
-  <button class="btn btn-accent hotels-catalog__map-open js-hotels-map-open" type="button">На карте</button>
+    <?php /* Кнопка мобильной карты нужна только когда карте есть что показать:
+             у отелей без координат она открывала бы пустоту. */ ?>
+    <button class="btn btn-accent hotels-catalog__map-open js-hotels-map-open" type="button">На карте</button>
+  <?php endif; ?>
 </div>
