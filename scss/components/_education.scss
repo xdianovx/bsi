@@ -1264,7 +1264,6 @@
   gap: 8px;
   margin-top: auto;
   flex-direction: column;
-  font-weight: 500;
   font-size: 14px;
   align-items: center;
   padding-top: 8px;
@@ -1576,6 +1575,19 @@
     b,
     strong {
       font-weight: 700;
+    }
+  }
+
+  // Ссылки из редактора — красные с подчёркиванием
+  a {
+    color: $red;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red-hover;
     }
   }
 

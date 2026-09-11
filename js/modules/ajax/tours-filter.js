@@ -1,3 +1,4 @@
+import { PAGINATION_PREV, PAGINATION_NEXT } from "../services/pagination-arrows";
 import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
@@ -150,7 +151,7 @@ export const initToursFilter = () => {
     let html = '';
 
     if (currentPage > 1) {
-      html += `<a href="#" class="page-numbers prev" data-page="${currentPage - 1}">&larr; Назад</a>`;
+      html += `<a href="#" class="page-numbers prev" data-page="${currentPage - 1}">${PAGINATION_PREV}</a>`;
     }
 
     if (startPage > 1) {
@@ -172,7 +173,7 @@ export const initToursFilter = () => {
     }
 
     if (currentPage < totalPages) {
-      html += `<a href="#" class="page-numbers next" data-page="${currentPage + 1}">Вперед &rarr;</a>`;
+      html += `<a href="#" class="page-numbers next" data-page="${currentPage + 1}">${PAGINATION_NEXT}</a>`;
     }
 
     pagination.innerHTML = html;

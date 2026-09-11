@@ -385,6 +385,8 @@ require get_template_directory() . '/inc/helpers/content-schedule.php';
 // Раньше CPT: файлы записей-разделов страны вызывают регистратор при подключении.
 require get_template_directory() . '/inc/helpers/country-section-singular.php';
 require get_template_directory() . '/inc/helpers/agency-events.php';
+require get_template_directory() . '/inc/helpers/pagination.php';
+require get_template_directory() . '/inc/helpers/resort.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
 require get_template_directory() . '/inc/admin/paragraph-indent.php';
@@ -393,6 +395,16 @@ require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
 require get_template_directory() . '/inc/admin/auto-slug-on-title-change.php';
+
+/* Временно скрытые разделы сайта (сейчас — круизы). */
+require get_template_directory() . '/inc/hidden-sections.php';
+
+/* Группировка админ-меню по хабам. */
+require get_template_directory() . '/inc/admin/menu-hubs.php';
+
+/* Инструменты → «Импорт экскурсий»: заливка JSON старого сайта (на проде только FTP). */
+require get_template_directory() . '/inc/admin/legacy-excursions-import.php';
+require get_template_directory() . '/inc/admin/legacy-sights-import.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/hotel-page/view.php';
 require get_template_directory() . '/inc/hotels-api/functions.php';
@@ -429,6 +441,7 @@ require get_template_directory() . '/inc/helpers/country-cases.php';
 require get_template_directory() . '/inc/helpers/event-price.php';
 require get_template_directory() . '/inc/helpers/crosstour.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
+require get_template_directory() . '/inc/post-types/sight.php';
 require get_template_directory() . '/inc/requests/event-tours-filter.php';
 require get_template_directory() . '/inc/requests/agency-event-registration.php';
 require get_template_directory() . '/inc/requests/batch-prices.php';
@@ -494,6 +507,8 @@ require get_template_directory() . '/inc/requests/country-tours.php';
 require get_template_directory() . '/inc/requests/tours-filter.php';
 require get_template_directory() . '/inc/requests/excursions-filter.php';
 require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
+require get_template_directory() . '/inc/requests/ajax-sight-request.php';
+require get_template_directory() . '/inc/requests/ajax-resort-request.php';
 require get_template_directory() . '/inc/requests/ajax-tour-booking.php';
 require get_template_directory() . '/inc/requests/ajax-hotel-request.php';
 require get_template_directory() . '/inc/requests/ajax-hotels-api-catalog.php';

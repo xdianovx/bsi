@@ -1,15 +1,5 @@
 <?php
 
-$cruise_pages = get_pages(
-     [
-          'meta_key' => '_wp_page_template',
-          'meta_value' => 'page-cruise.php',
-          'number' => 1,
-     ]
-);
-
-$cruise_url = ! empty($cruise_pages) ? get_permalink($cruise_pages[0]->ID) : '#';
-
 $education_page = get_page_by_path('obrazovanie-za-rubezhom');
 $education_url = $education_page ? get_permalink($education_page->ID) : '#';
 
@@ -42,14 +32,6 @@ $main_page_items = [
           'img' => 'esur.png',
 
      ],
-     [
-          'title' => 'Круизы',
-          'url' => $cruise_url,
-          'target' => '',
-          'img' => 'https://bsigroup.ru/wp-content/uploads/2026/04/ship.png',
-
-     ],
-
 ];
 ?>
 

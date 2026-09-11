@@ -78,19 +78,10 @@ $news_query = new WP_Query(bsi_query_args_append_schedule([
           <?php endwhile; ?>
         </div>
 
-        <div class="news-pagination js-news-pagination">
-          <?php if ($news_query->max_num_pages > 1): ?>
-            <?php
-            echo paginate_links([
-              'total' => $news_query->max_num_pages,
-              'current' => $paged,
-              'prev_text' => '&larr; Назад',
-              'next_text' => 'Вперед &rarr;',
-              'mid_size' => 2,
-            ]);
-            ?>
-          <?php endif; ?>
-        </div>
+        <?php bsi_pagination([
+          'total' => $news_query->max_num_pages,
+          'current' => $paged,
+        ], ['class' => 'js-news-pagination', 'always' => true]); ?>
       <?php else: ?>
         <div class="no-news">
           <p>Новостей пока нет.</p>

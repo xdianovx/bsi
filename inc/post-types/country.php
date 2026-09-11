@@ -344,11 +344,35 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_education';
   $vars[] = 'country_news';
   $vars[] = 'country_excursions';
+  $vars[] = 'country_sights';
   $vars[] = 'country_events';
   $vars[] = 'country_hotels_info';
   $vars[] = 'country_deposits';
 
+  $vars[] = 'resort_section';
+
   return $vars;
+});
+
+/**
+ * Разделы страны с собственной пагинацией (`/page/N/`) висят на singular-странице
+ * страны, поэтому redirect_canonical считает `paged` лишним и 301-м срезает его
+ * на первую страницу. Для этих разделов канонический редирект отключаем.
+ */
+add_filter('redirect_canonical', function ($redirect_url) {
+  if ((int) get_query_var('paged') < 2) {
+    return $redirect_url;
+  }
+
+  $paged_sections = ['country_sights', 'country_events'];
+
+  foreach ($paged_sections as $var) {
+    if (get_query_var($var)) {
+      return false;
+    }
+  }
+
+  return $redirect_url;
 });
 
 add_action('init', function () {
@@ -434,6 +458,19 @@ add_action('init', function () {
     'top'
   );
 
+  // Пагинация каталога достопримечательностей: без правила /page/2/ уходит в 404.
+  add_rewrite_rule(
+    '^country/([^/]+)/dostoprimechatelnosti/page/([0-9]{1,})/?$',
+    'index.php?post_type=country&name=$matches[1]&country_sights=$matches[1]&paged=$matches[2]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/dostoprimechatelnosti/?$',
+    'index.php?post_type=country&name=$matches[1]&country_sights=$matches[1]',
+    'top'
+  );
+
   // Пагинация каталога событийных туров: без правила /page/2/ уходила
   // в 404, и в индекс попадали только первые 12 туров страны.
   add_rewrite_rule(
@@ -463,7 +500,26 @@ add_action('init', function () {
 }, 20);
 
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|dostoprimechatelnosti|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
+
+  /* Разделы курорта: /country/{c}/{region}/{resort}/{section}/ и /page/N/.
+     Правила добавляются раньше правила самого курорта — иначе четвёртый
+     сегмент съедается таксономией resort. */
+  $sections = implode('|', array_keys(bsi_resort_sections()));
+
+  add_rewrite_rule(
+    '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(' . $sections . ')/page/([0-9]{1,})/?$',
+    'index.php?taxonomy=resort&term=$matches[3]&country_in_path=$matches[1]&region_in_path=$matches[2]'
+      . '&resort_section=$matches[4]&paged=$matches[5]',
+    'top'
+  );
+
+  add_rewrite_rule(
+    '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(' . $sections . ')/?$',
+    'index.php?taxonomy=resort&term=$matches[3]&country_in_path=$matches[1]&region_in_path=$matches[2]'
+      . '&resort_section=$matches[4]',
+    'top'
+  );
 
   add_rewrite_rule(
     '^country/([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/(?!' . $reserved . '(?:/|$))([^/]+)/?$',

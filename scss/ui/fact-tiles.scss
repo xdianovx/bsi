@@ -1,0 +1,53 @@
+/* ───────────────────────────────────────────────────────────────────
+   Плитки фактов — «иконка + значение», строкой.
+
+   Общий компонент: страница страны (столица, население, язык, валюта,
+   время) и страница курорта (то же плюс сезон и аэропорт).
+   Подписи не выводим — значения говорят сами за себя; расшифровка
+   остаётся в `title` на случай неоднозначного значения.
+   Иконка чёрная: строка фактов — справка, а не акцент.
+   ─────────────────────────────────────────────────────────────────── */
+
+.fact-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fact-tile {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 1.2;
+  color: $text-black;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+.fact-tile-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: $text-black;
+}
+
+.fact-tile-icon svg {
+  display: block;
+}
+
+.fact-tile-value {
+  font-weight: 400;
+}
+
+@media screen and (max-width: 600px) {
+  .fact-tile {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

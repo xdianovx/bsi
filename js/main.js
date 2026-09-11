@@ -38,6 +38,8 @@ import { initEducationProgramForm } from "./modules/forms/education-program-form
 import { initEventTicketForm } from "./modules/forms/event-ticket-form";
 import { initExcursionBookingForm } from "./modules/forms/excursion-booking-form";
 import { initTourBookingForm } from "./modules/forms/tour-booking-form";
+import { initSightRequestForm } from "./modules/forms/sight-request-form";
+import { initResortRequestForm } from "./modules/forms/resort-request-form";
 import { initClaimCheckForm } from "./modules/forms/claim-check-form";
 import { initVacancyApplyForm } from "./modules/forms/vacancy-apply-form";
 import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
@@ -50,6 +52,8 @@ import {
   initHotelAmenities,
 } from "./modules/hotel-offers";
 import { initHotelRequestForm } from "./modules/forms/hotel-request-form";
+import { initSightsMap } from "./modules/sights-map";
+import { initSightsFilters } from "./modules/sights-filters";
 import { EducationCurrencySwitcher } from "./modules/education-currency-switcher";
 
 import { initCookieConsent } from "./modules/cookie-consent";
@@ -160,12 +164,16 @@ window.addEventListener("DOMContentLoaded", () => {
   initCrosstourCards();
   initExcursionBookingForm();
   initTourBookingForm();
+initSightRequestForm();
+initResortRequestForm();
+  initSightsFilters();
   initClaimCheckForm();
   initVacancyApplyForm();
   initAgencyEventRegForm();
   initBonusMarquee();
-  // Карта инициализируется после загрузки API Яндекс.Карт (скрипт в footer)
-  window.addEventListener("load", () => initMaps());
+  // API Яндекс.Карт подключён отдельным тегом в footer — модули сами ждут глобал
+  initMaps();
+  initSightsMap();
 
   // Инициализация модального окна предупреждения
   if (window.maintenanceModal) {

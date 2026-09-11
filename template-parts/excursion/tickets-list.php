@@ -10,6 +10,7 @@
 $rows = get_query_var('excursion_tickets_rows') ?: [];
 $excursion_id = (int) (get_query_var('excursion_post_id') ?: 0);
 $excursion_title = (string) (get_query_var('excursion_post_title') ?: '');
+$booking_url = function_exists('bsi_get_excursion_booking_url') ? bsi_get_excursion_booking_url($excursion_id) : '';
 
 if (empty($rows) || !is_array($rows)) {
   return;
@@ -66,10 +67,15 @@ if (empty($rows) || !is_array($rows)) {
           <?php endif; ?>
           <span class="single-event__dates-sep" aria-hidden="true"></span>
           <span class="single-event__dates-book-wrap">
-            <button type="button" class="single-event__dates-book js-excursion-booking-btn"
-                    data-excursion-id="<?= esc_attr((string) $excursion_id); ?>"
-                    data-excursion-title="<?= esc_attr($excursion_title); ?>"
-                    data-excursion-date="<?= esc_attr($name); ?>">забронировать</button>
+            <?php if ($booking_url !== ''): ?>
+              <a href="<?= esc_url($booking_url); ?>" class="single-event__dates-book"
+                 target="_blank" rel="nofollow noopener">забронировать</a>
+            <?php else: ?>
+              <button type="button" class="single-event__dates-book js-excursion-booking-btn"
+                      data-excursion-id="<?= esc_attr((string) $excursion_id); ?>"
+                      data-excursion-title="<?= esc_attr($excursion_title); ?>"
+                      data-excursion-date="<?= esc_attr($name); ?>">забронировать</button>
+            <?php endif; ?>
           </span>
         </div>
       </li>

@@ -45,6 +45,21 @@ if ($country_excursions_slug) {
   exit;
 }
 
+$country_sights_slug = get_query_var('country_sights');
+
+if ($country_sights_slug) {
+  $country = get_page_by_path($country_sights_slug, OBJECT, 'country');
+
+  global $country_sights_data;
+  $country_sights_data = [
+    'country' => $country,
+    'country_slug' => $country_sights_slug,
+  ];
+
+  get_template_part('country-sights');
+  exit;
+}
+
 $country_events_slug = get_query_var('country_events');
 
 if ($country_events_slug) {
@@ -202,9 +217,10 @@ get_header();
               <h1 class="h1 h1-country">Туры <?= esc_html($h1_prep . ' ' . $h1_country); ?></h1>
             </div>
 
+            <?php get_template_part('template-parts/pages/country/country-info'); ?>
+
             <p class="page-country__descr"><?= get_the_excerpt(); ?></p>
 
-            <?php get_template_part('template-parts/pages/country/country-info'); ?>
             <div class="country-page__gallery">
               <?php
               get_template_part('template-parts/sections/gallery', null, [
@@ -216,8 +232,6 @@ get_header();
 
 
           </div>
-
-
 
           <?php /* Контент из редактора */ ?>
           <div class="editor-content page-country__editor-content">

@@ -171,6 +171,27 @@ export const sliders = () => {
     },
   });
 
+  /* Слайдеры секций на странице курорта: у каждой секции свои стрелки,
+     поэтому инициализируем поэлементно, а не по общему селектору */
+  document.querySelectorAll(".resort-slider").forEach((sliderEl) => {
+    const section = sliderEl.closest(".resort-section");
+
+    new Swiper(sliderEl, {
+      spaceBetween: 8,
+      watchOverflow: true,
+      navigation: {
+        // Стрелки живут в шапке секции, а не внутри слайдера
+        nextEl: section ? section.querySelector(".resort-slider-next") : null,
+        prevEl: section ? section.querySelector(".resort-slider-prev") : null,
+      },
+      breakpoints: {
+        320: { slidesPerView: 1.15 },
+        601: { slidesPerView: 2 },
+        901: { slidesPerView: 3 },
+      },
+    });
+  });
+
   const newsSectionSlider = new Swiper(".news-slider-slider", {
     spaceBetween: 16,
     navigation: {

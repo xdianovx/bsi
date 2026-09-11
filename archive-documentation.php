@@ -64,17 +64,10 @@ get_header();
         </div>
 
         <!-- Пагинация -->
-        <div class="docs-pagination">
-          <?php
-          echo paginate_links([
-            'total' => $docs_query->max_num_pages,
-            'current' => $paged,
-            'prev_text' => '&larr; Назад',
-            'next_text' => 'Вперед &rarr;',
-            'mid_size' => 2,
-          ]);
-          ?>
-        </div>
+        <?php bsi_pagination([
+          'total' => $docs_query->max_num_pages,
+          'current' => $paged,
+        ], ['class' => 'docs-pagination']); ?>
 
       <?php else: ?>
         <div class="docs-empty">

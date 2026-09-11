@@ -1,6 +1,8 @@
 .header {
   // padding: 0 0 16px;
-  background: #fff;
+  /* Шапка всегда белая: страницы постепенно переезжают на серый фон,
+     и прозрачная шапка на них подхватывала серый. */
+  background: $bg-color;
 
   @media screen and (max-width: 768px) {
     position: sticky;
@@ -104,7 +106,7 @@
 
 .header-top__wrap {
   padding: 4px 0;
-  background: #f4f4f6;
+  background: #f7f7f7;
   line-height: 100%;
 
   @media screen and (max-width: 1200px) {
@@ -136,7 +138,7 @@
   // ниже страхует от искажения, если логотип заменят на другой формат.
   display: block;
   aspect-ratio: 300 / 67;
-  width: 220px;
+  width: 180px;
 
   img {
     width: 100%;
@@ -202,12 +204,6 @@
     &.active {
       color: $red;
     }
-  }
-}
-
-.button-old-site {
-  @media screen and (max-width: 768px) {
-    display: none;
   }
 }
 

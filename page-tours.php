@@ -431,19 +431,10 @@ if ($active_tour_ids !== []) {
       <?php endif; ?>
     </div>
 
-    <div class="tours-pagination js-tours-pagination">
-      <?php if ($initial_query->max_num_pages > 1): ?>
-        <?php
-        echo paginate_links([
-          'total' => $initial_query->max_num_pages,
-          'current' => $paged,
-          'prev_text' => '&larr; Назад',
-          'next_text' => 'Вперед &rarr;',
-          'mid_size' => 2,
-        ]);
-        ?>
-      <?php endif; ?>
-    </div>
+    <?php bsi_pagination([
+      'total' => $initial_query->max_num_pages,
+      'current' => $paged,
+    ], ['class' => 'js-tours-pagination', 'always' => true]); ?>
   </div>
 </section>
 

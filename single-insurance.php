@@ -17,7 +17,10 @@ get_header();
 <main class="site-main insurance-single">
 
 	<?php if (function_exists('yoast_breadcrumb')) {
-		yoast_breadcrumb('<div class="breadcrumbs container"><p>', '</p></div>');
+		yoast_breadcrumb(
+			'<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
+			'</p></div></div>'
+		);
 	} ?>
 
 	<?php
@@ -32,14 +35,65 @@ get_header();
 
 		$hero_note = (string) get_field('insurance_hero_note', $insurance_id);
 		$has_info = function_exists('have_rows') && have_rows('insurance_info', $insurance_id);
+
+		/**
+		 * Ключевые параметры собираем заранее: первый становится главным
+		 * (крупная строка в карточке-оффере), остальные — списком под ним.
+		 */
+		$facts = [];
+		if ($has_info) {
+			while (have_rows('insurance_info', $insurance_id)):
+				the_row();
+				$fact_key = (string) get_sub_field('key');
+				$fact_value = (string) get_sub_field('value');
+
+				if ($fact_key === '' && $fact_value === '') {
+					continue;
+				}
+
+				$facts[] = [
+					'icon' => get_sub_field('icon'),
+					'key' => $fact_key,
+					'value' => $fact_value,
+				];
+			endwhile;
+		}
+
+		$lead_fact = array_shift($facts);
+
+		/**
+		 * Якорная навигация: собираем только те секции, которые реально заполнены,
+		 * чтобы не вести пользователя в пустоту.
+		 */
+		$has_benefits_section = function_exists('have_rows') && have_rows('insurance_benefits', $insurance_id);
+		$has_coverage_section = function_exists('have_rows') && have_rows('insurance_coverage', $insurance_id);
+		$has_exclusions_section = function_exists('have_rows') && have_rows('insurance_exclusions', $insurance_id);
+		$has_rules_section = (function_exists('have_rows') && have_rows('insurance_rules', $insurance_id))
+			|| trim((string) get_the_content()) !== '';
+		$has_docs_section = function_exists('have_rows') && have_rows('insurance_docs', $insurance_id);
+
+		$anchors = array_filter([
+			$has_benefits_section ? ['id' => 'insurance-benefits', 'label' => 'Преимущества'] : null,
+			($has_coverage_section || $has_exclusions_section) ? ['id' => 'insurance-coverage', 'label' => 'Что покрывает'] : null,
+			$has_rules_section ? ['id' => 'insurance-rules', 'label' => 'Условия и правила'] : null,
+			$has_docs_section ? ['id' => 'insurance-docs', 'label' => 'Документы'] : null,
+		]);
 		?>
 
 		<section class="insurance-hero">
 			<div class="container">
 				<div class="insurance-hero__inner">
 
-					<div class="insurance-hero__main">
-						<div class="insurance-hero__head">
+					<div class="insurance-hero__intro">
+						<?php if (has_post_thumbnail($insurance_id)): ?>
+							<div class="insurance-hero__media">
+								<?php echo get_the_post_thumbnail($insurance_id, 'medium', [
+									'alt' => esc_attr(get_the_title($insurance_id)),
+									'loading' => 'eager',
+								]); ?>
+							</div>
+						<?php endif; ?>
+
 						<?php if (!empty($insurance_types)): ?>
 							<div class="insurance-hero__badges">
 								<?php foreach ($insurance_types as $type): ?>
@@ -53,67 +107,81 @@ get_header();
 						<?php if (has_excerpt()): ?>
 							<p class="insurance-hero__excerpt"><?php echo esc_html(wp_strip_all_tags(get_the_excerpt())); ?></p>
 						<?php endif; ?>
+					</div>
 
-						<div class="insurance-hero__actions">
-								<a href="#insurance-consultation" class="btn btn-accent">Получить консультацию</a>
-							</div>
-						</div>
+					<div class="insurance-hero__trust">
+						<p class="insurance-hero__provider">
+							<span class="insurance-hero__provider-icon">
+								<?php get_template_part('template-parts/ui/icon', null, ['name' => 'shield-check', 'size' => 20]); ?>
+							</span>
+							Страховщик — СПАО «Ингосстрах», сервисный центр работает круглосуточно
+						</p>
+					</div>
 
-						<?php if (has_post_thumbnail($insurance_id)): ?>
-							<div class="insurance-hero__media">
-								<?php echo get_the_post_thumbnail($insurance_id, 'medium_large', [
-									'alt' => esc_attr(get_the_title($insurance_id)),
-									'loading' => 'eager',
-								]); ?>
-							</div>
+					<div class="insurance-hero__actions">
+						<a href="#insurance-consultation" class="btn btn-accent">Получить консультацию</a>
+
+						<?php if ($has_coverage_section): ?>
+							<a href="#insurance-coverage" class="btn btn-white">Что покрывает полис</a>
 						<?php endif; ?>
 					</div>
 
-					<?php if ($has_info): ?>
-						<div class="insurance-facts">
-							<?php while (have_rows('insurance_info', $insurance_id)):
-								the_row();
-								$icon = get_sub_field('icon');
-								$key = (string) get_sub_field('key');
-								$value = (string) get_sub_field('value');
+					<?php if ($lead_fact || !empty($facts)): ?>
+						<div class="insurance-hero__params">
+							<ul class="insurance-facts">
+								<?php foreach (array_filter(array_merge([$lead_fact], $facts)) as $fact): ?>
+									<li class="insurance-fact">
+										<span class="insurance-fact__head">
+											<?php if ($fact['icon']): ?>
+												<span class="insurance-fact__icon">
+													<?php get_template_part('template-parts/ui/icon', null, ['name' => $fact['icon'], 'size' => 20]); ?>
+												</span>
+											<?php endif; ?>
 
-								if ($key === '' && $value === '') {
-									continue;
-								}
-								?>
-								<div class="insurance-fact">
-									<div class="insurance-fact__head">
-										<?php if ($icon): ?>
-											<span class="insurance-fact__icon">
-												<?php get_template_part('template-parts/ui/icon', null, ['name' => $icon, 'size' => 20]); ?>
-											</span>
+											<?php if ($fact['key'] !== ''): ?>
+												<span class="insurance-fact__key"><?php echo esc_html($fact['key']); ?></span>
+											<?php endif; ?>
+										</span>
+
+										<?php if ($fact['value'] !== ''): ?>
+											<span class="insurance-fact__value numfont"><?php echo esc_html($fact['value']); ?></span>
 										<?php endif; ?>
+									</li>
+								<?php endforeach; ?>
+							</ul>
 
-										<?php if ($key !== ''): ?>
-											<span class="insurance-fact__key"><?php echo esc_html($key); ?></span>
-										<?php endif; ?>
-									</div>
-
-									<?php if ($value !== ''): ?>
-										<span class="insurance-fact__value numfont"><?php echo esc_html($value); ?></span>
-									<?php endif; ?>
-								</div>
-							<?php endwhile; ?>
+							<?php if ($hero_note): ?>
+								<p class="insurance-hero__note"><?php echo esc_html($hero_note); ?></p>
+							<?php endif; ?>
 						</div>
-
-						<?php if ($hero_note): ?>
-							<p class="insurance-hero__note"><?php echo esc_html($hero_note); ?></p>
-						<?php endif; ?>
 					<?php endif; ?>
 
 				</div>
 			</div>
 		</section>
 
-		<?php if (function_exists('have_rows') && have_rows('insurance_benefits', $insurance_id)): ?>
-			<section class="insurance-benefits">
+		<?php if (!empty($anchors)): ?>
+			<nav class="insurance-anchors" aria-label="Разделы страницы">
 				<div class="container">
-					<h2 class="h2">Преимущества</h2>
+					<ul class="insurance-anchors__list">
+						<?php foreach ($anchors as $anchor): ?>
+							<li>
+								<a class="insurance-anchors__link" href="#<?php echo esc_attr($anchor['id']); ?>">
+									<?php echo esc_html($anchor['label']); ?>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+			</nav>
+		<?php endif; ?>
+
+		<?php get_template_part('template-parts/insurance/why'); ?>
+
+		<?php if (function_exists('have_rows') && have_rows('insurance_benefits', $insurance_id)): ?>
+			<section class="insurance-benefits" id="insurance-benefits">
+				<div class="container">
+					<h2 class="h2">Что входит в полис</h2>
 
 					<div class="insurance-benefits__grid">
 						<?php while (have_rows('insurance_benefits', $insurance_id)):
@@ -152,7 +220,7 @@ get_header();
 		$has_exclusions = function_exists('have_rows') && have_rows('insurance_exclusions', $insurance_id);
 
 		if ($has_coverage || $has_exclusions): ?>
-			<section class="insurance-coverage">
+			<section class="insurance-coverage" id="insurance-coverage">
 				<div class="container">
 					<div class="insurance-coverage__grid">
 
@@ -163,6 +231,7 @@ get_header();
 									<?php while (have_rows('insurance_coverage', $insurance_id)):
 										the_row();
 										$title = (string) get_sub_field('title');
+										$limit = trim((string) get_sub_field('limit'));
 
 										if (!$title) {
 											continue;
@@ -173,6 +242,10 @@ get_header();
 												<?php get_template_part('template-parts/ui/icon', null, ['name' => 'circle-check', 'size' => 20]); ?>
 											</span>
 											<span class="insurance-list__text"><?php echo esc_html($title); ?></span>
+
+											<?php if ($limit !== ''): ?>
+												<span class="insurance-list__limit"><?php echo esc_html($limit); ?></span>
+											<?php endif; ?>
 										</li>
 									<?php endwhile; ?>
 								</ul>
@@ -209,6 +282,8 @@ get_header();
 
 		<?php get_template_part('template-parts/insurance/steps'); ?>
 
+		<?php get_template_part('template-parts/insurance/claim'); ?>
+
 		<?php
 		/**
 		 * Условия и правила — аккордеон.
@@ -222,7 +297,7 @@ get_header();
 		$content_title = $content_title ?: 'Полный текст правил страхования';
 
 		if ($rules_rows || $editor_content): ?>
-			<section class="insurance-rules">
+			<section class="insurance-rules" id="insurance-rules">
 				<div class="container">
 					<h2 class="h2">Условия и правила</h2>
 
@@ -295,7 +370,7 @@ get_header();
 		<?php endif; ?>
 
 		<?php if (function_exists('have_rows') && have_rows('insurance_docs', $insurance_id)): ?>
-			<section class="insurance-docs">
+			<section class="insurance-docs" id="insurance-docs">
 				<div class="container">
 					<h2 class="h2">Документы</h2>
 
@@ -338,6 +413,10 @@ get_header();
 		<?php endif; ?>
 
 		<?php get_template_part('template-parts/insurance/faq'); ?>
+
+		<?php get_template_part('template-parts/insurance/related', null, [
+			'current_id' => $insurance_id,
+		]); ?>
 
 		<?php get_template_part('template-parts/insurance/consultation-form', null, [
 			'insurance_title' => get_the_title($insurance_id),

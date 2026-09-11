@@ -38,6 +38,11 @@ export const initResortHotelsAjax = () => {
       state.hasMore = !!json.data.has_more;
       if (state.btn) state.btn.style.display = state.hasMore ? "" : "none";
 
+      // Отелей у курорта может не быть вовсе — пустой заголовок секции не нужен
+      if (!state.list.hasChildNodes()) {
+        state.wrap.hidden = true;
+      }
+
       state.page += 1;
     } catch (e) {
       // Error handling without console output
