@@ -715,6 +715,8 @@ $hp-nav-offset: 76px;
   color: #2e7d32;
 }
 
+/* Модификатора для `request` нет намеренно: бронь под запрос не подписывается. */
+
 .hp-badge--deal,
 .hp-badge--until {
   border-color: $gray-light;
