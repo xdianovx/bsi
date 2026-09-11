@@ -81,5 +81,8 @@ function bsi_hotels_api_quote_ajax(): void
     'checkIn' => (string) ($quote['check_in'] ?? $check_in),
     'booking' => (string) ($quote['booking']['url'] ?? ''),
     'pricedBy' => (string) ($quote['priced_by'] ?? ''),
+    /* true — хаб ходил к оператору, false — ответил из своего кеша.
+       На экран не идёт, нужно для логов и замеров. */
+    'refreshed' => !empty($quote['refreshed']),
   ]);
 }

@@ -148,7 +148,7 @@ export const initHotelOffers = () => {
         container.innerHTML = rows.map((row) => offerRow(row, nights)).join("");
         total += rows.length;
       } else {
-        container.innerHTML = '<p class="hp-room__empty">На эти даты мест нет</p>';
+        container.innerHTML = '<p class="hp-room__empty">Нет предложений на выбранные даты</p>';
       }
 
       // Номера без предложений уезжают в конец списка, но остаются на виду.
@@ -229,7 +229,9 @@ export const initHotelOffers = () => {
     if (note) {
       note.textContent = total
         ? `Нашли вариантов: ${total} · ${nightsLabel(payload.data.nights || nights)} с ${dayLabel(state.date)}`
-        : "На эти даты мест нет — выберите другую дату или длительность";
+        /* Пустой ответ хаба значит «у оператора нет предложений на эти даты»,
+           а не сбой. Повторять тот же запрос бесполезно: ответ час не изменится. */
+        : "Нет предложений на выбранные даты — выберите другую дату или длительность";
       note.classList.toggle("is-empty", total === 0);
     }
   };
