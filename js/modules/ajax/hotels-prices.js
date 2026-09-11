@@ -10,6 +10,10 @@
  * такие карточки показывают то, что есть, и в опрос не попадают.
  */
 
+/* Та же иконка, что рисует bsi_hotel_view_badge('limited', …) на сервере. */
+const ZAP_ICON =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>';
+
 const INTERVAL = 4000;
 const LIMIT_MS = 3 * 60 * 1000;
 
@@ -19,10 +23,15 @@ export const initHotelsPrices = () => {
     return;
   }
 
-  /** Карточки, которые ещё чего-то ждут от хаба. */
+  /** Карточки, которые ждут обновления цен: хаб держит их в очереди. */
   const waiting = () => [...root.querySelectorAll('.api-row[data-prices-status="updating"]')];
 
-  if (!waiting().length) {
+  /** Карточки без цены: у части из них цена есть в прайсе оператора. */
+  const priceless = () => [...root.querySelectorAll(".api-row")].filter(
+    (card) => card.querySelector(".api-row__price-empty") && !card.dataset.priceAsked,
+  );
+
+  if (!waiting().length && !priceless().length) {
     return;
   }
 
@@ -72,6 +81,29 @@ export const initHotelsPrices = () => {
     }
   };
 
+  /**
+   * Цены к продаже нет, но она есть в прайсе: оператор держит стоп-продажу на
+   * прогретое окно. Показываем её с меткой — за окном места обычно находятся.
+   */
+  const showPriceList = (card, price) => {
+    const slot = card.querySelector(".api-row__price-empty");
+    if (!slot) {
+      return;
+    }
+
+    const value = document.createElement("span");
+    value.className = "api-row__price";
+    value.textContent = `от ${price}`;
+
+    const badge = document.createElement("span");
+    badge.className = "hp-badge hp-badge--limited api-row__price-badge";
+    badge.title = "На ближайшие даты мест нет. Выберите даты — проверим наличие у оператора";
+    badge.innerHTML = ZAP_ICON;
+    badge.append("Мало мест");
+
+    slot.replaceWith(value, badge);
+  };
+
   /** Ждать больше нечего, а цены нет: подпись уже стоит, снимаем только пометку. */
   const showEmpty = (card) => {
     const label = card.querySelector(".api-row__price-label");
@@ -93,7 +125,15 @@ export const initHotelsPrices = () => {
   };
 
   const ask = async () => {
-    const cards = waiting();
+    /* Спрашиваем и тех, кто в очереди, и тех, у кого цены нет совсем: у части
+       вторых она лежит в прайсе оператора. Вторых спрашиваем один раз —
+       прайс не меняется, пока хаб не пересчитает отель. */
+    const pending = priceless();
+    pending.forEach((card) => {
+      card.dataset.priceAsked = "1";
+    });
+
+    const cards = [...new Set([...waiting(), ...pending])];
     if (!cards.length) {
       return;
     }
@@ -133,11 +173,13 @@ export const initHotelsPrices = () => {
 
       if (entry.price) {
         showPrice(card, entry.price, entry.waiting);
+      } else if (entry.priceList) {
+        showPriceList(card, entry.priceList);
       }
 
       if (!entry.waiting) {
         setStatus(card, entry.status);
-        if (!entry.price) {
+        if (!entry.price && !entry.priceList) {
           showEmpty(card);
         }
       }
@@ -155,7 +197,9 @@ export const initHotelsPrices = () => {
     timer = setTimeout(ask, INTERVAL);
   };
 
-  timer = setTimeout(ask, INTERVAL);
+  /* Первый запрос сразу: карточки без цены ждут прайс, и держать их пустыми
+     лишние секунды незачем. Дальше — по интервалу. */
+  ask();
 
   /* Вкладку свернули — хаб не дёргаем: цены всё равно никто не смотрит. */
   document.addEventListener("visibilitychange", () => {

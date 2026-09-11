@@ -204,6 +204,49 @@ class HotelsApiClient
     return $out;
   }
 
+  /**
+   * Минимальная цена прайса отеля, включая ночи со стоп-продажей.
+   *
+   * Список отелей отдаёт только `price_from` — цену, которую можно купить.
+   * Когда оператор держит стоп-продажу на всё окно, она пустая, хотя в тарифах
+   * цена есть: карточка отеля показывает её с меткой «Мало мест». Чтобы то же
+   * самое показал каталог, читаем тарифы из карточки.
+   *
+   * Хаб обещал отдавать эту цену прямо в списке (пункт 07 ТЗ) — тогда метод
+   * станет не нужен.
+   *
+   * @return array{amount: float, currency: string}|null
+   */
+  public function priceListFrom(int $hotelId): ?array
+  {
+    if ($hotelId <= 0) {
+      return null;
+    }
+
+    try {
+      $hotel = $this->hotel((string) $hotelId);
+    } catch (HotelsApiException $e) {
+      return null;
+    }
+
+    $min = null;
+
+    foreach ((array) ($hotel['room_types'] ?? []) as $room) {
+      foreach ((array) ($room['rates'] ?? []) as $rate) {
+        $amount = (float) ($rate['price'] ?? 0);
+        if ($amount <= 0) {
+          continue;
+        }
+
+        if ($min === null || $amount < $min['amount']) {
+          $min = ['amount' => $amount, 'currency' => (string) ($rate['base_currency'] ?? '')];
+        }
+      }
+    }
+
+    return $min;
+  }
+
   /** Живо ли API. Без кеша и с коротким таймаутом — для диагностики. */
   public function isAlive(): bool
   {
