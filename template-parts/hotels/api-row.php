@@ -49,17 +49,18 @@ $amenities = array_values(array_filter($amenities, static fn($a) => $a['name'] !
 
 $popular = !empty($hotel['is_popular']);
 
-/* Список отелей мгновенного подтверждения не отмечает — такого поля в выдаче
-   нет. Но когда включён фильтр «Мгновенное подтверждение», в выдаче только
-   такие отели, и бейдж честен для всей страницы. */
-$instant = !empty($args['instant']);
+/* Мгновенное подтверждение хаб считает независимо от фильтра, поэтому значок
+   стоит в любой выдаче. */
+$instant = bsi_hotels_api_format_price($hotel['instant_price_from'] ?? null) !== '';
 
-/* Цены отеля прямо сейчас обновляются в хабе: показываем это вместо пустого
-   места, иначе «Цену уточним по запросу» выглядит как окончательный ответ. */
+/* Ждать цену имеет смысл только при `updating` — отель в очереди на обновление.
+   `stale` значит «цены старые и никто их не грузит»: крутилка там врала бы. */
 $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
 ?>
 
-<article class="api-row" data-hotel="<?= esc_attr($id); ?>">
+<article class="api-row"
+         data-hotel="<?= esc_attr($id); ?>"
+         data-prices-status="<?= esc_attr((string) ($hotel['prices_status'] ?? '')); ?>">
   <div class="api-row__media">
     <?php if ($popular): ?>
       <span class="api-row__badge">Популярный</span>
@@ -134,7 +135,9 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
       <div class="api-row__price-wrap">
         <?php if ($price !== ''): ?>
           <span class="api-row__price">от <?= esc_html($price); ?></span>
-          <span class="api-row__price-label">за ночь</span>
+          <span class="api-row__price-label">
+            за ночь<?php if ($prices_updating): ?> · уточняется<?php endif; ?>
+          </span>
         <?php elseif ($prices_updating): ?>
           <span class="api-row__price-loading">
             <span class="api-row__price-spinner" aria-hidden="true"></span>

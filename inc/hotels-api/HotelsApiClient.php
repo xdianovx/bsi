@@ -161,6 +161,46 @@ class HotelsApiClient
     ], self::CACHE_QUOTE);
   }
 
+  /**
+   * Цены нескольких отелей и ничего больше.
+   *
+   * Ответ в двести раз легче страницы каталога, поэтому им и догружают цены
+   * отелей со статусом `updating`. Хаб здесь только читает уже загруженное —
+   * в очередь на обновление отель ставит запрос списка.
+   *
+   * @param int[] $ids до 100 отелей
+   * @param bool  $instant считать цену по ночам мгновенного подтверждения —
+   *                       передавать, если тем же фильтром отобран список
+   * @return array<int, array{price_from: ?array, instant_price_from: ?array,
+   *                          prices_status: string, prices_checked_at: ?string}>
+   * @throws HotelsApiException
+   */
+  public function prices(array $ids, bool $instant = false): array
+  {
+    $ids = array_slice(array_values(array_unique(array_filter(array_map('intval', $ids)))), 0, 100);
+    if (!$ids) {
+      return [];
+    }
+
+    $params = ['id' => implode(',', $ids)];
+    if ($instant) {
+      $params['instant'] = 'true';
+    }
+
+    /* Кеш тут вреден: эндпоинт для того и зовут, чтобы увидеть новую цену. */
+    $data = $this->get('/v1/hotels/prices', $params, 0);
+
+    $out = [];
+    foreach ((array) ($data['items'] ?? []) as $item) {
+      $id = (int) ($item['id'] ?? 0);
+      if ($id > 0) {
+        $out[$id] = $item;
+      }
+    }
+
+    return $out;
+  }
+
   /** Живо ли API. Без кеша и с коротким таймаутом — для диагностики. */
   public function isAlive(): bool
   {

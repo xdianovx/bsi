@@ -44,16 +44,12 @@ $has_more = $paged < (int) $list['pages'];
 ?>
 
 <?php
-/* Карточки без цены со статусом `updating` ждут хаб: их цены обновляются прямо
-   сейчас. Атрибуты повторяют запрос страницы — по ним js/modules/ajax/hotels-prices.js
-   переспрашивает те же цены, пока они не приедут. */
+/* Карточки со статусом `updating` ждут хаб: их цены обновляются прямо сейчас.
+   js/modules/ajax/hotels-prices.js собирает их id и спрашивает только цены. */
 ?>
 <div class="hotels-catalog<?= $map['points'] ? '' : ' hotels-catalog--no-map'; ?>"
      data-hotels-prices
-     data-country="<?= (int) $country->ID; ?>"
-     data-paged="<?= (int) $paged; ?>"
-     data-resort="<?= esc_attr($resort); ?>"
-     data-filters="<?= esc_attr(http_build_query($filters_query)); ?>">
+     data-instant="<?= in_array('instant', $filters['flags'] ?? [], true) ? '1' : ''; ?>">
   <div class="hotels-catalog__inner">
 
     <?php get_template_part('template-parts/pages/country/hotels-api-filters', null, [
@@ -128,8 +124,6 @@ $has_more = $paged < (int) $list['pages'];
             <?php get_template_part('template-parts/hotels/api-row', null, [
               'hotel' => $hotel,
               'country_url' => $catalog_url,
-              /* Выдача отобрана по мгновенному подтверждению — отмечаем карточки. */
-              'instant' => in_array('instant', $filters['flags'] ?? [], true),
             ]); ?>
           <?php endforeach; ?>
         </div>
