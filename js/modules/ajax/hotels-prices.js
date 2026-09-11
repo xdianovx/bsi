@@ -43,7 +43,10 @@ export const initHotelsPrices = () => {
   const priceLabel = (waiting) => (waiting ? "за ночь · уточняется" : "за ночь");
 
   const showPrice = (card, price, waiting) => {
-    const slot = card.querySelector(".api-row__price-loading");
+    /* Карточка без цены показывает «Цену уточним по запросу»: пока хаб держит
+       очередь на всю базу, ждущий спиннер врал бы про скорость. Приехавшая
+       цена встаёт на место этой подписи. */
+    const slot = card.querySelector(".api-row__price-loading, .api-row__price-empty");
 
     if (slot) {
       const value = document.createElement("span");
@@ -69,18 +72,12 @@ export const initHotelsPrices = () => {
     }
   };
 
-  /** Ждать больше нечего, а цены нет. */
+  /** Ждать больше нечего, а цены нет: подпись уже стоит, снимаем только пометку. */
   const showEmpty = (card) => {
-    const slot = card.querySelector(".api-row__price-loading");
-    if (!slot) {
-      return;
+    const label = card.querySelector(".api-row__price-label");
+    if (label) {
+      label.textContent = priceLabel(false);
     }
-
-    const empty = document.createElement("span");
-    empty.className = "api-row__price-empty";
-    empty.textContent = "Цену уточним по запросу";
-
-    slot.replaceWith(empty);
   };
 
   const stop = () => {

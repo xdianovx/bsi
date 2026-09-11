@@ -138,12 +138,11 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
           <span class="api-row__price-label">
             за ночь<?php if ($prices_updating): ?> · уточняется<?php endif; ?>
           </span>
-        <?php elseif ($prices_updating): ?>
-          <span class="api-row__price-loading">
-            <span class="api-row__price-spinner" aria-hidden="true"></span>
-            Считаем
-          </span>
         <?php else: ?>
+          <?php /* Крутилку не рисуем: у хаба одна очередь на всю базу, и отель
+                   в ней может стоять часами — ждущий спиннер на половине
+                   карточек врал бы про «сейчас посчитаем». Цена, которая всё же
+                   приедет, подставится тихо (js/modules/ajax/hotels-prices.js). */ ?>
           <span class="api-row__price-empty">Цену уточним по запросу</span>
         <?php endif; ?>
       </div>
