@@ -207,6 +207,13 @@ foreach ($calendar as $date => $entry) {
               <?php if ($confirmation_label !== '' && $confirmation !== $common['confirmation']): ?>
                 <span class="hp-badge hp-badge--<?= esc_attr($confirmation); ?>"><?= esc_html($confirmation_label); ?></span>
               <?php endif; ?>
+
+              <?php if (!empty($room['limited'])): ?>
+                <span class="hp-badge hp-badge--limited" title="На ближайшие даты мест нет. Выберите даты — проверим наличие у оператора">
+                  <?= bsi_lucide_icon('zap'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- инлайновая иконка Lucide ?>
+                  Мало мест
+                </span>
+              <?php endif; ?>
             </div>
 
             <?php

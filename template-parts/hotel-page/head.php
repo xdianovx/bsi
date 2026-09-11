@@ -85,6 +85,17 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
 
           <?php /* Дешёвые ночи чаще идут под запрос, поэтому цену с гарантией
                    показываем отдельной строкой, а не вместо основной. */ ?>
+          <?php /* Мест на ближайшие даты нет — цена из прайса оператора, а не
+                   к продаже прямо сейчас. За окном хаба места обычно находятся. */ ?>
+          <?php if (!empty($view['limited'])): ?>
+            <p class="hp-head__price-note">
+              <span class="hp-badge hp-badge--limited">
+                <?= bsi_lucide_icon('zap'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- инлайновая иконка Lucide ?>
+                Мало мест
+              </span>
+            </p>
+          <?php endif; ?>
+
           <?php if (!empty($view['instant_price_from'])): ?>
             <p class="hp-head__price-instant">
               <span class="hp-badge hp-badge--instant">Мгновенное подтверждение</span>
