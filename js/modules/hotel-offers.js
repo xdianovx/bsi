@@ -49,11 +49,18 @@ const offerRow = (offer, nights) => {
     ? `<span class="hp-offer__placement">${escapeHtml(offer.placementLabel)}</span>`
     : "";
 
+  /* Подтверждение приходит вместе с расчётом заезда: до выбора дат хаб знает
+     его только по отдельным ночам. */
+  const confirmation = offer.confirmationLabel
+    ? `<span class="hp-badge hp-badge--${escapeHtml(offer.confirmation)}">${escapeHtml(offer.confirmationLabel)}</span>`
+    : "";
+
   return `
     <div class="hp-offer">
       <div class="hp-offer__terms">
         <span class="hp-offer__meal">${escapeHtml(offer.mealLabel)}</span>
         ${placement}
+        ${confirmation}
       </div>
       <div class="hp-offer__price">
         <b>${escapeHtml(offer.price)}</b>
@@ -111,6 +118,7 @@ export const initHotelOffers = () => {
         <div class="hp-offer__terms">
           <span class="hp-offer__meal">${escapeHtml(meal.label)}</span>
           ${meal.placement_label ? `<span class="hp-offer__placement">${escapeHtml(meal.placement_label)}</span>` : ""}
+          ${meal.instant_nights ? `<span class="hp-offer__instant">подтверждение сразу: ${meal.instant_nights}${meal.nights ? ` из ${meal.nights}` : ""}</span>` : ""}
         </div>
         ${meal.price ? `<div class="hp-offer__price"><b>${escapeHtml(meal.price)}</b><span>за ночь</span></div>` : ""}
       </div>

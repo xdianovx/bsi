@@ -82,6 +82,15 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
         <?php if ($view['price_from']): ?>
           <p class="hp-head__price-label">Цена за ночь от</p>
           <p class="hp-head__price"><?= esc_html(bsi_hotel_view_price($view['price_from'])); ?></p>
+
+          <?php /* Дешёвые ночи чаще идут под запрос, поэтому цену с гарантией
+                   показываем отдельной строкой, а не вместо основной. */ ?>
+          <?php if (!empty($view['instant_price_from'])): ?>
+            <p class="hp-head__price-instant">
+              <span class="hp-badge hp-badge--instant">Подтверждение сразу</span>
+              от <?= esc_html(bsi_hotel_view_price($view['instant_price_from'])); ?>
+            </p>
+          <?php endif; ?>
         <?php endif; ?>
 
         <?php if ($view['booking']): ?>

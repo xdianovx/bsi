@@ -672,6 +672,84 @@ $hp-nav-offset: 76px;
   color: #c4c4cc;
 }
 
+/* Подтверждение брони и спецпредложения.
+   Бейдж — только цвет текста и тонкая рамка: карточка номера не должна
+   рябить плашками (wiki/docs/design-guidelines.md). */
+.hp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid $gray-light;
+  border-radius: 6px;
+  background: $bg-color;
+  color: $text-gray;
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.hp-badge--instant {
+  border-color: rgba(46, 125, 50, 0.35);
+  color: #2e7d32;
+}
+
+.hp-badge--deal,
+.hp-badge--until {
+  border-color: $gray-light;
+}
+
+.hp-room__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.hp-room__deals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-room__instant-price {
+  margin: 8px 0 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-offer__instant {
+  color: #2e7d32;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* Дата с гарантированным подтверждением: точка у цены, без заливки плитки —
+   строка дат и так пёстрая от цен. */
+.hp-room__day--instant .hp-room__day-price::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: #2e7d32;
+  vertical-align: middle;
+}
+
+.hp-head__price-instant {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
 .hp-room__title {
   margin: 0;
   font-size: 18px;

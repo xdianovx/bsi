@@ -66,6 +66,10 @@ function bsi_hotels_api_quote_ajax(): void
         'currency' => (string) ($row['currency'] ?? ''),
       ]),
       'priceValue' => (float) ($row['total'] ?? 0),
+      /* Подтверждение считается по самой неуверенной ночи заезда: одна ночь
+         под запрос — всё проживание под запрос. */
+      'confirmation' => (string) ($row['confirmation'] ?? ''),
+      'confirmationLabel' => bsi_hotel_view_confirmation_label((string) ($row['confirmation'] ?? '')),
     ];
   }
 

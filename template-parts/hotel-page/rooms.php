@@ -169,7 +169,32 @@ foreach ($calendar as $date => $entry) {
           </div>
 
           <div class="hp-room__body">
-            <h3 class="hp-room__title"><?= esc_html($room['name']); ?></h3>
+            <?php
+            /* Подтверждение — второе, что важно гостю после цены: бронь
+               подтверждается сразу или оператор сначала спрашивает отель. */
+            $confirmation = bsi_hotel_view_room_confirmation($room);
+            $confirmation_label = bsi_hotel_view_confirmation_label($confirmation);
+            $deals = bsi_hotel_view_room_deals($room);
+            ?>
+
+            <div class="hp-room__head">
+              <h3 class="hp-room__title"><?= esc_html($room['name']); ?></h3>
+
+              <?php if ($confirmation_label !== ''): ?>
+                <span class="hp-badge hp-badge--<?= esc_attr($confirmation); ?>"><?= esc_html($confirmation_label); ?></span>
+              <?php endif; ?>
+            </div>
+
+            <?php if ($deals['early_booking'] || $deals['offer_until'] !== ''): ?>
+              <ul class="hp-room__deals">
+                <?php if ($deals['early_booking']): ?>
+                  <li class="hp-badge hp-badge--deal">Раннее бронирование</li>
+                <?php endif; ?>
+                <?php if ($deals['offer_until'] !== ''): ?>
+                  <li class="hp-badge hp-badge--until"><?= esc_html(bsi_hotel_view_offer_until_label($deals['offer_until'])); ?></li>
+                <?php endif; ?>
+              </ul>
+            <?php endif; ?>
 
             <ul class="hp-room__meta">
               <?php if (!empty($room['area'])): ?>
@@ -214,7 +239,19 @@ foreach ($calendar as $date => $entry) {
 
                 <ul class="hp-room__days">
                   <?php foreach ($days as $day): ?>
-                    <li class="hp-room__day" title="<?= esc_attr($day['label']); ?>">
+                    <?php
+                    /* Дата, на которую есть гарантированный вариант, помечается:
+                       по такой можно бронировать без ожидания ответа отеля. */
+                    $day_instant = !empty($day['instant_price']) || (int) $day['instant_rooms'] > 0;
+                    $day_title = $day['label'];
+                    if ($day_instant) {
+                      $day_title .= ' — подтверждение сразу';
+                      if (!empty($day['instant_price'])) {
+                        $day_title .= ', от ' . bsi_hotel_view_price($day['instant_price']);
+                      }
+                    }
+                    ?>
+                    <li class="hp-room__day<?= $day_instant ? ' hp-room__day--instant' : ''; ?>" title="<?= esc_attr($day_title); ?>">
                       <span class="hp-room__day-date"><?= esc_html($day['day']); ?></span>
                       <span class="hp-room__day-price"><?= esc_html(bsi_hotel_view_price($day['price'])); ?></span>
                     </li>
@@ -228,11 +265,19 @@ foreach ($calendar as $date => $entry) {
               <?php foreach ($room['meals'] as $meal): ?>
                 <div class="hp-offer">
                   <div class="hp-offer__terms">
-                    <span class="hp-offer__meal"><?= esc_html($meal['label']); ?></span>
+                    <span class="hp-offer__meal"
+                          <?php if ($meal['description'] !== ''): ?>title="<?= esc_attr($meal['description']); ?>"<?php endif; ?>><?= esc_html($meal['label']); ?></span>
                     <?php if ($meal['placement_label'] !== ''): ?>
                       <span class="hp-offer__placement"><?= esc_html($meal['placement_label']); ?></span>
                     <?php endif; ?>
                   </div>
+
+                  <?php if (!empty($meal['instant_nights'])): ?>
+                    <span class="hp-offer__instant">
+                      подтверждение сразу: <?= (int) $meal['instant_nights']; ?>
+                      <?php if (!empty($meal['nights'])): ?>из <?= (int) $meal['nights']; ?><?php endif; ?>
+                    </span>
+                  <?php endif; ?>
 
                   <?php if ($meal['price_from']): ?>
                     <div class="hp-offer__price">
@@ -260,6 +305,12 @@ foreach ($calendar as $date => $entry) {
 
             <?php /* Одна кнопка на номер: у тарифов своей ссылки хаб не даёт,
                      а ссылка отеля ведёт в Само на тот же отель. */ ?>
+            <?php if (!empty($room['instant_price_from'])): ?>
+              <p class="hp-room__instant-price">
+                С подтверждением сразу — от <b><?= esc_html(bsi_hotel_view_price($room['instant_price_from'])); ?></b> за ночь
+              </p>
+            <?php endif; ?>
+
             <?php $room_booking = $room['booking_url'] !== '' ? $room['booking_url'] : $hotel_booking; ?>
             <?php if ($room_booking !== ''): ?>
               <a class="btn btn-accent sm hp-room__cta"
@@ -284,6 +335,8 @@ foreach ($calendar as $date => $entry) {
         'label' => $meal['label'],
         'placement_label' => $meal['placement_label'],
         'price' => $meal['price_from'] ? bsi_hotel_view_price($meal['price_from']) : '',
+        'instant_nights' => (int) ($meal['instant_nights'] ?? 0),
+        'nights' => (int) ($meal['nights'] ?? 0),
       ], $room['meals']),
     ], $rooms);
     ?>

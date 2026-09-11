@@ -27,6 +27,8 @@ function bsi_hotel_view_defaults(): array
     'excerpt' => '',
     'id' => 0,              // id отеля в хабе; 0 — отель из WordPress
     'price_from' => null,   // ['amount' => float, 'currency' => 'USD']
+    'instant_price_from' => null, // самая дешёвая ночь с мгновенным подтверждением
+    'building' => [],       // ['rooms_count' => ?int, 'floors_count' => ?int, ...]
     'booking_url' => '',
     'booking' => [],        // [['label' => '', 'url' => ''], ...] — кнопки брони
     'contacts' => [],       // ['phone' => '', 'address' => '', 'website' => '']
@@ -82,6 +84,13 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
       'label' => $city,
       'url' => $city_slug !== '' ? bsi_hotels_api_resort_url($catalog_url, $city_slug) : '',
     ];
+  }
+
+  /* Район города («Аль-Барша» в Дубае) — своей страницы у него нет,
+     поэтому только подпись в строке расположения. */
+  $district = (string) ($hotel['district']['name'] ?? '');
+  if ($district !== '') {
+    $view['place'][] = ['label' => $district, 'url' => ''];
   }
 
   foreach ((array) ($hotel['photos'] ?? []) as $photo) {
@@ -145,6 +154,10 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
      запасным — у отелей без календаря поля нет. */
   $view['price_from'] = bsi_hotel_view_price_value($hotel['price_from'] ?? null)
     ?? bsi_hotel_view_price_from($view['rooms']);
+
+  /* Цена ночей, которые оператор подтверждает сразу. Обычно выше `price_from`:
+     дешёвое чаще идёт под запрос. null — гарантированных ночей нет. */
+  $view['instant_price_from'] = bsi_hotel_view_price_value($hotel['instant_price_from'] ?? null);
 
   $view['back'] = [
     'url' => $catalog_url,
@@ -250,6 +263,21 @@ function bsi_hotel_view_api_facts(array $hotel): array
     $facts[] = ['kind' => 'note', 'icon' => '', 'label' => 'Только для взрослых', 'value' => 'да'];
   }
 
+  /* Факты о здании: хаб отдаёт объект, где каждое поле может быть null. */
+  $building_labels = [
+    'rooms_count' => 'Номеров в отеле',
+    'floors_count' => 'Этажей',
+    'built_year' => 'Год постройки',
+    'renovated_year' => 'Год реновации',
+  ];
+
+  foreach ($building_labels as $key => $label) {
+    $value = (int) (($hotel['building'][$key] ?? 0));
+    if ($value > 0) {
+      $facts[] = ['kind' => 'note', 'icon' => '', 'label' => $label, 'value' => (string) $value];
+    }
+  }
+
   return $facts;
 }
 
@@ -332,12 +360,17 @@ function bsi_hotel_view_api_rooms(array $hotel): array
       'max_adults' => (int) ($room['max_adults'] ?? 0),
       'max_children' => (int) ($room['max_children'] ?? 0),
       'max_total' => (int) ($room['max_total'] ?? 0),
-      'view' => (string) ($room['view'] ?? ''),
+      /* Раньше вид из окна приходил строкой, теперь объектом {name, slug, icon} —
+         как у групп удобств. */
+      'view' => is_array($room['view'] ?? null)
+        ? (string) ($room['view']['name'] ?? '')
+        : (string) ($room['view'] ?? ''),
       'photos' => $photos,
       'amenities' => bsi_hotel_view_api_room_amenities($room),
       'meals' => bsi_hotel_view_api_room_meals($room),
       'availability' => bsi_hotel_view_api_availability($room),
       'price_from' => bsi_hotel_view_price_value($room['price_from'] ?? null),
+      'instant_price_from' => bsi_hotel_view_price_value($room['instant_price_from'] ?? null),
       'booking_url' => bsi_hotel_view_booking_url($room['booking'] ?? null),
     ];
   }
@@ -407,6 +440,11 @@ function bsi_hotel_view_api_availability(array $room): array
         'placement_label' => bsi_hotel_view_placement_label($placement),
         'price' => $price,
         'currency' => (string) ($entry['currency'] ?? ''),
+        /* `instant` — оператор подтверждает бронь сразу, `request` — сначала
+           спрашивает отель, и тот может отказать. Большинство ночей — второе. */
+        'confirmation' => (string) ($option['confirmation'] ?? ''),
+        'early_booking' => !empty($option['early_booking']),
+        'offer_until' => (string) ($option['offer_until'] ?? ''),
       ];
     }
 
@@ -417,12 +455,20 @@ function bsi_hotel_view_api_availability(array $room): array
 
     $money = ['amount' => $price ?: $options[0]['price'], 'currency' => (string) ($entry['currency'] ?? '')];
 
+    $instant_amount = (float) ($entry['instant_price'] ?? 0);
+
     $days[] = [
       'date' => $date,
       'label' => bsi_hotel_view_date_label($date),
       'day' => wp_date('j M', $stamp),
       'rooms' => (int) ($entry['rooms'] ?? 0),
       'price' => $money,
+      /* Цена этой даты с мгновенным подтверждением и сколько номеров её дают.
+         Пусто — на дату всё продаётся под запрос. */
+      'instant_price' => $instant_amount > 0
+        ? ['amount' => $instant_amount, 'currency' => (string) ($entry['currency'] ?? '')]
+        : null,
+      'instant_rooms' => (int) ($entry['instant_rooms'] ?? 0),
       'options' => $options,
     ];
 
@@ -467,6 +513,10 @@ function bsi_hotel_view_api_room_meals(array $room): array
       'placement_label' => bsi_hotel_view_placement_label($placement),
       'price_from' => bsi_hotel_view_price_value($meal['price_from'] ?? null),
       'nights' => (int) ($meal['nights'] ?? 0),
+      /* Из скольких дат этого питания бронь подтверждается сразу. */
+      'instant_nights' => (int) ($meal['instant_nights'] ?? 0),
+      /* Расшифровка кода от поставщика: «BB - завтраки». */
+      'description' => (string) ($meal['description'] ?? ''),
     ];
   }
 
@@ -615,6 +665,95 @@ function bsi_hotel_view_price(array $price): string
     'amount' => $price['amount'],
     'currency' => $price['currency'],
   ]);
+}
+
+/**
+ * Подпись подтверждения брони.
+ *
+ * `instant` — оператор подтверждает сразу; `request` — сначала спрашивает отель,
+ * и тот может отказать (так продаётся большинство ночей); `none` — не продаётся.
+ */
+function bsi_hotel_view_confirmation_label(string $code): string
+{
+  return match ($code) {
+    'instant' => 'Подтверждение сразу',
+    'request' => 'Под запрос',
+    default => '',
+  };
+}
+
+/**
+ * Подтверждение уровня номера: сразу, если хоть одна ночь подтверждается сразу.
+ *
+ * Календарь номера содержит варианты по каждой дате, и внутри одной даты
+ * подтверждение у разных питаний разное — гостю важно, есть ли вообще
+ * гарантированный вариант.
+ */
+function bsi_hotel_view_room_confirmation(array $room): string
+{
+  if (!empty($room['instant_price_from'])) {
+    return 'instant';
+  }
+
+  $has_request = false;
+
+  foreach ($room['availability']['days'] ?? [] as $day) {
+    if (!empty($day['instant_price']) || (int) ($day['instant_rooms'] ?? 0) > 0) {
+      return 'instant';
+    }
+
+    foreach ($day['options'] ?? [] as $option) {
+      if (($option['confirmation'] ?? '') === 'instant') {
+        return 'instant';
+      }
+      if (($option['confirmation'] ?? '') === 'request') {
+        $has_request = true;
+      }
+    }
+  }
+
+  return $has_request ? 'request' : '';
+}
+
+/**
+ * Спецпредложения номера, собранные по всем вариантам его календаря:
+ * есть ли цена раннего бронирования и до какой даты она держится.
+ *
+ * @return array{early_booking: bool, offer_until: string}
+ */
+function bsi_hotel_view_room_deals(array $room): array
+{
+  $early = false;
+  $until = '';
+
+  foreach ($room['availability']['days'] ?? [] as $day) {
+    foreach ($day['options'] ?? [] as $option) {
+      if (!empty($option['early_booking'])) {
+        $early = true;
+      }
+
+      $option_until = (string) ($option['offer_until'] ?? '');
+      /* Ближайший срок: предложение заканчивается по самой ранней дате. */
+      if ($option_until !== '' && ($until === '' || $option_until < $until)) {
+        $until = $option_until;
+      }
+    }
+  }
+
+  return ['early_booking' => $early, 'offer_until' => $until];
+}
+
+/**
+ * Срок действия спецпредложения: «до 30 июня 2027».
+ */
+function bsi_hotel_view_offer_until_label(string $date): string
+{
+  $ts = strtotime($date);
+  if (!$ts) {
+    return '';
+  }
+
+  return 'цена действует до ' . wp_date('j F Y', $ts);
 }
 
 /**

@@ -47,8 +47,14 @@ $rooms = (int) ($hotel['room_types'] ?? 0);
       <?php endif; ?>
     </h3>
 
-    <?php if ($city): ?>
-      <p class="api-hotel__city"><?= esc_html($city); ?></p>
+    <?php
+    /* Вид объекта — отдельная ось от звёзд: «Бутик-отель» и 5* не заменяют
+       друг друга. Хаб проставил его не всем, поэтому строка условная. */
+    $type = (string) ($hotel['type']['name'] ?? '');
+    $place_line = trim(implode(' · ', array_filter([$city, $type])));
+    ?>
+    <?php if ($place_line !== ''): ?>
+      <p class="api-hotel__city"><?= esc_html($place_line); ?></p>
     <?php endif; ?>
 
     <div class="api-hotel__footer">
