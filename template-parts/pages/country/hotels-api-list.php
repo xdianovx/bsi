@@ -43,7 +43,17 @@ $map = bsi_hotels_api_map_points($country, $resort, $list['items'], $filters);
 $has_more = $paged < (int) $list['pages'];
 ?>
 
-<div class="hotels-catalog<?= $map['points'] ? '' : ' hotels-catalog--no-map'; ?>">
+<?php
+/* Карточки без цены со статусом `updating` ждут хаб: их цены обновляются прямо
+   сейчас. Атрибуты повторяют запрос страницы — по ним js/modules/ajax/hotels-prices.js
+   переспрашивает те же цены, пока они не приедут. */
+?>
+<div class="hotels-catalog<?= $map['points'] ? '' : ' hotels-catalog--no-map'; ?>"
+     data-hotels-prices
+     data-country="<?= (int) $country->ID; ?>"
+     data-paged="<?= (int) $paged; ?>"
+     data-resort="<?= esc_attr($resort); ?>"
+     data-filters="<?= esc_attr(http_build_query($filters_query)); ?>">
   <div class="hotels-catalog__inner">
 
     <?php get_template_part('template-parts/pages/country/hotels-api-filters', null, [

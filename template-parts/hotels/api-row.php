@@ -138,7 +138,7 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
         <?php elseif ($prices_updating): ?>
           <span class="api-row__price-loading">
             <span class="api-row__price-spinner" aria-hidden="true"></span>
-            Считаем цену
+            Считаем
           </span>
         <?php else: ?>
           <span class="api-row__price-empty">Цену уточним по запросу</span>
