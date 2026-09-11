@@ -74,13 +74,13 @@ $not_included = function_exists('get_field') ? (string) get_field('excursion_not
 $faq = function_exists('get_field') ? get_field('excursion_faq', $post_id) : [];
 $faq = is_array($faq) ? $faq : [];
 
-$duration_hours = function_exists('get_field') ? (float) get_field('excursion_duration_hours', $post_id) : 0.0;
+$duration_label = function_exists('bsi_get_excursion_duration_label') ? bsi_get_excursion_duration_label($post_id) : '';
+$dates_text = function_exists('bsi_get_excursion_dates_text') ? bsi_get_excursion_dates_text($post_id) : '';
+$booking_url = function_exists('bsi_get_excursion_booking_url') ? bsi_get_excursion_booking_url($post_id) : '';
 $phone = function_exists('get_field') ? trim((string) get_field('excursion_phone', $post_id)) : '';
 $website = function_exists('get_field') ? trim((string) get_field('excursion_website', $post_id)) : '';
-$cta_lead = function_exists('get_field') ? trim((string) get_field('excursion_cta_lead', $post_id)) : '';
-if ($cta_lead === '') {
-  $cta_lead = 'Оставьте заявку — менеджер свяжется с вами и поможет подобрать удобную дату.';
-}
+/* Текст под формой консультации — фикс для всех экскурсий, поля в админке нет. */
+$cta_lead = 'Оставьте заявку — менеджер свяжется с вами и поможет подобрать удобную дату.';
 
 $tickets_rows = function_exists('bsi_get_excursion_tickets_rows') ? bsi_get_excursion_tickets_rows($post_id) : [];
 $price_from = function_exists('bsi_get_excursion_price_from_rub') ? bsi_get_excursion_price_from_rub($post_id) : null;
@@ -104,25 +104,23 @@ if (!is_wp_error($type_terms) && !empty($type_terms)) {
   }
 }
 
-$excursion_title = get_the_title($post_id);
-
-$duration_label = '';
-if ($duration_hours > 0) {
-  if (abs($duration_hours - round($duration_hours)) < 0.01) {
-    $h = (int) round($duration_hours);
-    $mod10 = $h % 10;
-    $mod100 = $h % 100;
-    if ($mod10 === 1 && $mod100 !== 11) {
-      $duration_label = $h . ' час';
-    } elseif (in_array($mod10, [2, 3, 4], true) && !in_array($mod100, [12, 13, 14], true)) {
-      $duration_label = $h . ' часа';
-    } else {
-      $duration_label = $h . ' часов';
-    }
-  } else {
-    $duration_label = rtrim(rtrim(number_format($duration_hours, 1, ',', ''), '0'), ',') . ' ч';
+$format_terms = get_the_terms($post_id, 'excursion_format');
+$format_names = [];
+if (!is_wp_error($format_terms) && !empty($format_terms)) {
+  foreach ($format_terms as $ft) {
+    $format_names[] = $ft->name;
   }
 }
+
+$transport_terms = get_the_terms($post_id, 'excursion_transport');
+$transport_names = [];
+if (!is_wp_error($transport_terms) && !empty($transport_terms)) {
+  foreach ($transport_terms as $trt) {
+    $transport_names[] = $trt->name;
+  }
+}
+
+$excursion_title = get_the_title($post_id);
 
 $hero_price_line = '';
 if ($price_from !== null && (int) $price_from > 0) {
@@ -218,8 +216,17 @@ get_header();
           if ($duration_label !== '') {
             $info_items[] = ['Длительность', $duration_label];
           }
+          if ($dates_text !== '') {
+            $info_items[] = ['Даты', $dates_text];
+          }
           if (!empty($type_names)) {
             $info_items[] = ['Тип', implode(', ', $type_names)];
+          }
+          if (!empty($format_names)) {
+            $info_items[] = ['Формат', implode(', ', $format_names)];
+          }
+          if (!empty($transport_names)) {
+            $info_items[] = ['Транспорт', implode(', ', $transport_names)];
           }
           if (!empty($language_names)) {
             $info_items[] = ['Язык гида', implode(', ', $language_names)];
@@ -339,11 +346,18 @@ get_header();
             <?php endif; ?>
 
             <div class="single-education__booking">
-              <button type="button" class="btn btn-accent single-education__booking-btn js-excursion-booking-btn"
-                      data-excursion-id="<?= esc_attr((string) $post_id); ?>"
-                      data-excursion-title="<?= esc_attr($excursion_title); ?>">
-                Забронировать
-              </button>
+              <?php if ($booking_url !== ''): ?>
+                <a href="<?= esc_url($booking_url); ?>" class="btn btn-accent single-education__booking-btn"
+                   target="_blank" rel="nofollow noopener">
+                  Забронировать
+                </a>
+              <?php else: ?>
+                <button type="button" class="btn btn-accent single-education__booking-btn js-excursion-booking-btn"
+                        data-excursion-id="<?= esc_attr((string) $post_id); ?>"
+                        data-excursion-title="<?= esc_attr($excursion_title); ?>">
+                  Забронировать
+                </button>
+              <?php endif; ?>
             </div>
           </div>
         </aside>

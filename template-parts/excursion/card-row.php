@@ -31,24 +31,9 @@ if ($resort_title === '') {
   }
 }
 
-$duration = function_exists('get_field') ? (float) get_field('excursion_duration_hours', $post_id) : 0.0;
-$duration_label = '';
-if ($duration > 0) {
-  if (abs($duration - round($duration)) < 0.01) {
-    $duration_int = (int) round($duration);
-    $mod10 = $duration_int % 10;
-    $mod100 = $duration_int % 100;
-    if ($mod10 === 1 && $mod100 !== 11) {
-      $duration_label = $duration_int . ' час';
-    } elseif (in_array($mod10, [2, 3, 4], true) && !in_array($mod100, [12, 13, 14], true)) {
-      $duration_label = $duration_int . ' часа';
-    } else {
-      $duration_label = $duration_int . ' часов';
-    }
-  } else {
-    $duration_label = rtrim(rtrim(number_format($duration, 1, ',', ''), '0'), ',') . ' ч';
-  }
-}
+$duration_label = function_exists('bsi_get_excursion_duration_label') ? bsi_get_excursion_duration_label($post_id) : '';
+$dates_text = function_exists('bsi_get_excursion_dates_text') ? bsi_get_excursion_dates_text($post_id) : '';
+$booking_url = function_exists('bsi_get_excursion_booking_url') ? bsi_get_excursion_booking_url($post_id) : '';
 
 $price_rub = function_exists('bsi_get_excursion_price_from_rub') ? bsi_get_excursion_price_from_rub($post_id) : null;
 $price_original_data = function_exists('bsi_get_excursion_price_from_original')
@@ -131,9 +116,14 @@ $excerpt_raw = preg_replace('/\s+/u', ' ', trim(wp_strip_all_tags($excerpt_raw))
       <p class="catalog-card__excerpt"><?= esc_html($excerpt_raw); ?></p>
     <?php endif; ?>
 
-    <?php if ($duration_label !== ''): ?>
+    <?php if ($duration_label !== '' || $dates_text !== ''): ?>
       <div class="catalog-card__info-row">
-        <span class="catalog-card__duration">Длительность: <?= esc_html($duration_label); ?></span>
+        <?php if ($duration_label !== ''): ?>
+          <span class="catalog-card__duration">Длительность: <?= esc_html($duration_label); ?></span>
+        <?php endif; ?>
+        <?php if ($dates_text !== ''): ?>
+          <span class="catalog-card__dates">Даты: <?= esc_html($dates_text); ?></span>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
 
@@ -141,7 +131,22 @@ $excerpt_raw = preg_replace('/\s+/u', ' ', trim(wp_strip_all_tags($excerpt_raw))
       <a href="<?= esc_url($link); ?>" class="btn btn-gray sm catalog-card__btn">
         Подробнее
       </a>
-      <?php if ($price_rub !== null && $price_rub > 0): ?>
+      <?php if ($booking_url !== ''): ?>
+        <?php $has_price = ($price_rub !== null && $price_rub > 0); ?>
+        <a href="<?= esc_url($booking_url); ?>"
+           class="btn btn-accent sm catalog-card__btn<?= $has_price ? ' js-excursion-price' : ''; ?>"
+           target="_blank" rel="nofollow noopener"
+           <?php if ($has_price): ?>
+           data-price-rub="<?= esc_attr((string) (int) $price_rub); ?>"
+           <?php if (!empty($price_original_data['amount']) && !empty($price_original_data['currency'])): ?>
+           data-price-original="<?= esc_attr((string) $price_original_data['amount']); ?>"
+           data-price-currency="<?= esc_attr((string) $price_original_data['currency']); ?>"
+           <?php endif; ?>
+           data-has-from="true"
+           <?php endif; ?>><?= $has_price
+             ? esc_html('от ' . number_format((int) $price_rub, 0, ',', ' ') . ' ₽')
+             : 'Забронировать'; ?></a>
+      <?php elseif ($price_rub !== null && $price_rub > 0): ?>
         <button type="button"
                 class="btn btn-accent sm catalog-card__btn js-excursion-booking-btn js-excursion-price"
                 data-excursion-id="<?= esc_attr((string) $post_id); ?>"

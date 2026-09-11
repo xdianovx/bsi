@@ -1276,20 +1276,59 @@ get_template_part('template-parts/hotels/room-card');
           <a href="#">Обзорная экскурсия по Стамбулу с гидом</a>
         </h3>
         <p class="catalog-card__excerpt">Прогулка по Старому городу: Софийский собор, Голубая мечеть, дворец Топкапы.</p>
-        <div class="catalog-card__meta">
-          <span class="catalog-card__chip">4 часа</span>
-          <span class="catalog-card__chip">русский, английский</span>
+        <div class="catalog-card__info-row">
+          <span class="catalog-card__duration">Длительность: 8-9 часов</span>
+          <span class="catalog-card__dates">Даты: по вторникам и пятницам</span>
         </div>
-        <div class="catalog-card__foot">
-          <span class="catalog-card__price numfont js-excursion-price"
-                data-price-rub="6500"
-                data-price-original="75"
-                data-price-currency="USD"
-                data-has-from="true">от 6 500 ₽</span>
-          <a href="#" class="btn btn-accent sm catalog-card__book" target="_blank" rel="nofollow noopener">Забронировать</a>
+        <div class="catalog-card__actions">
+          <a href="#" class="btn btn-gray sm catalog-card__btn">Подробнее</a>
+          <!-- Если заполнен ACF `excursion_booking_url` (онлайн Само) — ссылка,
+               иначе кнопка с .js-excursion-booking-btn, открывающая модалку заявки. -->
+          <a href="#" class="btn btn-accent sm catalog-card__btn js-excursion-price"
+             target="_blank" rel="nofollow noopener"
+             data-price-rub="6500"
+             data-price-original="75"
+             data-price-currency="USD"
+             data-has-from="true">от 6 500 ₽</a>
         </div>
       </div>
     </article>
+  </section>
+
+  <section style="margin:40px 0">
+    <h2 class="h2" style="margin-bottom:16px">Радиокнопки (.ui-radio) и группы (.ui-radio-group / .ui-checkbox-group)</h2>
+    <p style="color:var(--uikit-muted);font-size:13px;margin-bottom:12px">
+      Стили: <code>scss/ui/forms.scss</code>. Состояние выбора показывает только точка/галочка внутри:
+      рамка и кегель текста не меняются. В фильтрах каталога экскурсий
+      (<code>country-excursions.php</code>) оси «Формат» и «Транспорт» — чекбоксы с множественным
+      выбором в <code>.ui-checkbox-group</code>; пустой набор = фильтр не применён.
+    </p>
+
+    <div class="ui-checkbox-group" style="margin-bottom:16px">
+      <label class="ui-checkbox">
+        <input type="checkbox" class="ui-checkbox__input" name="ui-demo-format[]" value="1">
+        <span class="ui-checkbox__mark"></span>
+        <span class="ui-checkbox__text">Групповая</span>
+      </label>
+      <label class="ui-checkbox">
+        <input type="checkbox" class="ui-checkbox__input" name="ui-demo-format[]" value="2">
+        <span class="ui-checkbox__mark"></span>
+        <span class="ui-checkbox__text">Индивидуальная</span>
+      </label>
+    </div>
+
+    <div class="ui-radio-group">
+      <label class="ui-radio">
+        <input type="radio" class="ui-radio__input" name="ui-demo-radio" value="" checked>
+        <span class="ui-radio__mark"></span>
+        <span class="ui-radio__text">Все</span>
+      </label>
+      <label class="ui-radio">
+        <input type="radio" class="ui-radio__input" name="ui-demo-radio" value="1">
+        <span class="ui-radio__mark"></span>
+        <span class="ui-radio__text">Вариант с одним выбором</span>
+      </label>
+    </div>
   </section>
 
   <section style="margin:40px 0">

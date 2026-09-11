@@ -46,7 +46,17 @@ export const initExcursionsFilter = () => {
   const regionSelect = root.querySelector('select[name="region"]');
   const resortSelect = root.querySelector('select[name="resort"]');
   const typeSelect = root.querySelector('select[name="excursion_type"]');
-  const languageSelect = root.querySelector('select[name="excursion_language"]');
+  const formatBoxes = root.querySelectorAll('input[type="checkbox"][name="excursion_format[]"]');
+  const transportBoxes = root.querySelectorAll('input[type="checkbox"][name="excursion_transport[]"]');
+
+  const checkedValues = (boxes) =>
+    [...boxes].filter((b) => b.checked).map((b) => b.value);
+
+  const resetBoxes = (boxes) => {
+    [...boxes].forEach((b) => {
+      b.checked = false;
+    });
+  };
   const sortContainer = root.querySelector(".country-excursions__sort");
   const sortTextEl = sortContainer?.querySelector(".country-excursions__sort-text");
 
@@ -75,8 +85,8 @@ export const initExcursionsFilter = () => {
       const typeVal = typeSelect ? typeSelect.value || "" : "";
       if (typeVal) body.set("excursion_type", typeVal);
 
-      const langVal = languageSelect ? languageSelect.value || "" : "";
-      if (langVal) body.set("excursion_language", langVal);
+      checkedValues(formatBoxes).forEach((v) => body.append("excursion_format[]", v));
+      checkedValues(transportBoxes).forEach((v) => body.append("excursion_transport[]", v));
 
       const res = await fetch(ajaxUrl, {
         method: "POST",
@@ -154,10 +164,6 @@ export const initExcursionsFilter = () => {
     ? new Choices(typeSelect, { ...CHOICES_RU, searchEnabled: true, shouldSort: false })
     : null;
 
-  const languageChoice = languageSelect
-    ? new Choices(languageSelect, { ...CHOICES_RU, searchEnabled: true, shouldSort: false })
-    : null;
-
   const loadResorts = async () => {
     if (!resortChoice) return;
 
@@ -218,7 +224,8 @@ export const initExcursionsFilter = () => {
       (regionSelect && regionSelect.value) ||
       (resortSelect && resortSelect.value) ||
       (typeSelect && typeSelect.value) ||
-      (languageSelect && languageSelect.value);
+      checkedValues(formatBoxes).length ||
+      checkedValues(transportBoxes).length;
     resetBtn.classList.toggle("is-hidden", !hasAnyFilter);
   };
 
@@ -230,7 +237,8 @@ export const initExcursionsFilter = () => {
     setEmpty(regionChoice, regionSelect);
     setEmpty(resortChoice, resortSelect);
     setEmpty(typeChoice, typeSelect);
-    setEmpty(languageChoice, languageSelect);
+    resetBoxes(formatBoxes);
+    resetBoxes(transportBoxes);
 
     if (resortChoice) {
       await loadResorts();
@@ -248,7 +256,9 @@ export const initExcursionsFilter = () => {
   }
   if (resortSelect) resortSelect.addEventListener("change", () => { updateResetVisibility(); loadExcursions(1); });
   if (typeSelect) typeSelect.addEventListener("change", () => { updateResetVisibility(); loadExcursions(1); });
-  if (languageSelect) languageSelect.addEventListener("change", () => { updateResetVisibility(); loadExcursions(1); });
+  [...formatBoxes, ...transportBoxes].forEach((box) => {
+    box.addEventListener("change", () => { updateResetVisibility(); loadExcursions(1); });
+  });
 
   if (resetBtn) {
     resetBtn.addEventListener("click", (e) => {

@@ -78,9 +78,22 @@ $type_terms = !empty($excursion_ids)
   ? wp_get_object_terms($excursion_ids, 'excursion_type', ['orderby' => 'name', 'order' => 'ASC'])
   : [];
 
-$language_terms = !empty($excursion_ids)
-  ? wp_get_object_terms($excursion_ids, 'excursion_language', ['orderby' => 'name', 'order' => 'ASC'])
-  : [];
+/* Формат и транспорт — фиксированные оси из 2-3 значений: показываем все термины
+   таксономии, а не только встречающиеся у экскурсий страны, иначе фильтр выглядит
+   неполным, пока редактор не проставил метки. */
+$format_terms = get_terms([
+  'taxonomy' => 'excursion_format',
+  'hide_empty' => false,
+  'orderby' => 'name',
+  'order' => 'ASC',
+]);
+
+$transport_terms = get_terms([
+  'taxonomy' => 'excursion_transport',
+  'hide_empty' => false,
+  'orderby' => 'name',
+  'order' => 'ASC',
+]);
 
 $region_ids = [];
 if (!is_wp_error($region_terms) && !empty($region_terms)) {
@@ -201,17 +214,35 @@ get_header(); ?>
                   </select>
                 </div>
 
+                <?php if (!is_wp_error($format_terms) && !empty($format_terms)): ?>
                 <div class="tours-filter__field">
-                  <div class="tours-filter__label">Язык гида</div>
-                  <select class="tours-filter__select" name="excursion_language" data-choice="single">
-                    <option value="">Все языки</option>
-                    <?php if (!is_wp_error($language_terms) && !empty($language_terms)): ?>
-                      <?php foreach ($language_terms as $t): ?>
-                        <option value="<?= (int) $t->term_id; ?>"><?= esc_html($t->name); ?></option>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                  </select>
+                  <div class="tours-filter__label">Формат</div>
+                  <div class="ui-checkbox-group">
+                    <?php foreach ($format_terms as $t): ?>
+                      <label class="ui-checkbox">
+                        <input type="checkbox" class="ui-checkbox__input" name="excursion_format[]" value="<?= (int) $t->term_id; ?>">
+                        <span class="ui-checkbox__mark"></span>
+                        <span class="ui-checkbox__text"><?= esc_html($t->name); ?></span>
+                      </label>
+                    <?php endforeach; ?>
+                  </div>
                 </div>
+                <?php endif; ?>
+
+                <?php if (!is_wp_error($transport_terms) && !empty($transport_terms)): ?>
+                <div class="tours-filter__field country-excursions__filters-field-wide">
+                  <div class="tours-filter__label">Транспорт</div>
+                  <div class="ui-checkbox-group">
+                    <?php foreach ($transport_terms as $t): ?>
+                      <label class="ui-checkbox">
+                        <input type="checkbox" class="ui-checkbox__input" name="excursion_transport[]" value="<?= (int) $t->term_id; ?>">
+                        <span class="ui-checkbox__mark"></span>
+                        <span class="ui-checkbox__text"><?= esc_html($t->name); ?></span>
+                      </label>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+                <?php endif; ?>
 
               </div>
             </form>

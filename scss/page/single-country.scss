@@ -469,6 +469,13 @@ body.single-country .news-card {
   border-radius: 12px;
 }
 
+/* Экскурсии каталога — те же белые карточки на сером фоне списка. */
+body.single-country .catalog-card--excursion {
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
 /* Плитки характеристик и региональные блоки лежат внутри белых карточек —
    им нужен серый фон страницы, иначе белое на белом. */
 body.single-country .country-attr,

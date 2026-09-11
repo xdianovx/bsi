@@ -8,7 +8,8 @@
  *   rewrite зарегистрирован в inc/post-types/country.php, шаблон country-excursions.php,
  *   роутер в single-country.php)
  * - Связь со страной — ACF `excursion_country` (post_object на CPT country)
- * - Бронирование — только внешний URL (ACF `excursion_booking_url`)
+ * - Бронирование — внешний URL (ACF `excursion_booking_url`, обычно онлайн Само),
+ *   иначе модалка заявки
  * - Цены — repeater `excursion_dates`, конвертация через bsi_education_convert_price_to_rub()
  */
 
@@ -66,6 +67,48 @@ add_action('init', function () {
     'query_var' => true,
   ]);
 
+  register_taxonomy('excursion_format', ['excursion'], [
+    'labels' => [
+      'name' => 'Форматы экскурсий',
+      'singular_name' => 'Формат экскурсии',
+      'search_items' => 'Найти формат',
+      'all_items' => 'Все форматы',
+      'edit_item' => 'Редактировать формат',
+      'update_item' => 'Обновить формат',
+      'add_new_item' => 'Добавить формат',
+      'new_item_name' => 'Новый формат',
+      'menu_name' => 'Форматы (групповая / индивидуальная)',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => true,
+    'rewrite' => false,
+    'query_var' => true,
+  ]);
+
+  register_taxonomy('excursion_transport', ['excursion'], [
+    'labels' => [
+      'name' => 'Типы транспорта',
+      'singular_name' => 'Тип транспорта',
+      'search_items' => 'Найти тип транспорта',
+      'all_items' => 'Все типы транспорта',
+      'edit_item' => 'Редактировать тип транспорта',
+      'update_item' => 'Обновить тип транспорта',
+      'add_new_item' => 'Добавить тип транспорта',
+      'new_item_name' => 'Новый тип транспорта',
+      'menu_name' => 'Типы транспорта',
+    ],
+    'public' => true,
+    'show_ui' => true,
+    'show_admin_column' => true,
+    'show_in_rest' => true,
+    'hierarchical' => true,
+    'rewrite' => false,
+    'query_var' => true,
+  ]);
+
   register_taxonomy('excursion_include', ['excursion'], [
     'labels' => [
       'name' => 'Включено в экскурсию',
@@ -117,7 +160,7 @@ add_action('init', function () {
 
     'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'page-attributes', 'revisions'],
 
-    'taxonomies' => ['region', 'resort', 'excursion_type', 'excursion_language', 'excursion_include'],
+    'taxonomies' => ['region', 'resort', 'excursion_type', 'excursion_format', 'excursion_transport', 'excursion_language', 'excursion_include'],
 
     'has_archive' => false,
     'rewrite' => false,
@@ -136,6 +179,12 @@ add_action('init', function () {
   if (taxonomy_exists('excursion_type')) {
     register_taxonomy_for_object_type('excursion_type', 'excursion');
   }
+  if (taxonomy_exists('excursion_format')) {
+    register_taxonomy_for_object_type('excursion_format', 'excursion');
+  }
+  if (taxonomy_exists('excursion_transport')) {
+    register_taxonomy_for_object_type('excursion_transport', 'excursion');
+  }
   if (taxonomy_exists('excursion_language')) {
     register_taxonomy_for_object_type('excursion_language', 'excursion');
   }
@@ -143,6 +192,36 @@ add_action('init', function () {
     register_taxonomy_for_object_type('excursion_include', 'excursion');
   }
 }, 30);
+
+/* ───────────────────────────────────────────────────────────────────
+ * Стартовые термины форматов и транспорта — создаём один раз,
+ * дальше редактор правит их в админке (option-флаг защищает от
+ * повторного создания удалённых терминов).
+ * ─────────────────────────────────────────────────────────────────── */
+
+add_action('init', function () {
+  if (get_option('bsi_excursion_default_terms_seeded')) {
+    return;
+  }
+
+  $defaults = [
+    'excursion_format' => ['Групповая', 'Индивидуальная'],
+    'excursion_transport' => ['Автобусная', 'Автомобильная', 'Пешеходная'],
+  ];
+
+  foreach ($defaults as $taxonomy => $names) {
+    if (!taxonomy_exists($taxonomy)) {
+      return;
+    }
+    foreach ($names as $name) {
+      if (!term_exists($name, $taxonomy)) {
+        wp_insert_term($name, $taxonomy);
+      }
+    }
+  }
+
+  update_option('bsi_excursion_default_terms_seeded', 1, false);
+}, 40);
 
 /* ───────────────────────────────────────────────────────────────────
  * Single URL: /country/{country_slug}/ekskursii/{excursion_slug}/
@@ -258,6 +337,80 @@ if (!function_exists('bsi_get_excursion_country_id')) {
       return (int) $first;
     }
     return (int) $value;
+  }
+}
+
+if (!function_exists('bsi_get_excursion_duration_label')) {
+  /**
+   * Подпись длительности экскурсии.
+   *
+   * Поле `excursion_duration_hours` — текст: чистое число склоняется
+   * («8» → «8 часов», «1.5» → «1,5 ч»), любой другой текст («8-9 часов»)
+   * возвращается как есть.
+   */
+  function bsi_get_excursion_duration_label(int $post_id): string
+  {
+    if ($post_id <= 0 || !function_exists('get_field')) {
+      return '';
+    }
+
+    $raw = trim((string) get_field('excursion_duration_hours', $post_id));
+    if ($raw === '') {
+      return '';
+    }
+
+    $normalized = str_replace(',', '.', $raw);
+    if (!is_numeric($normalized)) {
+      return $raw;
+    }
+
+    $hours = (float) $normalized;
+    if ($hours <= 0) {
+      return '';
+    }
+
+    if (abs($hours - round($hours)) >= 0.01) {
+      return rtrim(rtrim(number_format($hours, 1, ',', ''), '0'), ',') . ' ч';
+    }
+
+    $h = (int) round($hours);
+    $mod10 = $h % 10;
+    $mod100 = $h % 100;
+
+    if ($mod10 === 1 && $mod100 !== 11) {
+      return $h . ' час';
+    }
+    if (in_array($mod10, [2, 3, 4], true) && !in_array($mod100, [12, 13, 14], true)) {
+      return $h . ' часа';
+    }
+    return $h . ' часов';
+  }
+}
+
+if (!function_exists('bsi_get_excursion_booking_url')) {
+  /**
+   * Ссылка на онлайн-бронирование (Само). Пусто — используется модалка заявки.
+   */
+  function bsi_get_excursion_booking_url(int $post_id): string
+  {
+    if ($post_id <= 0 || !function_exists('get_field')) {
+      return '';
+    }
+    $url = trim((string) get_field('excursion_booking_url', $post_id));
+    return $url !== '' ? esc_url_raw($url) : '';
+  }
+}
+
+if (!function_exists('bsi_get_excursion_dates_text')) {
+  /**
+   * Текст «Даты проведения» (свободная строка, как `tour_checkin_dates`).
+   */
+  function bsi_get_excursion_dates_text(int $post_id): string
+  {
+    if ($post_id <= 0 || !function_exists('get_field')) {
+      return '';
+    }
+    return trim((string) get_field('excursion_dates', $post_id));
   }
 }
 
@@ -521,12 +674,30 @@ add_action('acf/init', function () {
       ],
       [
         'key' => 'field_excursion_duration_hours',
-        'label' => 'Длительность (часов)',
+        'label' => 'Длительность',
         'name' => 'excursion_duration_hours',
-        'type' => 'number',
-        'min' => 0,
-        'step' => 0.5,
+        'type' => 'text',
+        'placeholder' => 'Например: 8 или 8-9 часов',
+        'instructions' => 'Число («8») будет выведено как «8 часов». Любой другой текст («8-9 часов», «весь день») выводится как есть.',
         'wrapper' => ['width' => '33'],
+      ],
+      [
+        'key' => 'field_excursion_dates',
+        'label' => 'Даты проведения',
+        'name' => 'excursion_dates',
+        'type' => 'text',
+        'placeholder' => 'Например: по вторникам и пятницам / 15 марта, 22 марта',
+        'instructions' => 'Свободный текст: расписание или конкретные даты через запятую.',
+        'wrapper' => ['width' => '67'],
+      ],
+      [
+        'key' => 'field_excursion_booking_url',
+        'label' => 'Ссылка на онлайн Само',
+        'name' => 'excursion_booking_url',
+        'type' => 'url',
+        'placeholder' => 'https://online.bsigroup.ru/search_excursion?...',
+        'instructions' => 'Если заполнено, кнопка «Забронировать» ведёт по этой ссылке в новой вкладке вместо формы заявки.',
+        'wrapper' => ['width' => '100'],
       ],
       [
         'key' => 'field_excursion_phone',
@@ -543,14 +714,6 @@ add_action('acf/init', function () {
         'type' => 'url',
         'placeholder' => 'https://...',
         'wrapper' => ['width' => '50'],
-      ],
-      [
-        'key' => 'field_excursion_cta_lead',
-        'label' => 'Текст под формой консультации (внизу страницы)',
-        'name' => 'excursion_cta_lead',
-        'type' => 'text',
-        'default_value' => 'Оставьте заявку — менеджер свяжется в течение дня и поможет подобрать удобную дату.',
-        'wrapper' => ['width' => '100'],
       ],
       [
         'key' => 'field_excursion_gallery',

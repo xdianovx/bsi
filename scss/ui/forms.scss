@@ -286,52 +286,112 @@ input.error {
   gap: 8px;
   cursor: pointer;
   user-select: none;
+}
 
-  &__input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+.ui-checkbox__input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
 
-    &:checked {
-      &~.ui-checkbox__mark {
-        background-color: $red;
-        border-color: $red;
+.ui-checkbox__mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 1px solid $gray-light;
+  border-radius: 6px;
+  background: $bg-color;
+  transition: $trans-text;
+}
 
-        &::after {
-          display: block;
-        }
-      }
-    }
-  }
+/* Галочка — иконка `check` из Lucide, вложена маской: цвет задаётся background,
+   форма — тем же path, что в img/icons/lucide/. */
+.ui-checkbox__mark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: $text-white;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
 
-  &__mark {
-    position: relative;
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    transition: all 0.2s;
+.ui-checkbox__input:checked ~ .ui-checkbox__mark {
+  background: $red;
+  border-color: $red;
+}
 
-    &::after {
-      content: "";
-      position: absolute;
-      display: none;
-      left: 6px;
-      top: 2px;
-      width: 4px;
-      height: 9px;
-      border: solid white;
-      border-width: 0 2px 2px 0;
-      transform: rotate(45deg);
-    }
-  }
+.ui-checkbox__input:checked ~ .ui-checkbox__mark::after {
+  display: block;
+}
 
-  &__text {
-    flex: 1;
-  }
+.ui-checkbox__text {
+  flex: 1;
+}
+
+.ui-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 16px;
+  color: $text-black;
+}
+
+.ui-radio__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ui-radio__mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid $gray-light;
+  border-radius: 50%;
+  transition: $trans-text;
+}
+
+.ui-radio__mark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 3px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $red;
+}
+
+/* Состояние выбора — только точка внутри: рамка и кегель текста не меняются. */
+.ui-radio__input:checked ~ .ui-radio__mark::after {
+  display: block;
+}
+
+.ui-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+}
+
+.ui-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
 }
 
 .gtm-datepicker {

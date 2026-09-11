@@ -22,7 +22,16 @@ function bsi_excursions_filter()
   $region    = isset($_POST['region']) ? absint(wp_unslash($_POST['region'])) : 0;
   $resort    = isset($_POST['resort']) ? absint(wp_unslash($_POST['resort'])) : 0;
   $type      = isset($_POST['excursion_type']) ? absint(wp_unslash($_POST['excursion_type'])) : 0;
-  $language  = isset($_POST['excursion_language']) ? absint(wp_unslash($_POST['excursion_language'])) : 0;
+  /* Формат и транспорт — множественный выбор чекбоксами: приходит списком term_id. */
+  $term_ids = static function ($raw): array {
+    if (!is_array($raw)) {
+      $raw = [$raw];
+    }
+    return array_values(array_filter(array_map('absint', wp_unslash($raw))));
+  };
+
+  $format    = isset($_POST['excursion_format']) ? $term_ids($_POST['excursion_format']) : [];
+  $transport = isset($_POST['excursion_transport']) ? $term_ids($_POST['excursion_transport']) : [];
 
   $paged     = isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1;
   $sort      = isset($_POST['sort']) ? sanitize_text_field(wp_unslash($_POST['sort'])) : 'price_asc';
@@ -42,8 +51,11 @@ function bsi_excursions_filter()
   if ($type) {
     $tax_query[] = ['taxonomy' => 'excursion_type', 'field' => 'term_id', 'terms' => [$type], 'include_children' => true];
   }
-  if ($language) {
-    $tax_query[] = ['taxonomy' => 'excursion_language', 'field' => 'term_id', 'terms' => [$language]];
+  if (!empty($format)) {
+    $tax_query[] = ['taxonomy' => 'excursion_format', 'field' => 'term_id', 'terms' => $format, 'operator' => 'IN', 'include_children' => true];
+  }
+  if (!empty($transport)) {
+    $tax_query[] = ['taxonomy' => 'excursion_transport', 'field' => 'term_id', 'terms' => $transport, 'operator' => 'IN', 'include_children' => true];
   }
 
   $args = [

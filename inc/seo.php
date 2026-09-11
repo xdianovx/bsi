@@ -1047,6 +1047,8 @@ function bsi_seo_excluded_taxonomies(): array
            пустые закрываются точечно — см. bsi_resort_is_indexable(). */
         'tour_include',
         'excursion_type',
+        'excursion_format',
+        'excursion_transport',
         'excursion_include',
         'excursion_language',
         'education_language',
