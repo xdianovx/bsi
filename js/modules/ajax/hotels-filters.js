@@ -86,17 +86,22 @@ const filterResorts = (input) => {
 export const initHotelsFilters = (root, load) => {
   let timer = null;
 
-  const apply = (form) => {
+  /**
+   * @param {boolean} [partial] менять только выдачу, не трогая панель фильтров.
+   *   Нужно набору в поиске: иначе поле пересоздаётся на каждой паузе и
+   *   каретка уезжает в начало.
+   */
+  const apply = (form, partial = false) => {
     const href = filtersUrl(form);
 
-    load(href, true).then((ok) => {
+    load(href, true, false, partial).then((ok) => {
       if (!ok) window.location.href = href;
     });
   };
 
-  const applyLater = (form, delay) => {
+  const applyLater = (form, delay, partial = false) => {
     window.clearTimeout(timer);
-    timer = window.setTimeout(() => apply(form), delay);
+    timer = window.setTimeout(() => apply(form, partial), delay);
   };
 
   root.addEventListener("submit", (event) => {
@@ -135,7 +140,7 @@ export const initHotelsFilters = (root, load) => {
     const form = event.target.closest(".js-hotels-filters");
     if (!form || event.target.type !== "search") return;
 
-    applyLater(form, TYPE_DELAY);
+    applyLater(form, TYPE_DELAY, true);
   });
 
   root.addEventListener("click", (event) => {

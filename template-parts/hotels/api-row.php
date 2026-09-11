@@ -66,10 +66,6 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
       <span class="api-row__badge">Популярный</span>
     <?php endif; ?>
 
-    <?php if ($instant): ?>
-      <span class="api-row__badge api-row__badge--instant">Мгновенное подтверждение</span>
-    <?php endif; ?>
-
     <?php if ($photo): ?>
       <?php if ($url): ?><a href="<?= esc_url($url); ?>"><?php endif; ?>
         <img src="<?= esc_url($photo); ?>" alt="<?= esc_attr($hotel['name']); ?>" loading="lazy" decoding="async">
@@ -107,6 +103,14 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
       <?php endif; ?>
     </h3>
 
+    <?php /* Плашка под названием, а не поверх фото: снимок отеля не место для
+             служебных меток. */ ?>
+    <?php if ($instant): ?>
+      <p class="api-row__flags">
+        <?= bsi_hotel_view_badge('instant', 'Мгновенное подтверждение', 'circle-check'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
+      </p>
+    <?php endif; ?>
+
     <?php if ($facts || $amenities): ?>
       <ul class="api-row__facts">
         <?php foreach ($facts as $fact): ?>
@@ -143,7 +147,7 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
                    в ней может стоять часами — ждущий спиннер на половине
                    карточек врал бы про «сейчас посчитаем». Цена, которая всё же
                    приедет, подставится тихо (js/modules/ajax/hotels-prices.js). */ ?>
-          <span class="api-row__price-empty">Цену уточним по запросу</span>
+          <span class="api-row__price-empty">По запросу</span>
         <?php endif; ?>
       </div>
 

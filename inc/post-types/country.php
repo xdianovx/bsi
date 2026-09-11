@@ -380,21 +380,8 @@ add_action('init', function () {
   // Каталог отелей по курорту: /hotel/kurort/{курорт}/ — свой адрес вместо
   // параметра, чтобы запросы вида «отели Стамбула» имели индексируемую страницу.
   add_rewrite_rule(
-    '^country/([^/]+)/hotel/kurort/([^/]+)/page/([0-9]{1,})/?$',
-    'index.php?post_type=country&name=$matches[1]&country_hotels=$matches[1]&country_hotel_resort=$matches[2]&paged=$matches[3]',
-    'top'
-  );
-
-  add_rewrite_rule(
     '^country/([^/]+)/hotel/kurort/([^/]+)/?$',
     'index.php?post_type=country&name=$matches[1]&country_hotels=$matches[1]&country_hotel_resort=$matches[2]',
-    'top'
-  );
-
-  // Пагинация каталога отелей: без правила /page/2/ вторая страница уходила в 404.
-  add_rewrite_rule(
-    '^country/([^/]+)/hotel/page/([0-9]{1,})/?$',
-    'index.php?post_type=country&name=$matches[1]&country_hotels=$matches[1]&paged=$matches[2]',
     'top'
   );
 

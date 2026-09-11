@@ -33,6 +33,45 @@ const keepPanelState = (root) => {
 };
 
 /**
+ * Подменяет только результаты: список, счётчик, пагинацию и карту.
+ *
+ * Панель фильтров остаётся прежней — вместе с фокусом и введённым текстом.
+ * Возвращает false, если разметки не хватило: тогда зовущий перерисует всё.
+ */
+const RESULT_PARTS = [
+  ".js-hotels-rows",
+  ".hotels-catalog__counter",
+  ".hotels-catalog__more",
+  ".hotels-catalog__empty",
+  ".js-hotels-map-data",
+];
+
+const swapResults = (root, html) => {
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const list = parsed.querySelector(".js-hotels-rows");
+  const current = root.querySelector(".js-hotels-rows");
+
+  if (!list || !current) return false;
+
+  RESULT_PARTS.forEach((selector) => {
+    const next = parsed.querySelector(selector);
+    const node = root.querySelector(selector);
+
+    if (node && next) {
+      node.replaceWith(next.cloneNode(true));
+      return;
+    }
+
+    // Блока больше нет в ответе (кончились страницы, ушла заглушка) — убираем.
+    if (node && !next) {
+      node.remove();
+    }
+  });
+
+  return true;
+};
+
+/**
  * Каталог отелей страны из хаба: смена страницы и курорта без перезагрузки.
  *
  * Ссылки в разметке настоящие — поисковик и переход по прямому адресу работают
@@ -152,12 +191,16 @@ export const initHotelsApiCatalog = () => {
    *   страницам, где новые карточки начинаются выше экрана. Смена фильтров
    *   этого не делает: панель и карта должны остаться там, где на них смотрят.
    */
-  const load = async (href, push, scroll = false) => {
+  const load = async (href, push, scroll = false, partial = false) => {
     const target = parseUrl(href, baseUrl);
     if (!target) return false;
 
     const ticket = ++request;
-    root.classList.add("is-loading");
+
+    /* Гасим только список карточек: фильтры остаются живыми — по ним
+       продолжают кликать, пока грузится выдача. */
+    const rows = root.querySelector(".js-hotels-rows") || root;
+    rows.classList.add("is-loading");
 
     try {
       const json = await fetchCatalog(target.page, target.resort, target.query);
@@ -169,10 +212,17 @@ export const initHotelsApiCatalog = () => {
         throw new Error("empty response");
       }
 
-      const restore = keepPanelState(root);
-      root.innerHTML = json.data.html;
-      restore();
-      initHotelsMap();
+      /* Набор в поиске меняет только выдачу. Перерисовывать вместе с ней
+         панель фильтров нельзя: поле пересоздаётся, каретка прыгает в начало,
+         и продолжать печатать невозможно. */
+      if (partial && swapResults(root, json.data.html)) {
+        initHotelsMap();
+      } else {
+        const restore = keepPanelState(root);
+        root.innerHTML = json.data.html;
+        restore();
+        initHotelsMap();
+      }
 
       // Сервер вернул заглушки — доспрашиваем каталог тем же путём.
       if (root.querySelector(".js-hotels-retry")) {
@@ -193,7 +243,7 @@ export const initHotelsApiCatalog = () => {
       // Не смогли подгрузить — уходим по ссылке обычным переходом.
       return false;
     } finally {
-      if (ticket === request) root.classList.remove("is-loading");
+      if (ticket === request) rows.classList.remove("is-loading");
     }
   };
 
@@ -205,13 +255,16 @@ export const initHotelsApiCatalog = () => {
     const more = root.querySelector(".js-hotels-more");
     if (!more || more.classList.contains("is-loading")) return;
 
-    const target = parseUrl(more.dataset.next, baseUrl);
-    if (!target) return;
+    /* Следующая порция берётся по номеру страницы: постраничных адресов у
+       каталога нет, и в истории остаётся один URL. */
+    const page = Number(more.dataset.nextPage || 0);
+    const current = parseUrl(window.location.href, baseUrl);
+    if (!page || !current) return;
 
     more.classList.add("is-loading");
 
     try {
-      const json = await fetchCatalog(target.page, target.resort, target.query);
+      const json = await fetchCatalog(page, current.resort, current.query);
       if (!json?.success || !json.data?.html) throw new Error("empty response");
 
       const parsed = new DOMParser().parseFromString(json.data.html, "text/html");
@@ -222,19 +275,13 @@ export const initHotelsApiCatalog = () => {
 
       list.append(...rows.children);
 
-      // Кнопку и пагинацию заменяем на пришедшие: в них следующий адрес.
+      // Кнопку заменяем на пришедшую: в ней номер следующей порции.
       const nextMore = parsed.querySelector(".js-hotels-more");
       if (nextMore) {
         more.replaceWith(nextMore);
       } else {
         more.remove();
       }
-
-      const pagination = root.querySelector(".country-hotels__pagination");
-      const nextPagination = parsed.querySelector(".country-hotels__pagination");
-      if (pagination && nextPagination) pagination.replaceWith(nextPagination);
-
-      window.history.replaceState({ hotelsCatalog: true }, "", more.dataset.next || window.location.href);
     } catch (error) {
       more.classList.remove("is-loading");
     }

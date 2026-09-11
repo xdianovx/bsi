@@ -779,6 +779,25 @@ function bsi_hotel_view_room_deals(array $room): array
 }
 
 /**
+ * Готовая плашка отеля: иконка Lucide плюс подпись.
+ *
+ * Вызывается из шапки, карточки номера и карточки каталога — разметка одна,
+ * чтобы значок не разъезжался между страницами.
+ */
+function bsi_hotel_view_badge(string $modifier, string $label, string $icon = '', string $title = ''): string
+{
+  $svg = $icon !== '' && function_exists('bsi_lucide_icon') ? bsi_lucide_icon($icon) : '';
+
+  return sprintf(
+    '<span class="hp-badge hp-badge--%s"%s>%s%s</span>',
+    esc_attr($modifier),
+    $title !== '' ? ' title="' . esc_attr($title) . '"' : '',
+    $svg,
+    esc_html($label)
+  );
+}
+
+/**
  * Что у всех номеров одинаково: подтверждение и срок спецпредложения.
  *
  * Когда отель продаётся целиком под запрос и по одному сроку — а так чаще

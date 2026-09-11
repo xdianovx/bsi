@@ -47,12 +47,9 @@ function bsi_hotels_api_seo_resort_meta(array $data): array
 {
   $name = $data['resort']['name'];
   $country = $data['country']->post_title;
-  $paged = (int) get_query_var('paged');
 
+  /* Постраничных адресов у каталога нет — приписки «страница N» тоже. */
   $title = "Отели: {$name}, {$country}";
-  if ($paged > 1) {
-    $title .= ' — страница ' . $paged;
-  }
 
   return [
     'title' => $title . ' | ' . get_bloginfo('name'),
@@ -152,11 +149,6 @@ function bsi_hotels_api_seo_current_url(): string
     $resort['resort']['slug']
   );
 
-  $paged = (int) get_query_var('paged');
-  if ($paged > 1) {
-    $url = trailingslashit($url . 'page/' . $paged);
-  }
-
   return $url;
 }
 
@@ -253,48 +245,6 @@ add_filter('wpseo_breadcrumb_links', function (array $links): array {
 
   return $trail;
 }, 20);
-
-/**
- * rel=prev/next для пагинации каталога отелей. Яндекс по ним связывает
- * страницы одного списка.
- */
-add_action('wp_head', 'bsi_hotels_api_seo_pagination_links', 2);
-function bsi_hotels_api_seo_pagination_links(): void
-{
-  if (!get_query_var('country_hotels') || bsi_hotels_api_seo_hotel()) {
-    return;
-  }
-
-  $country_slug = (string) get_query_var('country_hotels');
-  $country = get_page_by_path($country_slug, OBJECT, 'country');
-  if (!$country instanceof WP_Post) {
-    return;
-  }
-
-  $catalog = bsi_hotels_api_catalog_query($country);
-  $pages = (int) ($catalog['list']['pages'] ?? 0);
-  if ($pages < 2) {
-    return;
-  }
-
-  $paged = max(1, (int) get_query_var('paged'));
-
-  $base = bsi_hotels_api_catalog_url($country);
-  $resort = bsi_hotels_api_seo_resort();
-  if ($resort) {
-    $base = bsi_hotels_api_resort_url($base, $resort['resort']['slug']);
-  }
-
-  $page_url = static fn(int $n): string => $n > 1 ? trailingslashit($base . 'page/' . $n) : $base;
-
-  if ($paged > 1) {
-    printf('<link rel="prev" href="%s">' . "\n", esc_url($page_url($paged - 1)));
-  }
-
-  if ($paged < $pages) {
-    printf('<link rel="next" href="%s">' . "\n", esc_url($page_url($paged + 1)));
-  }
-}
 
 /**
  * Разметка каталога: ItemList с отелями текущей страницы.

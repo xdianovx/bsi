@@ -205,7 +205,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 4но мpx;
+  gap: 4px;
   border-radius: 20px;
   overflow: hidden;
   max-height: 420px;
@@ -722,7 +722,7 @@ $hp-nav-offset: 76px;
   color: #8a5a00;
 }
 
-.hp-badge--limited svg {
+.hp-badge svg {
   width: 14px;
   height: 14px;
   flex-shrink: 0;

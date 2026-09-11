@@ -61,7 +61,7 @@ $rooms = (int) ($hotel['room_types'] ?? 0);
       <?php if ($price): ?>
         <span class="api-hotel__price">от <?= esc_html($price); ?> за ночь</span>
       <?php elseif ($rooms): ?>
-        <span class="api-hotel__price api-hotel__price--empty">Цену уточним по запросу</span>
+        <span class="api-hotel__price api-hotel__price--empty">По запросу</span>
       <?php endif; ?>
     </div>
   </div>

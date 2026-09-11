@@ -243,6 +243,34 @@ function bsi_hotels_api_catalog_query(
 }
 
 /**
+ * Старые постраничные адреса каталога отелей — 301 на сам каталог.
+ *
+ * Пагинации у каталога больше нет: список догружается кнопкой «Показать ещё»,
+ * адрес всегда один. Ссылки вида `/hotel/page/2/` остались в индексе и в чужих
+ * ссылках, и без этого правила они отдавали бы 404.
+ */
+add_action('template_redirect', static function (): void {
+  $uri = (string) ($_SERVER['REQUEST_URI'] ?? '');
+  $path = (string) parse_url($uri, PHP_URL_PATH);
+
+  if (!preg_match('~^(.*/hotel(?:/kurort/[^/]+)?)/page/\d+/?$~', $path, $m)) {
+    return;
+  }
+
+  /* Путь уже содержит подкаталог установки, поэтому home_url() тут не нужен:
+     иначе к адресу приклеится второй префикс сайта. */
+  $target = trailingslashit($m[1]);
+
+  $query = (string) parse_url($uri, PHP_URL_QUERY);
+  if ($query !== '') {
+    $target .= '?' . $query;
+  }
+
+  wp_safe_redirect($target, 301);
+  exit;
+}, 1);
+
+/**
  * Точки для карты каталога: все отели направления с координатами.
  *
  * Пока хаб не отдаёт /v1/hotels/map, карта строится по отелям текущей страницы —

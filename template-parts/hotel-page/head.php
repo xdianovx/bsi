@@ -89,16 +89,13 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
                    к продаже прямо сейчас. За окном хаба места обычно находятся. */ ?>
           <?php if (!empty($view['limited'])): ?>
             <p class="hp-head__price-note">
-              <span class="hp-badge hp-badge--limited">
-                <?= bsi_lucide_icon('zap'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- инлайновая иконка Lucide ?>
-                Мало мест
-              </span>
+              <?= bsi_hotel_view_badge('limited', 'Мало мест', 'zap'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
             </p>
           <?php endif; ?>
 
           <?php if (!empty($view['instant_price_from'])): ?>
             <p class="hp-head__price-instant">
-              <span class="hp-badge hp-badge--instant">Мгновенное подтверждение</span>
+              <?= bsi_hotel_view_badge('instant', 'Мгновенное подтверждение', 'circle-check'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
               от <?= esc_html(bsi_hotel_view_price($view['instant_price_from'])); ?>
             </p>
           <?php endif; ?>

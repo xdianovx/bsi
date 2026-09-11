@@ -507,7 +507,7 @@
   gap: 20px;
   min-width: 0;
   background: $bg-gray;
-  padding: 20px 16px 40px max($container-padding, calc((100vw - #{$container}) / 2));
+  padding: 0 16px 40px max($container-padding, calc((100vw - #{$container}) / 2));
 
   /* Отступ слева больше не тянется к середине контейнера: на 1440 он съедал
      сотню пикселей у колонки, которой их и не хватало. */
@@ -1120,12 +1120,18 @@ body.is-hotels-map-open {
   line-height: 1.3;
 }
 
-/* Второй бейдж встаёт под первым: «Популярный» и «Мгновенное подтверждение»
-   приходят вместе. */
-.api-row__badge--instant {
-  top: auto;
-  bottom: 10px;
-  color: #2e7d32;
+/* Метки отеля идут строкой в теле карточки, поверх фото их не кладём. */
+/* Пока грузится выдача, гасим только карточки: фильтры и карта остаются
+   рабочими. Спиннер общий из scss/ui/preloader.scss. */
+.hotels-catalog__rows.is-loading {
+  min-height: 200px;
+}
+
+.api-row__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
 }
 
 /* Цены отеля обновляются в хабе прямо сейчас. */

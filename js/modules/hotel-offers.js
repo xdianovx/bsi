@@ -43,6 +43,9 @@ const nightsLabel = (nights) => {
   return `${nights} ночей`;
 };
 
+const CHECK_ICON =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+
 /** Строка тарифа: условия слева, срок и сумма справа. */
 const offerRow = (offer, nights) => {
   const placement = offer.placementLabel
@@ -51,8 +54,10 @@ const offerRow = (offer, nights) => {
 
   /* Подтверждение приходит вместе с расчётом заезда: до выбора дат хаб знает
      его только по отдельным ночам. */
+  /* Тот же значок, что рисует bsi_hotel_view_badge() на сервере: иконка Lucide
+     circle-check плюс подпись. */
   const confirmation = offer.confirmationLabel
-    ? `<span class="hp-badge hp-badge--${escapeHtml(offer.confirmation)}">${escapeHtml(offer.confirmationLabel)}</span>`
+    ? `<span class="hp-badge hp-badge--${escapeHtml(offer.confirmation)}">${CHECK_ICON}${escapeHtml(offer.confirmationLabel)}</span>`
     : "";
 
   return `

@@ -77,7 +77,7 @@ foreach ($calendar as $date => $entry) {
       <?php if ($common_confirmation !== '' || $common_until !== '' || $common['early_booking']): ?>
         <ul class="hp-rooms__terms">
           <?php if ($common_confirmation !== ''): ?>
-            <li class="hp-badge hp-badge--<?= esc_attr($common['confirmation']); ?>"><?= esc_html($common_confirmation); ?></li>
+            <li><?= bsi_hotel_view_badge($common['confirmation'], $common_confirmation, 'circle-check'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?></li>
           <?php endif; ?>
           <?php if ($common['early_booking']): ?>
             <li class="hp-badge hp-badge--deal">Раннее бронирование</li>
@@ -205,14 +205,11 @@ foreach ($calendar as $date => $entry) {
               <h3 class="hp-room__title"><?= esc_html($room['name']); ?></h3>
 
               <?php if ($confirmation_label !== '' && $confirmation !== $common['confirmation']): ?>
-                <span class="hp-badge hp-badge--<?= esc_attr($confirmation); ?>"><?= esc_html($confirmation_label); ?></span>
+                <?= bsi_hotel_view_badge($confirmation, $confirmation_label, 'circle-check'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
               <?php endif; ?>
 
               <?php if (!empty($room['limited'])): ?>
-                <span class="hp-badge hp-badge--limited" title="На ближайшие даты мест нет. Выберите даты — проверим наличие у оператора">
-                  <?= bsi_lucide_icon('zap'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- инлайновая иконка Lucide ?>
-                  Мало мест
-                </span>
+                <?= bsi_hotel_view_badge('limited', 'Мало мест', 'zap', 'На ближайшие даты мест нет. Выберите даты — проверим наличие у оператора'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
               <?php endif; ?>
             </div>
 

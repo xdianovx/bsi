@@ -128,15 +128,11 @@ $has_more = $paged < (int) $list['pages'];
           <?php endforeach; ?>
         </div>
 
+        <?php /* Постраничных адресов у каталога нет: следующая порция
+                 догружается по номеру страницы, адрес остаётся одним. */ ?>
         <?php if ($has_more): ?>
-          <?php
-          $next_url = trailingslashit($base_url) . 'page/' . ($paged + 1) . '/';
-          if ($filters_query) {
-            $next_url = add_query_arg($filters_query, $next_url);
-          }
-          ?>
-          <div class="hotels-catalog__more js-hotels-more" data-next="<?= esc_url($next_url); ?>">
-            <a class="btn btn-gray hotels-catalog__more-btn" href="<?= esc_url($next_url); ?>">Показать ещё</a>
+          <div class="hotels-catalog__more js-hotels-more" data-next-page="<?= (int) ($paged + 1); ?>">
+            <button type="button" class="btn btn-gray hotels-catalog__more-btn">Показать ещё</button>
           </div>
         <?php endif; ?>
 
