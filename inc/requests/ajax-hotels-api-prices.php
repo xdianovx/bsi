@@ -49,28 +49,11 @@ function bsi_hotels_api_prices_ajax(): void
 
   $prices = [];
 
-  /* Сколько карточек за раз дозапрашиваем по прайсу: каждая — отдельный запрос
-     карточки отеля, и пачку надо держать в разумных рамках. */
-  $price_list_budget = 12;
-
   foreach ($items as $id => $item) {
     $status = (string) ($item['prices_status'] ?? '');
-    $price = bsi_hotels_api_format_price($item['price_from'] ?? null);
-
-    $price_list = '';
-
-    /* Купить нечего, но цена может быть в тарифах: оператор держит
-       стоп-продажу на всё прогретое окно. Тогда показываем цену прайса с
-       меткой «Мало мест» — за окном места обычно находятся. Пока отель в
-       очереди на обновление, ждём: цена вот-вот приедет нормальным путём. */
-    if ($price === '' && $status !== 'updating' && $price_list_budget > 0) {
-      $price_list_budget--;
-      $price_list = bsi_hotels_api_format_price($client->priceListFrom((int) $id));
-    }
 
     $prices[$id] = [
-      'price' => $price,
-      'priceList' => $price_list,
+      'price' => bsi_hotels_api_format_price($item['price_from'] ?? null),
       'instantPrice' => bsi_hotels_api_format_price($item['instant_price_from'] ?? null),
       'status' => $status,
       /* Ждать дальше или остановиться — решает фронт по этому флагу,

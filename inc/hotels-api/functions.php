@@ -227,6 +227,7 @@ function bsi_hotels_api_catalog_query(
     )));
 
     $result['list']['items'] = bsi_hotels_api_filter_items($result['list']['items']);
+    $result['list']['items'] = bsi_hotels_api_fill_price_list($result['list']['items'], $client);
   } catch (HotelsApiException $e) {
     $result['error'] = $e->getMessage();
   }
@@ -240,6 +241,46 @@ function bsi_hotels_api_catalog_query(
   }
 
   return $cache[$key] = $result;
+}
+
+/**
+ * Цена из прайса для отелей, которым нечего продать.
+ *
+ * Список отдаёт только `price_from` — цену, которую можно купить. Когда оператор
+ * держит стоп-продажу на всё прогретое окно, она пустая, хотя в тарифах цена
+ * есть. Читаем её из карточки отеля, чтобы каталог показал «от 35 $» с меткой
+ * «Мало мест», а не голое «По запросу».
+ *
+ * Отель в статусе `updating` не трогаем: его цена вот-вот приедет обычным путём.
+ * Бюджет запросов ограничен — карточка отеля тяжёлая, и десяток дозапросов на
+ * страницу это потолок.
+ *
+ * Хаб обещал отдавать эту цену прямо в списке (пункт 07 ТЗ) — тогда функция
+ * станет не нужна.
+ */
+function bsi_hotels_api_fill_price_list(array $items, HotelsApiClient $client): array
+{
+  $budget = 12;
+
+  foreach ($items as &$item) {
+    if ($budget <= 0) {
+      break;
+    }
+
+    if (!empty($item['price_from']) || ($item['prices_status'] ?? '') === 'updating') {
+      continue;
+    }
+
+    $budget--;
+    $price = $client->priceListFrom((int) ($item['id'] ?? 0));
+
+    if ($price) {
+      $item['price_list_from'] = ['amount' => $price['amount'], 'currency' => $price['currency']];
+    }
+  }
+  unset($item);
+
+  return $items;
 }
 
 /**
