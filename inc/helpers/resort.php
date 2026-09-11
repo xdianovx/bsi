@@ -587,7 +587,7 @@ if (!function_exists('bsi_resort_section_min_items')) {
    */
   function bsi_resort_section_min_items(): int
   {
-    return 8;
+    return 5;
   }
 }
 
