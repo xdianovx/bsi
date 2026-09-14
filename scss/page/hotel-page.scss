@@ -716,12 +716,6 @@ $hp-nav-offset: 76px;
 
 /* Модификатора для `request` нет намеренно: бронь под запрос не подписывается. */
 
-/* Мест на ближайшие даты нет, цена — из прайса оператора. */
-.hp-badge--limited {
-  background: #fbeccd;
-  color: #8a5a00;
-}
-
 .hp-badge svg {
   width: 14px;
   height: 14px;
@@ -733,9 +727,6 @@ $hp-nav-offset: 76px;
   stroke-linejoin: round;
 }
 
-.hp-head__price-note {
-  margin: 8px 0 0;
-}
 
 /* Общие для всех номеров условия — строкой под заголовком блока. */
 .hp-rooms__terms {

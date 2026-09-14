@@ -207,10 +207,6 @@ foreach ($calendar as $date => $entry) {
               <?php if ($confirmation_label !== '' && $confirmation !== $common['confirmation']): ?>
                 <?= bsi_hotel_view_badge($confirmation, $confirmation_label, 'circle-check'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
               <?php endif; ?>
-
-              <?php if (!empty($room['limited'])): ?>
-                <?= bsi_hotel_view_badge('limited', 'Мало мест', 'zap', 'На ближайшие даты мест нет. Выберите даты — проверим наличие у оператора'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
-              <?php endif; ?>
             </div>
 
             <?php

@@ -20,9 +20,6 @@ $stars = (int) ($hotel['stars'] ?? 0);
 $city = (string) ($hotel['city']['name'] ?? '');
 $price = bsi_hotels_api_format_price($hotel['price_from'] ?? null);
 
-/* Купить нечего, но цена есть в прайсе оператора: он держит стоп-продажу на
-   прогретое окно. Показываем её с меткой — за окном места обычно находятся. */
-$price_list = $price === '' ? bsi_hotels_api_format_price($hotel['price_list_from'] ?? null) : '';
 $beach_line = (int) ($hotel['beach_line'] ?? 0);
 $type = (string) ($hotel['type']['name'] ?? '');
 $id = (string) ($hotel['id'] ?? '');
@@ -146,9 +143,6 @@ $prices_updating = ($hotel['prices_status'] ?? '') === 'updating';
           <span class="api-row__price-label">
             за ночь<?php if ($prices_updating): ?> · уточняется<?php endif; ?>
           </span>
-        <?php elseif ($price_list !== ''): ?>
-          <span class="api-row__price">от <?= esc_html($price_list); ?></span>
-          <?= bsi_hotel_view_badge('limited', 'Мало мест', 'zap', 'На ближайшие даты мест нет. Выберите даты — проверим наличие у оператора'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- готовая плашка ?>
         <?php else: ?>
           <?php /* Крутилку не рисуем: у хаба одна очередь на всю базу, и отель
                    в ней может стоять часами — ждущий спиннер на половине

@@ -28,7 +28,6 @@ function bsi_hotel_view_defaults(): array
     'id' => 0,              // id отеля в хабе; 0 — отель из WordPress
     'price_from' => null,   // ['amount' => float, 'currency' => 'USD']
     'instant_price_from' => null, // самая дешёвая ночь с мгновенным подтверждением
-    'limited' => false,     // мест на ближайшие даты нет, цена — из прайса оператора
     'building' => [],       // ['rooms_count' => ?int, 'floors_count' => ?int, ...]
     'booking_url' => '',
     'booking' => [],        // [['label' => '', 'url' => ''], ...] — кнопки брони
@@ -155,11 +154,6 @@ function bsi_hotel_view_from_api(array $hotel, WP_Post $country): array
      запасным — у отелей без календаря поля нет. */
   $view['price_from'] = bsi_hotel_view_price_value($hotel['price_from'] ?? null)
     ?? bsi_hotel_view_price_from($view['rooms']);
-
-  /* Ни один номер нельзя купить на ближайшие даты — цену показываем из прайса. */
-  $view['limited'] = empty($hotel['price_from'])
-    && $view['rooms']
-    && !array_filter($view['rooms'], static fn(array $room) => empty($room['limited']) && $room['price_from']);
 
   /* Цена ночей, которые оператор подтверждает сразу. Обычно выше `price_from`:
      дешёвое чаще идёт под запрос. null — гарантированных ночей нет. */
@@ -375,12 +369,7 @@ function bsi_hotel_view_api_rooms(array $hotel): array
       'amenities' => bsi_hotel_view_api_room_amenities($room),
       'meals' => bsi_hotel_view_api_room_meals($room),
       'availability' => bsi_hotel_view_api_availability($room),
-      'price_from' => bsi_hotel_view_price_value($room['price_from'] ?? null)
-        ?? bsi_hotel_view_rate_price($room),
-      /* Цены в тарифах есть, а мест в прогретом окне нет: оператор держит
-         стоп-продажу (`available: 0`). Окно у хаба — около двух недель, дальше
-         по датам места обычно находятся, поэтому цену показываем, но с меткой. */
-      'limited' => empty($room['price_from']) && bsi_hotel_view_rate_price($room) !== null,
+      'price_from' => bsi_hotel_view_price_value($room['price_from'] ?? null),
       'instant_price_from' => bsi_hotel_view_price_value($room['instant_price_from'] ?? null),
       'booking_url' => bsi_hotel_view_booking_url($room['booking'] ?? null),
     ];
@@ -532,33 +521,6 @@ function bsi_hotel_view_api_room_meals(array $room): array
   }
 
   return $meals;
-}
-
-/**
- * Самая дешёвая цена из тарифов номера, включая ночи со стоп-продажей.
- *
- * `availability` хаб собирает только из того, что можно купить сейчас, а
- * `rates` — весь прайс оператора на прогретое окно. Когда мест в окне нет,
- * цена из прайса остаётся единственным ориентиром для гостя.
- *
- * @return array{amount: float, currency: string}|null
- */
-function bsi_hotel_view_rate_price(array $room): ?array
-{
-  $min = null;
-
-  foreach ((array) ($room['rates'] ?? []) as $rate) {
-    $amount = (float) ($rate['price'] ?? 0);
-    if ($amount <= 0) {
-      continue;
-    }
-
-    if ($min === null || $amount < $min['amount']) {
-      $min = ['amount' => $amount, 'currency' => (string) ($rate['base_currency'] ?? '')];
-    }
-  }
-
-  return $min;
 }
 
 /**
