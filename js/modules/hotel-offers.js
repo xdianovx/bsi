@@ -252,6 +252,8 @@ export const initHotelOffers = () => {
   nightsSelect.addEventListener("change", () => {
     state.nights = Number(nightsSelect.value);
     apply();
+    // Календарь перечитает показанный месяц под новую длительность.
+    form.dispatchEvent(new CustomEvent("bsi-hotel-nights"));
   });
 
   mealSelect?.addEventListener("change", () => {
@@ -269,9 +271,14 @@ export const initHotelOffers = () => {
 /**
  * Календарь заезда.
  *
- * Дни, которые хаб уже посчитал, подписаны ценой за ночь и числом свободных
- * номеров. Остальные дни не заняты — про них просто не спрашивали, поэтому они
- * тоже выбираются: цену на такой день считает `/quote`.
+ * Дни подписаны ценой за весь заезд выбранной длительности: показанный месяц
+ * целиком спрашивается у хаба (`bsi_hotels_api_search` → `/v1/hotels/{id}/search`),
+ * тот идёт к оператору вживую и помнит ответ час. Дни, которых в ответе нет,
+ * гасим: у оператора на них предложений нет, и клик по такому дню вернул бы
+ * пустой расчёт.
+ *
+ * Пока месяц не спрошен, день подписан ночной ставкой из `data-prices` — тем,
+ * что хаб успел прогреть к рендеру страницы, — и остаётся выбираемым.
  */
 const initCalendar = (form, state, apply) => {
   const field = form.querySelector(".js-hotel-range-field");
@@ -292,14 +299,57 @@ const initCalendar = (form, state, apply) => {
   field.hidden = false;
   if (dateField) dateField.hidden = true;
 
-  return flatpickr(input, {
+  /** Сегодняшняя полночь: раньше неё заезда не бывает. */
+  const today = () => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  };
+
+  /* Ответы хаба по месяцам: ключ «2026-10 × 7 ночей». Возврат к уже
+     спрошенному месяцу ничего не стоит, а хаб и так помнит его час. */
+  const months = new Map();
+  const monthKey = (year, month, nights) =>
+    `${year}-${String(month + 1).padStart(2, "0")}-${nights}`;
+
+  const loaded = (date) => months.get(monthKey(date.getFullYear(), date.getMonth(), state.nights));
+
+  /* Месяц спрошен, а дня в ответе нет — у оператора на него предложений нет.
+     Непрошенный месяц не гасим: про него просто ещё не спрашивали. */
+  const isOff = (date) => {
+    const answer = loaded(date);
+    return Boolean(answer) && !answer[isoDate(date)];
+  };
+
+  /* Каждая загрузка получает номер: пока ходим к хабу, гость успевает
+     пролистать месяцы, и опоздавший ответ перерисовывать нечего. */
+  let request = 0;
+
+  const picker = flatpickr(input, {
     locale: Russian,
     dateFormat: "d.m.Y",
     minDate: "today",
     defaultDate: toDate(state.date),
     showMonths: window.innerWidth > 900 ? 2 : 1,
+    disable: [isOff],
     onDayCreate: (_selected, _str, _instance, dayElem) => {
-      const known = prices[isoDate(dayElem.dateObj)];
+      /* Прошедшие дни календарь гасит сам, и «нет предложений» про них
+         сказать нельзя: хаб мы спрашиваем только про будущее. Проверяем дату,
+         а не класс `flatpickr-disabled`: его получают и дни без предложений. */
+      if (dayElem.dateObj < today()) return;
+
+      const iso = isoDate(dayElem.dateObj);
+      const answer = loaded(dayElem.dateObj);
+      const day = answer ? answer[iso] : null;
+
+      if (answer && !day) {
+        dayElem.classList.add("is-off");
+        return;
+      }
+
+      /* Цена за весь заезд, пока месяц не спрошен — ночная ставка из прогрева.
+         Подписи разные по смыслу, поэтому за ценой хаба ставим метку. */
+      const known = day || prices[iso];
       if (!known) return;
 
       dayElem.classList.add("is-priced");
@@ -309,6 +359,9 @@ const initCalendar = (form, state, apply) => {
       label.textContent = known.price;
       dayElem.appendChild(label);
     },
+    onReady: (_selected, _str, instance) => loadVisible(instance),
+    onMonthChange: (_selected, _str, instance) => loadVisible(instance),
+    onYearChange: (_selected, _str, instance) => loadVisible(instance),
     onChange: (selected) => {
       if (!selected.length) return;
 
@@ -316,6 +369,75 @@ const initCalendar = (form, state, apply) => {
       apply();
     },
   });
+
+  /** Спрашивает хаб про показанные месяцы: по одному, диапазон шире 31 дня он не берёт. */
+  async function loadVisible(instance) {
+    const first = new Date(instance.currentYear, instance.currentMonth, 1);
+    const shown = instance.config.showMonths || 1;
+
+    for (let i = 0; i < shown; i++) {
+      await loadMonth(instance, first.getFullYear(), first.getMonth() + i);
+    }
+  }
+
+  async function loadMonth(instance, year, month) {
+    const nights = state.nights;
+    const key = monthKey(year, month, nights);
+
+    if (months.has(key)) return;
+
+    const from0 = today();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    // Прошлый месяц гостю недоступен, спрашивать про него нечего.
+    if (lastDay < from0) return;
+
+    const from = firstDay < from0 ? from0 : firstDay;
+    const ticket = ++request;
+
+    field.classList.add("is-loading");
+
+    let payload = null;
+    try {
+      const body = new URLSearchParams({
+        action: "bsi_hotels_api_search",
+        hotel: form.dataset.hotel,
+        check_in_from: isoDate(from),
+        check_in_to: isoDate(lastDay),
+        nights: String(nights),
+      });
+
+      const ajaxUrl = window.ajax?.url || window.ajaxurl || "/wp-admin/admin-ajax.php";
+
+      const response = await fetch(ajaxUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+      });
+
+      payload = await response.json();
+    } catch (error) {
+      payload = null;
+    }
+
+    if (ticket === request) {
+      field.classList.remove("is-loading");
+    }
+
+    /* Хаб не ответил — оставляем месяц неспрошенным: подписи из прогрева
+       остаются, и ни один день не гаснет по нашей ошибке. */
+    if (!payload?.success || Number(payload.data.nights) !== nights) return;
+
+    months.set(key, payload.data.days || {});
+    instance.redraw();
+  }
+
+  /* Другая длительность — другие цены и другие свободные дни: ответы прошлой
+     длительности лежат под своим ключом, показанный месяц спрашиваем заново. */
+  form.addEventListener("bsi-hotel-nights", () => loadVisible(picker));
+
+  return picker;
 };
 
 /**
@@ -351,6 +473,8 @@ const initReset = (form, { dateSelect, nightsSelect, mealSelect, calendar, state
     calendar?.setDate(toDate(initial.date), false);
 
     apply();
+    // Длительность вернулась к исходной — календарю снова нужен свой месяц.
+    form.dispatchEvent(new CustomEvent("bsi-hotel-nights"));
     sync();
   });
 

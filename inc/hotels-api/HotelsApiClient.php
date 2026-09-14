@@ -165,6 +165,33 @@ class HotelsApiClient
   }
 
   /**
+   * Свободные заезды отеля на диапазон дат и длительностей.
+   *
+   * Тот же вопрос, что форма поиска на сайте оператора, только по одному
+   * отелю: хаб спрашивает его вживую и помнит ответ час. Первый запрос
+   * занимает секунды, повтор отдаётся мгновенно.
+   *
+   * Кеша тут нет по той же причине, что у `quote()`: час помнит сам хаб,
+   * а наш слой только состарил бы цены.
+   *
+   * @param array{check_in_from: string, check_in_to?: string, nights_from: int,
+   *              nights_to?: int, adults?: int, children?: int} $params
+   * @return array{calendar: array, offers: array, complete: bool, refreshed: bool}
+   * @throws HotelsApiException 400 — диапазон шире 31 дня или 14 длительностей
+   */
+  public function search(int $hotelId, array $params): array
+  {
+    $data = $this->get('/v1/hotels/' . $hotelId . '/search', $params, 0);
+
+    return [
+      'calendar' => is_array($data['calendar'] ?? null) ? $data['calendar'] : [],
+      'offers' => is_array($data['offers'] ?? null) ? $data['offers'] : [],
+      'complete' => (bool) ($data['complete'] ?? false),
+      'refreshed' => (bool) ($data['refreshed'] ?? false),
+    ];
+  }
+
+  /**
    * Цены нескольких отелей и ничего больше.
    *
    * Ответ в двести раз легче страницы каталога, поэтому им и догружают цены

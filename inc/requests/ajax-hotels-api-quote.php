@@ -27,14 +27,17 @@ function bsi_hotels_api_quote_ajax(): void
     wp_send_json_error(['message' => 'Неверные параметры запроса'], 400);
   }
 
+  /* Холодная дата уходит к поставщику, и ответ занимает секунды. Ждём дольше
+     обычного, но с запасом до предела веб-сервера.
+
+     Фильтр стоит до bsi_hotels_api(): таймаут читается в конструкторе клиента,
+     а клиент живёт один на запрос — поставленный после него фильтр опоздал бы. */
+  add_filter('bsi_hotels_api_timeout', static fn() => 20);
+
   $client = bsi_hotels_api();
   if (!$client) {
     wp_send_json_error(['message' => 'Хаб отелей не настроен'], 503);
   }
-
-  /* Холодная дата уходит к поставщику, и ответ занимает секунды. Ждём дольше
-     обычного, но с запасом до предела веб-сервера. */
-  add_filter('bsi_hotels_api_timeout', static fn() => 20);
 
   try {
     $quote = $client->quote($hotel_id, $check_in, $nights);

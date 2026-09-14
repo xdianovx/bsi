@@ -514,6 +514,7 @@ require get_template_directory() . '/inc/requests/ajax-hotel-request.php';
 require get_template_directory() . '/inc/requests/ajax-hotels-api-catalog.php';
 require get_template_directory() . '/inc/requests/ajax-hotels-api-quote.php';
 require get_template_directory() . '/inc/requests/ajax-hotels-api-prices.php';
+require get_template_directory() . '/inc/requests/ajax-hotels-api-search.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
 add_filter('template_include', function ($template) {
