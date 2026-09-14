@@ -387,6 +387,7 @@ require get_template_directory() . '/inc/helpers/country-section-singular.php';
 require get_template_directory() . '/inc/helpers/agency-events.php';
 require get_template_directory() . '/inc/helpers/pagination.php';
 require get_template_directory() . '/inc/helpers/orphan-country-guard.php';
+require get_template_directory() . '/inc/helpers/webp.php';
 require get_template_directory() . '/inc/helpers/resort.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
@@ -406,6 +407,7 @@ require get_template_directory() . '/inc/admin/menu-hubs.php';
 /* Инструменты → «Импорт экскурсий»: заливка JSON старого сайта (на проде только FTP). */
 require get_template_directory() . '/inc/admin/legacy-excursions-import.php';
 require get_template_directory() . '/inc/admin/legacy-sights-import.php';
+require get_template_directory() . '/inc/admin/webp-convert.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/disable-comments.php';

@@ -22,7 +22,8 @@ add_action('acf/init', function () {
                         'label' => 'Изображение',
                         'name' => 'img',
                         'type' => 'image',
-                        'return_format' => 'url',
+                        /* ID, а не URL: шаблону нужны srcset и размеры оригинала. */
+                        'return_format' => 'id',
                         'preview_size' => 'medium',
                         'library' => 'all',
                         'wrapper' => ['width' => '50'],
@@ -32,7 +33,8 @@ add_action('acf/init', function () {
                         'label' => 'Мобильный баннер',
                         'name' => 'mobilnyj_banner',
                         'type' => 'image',
-                        'return_format' => 'url',
+                        /* ID, а не URL: шаблону нужны srcset и размеры оригинала. */
+                        'return_format' => 'id',
                         'preview_size' => 'medium',
                         'library' => 'all',
                         'wrapper' => ['width' => '50'],

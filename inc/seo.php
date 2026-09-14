@@ -1559,7 +1559,9 @@ function bsi_seo_social_image_url(): string
         $banners = ($front_id && function_exists('get_field')) ? get_field('banners', $front_id) : [];
         if (is_array($banners)) {
             foreach ($banners as $banner) {
-                $cached = bsi_seo_social_image_accept((string) ($banner['img'] ?? ''));
+                /* Поле отдаёт ID вложения (custom-fields/pages/main-banners.php). */
+                $banner_url = wp_get_attachment_image_url((int) ($banner['img'] ?? 0), 'full');
+                $cached = bsi_seo_social_image_accept((string) ($banner_url ?: ''));
                 if ($cached !== '') {
                     return $cached;
                 }
