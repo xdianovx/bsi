@@ -247,6 +247,16 @@ $countries = [
     ],
     'subtype_regions' => [],
   ],
+  'are' => [
+    'legacy_id' => 2,
+    'country_slug' => 'oae',
+    'default_region' => null,
+    'cities' => [
+      'Дубай' => 'Дубай',
+      'Абу-Даби' => 'Абу-Даби',
+    ],
+    'subtype_regions' => [],
+  ],
 ];
 
 if (!isset($countries[$country_code])) {

@@ -18,13 +18,16 @@ if (PHP_SAPI !== 'cli') {
   exit("CLI only\n");
 }
 
-$options = getopt('', ['country:', 'out:', 'host:', 'port:', 'user:', 'pass:', 'db:', 'with-hidden']);
+$options = getopt('', ['country:', 'out:', 'host:', 'port:', 'user:', 'pass:', 'db:', 'with-hidden', 'skip-empty']);
 
 $country_code = strtolower((string) ($options['country'] ?? 'gbr'));
 
 /* На старом сайте скрытыми лежат записи без описания (одни названия).
    Забираем их только по флагу — импорт заведёт их черновиками. */
 $with_hidden = isset($options['with-hidden']);
+
+/* Записи без описания в CPT не заводим — каталог они не наполняют. */
+$skip_empty = isset($options['skip-empty']);
 
 $db_host = (string) ($options['host'] ?? '127.0.0.1');
 $db_port = (int) ($options['port'] ?? 13306);
@@ -282,6 +285,27 @@ $countries = [
     ],
     'skip_title_patterns' => ['/по программе/iu'],
   ],
+  'are' => [
+    'legacy_id' => 2,
+    'country_slug' => 'oae',
+    'default_region' => null,
+    'cities' => [
+      'Дубай' => 'Дубай',
+      'Абу-Даби' => 'Абу-Даби',
+    ],
+    'skip_title_patterns' => ['/по программе/iu'],
+  ],
+  'idn' => [
+    'legacy_id' => 6221,
+    'country_slug' => 'indoneziya',
+    'default_region' => null,
+    'cities' => [
+      /* В источнике город указан только как остров — курорта из него не делаем. */
+      'о. Бали' => ['region' => 'Бали', 'resort' => null],
+      'о. Ява' => ['region' => 'Ява', 'resort' => null],
+    ],
+    'skip_title_patterns' => ['/по программе/iu'],
+  ],
 ];
 
 if (!isset($countries[$country_code])) {
@@ -391,6 +415,7 @@ function bsi_legacy_is_junk_title(string $title, array $patterns): bool
 /* Экскурсии */
 
 $skipped_junk = [];
+$skipped_empty = [];
 
 $visible_where = $with_hidden ? '' : ' AND e.E_VISIBLE = 1';
 
@@ -446,6 +471,14 @@ while ($row = $result->fetch_assoc()) {
     $resort = $city;
   }
 
+  $content = clean_legacy_html($row['content']);
+  $excerpt = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $row['excerpt'])));
+
+  if ($skip_empty && $content === '' && $excerpt === '') {
+    $skipped_empty[] = $title;
+    continue;
+  }
+
   $ids[] = $legacy_id;
 
   $items[$legacy_id] = [
@@ -453,8 +486,8 @@ while ($row = $result->fetch_assoc()) {
     /* Пустой slug — импорт сгенерирует его из заголовка (транслит через cyr2lat). */
     'slug' => (string) ($row['urlcode'] ?? ''),
     'title' => $title,
-    'content' => clean_legacy_html($row['content']),
-    'excerpt' => trim(preg_replace('/\s+/u', ' ', strip_tags((string) $row['excerpt']))),
+    'content' => $content,
+    'excerpt' => $excerpt,
     'duration_hours' => parse_duration_hours($row['length_raw']),
     'duration_raw' => trim((string) $row['length_raw']),
     'notes' => trim((string) $row['notes']),
@@ -575,6 +608,10 @@ printf(
   $without_region,
   $out_path
 );
+
+if ($skipped_empty) {
+  printf("Пропущено без описания: %d\n", count($skipped_empty));
+}
 
 if ($skipped_junk) {
   printf("Отсеяно не-экскурсий: %d (%s)\n", count($skipped_junk), implode('; ', array_slice($skipped_junk, 0, 5)) . (count($skipped_junk) > 5 ? '…' : ''));
