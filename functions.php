@@ -405,9 +405,9 @@ require get_template_directory() . '/inc/hidden-sections.php';
 /* Группировка админ-меню по хабам. */
 require get_template_directory() . '/inc/admin/menu-hubs.php';
 
-/* Инструменты → «Импорт экскурсий»: заливка JSON старого сайта (на проде только FTP). */
-require get_template_directory() . '/inc/admin/legacy-excursions-import.php';
-require get_template_directory() . '/inc/admin/legacy-sights-import.php';
+/* Настройки сайта → «Импорт со старого сайта»: заливка JSON (на проде только FTP).
+   Одна страница на экскурсии и достопримечательности сразу. */
+require get_template_directory() . '/inc/admin/legacy-import.php';
 require get_template_directory() . '/inc/admin/webp-convert.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';

@@ -1,10 +1,10 @@
 {
-    "generated_at": "2026-09-14T10:04:10+00:00",
-    "source": "past.bsigroup.ru (bitrix)",
+    "generated_at": "2026-09-14T14:16:19+00:00",
+    "source": "past.bsigroup.ru (bitrix): t_excursions + t_sights",
     "country_code": "idn",
     "country_slug": "indoneziya",
     "legacy_country_id": 6221,
-    "items": [
+    "excursions": [
         {
             "legacy_id": 8439,
             "slug": "DAVDAN_SHOW_VIP_mesta",
@@ -1115,5 +1115,6 @@
             "status": "publish",
             "tickets": []
         }
-    ]
+    ],
+    "sights": []
 }

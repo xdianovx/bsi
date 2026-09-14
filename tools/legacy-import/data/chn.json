@@ -1,10 +1,10 @@
 {
-    "generated_at": "2026-09-14T09:53:42+00:00",
-    "source": "past.bsigroup.ru (bitrix)",
+    "generated_at": "2026-09-14T14:16:19+00:00",
+    "source": "past.bsigroup.ru (bitrix): t_excursions + t_sights",
     "country_code": "chn",
     "country_slug": "kitaj",
     "legacy_country_id": 34,
-    "items": [
+    "excursions": [
         {
             "legacy_id": 7927,
             "slug": "xutun",
@@ -19,36 +19,7 @@
             "region": "Северный Китай",
             "status": "publish",
             "tickets": []
-        },
-        {
-            "legacy_id": 7934,
-            "slug": "kruiz_huanpu",
-            "title": "Круиз по реке Хуанпу",
-            "content": "",
-            "excerpt": "",
-            "duration_hours": null,
-            "duration_raw": "",
-            "notes": "",
-            "city": "Шанхай",
-            "city_code": "sha",
-            "region": "Восточный Китай",
-            "status": "publish",
-            "tickets": []
-        },
-        {
-            "legacy_id": 7935,
-            "slug": "shanchai_cirk",
-            "title": "Шанхайский цирк",
-            "content": "",
-            "excerpt": "",
-            "duration_hours": null,
-            "duration_raw": "",
-            "notes": "",
-            "city": "Шанхай",
-            "city_code": "sha",
-            "region": "Восточный Китай",
-            "status": "publish",
-            "tickets": []
         }
-    ]
+    ],
+    "sights": []
 }

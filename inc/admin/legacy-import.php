@@ -1,12 +1,17 @@
 <?php
 
 /**
- * Настройки сайта → «Импорт экскурсий» — заливка JSON на проде,
+ * Настройки сайта → «Импорт со старого сайта» — заливка JSON на проде,
  * где есть только FTP (CLI недоступен).
  *
- * Файлы берутся из tools/legacy-excursions/data/*.json (кладутся по FTP).
+ * Одна страница на обе сущности: файл tools/legacy-import/data/{код}.json
+ * содержит и экскурсии, и достопримечательности страны. Раньше страниц было
+ * две («Импорт экскурсий» и «Импорт достопримечательностей»), с раздельными
+ * файлами и раздельными прогонами.
+ *
  * Импорт идёт батчами по 20 записей через admin-ajax, чтобы не упереться
- * в 30-секундный таймаут FastCGI. Логика — tools/legacy-excursions/importer.php.
+ * в 30-секундный таймаут FastCGI: сначала экскурсии, затем достопримечательности.
+ * Логика — tools/legacy-import/importer.php.
  */
 
 if (!defined('ABSPATH')) {
@@ -16,17 +21,15 @@ if (!defined('ABSPATH')) {
 const BSI_LEGACY_IMPORT_BATCH = 20;
 const BSI_LEGACY_IMPORT_CAP = 'manage_options';
 
-require_once get_template_directory() . '/tools/legacy-excursions/importer.php';
+require_once get_template_directory() . '/tools/legacy-import/importer.php';
 
-/* Страница живёт в хабе «Настройки сайта» (inc/admin/menu-hubs.php).
-   Приоритет 998.5 — хабы уже созданы, но пункты по ним ещё не разложены. */
 add_action('admin_menu', function () {
   add_submenu_page(
     'bsi-hub-settings',
-    'Импорт экскурсий',
-    'Импорт экскурсий',
+    'Импорт со старого сайта',
+    'Импорт со старого сайта',
     BSI_LEGACY_IMPORT_CAP,
-    'bsi-legacy-excursions',
+    'bsi-legacy-import',
     'bsi_legacy_import_page'
   );
 }, 998.5);
@@ -37,20 +40,24 @@ function bsi_legacy_import_page(): void
     wp_die('Недостаточно прав.');
   }
 
-  $files = bsi_legacy_available_files();
+  $files = bsi_legacy_unified_available_files();
   ?>
   <div class="wrap">
-    <h1>Импорт экскурсий со старого сайта</h1>
+    <h1>Импорт со старого сайта</h1>
 
     <?php if (empty($files)): ?>
       <div class="notice notice-warning">
-        <p>Нет файлов в <code>wp-content/themes/bsi/tools/legacy-excursions/data/</code>. Загрузите JSON по FTP.</p>
+        <p>Нет файлов в <code>wp-content/themes/bsi/tools/legacy-import/data/</code>. Загрузите JSON по FTP.</p>
       </div>
     <?php else: ?>
       <p>
-        Записи ищутся по мете <code>bsi_legacy_excursion_id</code>: повторный запуск обновляет
-        только свои записи. Экскурсии, заведённые вручную, не перезаписываются и не дублируются —
-        такие совпадения попадут в отчёт как «конфликт».
+        Один файл — одна страна, внутри и экскурсии, и достопримечательности.
+        Записи ищутся по мете <code>bsi_legacy_excursion_id</code> и <code>bsi_legacy_sight_id</code>:
+        повторный запуск обновляет только свои записи. Заведённые вручную не перезаписываются
+        и не дублируются — такие совпадения попадут в отчёт как «конфликт».
+        <strong>Записи, текст которых правили на сайте после импорта, повторный прогон
+        не перетирает</strong> — они попадут в отчёт как «сохранено правленых».
+        Фото не переносятся: остались на старом сайте.
       </p>
 
       <table class="form-table" role="presentation">
@@ -72,6 +79,19 @@ function bsi_legacy_import_page(): void
               <option value="publish">Опубликовать</option>
             </select>
             <p class="description">Уже опубликованные записи импорт не понижает до черновика.</p>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Правленые вручную</th>
+          <td>
+            <label>
+              <input type="checkbox" id="bsi-legacy-force">
+              Перезаписать текстом из источника
+            </label>
+            <p class="description">
+              По умолчанию такие записи импорт не трогает. Галочка вернёт им текст старого сайта —
+              правки контент-команды пропадут.
+            </p>
           </td>
         </tr>
       </table>
@@ -96,19 +116,23 @@ function bsi_legacy_import_page(): void
 
       const fileEl = document.getElementById('bsi-legacy-file');
       const statusEl = document.getElementById('bsi-legacy-status');
+      const forceEl = document.getElementById('bsi-legacy-force');
       const progressEl = document.getElementById('bsi-legacy-progress');
       const logEl = document.getElementById('bsi-legacy-log');
       const nonce = <?= wp_json_encode(wp_create_nonce('bsi_legacy_import')); ?>;
       const ajaxUrl = <?= wp_json_encode(admin_url('admin-ajax.php')); ?>;
+      const labels = { excursions: 'экскурсии', sights: 'достопримечательности' };
 
-      async function runBatch(offset, dryRun, totals) {
+      async function runBatch(entity, offset, dryRun, totals) {
         const body = new URLSearchParams({
           action: 'bsi_legacy_import',
           _wpnonce: nonce,
           file: fileEl.value,
+          entity: entity,
           status: statusEl.value,
           offset: String(offset),
-          dry_run: dryRun ? '1' : '0'
+          dry_run: dryRun ? '1' : '0',
+          force: forceEl.checked ? '1' : '0'
         });
 
         const response = await fetch(ajaxUrl, { method: 'POST', body: body, credentials: 'same-origin' });
@@ -118,7 +142,7 @@ function bsi_legacy_import_page(): void
           progressEl.textContent = 'Ошибка: ' + (json.data && json.data.message ? json.data.message : 'неизвестно');
           runBtn.disabled = false;
           dryBtn.disabled = false;
-          return;
+          return false;
         }
 
         const data = json.data;
@@ -126,7 +150,7 @@ function bsi_legacy_import_page(): void
         totals.updated += data.updated;
         totals.skipped += data.skipped;
         totals.conflicts += data.conflicts;
-        totals.with_prices += data.with_prices;
+        totals.protected += data.protected;
 
         if (data.log.length) {
           logEl.style.display = 'block';
@@ -134,28 +158,38 @@ function bsi_legacy_import_page(): void
           logEl.scrollTop = logEl.scrollHeight;
         }
 
-        progressEl.textContent = data.next + ' из ' + data.total;
+        progressEl.textContent = labels[entity] + ': ' + data.next + ' из ' + data.total;
 
         if (data.next < data.total) {
-          return runBatch(data.next, dryRun, totals);
+          return runBatch(entity, data.next, dryRun, totals);
         }
 
-        progressEl.textContent = 'Готово: создано ' + totals.created +
-          ', обновлено ' + totals.updated +
-          ', конфликтов ' + totals.conflicts +
-          ', с ценами ' + totals.with_prices +
-          (dryRun ? ' [прогон, ничего не записано]' : '');
-        runBtn.disabled = false;
-        dryBtn.disabled = false;
+        return true;
       }
 
-      function start(dryRun) {
+      async function start(dryRun) {
         runBtn.disabled = true;
         dryBtn.disabled = true;
         logEl.textContent = '';
         logEl.style.display = 'none';
         progressEl.textContent = 'Старт…';
-        runBatch(0, dryRun, { created: 0, updated: 0, skipped: 0, conflicts: 0, with_prices: 0 });
+
+        const totals = { created: 0, updated: 0, skipped: 0, conflicts: 0, protected: 0 };
+
+        for (const entity of ['excursions', 'sights']) {
+          const ok = await runBatch(entity, 0, dryRun, totals);
+          if (!ok) {
+            return;
+          }
+        }
+
+        progressEl.textContent = 'Готово: создано ' + totals.created +
+          ', обновлено ' + totals.updated +
+          ', сохранено правленых ' + totals.protected +
+          ', конфликтов ' + totals.conflicts +
+          (dryRun ? ' [прогон, ничего не записано]' : '');
+        runBtn.disabled = false;
+        dryBtn.disabled = false;
       }
 
       runBtn.addEventListener('click', function () { start(false); });
@@ -175,32 +209,39 @@ add_action('wp_ajax_bsi_legacy_import', function () {
     wp_send_json_error(['message' => 'ACF не активен'], 500);
   }
 
-  $files = bsi_legacy_available_files();
+  $files = bsi_legacy_unified_available_files();
   $file = isset($_POST['file']) ? sanitize_file_name(wp_unslash($_POST['file'])) : '';
   if (!isset($files[$file])) {
     wp_send_json_error(['message' => 'Файл не найден'], 400);
   }
 
+  $entity = (isset($_POST['entity']) && $_POST['entity'] === 'sights') ? 'sights' : 'excursions';
   $status = (isset($_POST['status']) && $_POST['status'] === 'publish') ? 'publish' : 'draft';
   $dry_run = !empty($_POST['dry_run']) && $_POST['dry_run'] !== '0';
+  $force = !empty($_POST['force']) && $_POST['force'] !== '0';
   $offset = isset($_POST['offset']) ? max(0, (int) $_POST['offset']) : 0;
 
-  $loaded = bsi_legacy_load_payload($files[$file]);
+  $loaded = bsi_legacy_unified_load_payload($files[$file]);
   if (is_wp_error($loaded)) {
     wp_send_json_error(['message' => $loaded->get_error_message()], 400);
   }
 
-  $total = count($loaded['payload']['items']);
-  $batch = array_slice($loaded['payload']['items'], $offset, BSI_LEGACY_IMPORT_BATCH);
+  $items = (array) ($loaded['payload'][$entity] ?? []);
+  $total = count($items);
+  $batch = array_slice($items, $offset, BSI_LEGACY_IMPORT_BATCH);
 
-  $stats = bsi_legacy_import_items($batch, $loaded['country_id'], $status, $dry_run);
+  $stats = $batch
+    ? ($entity === 'sights'
+      ? bsi_legacy_import_sights($batch, $loaded['country_id'], $status, $dry_run, $force)
+      : bsi_legacy_import_items($batch, $loaded['country_id'], $status, $dry_run, $force))
+    : ['created' => 0, 'updated' => 0, 'skipped' => 0, 'conflicts' => 0, 'protected' => 0, 'log' => []];
 
   wp_send_json_success([
     'created' => $stats['created'],
     'updated' => $stats['updated'],
     'skipped' => $stats['skipped'],
     'conflicts' => $stats['conflicts'],
-    'with_prices' => $stats['with_prices'],
+    'protected' => $stats['protected'],
     'log' => $stats['log'],
     'next' => min($offset + BSI_LEGACY_IMPORT_BATCH, $total),
     'total' => $total,

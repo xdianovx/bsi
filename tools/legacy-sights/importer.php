@@ -3,12 +3,11 @@
 /**
  * Ядро импорта достопримечательностей старого сайта. Требует загруженный WordPress.
  *
- * Точки входа:
- *  - CLI: tools/legacy-sights/import.php (локально);
- *  - админка: Настройки сайта → «Импорт достопримечательностей»
- *    (inc/admin/legacy-sights-import.php) — единственный способ на проде, где только FTP.
+ * Ядро вызывается из единого импорта (tools/legacy-import/) вместе с экскурсиями.
  *
  * Импорт идемпотентный: запись ищется по мете `bsi_legacy_sight_id`.
+ * Записи, текст которых правили после импорта, повторный прогон не перетирает —
+ * см. bsi_legacy_is_edited_by_hand() в ядре экскурсий.
  */
 
 declare(strict_types=1);
@@ -112,12 +111,13 @@ function bsi_legacy_find_sight_conflict(string $slug, string $title): int
  * @param int    $country_id ID записи CPT country
  * @param string $status     'publish' | 'draft'
  * @param bool   $dry_run    только посчитать, ничего не писать
+ * @param bool   $force      перезаписывать записи, правленые руками после импорта
  *
- * @return array{created:int, updated:int, skipped:int, conflicts:int, typed:int, log:string[]}
+ * @return array{created:int, updated:int, skipped:int, conflicts:int, protected:int, typed:int, log:string[]}
  */
-function bsi_legacy_import_sights(array $items, int $country_id, string $status, bool $dry_run): array
+function bsi_legacy_import_sights(array $items, int $country_id, string $status, bool $dry_run, bool $force = false): array
 {
-  $stats = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'conflicts' => 0, 'typed' => 0, 'log' => []];
+  $stats = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'conflicts' => 0, 'protected' => 0, 'typed' => 0, 'log' => []];
 
   foreach ($items as $item) {
     $legacy_id = (int) ($item['legacy_id'] ?? 0);
@@ -156,6 +156,14 @@ function bsi_legacy_import_sights(array $items, int $country_id, string $status,
       }
     }
 
+    /* Текст правили после импорта — повторный прогон его не перетирает.
+       Координаты при этом не теряются: их заполняет отдельный прогон. */
+    if ($post_id > 0 && !$force && bsi_legacy_is_edited_by_hand($post_id, $item)) {
+      $stats['protected']++;
+      $stats['log'][] = sprintf('сохранена «%s» (ID %d) — текст правили вручную', $title, $post_id);
+      continue;
+    }
+
     $postarr = [
       'post_type' => 'sight',
       'post_title' => $title,
@@ -172,6 +180,8 @@ function bsi_legacy_import_sights(array $items, int $country_id, string $status,
       }
       continue;
     }
+
+    $is_new = $post_id === 0;
 
     if ($post_id > 0) {
       $postarr['ID'] = $post_id;
@@ -192,6 +202,14 @@ function bsi_legacy_import_sights(array $items, int $country_id, string $status,
     }
 
     $post_id = (int) $result;
+
+    /* Отпечаток снимаем с уже сохранённой записи: следующий прогон по нему
+       отличит правку контент-команды от собственного результата импорта. */
+    bsi_legacy_store_post_hash($post_id);
+
+    /* Картинки импорт не трогает вообще: ни `_thumbnail_id`, ни галерея
+       здесь не пишутся. Фото старого сайта не переносятся (72 ГБ остались там),
+       а всё, что подобрала контент-команда, переживает любой повторный прогон. */
 
     update_post_meta($post_id, 'bsi_legacy_sight_id', $legacy_id);
     update_field('sight_country', $country_id, $post_id);
@@ -220,63 +238,14 @@ function bsi_legacy_import_sights(array $items, int $country_id, string $status,
       }
     }
 
-    if ($resort_id > 0) {
-      wp_set_object_terms($post_id, [$resort_id], 'resort', false);
-    }
-    if ($region_id > 0) {
-      wp_set_object_terms($post_id, [$region_id], 'region', false);
-    }
+    bsi_legacy_assign_term($post_id, $resort_id, 'resort', $is_new);
+    bsi_legacy_assign_term($post_id, $region_id, 'region', $is_new);
+
     if ($type_id > 0) {
-      wp_set_object_terms($post_id, [$type_id], 'sight_type', false);
+      bsi_legacy_assign_term($post_id, $type_id, 'sight_type', $is_new);
       $stats['typed']++;
     }
   }
 
   return $stats;
-}
-
-/**
- * Список доступных JSON-файлов в data/.
- *
- * @return array<string, string> имя файла => полный путь
- */
-function bsi_legacy_sights_available_files(): array
-{
-  $dir = __DIR__ . '/data';
-  $files = [];
-
-  foreach ((array) glob($dir . '/*.json') as $path) {
-    $files[basename($path)] = $path;
-  }
-
-  return $files;
-}
-
-/**
- * Чтение и проверка JSON.
- *
- * @return array{payload: array, country_id: int, country_title: string}|WP_Error
- */
-function bsi_legacy_sights_load_payload(string $path)
-{
-  if (!is_readable($path)) {
-    return new WP_Error('bsi_legacy_no_file', 'Файл не найден: ' . $path);
-  }
-
-  $payload = json_decode((string) file_get_contents($path), true);
-  if (!is_array($payload) || empty($payload['items'])) {
-    return new WP_Error('bsi_legacy_bad_json', 'Пустой или битый JSON: ' . basename($path));
-  }
-
-  $country_slug = (string) ($payload['country_slug'] ?? '');
-  $country = $country_slug !== '' ? get_page_by_path($country_slug, OBJECT, 'country') : null;
-  if (!$country) {
-    return new WP_Error('bsi_legacy_no_country', "Не найдена страна CPT country со слагом «$country_slug»");
-  }
-
-  return [
-    'payload' => $payload,
-    'country_id' => (int) $country->ID,
-    'country_title' => (string) $country->post_title,
-  ];
 }

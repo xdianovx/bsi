@@ -3,12 +3,13 @@
 /**
  * Ядро импорта экскурсий старого сайта. Требует загруженный WordPress.
  *
- * Используется двумя точками входа:
- *  - CLI: tools/legacy-excursions/import.php (локально);
- *  - админка: Инструменты → «Импорт экскурсий» (inc/admin/legacy-excursions-import.php),
- *    единственный способ на проде, где есть только FTP.
+ * Ядро вызывается из единого импорта (tools/legacy-import/), у которого две
+ * точки входа: CLI import.php локально и страница «Настройки сайта → Импорт
+ * со старого сайта» на проде, где есть только FTP.
  *
  * Импорт идемпотентный: запись ищется по мете `bsi_legacy_excursion_id`.
+ * Записи, текст которых правили после импорта, повторный прогон не перетирает —
+ * см. bsi_legacy_is_edited_by_hand().
  */
 
 declare(strict_types=1);
@@ -16,6 +17,10 @@ declare(strict_types=1);
 if (!defined('ABSPATH')) {
   exit;
 }
+
+/* Отпечаток записи на момент импорта — по нему следующий прогон отличает
+   правку контент-команды от собственного результата. */
+const BSI_LEGACY_HASH_META = 'bsi_legacy_import_hash';
 
 /**
  * Транслитерация кириллицы для слага (плагин cyr2lat недоступен в CLI).
@@ -184,19 +189,127 @@ function bsi_legacy_find_conflict(string $slug, string $title): int
 }
 
 /**
+ * Текст для сравнения: сущности развёрнуты, пробелы схлопнуты, края обрезаны.
+ *
+ * Две причины расхождений, которые правкой не являются: экспорт схлопывает
+ * пробелы, а редактор WordPress может добавить переносы; и `wp_insert_post()`
+ * экранирует голый `&` в `&amp;`, из-за чего запись сразу после импорта
+ * выглядела бы изменённой.
+ */
+function bsi_legacy_normalize_text(string $text): string
+{
+  $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+  return trim(preg_replace('/\s+/u', ' ', $text));
+}
+
+/**
+ * Запись правили руками после импорта — перезаписывать её нельзя.
+ *
+ * Источник заморожен (дамп старого сайта), поэтому расхождение между записью
+ * и тем, что даёт источник, означает только одно: текст меняли на сайте.
+ * Сравниваем заголовок, контент и краткое описание.
+ *
+ * @param array{title?: string, content?: string, excerpt?: string} $item
+ */
+function bsi_legacy_is_edited_by_hand(int $post_id, array $item): bool
+{
+  $post = get_post($post_id);
+  if (!$post) {
+    return false;
+  }
+
+  /* Точный путь: отпечаток, снятый при прошлом импорте с уже сохранённой
+     записи. Совпал с текущим состоянием — запись после импорта не трогали. */
+  $stored = (string) get_post_meta($post_id, BSI_LEGACY_HASH_META, true);
+  if ($stored !== '') {
+    return $stored !== bsi_legacy_post_hash($post);
+  }
+
+  /* Запасной путь для записей, залитых прежним импортом (на проде такие все):
+     отпечатка нет, сравниваем с источником. Разметку при этом снимаем —
+     WordPress режет теги вне белого списка kses (`<nobr>`, `<?p>`, `<br />`
+     в заголовке — всё это есть в старой базе), и запись выглядела бы правленой
+     без причины. Правка контент-команды меняет слова, а не только теги.
+     Дальше сработает отпечаток: он снимается при первом же прогоне и точен. */
+  $pairs = [
+    [(string) $post->post_title, (string) ($item['title'] ?? '')],
+    [(string) $post->post_content, (string) ($item['content'] ?? '')],
+    [(string) $post->post_excerpt, (string) ($item['excerpt'] ?? '')],
+  ];
+
+  foreach ($pairs as [$current, $source]) {
+    $current = bsi_legacy_normalize_text(strip_tags($current));
+    $source = bsi_legacy_normalize_text(strip_tags($source));
+
+    if ($current !== $source) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Отпечаток сохранённой записи: заголовок, контент и краткое описание.
+ */
+function bsi_legacy_post_hash(WP_Post $post): string
+{
+  return md5(implode('|', [
+    bsi_legacy_normalize_text((string) $post->post_title),
+    bsi_legacy_normalize_text((string) $post->post_content),
+    bsi_legacy_normalize_text((string) $post->post_excerpt),
+  ]));
+}
+
+/**
+ * Снять отпечаток с записи после импорта — по нему следующий прогон поймёт,
+ * правили её или нет. Читаем свежий объект: wp_insert_post() мог изменить
+ * текст фильтрами kses.
+ */
+function bsi_legacy_store_post_hash(int $post_id): void
+{
+  $post = get_post($post_id);
+  if ($post instanceof WP_Post) {
+    update_post_meta($post_id, BSI_LEGACY_HASH_META, bsi_legacy_post_hash($post));
+  }
+}
+
+/**
+ * Термин на запись: у новой ставим всегда, у существующей — только если
+ * таксономия пуста.
+ *
+ * Регион и курорт после импорта правят менеджеры; повторный прогон не должен
+ * возвращать их к тому, что было в старой базе.
+ */
+function bsi_legacy_assign_term(int $post_id, int $term_id, string $taxonomy, bool $is_new): void
+{
+  if ($term_id <= 0) {
+    return;
+  }
+
+  if (!$is_new && has_term('', $taxonomy, $post_id)) {
+    return;
+  }
+
+  wp_set_object_terms($post_id, [$term_id], $taxonomy, false);
+}
+
+/**
  * Импорт среза записей.
  *
- * @param array  $items    элементы JSON (уже нарезанные для батча)
+ * @param array  $items      элементы JSON (уже нарезанные для батча)
  * @param int    $country_id ID записи CPT country
- * @param string $status   'publish' | 'draft' — по умолчанию для всего прогона;
- *                         элемент может переопределить его полем `status`
- * @param bool   $dry_run  только посчитать, ничего не писать
+ * @param string $status     'publish' | 'draft' — по умолчанию для всего прогона;
+ *                           элемент может переопределить его полем `status`
+ * @param bool   $dry_run    только посчитать, ничего не писать
+ * @param bool   $force      перезаписывать записи, правленые руками после импорта
  *
- * @return array{created:int, updated:int, skipped:int, with_prices:int, log:string[]}
+ * @return array{created:int, updated:int, skipped:int, conflicts:int, protected:int, with_prices:int, log:string[]}
  */
-function bsi_legacy_import_items(array $items, int $country_id, string $status, bool $dry_run): array
+function bsi_legacy_import_items(array $items, int $country_id, string $status, bool $dry_run, bool $force = false): array
 {
-  $stats = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'conflicts' => 0, 'with_prices' => 0, 'log' => []];
+  $stats = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'conflicts' => 0, 'protected' => 0, 'with_prices' => 0, 'log' => []];
 
   foreach ($items as $item) {
     $legacy_id = (int) ($item['legacy_id'] ?? 0);
@@ -232,6 +345,13 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
       }
     }
 
+    /* Текст правили после импорта — повторный прогон его не перетирает. */
+    if ($post_id > 0 && !$force && bsi_legacy_is_edited_by_hand($post_id, $item)) {
+      $stats['protected']++;
+      $stats['log'][] = sprintf('сохранена «%s» (ID %d) — текст правили вручную', $title, $post_id);
+      continue;
+    }
+
     /* Экспорт может задать статус для конкретной записи (скрытые на старом
        сайте приходят черновиками); иначе действует статус всего прогона. */
     $item_status = (string) ($item['status'] ?? '');
@@ -256,6 +376,8 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
       continue;
     }
 
+    $is_new = $post_id === 0;
+
     if ($post_id > 0) {
       $postarr['ID'] = $post_id;
       /* Статус уже опубликованной записи не понижаем повторным импортом. */
@@ -276,6 +398,14 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
 
     $post_id = (int) $result;
 
+    /* Отпечаток снимаем с уже сохранённой записи: следующий прогон по нему
+       отличит правку контент-команды от собственного результата импорта. */
+    bsi_legacy_store_post_hash($post_id);
+
+    /* Картинки импорт не трогает вообще: ни `_thumbnail_id`, ни галерея
+       здесь не пишутся. Фото старого сайта не переносятся (72 ГБ остались там),
+       а всё, что подобрала контент-команда, переживает любой повторный прогон. */
+
     update_post_meta($post_id, 'bsi_legacy_excursion_id', $legacy_id);
     update_field('excursion_country', $country_id, $post_id);
 
@@ -283,12 +413,8 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
       update_field('excursion_duration_hours', (int) $item['duration_hours'], $post_id);
     }
 
-    if ($resort_id > 0) {
-      wp_set_object_terms($post_id, [$resort_id], 'resort', false);
-    }
-    if ($region_id > 0) {
-      wp_set_object_terms($post_id, [$region_id], 'region', false);
-    }
+    bsi_legacy_assign_term($post_id, $resort_id, 'resort', $is_new);
+    bsi_legacy_assign_term($post_id, $region_id, 'region', $is_new);
 
     if (!empty($item['tickets']) && is_array($item['tickets'])) {
       $rows = [];
@@ -306,50 +432,4 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
   }
 
   return $stats;
-}
-
-/**
- * Список доступных JSON-файлов в data/.
- *
- * @return array<string, string> имя файла => полный путь
- */
-function bsi_legacy_available_files(): array
-{
-  $dir = __DIR__ . '/data';
-  $files = [];
-
-  foreach ((array) glob($dir . '/*.json') as $path) {
-    $files[basename($path)] = $path;
-  }
-
-  return $files;
-}
-
-/**
- * Чтение и проверка JSON. Возвращает WP_Error при проблеме.
- *
- * @return array{payload: array, country_id: int, country_title: string}|WP_Error
- */
-function bsi_legacy_load_payload(string $path)
-{
-  if (!is_readable($path)) {
-    return new WP_Error('bsi_legacy_no_file', 'Файл не найден: ' . $path);
-  }
-
-  $payload = json_decode((string) file_get_contents($path), true);
-  if (!is_array($payload) || empty($payload['items'])) {
-    return new WP_Error('bsi_legacy_bad_json', 'Пустой или битый JSON: ' . basename($path));
-  }
-
-  $country_slug = (string) ($payload['country_slug'] ?? '');
-  $country = $country_slug !== '' ? get_page_by_path($country_slug, OBJECT, 'country') : null;
-  if (!$country) {
-    return new WP_Error('bsi_legacy_no_country', "Не найдена страна CPT country со слагом «$country_slug»");
-  }
-
-  return [
-    'payload' => $payload,
-    'country_id' => (int) $country->ID,
-    'country_title' => (string) $country->post_title,
-  ];
 }
