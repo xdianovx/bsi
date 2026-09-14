@@ -15,7 +15,9 @@
             "region": null,
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.804404, 2.123162",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 192,
@@ -39,7 +41,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.950800, 4.807500",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 193,
@@ -63,7 +67,9 @@
             "region": "Новая Аквитания",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "44.838610, -0.578330",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 196,
@@ -75,7 +81,9 @@
             "region": "Новая Аквитания",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "44.842500, -0.573611",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 195,
@@ -123,7 +131,9 @@
             "region": "Нормандия",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "49.076110, 1.529170",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 189,
@@ -159,7 +169,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.606774, 3.903068",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 173,
@@ -195,7 +207,9 @@
             "region": "Бретань",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "47.333940, -3.197271",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 729,
@@ -207,7 +221,9 @@
             "region": "Овернь – Рона – Альпы",
             "subtype": "Овернь",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "45.813550, 2.943211",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1005,
@@ -219,7 +235,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.748897, 4.797218",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 78,
@@ -231,7 +249,9 @@
             "region": "Нормандия",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.635561, -1.510611",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1028,
@@ -243,7 +263,9 @@
             "region": "Овернь – Рона – Альпы",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "45.759720, 4.842220",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 186,
@@ -267,7 +289,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.739440, 7.428890",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 179,
@@ -279,7 +303,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.731417, 7.420275",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 184,
@@ -291,7 +317,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.733330, 7.416670",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 190,
@@ -315,7 +343,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.733330, 7.416670",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 185,
@@ -327,7 +357,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.733330, 7.416670",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 182,
@@ -351,7 +383,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.742325, 7.430978",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 861,
@@ -375,7 +409,9 @@
             "region": "Окситания",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.947070, 4.535601",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 161,
@@ -387,7 +423,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.691110, 7.247500",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 165,
@@ -399,7 +437,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.714813, 7.272488",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 169,
@@ -423,7 +463,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.701442, 7.278227",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 162,
@@ -435,7 +477,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.694440, 7.257500",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 168,
@@ -471,7 +515,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.695830, 7.271390",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 166,
@@ -483,7 +529,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.703890, 7.253890",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 170,
@@ -495,7 +543,9 @@
             "region": "Прованс – Альпы – Лазурный Берег",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.698056, 7.280556",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 730,
@@ -519,7 +569,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.866161, 2.312553",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 558,
@@ -531,7 +583,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.867500, 2.329444",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 570,
@@ -543,7 +597,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.839333, 2.318289",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 571,
@@ -555,7 +611,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.876944, 2.324444",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 569,
@@ -567,7 +625,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.876944, 2.359167",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 132,
@@ -579,7 +639,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.871940, 2.331670",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 199,
@@ -603,7 +665,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.855000, 2.312220",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 556,
@@ -615,7 +679,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.869720, 2.307500",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 135,
@@ -627,7 +693,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.851417, 2.343167",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 574,
@@ -639,7 +707,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.844722, 2.373611",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 130,
@@ -651,7 +721,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.860600, 2.337700",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 127,
@@ -663,7 +735,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.846944, 2.337222",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 575,
@@ -675,7 +749,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.866028, 2.314556",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 79,
@@ -687,7 +763,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.886110, 2.338890",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1025,
@@ -699,7 +777,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.833330, 2.333330",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1024,
@@ -711,7 +791,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.862783, 2.334108",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 567,
@@ -723,7 +805,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.875450, 2.310544",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 564,
@@ -735,7 +819,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "49.075000, 1.535556",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1002,
@@ -747,7 +833,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.850560, 2.343330",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1026,
@@ -759,7 +847,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.860833, 2.297500",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 566,
@@ -771,7 +861,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.863856, 2.322272",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 557,
@@ -783,7 +875,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.860000, 2.326390",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1006,
@@ -795,7 +889,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.864313, 2.297860",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 128,
@@ -807,7 +903,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.846110, 2.345830",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 563,
@@ -819,7 +917,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.871837, 2.342097",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 561,
@@ -831,7 +931,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.853139, 2.369111",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 568,
@@ -855,7 +957,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.870000, 2.324170",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 573,
@@ -867,7 +971,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.848333, 2.395833",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 560,
@@ -879,7 +985,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.865633, 2.321236",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 559,
@@ -891,7 +999,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.891008, 2.241208",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 131,
@@ -903,7 +1013,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.886650, 2.342950",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1007,
@@ -915,7 +1027,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.855393, 2.344994",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 578,
@@ -927,7 +1041,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Развлечения",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.843639, 2.323811",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 74,
@@ -939,7 +1055,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.852780, 2.350000",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 134,
@@ -951,7 +1069,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.848640, 2.343560",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 562,
@@ -963,7 +1083,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.856917, 2.353672",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 565,
@@ -975,7 +1097,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Развлечения",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.860642, 2.352245",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 129,
@@ -987,7 +1111,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.848330, 2.343060",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 133,
@@ -999,7 +1125,9 @@
             "region": "Иль-де-Франс",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.858060, 2.294440",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1003,
@@ -1011,7 +1139,9 @@
             "region": "Новая Аквитания",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "45.053610, 1.170000",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 82,
@@ -1023,7 +1153,9 @@
             "region": "Нормандия",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "49.440280, 1.094720",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 178,
@@ -1035,7 +1167,9 @@
             "region": "Бретань",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.648610, -2.006670",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 81,
@@ -1095,7 +1229,9 @@
             "region": "Гранд-Эст",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.573330, 7.752220",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 859,
@@ -1119,7 +1255,9 @@
             "region": "Гранд-Эст",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.581007, 7.752646",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 856,
@@ -1131,7 +1269,9 @@
             "region": "Гранд-Эст",
             "subtype": "",
             "sight_type": "Храмы",
-            "visible": true
+            "visible": true,
+            "coordinates": "48.581890, 7.751056",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 858,
@@ -1155,7 +1295,9 @@
             "region": "О-де-Франс",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "49.193889, 2.485833",
+            "coordinates_source": "wikipedia"
         }
     ]
 }

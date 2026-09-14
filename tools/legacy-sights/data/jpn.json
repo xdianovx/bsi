@@ -39,7 +39,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "33.840351, 135.773633",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 929,
@@ -51,7 +53,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.333300, 136.166700",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 933,
@@ -63,7 +67,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.034444, 135.718333",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 934,
@@ -99,7 +105,9 @@
             "region": "Тюбу",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "36.238060, 137.971940",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 955,
@@ -135,7 +143,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "34.616670, 135.733330",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 935,
@@ -183,7 +193,9 @@
             "region": "Тюбу",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "38.018258, 138.368400",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 944,
@@ -195,7 +207,9 @@
             "region": "Окинава",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "26.168292, 127.293506",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 945,
@@ -231,7 +245,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "34.809500, 135.532400",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 939,
@@ -243,7 +259,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "34.668484, 135.502590",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 940,
@@ -255,7 +273,9 @@
             "region": "Кансай",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "34.814436, 135.650728",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1060,
@@ -267,7 +287,9 @@
             "region": "Хоккайдо",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.048751, 141.306127",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 930,
@@ -279,7 +301,9 @@
             "region": "Токио",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.682500, 139.752100",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 931,
@@ -303,7 +327,9 @@
             "region": "Токио",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.625860, 139.776310",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1059,
@@ -315,7 +341,9 @@
             "region": "Токио",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.659108, 139.745364",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1058,
@@ -327,7 +355,9 @@
             "region": "Токио",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.686378, 139.329454",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 947,
@@ -351,7 +381,9 @@
             "region": "Хоккайдо",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "43.766670, 142.366670",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 948,

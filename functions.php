@@ -386,6 +386,7 @@ require get_template_directory() . '/inc/helpers/content-schedule.php';
 require get_template_directory() . '/inc/helpers/country-section-singular.php';
 require get_template_directory() . '/inc/helpers/agency-events.php';
 require get_template_directory() . '/inc/helpers/pagination.php';
+require get_template_directory() . '/inc/helpers/orphan-country-guard.php';
 require get_template_directory() . '/inc/helpers/resort.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';

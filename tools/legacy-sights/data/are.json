@@ -15,7 +15,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.141327, 55.185397",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 1096,
@@ -27,7 +29,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "Развлечения",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.197556, 55.278417",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1098,
@@ -39,7 +43,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.171474, 55.232973",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1095,
@@ -51,7 +57,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.233972, 55.265503",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1097,
@@ -63,7 +71,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.271763, 55.310317",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1101,
@@ -75,7 +85,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.100190, 55.118535",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 1093,
@@ -87,7 +99,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.194843, 55.278195",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1099,
@@ -99,7 +113,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.192877, 55.325763",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1100,
@@ -111,7 +127,9 @@
             "region": "Дубай",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "25.258650, 55.326450",
+            "coordinates_source": "nominatim-latin"
         }
     ]
 }

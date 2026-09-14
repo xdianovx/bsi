@@ -430,6 +430,14 @@ add_action('init', function () {
     'top'
   );
 
+  // Пагинация каталога экскурсий: без правила /page/2/ уходит в 404,
+  // и в индекс попадают только первые 12 карточек страны.
+  add_rewrite_rule(
+    '^country/([^/]+)/ekskursii/page/([0-9]{1,})/?$',
+    'index.php?post_type=country&name=$matches[1]&country_excursions=$matches[1]&paged=$matches[2]',
+    'top'
+  );
+
   add_rewrite_rule(
     '^country/([^/]+)/ekskursii/?$',
     'index.php?post_type=country&name=$matches[1]&country_excursions=$matches[1]',

@@ -42,6 +42,7 @@ function bsi_seo_virtual_sections(): array
         'country_visa'        => ['label' => 'Виза',            'slug' => 'visa'],
         'country_news'        => ['label' => 'Новости',         'slug' => 'novosti'],
         'country_excursions'  => ['label' => 'Экскурсии',       'slug' => 'ekskursii'],
+        'country_sights'      => ['label' => 'Достопримечательности', 'slug' => 'dostoprimechatelnosti'],
         'country_events'      => ['label' => 'Событийные туры', 'slug' => 'sobytiynye-tury'],
         'country_deposits'    => ['label' => 'Депозиты в отелях', 'slug' => 'depozity'],
     ];
@@ -481,6 +482,27 @@ add_filter('wpseo_canonical', function ($canonical): string {
     return $custom !== '' ? $custom : $canonical;
 }, 5);
 
+// ── Canonical: записи, чей URL строится из страны ───────────
+// У `excursion` и `sight` адрес собирается фильтром `post_type_link`
+// из слага привязанной страны. Пока страна не заполнена, permalink —
+// служебный `/?sight=slug`, и Yoast кеширует его в своей таблице
+// indexables; закешированное значение переживает заполнение страны.
+// Поэтому для этих типов canonical берём прямо из `get_permalink()`.
+// Приоритет 6 — после виртуальных разделов (5), до остальных.
+
+add_filter('wpseo_canonical', function ($canonical): string {
+    if (!is_singular(['excursion', 'sight'])) {
+        return (string) $canonical;
+    }
+
+    $permalink = get_permalink(get_queried_object_id());
+    if ($permalink === false || strpos($permalink, '?') !== false) {
+        return (string) $canonical;
+    }
+
+    return $permalink;
+}, 6);
+
 // ── Canonical: очистка GET-параметров фильтрации ────────────
 // AJAX-фильтры (education, tours, events) добавляют ?sort=, ?region=
 // и т.д. через replaceState — каждый вариант URL выглядит как
@@ -494,8 +516,27 @@ add_filter('wpseo_canonical', function ($canonical): string {
     }
 
     $clean = strtok($canonical, '?');
+    if ($clean === false) {
+        return $canonical;
+    }
 
-    return ($clean !== false) ? trailingslashit($clean) : $canonical;
+    $clean = trailingslashit($clean);
+
+    /* Служебный адрес записи (/?sight=slug, /?excursion=slug) обрезкой
+       превращается в голую главную — и запись склеивается с ней в индексе.
+       Yoast берёт такой адрес из своей таблицы indexables, если та была
+       заполнена до того, как у записи появилась страна: URL этих типов
+       строится из слага страны фильтром `post_type_link`.
+       На проде так потерялись 30 достопримечательностей Японии
+       (wiki/docs/seo-audit-2026-09-14.md, C1). Для одиночной записи
+       достоверный источник — `get_permalink()`, а не обрезанный URL. */
+    if (is_singular() && untrailingslashit($clean) === untrailingslashit(home_url('/'))) {
+        $permalink = get_permalink(get_queried_object_id());
+
+        return $permalink !== false ? $permalink : $canonical;
+    }
+
+    return $clean;
 }, 20);
 
 // ── Yoast: Open Graph URL — аналогичная очистка ─────────────

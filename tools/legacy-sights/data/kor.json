@@ -27,7 +27,9 @@
             "region": null,
             "subtype": "",
             "sight_type": "Природа",
-            "visible": true
+            "visible": true,
+            "coordinates": "36.498000, 127.273311",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 976,
@@ -39,7 +41,9 @@
             "region": null,
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.875489, 128.584596",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 1061,
@@ -51,7 +55,9 @@
             "region": null,
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "37.578865, 126.980680",
+            "coordinates_source": "nominatim"
         },
         {
             "legacy_id": 966,
@@ -63,7 +69,9 @@
             "region": "Северо-Запад Южной Кореи",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "37.463890, 126.648610",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 958,
@@ -87,7 +95,9 @@
             "region": "Северо-Запад Южной Кореи",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "37.389170, 126.643890",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 969,
@@ -99,7 +109,9 @@
             "region": "Юго-Запад Южной Кореи",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.138309, 126.915827",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 970,
@@ -135,7 +147,9 @@
             "region": "Юго-Восток Южной Кореи",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "35.096670, 129.030280",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 961,
@@ -159,7 +173,9 @@
             "region": "Северо-Запад Южной Кореи",
             "subtype": "",
             "sight_type": "Замки и дворцы",
-            "visible": true
+            "visible": true,
+            "coordinates": "37.578600, 126.977000",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 1062,
@@ -171,7 +187,9 @@
             "region": "Северо-Запад Южной Кореи",
             "subtype": "",
             "sight_type": "Музеи и галереи",
-            "visible": true
+            "visible": true,
+            "coordinates": "37.523953, 126.980320",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 962,
@@ -207,7 +225,9 @@
             "region": "Северо-Запад Южной Кореи",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "37.551250, 126.988060",
+            "coordinates_source": "wikipedia"
         },
         {
             "legacy_id": 967,
@@ -255,7 +275,9 @@
             "region": "Остров Чеджу",
             "subtype": "",
             "sight_type": "",
-            "visible": true
+            "visible": true,
+            "coordinates": "33.237790, 126.559485",
+            "coordinates_source": "nominatim-latin"
         },
         {
             "legacy_id": 972,
