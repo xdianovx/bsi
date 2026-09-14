@@ -3,14 +3,16 @@
  *
  * Хаб помечает отель `prices_status: updating`, пока тот стоит в очереди на
  * обновление цен. Очередь одна, отель занимает 5-10 секунд, и при длинной
- * очереди своей цены он может ждать пару минут — поэтому опрашиваем долго, но
- * дёшево: эндпоинт отдаёт цены только названных отелей.
+ * очереди своей цены он может ждать пару минут — поэтому опрашиваем долго и
+ * часто, но дёшево: эндпоинт отдаёт цены только названных отелей.
  *
  * Ждём только `updating`. `stale` значит «цены старые и никто их не грузит» —
  * такие карточки показывают то, что есть, и в опрос не попадают.
  */
 
-const INTERVAL = 4000;
+/* Полсекунды: запрос отдаёт цены только названных отелей и стоит хабу
+   доли миллисекунды, зато цена встаёт в карточку сразу, как хаб её посчитал. */
+const INTERVAL = 500;
 const LIMIT_MS = 3 * 60 * 1000;
 
 export const initHotelsPrices = () => {
@@ -72,12 +74,23 @@ export const initHotelsPrices = () => {
     }
   };
 
-  /** Ждать больше нечего, а цены нет: подпись уже стоит, снимаем только пометку. */
+  /** Ждать больше нечего, а цены нет: крутилка уступает место подписи. */
   const showEmpty = (card) => {
     const label = card.querySelector(".api-row__price-label");
     if (label) {
       label.textContent = priceLabel(false);
     }
+
+    const slot = card.querySelector(".api-row__price-loading");
+    if (!slot) {
+      return;
+    }
+
+    const empty = document.createElement("span");
+    empty.className = "api-row__price-empty";
+    empty.textContent = "По запросу";
+
+    slot.replaceWith(empty);
   };
 
   const stop = () => {
