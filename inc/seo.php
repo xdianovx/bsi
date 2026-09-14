@@ -1104,6 +1104,11 @@ function bsi_seo_excluded_taxonomies(): array
         'agency_event_direction',
         'agency_item_type',
         'event_tour_type',
+        /* Архивы этих двух живут только по служебному адресу (`/?tour_type=`,
+           `/?sight_type=`), который сам же robots.txt и запрещает. Они нужны
+           как фильтры каталога, отдельными страницами не работают. */
+        'tour_type',
+        'sight_type',
         'promo_type',
         'news_type',
         'offer_badge',

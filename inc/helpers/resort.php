@@ -348,6 +348,18 @@ if (!function_exists('bsi_resort_is_indexable')) {
       return false;
     }
 
+    /* URL курорта собирается из цепочки курорт → регион → страна
+       (фильтр `term_link` в inc/post-types/country.php). Если регион не
+       заполнен, ссылка остаётся служебной — `/?resort=slug`, а такие адреса
+       запрещены в robots.txt. Отдавать их в sitemap значит просить Google
+       проиндексировать то, к чему он не имеет права подойти: в Search Console
+       это ошибка «Отправленный URL заблокирован в robots.txt».
+       Пять таких курортов нашлись на проде 14.09.2026 —
+       см. wiki/docs/seo-audit-2026-09-14.md, H2. */
+    if (strpos(bsi_resort_url($term_id), '?') !== false) {
+      return false;
+    }
+
     if (bsi_resort_description_text($term_id) !== '') {
       return true;
     }
