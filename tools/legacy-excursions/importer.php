@@ -188,7 +188,8 @@ function bsi_legacy_find_conflict(string $slug, string $title): int
  *
  * @param array  $items    элементы JSON (уже нарезанные для батча)
  * @param int    $country_id ID записи CPT country
- * @param string $status   'publish' | 'draft'
+ * @param string $status   'publish' | 'draft' — по умолчанию для всего прогона;
+ *                         элемент может переопределить его полем `status`
  * @param bool   $dry_run  только посчитать, ничего не писать
  *
  * @return array{created:int, updated:int, skipped:int, with_prices:int, log:string[]}
@@ -231,13 +232,20 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
       }
     }
 
+    /* Экспорт может задать статус для конкретной записи (скрытые на старом
+       сайте приходят черновиками); иначе действует статус всего прогона. */
+    $item_status = (string) ($item['status'] ?? '');
+    if (!in_array($item_status, ['publish', 'draft'], true)) {
+      $item_status = $status;
+    }
+
     $postarr = [
       'post_type' => 'excursion',
       'post_title' => $title,
       'post_name' => $slug,
       'post_content' => (string) ($item['content'] ?? ''),
       'post_excerpt' => (string) ($item['excerpt'] ?? ''),
-      'post_status' => $status,
+      'post_status' => $item_status,
     ];
 
     if ($dry_run) {
@@ -251,7 +259,7 @@ function bsi_legacy_import_items(array $items, int $country_id, string $status, 
     if ($post_id > 0) {
       $postarr['ID'] = $post_id;
       /* Статус уже опубликованной записи не понижаем повторным импортом. */
-      if (get_post_status($post_id) === 'publish' && $status === 'draft') {
+      if (get_post_status($post_id) === 'publish' && $item_status === 'draft') {
         unset($postarr['post_status']);
       }
       $result = wp_update_post($postarr, true);
