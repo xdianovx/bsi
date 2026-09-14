@@ -872,7 +872,8 @@
 .single-event__venue-legend-label {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  width: 100%;
   gap: 12px;
   font-weight: 400;
 }
