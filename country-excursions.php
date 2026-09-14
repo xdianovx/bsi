@@ -69,6 +69,11 @@ $excursions_query = new WP_Query([
 $excursions_query->found_posts = $total;
 $excursions_query->max_num_pages = $total_pages;
 
+/* ItemList в разметке страницы — печатается в подвале (inc/schema.php). */
+if (function_exists('bsi_schema_register_catalog')) {
+  bsi_schema_register_catalog($page_ids, 'Экскурсии');
+}
+
 /* Регионы / курорты / типы / языки — только встречающиеся у экскурсий страны */
 $region_terms = !empty($excursion_ids)
   ? wp_get_object_terms($excursion_ids, 'region', ['orderby' => 'name', 'order' => 'ASC'])

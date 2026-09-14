@@ -43,16 +43,48 @@ add_action('wp_head', function () {
         bsi_schema_vacancy();
     } elseif (is_singular('insurance')) {
         bsi_schema_insurance();
+    } elseif (is_singular('sight')) {
+        bsi_schema_sight();
+    } elseif (is_singular('excursion')) {
+        bsi_schema_excursion();
     } elseif (is_tax('resort')) {
         bsi_schema_resort();
     }
 }, 99);
+
+/* Каталоги страны собирают выдачу внутри шаблона, к wp_head её ещё нет,
+   поэтому список печатается в подвале — для JSON-LD место в документе
+   значения не имеет. */
+add_action('wp_footer', 'bsi_schema_render_catalog', 99);
+
+/**
+ * Раскрыть HTML-сущности в значениях: заголовки записей приходят
+ * с `&#8212;` и `&amp;`, а в JSON-LD нужен обычный текст.
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+function bsi_schema_decode(&$value)
+{
+    if (is_array($value)) {
+        foreach ($value as &$item) {
+            bsi_schema_decode($item);
+        }
+        unset($item);
+    } elseif (is_string($value)) {
+        $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    return $value;
+}
 
 function bsi_schema_json(array $data): void
 {
     $data = array_filter($data, function ($v) {
         return $v !== '' && $v !== null && $v !== [];
     });
+
+    bsi_schema_decode($data);
     $json = wp_json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if ($json) {
         echo '<script type="application/ld+json">' . $json . '</script>' . "\n";
@@ -799,6 +831,262 @@ function bsi_schema_resort_section(WP_Term $term, string $section): void
         '@type' => 'ItemList',
         'name' => bsi_resort_section_h1($term_id, $section),
         'numberOfItems' => count($all_ids),
+        'itemListElement' => $items,
+    ]);
+}
+
+// ── Достопримечательность и экскурсия ───────────────────────
+
+/**
+ * Страна записи в виде schema-объекта Country.
+ *
+ * @return array<string,string>|null
+ */
+function bsi_schema_country_place(int $country_id): ?array
+{
+    if ($country_id <= 0) {
+        return null;
+    }
+
+    $title = get_the_title($country_id);
+
+    return $title !== '' ? ['@type' => 'Country', 'name' => $title] : null;
+}
+
+/**
+ * Регион и курорт записи — для почтового адреса.
+ *
+ * @return array{region:string, locality:string}
+ */
+function bsi_schema_place_terms(int $post_id): array
+{
+    $out = ['region' => '', 'locality' => ''];
+
+    foreach (['region' => 'region', 'resort' => 'locality'] as $taxonomy => $key) {
+        $terms = wp_get_post_terms($post_id, $taxonomy, ['fields' => 'names']);
+        if (!is_wp_error($terms) && !empty($terms)) {
+            $out[$key] = (string) $terms[0];
+        }
+    }
+
+    return $out;
+}
+
+/**
+ * TouristAttraction для достопримечательности.
+ *
+ * Координаты есть не у всех записей (геокодер узнаёт не каждое название),
+ * поэтому geo добавляется только когда они заполнены.
+ */
+function bsi_schema_sight(): void
+{
+    $post_id = (int) get_queried_object_id();
+    if ($post_id <= 0) {
+        return;
+    }
+
+    $country_id = function_exists('bsi_get_sight_country_id') ? bsi_get_sight_country_id($post_id) : 0;
+    $places = bsi_schema_place_terms($post_id);
+
+    $description = trim(wp_strip_all_tags((string) get_the_excerpt($post_id)));
+    if ($description === '') {
+        $description = trim(wp_strip_all_tags((string) get_post_field('post_content', $post_id)));
+    }
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'TouristAttraction',
+        'name' => get_the_title($post_id),
+        'url' => get_permalink($post_id),
+        'description' => $description !== '' ? wp_trim_words($description, 40, '…') : '',
+    ];
+
+    $country = bsi_schema_country_place($country_id);
+    if ($country !== null) {
+        $schema['containedInPlace'] = $country;
+
+        $address = ['@type' => 'PostalAddress', 'addressCountry' => $country['name']];
+        if ($places['region'] !== '') {
+            $address['addressRegion'] = $places['region'];
+        }
+        if ($places['locality'] !== '') {
+            $address['addressLocality'] = $places['locality'];
+        }
+        $schema['address'] = $address;
+    }
+
+    if (function_exists('bsi_get_sight_coordinates')) {
+        $coords = bsi_get_sight_coordinates($post_id);
+        if ($coords !== null) {
+            $schema['geo'] = [
+                '@type' => 'GeoCoordinates',
+                'latitude' => round($coords['lat'], 5),
+                'longitude' => round($coords['lng'], 5),
+            ];
+        }
+    }
+
+    $thumb = get_the_post_thumbnail_url($post_id, 'large');
+    if ($thumb) {
+        $schema['image'] = $thumb;
+    }
+
+    bsi_schema_json($schema);
+}
+
+/**
+ * TouristTrip для экскурсии.
+ *
+ * Offer добавляем только когда цена реально показана пользователю:
+ * размечать стоимость, которой нет на странице, — вводить в заблуждение.
+ */
+function bsi_schema_excursion(): void
+{
+    $post_id = (int) get_queried_object_id();
+    if ($post_id <= 0) {
+        return;
+    }
+
+    $country_id = function_exists('bsi_get_excursion_country_id') ? bsi_get_excursion_country_id($post_id) : 0;
+    $places = bsi_schema_place_terms($post_id);
+
+    $description = trim(wp_strip_all_tags((string) get_the_excerpt($post_id)));
+    if ($description === '') {
+        $description = trim(wp_strip_all_tags((string) get_post_field('post_content', $post_id)));
+    }
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'TouristTrip',
+        'name' => get_the_title($post_id),
+        'url' => get_permalink($post_id),
+        'description' => $description !== '' ? wp_trim_words($description, 40, '…') : '',
+        'provider' => ['@type' => 'TravelAgency', 'name' => get_bloginfo('name'), 'url' => home_url('/')],
+    ];
+
+    $country = bsi_schema_country_place($country_id);
+    if ($country !== null) {
+        $address = ['@type' => 'PostalAddress', 'addressCountry' => $country['name']];
+        if ($places['region'] !== '') {
+            $address['addressRegion'] = $places['region'];
+        }
+        if ($places['locality'] !== '') {
+            $address['addressLocality'] = $places['locality'];
+        }
+
+        $schema['itinerary'] = [
+            '@type' => 'Place',
+            'name' => $places['locality'] !== '' ? $places['locality'] : $country['name'],
+            'address' => $address,
+        ];
+    }
+
+    $thumb = get_the_post_thumbnail_url($post_id, 'large');
+    if ($thumb) {
+        $schema['image'] = $thumb;
+    }
+
+    if (function_exists('bsi_get_excursion_tickets_rows')) {
+        $offers = [];
+        foreach (bsi_get_excursion_tickets_rows($post_id) as $row) {
+            $amount = $row['amount'] ?? null;
+            if ($amount === null || (float) $amount <= 0) {
+                continue;
+            }
+
+            $offers[] = [
+                '@type' => 'Offer',
+                'name' => (string) ($row['name'] ?? 'Стоимость'),
+                'price' => (string) round((float) $amount, 2),
+                'priceCurrency' => (string) ($row['currency'] ?? 'RUB'),
+                'availability' => 'https://schema.org/InStock',
+                'url' => get_permalink($post_id),
+            ];
+        }
+
+        if ($offers) {
+            $schema['offers'] = count($offers) === 1 ? $offers[0] : $offers;
+        }
+    }
+
+    bsi_schema_json($schema);
+}
+
+/**
+ * ItemList каталогов экскурсий и достопримечательностей страны.
+ *
+ * Шаблон каталога отдаёт сюда ID записей текущей страницы выдачи через
+ * bsi_schema_register_catalog() — список в разметке должен совпадать
+ * с тем, что видит человек, включая пагинацию и фильтры.
+ *
+ * @param int[]|null $ids   записи текущей страницы; null — только прочитать
+ * @param string     $label «Экскурсии» или «Достопримечательности»
+ * @return array{ids:int[], label:string}
+ */
+function bsi_schema_catalog_store(?array $ids = null, string $label = ''): array
+{
+    static $store = ['ids' => [], 'label' => ''];
+
+    if ($ids !== null) {
+        $store = ['ids' => array_values(array_filter(array_map('intval', $ids))), 'label' => $label];
+    }
+
+    return $store;
+}
+
+/**
+ * Вызывается из шаблона каталога.
+ *
+ * @param int[] $ids
+ */
+function bsi_schema_register_catalog(array $ids, string $label): void
+{
+    bsi_schema_catalog_store($ids, $label);
+}
+
+/**
+ * Печать ItemList каталога — на хуке wp_footer.
+ */
+function bsi_schema_render_catalog(): void
+{
+    $store = bsi_schema_catalog_store();
+    if (empty($store['ids'])) {
+        return;
+    }
+
+    $items = [];
+    foreach (array_slice($store['ids'], 0, 30) as $index => $post_id) {
+        $url = get_permalink((int) $post_id);
+        $name = get_the_title((int) $post_id);
+
+        if ($url === false || $name === '') {
+            continue;
+        }
+
+        $items[] = [
+            '@type' => 'ListItem',
+            'position' => $index + 1,
+            'url' => $url,
+            'name' => $name,
+        ];
+    }
+
+    if (empty($items)) {
+        return;
+    }
+
+    $country_id = (int) get_queried_object_id();
+    $country_title = $country_id > 0 ? get_the_title($country_id) : '';
+    $name = $store['label'];
+    if ($country_title !== '') {
+        $name .= ': ' . $country_title;
+    }
+
+    bsi_schema_json([
+        '@context' => 'https://schema.org',
+        '@type' => 'ItemList',
+        'name' => $name,
+        'numberOfItems' => count($items),
         'itemListElement' => $items,
     ]);
 }
