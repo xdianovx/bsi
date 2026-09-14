@@ -2169,7 +2169,7 @@ add_filter('wpseo_title', function ($title) {
         return $head . ' | ' . get_bloginfo('name');
     }
 
-    $head = $locative !== '' ? 'Отдых в ' . $locative : $name;
+    $head = $locative !== '' ? 'Отдых ' . bsi_seo_preposition_v($locative) . ' ' . $locative : $name;
     if ($country !== '') {
         $head .= ' (' . $country . ')';
     }
@@ -2236,7 +2236,7 @@ add_filter('wpseo_metadesc', function ($desc) {
         return $desc;
     }
 
-    $head = $locative !== '' ? 'Отдых в ' . $locative : $term->name;
+    $head = $locative !== '' ? 'Отдых ' . bsi_seo_preposition_v($locative) . ' ' . $locative : $term->name;
 
     return bsi_seo_trim_description($head . ': ' . $facts . '. Карта, описания и бронирование — BSI Group.');
 }, 26);

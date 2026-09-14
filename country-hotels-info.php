@@ -27,7 +27,7 @@ $country_locative = $country_id && function_exists('bsi_country_locative_title')
   : $country_title;
 
 $hotels_info_h1 = $country_locative !== ''
-  ? 'Информация об отелях в ' . $country_locative
+  ? 'Информация об отелях ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($country_locative) : 'в') . ' ' . $country_locative
   : 'Информация об отелях';
 
 /* Записи CPT hotel_info по стране. */

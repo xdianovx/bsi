@@ -131,7 +131,7 @@ get_header(); ?>
             <section class="resort-section" id="sights">
               <div class="resort-section-head">
                 <h2 class="h2 resort-section-title">
-                  <?= esc_html($locative !== '' ? 'Что посмотреть в ' . $locative : 'Достопримечательности'); ?>
+                  <?= esc_html($locative !== '' ? 'Что посмотреть ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($locative) : 'в') . ' ' . $locative : 'Достопримечательности'); ?>
                 </h2>
 
                 <div class="resort-section-tools">
@@ -174,7 +174,7 @@ get_header(); ?>
             <section class="resort-section" id="excursions">
               <div class="resort-section-head">
                 <h2 class="h2 resort-section-title">
-                  <?= esc_html($locative !== '' ? 'Экскурсии в ' . $locative : 'Экскурсии'); ?>
+                  <?= esc_html($locative !== '' ? 'Экскурсии ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($locative) : 'в') . ' ' . $locative : 'Экскурсии'); ?>
                 </h2>
 
                 <div class="resort-section-tools">
@@ -217,7 +217,7 @@ get_header(); ?>
             <section class="resort-section" id="education">
               <div class="resort-section-head">
                 <h2 class="h2 resort-section-title">
-                  <?= esc_html($locative !== '' ? 'Обучение в ' . $locative : 'Обучение'); ?>
+                  <?= esc_html($locative !== '' ? 'Обучение ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($locative) : 'в') . ' ' . $locative : 'Обучение'); ?>
                 </h2>
 
                 <div class="resort-section-tools">
@@ -265,7 +265,7 @@ get_header(); ?>
           <section class="resort-section resort-hotels" id="hotels" data-term-id="<?= (int) $term_id; ?>">
             <div class="resort-section-head">
               <h2 class="h2 resort-section-title">
-                <?= esc_html($locative !== '' ? 'Отели в ' . $locative : 'Отели'); ?>
+                <?= esc_html($locative !== '' ? 'Отели ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($locative) : 'в') . ' ' . $locative : 'Отели'); ?>
               </h2>
 
               <?php if ($hotels_url !== ''): ?>

@@ -34,7 +34,7 @@ $country_locative = $country_id && function_exists('bsi_country_locative_title')
   : $country_title;
 
 $excursions_h1 = $country_locative !== ''
-  ? 'Экскурсии в ' . $country_locative
+  ? 'Экскурсии ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($country_locative) : 'в') . ' ' . $country_locative
   : 'Экскурсии';
 
 $paged = max(1, (int) get_query_var('paged'));

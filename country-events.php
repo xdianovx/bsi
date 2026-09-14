@@ -46,7 +46,7 @@ $country_locative = $country_id && function_exists('bsi_country_locative_title')
   : $country_title;
 
 $events_h1 = $country_locative !== ''
-  ? 'Событийные туры в ' . $country_locative
+  ? 'Событийные туры ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($country_locative) : 'в') . ' ' . $country_locative
   : 'Событийные туры';
 
 /* 12 карточек на страницу — как в остальных каталогах. */

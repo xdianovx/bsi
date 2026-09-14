@@ -551,28 +551,28 @@ if (!function_exists('bsi_resort_sections')) {
       'ekskursii' => [
         'crumb' => 'Экскурсии',
         'post_type' => 'excursion',
-        'title' => 'Экскурсии в %s',
+        'title' => 'Экскурсии %s %s',
         'plural' => ['экскурсия', 'экскурсии', 'экскурсий'],
         'template' => 'template-parts/excursion/card-row',
       ],
       'dostoprimechatelnosti' => [
         'crumb' => 'Достопримечательности',
         'post_type' => 'sight',
-        'title' => 'Достопримечательности в %s',
+        'title' => 'Достопримечательности %s %s',
         'plural' => ['достопримечательность', 'достопримечательности', 'достопримечательностей'],
         'template' => 'template-parts/sight/card',
       ],
       'obuchenie' => [
         'crumb' => 'Обучение',
         'post_type' => 'education',
-        'title' => 'Обучение в %s',
+        'title' => 'Обучение %s %s',
         'plural' => ['программа', 'программы', 'программ'],
         'template' => 'template-parts/education/card',
       ],
       'oteli' => [
         'crumb' => 'Отели',
         'post_type' => 'hotel',
-        'title' => 'Отели в %s',
+        'title' => 'Отели %s %s',
         'plural' => ['отель', 'отеля', 'отелей'],
         'template' => 'template-parts/hotels/card-row',
       ],
@@ -652,7 +652,10 @@ if (!function_exists('bsi_resort_section_h1')) {
     $locative = bsi_resort_locative($term_id);
     $subject = $locative !== '' ? $locative : (($term instanceof WP_Term) ? $term->name : '');
 
-    return sprintf((string) $sections[$section]['title'], $subject);
+    /* Предлог согласуем с названием: «во Флоренции», но «в Венеции». */
+    $preposition = function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($subject) : 'в';
+
+    return sprintf((string) $sections[$section]['title'], $preposition, $subject);
   }
 }
 
