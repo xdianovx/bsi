@@ -214,3 +214,36 @@ function bsi_webp_srcset(int $attachment_id, string $size = 'full'): string
 
   return implode(', ', $out);
 }
+
+/**
+ * <picture> с WebP-источником и обычной картинкой внутри.
+ *
+ * Смысл тот же, что у баннеров главной: браузер берёт WebP, если умеет,
+ * иначе исходный формат. Размеры проставляет wp_get_attachment_image(),
+ * поэтому место под картинку резервируется до загрузки и макет не дёргается.
+ *
+ * @param int                  $attachment_id вложение
+ * @param string               $size          размер WordPress
+ * @param array<string,string> $attrs         атрибуты <img>
+ * @param string               $sizes         значение sizes, пусто — не выводить
+ */
+function bsi_picture(int $attachment_id, string $size = 'large', array $attrs = [], string $sizes = ''): string
+{
+  if ($attachment_id <= 0) {
+    return '';
+  }
+
+  $img = wp_get_attachment_image($attachment_id, $size, false, $attrs);
+  if ($img === '') {
+    return '';
+  }
+
+  $webp = bsi_webp_srcset($attachment_id, $size);
+  if ($webp === '') {
+    return $img;
+  }
+
+  $sizes_attr = $sizes !== '' ? ' sizes="' . esc_attr($sizes) . '"' : '';
+
+  return '<picture><source type="image/webp" srcset="' . esc_attr($webp) . '"' . $sizes_attr . ' />' . $img . '</picture>';
+}

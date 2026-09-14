@@ -132,9 +132,19 @@ add_filter('get_custom_logo', function ($html) {
 		return $html;
 	}
 
+	/* WordPress сам проставляет decoding и fetchpriority — добавляем только
+	   недостающее, иначе в теге оказываются два одинаковых атрибута. */
+	$extra = '';
+	if (!preg_match('/\sfetchpriority\s*=/i', $html)) {
+		$extra .= ' fetchpriority="high"';
+	}
+	if (!preg_match('/\sdecoding\s*=/i', $html)) {
+		$extra .= ' decoding="async"';
+	}
+
 	return preg_replace(
 		'/<img\s+([^>]*?)class="([^"]*)"/',
-		'<img $1class="$2 no-lazyload" fetchpriority="high" decoding="async"',
+		'<img $1class="$2 no-lazyload"' . $extra,
 		$html,
 		1
 	);
