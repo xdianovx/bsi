@@ -15,6 +15,7 @@ $is_memo_page = false;
 $is_entry_rules_page = false;
 $is_news_page = false;
 $is_excursions_page = false;
+$is_education_page = false;
 $is_sights_page = false;
 $is_events_page = false;
 $is_hotels_info_page = false;
@@ -249,6 +250,15 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_excursions_page = true;
 
+} elseif (get_query_var('country_education')) {
+
+  $country_slug = (string) get_query_var('country_education');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_education_page = true;
+
 } elseif (get_query_var('country_sights')) {
 
   $country_slug = (string) get_query_var('country_sights');
@@ -429,6 +439,16 @@ $has_sights = get_posts([
   ],
 ]);
 
+$has_education = get_posts([
+  'post_type' => 'education',
+  'post_status' => 'publish',
+  'posts_per_page' => 1,
+  'fields' => 'ids',
+  'meta_query' => [
+    ['key' => 'education_country', 'value' => $main_parent_id, 'compare' => '='],
+  ],
+]);
+
 $has_deposits = get_posts([
   'post_type' => 'hotel_deposit',
   'post_status' => 'publish',
@@ -455,7 +475,7 @@ $is_country_overview = (
   !$is_resorts_page && !$is_tours_page &&
   !$is_memo_page && !$is_entry_rules_page && !$is_news_page &&
   !$is_excursions_page && !$is_sights_page && !$is_events_page && !$is_hotels_info_page &&
-  !$is_deposits_page
+  !$is_deposits_page && !$is_education_page
 );
 
 $active_tour_types = [];
@@ -785,6 +805,22 @@ $visa_icon_svg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" st
           </svg>
         </span>
         <span>Достопримечательности</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if (!empty($has_education)): ?>
+      <a href="<?= esc_url(home_url("/country/{$country_slug}/obuchenie/")); ?>"
+        class="child-page-item <?= $is_education_page ? 'active' : ''; ?>">
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-graduation-cap-icon lucide-graduation-cap">
+            <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
+            <path d="M22 10v6" />
+            <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
+          </svg>
+        </span>
+        <span>Обучение</span>
       </a>
     <?php endif; ?>
 
