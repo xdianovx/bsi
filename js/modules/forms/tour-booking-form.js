@@ -138,6 +138,20 @@ function bindForm(form) {
   }
 }
 
+const YM_ID = 108341897;
+
+/** Цель «заявка на тур» с параметрами: в отчёте видно, на какой именно тур пришли. */
+function reachGoal(form) {
+  if (typeof window.ym !== "function") return;
+
+  const val = (sel) => form.querySelector(sel)?.value || "";
+
+  window.ym(YM_ID, "reachGoal", "tour_booking_submitted", {
+    tour: val(".js-form-tour-title"),
+    tour_id: val(".js-form-tour-id"),
+  });
+}
+
 async function submitForm(e) {
   e.preventDefault();
   const form = e.currentTarget;
@@ -164,6 +178,7 @@ async function submitForm(e) {
     const result = await submitFormWithRecaptcha(formData, { debug: false });
 
     if (result.success) {
+      reachGoal(form);
       MicroModal.close("modal-tour-booking");
 
       setTimeout(() => {

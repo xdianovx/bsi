@@ -29,7 +29,7 @@
   <?php wp_head(); ?>
 </head>
 
-<body <?php body_class(); ?>>
+<body <?php body_class(); ?><?php bsi_ym_content_params_attrs(); ?>>
   <header class="header">
     <div class="header-top__wrap">
       <div class="container">

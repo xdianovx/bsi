@@ -408,6 +408,9 @@ require get_template_directory() . '/inc/admin/menu-hubs.php';
 /* Настройки сайта → «Импорт со старого сайта»: заливка JSON (на проде только FTP).
    Одна страница на экскурсии и достопримечательности сразу. */
 require get_template_directory() . '/inc/admin/legacy-import.php';
+
+/* Параметры визита для Метрики на карточках контента. */
+require get_template_directory() . '/inc/ym-content-params.php';
 require get_template_directory() . '/inc/admin/webp-convert.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';

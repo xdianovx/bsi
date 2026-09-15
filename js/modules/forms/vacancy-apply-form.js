@@ -107,6 +107,17 @@ function bindPhoneMask(form) {
   });
 }
 
+const YM_ID = 108341897;
+
+/** Цель «отклик на вакансию»: в отчёте видно, на какую именно вакансию откликнулись. */
+function reachGoal(form) {
+  if (typeof window.ym !== "function") return;
+
+  window.ym(YM_ID, "reachGoal", "vacancy_apply_submitted", {
+    vacancy_id: form.querySelector('[name="vacancy_id"]')?.value || "",
+  });
+}
+
 async function submitForm(e) {
   e.preventDefault();
   const form = e.currentTarget;
@@ -138,6 +149,7 @@ async function submitForm(e) {
     const result = await submitFormWithRecaptcha(formData, { debug: false });
 
     if (result.success) {
+      reachGoal(form);
       form.reset();
       const nameEl = form.querySelector(".js-vacancy-resume-name");
       if (nameEl) nameEl.textContent = "Файл не выбран";

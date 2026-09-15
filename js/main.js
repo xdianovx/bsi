@@ -49,6 +49,7 @@ import { initSightsFilters } from "./modules/sights-filters";
 import { EducationCurrencySwitcher } from "./modules/education-currency-switcher";
 
 import { initCookieConsent } from "./modules/cookie-consent";
+import { initYmContentParams } from "./modules/ym-content-params";
 
 function initYmReachGoals() {
   const isVisaPage =
@@ -104,6 +105,7 @@ function initYmReachGoals() {
 window.addEventListener("DOMContentLoaded", () => {
   initYmReachGoals();
   initCookieConsent();
+  initYmContentParams();
 
   burger();
   mobileNavAccordion();

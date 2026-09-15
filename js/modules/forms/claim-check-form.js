@@ -56,6 +56,14 @@ function renderMessage(box, message, tone) {
   box.hidden = false;
 }
 
+const YM_ID = 108341897;
+
+/** Цель «проверка заявки»: не лид, а показатель использования личного кабинета. */
+function reachGoal() {
+  if (typeof window.ym !== "function") return;
+  window.ym(YM_ID, "reachGoal", "claim_checked");
+}
+
 async function submit(form, box) {
   const input = form.querySelector(".js-claim-check-input");
   const value = input ? input.value.trim() : "";
@@ -80,6 +88,7 @@ async function submit(form, box) {
     const result = await submitFormWithRecaptcha(new FormData(form));
 
     if (result.success) {
+      reachGoal();
       renderResult(box, result.data);
     } else if (result.data?.errors?.claim) {
       setError(form, result.data.errors.claim);
