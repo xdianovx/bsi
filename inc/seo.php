@@ -913,6 +913,7 @@ function bsi_seo_country_section_exists(int $country_id, string $qv): bool
         'country_entry_rules' => ['entry_rules', 'entry_rules_country'],
         'country_events'      => ['event', 'tour_country'],
         'country_deposits'    => ['hotel_deposit', 'hotel_deposit_country'],
+        'country_excursions'  => ['excursion', 'excursion_country'],
     ];
 
     if (!isset($linked[$qv])) {
@@ -1325,6 +1326,45 @@ function bsi_seo_legacy_country_codes(): array
 }
 
 /**
+ * Сопоставляет тип тура из старого URL `/country/{iso}/tip-tura/{type}/`
+ * с подстраницей страны.
+ *
+ * На старом сайте типов тура под две сотни (пляжный отдых, горнолыжные,
+ * шопинг-туры и так далее), отдельных разделов под них нет — такие URL уходят
+ * в общий каталог туров. Здесь перечислены только те типы, которым на новом
+ * сайте есть точное соответствие: без этого запросы вида «экскурсионные туры
+ * в италию» приземлялись на каталог туров и теряли тематику.
+ */
+function bsi_seo_legacy_tour_type_target(string $base, array $parts, int $country_id): string
+{
+    $type = strtolower($parts[3] ?? '');
+
+    $map = [
+        'ekskursionnye-tury'              => 'country_excursions',
+        'excursion'                       => 'country_excursions',
+        'excursions-and-rest'             => 'country_excursions',
+        'excursion-tours-with-flight'     => 'country_excursions',
+        'excursion-tours-without-flight'  => 'country_excursions',
+        'event-tours'                     => 'country_events',
+    ];
+
+    if (!isset($map[$type])) {
+        return $base . 'tours/';
+    }
+
+    $qv = $map[$type];
+
+    // Раздела у страны может не быть — тогда общий каталог туров, а не 404.
+    if (!bsi_seo_country_section_exists($country_id, $qv)) {
+        return $base . 'tours/';
+    }
+
+    $sections = bsi_seo_virtual_sections();
+
+    return $base . $sections[$qv]['slug'] . '/';
+}
+
+/**
  * Сопоставляет раздел старого URL с разделом нового.
  * Неизвестный раздел ведёт на страницу страны.
  */
@@ -1333,12 +1373,14 @@ function bsi_seo_legacy_country_target(string $base, array $parts, int $country_
     $section = strtolower($parts[2] ?? '');
 
     switch ($section) {
+        case 'tip-tura':
+            return bsi_seo_legacy_tour_type_target($base, $parts, $country_id);
+
         case 'visa':
             return bsi_seo_country_section_exists($country_id, 'country_visa')
                 ? $base . 'visa/'
                 : $base;
 
-        case 'tip-tura':
         case 'tours':
             return $base . 'tours/';
 
