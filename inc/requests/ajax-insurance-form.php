@@ -50,8 +50,11 @@ function handle_insurance_form()
   $insurance_type = sanitize_text_field($_POST['insurance_type'] ?? '');
   $date = sanitize_text_field($_POST['date'] ?? '');
 
-  // Формируем HTML сообщение для email
-  $recipient_email = 'dianov.js@gmail.com';
+  // Получатели заявки
+  $recipient_email = [
+    'dianov.js@gmail.com',
+    'e.klimova@bsigroup.ru',
+  ];
 
   // Формируем HTML письмо
   $html_message = '<!DOCTYPE html>
@@ -139,7 +142,7 @@ function handle_insurance_form()
 
   // Отправка письма
   $subject = 'Новая заявка на консультацию по страхованию';
-  error_log('Insurance Form: Sending email to ' . $recipient_email);
+  error_log('Insurance Form: Sending email to ' . implode(', ', $recipient_email));
   $sent = wp_mail($recipient_email, $subject, $html_message, $headers);
   error_log('Insurance Form: wp_mail result = ' . ($sent ? 'true' : 'false'));
 
