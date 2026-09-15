@@ -34,6 +34,23 @@ add_action('admin_menu', function () {
   );
 }, 998.5);
 
+/**
+ * Русское склонение числительного: 1 файл, 2 файла, 5 файлов.
+ */
+function bsi_legacy_plural(int $count, string $one, string $few, string $many): string
+{
+  $mod100 = $count % 100;
+  if ($mod100 >= 11 && $mod100 <= 14) {
+    return $many;
+  }
+
+  return match ($count % 10) {
+    1 => $one,
+    2, 3, 4 => $few,
+    default => $many,
+  };
+}
+
 function bsi_legacy_import_page(): void
 {
   if (!current_user_can(BSI_LEGACY_IMPORT_CAP)) {
@@ -52,6 +69,7 @@ function bsi_legacy_import_page(): void
     <?php else: ?>
       <p>
         Один файл — одна страна, внутри и экскурсии, и достопримечательности.
+        Пункт «Все страны» прогоняет все файлы подряд одной кнопкой.
         Записи ищутся по мете <code>bsi_legacy_excursion_id</code> и <code>bsi_legacy_sight_id</code>:
         повторный запуск обновляет только свои записи. Заведённые вручную не перезаписываются
         и не дублируются — такие совпадения попадут в отчёт как «конфликт».
@@ -65,6 +83,9 @@ function bsi_legacy_import_page(): void
           <th scope="row"><label for="bsi-legacy-file">Файл</label></th>
           <td>
             <select id="bsi-legacy-file">
+              <option value="__all__">
+                Все страны — <?= count($files); ?> <?= bsi_legacy_plural(count($files), 'файл', 'файла', 'файлов'); ?>, <?= esc_html(size_format(array_sum(array_map('filesize', $files)))); ?>
+              </option>
               <?php foreach ($files as $name => $path): ?>
                 <option value="<?= esc_attr($name); ?>"><?= esc_html($name); ?> (<?= esc_html(size_format((int) filesize($path))); ?>)</option>
               <?php endforeach; ?>
@@ -122,12 +143,13 @@ function bsi_legacy_import_page(): void
       const nonce = <?= wp_json_encode(wp_create_nonce('bsi_legacy_import')); ?>;
       const ajaxUrl = <?= wp_json_encode(admin_url('admin-ajax.php')); ?>;
       const labels = { excursions: 'экскурсии', sights: 'достопримечательности' };
+      const allFiles = <?= wp_json_encode(array_keys($files)); ?>;
 
-      async function runBatch(entity, offset, dryRun, totals) {
+      async function runBatch(file, entity, offset, dryRun, totals) {
         const body = new URLSearchParams({
           action: 'bsi_legacy_import',
           _wpnonce: nonce,
-          file: fileEl.value,
+          file: file,
           entity: entity,
           status: statusEl.value,
           offset: String(offset),
@@ -139,9 +161,11 @@ function bsi_legacy_import_page(): void
         const json = await response.json();
 
         if (!json.success) {
-          progressEl.textContent = 'Ошибка: ' + (json.data && json.data.message ? json.data.message : 'неизвестно');
-          runBtn.disabled = false;
-          dryBtn.disabled = false;
+          const message = json.data && json.data.message ? json.data.message : 'неизвестно';
+          logEl.style.display = 'block';
+          logEl.textContent += '! ' + file + ': ' + message + '\n';
+          logEl.scrollTop = logEl.scrollHeight;
+          totals.failed.push(file);
           return false;
         }
 
@@ -158,10 +182,22 @@ function bsi_legacy_import_page(): void
           logEl.scrollTop = logEl.scrollHeight;
         }
 
-        progressEl.textContent = labels[entity] + ': ' + data.next + ' из ' + data.total;
+        progressEl.textContent = totals.prefix + file + ' — ' + labels[entity] + ': ' + data.next + ' из ' + data.total;
 
         if (data.next < data.total) {
-          return runBatch(entity, data.next, dryRun, totals);
+          return runBatch(file, entity, data.next, dryRun, totals);
+        }
+
+        return true;
+      }
+
+      /* Сбой одного файла не роняет прогон «все страны»: пишем в лог и идём дальше. */
+      async function runFile(file, dryRun, totals) {
+        for (const entity of ['excursions', 'sights']) {
+          const ok = await runBatch(file, entity, 0, dryRun, totals);
+          if (!ok) {
+            return false;
+          }
         }
 
         return true;
@@ -174,19 +210,19 @@ function bsi_legacy_import_page(): void
         logEl.style.display = 'none';
         progressEl.textContent = 'Старт…';
 
-        const totals = { created: 0, updated: 0, skipped: 0, conflicts: 0, protected: 0 };
+        const files = fileEl.value === '__all__' ? allFiles : [fileEl.value];
+        const totals = { created: 0, updated: 0, skipped: 0, conflicts: 0, protected: 0, prefix: '', failed: [] };
 
-        for (const entity of ['excursions', 'sights']) {
-          const ok = await runBatch(entity, 0, dryRun, totals);
-          if (!ok) {
-            return;
-          }
+        for (let i = 0; i < files.length; i++) {
+          totals.prefix = files.length > 1 ? '[' + (i + 1) + '/' + files.length + '] ' : '';
+          await runFile(files[i], dryRun, totals);
         }
 
         progressEl.textContent = 'Готово: создано ' + totals.created +
           ', обновлено ' + totals.updated +
           ', сохранено правленых ' + totals.protected +
           ', конфликтов ' + totals.conflicts +
+          (totals.failed.length ? ', не прочитано файлов: ' + totals.failed.length : '') +
           (dryRun ? ' [прогон, ничего не записано]' : '');
         runBtn.disabled = false;
         dryBtn.disabled = false;
