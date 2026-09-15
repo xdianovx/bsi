@@ -14,8 +14,10 @@
 Файлы `01..03` по тирам пишутся рядом как справочные срезы — они нужны, если
 хочется развести частоту съёма по отдельным проектам, ценой потери истории.
 
-Колонки повторяют формат выгрузки pr-cy («Позиции ключевых слов»), чтобы импорт
-опознал их без ручного маппинга: Запрос;Группы;Целевой url
+Формат импорта pr-cy (проверен на ошибке валидатора, отличается от формата выгрузки):
+  Запросы;"Целевая ссылка";"Имя группы";ГГГГ-ММ-ДД[;ГГГГ-ММ-ДД...]
+Колонки дат обязательны — хотя бы одна. Позиции берутся из исходной выгрузки,
+отсутствие в топ-100 (в выгрузке `-1`) записывается как `--`.
 
 Группа = «раздел | страна», но только если по связке набирается MIN_IN_GROUP
 запросов — иначе страна схлопывается в «прочие страны», чтобы отчёт не рассыпался
@@ -23,9 +25,9 @@
 в размеченном CSV, он и есть источник для разбора.
 
 Запуск:
-  python3 tools/seo/make-prcy-projects.py <clustered.csv> <выходная-папка>
+  python3 tools/seo/make-prcy-projects.py <clustered.csv> <исходная-выгрузка.csv> <выходная-папка>
 """
-import csv, os, sys
+import csv, os, re, sys
 from collections import Counter
 
 # меньше этого числа запросов в связке «раздел+страна» — страна уходит в «прочие»
@@ -53,14 +55,32 @@ def make_grouper(rows):
     return group_of
 
 
-def write(path, rows, group_of, title, verbose=True):
+DATE_RX = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+
+
+def read_history(src):
+    """Позиции по датам из исходной выгрузки pr-cy: {запрос: {дата: позиция}}."""
+    rows = list(csv.DictReader(open(src, encoding='utf-8-sig'), delimiter=';'))
+    dates = [k for k in rows[0] if DATE_RX.match(k)]
+    dates.sort(reverse=True)
+    hist = {}
+    for r in rows:
+        # в выгрузке «вне топ-100» это -1, импорт ждёт «--»
+        hist[r['Запрос']] = {d: ('--' if r[d].strip() in ('-1', '') else r[d].strip())
+                             for d in dates}
+    return dates, hist
+
+
+def write(path, rows, group_of, title, dates, hist, verbose=True):
     rows = sorted(rows, key=lambda r: (group_of(r), -int(r['Частотность'])))
     with open(path, 'w', encoding='utf-8-sig', newline='') as f:
         w = csv.writer(f, delimiter=';', quoting=csv.QUOTE_MINIMAL)
-        w.writerow(['Запрос', 'Группы', 'Целевой url'])
+        w.writerow(['Запросы', 'Целевая ссылка', 'Имя группы'] + dates)
         for r in rows:
-            w.writerow([r['Запрос'], group_of(r),
-                        'https://bsigroup.ru' + r['Целевой URL (гипотеза)']])
+            h = hist.get(r['Запрос'], {})
+            w.writerow([r['Запрос'],
+                        'https://bsigroup.ru' + r['Целевой URL (гипотеза)'],
+                        group_of(r)] + [h.get(d, '--') for d in dates])
     freq = sum(int(r['Частотность']) for r in rows)
     gc = Counter(group_of(r) for r in rows)
     print(f'{path}\n  {title}\n  {len(rows)} запросов, {len(gc)} групп, частотность {freq}')
@@ -70,22 +90,28 @@ def write(path, rows, group_of, title, verbose=True):
     print()
 
 
-def main(src, outdir):
+def main(src, export, outdir):
     rows = list(csv.DictReader(open(src, encoding='utf-8-sig'), delimiter=';'))
+    dates, hist = read_history(export)
     os.makedirs(outdir, exist_ok=True)
+
+    missing = [r['Запрос'] for r in rows if r['Запрос'] not in hist]
+    if missing:
+        print(f'! нет истории у {len(missing)} запросов, им проставлено «--»\n')
 
     # основной файл: группы считаются по всей семантике разом, чтобы «прочие страны»
     # не разъезжались между тирами
     group_of = make_grouper(rows)
     write(os.path.join(outdir, '00-vse-zaprosy.csv'), rows, group_of,
-          'ВСЕ ЗАПРОСЫ — лить поверх существующего проекта, история сохраняется')
+          'ВСЕ ЗАПРОСЫ — основной файл импорта', dates, hist)
 
     print('--- справочные срезы по тирам (отдельные проекты = потеря истории) ---\n')
     for t, (fname, title) in PROJECTS.items():
         sub = [r for r in rows if r['Тир'] == t]
         if sub:
-            write(os.path.join(outdir, f'{fname}.csv'), sub, group_of, title, verbose=False)
+            write(os.path.join(outdir, f'{fname}.csv'), sub, group_of, title,
+                  dates, hist, verbose=False)
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
