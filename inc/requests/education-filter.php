@@ -810,6 +810,8 @@ function bsi_ajax_country_education_filter(): void
   $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
   $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
 
+  $paged = isset($_POST['paged']) ? max(1, absint(wp_unslash($_POST['paged']))) : 1;
+
   $tax_query = [];
 
   if (!empty($programs)) {
@@ -844,10 +846,13 @@ function bsi_ajax_country_education_filter(): void
     ];
   }
 
+  // Собираем ВСЕ подходящие школы: дальше они досеиваются по программам
+  // (возраст/длительность/даты) и режутся на страницы вручную.
   $args = [
     'post_type' => 'education',
     'post_status' => 'publish',
-    'posts_per_page' => 12,
+    'posts_per_page' => -1,
+    'no_found_rows' => true,
     'orderby' => 'title',
     'order' => 'ASC',
     'meta_query' => [
@@ -953,16 +958,26 @@ function bsi_ajax_country_education_filter(): void
     wp_send_json_success([
       'html' => '<div class="country-education__empty">Школы не найдены.</div>',
       'total' => 0,
+      'pagination' => '',
     ]);
   }
+
+  $per_page = 12;
+  $total = count($filtered_ids);
+  $max_pages = (int) ceil($total / $per_page);
+  if ($paged > $max_pages) {
+    $paged = $max_pages;
+  }
+  $page_ids = array_slice($filtered_ids, ($paged - 1) * $per_page, $per_page);
 
   $final_query = new WP_Query([
     'post_type' => 'education',
     'post_status' => 'publish',
-    'post__in' => $filtered_ids,
-    'posts_per_page' => 12,
+    'post__in' => $page_ids,
+    'posts_per_page' => $per_page,
     'orderby' => 'title',
     'order' => 'ASC',
+    'no_found_rows' => true,
   ]);
 
   ob_start();
@@ -978,9 +993,14 @@ function bsi_ajax_country_education_filter(): void
 
   $html = ob_get_clean();
 
+  $pagination = $max_pages > 1
+    ? bsi_pagination_links(['total' => $max_pages, 'current' => $paged])
+    : '';
+
   wp_send_json_success([
     'html' => $html,
-    'total' => (int) $final_query->found_posts,
+    'total' => (int) $total,
+    'pagination' => $pagination,
   ]);
 }
 
