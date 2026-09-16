@@ -440,8 +440,7 @@
   }
 }
 
-@media screen and (max-width: 600px) {
-}
+@media screen and (max-width: 600px) {}
 
 /* Карточка-плитка событийного тура */
 .event-card {
@@ -611,7 +610,7 @@
   color: $text-black;
 }
 
-.event-card__price-line + .event-card__actions {
+.event-card__price-line+.event-card__actions {
   margin-top: 0;
   padding-top: 8px;
 }
@@ -2189,7 +2188,7 @@ body.page-template-page-sobytiynye-tury .country-tours__counter {
 
 body.page-template-page-sobytiynye-tury .country-tours__list {
   margin-top: 16px;
-  gap: 16px;
+  gap: 8px;
 }
 
 /* Сброс — текстовая кнопка с крестиком, без рамки. */
