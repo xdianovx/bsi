@@ -24,6 +24,40 @@
     margin-bottom: 0;
   }
 
+  /* Нативный <select> виден до инициализации Choices. Без этих правил у него
+     системная стрелка и свой отступ текста, и в момент подмены содержимое
+     заметно дёргается. Повторяем геометрию .choices__inner. */
+  select {
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 48px;
+    padding: 0 32px 0 16px;
+    border: 0;
+    border-radius: 8px;
+    background-color: $bg-page;
+    background-image: url("../../img/icons/chevron-d.svg");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px 18px;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 48px;
+    color: $text-black;
+  }
+
+  /* Пустое значение («Все страны») Choices рисует серым плейсхолдером —
+     красим так же, иначе в момент подмены текст меняет цвет. */
+  select:has(option[value=""]:checked) {
+    color: $text-gray;
+  }
+
+  /* После инициализации Choices прячет select внутри своей обёртки */
+  .choices select {
+    display: none;
+  }
+
   .choices__inner {
     box-sizing: border-box;
     display: flex;
