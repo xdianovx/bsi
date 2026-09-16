@@ -115,7 +115,33 @@ body.page-template-page-education .education-page__empty {
     padding-block: 10px;
   }
 
+  /* Панель складываем в столбик: счётчик, переключатели, сброс и сортировка
+     идут строками слева. Раньше они переносились по ширине и вставали
+     вразнобой — сортировка уезжала одна вправо. */
   body.page-template-page-education .education-page__controls {
-    gap: 4px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  body.page-template-page-education .education-page__counter-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  body.page-template-page-education .education-page__counter {
+    padding-block: 6px;
+  }
+
+  body.page-template-page-education .education-page__controls-right {
+    margin-left: 0;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  body.page-template-page-education .education-page__sort-panel {
+    right: auto;
+    left: 0;
   }
 }
