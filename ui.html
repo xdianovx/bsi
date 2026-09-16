@@ -670,6 +670,18 @@ $trans-text: all 0.3s ease-in-out;
         </div>
       </div>
     </div>
+    <p class="uikit-section__hint">Одно фото — модификатор <code>.ui-gallery--single</code>: кадр 16:9 во всю ширину контейнера (типовой случай для достопримечательностей).</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="ui-gallery ui-gallery--single">
+        <div class="ui-gallery__grid">
+          <a class="ui-gallery__item ui-gallery__item--main" href="https://picsum.photos/id/1036/1600/900" data-fancybox="uikit-gallery-single">
+            <img src="https://picsum.photos/id/1036/1280/720" alt="">
+          </a>
+        </div>
+      </div>
+    </div>
+
     <pre class="uikit-snippet">&lt;?php get_template_part('template-parts/sections/gallery', null, [
   'gallery' =&gt; $gallery,   // массив ACF-галереи
   'id'      =&gt; 'hotel-' . get_the_ID(),

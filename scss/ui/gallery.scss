@@ -63,10 +63,14 @@
   grid-row: span 2;
 }
 
+/* Одно фото (обычный случай у достопримечательностей) занимает всю ширину
+   контейнера кадром 16:9 — обрезать его полосой под мозаику незачем.
+   Потолок высоты снят: пропорцию держит aspect-ratio. */
 .ui-gallery--single .ui-gallery__grid {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  aspect-ratio: 16 / 7;
+  aspect-ratio: 16 / 9;
+  max-height: none;
 }
 
 .ui-gallery--single .ui-gallery__item--main {
