@@ -68,7 +68,9 @@
 }
 /* На страницах с серым фоном кнопки красим в белый: $bg-gray почти сливается с $bg-page */
 body.single-country,
-body.single-insurance {
+body.single-insurance,
+body.tax-resort,
+body.page-template-page-education {
 
   .ui-pagination .page-numbers,
   .news-pagination .page-numbers {
