@@ -187,7 +187,7 @@ get_header(); ?>
             <?php endif; ?>
 
             <?php if (!empty($region_terms) || !empty($type_terms)): ?>
-              <form class="country-sights-filters" method="get" action="<?= esc_url($base_url); ?>" data-sights-filters>
+              <form class="country-sights-filters ui-filters" method="get" action="<?= esc_url($base_url); ?>" data-sights-filters>
                 <div class="country-sights-filters-fields">
 
                 <?php if (!is_wp_error($region_terms) && !empty($region_terms)): ?>

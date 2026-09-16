@@ -910,7 +910,7 @@ get_header();
 
             <?php if (($price_from_amount !== null && (int) $price_from_amount > 0) || $crosstour_ref || $has_scheme_legend): ?>
               <div class="single-event__currency-toggle">
-                <label class="ui-checkbox">
+                <label class="ui-checkbox ui-currency-toggle">
                   <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" name="show_original_currency_event"
                     value="1">
                   <span class="ui-checkbox__mark"></span>

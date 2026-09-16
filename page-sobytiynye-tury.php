@@ -190,7 +190,7 @@ $tour_type_terms = get_terms([
              data-initial-paged="<?= (int) $paged; ?>"
              data-page-base="<?= esc_url($event_tours_base_url); ?>">
 
-          <form class="country-tours__filters"
+          <form class="country-tours__filters ui-filters"
                 data-tours-form>
             <div class="country-tours__filters-row --events">
               <div class="tours-filter__field tours-filter__field--search">
@@ -254,7 +254,7 @@ $tour_type_terms = get_terms([
 
           <div class="country-tours__head">
             <div class="country-tours__head-left">
-              <label class="ui-checkbox country-tours__currency-toggle">
+              <label class="ui-checkbox ui-currency-toggle country-tours__currency-toggle">
                 <input type="checkbox"
                        class="ui-checkbox__input js-education-show-original-currency"
                        name="show_original_currency_event_catalog"
@@ -275,11 +275,11 @@ $tour_type_terms = get_terms([
 
             <div class="country-tours__head-right">
               <!-- Сортировка -->
-              <div class="country-tours__sort js-dropdown"
+              <div class="ui-sort country-tours__sort js-dropdown"
                    data-tours-sort>
                 <button type="button"
-                        class="js-dropdown-trigger country-tours__sort-trigger">
-                  <span class="country-tours__sort-text">По дате (сначала ближайшие)</span>
+                        class="js-dropdown-trigger ui-sort__trigger country-tours__sort-trigger">
+                  <span class="ui-sort__text country-tours__sort-text">По дате (сначала ближайшие)</span>
                   <svg xmlns="http://www.w3.org/2000/svg"
                        width="20"
                        height="20"
@@ -292,19 +292,19 @@ $tour_type_terms = get_terms([
                           stroke-linejoin="round" />
                   </svg>
                 </button>
-                <div class="js-dropdown-panel country-tours__sort-panel">
-                  <div class="country-tours__sort-options">
+                <div class="js-dropdown-panel ui-sort__panel country-tours__sort-panel">
+                  <div class="ui-sort__options country-tours__sort-options">
                     <button type="button"
-                            class="country-tours__sort-option is-active"
+                            class="ui-sort__option country-tours__sort-option is-active"
                             data-value="date_asc">По дате (сначала ближайшие)</button>
                     <button type="button"
-                            class="country-tours__sort-option"
+                            class="ui-sort__option country-tours__sort-option"
                             data-value="date_desc">По дате (сначала поздние)</button>
                     <button type="button"
-                            class="country-tours__sort-option"
+                            class="ui-sort__option country-tours__sort-option"
                             data-value="price_asc">По цене (возрастание)</button>
                     <button type="button"
-                            class="country-tours__sort-option"
+                            class="ui-sort__option country-tours__sort-option"
                             data-value="price_desc">По цене (убывание)</button>
                   </div>
                 </div>

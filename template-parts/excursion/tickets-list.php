@@ -20,13 +20,13 @@ if (empty($rows) || !is_array($rows)) {
 <section class="single-event__dates-section single-excursion__tickets-section">
   <div class="single-excursion__tickets-head">
     <h2 class="h2 single-event__dates-title single-excursion__tickets-title">Стоимость билетов</h2>
-    <label class="ui-checkbox single-excursion__tickets-currency-toggle">
+    <label class="ui-checkbox ui-currency-toggle single-excursion__tickets-currency-toggle">
       <input type="checkbox"
              class="ui-checkbox__input js-education-show-original-currency"
              name="show_original_currency_tickets"
              value="1">
       <span class="ui-checkbox__mark"></span>
-      <span class="ui-checkbox__text">Стоимость в валюте</span>
+      <span class="ui-checkbox__text">Показать в валюте</span>
     </label>
   </div>
   <ul class="single-event__dates-list single-excursion__tickets-list">

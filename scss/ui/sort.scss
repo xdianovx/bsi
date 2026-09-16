@@ -1,0 +1,126 @@
+/**
+ * Сортировка каталога — общий компонент.
+ *
+ * До 2026-09-16 каждый каталог вёрстку сортировки писал заново:
+ * country-tours__sort-trigger (прозрачный), он же под .event-tours-page
+ * (белая пилюля 44px), country-excursions__sort-trigger, education-page__,
+ * tours-page__, single-education__programs-. Отсюда разный вид на соседних
+ * страницах. Теперь вид один, а старые классы остаются в разметке только
+ * как зацепки для JS.
+ *
+ * Разметка:
+ *   <div class="ui-sort js-dropdown">
+ *     <button class="js-dropdown-trigger ui-sort__trigger">
+ *       <span class="ui-sort__text">По цене</span>
+ *       <svg …>
+ *     </button>
+ *     <div class="js-dropdown-panel ui-sort__panel">
+ *       <div class="ui-sort__options">
+ *         <button class="ui-sort__option is-active">…</button>
+ *       </div>
+ *     </div>
+ *   </div>
+ */
+
+.ui-sort {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ui-sort__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 100%;
+  color: $text-black;
+  cursor: pointer;
+  transition: $trans-text;
+
+  /* У .js-dropdown-trigger свой chevron через ::after — в разметке уже своя иконка */
+  &::after {
+    display: none !important;
+  }
+
+  svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  /* Цвет текста на hover не меняем: обратную связь даёт раскрытая панель
+     и подсветка пункта заливкой. */
+}
+
+.ui-sort.is-open .ui-sort__trigger svg {
+  transform: rotate(180deg);
+}
+
+.ui-sort__panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: auto;
+  min-width: 240px;
+  margin-top: 0;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: $bg-color;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+  display: none;
+  z-index: 50;
+}
+
+.ui-sort.is-open .ui-sort__panel {
+  display: block;
+}
+
+.ui-sort__options {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.ui-sort__option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.25;
+  text-align: left;
+  color: $text-black;
+  cursor: pointer;
+  transition: $trans-text;
+
+  &:hover {
+    background: $bg-gray;
+  }
+
+  &.is-active {
+    color: $red;
+    font-weight: 600;
+  }
+}
+
+/* На узком экране панель открывается влево, иначе уезжает за край */
+@media screen and (max-width: 768px) {
+  .ui-sort__panel {
+    right: auto;
+    left: 0;
+    min-width: 220px;
+  }
+}

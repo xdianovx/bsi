@@ -97,7 +97,7 @@ get_header(); ?>
             <?php /* ВРЕМЕННО: фильтры скрыты по просьбе заказчика (2026-09-15).
                      Разметка и JS остаются рабочими — вернуть, убрав if (false). */ ?>
             <?php if (false): ?>
-            <form class="country-education__filters"
+            <form class="country-education__filters ui-filters"
                   data-education-form>
               <div class="country-education__filters-row">
                 <div class="education-filter__field">

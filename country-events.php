@@ -136,7 +136,7 @@ get_header(); ?>
 
             <div class="country-tours__head">
               <div class="country-tours__head-left">
-                <label class="ui-checkbox country-tours__currency-toggle">
+                <label class="ui-checkbox ui-currency-toggle country-tours__currency-toggle">
                   <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency"
                     name="show_original_currency_event_catalog" value="1">
                   <span class="ui-checkbox__mark"></span>
@@ -146,20 +146,20 @@ get_header(); ?>
 
               <div class="country-tours__head-right">
                 <!-- Сортировка -->
-                <div class="country-tours__sort js-dropdown" data-tours-sort>
-                  <button type="button" class="js-dropdown-trigger country-tours__sort-trigger">
-                    <span class="country-tours__sort-text">По дате (сначала ближайшие)</span>
+                <div class="ui-sort country-tours__sort js-dropdown" data-tours-sort>
+                  <button type="button" class="js-dropdown-trigger ui-sort__trigger country-tours__sort-trigger">
+                    <span class="ui-sort__text country-tours__sort-text">По дате (сначала ближайшие)</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
                             stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   </button>
-                  <div class="js-dropdown-panel country-tours__sort-panel">
-                    <div class="country-tours__sort-options">
-                      <button type="button" class="country-tours__sort-option is-active" data-value="date_asc">По дате (сначала ближайшие)</button>
-                      <button type="button" class="country-tours__sort-option" data-value="date_desc">По дате (сначала поздние)</button>
-                      <button type="button" class="country-tours__sort-option" data-value="price_asc">По цене (возрастание)</button>
-                      <button type="button" class="country-tours__sort-option" data-value="price_desc">По цене (убывание)</button>
+                  <div class="js-dropdown-panel ui-sort__panel country-tours__sort-panel">
+                    <div class="ui-sort__options country-tours__sort-options">
+                      <button type="button" class="ui-sort__option country-tours__sort-option is-active" data-value="date_asc">По дате (сначала ближайшие)</button>
+                      <button type="button" class="ui-sort__option country-tours__sort-option" data-value="date_desc">По дате (сначала поздние)</button>
+                      <button type="button" class="ui-sort__option country-tours__sort-option" data-value="price_asc">По цене (возрастание)</button>
+                      <button type="button" class="ui-sort__option country-tours__sort-option" data-value="price_desc">По цене (убывание)</button>
                     </div>
                   </div>
                 </div>

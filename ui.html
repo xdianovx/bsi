@@ -544,6 +544,95 @@ $trans-text: all 0.3s ease-in-out;
 &lt;!-- JS добавляет .is-open на .js-dropdown --&gt;</pre>
   </section>
 
+  <!-- ============ SORT ============ -->
+  <section class="uikit-section" id="sort">
+    <h2>Сортировка каталога (ui-sort)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/sort.scss</code>, поведение — <code>js/modules/forms/dropdown.js</code> (<code>.js-dropdown</code>). Один вид на все каталоги: туры, экскурсии, событийные туры, образование, программы школы. Цвет текста на hover не меняем — обратную связь даёт раскрытая панель.</p>
+
+    <div class="uikit-demo uikit-demo--block" style="min-height:200px">
+      <div class="ui-sort js-dropdown is-open">
+        <button type="button" class="js-dropdown-trigger ui-sort__trigger">
+          <span class="ui-sort__text">По цене (возрастание)</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="js-dropdown-panel ui-sort__panel">
+          <div class="ui-sort__options">
+            <button type="button" class="ui-sort__option is-active">По цене (возрастание)</button>
+            <button type="button" class="ui-sort__option">По цене (убывание)</button>
+            <button type="button" class="ui-sort__option">По названию (А-Я)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="ui-sort js-dropdown"&gt;
+  &lt;button class="js-dropdown-trigger ui-sort__trigger"&gt;
+    &lt;span class="ui-sort__text"&gt;По цене&lt;/span&gt; &lt;svg …&gt;
+  &lt;/button&gt;
+  &lt;div class="js-dropdown-panel ui-sort__panel"&gt;
+    &lt;div class="ui-sort__options"&gt;
+      &lt;button class="ui-sort__option is-active"&gt;По цене&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Старые классы каталога (country-tours__sort-option и т.п.)
+     оставляем рядом: за них цепляется JS фильтров --&gt;</pre>
+  </section>
+
+  <!-- ============ FILTERS ============ -->
+  <section class="uikit-section" id="filters">
+    <h2>Панель фильтров (ui-filters)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/filters.scss</code>. Панель белая, поля внутри — серые <code>$bg-page</code> без обводки, высота 48. Класс вешается на <code>&lt;form&gt;</code> фильтра каталога.</p>
+
+    <div class="uikit-demo uikit-demo--gray uikit-demo--block">
+      <form class="ui-filters" style="background:#fff;padding:16px;border-radius:12px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+          <div class="tours-filter__field">
+            <div class="tours-filter__label">Регион</div>
+            <input type="text" placeholder="Все регионы">
+          </div>
+          <div class="tours-filter__field">
+            <div class="tours-filter__label">Даты</div>
+            <input type="text" placeholder="Выберите даты">
+          </div>
+          <div class="tours-filter__field">
+            <div class="tours-filter__label">Поиск</div>
+            <input type="text" placeholder="Название или описание">
+          </div>
+        </div>
+      </form>
+    </div>
+    <pre class="uikit-snippet">&lt;form class="ui-filters country-excursions__filters"&gt;
+  &lt;div class="country-excursions__filters-row"&gt;
+    &lt;div class="tours-filter__field"&gt;
+      &lt;div class="tours-filter__label"&gt;Регион&lt;/div&gt;
+      &lt;select data-choice="single"&gt;…&lt;/select&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+  </section>
+
+  <!-- ============ CURRENCY TOGGLE ============ -->
+  <section class="uikit-section" id="currency-toggle">
+    <h2>Переключатель валюты (ui-currency-toggle)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/currency-toggle.scss</code>, поведение — <code>js/modules/education-currency-switcher.js</code> (хук <code>.js-education-show-original-currency</code>). Подпись всегда «Показать в валюте».</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <label class="ui-checkbox ui-currency-toggle">
+        <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" value="1">
+        <span class="ui-checkbox__mark"></span>
+        <span class="ui-checkbox__text">Показать в валюте</span>
+      </label>
+    </div>
+    <pre class="uikit-snippet">&lt;label class="ui-checkbox ui-currency-toggle"&gt;
+  &lt;input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" value="1"&gt;
+  &lt;span class="ui-checkbox__mark"&gt;&lt;/span&gt;
+  &lt;span class="ui-checkbox__text"&gt;Показать в валюте&lt;/span&gt;
+&lt;/label&gt;</pre>
+  </section>
+
   <!-- ============ SLIDER ARROWS ============ -->
   <section class="uikit-section" id="slider">
     <h2>Slider arrows</h2>

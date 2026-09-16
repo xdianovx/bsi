@@ -307,7 +307,7 @@ get_header();
                 </div>
               </div>
               <?php if ($rooms_has_foreign_currency): ?>
-                <label class="ui-checkbox hotel-rooms__currency-toggle">
+                <label class="ui-checkbox ui-currency-toggle hotel-rooms__currency-toggle">
                   <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency">
                   <span class="ui-checkbox__mark"></span>
                   <span class="ui-checkbox__text">Показать в валюте</span>
@@ -412,7 +412,7 @@ get_header();
                        <?php endif; ?>
                   >от <?= esc_html(format_number($room_min_price['rub'])); ?> ₽</div>
                   <?php if ($room_min_price['currency'] !== 'RUB'): ?>
-                    <label class="ui-checkbox hotel-widget__currency-toggle">
+                    <label class="ui-checkbox ui-currency-toggle hotel-widget__currency-toggle">
                       <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency">
                       <span class="ui-checkbox__mark"></span>
                       <span class="ui-checkbox__text">Показать в валюте</span>

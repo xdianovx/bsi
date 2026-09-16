@@ -5,7 +5,8 @@
 
   &.--mob {
     .slider-arrow {
-      border: 1px solid #bebebe;
+      border: 0;
+      background: $bg-gray;
       width: 48px;
       height: 48px;
       display: flex;

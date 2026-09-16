@@ -51,71 +51,8 @@
   }
 }
 
-.country-excursions__sort {
-  position: relative;
-}
-
-.country-excursions__sort-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: $text-black;
-  font-size: 16px;
-  cursor: pointer;
-  transition: $trans-text;
-  width: auto;
-
-  /* Скрываем дефолтный chevron из .js-dropdown-trigger::after — в HTML уже своя иконка */
-  &::after {
-    display: none !important;
-  }
-
-  &:hover {
-    color: $red;
-  }
-}
-
-.country-excursions__sort-panel {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  min-width: 240px;
-  border: 0;
-  border-radius: 8px;
-  background: $bg-color;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
-  padding: 8px;
-  z-index: 5;
-}
-
-.country-excursions__sort-options {
-  display: flex;
-  flex-direction: column;
-}
-
-.country-excursions__sort-option {
-  background: transparent;
-  border: 0;
-  text-align: left;
-  padding: 8px 10px;
-  color: $text-black;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: $trans-text;
-
-  &:hover {
-    background: $bg-gray;
-  }
-
-  &.is-active {
-    color: $red;
-    font-weight: 600;
-  }
-}
+/* Вид сортировки задаёт общий компонент .ui-sort (scss/ui/sort.scss);
+   старые классы остались в разметке зацепками для JS. */
 
 .country-excursions__filters {
   margin-bottom: 16px;

@@ -281,7 +281,7 @@ if ($all_edu_for_sort->have_posts()) {
       </div>
     <?php endif; ?>
 
-    <form class="education-filter js-education-filter"
+    <form class="education-filter ui-filters js-education-filter"
           data-education-form>
       <div class="education-filter__row">
         <div class="education-filter__field tours-filter__field">
@@ -404,13 +404,13 @@ if ($all_edu_for_sort->have_posts()) {
           <span class="ui-checkbox__text">Групповой заезд</span>
         </label>
 
-        <label class="ui-checkbox">
+        <label class="ui-checkbox ui-currency-toggle">
           <input type="checkbox"
                  class="ui-checkbox__input js-education-show-original-currency"
                  name="show_original_currency"
                  value="1">
           <span class="ui-checkbox__mark"></span>
-          <span class="ui-checkbox__text">Стоимость в валюте</span>
+          <span class="ui-checkbox__text">Показать в валюте</span>
         </label>
 
         <button type="button"
@@ -456,10 +456,10 @@ if ($all_edu_for_sort->have_posts()) {
           </div>
         </div>
 
-        <div class="education-page__sort js-dropdown">
+        <div class="ui-sort education-page__sort js-dropdown">
           <button type="button"
-                  class="js-dropdown-trigger education-page__sort-trigger">
-            <span class="education-page__sort-text">По цене (возрастание)</span>
+                  class="js-dropdown-trigger ui-sort__trigger education-page__sort-trigger">
+            <span class="ui-sort__text education-page__sort-text">По цене (возрастание)</span>
             <svg xmlns="http://www.w3.org/2000/svg"
                  width="20"
                  height="20"
@@ -472,22 +472,22 @@ if ($all_edu_for_sort->have_posts()) {
                     stroke-linejoin="round" />
             </svg>
           </button>
-          <div class="js-dropdown-panel education-page__sort-panel">
-            <div class="education-page__sort-options">
+          <div class="js-dropdown-panel ui-sort__panel education-page__sort-panel">
+            <div class="ui-sort__options education-page__sort-options">
               <button type="button"
-                      class="education-page__sort-option"
+                      class="ui-sort__option education-page__sort-option"
                       data-value="title_asc">По названию
                 (А-Я)</button>
               <button type="button"
-                      class="education-page__sort-option"
+                      class="ui-sort__option education-page__sort-option"
                       data-value="title_desc">По названию
                 (Я-А)</button>
               <button type="button"
-                      class="education-page__sort-option"
+                      class="ui-sort__option education-page__sort-option"
                       data-value="price_asc">По цене
                 (возрастание)</button>
               <button type="button"
-                      class="education-page__sort-option"
+                      class="ui-sort__option education-page__sort-option"
                       data-value="price_desc">По цене
                 (убывание)</button>
             </div>

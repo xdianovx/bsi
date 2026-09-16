@@ -1,0 +1,31 @@
+/**
+ * Переключатель «Показать в валюте» — общий компонент.
+ *
+ * Сам чекбокс — .ui-checkbox (scss/ui/forms.scss), здесь только единые
+ * отступы и высота цели. До 2026-09-16 у каждой страницы был свой
+ * модификатор (country-tours__currency-toggle, country-excursions__,
+ * hotel-rooms__, single-event__, single-excursion__tickets-), а на
+ * образовании его не было вовсе — поэтому один и тот же переключатель
+ * выглядел по-разному.
+ *
+ * Разметка:
+ *   <label class="ui-checkbox ui-currency-toggle">
+ *     <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency">
+ *     <span class="ui-checkbox__mark"></span>
+ *     <span class="ui-checkbox__text">Показать в валюте</span>
+ *   </label>
+ */
+
+.ui-currency-toggle {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+@media screen and (max-width: 768px) {
+
+  /* Пальцем по чекбоксу — цель не меньше 44px */
+  .ui-currency-toggle {
+    min-height: 44px;
+    padding-block: 10px;
+  }
+}

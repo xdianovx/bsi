@@ -254,10 +254,6 @@
   min-width: 0;
 }
 
-.event-tours-page .country-tours__filters-row.--events .tours-filter__field .choices {
-  width: 100%;
-  margin-bottom: 0;
-}
 
 .event-tours-page .country-tours__filters-row.--events .tours-filter__field--search {
   grid-column: 1 / -1;
@@ -271,25 +267,7 @@
   color: #1f1f1f;
 }
 
-.event-tours-page .country-tours__filters .tours-filter__input {
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  height: 52px;
-  margin: 0;
-  padding: 18px 16px;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 16px;
-  line-height: 100%;
-  color: $text-black;
-  cursor: text;
-}
 
-.event-tours-page .country-tours__filters .tours-filter__field--search .tours-filter__input {
-  border-radius: 10px;
-}
 
 .event-tours-page .country-tours__filters .tours-filter__input[name="departure_date"] {
   cursor: pointer;
@@ -299,28 +277,7 @@
   color: #999;
 }
 
-.event-tours-page .country-tours__filters .choices__inner {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  min-height: 52px;
-  height: 52px;
-  padding: 0 4px;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 16px;
-}
 
-.event-tours-page .country-tours__filters .choices__list--single {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-  height: 52px;
-  padding: 0 36px 0 16px;
-}
 
 .event-tours-page .country-tours__filters .choices__list--single .choices__item {
   box-sizing: border-box;
@@ -444,70 +401,10 @@
 }
 
 /* Сортировка (dropdown) */
-.event-tours-page .country-tours__sort {
-  position: relative;
-}
 
 /* Кнопка сортировки — белая заливка без рамки: обводки в теме не используем. */
-.event-tours-page .country-tours__sort-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 16px;
-  color: $text-black;
-  cursor: pointer;
-  transition: $trans-text;
 
-  &:hover {
-    color: $red;
-  }
-}
 
-.event-tours-page .country-tours__sort-panel {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 20;
-  min-width: 220px;
-  padding: 6px;
-  border: 0;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  display: none;
-}
-
-.event-tours-page .country-tours__sort.is-open .country-tours__sort-panel {
-  display: block;
-}
-
-.event-tours-page .country-tours__sort-option {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  text-align: left;
-  font-size: 15px;
-  color: $text-black;
-  cursor: pointer;
-  transition: $trans-text;
-
-  &:hover {
-    background: $bg-gray;
-  }
-
-  &.is-active {
-    color: $red;
-    font-weight: 500;
-  }
-}
 
 /* Переключатель выкладки */
 .catalog-view-toggle {
@@ -544,9 +441,6 @@
 }
 
 @media screen and (max-width: 600px) {
-  .event-tours-page .country-tours__sort-trigger {
-    height: 40px;
-  }
 }
 
 /* Карточка-плитка событийного тура */
@@ -2352,3 +2246,6 @@ body.page-template-page-sobytiynye-tury .country-tours__empty {
     left: 0;
   }
 }
+
+/* Вид сортировки задаёт общий компонент .ui-sort (scss/ui/sort.scss);
+   старые классы остались в разметке зацепками для JS. */

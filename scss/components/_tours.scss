@@ -26,14 +26,12 @@
   }
 }
 
+/* Рамок у полей нет: вид задаёт .ui-filters (scss/ui/filters.scss) —
+   серая заливка на белой панели. */
 .tours-filter__field {
   display: flex;
   flex-direction: column;
   gap: 8px;
-
-  .choices__inner {
-    border: 1px solid #dbdbdb;
-  }
 }
 
 .tours-filter__label {
@@ -44,18 +42,21 @@
 
 .tours-filter__select {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #dbdbdb;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: $bg-page;
+  font-size: 16px;
+  height: 48px;
 }
 
 .tours-filter__input {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #dbdbdb;
+  padding: 12px 16px;
+  border: 0;
   border-radius: 8px;
-  font-size: 14px;
+  background: $bg-page;
+  font-size: 16px;
   height: 48px;
 }
 
@@ -260,83 +261,10 @@
       transform: rotate(180deg);
     }
 
-    .tours-page__sort-panel {
-      display: block;
-    }
   }
 }
 
-.tours-page__sort-trigger {
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  gap: 8px;
 
-  svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-  }
-}
-
-.tours-page__sort-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: auto;
-  margin-top: 8px;
-  min-width: 200px;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  display: none;
-  z-index: 100;
-  width: max-content;
-}
-
-.tours-page__sort-options {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
-}
-
-.tours-page__sort-option {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  text-align: left;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #000000;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #f5f5f5;
-  }
-
-  &:active {
-    background-color: #eeeeee;
-  }
-
-  &.is-active {
-    background-color: #f5f5f5;
-    font-weight: 500;
-  }
-}
 
 .tours-page__list {
   display: grid;
@@ -391,3 +319,6 @@
     }
   }
 }
+
+/* Вид сортировки задаёт общий компонент .ui-sort (scss/ui/sort.scss);
+   старые классы остались в разметке зацепками для JS. */

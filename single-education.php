@@ -488,23 +488,23 @@ get_header();
                   </svg>
                   Сбросить фильтры
                 </button>
-                <div class="single-education__programs-sort js-dropdown">
-                  <button type="button" class="js-dropdown-trigger single-education__programs-sort-trigger">
-                    <span class="single-education__programs-sort-text">Цена: по возрастанию</span>
+                <div class="ui-sort single-education__programs-sort js-dropdown">
+                  <button type="button" class="js-dropdown-trigger ui-sort__trigger single-education__programs-sort-trigger">
+                    <span class="ui-sort__text single-education__programs-sort-text">Цена: по возрастанию</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path
                         d="M2.5 13.3333L5.83333 16.6667M5.83333 16.6667L9.16667 13.3333M5.83333 16.6667V3.33333M9.16667 3.33333H17.5M9.16667 6.66666H15M9.16667 9.99999H12.5"
                         stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   </button>
-                  <div class="js-dropdown-panel single-education__programs-sort-panel">
-                    <button type="button" class="single-education__programs-sort-option" data-value="price_asc">Цена: по
+                  <div class="js-dropdown-panel ui-sort__panel ui-sort__options single-education__programs-sort-panel">
+                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="price_asc">Цена: по
                       возрастанию</button>
-                    <button type="button" class="single-education__programs-sort-option" data-value="price_desc">Цена: по
+                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="price_desc">Цена: по
                       убыванию</button>
-                    <button type="button" class="single-education__programs-sort-option" data-value="age_asc">Возраст: по
+                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="age_asc">Возраст: по
                       возрастанию</button>
-                    <button type="button" class="single-education__programs-sort-option" data-value="age_desc">Возраст: по
+                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="age_desc">Возраст: по
                       убыванию</button>
                   </div>
                 </div>
@@ -550,7 +550,7 @@ get_header();
                 </div>
 
                 <div class="education-programs-filter__field education-programs-filter__field--checkbox">
-                  <label class="ui-checkbox">
+                  <label class="ui-checkbox ui-currency-toggle">
                     <input type="checkbox"
                            class="ui-checkbox__input js-education-show-original-currency"
                            name="show_original_currency"

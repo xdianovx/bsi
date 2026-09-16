@@ -145,7 +145,7 @@ if ($active_tour_ids !== []) {
       <?php endwhile; ?>
     <?php endif; ?>
 
-    <form class="tours-filter js-tours-filter"
+    <form class="tours-filter ui-filters js-tours-filter"
           data-tours-form>
       <div class="tours-filter__row">
         <div class="tours-filter__field">
@@ -292,10 +292,10 @@ if ($active_tour_ids !== []) {
           </div>
         </div> -->
 
-        <div class="tours-page__sort js-dropdown">
+        <div class="ui-sort tours-page__sort js-dropdown">
           <button type="button"
-                  class="js-dropdown-trigger tours-page__sort-trigger">
-            <span class="tours-page__sort-text">По цене (возрастание)</span>
+                  class="js-dropdown-trigger ui-sort__trigger tours-page__sort-trigger">
+            <span class="ui-sort__text tours-page__sort-text">По цене (возрастание)</span>
             <svg xmlns="http://www.w3.org/2000/svg"
                  width="20"
                  height="20"
@@ -308,19 +308,19 @@ if ($active_tour_ids !== []) {
                     stroke-linejoin="round" />
             </svg>
           </button>
-          <div class="js-dropdown-panel tours-page__sort-panel">
-            <div class="tours-page__sort-options">
+          <div class="js-dropdown-panel ui-sort__panel tours-page__sort-panel">
+            <div class="ui-sort__options tours-page__sort-options">
               <button type="button"
-                      class="tours-page__sort-option"
+                      class="ui-sort__option tours-page__sort-option"
                       data-value="title_asc">По названию (А-Я)</button>
               <button type="button"
-                      class="tours-page__sort-option"
+                      class="ui-sort__option tours-page__sort-option"
                       data-value="title_desc">По названию (Я-А)</button>
               <button type="button"
-                      class="tours-page__sort-option"
+                      class="ui-sort__option tours-page__sort-option"
                       data-value="price_asc">По цене (возрастание)</button>
               <button type="button"
-                      class="tours-page__sort-option"
+                      class="ui-sort__option tours-page__sort-option"
                       data-value="price_desc">По цене (убывание)</button>
             </div>
           </div>

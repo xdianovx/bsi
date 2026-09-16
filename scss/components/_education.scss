@@ -40,8 +40,9 @@
 .education-filter__select {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #dbdbdb;
+  border: 0;
   border-radius: 8px;
+  background: $bg-page;
   font-size: 16px;
   height: 48px;
 }
@@ -51,9 +52,9 @@
   width: 100%;
   height: 48px;
   padding: 12px 16px;
-  border: 1px solid #dbdbdb;
+  border: 0;
   border-radius: 8px;
-  background: $bg-color;
+  background: $bg-page;
   font-size: 16px;
   line-height: 1.2;
   color: $text-black;
@@ -89,8 +90,8 @@
 .education-filter__reset-btn {
   padding: 8px 16px;
   background: $bg-gray;
-  border: 1px solid #dbdbdb;
-  border-radius: 4px;
+  border: 0;
+  border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -131,27 +132,6 @@
       transform: rotate(180deg);
     }
 
-    .education-page__sort-panel {
-      display: block;
-    }
-  }
-}
-
-.education-page__sort-trigger {
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  gap: 8px;
-
-  svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
   }
 }
 
@@ -159,58 +139,7 @@
   margin-top: 64px;
 }
 
-.education-page__sort-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: auto;
-  margin-top: 8px;
-  min-width: 200px;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  display: none;
-  z-index: 50;
-  width: max-content;
-}
 
-.education-page__sort-options {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
-}
-
-.education-page__sort-option {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  text-align: left;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #000000;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #f5f5f5;
-  }
-
-  &:active {
-    background-color: #eeeeee;
-  }
-
-  &.is-active {
-    background-color: #f5f5f5;
-    font-weight: 500;
-  }
-}
 
 .education-page__list {
   display: grid;
@@ -1227,7 +1156,6 @@
   // ВРЕМЕННО: скрываем табы фильтра
   // display: none !important;
 
-
   @media screen and (max-width: 1200px) {
     flex-wrap: nowrap;
     overflow-x: scroll;
@@ -1526,93 +1454,12 @@
   // }
 }
 
-.single-education__programs-sort-text {
-  @media screen and (max-width: 550px) {
-    display: none;
-  }
-}
 
-.single-education__programs-sort {
-  flex-shrink: 0;
-  margin-left: auto;
-  position: relative;
 
-  .js-dropdown-trigger::after {
-    display: none;
-  }
-}
 
-.single-education__programs-sort-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 19.2px;
-  color: #000000;
 
-  svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-  }
-}
 
-.single-education__programs-sort.is-open {
-  .single-education__programs-sort-trigger svg {
-    transform: rotate(180deg);
-  }
-}
 
-.single-education__programs-sort-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: auto;
-  margin-top: 8px;
-  min-width: 200px;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  display: none;
-  z-index: 50;
-  width: max-content;
-}
-
-.single-education__programs-sort.is-open .single-education__programs-sort-panel {
-  display: block;
-}
-
-.single-education__programs-sort-option {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  text-align: left;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #000000;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #f5f5f5;
-  }
-
-  &:active {
-    background-color: #eeeeee;
-  }
-}
 
 .single-education__price-details-section {
   margin-top: 64px;
@@ -1780,3 +1627,6 @@
 .education-page__load-more {
   margin-top: 24px;
 }
+
+/* Вид сортировки задаёт общий компонент .ui-sort (scss/ui/sort.scss);
+   старые классы остались в разметке зацепками для JS. */

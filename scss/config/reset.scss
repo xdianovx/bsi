@@ -183,7 +183,8 @@ sup {
   margin: 0;
   border: 0;
   border-radius: 0;
-  background: $bg-gray;
+  /* Поиск — часть белой панели списка, заливку не даём */
+  background: transparent;
 }
 
 .choices[data-type*="select-one"]::after {

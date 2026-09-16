@@ -418,6 +418,14 @@ add_action('init', function () {
     'top'
   );
 
+  // Пагинация каталога школ: без правила /page/2/ уходит в 404,
+  // и в индекс попадают только первые 12 школ страны.
+  add_rewrite_rule(
+    '^country/([^/]+)/obuchenie/page/([0-9]{1,})/?$',
+    'index.php?post_type=country&name=$matches[1]&country_education=$matches[1]&paged=$matches[2]',
+    'top'
+  );
+
   add_rewrite_rule(
     '^country/([^/]+)/obuchenie/?$',
     'index.php?post_type=country&name=$matches[1]&country_education=$matches[1]',
