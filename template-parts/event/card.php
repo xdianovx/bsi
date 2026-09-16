@@ -211,28 +211,32 @@ $event_booking_url = function_exists('get_field') ? trim((string) get_field('tou
       <p class="event-card__excerpt"><?= esc_html($excerpt_raw); ?></p>
     <?php endif; ?>
 
+    <?php /* Цена — строкой над кнопкой, а не второй кнопкой: в карточке одна CTA.
+             Классы event-card__btn-book и data-crosstour-card оставлены — за них
+             цепляются js/modules/crosstour-cards.js (догружает цену) и
+             education-currency-switcher.js (переписывает textContent). */ ?>
+    <div class="event-card__price-line event-card__btn-book<?= $price_rub !== null ? ' js-event-price' : ''; ?>"
+      data-crosstour-card="<?= esc_attr((string) (int) $post_id); ?>"
+      <?php if ($event_booking_url !== ''): ?>
+      data-booking-url="<?= esc_url($event_booking_url); ?>"
+      <?php endif; ?>
+      <?php if ($price_rub !== null): ?>
+      data-price-rub="<?= esc_attr((string) (int) $price_rub); ?>"
+      <?php if ($price_original !== null && $price_currency !== null): ?>
+      data-price-original="<?= esc_attr((string) $price_original); ?>"
+      data-price-currency="<?= esc_attr($price_currency); ?>"
+      <?php endif; ?>
+      data-has-from="true"
+      <?php endif; ?>><?php
+      if ($price_rub !== null) {
+        echo 'от ' . esc_html(number_format((int) $price_rub, 0, ',', ' ')) . ' ₽';
+      } else {
+        echo 'Цена по запросу';
+      }
+    ?></div>
+
     <div class="event-card__actions">
       <a href="<?= esc_url($link); ?>" class="event-card__btn event-card__btn-details">Подробнее</a>
-      <a href="<?= esc_url($link); ?>"
-        class="btn btn-accent event-card__btn event-card__btn-book<?= $price_rub !== null ? ' js-event-price' : ''; ?>"
-        data-crosstour-card="<?= esc_attr((string) (int) $post_id); ?>"
-        <?php if ($event_booking_url !== ''): ?>
-        data-booking-url="<?= esc_url($event_booking_url); ?>"
-        <?php endif; ?>
-        <?php if ($price_rub !== null): ?>
-        data-price-rub="<?= esc_attr((string) (int) $price_rub); ?>"
-        <?php if ($price_original !== null && $price_currency !== null): ?>
-        data-price-original="<?= esc_attr((string) $price_original); ?>"
-        data-price-currency="<?= esc_attr($price_currency); ?>"
-        <?php endif; ?>
-        data-has-from="true"
-        <?php endif; ?>>
-        <?php if ($price_rub !== null): ?>
-          от <?= esc_html(number_format((int) $price_rub, 0, ',', ' ')); ?> ₽
-        <?php else: ?>
-          по запросу
-        <?php endif; ?>
-      </a>
     </div>
   </div>
 </article>
