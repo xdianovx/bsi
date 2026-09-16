@@ -16,7 +16,7 @@
   padding: 32px;
   max-width: 500px;
   max-height: 100vh;
-  border-radius: 12px;
+  border-radius: $radius-md;
   overflow-y: auto;
   box-sizing: border-box;
   position: relative;
@@ -136,7 +136,7 @@
   margin-top: 8px;
   padding: 10px 12px;
   border: 1px solid #d8d8d8;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   font-size: 15px;
 }
 
@@ -148,7 +148,7 @@
   width: 100%;
   border-collapse: collapse;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: $radius-md;
   border: 1px solid #ececec;
   margin: 0;
 }

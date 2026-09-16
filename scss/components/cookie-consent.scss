@@ -30,7 +30,7 @@ html.bsi-cookie-consented .cookie-consent {
     gap: 20px;
     flex-wrap: wrap;
     background: #fff;
-    border-radius: 12px;
+    border-radius: $radius-md;
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow:
       0 4px 6px rgba(0, 0, 0, 0.04),

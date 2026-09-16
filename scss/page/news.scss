@@ -64,7 +64,7 @@
 .single-news__poster {
   width: 100%;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   margin-top: 16px;
 
   img {
@@ -84,7 +84,7 @@
 
 .news-card__image {
   aspect-ratio: 16/9;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
 
   img {
@@ -133,7 +133,7 @@
   color: $text-gray;
   background: $bg-gray;
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   gap: 4px;
 
   * {
@@ -152,7 +152,7 @@
   gap: 4px;
   background: $bg-gray;
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: $radius-sm;
 
   p {
     margin-bottom: 0px;
@@ -180,7 +180,7 @@
 .news-filter__btn {
   line-height: 100%;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: $bg-gray;
   transition: $trans-text;
 

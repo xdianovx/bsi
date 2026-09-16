@@ -29,7 +29,7 @@
 .main-pages__item {
   background: $bg-gray;
   padding: 4px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -62,7 +62,7 @@
   align-items: center;
   gap: 12px;
   background: #fff;
-  border-radius: 6px;
+  border-radius: $radius-sm;
   padding: 8px;
 }
 

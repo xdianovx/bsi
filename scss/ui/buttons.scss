@@ -1,5 +1,5 @@
 .btn {
-  border-radius: 8px;
+  border-radius: $radius-sm;
   padding: 16px 24px;
   font-size: 16px;
   font-family: inherit;
@@ -79,7 +79,7 @@
   line-height: 120%;
   gap: 6px;
   padding: 6px 12px 6px 8px;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   transition: $trans-text;
 
   svg {
@@ -99,7 +99,7 @@
 .print-btn {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: #f5f5f5;
   display: flex;
   align-items: center;
@@ -136,7 +136,7 @@
 .link-arrow__icon {
   width: 28px;
   height: 28px;
-  border-radius: 100%;
+  border-radius: $radius-full;
   border: 1px solid $red;
   display: flex;
   align-items: center;
@@ -153,7 +153,7 @@
 .burger {
   width: 24px;
   height: 24px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   position: relative;
   display: none;
   margin-left: 8px;
@@ -162,7 +162,7 @@
     position: absolute;
     height: 2px;
     left: 2px;
-    border-radius: 2px;
+    border-radius: $radius-sm;
     background: $bg-black;
     width: 20px;
     transition: $trans-text;

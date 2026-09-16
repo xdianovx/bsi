@@ -36,7 +36,7 @@
 
 .country-excursions__date-input {
   border: 1px solid $gray-light;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   padding: 10px 14px;
   background: $bg-color;
   color: $text-black;
@@ -156,7 +156,7 @@
   text-align: center;
   color: $text-gray;
   background: $bg-gray;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 /* Карточка экскурсии — по образцу .education-card (page-education).
@@ -179,7 +179,7 @@
   .catalog-card__media {
     display: block;
     aspect-ratio: 16 / 9;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     overflow: hidden;
     flex-shrink: 0;
     text-decoration: none;
@@ -222,7 +222,7 @@
   .catalog-card__flag {
     width: 18px;
     height: 18px;
-    border-radius: 100%;
+    border-radius: $radius-full;
     overflow: hidden;
     flex-shrink: 0;
   }
@@ -357,7 +357,7 @@
   gap: 4px;
   padding: 12px 16px;
   background: $bg-gray;
-  border-radius: 10px;
+  border-radius: $radius-md;
 }
 
 .single-excursion__fact-label {
@@ -422,7 +422,7 @@
   padding: 16px;
   background: $bg-color;
   border: 1px solid $gray-light;
-  border-radius: 10px;
+  border-radius: $radius-md;
 
   /* Точку из базового макета прячем — лишний декор */
   .single-event__dates-dot {

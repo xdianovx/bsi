@@ -160,7 +160,7 @@ sup {
   box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
   top: calc(100% + 4px);
   margin-top: 0;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
   word-break: break-all;
   z-index: 10;
@@ -194,7 +194,7 @@ sup {
 .choices__list--multiple .choices__item {
   background: $red;
   border: none;
-  border-radius: 4px;
+  border-radius: $radius-sm;
 }
 
 /* Высота 28px при line-height 24 прижимала текст к верху поля — выбранное

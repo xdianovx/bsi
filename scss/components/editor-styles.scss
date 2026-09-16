@@ -191,7 +191,7 @@
   img {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: $radius-sm;
 
     &.alignleft {
       float: left;
@@ -228,7 +228,7 @@
     padding: 16px;
     margin: 2em 0;
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     font-style: italic;
 
     @media screen and (max-width: 1024px) {
@@ -323,7 +323,7 @@
   code {
     background: #f4f4f4;
     padding: 0.2em 0.4em;
-    border-radius: 3px;
+    border-radius: $radius-sm;
     font-family: "Courier New", monospace;
     font-size: 0.9em;
   }
@@ -331,7 +331,7 @@
   pre {
     background: #f8f9fa;
     padding: 1.5em;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     overflow-x: auto;
     margin: 2em 0;
 

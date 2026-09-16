@@ -13,7 +13,7 @@
     width: 32px;
     height: 32px;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: $radius-full;
   }
 
   @media screen and (max-width: 1200px) {
@@ -37,7 +37,7 @@
   gap: 4px;
   background: #faf6f5;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 
   img {
     width: 48px;
@@ -153,7 +153,7 @@
     width: 6px;
     height: 2px;
     background: $red;
-    border-radius: 2px;
+    border-radius: $radius-sm;
   }
 }
 
@@ -167,7 +167,7 @@
   display: flex;
   cursor: pointer;
   line-height: 100%;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: #fff;
 
   &.--mobile {
@@ -213,7 +213,7 @@
     background: $bg-gray;
     line-height: 100%;
     padding: 6px 10px;
-    border-radius: 8px;
+    border-radius: $radius-sm;
   }
 }
 
@@ -258,7 +258,7 @@
 
 .country-regions {
   padding: 16px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: $bg-gray;
 }
 
@@ -358,7 +358,7 @@
     text-align: center;
     color: $text-gray;
     background: $bg-gray;
-    border-radius: 12px;
+    border-radius: $radius-md;
   }
 }
 
@@ -390,7 +390,7 @@ body.single-country {
     align-self: start;
     padding: 8px;
     background: $bg-color;
-    border-radius: 12px;
+    border-radius: $radius-md;
   }
 }
 
@@ -404,7 +404,7 @@ body.single-country .country-education__filters,
 body.single-country .country-excursions__filters {
   padding: 16px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 body.single-country .page-country__editor-content,
@@ -417,14 +417,14 @@ body.single-country .page-country__news {
 body.single-country .news-card {
   padding: 8px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 /* Экскурсии каталога — те же белые карточки на сером фоне списка. */
 body.single-country .catalog-card--excursion {
   padding: 8px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 /* Событийные туры страны — карточка событием тоже белая плитка.
@@ -432,7 +432,7 @@ body.single-country .catalog-card--excursion {
 body.single-country .event-card {
   padding: 8px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 body.single-country .country-tours__list {
@@ -457,7 +457,7 @@ body.single-country .education-card {
   width: 100%;
   padding: 8px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 /* Единственная кнопка карточки школы — она же CTA: серая заливка на белом,

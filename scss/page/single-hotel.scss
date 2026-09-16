@@ -37,7 +37,7 @@
   img {
     @include lazy-fixed-size(24px);
     margin-top: 2px;
-    border-radius: 100%;
+    border-radius: $radius-full;
     object-fit: cover;
     border: 1px solid #000;
   }
@@ -136,7 +136,7 @@
 .hotel-widget {
   background: $bg-gray;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: $radius-md;
 
   .single-hotel__address {
     font-size: 14px;
@@ -175,7 +175,7 @@
   width: 100%;
   padding: 8px 12px;
   line-height: 100%;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 
 .hotel-widget__checkin-label {
@@ -201,7 +201,7 @@
   line-height: 100%;
   background: #fff;
   padding: 2px 4px;
-  border-radius: 2px;
+  border-radius: $radius-sm;
 
   svg {
     color: #ffd700;
@@ -264,7 +264,7 @@
   background: #fff;
   flex-wrap: wrap;
   line-height: 120%;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 
 .hotel-widget__distance-key {
@@ -285,7 +285,7 @@
 
 .tour-page__details {
   background: $bg-gray;
-  border-radius: 12px;
+  border-radius: $radius-md;
   padding: 16px;
   display: flex;
   flex-direction: column;

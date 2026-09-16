@@ -15,7 +15,7 @@ body.page-template-page-education .education-filter {
   margin-top: 16px;
   padding: 16px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 body.page-template-page-education .education-filter__row {
@@ -94,7 +94,7 @@ body.page-template-page-education .education-page__list {
 body.page-template-page-education .education-card {
   padding: 8px;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 body.page-template-page-education .education-card__actions .education-card__btn-details:hover {
@@ -104,7 +104,7 @@ body.page-template-page-education .education-card__actions .education-card__btn-
 
 body.page-template-page-education .education-page__empty {
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 /* На телефоне пальцем попадают в чекбоксы и в сортировку — поднимаем

@@ -20,7 +20,7 @@
   padding: 16px 16px 0 16px !important;
   margin-bottom: 8px;
   background: $bg-gray;
-  border-radius: 12px;
+  border-radius: $radius-md;
 
   @media screen and (max-width: 768px) {
     gap: 16px;
@@ -51,7 +51,7 @@
   height: 48px;
   padding: 0 4px;
   border: none;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: #f7f7f7;
   font-size: 16px;
 }
@@ -88,7 +88,7 @@
   top: calc(100% + 4px);
   margin-top: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: #fff;
   box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
 }
@@ -160,7 +160,7 @@
   min-height: 36px;
   padding: 6px 14px;
   border: 1px solid #dfdfdf;
-  border-radius: 100px;
+  border-radius: $radius-pill;
   background: #fff;
   font-size: 14px;
   line-height: 100%;
@@ -205,7 +205,7 @@
   height: 420px;
   margin-bottom: 28px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: $radius-md;
   background: $bg-gray;
 }
 
@@ -220,7 +220,7 @@
   color: $text-gray;
   text-align: center;
   background: $bg-gray;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 .country-sights-pagination {
@@ -235,7 +235,7 @@
   padding: 8px;
   overflow: hidden;
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 .sight-card-media {
@@ -244,7 +244,7 @@
   aspect-ratio: 16 / 10;
   overflow: hidden;
   background: $bg-gray;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 
 .sight-card-image {
@@ -275,7 +275,7 @@
 
   line-height: 100%;
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 
 .sight-card-body {
@@ -346,7 +346,7 @@
   width: 100%;
   height: 380px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: $radius-md;
   background: $bg-gray;
 }
 
@@ -406,7 +406,7 @@
   color: $text-white;
   background: $red;
   border: 2px solid $text-white;
-  border-radius: 50%;
+  border-radius: $radius-full;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
@@ -428,7 +428,7 @@
   width: 148px;
   padding: 6px;
   background: $bg-color;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   transform: translateX(-50%);
   visibility: hidden;
@@ -441,7 +441,7 @@
   width: 100%;
   height: 84px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: $radius-sm;
 }
 
 .sights-map-marker-label {

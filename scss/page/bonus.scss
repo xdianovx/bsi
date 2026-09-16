@@ -41,7 +41,7 @@
   color: #1a1a1a;
   background-color: #f4f4f6;
   padding: 8px 20px;
-  border-radius: 100px;
+  border-radius: $radius-pill;
   margin: 0 12px;
 }
 
@@ -232,7 +232,7 @@
   top: 10px;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: $radius-full;
   background-color: #ee3145;
 }
 
@@ -259,6 +259,6 @@
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 16px;
+    border-radius: $radius-lg;
   }
 }

@@ -27,7 +27,7 @@
 }
 
 .slider-arrow {
-  border-radius: 100%;
+  border-radius: $radius-full;
   background: $bg-gray;
   width: 32px;
   height: 32px;
@@ -107,7 +107,7 @@
   bottom: 16px !important;
   width: auto !important;
   display: flex !important;
-  border-radius: 100px;
+  border-radius: $radius-pill;
   background: #fff;
   padding: 4px 8px;
   font-weight: 600;

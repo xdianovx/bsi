@@ -38,7 +38,7 @@
 }
 
 .mice-hero-item {
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
   background: $bg-gray;
   padding: 16px;
@@ -110,7 +110,7 @@
 .mice-benefit {
   display: flex;
   background: $bg-gray;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   flex-direction: column;
   padding: 8px;
 }
@@ -124,7 +124,7 @@
 .mice-benefit__text {
   margin-top: 8px;
   background: #fff;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   padding: 12px;
   line-height: 140%;
   height: 100%;

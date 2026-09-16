@@ -61,7 +61,7 @@
 }
 
 .promo-filter__btn {
-  border-radius: 8px;
+  border-radius: $radius-sm;
   // border: 1px solid #bebebe;
   background: $bg-gray;
   display: flex;
@@ -91,7 +91,7 @@
 .promo-filter__flag-wrap {
   width: 28px;
   height: 28px;
-  border-radius: 100%;
+  border-radius: $radius-full;
   overflow: hidden;
   position: relative;
   isolation: isolate;
@@ -119,7 +119,7 @@
 
 .promo-card__info {
   margin-top: 8px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -131,7 +131,7 @@
 }
 
 .promo-card__poster {
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
 
   img {
@@ -174,7 +174,7 @@
   width: auto;
   font-size: 14px;
   display: none;
-  border-radius: 2px;
+  border-radius: $radius-sm;
   color: $text-gray;
 }
 
@@ -192,7 +192,7 @@
   right: 12px;
   top: 8px;
   background: white;
-  border-radius: 2px;
+  border-radius: $radius-sm;
   padding: 2px 8px;
 }
 
@@ -244,7 +244,7 @@
 .single-promo__ended {
   margin-top: 20px;
   padding: 16px 20px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: $bg-gray;
 }
 
@@ -275,7 +275,7 @@
 
 .single-promo__poster {
   margin-top: 24px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
 
   .single-promo__poster-img {

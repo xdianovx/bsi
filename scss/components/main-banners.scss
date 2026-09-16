@@ -5,12 +5,12 @@
 }
 
 .main-banners-slider {
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 
 .main-banner__slide {
   aspect-ratio: 15/6;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
   display: block;
   @media screen and (max-width: 768px) {

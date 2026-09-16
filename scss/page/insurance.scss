@@ -19,7 +19,7 @@
 
 .insurance_item {
   background: $bg-gray;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   padding: 8px;
   display: flex;
   gap: 16px;
@@ -35,7 +35,7 @@
 .insurance_item_img {
   aspect-ratio: 1/1;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
   height: 200px;
 
@@ -86,7 +86,7 @@
   line-height: 100%;
   color: $text-black;
   background: #fff;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   padding: 4px 8px;
   position: absolute;
   top: 16px;
@@ -310,7 +310,7 @@ body.single-insurance {
 .insurance-hero__media {
   width: 120px;
   height: 120px;
-  border-radius: 50%;
+  border-radius: $radius-full;
   overflow: hidden;
   background: $bg-color;
 
@@ -339,7 +339,7 @@ body.single-insurance {
   line-height: 100%;
   color: $text-gray;
   background: $bg-color;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   padding: 6px 10px;
   white-space: nowrap;
 }
@@ -426,7 +426,7 @@ body.single-insurance {
   justify-content: space-between;
   gap: 8px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
   text-align: left;
 }
@@ -549,7 +549,7 @@ body.single-insurance {
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
 }
 
@@ -562,7 +562,7 @@ body.single-insurance {
 
 .insurance-benefit__icon {
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   color: $red;
   display: flex;
   align-items: center;
@@ -610,7 +610,7 @@ body.single-insurance {
 
 .insurance-coverage__col {
   padding: 24px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
 
   @media screen and (max-width: 768px) {
@@ -687,7 +687,7 @@ body.single-insurance {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   padding: 16px;
   background: $bg-color;
 }
@@ -738,7 +738,7 @@ body.single-insurance {
 }
 
 .insurance-rules__item {
-  border-radius: 16px;
+  border-radius: $radius-lg;
   overflow: hidden;
   background: $bg-color;
 }
@@ -836,7 +836,7 @@ body.single-insurance {
   flex-wrap: wrap;
   gap: 8px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
   font-size: 16px;
   line-height: 145%;
@@ -963,7 +963,7 @@ body.single-insurance {
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
 }
 
@@ -1000,7 +1000,7 @@ body.single-insurance {
   flex-direction: column;
   gap: 8px;
   padding: 24px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
 }
 
@@ -1046,7 +1046,7 @@ body.single-insurance {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 32px;
   padding: 32px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
 
   @media screen and (max-width: 1024px) {
@@ -1124,7 +1124,7 @@ body.single-insurance {
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   background: $bg-color;
   text-decoration: none;
   cursor: pointer;
@@ -1135,7 +1135,7 @@ body.single-insurance {
   flex-shrink: 0;
   width: 64px;
   height: 64px;
-  border-radius: 50%;
+  border-radius: $radius-full;
   overflow: hidden;
   background: $bg-page;
 

@@ -90,7 +90,7 @@ html:has(.bsimice-page) {
   width: 3px;
   align-self: stretch;
   background-color: #ee3146;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 @media (max-width: 767px) {
   .bsimice-page .hero__subtitle {
@@ -105,7 +105,7 @@ html:has(.bsimice-page) {
 }
 .bsimice-page .hero__btn {
   padding: 10px 32px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   color: #fff;
   font-size: 16px;
   min-height: 44px;
@@ -129,7 +129,7 @@ html:has(.bsimice-page) {
 }
 .bsimice-page .plate {
   flex: 1;
-  border-radius: 12px;
+  border-radius: $radius-md;
   padding: 16px 24px;
   background-color: #f4f4f6;
   position: relative;
@@ -148,7 +148,7 @@ html:has(.bsimice-page) {
   position: absolute;
   width: 373px;
   height: 373px;
-  border-radius: 50%;
+  border-radius: $radius-full;
   background-color: rgba(27, 27, 27, 0.03);
   pointer-events: none;
   z-index: 1;
@@ -197,7 +197,7 @@ html:has(.bsimice-page) {
   width: 40px;
   height: 40px;
   background-color: #ee3146;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 }
 .bsimice-page .mice-about__subtitle {
   font-size: clamp(15px, 1.5vw, 18px);
@@ -279,7 +279,7 @@ html:has(.bsimice-page) {
   overflow-wrap: break-word;
 }
 .bsimice-page .mice-proove__media {
-  border-radius: 16px;
+  border-radius: $radius-lg;
   overflow: hidden;
   aspect-ratio: 2.1793103448;
 }
@@ -312,7 +312,7 @@ html:has(.bsimice-page) {
   display: flex;
   flex-direction: column;
   position: relative;
-  border-radius: 16px;
+  border-radius: $radius-lg;
   gap: 4px;
   overflow: hidden;
   padding: 16px;
@@ -422,7 +422,7 @@ html:has(.bsimice-page) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: $radius-md;
   font-size: 16px;
 }
 .bsimice-page .services__guarantee-box::before,
@@ -431,7 +431,7 @@ html:has(.bsimice-page) {
   position: absolute;
   width: 373px;
   height: 373px;
-  border-radius: 50%;
+  border-radius: $radius-full;
   background-color: rgba(27, 27, 27, 0.03);
   pointer-events: none;
   z-index: 1;

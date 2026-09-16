@@ -24,7 +24,7 @@
      её от разрастания на широких мониторах. */
   aspect-ratio: 128 / 42;
   max-height: 420px;
-  border-radius: 20px;
+  border-radius: $radius-xl;
   overflow: hidden;
 }
 

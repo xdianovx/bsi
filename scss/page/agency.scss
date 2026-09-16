@@ -31,7 +31,7 @@
 
 .agency-sidebar {
   background: #f3f3f4;
-  border-radius: 12px;
+  border-radius: $radius-md;
   padding: 8px;
 }
 
@@ -49,7 +49,7 @@
   display: block;
   width: 100%;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   font-weight: 500;
   transition: $trans-text;
 
@@ -213,7 +213,7 @@
   display: block;
   margin-top: 8px;
   text-align: center;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   font-weight: 500;
 
   &:hover {
@@ -226,7 +226,7 @@
 .agency-sidebar-event {
   display: block;
   background: #f3f3f4;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   padding: 8px;
   cursor: pointer;
   color: inherit;
@@ -248,7 +248,7 @@
 .agency-sidebar-event__kind {
   display: inline-flex;
   align-items: center;
-  border-radius: 100px;
+  border-radius: $radius-pill;
   font-size: 12px;
   line-height: 1;
 
@@ -295,7 +295,7 @@
   align-items: flex-start;
   gap: 4px;
   background: #fff;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   padding: 4px 8px;
   font-size: 12px;
   line-height: 120%;
@@ -350,7 +350,7 @@
   height: 48px;
   padding: 0 16px;
   border: 1px solid darken($bg-gray, 8%);
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: #fff;
   font-family: inherit;
   font-size: 16px;
@@ -406,7 +406,7 @@
   justify-content: center;
   padding: 10px 16px;
   border: 0;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   background: #ececee;
   color: $text-black;
   font-weight: 400;
@@ -450,7 +450,7 @@
 
 .agency-education-card {
   background: $bg-gray;
-  border-radius: 12px;
+  border-radius: $radius-md;
   padding: 12px;
 }
 
@@ -464,7 +464,7 @@
 .agency-education-card__kind {
   display: inline-flex;
   align-items: center;
-  border-radius: 100px;
+  border-radius: $radius-pill;
   font-size: 13px;
   line-height: 1;
   padding: 5px 10px;
@@ -526,7 +526,7 @@
   align-items: center;
   gap: 6px;
   background: #fff;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   line-height: 100%;
   padding: 6px 10px;
 

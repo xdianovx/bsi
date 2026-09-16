@@ -8,7 +8,7 @@
 
 .promo-banner-card {
   width: 100%;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
 }
 
@@ -60,7 +60,7 @@
 @media screen and (max-width: 768px) {
   .promo-banner-card {
     width: 100%;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     overflow: hidden;
   }
 }

@@ -31,7 +31,7 @@
   .social-item {
     width: 40px;
     height: 40px;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     background: #fff;
 
     &:hover {
@@ -55,7 +55,7 @@
 
 .currency-select-trigger__wrap {
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   background: #fff;
   font-size: 14px;
   line-height: 100%;
@@ -84,7 +84,7 @@
     min-width: 100%;
     white-space: nowrap;
     padding: 0;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     overflow: hidden;
   }
 

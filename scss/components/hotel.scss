@@ -47,7 +47,7 @@
 
 .hotel-card__media {
   aspect-ratio: 16/9;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   flex-shrink: 0;
   overflow: hidden;
   display: block;
@@ -75,7 +75,7 @@
 .hotel-card__flag {
   width: 24px;
   height: 24px;
-  border-radius: 100%;
+  border-radius: $radius-full;
   overflow: hidden;
   flex-shrink: 0;
   border: 1px solid #fff;
@@ -175,7 +175,7 @@
     align-items: center;
     justify-content: center;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     font-size: 16px;
     line-height: 100%;
     text-align: center;
@@ -234,7 +234,7 @@
 .hotel-card__tag {
   position: absolute;
   top: 8px;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   right: 8px;
   background: #fff;
   color: $text-black;
@@ -282,7 +282,7 @@
   gap: 4px;
   background: $bg-gray;
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: $radius-sm;
 
   svg {
     color: #ffd700;
@@ -296,7 +296,7 @@
 }
 
 .hotel-card-row {
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
 }
 
@@ -318,7 +318,7 @@
   align-self: stretch;
   display: block;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   overflow: hidden;
   img {
     width: 100%;
@@ -459,7 +459,7 @@
   gap: 4px;
   font-size: 14px;
   line-height: 100%;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   padding: 4px 8px;
   background: $bg-gray;
 
@@ -504,7 +504,7 @@
 
 .hotel-card__anemetie {
   background: $bg-gray;
-  border-radius: 4px;
+  border-radius: $radius-sm;
   display: flex;
   align-items: center;
   justify-content: center;

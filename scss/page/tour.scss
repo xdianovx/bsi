@@ -40,7 +40,7 @@
   background: #fff;
   line-height: 100%;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: $radius-sm;
 }
 
 .tour-card-row__location {
@@ -68,7 +68,7 @@
 .tour-card-row__flag {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
+  border-radius: $radius-full;
   overflow: hidden;
   flex-shrink: 0;
   position: relative;
@@ -176,7 +176,7 @@
   width: 100%;
   aspect-ratio: 16/10;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 
   .tour-card-row__img {
     display: block;
@@ -262,7 +262,7 @@
   display: inline-flex;
   align-items: center;
   background: $bg-gray;
-  border-radius: 6px;
+  border-radius: $radius-sm;
   padding: 6px 8px;
   font-size: 14px;
   line-height: 100%;
@@ -334,7 +334,7 @@
   width: 100%;
   padding: 16px;
   background: $bg-gray;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   font-size: 16px;
   line-height: 120%;
   gap: 8px;
@@ -400,7 +400,7 @@
   padding: 16px;
   background: $bg-color;
   margin-top: 16px;
-  border-radius: 12px;
+  border-radius: $radius-md;
 }
 
 .country-tours__filters-row {
@@ -428,16 +428,16 @@
 }
 
 .tours-filter__select {
-  border-radius: 8px;
+  border-radius: $radius-sm;
 
   .choices__inner {
-    border-radius: 8px;
+    border-radius: $radius-sm;
   }
 }
 
 .tours-filter__field {
   .choices__inner {
-    border-radius: 8px;
+    border-radius: $radius-sm;
   }
 }
 
@@ -464,7 +464,7 @@
   gap: 16px;
   padding: 8px;
   background: $red;
-  border-radius: 8px;
+  border-radius: $radius-sm;
 
   @media screen and (max-width: 1024px) {
     flex-direction: column;
@@ -593,7 +593,7 @@
 .tour-prices__filters-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   align-items: stretch;
   width: 100%;
   background: #fff;
@@ -625,10 +625,10 @@
   @media screen and (max-width: 768px) {
     grid-template-columns: repeat(1, 1fr);
     gap: 0;
-    border-radius: 8px;
+    border-radius: $radius-sm;
 
     > * {
-      border-radius: 8px;
+      border-radius: $radius-sm;
       width: 100%;
       border-right: none !important;
       border-bottom: 1px solid #dfdfdf;
@@ -699,7 +699,7 @@
       margin-top: 8px;
       background: #fff;
       border: 1px solid #dfdfdf;
-      border-radius: 8px;
+      border-radius: $radius-sm;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       padding: 16px;
       z-index: 1000;
@@ -756,7 +756,7 @@
       margin-top: 8px;
       background: #fff;
       border: 1px solid #dfdfdf;
-      border-radius: 8px;
+      border-radius: $radius-sm;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       padding: 16px;
       z-index: 1000;
@@ -841,7 +841,7 @@
   padding: 12px;
   background: #fff;
   justify-content: space-between;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   border: 1px solid #dbdbdb;
   transition: border-color 0.2s, box-shadow 0.2s;
   width: 100%;
@@ -1127,7 +1127,7 @@
   height: 48px;
   width: 100%;
   font-size: 16px;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   padding: 12px 16px;
 }
 
