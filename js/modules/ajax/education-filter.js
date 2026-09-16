@@ -82,7 +82,7 @@ export const initEducationFilter = () => {
     const count = countActiveFilters();
 
     if (resetBtn) {
-      resetBtn.style.display = count > 0 ? "block" : "none";
+      resetBtn.style.display = count > 0 ? "inline-flex" : "none";
     }
 
     if (activeFiltersEl && activeFiltersCount) {

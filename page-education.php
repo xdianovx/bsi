@@ -390,17 +390,6 @@ if ($all_edu_for_sort->have_posts()) {
                  value="">
         </div>
 
-        <div class="education-filter__field education-filter__field--checkbox">
-          <label class="ui-checkbox">
-            <input type="checkbox"
-                   class="ui-checkbox__input js-education-show-original-currency"
-                   name="show_original_currency"
-                   value="1">
-            <span class="ui-checkbox__mark"></span>
-            <span class="ui-checkbox__text">Показать стоимость в валюте</span>
-          </label>
-        </div>
-
       </div>
     </form>
 
@@ -410,20 +399,30 @@ if ($all_edu_for_sort->have_posts()) {
           Найдено: <?php echo (int) $initial_query->found_posts; ?>
         </div>
 
-        <div class="education-filter__field education-filter__field--checkbox">
-          <label class="ui-checkbox">
-            <input type="checkbox"
-                   class="ui-checkbox__input"
-                   name="group_arrival"
-                   value="1">
-            <span class="ui-checkbox__mark"></span>
-            <span class="ui-checkbox__text">Групповой заезд</span>
-          </label>
-        </div>
+        <label class="ui-checkbox">
+          <input type="checkbox"
+                 class="ui-checkbox__input"
+                 name="group_arrival"
+                 value="1">
+          <span class="ui-checkbox__mark"></span>
+          <span class="ui-checkbox__text">Групповой заезд</span>
+        </label>
+
+        <label class="ui-checkbox">
+          <input type="checkbox"
+                 class="ui-checkbox__input js-education-show-original-currency"
+                 name="show_original_currency"
+                 value="1">
+          <span class="ui-checkbox__mark"></span>
+          <span class="ui-checkbox__text">Стоимость в валюте</span>
+        </label>
 
         <button type="button"
                 class="education-page__reset-btn js-education-reset"
                 style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
           Сбросить фильтры
         </button>
       </div>

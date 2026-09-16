@@ -1,0 +1,121 @@
+/* ───────────────────────────────────────────────────────────────────
+   Каталог образования — /obrazovanie-za-rubezhom/ (page-education.php).
+
+   Серый фон страницы, содержимое — белые карточки: тот же переход, что
+   на стране и курорте (см. wiki/docs/design-guidelines.md). Скоуп —
+   body.page-template-page-education, другие страницы не задеваются.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.page-template-page-education {
+  background: $bg-page;
+}
+
+/* Фильтр — белая панель, а не россыпь полей на фоне страницы. */
+body.page-template-page-education .education-filter {
+  margin-top: 16px;
+  padding: 16px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+body.page-template-page-education .education-filter__row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  @media screen and (max-width: 1200px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media screen and (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Панель под фильтром: счётчик, переключатели и сброс слева, сортировка
+   справа — как в каталоге экскурсий. */
+body.page-template-page-education .education-page__controls {
+  margin-top: 20px;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+
+body.page-template-page-education .education-page__counter-wrap {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+
+  @media screen and (max-width: 768px) {
+    align-items: flex-start;
+  }
+}
+
+body.page-template-page-education .education-page__counter {
+  color: $text-gray;
+}
+
+/* Сброс — текстовая кнопка с крестиком, без рамки: различаем цветом,
+   а не обводкой. */
+body.page-template-page-education .education-page__reset-btn {
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font-size: 16px;
+  color: $red;
+  transition: $trans-text;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: $red-hover;
+    background: transparent;
+    border-color: transparent;
+  }
+}
+
+/* Карточки — белые плитки на сером фоне. Вертикальный зазор был 40px
+   под карточку без подложки; у плиток хватает 16. */
+body.page-template-page-education .education-page__list {
+  gap: 16px;
+}
+
+body.page-template-page-education .education-card {
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+body.page-template-page-education .education-card__actions .education-card__btn-details:hover {
+  background: $red;
+  color: #fff !important;
+}
+
+body.page-template-page-education .education-page__empty {
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+/* На телефоне пальцем попадают в чекбоксы и в сортировку — поднимаем
+   высоту цели до 44px вертикальными отступами, не трогая общий компонент. */
+@media screen and (max-width: 768px) {
+
+  body.page-template-page-education .education-page__counter-wrap .ui-checkbox,
+  body.page-template-page-education .education-page__sort-trigger,
+  body.page-template-page-education .education-page__reset-btn {
+    min-height: 44px;
+    padding-block: 10px;
+  }
+
+  body.page-template-page-education .education-page__controls {
+    gap: 4px 20px;
+  }
+}
