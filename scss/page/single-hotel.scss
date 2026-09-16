@@ -86,7 +86,7 @@
 }
 
 .single-hotel__gallery-section {
-  margin-top: 20px;
+  /* Вертикальные отступы даёт сам компонент галереи (scss/ui/gallery.scss). */
 }
 
 .single-hotel__content {

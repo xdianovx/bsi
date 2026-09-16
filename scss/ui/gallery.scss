@@ -5,7 +5,9 @@
  */
 
 .ui-gallery {
-  margin-bottom: 20px;
+  /* Отступ задаёт сам компонент: обёртка .country-page__gallery одинакова
+     во всех девяти шаблонах и своих полей не имеет. */
+  margin: 24px 0;
 }
 
 .ui-gallery__title {
