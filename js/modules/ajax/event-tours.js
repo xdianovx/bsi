@@ -3,6 +3,7 @@ import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
 import { dropdown } from "../forms/dropdown.js";
+import { sortLabel } from "../services/sort-label.js";
 
 const VIEW_STORAGE_KEY = "bsi_event_tours_view";
 
@@ -596,7 +597,7 @@ export const initEventToursFilters = async () => {
     sortOptions.forEach((opt) => {
       const active = (opt.dataset.value || "date_asc") === sortValue;
       opt.classList.toggle("is-active", active);
-      if (active && sortText) sortText.textContent = opt.textContent.trim();
+      if (active && sortText) sortText.textContent = sortLabel(opt);
     });
 
     sortOptions.forEach((opt) => {
@@ -608,7 +609,7 @@ export const initEventToursFilters = async () => {
         }
         sortValue = val;
         sortOptions.forEach((o) => o.classList.toggle("is-active", o === opt));
-        if (sortText) sortText.textContent = opt.textContent.trim();
+        if (sortText) sortText.textContent = sortLabel(opt);
         sortEl.classList.remove("is-open");
         currentPage = 1;
         await loadTours();

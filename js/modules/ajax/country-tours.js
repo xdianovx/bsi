@@ -3,6 +3,7 @@ import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
 import { dropdown } from "../forms/dropdown.js";
 import { displayTourPrices } from "../services/priceLoader.js";
+import { sortLabel } from "../services/sort-label.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -252,7 +253,7 @@ export const initCountryToursFilters = () => {
       opt.addEventListener('click', e => {
         e.preventDefault();
         currentSortValue = opt.dataset.value;
-        if (sortTextEl) sortTextEl.textContent = opt.textContent.trim();
+        if (sortTextEl) sortTextEl.textContent = sortLabel(opt);
         sortContainer.querySelectorAll('.country-tours__sort-option').forEach(o => o.classList.remove('is-active'));
         opt.classList.add('is-active');
         sortDropdown.close();

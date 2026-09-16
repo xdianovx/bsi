@@ -4,6 +4,7 @@ import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
 import { dropdown } from "../forms/dropdown.js";
 import { displayTourPrices } from "../services/priceLoader.js";
+import { sortLabel } from "../services/sort-label.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -468,7 +469,7 @@ export const initToursFilter = () => {
         // Обновляем текст триггера
         const trigger = sortContainer.querySelector('.tours-page__sort-trigger');
         if (trigger) {
-          trigger.querySelector('.tours-page__sort-text').textContent = option.textContent;
+          trigger.querySelector('.tours-page__sort-text').textContent = sortLabel(option);
         }
 
         // Закрываем dropdown
@@ -754,7 +755,7 @@ export const initToursFilter = () => {
       if (sortTrigger) {
         const sortOption = sortContainer?.querySelector(`[data-value="${sort}"]`);
         if (sortOption) {
-          sortTrigger.querySelector('.tours-page__sort-text').textContent = sortOption.textContent;
+          sortTrigger.querySelector('.tours-page__sort-text').textContent = sortLabel(sortOption);
         }
       }
     }

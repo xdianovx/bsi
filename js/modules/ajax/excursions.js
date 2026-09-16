@@ -1,5 +1,6 @@
 import Choices from "choices.js";
 import { dropdown } from "../forms/dropdown.js";
+import { sortLabel } from "../services/sort-label.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -205,7 +206,7 @@ export const initExcursionsFilter = () => {
       opt.addEventListener("click", (e) => {
         e.preventDefault();
         currentSortValue = opt.dataset.value;
-        if (sortTextEl) sortTextEl.textContent = opt.textContent.trim();
+        if (sortTextEl) sortTextEl.textContent = sortLabel(opt);
         sortContainer
           .querySelectorAll(".country-excursions__sort-option")
           .forEach((o) => o.classList.remove("is-active"));

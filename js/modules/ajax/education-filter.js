@@ -3,6 +3,7 @@ import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
 import { dropdown } from "../forms/dropdown.js";
+import { sortLabel } from "../services/sort-label.js";
 
 const CHOICES_RU = {
   itemSelectText: "",
@@ -763,7 +764,7 @@ export const initEducationFilter = () => {
       const selectedOption = sortContainer.querySelector(`.education-page__sort-option[data-value="${sort}"]`);
       
       if (selectedOption) {
-        const text = selectedOption.textContent.trim();
+        const text = sortLabel(selectedOption);
         if (sortText) {
           sortText.textContent = text;
         }
@@ -888,7 +889,7 @@ export const initEducationFilter = () => {
       option.addEventListener('click', (e) => {
         e.preventDefault();
         const value = option.getAttribute('data-value');
-        const text = option.textContent.trim();
+        const text = sortLabel(option);
         
         currentSortValue = value;
         if (sortText) {
