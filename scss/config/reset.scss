@@ -148,20 +148,42 @@ sup {
   padding-bottom: 0 !important;
 }
 
+/* Выпадающие списки в теме без обводок: панель отделяется от страницы
+   тенью и заливкой (см. wiki/docs/design-guidelines.md). */
 .choices__list--dropdown,
 .choices__list[aria-expanded] {
   display: none;
-  z-index: 1;
   position: absolute;
   width: 100%;
   background-color: #fff;
-  border: 1px solid #000;
-  top: 120%;
-  margin-top: -1px;
+  border: 0;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+  top: calc(100% + 4px);
+  margin-top: 0;
   border-radius: 8px;
   overflow: hidden;
   word-break: break-all;
   z-index: 10;
+}
+
+/* Строка поиска в списке — в одну меру с пунктами, иначе она заметно
+   мельче и «проваливается» над первым вариантом. */
+.choices__list--dropdown .choices__list .choices__item,
+.choices__list[aria-expanded] .choices__list .choices__item,
+.choices__list--dropdown .choices__input,
+.choices__list[aria-expanded] .choices__input {
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.choices__list--dropdown .choices__input,
+.choices__list[aria-expanded] .choices__input {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: $bg-gray;
 }
 
 .choices[data-type*="select-one"]::after {

@@ -45,8 +45,9 @@
 // Рендерятся в <body> вне обёртки страницы, поэтому стили глобальные.
 .flatpickr-calendar {
   width: fit-content;
-  border: 1px solid $gray-light;
+  border: 0;
   border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   font-family: "Inter", sans-serif;
   // padding не добавляем: flatpickr box-sizing:border-box + фикс-ширина .flatpickr-days

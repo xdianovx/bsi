@@ -284,9 +284,9 @@ if ($all_edu_for_sort->have_posts()) {
     <form class="education-filter js-education-filter"
           data-education-form>
       <div class="education-filter__row">
-        <div class="education-filter__field input-item select-item">
-          <label>Страна</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Страна</div>
+          <select class="education-filter__select tours-filter__select"
                   name="country"
                   data-choice="single">
             <option value="">Все страны</option>
@@ -298,9 +298,9 @@ if ($all_edu_for_sort->have_posts()) {
           </select>
         </div>
 
-        <div class="education-filter__field input-item select-item">
-          <label>Язык</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Язык</div>
+          <select class="education-filter__select tours-filter__select"
                   name="language"
                   data-choice="single">
             <option value="">Все языки</option>
@@ -312,9 +312,9 @@ if ($all_edu_for_sort->have_posts()) {
           </select>
         </div>
 
-        <div class="education-filter__field input-item select-item">
-          <label>Программа</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Программа</div>
+          <select class="education-filter__select tours-filter__select"
                   name="program"
                   data-choice="single">
             <option value="">Показать все</option>
@@ -326,9 +326,9 @@ if ($all_edu_for_sort->have_posts()) {
           </select>
         </div>
 
-        <div class="education-filter__field input-item select-item">
-          <label>Тип обучения</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Тип обучения</div>
+          <select class="education-filter__select tours-filter__select"
                   name="type"
                   data-choice="single">
             <option value="">Показать все</option>
@@ -340,9 +340,9 @@ if ($all_edu_for_sort->have_posts()) {
           </select>
         </div>
 
-        <div class="education-filter__field input-item select-item">
-          <label>Размещение</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Размещение</div>
+          <select class="education-filter__select tours-filter__select"
                   name="accommodation"
                   data-choice="single">
             <option value="">Показать все</option>
@@ -354,9 +354,9 @@ if ($all_edu_for_sort->have_posts()) {
           </select>
         </div>
 
-        <div class="education-filter__field input-item select-item">
-          <label>Возраст</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Возраст</div>
+          <select class="education-filter__select tours-filter__select"
                   name="age"
                   data-choice="single">
             <option value="">Показать все</option>
@@ -366,17 +366,17 @@ if ($all_edu_for_sort->have_posts()) {
           </select>
         </div>
 
-        <div class="education-filter__field input-item select-item">
-          <label>Продолжительность</label>
-          <select class="education-filter__select"
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Продолжительность</div>
+          <select class="education-filter__select tours-filter__select"
                   name="duration"
                   data-choice="single">
             <option value="">Показать все</option>
           </select>
         </div>
 
-        <div class="education-filter__field input-item">
-          <label>Даты заезда</label>
+        <div class="education-filter__field tours-filter__field">
+          <div class="tours-filter__label">Даты заезда</div>
           <input type="text"
                  class="education-filter__input education-filter__datepicker"
                  name="date_range"

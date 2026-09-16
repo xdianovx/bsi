@@ -332,9 +332,10 @@
 
 .event-tours-page .country-tours__filters .choices__list--dropdown,
 .event-tours-page .country-tours__filters .choices__list[aria-expanded] {
-  border: 1px solid #dfdfdf;
+  border: 0;
   border-radius: 8px;
   background-color: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
 }
 
 .event-tours-page .tours-page__controls {

@@ -19,11 +19,6 @@ body.page-template-page-education .education-filter {
 }
 
 body.page-template-page-education .education-filter__row {
-  /* Плавающий label .input-item висит на -10px над полем: даём ряду запас
-     сверху и увеличиваем вертикальный зазор, иначе подписи срезаются
-     панелью и налезают на поля предыдущего ряда. */
-  padding-top: 12px;
-  row-gap: 28px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 
   @media screen and (max-width: 1200px) {
@@ -123,14 +118,4 @@ body.page-template-page-education .education-page__empty {
   body.page-template-page-education .education-page__controls {
     gap: 4px 20px;
   }
-}
-/* Датапикер — в высоту селектов Choices (.select-item задаёт 54px). */
-body.page-template-page-education .education-filter__datepicker {
-  min-height: 54px;
-}
-
-/* Choices рисуется после подписи и своим белым фоном срезал её верх —
-   поднимаем label над полем. */
-body.page-template-page-education .education-filter__field > label {
-  z-index: 2;
 }
