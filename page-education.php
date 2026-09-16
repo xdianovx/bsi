@@ -395,10 +395,6 @@ if ($all_edu_for_sort->have_posts()) {
 
     <div class="education-page__controls">
       <div class="education-page__counter-wrap">
-        <div class="education-page__counter js-education-counter">
-          Найдено: <?php echo (int) $initial_query->found_posts; ?>
-        </div>
-
         <label class="ui-checkbox">
           <input type="checkbox"
                  class="ui-checkbox__input"
@@ -498,6 +494,10 @@ if ($all_edu_for_sort->have_posts()) {
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="education-page__counter js-education-counter">
+      Найдено: <?php echo (int) $initial_query->found_posts; ?>
     </div>
 
     <div class="education-page__list js-education-list">
