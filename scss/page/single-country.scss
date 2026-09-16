@@ -477,6 +477,31 @@ body.single-country .catalog-card--excursion {
   border-radius: 12px;
 }
 
+/* Событийные туры страны — карточка событием тоже белая плитка.
+   Список шёл с вертикальным зазором 40px под карточки без подложки. */
+body.single-country .event-card {
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+body.single-country .country-tours__list {
+  gap: 16px;
+}
+
+body.single-country .event-card__actions .event-card__btn-details:hover {
+  background: $red;
+  color: #fff !important;
+}
+
+/* Плашки внутри белой плитки отступают от края фото: у карточки свой
+   padding 8px, при 8px метки липнут к краю (как было у карточек школ). */
+body.single-country .event-card__label {
+  top: 14px;
+  left: 14px;
+  right: 14px;
+}
+
 /* Школы каталога обучения — карточка-плитка на всю ячейку грида. */
 body.single-country .education-card {
   width: 100%;
