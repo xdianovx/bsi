@@ -76,12 +76,15 @@
   border-radius: 8px;
   background: $bg-color;
   box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
-  display: none;
   z-index: 50;
 }
 
-.ui-sort.is-open .ui-sort__panel {
-  display: block;
+/* Скрытие через :not(.is-open) — правило весит больше, чем .ui-sort__options
+   ниже по файлу. Если панель и список опций окажутся одним элементом (так было
+   на странице школы), flex из .ui-sort__options иначе перебивает display: none
+   и панель висит раскрытой. */
+.ui-sort:not(.is-open) .ui-sort__panel {
+  display: none;
 }
 
 .ui-sort__options {

@@ -497,15 +497,13 @@ get_header();
                         stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   </button>
-                  <div class="js-dropdown-panel ui-sort__panel ui-sort__options single-education__programs-sort-panel">
-                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="price_asc">Цена: по
-                      возрастанию</button>
-                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="price_desc">Цена: по
-                      убыванию</button>
-                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="age_asc">Возраст: по
-                      возрастанию</button>
-                    <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="age_desc">Возраст: по
-                      убыванию</button>
+                  <div class="js-dropdown-panel ui-sort__panel single-education__programs-sort-panel">
+                    <div class="ui-sort__options">
+                      <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="price_asc">Цена: по возрастанию</button>
+                      <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="price_desc">Цена: по убыванию</button>
+                      <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="age_asc">Возраст: по возрастанию</button>
+                      <button type="button" class="ui-sort__option single-education__programs-sort-option" data-value="age_desc">Возраст: по убыванию</button>
+                    </div>
                   </div>
                 </div>
               </div>
