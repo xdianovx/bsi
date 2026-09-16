@@ -197,9 +197,13 @@ sup {
   border-radius: 4px;
 }
 
+/* Высота 28px при line-height 24 прижимала текст к верху поля — выбранное
+   значение сидело выше центра примерно на 4px. Центрируем флексом. */
 .choices__list--single .choices__item {
+  display: flex;
+  align-items: center;
   width: 100%;
-  height: 28px;
+  min-height: 28px;
   padding-right: 16px;
   overflow: hidden;
   white-space: nowrap;
