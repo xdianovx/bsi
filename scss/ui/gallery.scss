@@ -1,0 +1,110 @@
+/**
+ * Галерея-мозаика: крупный кадр слева, четыре мелких справа.
+ * Остальные снимки лежат скрытыми ссылками и открываются в том же альбоме.
+ * Разметка — template-parts/sections/gallery.php, витрина — ui.html.
+ */
+
+.ui-gallery {
+  margin-bottom: 20px;
+}
+
+.ui-gallery__title {
+  margin: 0 0 16px;
+}
+
+.ui-gallery__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+  max-height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+
+  /* На узком экране мозаика разворачивается в столбик: крупный кадр во всю
+     ширину, под ним четыре плитки по две в ряд. Высоту задают пропорции
+     элементов, поэтому потолок 420px здесь снимается. */
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    max-height: none;
+  }
+}
+
+/* Плитка — ссылка; ячейка нужна только там, где сверху ложится счётчик. */
+.ui-gallery__cell,
+.ui-gallery__item {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  background: $bg-gray;
+}
+
+.ui-gallery__cell .ui-gallery__item {
+  height: 100%;
+}
+
+@media (max-width: 767px) {
+
+  .ui-gallery__cell,
+  .ui-gallery__cell .ui-gallery__item {
+    aspect-ratio: 4 / 3;
+    height: auto;
+  }
+}
+
+.ui-gallery__item picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ui-gallery__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease-in-out;
+}
+
+.ui-gallery__item:hover img {
+  transform: scale(1.04);
+}
+
+.ui-gallery__item--main {
+  grid-row: span 2;
+
+  @media (max-width: 767px) {
+    grid-column: span 2;
+    grid-row: span 1;
+    aspect-ratio: 16 / 10;
+  }
+}
+
+.ui-gallery--single .ui-gallery__grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.ui-gallery--single .ui-gallery__item--main {
+  grid-row: span 1;
+  aspect-ratio: 16 / 7;
+}
+
+/* Счётчик не перехватывает клик — под ним лежит ссылка на fancybox. */
+.ui-gallery__more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: $text-white;
+  font-size: 15px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.ui-gallery__hidden {
+  display: none;
+}

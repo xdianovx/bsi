@@ -1,15 +1,16 @@
 <?php
 
 /**
- * Галерея с превью — общая для страны, отеля, достопримечательности, образования.
+ * Галерея-мозаика — общая для страны, отеля, достопримечательности, образования.
  *
- * Картинки выводятся через bsi_picture(): WordPress проставляет ширину и высоту,
- * поэтому место резервируется до загрузки и макет не дёргается. Раньше атрибутов
- * не было, и счётчик «Ещё N фото» давал почти весь сдвиг макета на десктопе
- * (CLS 0,283 при пороге 0,1 — см. wiki/docs/seo-audit-2026-09-14.md, C3).
+ * Одно крупное фото и до четырёх мелких; остальные снимки лежат скрытыми
+ * ссылками и открываются в том же fancybox-альбоме. Раньше здесь был
+ * Swiper с превью-полосой, но мозаика показывает больше кадров сразу
+ * и не требует JS для отрисовки.
  *
- * В превью уходит `medium`, а не оригинал: полоска шириной в сотню пикселей
- * не нуждается в файле на 2500.
+ * Картинки выводятся через bsi_picture(): WordPress проставляет ширину и
+ * высоту, поэтому место резервируется до загрузки и макет не дёргается
+ * (CLS 0,283 → 0,004, см. wiki/docs/seo-audit-2026-09-14.md, C3).
  *
  * @package bsi
  */
@@ -21,12 +22,26 @@ if (empty($gallery) || !is_array($gallery)) {
   return;
 }
 
+/** Голые URL без файла отбрасываем, чтобы не рвать сетку пустыми плитками. */
+$gallery = array_values(array_filter($gallery, static function ($item): bool {
+  return is_array($item) && !empty($item['url']);
+}));
+
+if (!$gallery) {
+  return;
+}
+
 $id = $args['id'] ?? uniqid('gallery_');
 $title = $args['title'] ?? '';
 
-/** Крупный слайд занимает колонку контента, превью — узкую полоску. */
-$main_sizes = '(max-width: 1200px) 100vw, 800px';
-$thumb_sizes = '160px';
+/** Крупный слайд занимает две трети сетки, мелкие — по шестой части. */
+$main_sizes = '(max-width: 767px) 100vw, 640px';
+$thumb_sizes = '(max-width: 767px) 50vw, 320px';
+
+$main = $gallery[0];
+$thumbs = array_slice($gallery, 1, 4);
+$hidden = array_slice($gallery, 5);
+$rest = count($hidden);
 
 /**
  * ID вложения из элемента ACF-галереи; 0 — если пришёл голый URL.
@@ -34,87 +49,70 @@ $thumb_sizes = '160px';
 $attachment_id = static function (array $item): int {
   return (int) ($item['ID'] ?? $item['id'] ?? 0);
 };
+
+/**
+ * Плитка галереи: ссылка в fancybox с картинкой внутри.
+ */
+$render_item = static function (array $item, string $size, array $attrs, string $sizes, string $gallery_id, string $class) use ($attachment_id): void {
+  $url = $item['url'] ?? '';
+  $alt = $item['alt'] ?? '';
+  $item_id = $attachment_id($item);
+  $attrs['alt'] = $alt;
+  ?>
+  <a class="<?= esc_attr($class); ?>" href="<?= esc_url($url); ?>" data-fancybox="<?= esc_attr($gallery_id); ?>">
+    <?php if ($item_id > 0 && function_exists('bsi_picture')): ?>
+      <?= bsi_picture($item_id, $size, $attrs, $sizes); ?>
+    <?php else: ?>
+      <img src="<?= esc_url($url); ?>" alt="<?= esc_attr($alt); ?>"
+        loading="<?= esc_attr($attrs['loading'] ?? 'lazy'); ?>" decoding="async">
+    <?php endif; ?>
+  </a>
+<?php
+};
 ?>
 
-<div class="single-hotel__gallery-section country-page__gallery js-gallery" data-gallery-id="<?= esc_attr($id); ?>">
+<div class="ui-gallery ui-gallery--<?= $thumbs ? 'mosaic' : 'single'; ?>" data-gallery-id="<?= esc_attr($id); ?>">
 
   <?php if (!empty($title)): ?>
-    <h2 class="h2"><?= esc_html($title); ?></h2>
+    <h2 class="h2 ui-gallery__title"><?= esc_html($title); ?></h2>
   <?php endif; ?>
-  <div class="swiper  js-gallery-main">
-    <div class="swiper-wrapper">
-      <?php foreach ($gallery as $index => $item): ?>
+
+  <div class="ui-gallery__grid">
+    <?php
+    /* Первое фото видно сразу, остальные ждут прокрутки. */
+    $render_item(
+      $main,
+      'large',
+      ['decoding' => 'async', 'loading' => 'eager', 'sizes' => $main_sizes],
+      $main_sizes,
+      (string) $id,
+      'ui-gallery__item ui-gallery__item--main'
+    );
+    ?>
+
+    <?php foreach ($thumbs as $index => $item): ?>
+      <div class="ui-gallery__cell">
         <?php
-        $img_url = $item['url'] ?? '';
-        $img_alt = $item['alt'] ?? '';
-        if (!$img_url) {
-          continue;
-        }
-
-        $item_id = $attachment_id($item);
-        /* Первый слайд виден сразу, остальные ждут пролистывания. */
-        $attrs = [
-          'alt' => $img_alt,
-          'decoding' => 'async',
-          'loading' => $index === 0 ? 'eager' : 'lazy',
-          'sizes' => $main_sizes,
-        ];
+        $render_item(
+          $item,
+          'medium_large',
+          ['decoding' => 'async', 'loading' => 'lazy', 'sizes' => $thumb_sizes],
+          $thumb_sizes,
+          (string) $id,
+          'ui-gallery__item'
+        );
         ?>
-        <div class="swiper-slide">
-          <a class="hotel-gallery-main-slide country-page__gallery-slide" href="<?= esc_url($img_url); ?>"
-            data-fancybox="<?= esc_attr($id); ?>">
-            <?php if ($item_id > 0 && function_exists('bsi_picture')): ?>
-              <?= bsi_picture($item_id, 'large', $attrs, $main_sizes); ?>
-            <?php else: ?>
-              <img src="<?= esc_url($img_url); ?>" alt="<?= esc_attr($img_alt); ?>" loading="<?= $index === 0 ? 'eager' : 'lazy'; ?>" decoding="async">
-            <?php endif; ?>
-          </a>
-        </div>
-      <?php endforeach; ?>
-    </div>
 
-    <div class="slider-arrow  slider-arrow-prev hotel-gallery-main-arrow-prev js-gallery-prev"></div>
-    <div class="slider-arrow  slider-arrow-next hotel-gallery-main-arrow-next js-gallery-next"></div>
-  </div>
-
-
-  <div class="swiper  js-gallery-thumbs">
-    <div class="swiper-wrapper">
-      <?php
-      $total_count = count($gallery);
-      $remaining_count = $total_count > 4 ? $total_count - 4 : 0;
-      foreach ($gallery as $item):
-        $img_url = $item['url'] ?? '';
-        $img_alt = $item['alt'] ?? '';
-        if (!$img_url) {
-          continue;
-        }
-
-        $item_id = $attachment_id($item);
-        $thumb_attrs = [
-          'alt' => $img_alt,
-          'decoding' => 'async',
-          'loading' => 'lazy',
-          'sizes' => $thumb_sizes,
-        ];
-        ?>
-        <div class="swiper-slide">
-          <div class="hotel-gallery-thumb-slide">
-            <?php if ($item_id > 0 && function_exists('bsi_picture')): ?>
-              <?= bsi_picture($item_id, 'medium', $thumb_attrs, $thumb_sizes); ?>
-            <?php else: ?>
-              <img src="<?= esc_url($img_url); ?>" alt="<?= esc_attr($img_alt); ?>" loading="lazy" decoding="async">
-            <?php endif; ?>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-    <?php if ($remaining_count > 0): ?>
-      <div class="gallery-thumb-overlay js-gallery-overlay" data-gallery-id="<?= esc_attr($id); ?>"
-        data-remaining-count="<?= esc_attr($remaining_count); ?>">
-        <span class="gallery-thumb-overlay__text">Ещё <?= esc_html($remaining_count); ?> фото</span>
+        <?php if ($rest > 0 && $index === count($thumbs) - 1): ?>
+          <span class="ui-gallery__more">Ещё <?= esc_html((string) $rest); ?> фото</span>
+        <?php endif; ?>
       </div>
-    <?php endif; ?>
+    <?php endforeach; ?>
+
+    <?php foreach ($hidden as $item): ?>
+      <a class="ui-gallery__hidden" href="<?= esc_url($item['url']); ?>" data-fancybox="<?= esc_attr($id); ?>"
+        tabindex="-1"></a>
+    <?php endforeach; ?>
   </div>
 
 </div>

@@ -61,21 +61,6 @@
   min-width: 0;
 }
 
-.country-page__gallery .swiper {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.country-page__gallery .swiper,
-.country-page__gallery .swiper-wrapper,
-.country-page__gallery .swiper-slide {
-  max-width: 100%;
-  min-width: 0;
-  /* тоже помогает, если внутри ещё flex */
-}
-
 .country-attr__key {
   font-weight: 600;
 }
@@ -271,26 +256,6 @@
   // margin-bottom: 32px;
 }
 
-.country-page__gallery {}
-
-.country-page__gallery-slide {
-  width: 100%;
-  overflow: hidden;
-  border-radius: 8px;
-
-  img {
-    width: auto;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
-  }
-
-  &:hover img {
-    transform: scale(1.05);
-  }
-}
-
 .country-regions {
   padding: 16px;
   border-radius: 8px;
@@ -346,21 +311,6 @@
 .country-regions__link {
   font-weight: 700;
   font-size: 18px;
-}
-
-/* Пропорции и высоту слайда задаёт общий компонент галереи
-   (scss/page/single-hotel.scss): блок целиком 16:9. */
-
-.js-gallery {}
-
-.hotel-gallery-thumb-slide {
-
-  // aspect-ratio: 16/9;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 }
 
 .country-promos__title {

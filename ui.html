@@ -184,6 +184,7 @@
     <li><a href="#daypicker">Day picker</a></li>
     <li><a href="#dropdown">Dropdown</a></li>
     <li><a href="#slider">Слайдер-стрелки</a></li>
+    <li><a href="#gallery">Галерея-мозаика</a></li>
     <li><a href="#breadcrumbs">Хлебные крошки</a></li>
       <li><a href="#location-line">Строка локации</a></li>
     <li><a href="#callout">Callout / Алерты</a></li>
@@ -631,6 +632,49 @@ $trans-text: all 0.3s ease-in-out;
   &lt;span class="ui-checkbox__mark"&gt;&lt;/span&gt;
   &lt;span class="ui-checkbox__text"&gt;Показать в валюте&lt;/span&gt;
 &lt;/label&gt;</pre>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section class="uikit-section" id="gallery">
+    <h2>Галерея-мозаика (ui-gallery)</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/gallery.scss</code>, разметка — <code>template-parts/sections/gallery.php</code>. Крупный кадр слева, четыре мелких справа; остальные снимки лежат скрытыми ссылками и открываются в том же альбоме fancybox. На последней плитке — счётчик «Ещё N фото». До 767px — две колонки, главный кадр на всю ширину. Без Swiper: сетка рисуется без JS.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="ui-gallery ui-gallery--mosaic">
+        <div class="ui-gallery__grid">
+          <a class="ui-gallery__item ui-gallery__item--main" href="https://picsum.photos/id/1018/1600/1000" data-fancybox="uikit-gallery">
+            <img src="https://picsum.photos/id/1018/1280/800" alt="">
+          </a>
+          <div class="ui-gallery__cell">
+            <a class="ui-gallery__item" href="https://picsum.photos/id/1015/1600/1000" data-fancybox="uikit-gallery">
+              <img src="https://picsum.photos/id/1015/640/400" alt="">
+            </a>
+          </div>
+          <div class="ui-gallery__cell">
+            <a class="ui-gallery__item" href="https://picsum.photos/id/1016/1600/1000" data-fancybox="uikit-gallery">
+              <img src="https://picsum.photos/id/1016/640/400" alt="">
+            </a>
+          </div>
+          <div class="ui-gallery__cell">
+            <a class="ui-gallery__item" href="https://picsum.photos/id/1019/1600/1000" data-fancybox="uikit-gallery">
+              <img src="https://picsum.photos/id/1019/640/400" alt="">
+            </a>
+          </div>
+          <div class="ui-gallery__cell">
+            <a class="ui-gallery__item" href="https://picsum.photos/id/1020/1600/1000" data-fancybox="uikit-gallery">
+              <img src="https://picsum.photos/id/1020/640/400" alt="">
+            </a>
+            <span class="ui-gallery__more">Ещё 7 фото</span>
+          </div>
+          <a class="ui-gallery__hidden" href="https://picsum.photos/id/1024/1600/1000" data-fancybox="uikit-gallery" tabindex="-1"></a>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;?php get_template_part('template-parts/sections/gallery', null, [
+  'gallery' =&gt; $gallery,   // массив ACF-галереи
+  'id'      =&gt; 'hotel-' . get_the_ID(),
+  'title'   =&gt; 'Фотографии',
+]); ?&gt;</pre>
   </section>
 
   <!-- ============ SLIDER ARROWS ============ -->
