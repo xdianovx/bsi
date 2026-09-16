@@ -405,13 +405,12 @@ require get_template_directory() . '/inc/hidden-sections.php';
 /* Группировка админ-меню по хабам. */
 require get_template_directory() . '/inc/admin/menu-hubs.php';
 
-/* Настройки сайта → «Импорт со старого сайта»: заливка JSON (на проде только FTP).
-   Одна страница на экскурсии и достопримечательности сразу. */
-require get_template_directory() . '/inc/admin/legacy-import.php';
-
 /* Параметры визита для Метрики на карточках контента. */
 require get_template_directory() . '/inc/ym-content-params.php';
 require get_template_directory() . '/inc/admin/webp-convert.php';
+/* Страница «Детализация счёта» отключена: источника данных нет.
+   Подробности — wiki/raw/samotour.md, раздел «Детализация счёта».
+require get_template_directory() . '/inc/admin/invoice-detail.php'; */
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/disable-comments.php';
