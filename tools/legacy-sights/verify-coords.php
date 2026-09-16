@@ -59,10 +59,29 @@ function bsi_verify_distance(float $lat1, float $lng1, float $lat2, float $lng2)
  *
  * @return array{lat:float, lng:float}|null
  */
+/**
+ * Код страны для города, который сам себе государство. Null — обычный город.
+ */
+function bsi_verify_enclave_cc(string $city): ?string
+{
+  $map = [
+    'Монако' => 'mc',
+    'Ватикан' => 'va',
+    'Сан-Марино' => 'sm',
+    'Андорра' => 'ad',
+    'Гонконг' => 'hk',
+    'Макао' => 'mo',
+    'Сингапур' => 'sg',
+  ];
+
+  return $map[trim($city)] ?? null;
+}
+
 function bsi_verify_city(string $city, string $cc, array &$cache): ?array
 {
-  if (array_key_exists($city, $cache)) {
-    return $cache[$city];
+  $key = $city . '|' . $cc;
+  if (array_key_exists($key, $cache)) {
+    return $cache[$key];
   }
 
   $url = BSI_VERIFY_ENDPOINT . '?' . http_build_query([
@@ -94,7 +113,7 @@ function bsi_verify_city(string $city, string $cc, array &$cache): ?array
     }
   }
 
-  $cache[$city] = $hit;
+  $cache[$key] = $hit;
 
   return $hit;
 }
@@ -160,7 +179,13 @@ foreach ($ids as $post_id) {
     continue;
   }
 
-  $city_point = bsi_verify_city($city . ', ' . $country->post_title, $cc, $cache);
+  /* Города-анклавы: «Монако, Франция» с countrycodes=fr уводит Nominatim
+     в заморские территории (нашёлся «Monaco» в Океании — 12 000 км от точки),
+     поэтому такие города ищем по их собственному коду страны. */
+  $enclave = bsi_verify_enclave_cc($city);
+  $city_point = $enclave !== null
+    ? bsi_verify_city($city, $enclave, $cache)
+    : bsi_verify_city($city . ', ' . $country->post_title, $cc, $cache);
   if ($city_point === null) {
     $nocity++;
     continue;

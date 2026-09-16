@@ -34,7 +34,7 @@ $country_locative = $country_id && function_exists('bsi_country_locative_title')
   : $country_title;
 
 $excursions_h1 = $country_locative !== ''
-  ? 'Экскурсии в ' . $country_locative
+  ? 'Экскурсии ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($country_locative) : 'в') . ' ' . $country_locative
   : 'Экскурсии';
 
 $paged = max(1, (int) get_query_var('paged'));
@@ -68,6 +68,11 @@ $excursions_query = new WP_Query([
 ]);
 $excursions_query->found_posts = $total;
 $excursions_query->max_num_pages = $total_pages;
+
+/* ItemList в разметке страницы — печатается в подвале (inc/schema.php). */
+if (function_exists('bsi_schema_register_catalog')) {
+  bsi_schema_register_catalog($page_ids, 'Экскурсии');
+}
 
 /* Регионы / курорты / типы / языки — только встречающиеся у экскурсий страны */
 $region_terms = !empty($excursion_ids)

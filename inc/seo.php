@@ -42,6 +42,7 @@ function bsi_seo_virtual_sections(): array
         'country_visa'        => ['label' => 'Виза',            'slug' => 'visa'],
         'country_news'        => ['label' => 'Новости',         'slug' => 'novosti'],
         'country_excursions'  => ['label' => 'Экскурсии',       'slug' => 'ekskursii'],
+        'country_sights'      => ['label' => 'Достопримечательности', 'slug' => 'dostoprimechatelnosti'],
         'country_events'      => ['label' => 'Событийные туры', 'slug' => 'sobytiynye-tury'],
         'country_deposits'    => ['label' => 'Депозиты в отелях', 'slug' => 'depozity'],
     ];
@@ -346,7 +347,7 @@ function bsi_seo_prepare_description(string $text): string
 function bsi_seo_fallback_description(): string
 {
     if (is_front_page()) {
-        return 'BSI Group — туроператор с 1989 года: туры по всему миру, отели, образование за рубежом, визы и страхование. Подбор и бронирование для туристов и агентств.';
+        return 'BSI Group — туроператор с 1990 года: туры по всему миру, отели, образование за рубежом, визы и страхование. Подбор и бронирование для туристов и агентств.';
     }
 
     if (is_singular()) {
@@ -481,6 +482,27 @@ add_filter('wpseo_canonical', function ($canonical): string {
     return $custom !== '' ? $custom : $canonical;
 }, 5);
 
+// ── Canonical: записи, чей URL строится из страны ───────────
+// У `excursion` и `sight` адрес собирается фильтром `post_type_link`
+// из слага привязанной страны. Пока страна не заполнена, permalink —
+// служебный `/?sight=slug`, и Yoast кеширует его в своей таблице
+// indexables; закешированное значение переживает заполнение страны.
+// Поэтому для этих типов canonical берём прямо из `get_permalink()`.
+// Приоритет 6 — после виртуальных разделов (5), до остальных.
+
+add_filter('wpseo_canonical', function ($canonical): string {
+    if (!is_singular(['excursion', 'sight'])) {
+        return (string) $canonical;
+    }
+
+    $permalink = get_permalink(get_queried_object_id());
+    if ($permalink === false || strpos($permalink, '?') !== false) {
+        return (string) $canonical;
+    }
+
+    return $permalink;
+}, 6);
+
 // ── Canonical: очистка GET-параметров фильтрации ────────────
 // AJAX-фильтры (education, tours, events) добавляют ?sort=, ?region=
 // и т.д. через replaceState — каждый вариант URL выглядит как
@@ -494,8 +516,27 @@ add_filter('wpseo_canonical', function ($canonical): string {
     }
 
     $clean = strtok($canonical, '?');
+    if ($clean === false) {
+        return $canonical;
+    }
 
-    return ($clean !== false) ? trailingslashit($clean) : $canonical;
+    $clean = trailingslashit($clean);
+
+    /* Служебный адрес записи (/?sight=slug, /?excursion=slug) обрезкой
+       превращается в голую главную — и запись склеивается с ней в индексе.
+       Yoast берёт такой адрес из своей таблицы indexables, если та была
+       заполнена до того, как у записи появилась страна: URL этих типов
+       строится из слага страны фильтром `post_type_link`.
+       На проде так потерялись 30 достопримечательностей Японии
+       (wiki/docs/seo-audit-2026-09-14.md, C1). Для одиночной записи
+       достоверный источник — `get_permalink()`, а не обрезанный URL. */
+    if (is_singular() && untrailingslashit($clean) === untrailingslashit(home_url('/'))) {
+        $permalink = get_permalink(get_queried_object_id());
+
+        return $permalink !== false ? $permalink : $canonical;
+    }
+
+    return $clean;
 }, 20);
 
 // ── Yoast: Open Graph URL — аналогичная очистка ─────────────
@@ -879,6 +920,7 @@ function bsi_seo_country_section_exists(int $country_id, string $qv): bool
         'country_entry_rules' => ['entry_rules', 'entry_rules_country'],
         'country_events'      => ['event', 'tour_country'],
         'country_deposits'    => ['hotel_deposit', 'hotel_deposit_country'],
+        'country_excursions'  => ['excursion', 'excursion_country'],
     ];
 
     if (!isset($linked[$qv])) {
@@ -1070,6 +1112,11 @@ function bsi_seo_excluded_taxonomies(): array
         'agency_event_direction',
         'agency_item_type',
         'event_tour_type',
+        /* Архивы этих двух живут только по служебному адресу (`/?tour_type=`,
+           `/?sight_type=`), который сам же robots.txt и запрещает. Они нужны
+           как фильтры каталога, отдельными страницами не работают. */
+        'tour_type',
+        'sight_type',
         'promo_type',
         'news_type',
         'offer_badge',
@@ -1176,7 +1223,7 @@ add_action('init', function (): void {
     $lines = [
         '# BSI Group',
         '',
-        '> Туроператор полного цикла, работает с 1989 года. Туры по всему миру,',
+        '> Туроператор полного цикла, работает с 1990 года. Туры по всему миру,',
         '> подбор отелей, образование за рубежом, визовая поддержка,',
         '> страхование и деловой туризм. Работает с туристами и турагентствами.',
         '',
@@ -1286,6 +1333,45 @@ function bsi_seo_legacy_country_codes(): array
 }
 
 /**
+ * Сопоставляет тип тура из старого URL `/country/{iso}/tip-tura/{type}/`
+ * с подстраницей страны.
+ *
+ * На старом сайте типов тура под две сотни (пляжный отдых, горнолыжные,
+ * шопинг-туры и так далее), отдельных разделов под них нет — такие URL уходят
+ * в общий каталог туров. Здесь перечислены только те типы, которым на новом
+ * сайте есть точное соответствие: без этого запросы вида «экскурсионные туры
+ * в италию» приземлялись на каталог туров и теряли тематику.
+ */
+function bsi_seo_legacy_tour_type_target(string $base, array $parts, int $country_id): string
+{
+    $type = strtolower($parts[3] ?? '');
+
+    $map = [
+        'ekskursionnye-tury'              => 'country_excursions',
+        'excursion'                       => 'country_excursions',
+        'excursions-and-rest'             => 'country_excursions',
+        'excursion-tours-with-flight'     => 'country_excursions',
+        'excursion-tours-without-flight'  => 'country_excursions',
+        'event-tours'                     => 'country_events',
+    ];
+
+    if (!isset($map[$type])) {
+        return $base . 'tours/';
+    }
+
+    $qv = $map[$type];
+
+    // Раздела у страны может не быть — тогда общий каталог туров, а не 404.
+    if (!bsi_seo_country_section_exists($country_id, $qv)) {
+        return $base . 'tours/';
+    }
+
+    $sections = bsi_seo_virtual_sections();
+
+    return $base . $sections[$qv]['slug'] . '/';
+}
+
+/**
  * Сопоставляет раздел старого URL с разделом нового.
  * Неизвестный раздел ведёт на страницу страны.
  */
@@ -1294,12 +1380,14 @@ function bsi_seo_legacy_country_target(string $base, array $parts, int $country_
     $section = strtolower($parts[2] ?? '');
 
     switch ($section) {
+        case 'tip-tura':
+            return bsi_seo_legacy_tour_type_target($base, $parts, $country_id);
+
         case 'visa':
             return bsi_seo_country_section_exists($country_id, 'country_visa')
                 ? $base . 'visa/'
                 : $base;
 
-        case 'tip-tura':
         case 'tours':
             return $base . 'tours/';
 
@@ -1520,7 +1608,9 @@ function bsi_seo_social_image_url(): string
         $banners = ($front_id && function_exists('get_field')) ? get_field('banners', $front_id) : [];
         if (is_array($banners)) {
             foreach ($banners as $banner) {
-                $cached = bsi_seo_social_image_accept((string) ($banner['img'] ?? ''));
+                /* Поле отдаёт ID вложения (custom-fields/pages/main-banners.php). */
+                $banner_url = wp_get_attachment_image_url((int) ($banner['img'] ?? 0), 'full');
+                $cached = bsi_seo_social_image_accept((string) ($banner_url ?: ''));
                 if ($cached !== '') {
                     return $cached;
                 }
@@ -2176,7 +2266,7 @@ add_filter('wpseo_title', function ($title) {
         return $head . ' | ' . get_bloginfo('name');
     }
 
-    $head = $locative !== '' ? 'Отдых в ' . $locative : $name;
+    $head = $locative !== '' ? 'Отдых ' . bsi_seo_preposition_v($locative) . ' ' . $locative : $name;
     if ($country !== '') {
         $head .= ' (' . $country . ')';
     }
@@ -2243,7 +2333,7 @@ add_filter('wpseo_metadesc', function ($desc) {
         return $desc;
     }
 
-    $head = $locative !== '' ? 'Отдых в ' . $locative : $term->name;
+    $head = $locative !== '' ? 'Отдых ' . bsi_seo_preposition_v($locative) . ' ' . $locative : $term->name;
 
     return bsi_seo_trim_description($head . ': ' . $facts . '. Карта, описания и бронирование — BSI Group.');
 }, 26);

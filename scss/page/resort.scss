@@ -437,6 +437,19 @@ body.tax-resort .catalog-card {
   border-radius: 12px;
 }
 
+/* Карточка школы в слайдере «Обучение» — та же белая плитка, что и в
+   каталоге школ страны (scss/page/single-country.scss). */
+body.tax-resort .education-card {
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+body.tax-resort .education-card__actions .education-card__btn-details:hover {
+  background: $red;
+  color: #fff !important;
+}
+
 /* Плейсхолдер картинки внутри белой карточки: серый фона страницы,
    а не $bg-gray — иначе рядом два почти одинаковых серых */
 body.tax-resort .catalog-card__img-placeholder,

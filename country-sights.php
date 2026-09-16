@@ -92,6 +92,11 @@ if (!empty($tax_query)) {
 
 $sights_query = new WP_Query($query_args);
 
+/* ItemList в разметке страницы — печатается в подвале (inc/schema.php). */
+if (function_exists('bsi_schema_register_catalog')) {
+  bsi_schema_register_catalog(wp_list_pluck($sights_query->posts, 'ID'), 'Достопримечательности');
+}
+
 /* Точки для карты — все отфильтрованные записи, а не только текущая страница */
 $map_points = [];
 $map_icons = [];

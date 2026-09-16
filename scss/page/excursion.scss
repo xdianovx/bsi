@@ -162,11 +162,14 @@
 
 .country-excursions__list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0, …) вместо 1fr: у карточки без фото картинка-заглушка с aspect-ratio,
+     её минимальная ширина раздувала колонку, и ряд получался 256/256/454 вместо
+     равных долей. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   @media (max-width: 768px) {
@@ -602,13 +605,13 @@
 
 .single-excursion-related-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
 }
 
 @media (max-width: 1200px) {
   .single-excursion-related-list {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

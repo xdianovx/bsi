@@ -81,7 +81,8 @@ add_action('acf/init', function () {
       'label' => 'Заголовок H1',
       'name' => $key . '_h1',
       'type' => 'text',
-      'instructions' => 'Пусто — соберётся сам: «' . sprintf($config['title'], 'Лондоне') . '».',
+      /* В шаблоне два плейсхолдера: предлог и название курорта. */
+      'instructions' => 'Пусто — соберётся сам: «' . sprintf($config['title'], 'в', 'Лондоне') . '».',
     ];
 
     $section_fields[] = [

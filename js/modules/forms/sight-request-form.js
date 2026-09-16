@@ -135,6 +135,20 @@ function bindForm(form) {
   }
 }
 
+const YM_ID = 108341897;
+
+/** Цель «хочу сюда» с параметрами: в отчёте видно, на какое место пришла заявка. */
+function reachGoal(form) {
+  if (typeof window.ym !== "function") return;
+
+  const val = (sel) => form.querySelector(sel)?.value || "";
+
+  window.ym(YM_ID, "reachGoal", "sight_request_submitted", {
+    sight: val(".js-form-sight-title"),
+    country: val(".js-form-sight-country"),
+  });
+}
+
 async function submitForm(e) {
   e.preventDefault();
   const form = e.currentTarget;
@@ -161,6 +175,7 @@ async function submitForm(e) {
     const result = await submitFormWithRecaptcha(formData, { debug: false });
 
     if (result.success) {
+      reachGoal(form);
       MicroModal.close("modal-sight-request");
 
       setTimeout(() => {

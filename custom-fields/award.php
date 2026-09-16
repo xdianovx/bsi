@@ -11,7 +11,8 @@ add_action('acf/init', function () {
         'label' => 'Год награды',
         'name' => 'award_year',
         'type' => 'number',
-        'min' => 1989,
+        /* Раньше основания компании награды быть не может. */
+        'min' => 1990,
         'max' => date('Y') + 1,
         'step' => 1,
         'wrapper' => [

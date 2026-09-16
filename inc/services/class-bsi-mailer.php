@@ -17,9 +17,13 @@ declare(strict_types=1);
 class BSI_Mailer
 {
   /**
-   * Email по умолчанию для заявок
+   * Получатели заявок по умолчанию: туры, экскурсии, образование, билеты,
+   * курорты, достопримечательности, отклики на вакансии.
+   *
+   * Список через запятую — wp_mail() принимает такую строку как несколько
+   * адресов.
    */
-  const DEFAULT_RECIPIENT = 'dianov.js@gmail.com'; // TODO: поменять на рабочий
+  const DEFAULT_RECIPIENT = 'e.klimova@bsigroup.ru, dianov_e@bsigroup.ru, dianov.js@gmail.com';
 
   /**
    * SMTP (используется, если в wp-config.php не заданы BSI_SMTP_*)

@@ -91,6 +91,50 @@ function bsi_admin_menu_hubs(): array
 }
 
 /**
+ * Подпункты-таксономии для типа записи: «Типы туров», «Удобства» и прочие
+ * справочники.
+ *
+ * При переносе CPT внутрь хаба его собственное подменю теряется — WordPress
+ * не умеет третий уровень. Таксономии перечислять руками в `items` оказалось
+ * ненадёжно: на 15.09.2026 так потерялась 21 непустая таксономия, включая
+ * «Типы туров». Поэтому собираем их по регистрации.
+ *
+ * Пустые справочники не показываем: они только удлиняют меню, а завести
+ * первый термин можно из формы записи.
+ *
+ * @return array<int, array{0:string,1:string,2:string}>
+ */
+function bsi_admin_menu_post_type_taxonomies(string $post_type): array
+{
+  $out = [];
+
+  foreach (get_object_taxonomies($post_type, 'objects') as $tax) {
+    if (!$tax->show_ui || $tax->show_in_menu === false) {
+      continue;
+    }
+
+    /* Таксономия может висеть на нескольких типах записей (`tour_include` —
+       на турах и событийных турах). Пункт делаем один, у первого из них. */
+    $owners = (array) $tax->object_type;
+    if (reset($owners) !== $post_type) {
+      continue;
+    }
+
+    if ((int) wp_count_terms(['taxonomy' => $tax->name, 'hide_empty' => false]) === 0) {
+      continue;
+    }
+
+    $out[] = [
+      $tax->labels->menu_name ?: $tax->label,
+      $tax->cap->manage_terms,
+      'edit-tags.php?taxonomy=' . $tax->name . '&post_type=' . $post_type,
+    ];
+  }
+
+  return $out;
+}
+
+/**
  * Служебные пункты — нижняя группа за разделителем, в этом порядке.
  *
  * @return string[]
@@ -133,6 +177,30 @@ add_action('admin_menu', function () {
 add_action('admin_menu', function () {
   global $menu, $submenu;
 
+  /* Слаги уже размещённых пунктов — общие на все хабы. Без этого `region`
+     и `resort` попадали и в «Направления» (явным списком), и в «Продукты»
+     (автоматически, от отелей). */
+  $placed = [];
+
+  /* Явные пункты из `items` резервируем заранее: хабы разбираются по порядку,
+     и «Продукты» идут раньше «Направлений» — иначе автоподбор от отелей
+     перехватил бы «Регионы» и «Курорты» у стран, где им и место. */
+  $reserved = [];
+  foreach (bsi_admin_menu_hubs() as $hub) {
+    foreach ($hub['items'] as $item) {
+      if (!is_array($item)) {
+        continue;
+      }
+      $reserved[$item[2]] = true;
+      /* Одна таксономия висит на нескольких типах записей, и слаг у пункта
+         разный (`taxonomy=region&post_type=country` против `…&post_type=hotel`).
+         Поэтому резервируем ещё и по имени таксономии. */
+      if (preg_match('~taxonomy=([^&]+)~', $item[2], $m)) {
+        $reserved['taxonomy:' . $m[1]] = true;
+      }
+    }
+  }
+
   /* Слаг пункта => ключ в $menu */
   $by_slug = [];
   foreach ($menu as $key => $item) {
@@ -152,10 +220,11 @@ add_action('admin_menu', function () {
     $submenu[$hub_slug] = [];
 
     foreach ($hub['items'] as $item_slug) {
-      /* Готовая тройка [название, право, слаг] — добавляем как есть. */
+      /* Готовая тройка [название, право, слаг]. */
       if (is_array($item_slug)) {
-        if (current_user_can($item_slug[1])) {
+        if (!isset($placed[$item_slug[2]]) && current_user_can($item_slug[1])) {
           $submenu[$hub_slug][] = $item_slug;
+          $placed[$item_slug[2]] = true;
         }
         continue;
       }
@@ -166,7 +235,36 @@ add_action('admin_menu', function () {
 
       $item = $menu[$by_slug[$item_slug]];
       $submenu[$hub_slug][] = [$item[0], $item[1], $item[2]];
+      $placed[$item[2]] = true;
       unset($menu[$by_slug[$item_slug]]);
+
+      /* Справочники этого типа записей — сразу под ним. */
+      if (preg_match('~^edit\.php\?post_type=([^&]+)$~', $item_slug, $m)) {
+        foreach (bsi_admin_menu_post_type_taxonomies($m[1]) as $tax_item) {
+          preg_match('~taxonomy=([^&]+)~', $tax_item[2], $tm);
+          $tax_key = 'taxonomy:' . ($tm[1] ?? $tax_item[2]);
+
+          if (isset($placed[$tax_key]) || isset($reserved[$tax_key])
+            || !current_user_can($tax_item[1])) {
+            continue;
+          }
+
+          /* Одинаковые названия в одном хабе разводим типом записи: «Питание»
+             есть и у отелей, и у обучения. */
+          foreach ($submenu[$hub_slug] as $existing) {
+            if ($existing[0] === $tax_item[0]) {
+              $owner = get_post_type_object($m[1]);
+              if ($owner) {
+                $tax_item[0] .= ' (' . $owner->labels->name . ')';
+              }
+              break;
+            }
+          }
+
+          $submenu[$hub_slug][] = $tax_item;
+          $placed[$tax_key] = true;
+        }
+      }
     }
 
     foreach ($registered as $registered_item) {

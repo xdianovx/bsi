@@ -133,10 +133,19 @@ export const initBsimiceConsultationForm = () => {
     const formData = new FormData(form);
     formData.append("action", "bsimice_consultation_form");
 
+const YM_ID = 108341897;
+
+/** Цель «заявка на консультацию MICE». */
+function reachGoal() {
+  if (typeof window.ym !== "function") return;
+  window.ym(YM_ID, "reachGoal", "bsimice_consultation_submitted");
+}
+
     try {
       const result = await submitFormWithRecaptcha(formData, { debug: false });
 
       if (result.success) {
+        reachGoal();
         form.reset();
         clearErrors();
 

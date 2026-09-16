@@ -212,9 +212,49 @@ if (empty($checkin_dates_formatted) && $education_id && function_exists('get_fie
   }
 }
 
-// Цена уже вычислена в page-education.php и передана через $education['price']
-// price_data_attrs также передается через $education['price_data_attrs']
-// Если карточка используется отдельно (не из каталога), нужно вычислить цену
+// Цена уже вычислена в page-education.php и передана через $education['price'].
+// Если карточка рендерится сама по себе (каталог страны, AJAX) — считаем здесь:
+// минимальная цена по программам школы, как в каталоге образования.
+if ($price === '' && $education_id && function_exists('get_field')) {
+  $price_programs = get_field('education_programs', $education_id);
+  $price_programs = is_array($price_programs) ? $price_programs : [];
+
+  $prices_data = [];
+  foreach ($price_programs as $program) {
+    if (!is_array($program)) {
+      continue;
+    }
+    $price_numeric = function_exists('bsi_education_get_program_price_numeric_rub')
+      ? bsi_education_get_program_price_numeric_rub($program)
+      : 0;
+    if ($price_numeric > 0) {
+      $prices_data[] = [
+        'price_rub' => $price_numeric,
+        'original' => $program['program_price_per_week_original'] ?? null,
+        'currency' => $program['program_price_per_week_currency'] ?? null,
+      ];
+    }
+  }
+
+  if (!empty($prices_data)) {
+    usort($prices_data, static function ($a, $b) {
+      return $a['price_rub'] <=> $b['price_rub'];
+    });
+    $min_price_data = $prices_data[0];
+
+    $price = number_format($min_price_data['price_rub'], 0, ',', ' ') . ' ₽/неделя';
+    if (function_exists('format_price_text')) {
+      $price = format_price_text($price);
+    }
+    $show_price_from = true;
+
+    $price_data_attrs['price-rub'] = (int) $min_price_data['price_rub'];
+    if (!empty($min_price_data['original']) && !empty($min_price_data['currency'])) {
+      $price_data_attrs['price-original'] = $min_price_data['original'];
+      $price_data_attrs['price-currency'] = $min_price_data['currency'];
+    }
+  }
+}
 
 // Подставляем продолжительность обучения в цену
 if (!empty($price) && $education_id && function_exists('get_field')) {
@@ -251,9 +291,14 @@ if (empty($price_data_attrs) && !empty($price)) {
 
   <a href="<?php echo esc_url($education_url); ?>"
      class="education-card__media">
-    <img src="<?php echo esc_url($education_image); ?>"
-         alt="<?php echo esc_attr($education_title); ?>"
-         class="education-card__image">
+    <?php if ($education_image): ?>
+      <img src="<?php echo esc_url($education_image); ?>"
+           alt="<?php echo esc_attr($education_title); ?>"
+           class="education-card__image"
+           loading="lazy">
+    <?php else: ?>
+      <span class="education-card__image-placeholder"></span>
+    <?php endif; ?>
   </a>
 
   <div class="education-card__body">
@@ -321,26 +366,16 @@ if (empty($price_data_attrs) && !empty($price)) {
       </div>
     <?php endif; ?>
 
-    <div class="education-card__actions">
+    <?php if ($price): ?>
       <?php
-      $education_rel = 'noopener noreferrer';
+        $price_text = ($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price);
+        if (!empty($duration_range)) {
+          $price_text .= ' / ' . $duration_range;
+        }
       ?>
-      <a href="<?php echo esc_url($education_url); ?>"
-         target="_blank"
-         rel="<?php echo esc_attr($education_rel); ?>"
-         class="education-card__btn education-card__btn-details">
-        Подробнее
-      </a>
-      <?php if ($price): ?>
-        <?php
-        // Временно кнопка с ценой ведет на страницу обучения
-        $price_url = $education_url;
-        $price_rel = 'noopener noreferrer';
-        ?>
-        <a href="<?php echo esc_url($price_url); ?>"
-           target="_blank"
-           rel="<?php echo esc_attr($price_rel); ?>"
-           class="btn btn-accent education-card__btn education-card__btn-book"
+      <?php /* Класс education-card__btn-book сохранён: за него цепляется
+               переключатель валют (js/modules/education-currency-switcher.js). */ ?>
+      <div class="education-card__price-line education-card__btn-book"
            <?php if (!empty($price_data_attrs['price-rub'])): ?>
            data-price-rub="<?php echo esc_attr($price_data_attrs['price-rub']); ?>"
            <?php endif; ?>
@@ -350,16 +385,16 @@ if (empty($price_data_attrs) && !empty($price)) {
            <?php endif; ?>
            <?php if ($show_price_from): ?>
            data-has-from="true"
-           <?php endif; ?>>
-          <?php
-            $price_text = ($show_price_from ? 'от ' : '') . str_replace(['руб.', 'руб'], '₽', $price);
-            if (!empty($duration_range)) {
-              $price_text .= ' / ' . $duration_range;
-            }
-            echo esc_html($price_text);
-          ?>
-        </a>
-      <?php endif; ?>
+           <?php endif; ?>><?php echo esc_html($price_text); ?></div>
+    <?php endif; ?>
+
+    <div class="education-card__actions">
+      <a href="<?php echo esc_url($education_url); ?>"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="btn btn-gray sm education-card__btn education-card__btn-details">
+        Подробнее
+      </a>
     </div>
   </div>
 </div>

@@ -2,6 +2,19 @@ import Choices from "choices.js";
 import flatpickr from "flatpickr";
 import { Russian } from "flatpickr/dist/l10n/ru.js";
 
+// Сервер отдаёт готовый HTML (get_template_part + paginate_links) —
+// вставляем фрагментом, а не через innerHTML.
+const replaceWithServerHtml = (target, html) => {
+  if (!target) return;
+  while (target.firstChild) {
+    target.removeChild(target.firstChild);
+  }
+  if (!html) return;
+  const range = document.createRange();
+  range.selectNodeContents(target);
+  target.appendChild(range.createContextualFragment(String(html)));
+};
+
 const CHOICES_RU = {
   itemSelectText: "",
   loadingText: "Загрузка...",
@@ -19,6 +32,8 @@ export const initCountryEducationFilters = () => {
   const form = root.querySelector("[data-education-form]");
   const list = document.querySelector("[data-education-list]");
   const count = document.querySelector("[data-education-count]");
+  const pagination = document.querySelector("[data-education-pagination]");
+  const resetBtn = document.querySelector("[data-education-reset]");
   if (!form || !list) return;
 
   const countryId = parseInt(root.getAttribute("data-country-id") || "0", 10);
@@ -50,13 +65,14 @@ export const initCountryEducationFilters = () => {
       .filter(Boolean);
   };
 
-  const loadEducation = async () => {
+  const loadEducation = async (page = 1) => {
     setLoading(true);
 
     try {
       const body = new URLSearchParams();
       body.set("action", "country_education_filter");
       body.set("country_id", String(countryId));
+      body.set("paged", String(page));
 
       getValues(programSelect).forEach((v) => body.append("program[]", v));
       getValues(languageSelect).forEach((v) => body.append("language[]", v));
@@ -94,15 +110,57 @@ export const initCountryEducationFilters = () => {
       const json = await res.json();
       if (!json || !json.success) throw new Error("AJAX error");
 
-      list.innerHTML = json.data.html || "";
+      replaceWithServerHtml(list, json.data.html || "");
       if (count) {
         count.textContent = `Найдено школ: ${json.data.total || 0}`;
       }
+
+      if (pagination) {
+        replaceWithServerHtml(pagination, json.data.pagination || "");
+        initPaginationHandlers();
+      }
+
+      document.dispatchEvent(new CustomEvent("education:content-updated"));
     } catch (e) {
       // Error handling without console output
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateResetVisibility = () => {
+    if (!resetBtn) return;
+    const hasAnyFilter =
+      getValues(programSelect).length ||
+      getValues(languageSelect).length ||
+      getValues(typeSelect).length ||
+      getValues(accommodationSelect).length ||
+      [ageMinInput, ageMaxInput, durationMinInput, durationMaxInput].some((i) => i && i.value) ||
+      (dateFromInput && dateFromInput.value) ||
+      (dateToInput && dateToInput.value);
+    resetBtn.classList.toggle("is-hidden", !hasAnyFilter);
+  };
+
+  const initPaginationHandlers = () => {
+    if (!pagination) return;
+
+    pagination.querySelectorAll("a").forEach((link) => {
+      const fresh = link.cloneNode(true);
+      link.parentNode.replaceChild(fresh, link);
+
+      fresh.addEventListener("click", (e) => {
+        e.preventDefault();
+        const href = fresh.getAttribute("href") || "";
+        const byQuery = href.match(/[?&]paged=(\d+)/);
+        const byPath = href.match(/\/page\/(\d+)\//);
+        const page = parseInt((byQuery && byQuery[1]) || (byPath && byPath[1]) || "1", 10);
+
+        if (page > 0) {
+          loadEducation(page);
+          list.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
   };
 
   const programChoice = programSelect
@@ -112,6 +170,7 @@ export const initCountryEducationFilters = () => {
         searchEnabled: true,
         shouldSort: false,
         placeholder: true,
+        placeholderValue: "Любая",
       })
     : null;
 
@@ -122,6 +181,7 @@ export const initCountryEducationFilters = () => {
         searchEnabled: true,
         shouldSort: false,
         placeholder: true,
+        placeholderValue: "Любой",
       })
     : null;
 
@@ -132,6 +192,7 @@ export const initCountryEducationFilters = () => {
         searchEnabled: true,
         shouldSort: false,
         placeholder: true,
+        placeholderValue: "Любой",
       })
     : null;
 
@@ -142,6 +203,7 @@ export const initCountryEducationFilters = () => {
         searchEnabled: true,
         shouldSort: false,
         placeholder: true,
+        placeholderValue: "Любое",
       })
     : null;
 
@@ -158,11 +220,13 @@ export const initCountryEducationFilters = () => {
           const endDate = selectedDates[1].toISOString().split("T")[0];
           if (dateFromInput) dateFromInput.value = startDate;
           if (dateToInput) dateToInput.value = endDate;
-          loadEducation();
+          updateResetVisibility();
+          loadEducation(1);
         } else if (selectedDates.length === 0) {
           if (dateFromInput) dateFromInput.value = "";
           if (dateToInput) dateToInput.value = "";
-          loadEducation();
+          updateResetVisibility();
+          loadEducation(1);
         }
       },
     });
@@ -236,38 +300,75 @@ export const initCountryEducationFilters = () => {
     const hasFilters = programs.length || languages.length || types.length || accommodations.length || ageMin || ageMax || durationMin || durationMax || dateFrom || dateTo;
 
     if (hasFilters) {
-      await loadEducation();
+      await loadEducation(1);
     }
   };
 
   if (programChoice) {
-    programSelect.addEventListener("change", loadEducation);
+    programSelect.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
   if (languageChoice) {
-    languageSelect.addEventListener("change", loadEducation);
+    languageSelect.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
   if (typeChoice) {
-    typeSelect.addEventListener("change", loadEducation);
+    typeSelect.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
   if (accommodationChoice) {
-    accommodationSelect.addEventListener("change", loadEducation);
+    accommodationSelect.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
 
   if (ageMinInput) {
-    ageMinInput.addEventListener("change", loadEducation);
+    ageMinInput.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
   if (ageMaxInput) {
-    ageMaxInput.addEventListener("change", loadEducation);
+    ageMaxInput.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
 
   if (durationMinInput) {
-    durationMinInput.addEventListener("change", loadEducation);
+    durationMinInput.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
   if (durationMaxInput) {
-    durationMaxInput.addEventListener("change", loadEducation);
+    durationMaxInput.addEventListener("change", () => { updateResetVisibility(); loadEducation(1); });
   }
 
 
+  if (resetBtn) {
+    resetBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // Choices хранит своё состояние отдельно от нативного select:
+      // чистим оба, иначе сброшенный фильтр продолжает уезжать в запрос.
+      [
+        [programChoice, programSelect],
+        [languageChoice, languageSelect],
+        [typeChoice, typeSelect],
+        [accommodationChoice, accommodationSelect],
+      ].forEach(([choice, select]) => {
+        if (choice) choice.removeActiveItems();
+        if (select) {
+          [...select.options].forEach((o) => {
+            o.selected = false;
+          });
+        }
+      });
+      [ageMinInput, ageMaxInput, durationMinInput, durationMaxInput].forEach((input) => {
+        if (input) input.value = "";
+      });
+      if (datePickerInstance) datePickerInstance.clear();
+      if (dateRangeInput) dateRangeInput.value = "";
+      if (dateFromInput) dateFromInput.value = "";
+      if (dateToInput) dateToInput.value = "";
+
+      updateResetVisibility();
+      loadEducation(1);
+    });
+  }
+
+  if (pagination) {
+    initPaginationHandlers();
+  }
+
+  updateResetVisibility();
   applyFromUrl();
 };
 

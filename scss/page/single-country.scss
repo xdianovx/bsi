@@ -450,6 +450,7 @@ body.single-country {
 body.single-country .page-country__editor-content,
 body.single-country .country-sights-filters,
 body.single-country .country-sights-empty,
+body.single-country .country-education__filters,
 body.single-country .country-excursions__filters {
   padding: 16px;
   background: $bg-color;
@@ -476,6 +477,25 @@ body.single-country .catalog-card--excursion {
   border-radius: 12px;
 }
 
+/* Школы каталога обучения — карточка-плитка на всю ячейку грида. */
+body.single-country .education-card {
+  width: 100%;
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+/* Единственная кнопка карточки школы — она же CTA: серая заливка на белом,
+   на hover заливается акцентом. Обводок нет, различаем заливкой. */
+/* Кнопка — .btn.btn-gray.sm из scss/ui/buttons.scss (см. ui.html).
+   Здесь только акцентный hover: это единственная CTA карточки. */
+body.single-country .education-card__actions .education-card__btn-details {
+  &:hover {
+    background: $red;
+    color: #fff !important;
+  }
+}
+
 /* Плитки характеристик и региональные блоки лежат внутри белых карточек —
    им нужен серый фон страницы, иначе белое на белом. */
 body.single-country .country-attr,
@@ -487,6 +507,7 @@ body.single-country .country-regions {
 
   body.single-country .page-country__editor-content,
   body.single-country .country-sights-filters,
+  body.single-country .country-education__filters,
   body.single-country .country-excursions__filters {
     padding: 16px;
   }

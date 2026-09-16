@@ -5,7 +5,7 @@ import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
 /**
  * Заявка на экскурсию: модалка #modal-excursion-booking.
  * Триггер — .js-excursion-booking-btn с data-excursion-id/title/date.
- * Метрика: ym(108341897, "reachGoal", "excursion_submited").
+ * Метрика: ym(108341897, "reachGoal", "excursion_submited", { excursion, excursion_id }).
  */
 
 const YM_ID = 108341897;
@@ -45,9 +45,16 @@ function populateModal(data) {
   setVal(".js-form-page-url", window.location.href);
 }
 
-function reachGoal() {
+/** Параметры цели — из скрытых полей формы: видно, на какую экскурсию заявка. */
+function reachGoal(form) {
   if (typeof ym === "undefined") return;
-  ym(YM_ID, "reachGoal", EXCURSION_GOAL);
+
+  const val = (sel) => form?.querySelector(sel)?.value || "";
+
+  ym(YM_ID, "reachGoal", EXCURSION_GOAL, {
+    excursion: val(".js-form-excursion-title"),
+    excursion_id: val(".js-form-excursion-id"),
+  });
 }
 
 function resetForm() {
@@ -177,7 +184,7 @@ async function submitForm(e) {
     const result = await submitFormWithRecaptcha(formData, { debug: false });
 
     if (result.success) {
-      reachGoal();
+      reachGoal(form);
 
       const isInline = form.id === "excursion-cta-form";
 

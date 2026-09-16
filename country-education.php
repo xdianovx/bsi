@@ -82,16 +82,21 @@ get_header(); ?>
                data-education-filter
                data-country-id="<?php echo (int) $country_id; ?>">
             <div class="country-education__head">
-              <h1 class="h1 country-education__title">
-                <?php echo esc_html($country ? $country->post_title : ''); ?> — обучение
-              </h1>
+              <div class="country-education__head-left">
+                <h1 class="h1 country-education__title">
+                  <?php echo esc_html($country ? $country->post_title : ''); ?> — обучение
+                </h1>
 
-              <div class="country-education__counter"
-                   data-education-count>
-                Найдено школ: <?php echo (int) $education_query->found_posts; ?>
+                <div class="country-education__counter"
+                     data-education-count>
+                  Найдено школ: <?php echo (int) $education_query->found_posts; ?>
+                </div>
               </div>
             </div>
 
+            <?php /* ВРЕМЕННО: фильтры скрыты по просьбе заказчика (2026-09-15).
+                     Разметка и JS остаются рабочими — вернуть, убрав if (false). */ ?>
+            <?php if (false): ?>
             <form class="country-education__filters"
                   data-education-form>
               <div class="country-education__filters-row">
@@ -177,6 +182,16 @@ get_header(); ?>
                 </div>
               </div>
             </form>
+            <?php endif; ?>
+
+            <div class="country-education__toolbar">
+              <button type="button" class="country-education__reset is-hidden" data-education-reset>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Сбросить фильтры
+              </button>
+            </div>
 
             <div class="country-education__list"
                  data-education-list>
@@ -194,6 +209,15 @@ get_header(); ?>
               <?php endif; ?>
               <?php wp_reset_postdata(); ?>
             </div>
+
+            <?php bsi_pagination([
+              'total'   => $education_query->max_num_pages,
+              'current' => $paged,
+            ], [
+              'class' => 'country-education__pagination',
+              'attrs' => ['data-education-pagination' => ''],
+              'always' => true,
+            ]); ?>
           </div>
         </div>
       </div>

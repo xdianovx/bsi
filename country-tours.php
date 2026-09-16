@@ -95,7 +95,7 @@ if ($country_title_prepositional === '' && $country_title !== '') {
 }
 
 $country_tours_h1 = $country_title_prepositional !== ''
-  ? 'Туры в ' . $country_title_prepositional
+  ? 'Туры ' . (function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($country_title_prepositional) : 'в') . ' ' . $country_title_prepositional
   : 'Туры';
 
 $paged = max(1, (int) get_query_var('paged'));

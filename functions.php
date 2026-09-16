@@ -386,6 +386,9 @@ require get_template_directory() . '/inc/helpers/content-schedule.php';
 require get_template_directory() . '/inc/helpers/country-section-singular.php';
 require get_template_directory() . '/inc/helpers/agency-events.php';
 require get_template_directory() . '/inc/helpers/pagination.php';
+require get_template_directory() . '/inc/helpers/orphan-country-guard.php';
+require get_template_directory() . '/inc/helpers/webp.php';
+require get_template_directory() . '/inc/helpers/lazy-images.php';
 require get_template_directory() . '/inc/helpers/resort.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
@@ -402,9 +405,13 @@ require get_template_directory() . '/inc/hidden-sections.php';
 /* Группировка админ-меню по хабам. */
 require get_template_directory() . '/inc/admin/menu-hubs.php';
 
-/* Инструменты → «Импорт экскурсий»: заливка JSON старого сайта (на проде только FTP). */
-require get_template_directory() . '/inc/admin/legacy-excursions-import.php';
-require get_template_directory() . '/inc/admin/legacy-sights-import.php';
+/* Настройки сайта → «Импорт со старого сайта»: заливка JSON (на проде только FTP).
+   Одна страница на экскурсии и достопримечательности сразу. */
+require get_template_directory() . '/inc/admin/legacy-import.php';
+
+/* Параметры визита для Метрики на карточках контента. */
+require get_template_directory() . '/inc/ym-content-params.php';
+require get_template_directory() . '/inc/admin/webp-convert.php';
 require get_template_directory() . '/inc/disable-slug-redirects.php';
 require get_template_directory() . '/inc/hotel-page/view.php';
 require get_template_directory() . '/inc/hotels-api/functions.php';
