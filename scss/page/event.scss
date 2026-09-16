@@ -448,18 +448,24 @@
   position: relative;
 }
 
+/* Кнопка сортировки — белая заливка без рамки: обводки в теме не используем. */
 .event-tours-page .country-tours__sort-trigger {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 44px;
   padding: 0 16px;
-  border: 1px solid $gray-light;
+  border: 0;
   border-radius: 8px;
   background: #fff;
   font-size: 16px;
   color: $text-black;
   cursor: pointer;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
 }
 
 .event-tours-page .country-tours__sort-panel {
@@ -469,7 +475,7 @@
   z-index: 20;
   min-width: 220px;
   padding: 6px;
-  border: 1px solid $gray-light;
+  border: 0;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
@@ -2231,5 +2237,118 @@ button.single-event__dates-book {
     display: block;
     margin-top: 32px;
     margin-bottom: 8px;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Каталог событийных туров — /sobytiynye-tury/ (page-sobytiynye-tury.php).
+   Серый фон, фильтр белой панелью, карточки белыми плитками — как в
+   каталогах страны, курорта и образования.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.page-template-page-sobytiynye-tury {
+  background: $bg-page;
+}
+
+body.page-template-page-sobytiynye-tury .country-tours__filters {
+  margin-top: 16px;
+  padding: 16px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+body.page-template-page-sobytiynye-tury .event-card {
+  padding: 8px;
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+/* Плашки внутри плитки отступают от края фото: у карточки свой padding 8px. */
+body.page-template-page-sobytiynye-tury .event-card__label {
+  top: 14px;
+  left: 14px;
+  right: 14px;
+}
+
+body.page-template-page-sobytiynye-tury .event-card__btn-details:hover {
+  background: $red;
+  color: #fff !important;
+}
+
+body.page-template-page-sobytiynye-tury .country-tours__head {
+  margin-top: 20px;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+
+body.page-template-page-sobytiynye-tury .country-tours__head-left {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+/* Счётчик стоит отдельной строкой прямо над карточками. */
+body.page-template-page-sobytiynye-tury .country-tours__counter {
+  margin-top: 20px;
+  color: $text-gray;
+}
+
+body.page-template-page-sobytiynye-tury .country-tours__list {
+  margin-top: 16px;
+  gap: 16px;
+}
+
+/* Сброс — текстовая кнопка с крестиком, без рамки. */
+body.page-template-page-sobytiynye-tury .tours-page__reset-btn {
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font-size: 16px;
+  color: $red;
+  transition: $trans-text;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: $red-hover;
+  }
+}
+
+body.page-template-page-sobytiynye-tury .country-tours__empty {
+  background: $bg-color;
+  border-radius: 12px;
+}
+
+@media screen and (max-width: 768px) {
+
+  /* Панель складываем в столбик: иначе счётчик, переключатель и сортировка
+     переносятся по ширине и встают вразнобой. */
+  body.page-template-page-sobytiynye-tury .country-tours__head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  body.page-template-page-sobytiynye-tury .country-tours__head-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  body.page-template-page-sobytiynye-tury .country-tours__head-left .ui-checkbox,
+  body.page-template-page-sobytiynye-tury .country-tours__sort-trigger,
+  body.page-template-page-sobytiynye-tury .tours-page__reset-btn {
+    min-height: 44px;
+    padding-block: 10px;
+  }
+
+  body.page-template-page-sobytiynye-tury .country-tours__sort-panel {
+    right: auto;
+    left: 0;
   }
 }

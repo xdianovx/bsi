@@ -237,7 +237,7 @@ export const initEventToursFilters = async () => {
 
   const updateResetButton = () => {
     if (resetBtn) {
-      resetBtn.style.display = countActiveFilters() > 0 ? "block" : "none";
+      resetBtn.style.display = countActiveFilters() > 0 ? "inline-flex" : "none";
     }
   };
 

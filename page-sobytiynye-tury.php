@@ -254,10 +254,6 @@ $tour_type_terms = get_terms([
 
           <div class="country-tours__head">
             <div class="country-tours__head-left">
-              <div class="country-tours__counter js-tours-counter">
-                Найдено: <?= (int) $event_tours_total; ?>
-              </div>
-
               <label class="ui-checkbox country-tours__currency-toggle">
                 <input type="checkbox"
                        class="ui-checkbox__input js-education-show-original-currency"
@@ -270,6 +266,9 @@ $tour_type_terms = get_terms([
               <button type="button"
                       class="tours-page__reset-btn js-tours-reset"
                       style="display: none;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
                 Сбросить фильтры
               </button>
             </div>
@@ -314,6 +313,10 @@ $tour_type_terms = get_terms([
             </div>
           </div>
 
+
+          <div class="country-tours__counter js-tours-counter">
+            Найдено: <?= (int) $event_tours_total; ?>
+          </div>
 
           <div class="country-tours__list is-tiles"
                data-tours-list>
