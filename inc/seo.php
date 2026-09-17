@@ -2249,7 +2249,13 @@ add_filter('wpseo_title', function ($title) {
 
         $subject = $locative !== '' ? $locative : $name;
 
-        $head = sprintf((string) $sections[$section]['title'], $subject);
+        /* В шаблоне два плейсхолдера — предлог и название («Экскурсии %s %s»),
+           как в bsi_resort_section_h1(). Одного аргумента sprintf не прощает и
+           роняет страницу целиком. Предлог согласуем с названием:
+           «во Флоренции», но «в Венеции». */
+        $preposition = function_exists('bsi_seo_preposition_v') ? bsi_seo_preposition_v($subject) : 'в';
+
+        $head = sprintf((string) $sections[$section]['title'], $preposition, $subject);
         $count = bsi_resort_count($term_id, (string) $sections[$section]['post_type']);
 
         if ($count > 0) {

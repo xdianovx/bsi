@@ -264,6 +264,8 @@
   color: $gray-light;
 }
 
+/* Свой цвет обязателен: бейдж лежит внутри ссылки .sight-card-media и без него
+   наследовал глобальный a:hover — при наведении на картинку текст краснел. */
 .sight-card-type {
   position: absolute;
   bottom: 8px;
@@ -272,8 +274,8 @@
   align-items: center;
   padding: 6px 8px;
   font-size: 14px;
-
   line-height: 100%;
+  color: $text-black;
   background: rgba(255, 255, 255, 0.92);
   border-radius: $radius-sm;
 }
