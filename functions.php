@@ -33,6 +33,11 @@ add_action('init', function () {
 /**
  * Парсит строку координат "широта, долгота" (например "3.607725, 72.900417").
  * Возвращает ['lat' => float, 'lng' => float] или null при ошибке.
+ *
+ * Разделителем служит запятая, точка с запятой или пробел, дробная часть —
+ * точка или запятая: координаты вставляют копипастом из разных карт, и раньше
+ * всё, кроме "широта, долгота", молча давало null — поле заполнено, а карта
+ * на странице не появлялась.
  */
 function bsi_parse_map_coordinates($str)
 {
@@ -40,12 +45,27 @@ function bsi_parse_map_coordinates($str)
 	if ($str === '') {
 		return null;
 	}
-	$parts = preg_split('/\s*,\s*/', $str, 2);
-	if (count($parts) < 2) {
+
+	/* Неразрывные пробелы из редактора и лишние внутренние пробелы. */
+	$str = preg_replace('/[\x{00A0}\x{202F}\s]+/u', ' ', $str);
+	$str = trim((string) $str);
+
+	$number = '-?\d+(?:[.,]\d+)?';
+
+	/* Десятичная запятая различима только там, где разделитель — не запятая:
+	   "55,75 37,62". Иначе "55,75,37,62" распадается на четыре числа. */
+	if (preg_match('/^(' . $number . ')\s*[;\s]\s*(' . $number . ')$/u', $str, $m)) {
+		$raw_lat = $m[1];
+		$raw_lng = $m[2];
+	} elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/u', $str, $m)) {
+		$raw_lat = $m[1];
+		$raw_lng = $m[2];
+	} else {
 		return null;
 	}
-	$lat = filter_var(trim($parts[0]), FILTER_VALIDATE_FLOAT);
-	$lng = filter_var(trim($parts[1]), FILTER_VALIDATE_FLOAT);
+
+	$lat = filter_var(str_replace(',', '.', $raw_lat), FILTER_VALIDATE_FLOAT);
+	$lng = filter_var(str_replace(',', '.', $raw_lng), FILTER_VALIDATE_FLOAT);
 	if ($lat === false || $lng === false || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
 		return null;
 	}

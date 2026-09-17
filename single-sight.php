@@ -211,10 +211,16 @@ get_header();
           <?php if ($coords !== null): ?>
             <section class="single-sight-map-section">
               <h2 class="h2">На карте</h2>
+              <?php
+              /* Свой значок метки: без него maps.js идёт за темой оформления на
+                 cdn.jsdelivr.net, и когда CDN недоступен, карта рисуется без метки. */
+              $marker_icon_url = get_template_directory_uri() . '/img/icons/hotel/home-map.svg';
+              ?>
               <div class="single-sight-map hotel-map"
                    data-lat="<?= esc_attr((string) $coords['lat']); ?>"
                    data-lng="<?= esc_attr((string) $coords['lng']); ?>"
-                   data-zoom="<?= esc_attr((string) $map_zoom); ?>"></div>
+                   data-zoom="<?= esc_attr((string) $map_zoom); ?>"
+                   data-marker-icon="<?= esc_url($marker_icon_url); ?>"></div>
             </section>
           <?php endif; ?>
         </div>
