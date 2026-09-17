@@ -21,6 +21,12 @@ function bsi_hotels_api(): ?HotelsApiClient
 
   $tried = true;
 
+  // Выключатель интеграции: BSI_HOTELS_API_ENABLED=0 — сайт работает так,
+  // будто хаба нет (каталоги и карточки из CPT hotel), без отката кода.
+  if (!bsi_hotels_api_is_enabled()) {
+    return $client;
+  }
+
   try {
     $client = new HotelsApiClient(bsi_hotels_api_config());
   } catch (Throwable $e) {

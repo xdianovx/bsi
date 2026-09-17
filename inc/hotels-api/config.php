@@ -3,6 +3,8 @@
 /**
  * Конфиг клиента BSIHOTELS API.
  *
+ * BSI_HOTELS_API_ENABLED — выключатель интеграции (0/false/off — выключено).
+ *
  * Источники по приоритету:
  *   1. Константы в wp-config.php (BSI_HOTELS_API_URL, BSI_HOTELS_API_TIMEOUT)
  *   2. Переменные окружения
@@ -63,4 +65,17 @@ function bsi_hotels_api_config(): array
     'base_url' => bsi_hotels_api_env('BSI_HOTELS_API_URL') ?? '',
     'timeout' => (int) (bsi_hotels_api_env('BSI_HOTELS_API_TIMEOUT') ?? 15),
   ];
+}
+
+/**
+ * Включена ли интеграция с хабом. По умолчанию включена, если задан URL.
+ */
+function bsi_hotels_api_is_enabled(): bool
+{
+  $flag = bsi_hotels_api_env('BSI_HOTELS_API_ENABLED');
+  if ($flag === null) {
+    return true;
+  }
+
+  return !in_array(strtolower(trim($flag)), ['0', 'false', 'off', 'no'], true);
 }
