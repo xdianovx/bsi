@@ -85,5 +85,10 @@
 		"imask": "^7.6.1",
 		"micromodal": "^0.4.10",
 		"swiper": "^8.4.7"
+	},
+	"overrides": {
+		"gulp-clean-css": {
+			"clean-css": "^5.3.3"
+		}
 	}
 }

@@ -1092,7 +1092,16 @@ body.is-hotels-map-open {
     border-radius: 12px;
   }
 
+  /* Фото и ссылка вне потока: иначе высоту строки задаёт пропорция снимка,
+     и вертикальное фото растягивает карточку. */
+  a {
+    position: absolute;
+    inset: 0;
+  }
+
   img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
