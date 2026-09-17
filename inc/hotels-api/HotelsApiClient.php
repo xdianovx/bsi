@@ -6,7 +6,7 @@
  * Читает только: список отелей, карточку, справочники стран/городов/удобств.
  * Токена нет.
  *
- * Своего кеша нет и не будет: кеш держит хаб, его ответ всегда свежее нашей
+ * Своего кеша у отелей и цен нет (справочники — исключение, см. CACHE_DICT): кеш держит хаб, его ответ всегда свежее нашей
  * копии. Единственная защита на нашей стороне — время ожидания: на холодных
  * данных хаб уходит в минуты, и страница страны не должна за него висеть.
  * Поэтому при рендере ждём секунды, а каталог догружается запросом, которому
@@ -28,7 +28,16 @@ class HotelsApiClient
    */
   private const CACHE_LIST = 0;
   private const CACHE_HOTEL = 0;
-  private const CACHE_DICT = 0;
+
+  /**
+   * Справочники (страны, города, удобства, виды объектов) кешируем: они
+   * меняются редко, а /v1/amenities хаб считает 3-4 секунды на каждый запрос.
+   * Без кеша это 2 секунды таймаута на каждой странице каталога.
+   */
+  private const CACHE_DICT = 6 * HOUR_IN_SECONDS;
+
+  /** Столько ждём справочник: ответ кешируется, поэтому ждать его не жалко. */
+  private const TIMEOUT_DICT = 10;
 
   /**
    * Расчёт заезда тоже без своего кеша.
@@ -122,21 +131,21 @@ class HotelsApiClient
   /** Страны, в которых есть отели. */
   public function countries(): array
   {
-    $data = $this->get('/v1/countries', [], self::CACHE_DICT);
+    $data = $this->get('/v1/countries', [], self::CACHE_DICT, self::TIMEOUT_DICT);
     return is_array($data['items'] ?? null) ? $data['items'] : [];
   }
 
   /** Справочник удобств: слаг, иконка, группа, область применения. */
   public function amenities(): array
   {
-    $data = $this->get('/v1/amenities', [], self::CACHE_DICT);
+    $data = $this->get('/v1/amenities', [], self::CACHE_DICT, self::TIMEOUT_DICT);
     return is_array($data['items'] ?? null) ? $data['items'] : [];
   }
 
   /** Справочник видов объектов: апарт-отель, вилла, курортный отель. */
   public function hotelTypes(): array
   {
-    $data = $this->get('/v1/hotel-types', [], self::CACHE_DICT);
+    $data = $this->get('/v1/hotel-types', [], self::CACHE_DICT, self::TIMEOUT_DICT);
     return is_array($data['items'] ?? null) ? $data['items'] : [];
   }
 
@@ -144,7 +153,7 @@ class HotelsApiClient
   public function cities(string $country = ''): array
   {
     $params = $country !== '' ? ['country' => $country] : [];
-    $data = $this->get('/v1/cities', $params, self::CACHE_DICT);
+    $data = $this->get('/v1/cities', $params, self::CACHE_DICT, self::TIMEOUT_DICT);
     return is_array($data['items'] ?? null) ? $data['items'] : [];
   }
 
@@ -241,7 +250,7 @@ class HotelsApiClient
   /**
    * @throws HotelsApiException
    */
-  private function get(string $path, array $params, int $ttl): array
+  private function get(string $path, array $params, int $ttl, ?int $timeout = null): array
   {
     $params = array_filter(
       $params,
@@ -272,7 +281,7 @@ class HotelsApiClient
     }
 
     $response = wp_remote_get($url, [
-      'timeout' => $this->timeout,
+      'timeout' => $timeout ?? $this->timeout,
       'headers' => [
         'Accept' => 'application/json',
         // Выдача карты по стране сжимается втрое, разжимает сам WordPress.
