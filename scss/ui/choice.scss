@@ -1,0 +1,66 @@
+/**
+ * Выбор варианта — пилюли-кнопки с подписью (дата заезда, количество ночей,
+ * звёздность). В отличие от .country-sights-chip ничего не снимают, а выбирают
+ * одно значение из группы: активный — чёрная заливка.
+ *
+ * Разметка:
+ *   <div class="ui-choices">
+ *     <button type="button" class="ui-choice is-active">
+ *       <span class="ui-choice__label">6 ночей</span>
+ *       <span class="ui-choice__sub">от 55 635 ₽</span>
+ *     </button>
+ *   </div>
+ */
+
+.ui-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ui-choice {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-width: 72px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+  font-family: inherit;
+  text-align: left;
+  color: $text-black;
+  cursor: pointer;
+  transition: $trans-text;
+}
+
+.ui-choice__label {
+  font-size: 16px;
+  line-height: 110%;
+}
+
+.ui-choice__sub {
+  font-size: 14px;
+  line-height: 110%;
+  color: $text-gray;
+  transition: $trans-text;
+}
+
+.ui-choice.is-active {
+  background: $black;
+  color: $text-white;
+  cursor: default;
+}
+
+.ui-choice.is-active .ui-choice__sub {
+  color: rgb(255 255 255 / 70%);
+}
+
+@media (hover: hover) {
+  .ui-choice:not(.is-active):hover {
+    background: $gray-light;
+  }
+}

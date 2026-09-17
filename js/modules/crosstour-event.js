@@ -5,6 +5,10 @@
  * подтягиваем цену «от», список отелей и доступные даты через AJAX
  * (bsi_samo&method=crosstour_event) и обновляем разметку. Приоритет Само > ручное:
  * при наличии данных перекрываем ручные значения, иначе остаётся ручной fallback.
+ *
+ * [data-crosstour-builder] — конструктор; дата/ночи из ссылки — выбор по умолчанию.
+ * Сетка сочетаний (crosstour_matrix) → чипы «заезд» и «ночи» → отели выбранного
+ * сочетания (сразу из сетки, полный набор номеров — crosstour_slot).
  */
 
 const escapeHtml = (s) =>
@@ -136,6 +140,212 @@ const renderDates = (offer) => {
   el.hidden = false;
 };
 
+const postSamo = async (ajaxUrl, params) => {
+  const body = new URLSearchParams({ action: "bsi_samo", ...params });
+  const res = await fetch(ajaxUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
+    body: body.toString(),
+    credentials: "same-origin",
+  });
+  return res.json();
+};
+
+/* ── Конструктор тура: заезд × ночи × отель ─────────────────────────────── */
+
+const WEEKDAYS = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+
+const ymdParts = (ymd) => {
+  const s = String(ymd);
+  return { y: +s.slice(0, 4), m: +s.slice(4, 6), d: +s.slice(6, 8) };
+};
+
+const fmtShortDate = (ymd) => {
+  const { m, d } = ymdParts(ymd);
+  return `${String(d).padStart(2, "0")}.${String(m).padStart(2, "0")}`;
+};
+
+const weekday = (ymd) => {
+  const { y, m, d } = ymdParts(ymd);
+  return WEEKDAYS[new Date(y, m - 1, d).getDay()];
+};
+
+const pluralNights = (n) => {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "ночь";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "ночи";
+  return "ночей";
+};
+
+const priceSpan = (item, cls) => {
+  const rub = Number(item.price_rub);
+  if (!rub || rub <= 0) return `<span class="${cls}">по запросу</span>`;
+  const orig =
+    item.price_original && item.price_currency
+      ? ` data-price-original="${escapeHtml(item.price_original)}" data-price-currency="${escapeHtml(item.price_currency)}"`
+      : "";
+  return `<span class="${cls} numfont js-event-price" data-price-rub="${rub}" data-has-from="true"${orig}>от ${fmtPrice(rub)} ₽</span>`;
+};
+
+const cheapest = (list) =>
+  list.reduce((best, c) => {
+    if (!c.price_rub) return best;
+    if (!best || !best.price_rub || c.price_rub < best.price_rub) return c;
+    return best;
+  }, null) || list[0];
+
+const initBuilder = async (section, eventId, ajaxUrl) => {
+  const controls = section.querySelector("[data-builder-controls]");
+  const datesEl = section.querySelector("[data-builder-dates]");
+  const nightsEl = section.querySelector("[data-builder-nights]");
+  const starsGroup = section.querySelector('[data-builder-group="stars"]');
+  const starsEl = section.querySelector("[data-builder-stars]");
+  const summaryEl = section.querySelector("[data-builder-summary]");
+
+  const json = await postSamo(ajaxUrl, { method: "crosstour_matrix", event_id: eventId });
+  section.querySelector("[data-builder-skeleton]")?.remove();
+  const combos = json?.success && json.data?.samo ? json.data.combos || [] : [];
+  if (!combos.length) {
+    console.debug("[crosstour] конструктор: Само не вернул сочетаний", json);
+    // Прежний поток сам откроет секцию, если найдёт отели.
+    section.hidden = true;
+    return false;
+  }
+
+  renderPrice(json.data);
+
+  const dates = [...new Set(combos.map((c) => c.date))];
+  // Дата/ночи из ссылки менеджера, иначе самое дешёвое сочетание.
+  const preferred = json.data.preferred;
+  const start =
+    (preferred &&
+      combos.find((c) => c.date === preferred.date && c.nights === preferred.nights)) ||
+    cheapest(combos);
+  const state = { date: start.date, nights: start.nights, star: "" };
+  const slotCache = new Map();
+  const slotKey = (date, nights) => `${date}_${nights}`;
+  const currentCombo = () =>
+    combos.find((c) => c.date === state.date && c.nights === state.nights);
+
+  const renderDates = () => {
+    datesEl.innerHTML = dates
+      .map(
+        (d) => `<button type="button" class="ui-choice${d === state.date ? " is-active" : ""}" data-date="${d}">
+          <span class="ui-choice__label numfont">${fmtShortDate(d)}</span>
+          <span class="ui-choice__sub">${weekday(d)}</span>
+        </button>`,
+      )
+      .join("");
+  };
+
+  const renderNights = () => {
+    nightsEl.innerHTML = combos
+      .filter((c) => c.date === state.date)
+      .map(
+        (c) => `<button type="button" class="ui-choice${c.nights === state.nights ? " is-active" : ""}" data-nights="${c.nights}">
+          <span class="ui-choice__label"><span class="numfont">${c.nights}</span> ${pluralNights(c.nights)}</span>
+          ${priceSpan(c, "ui-choice__sub")}
+        </button>`,
+      )
+      .join("");
+  };
+
+  const renderSummary = (combo) => {
+    summaryEl.textContent =
+      `Заезд ${fmtShortDate(combo.date)} (${weekday(combo.date)}) — ` +
+      `выезд ${fmtShortDate(combo.checkout)} (${weekday(combo.checkout)}), ` +
+      `${combo.nights} ${pluralNights(combo.nights)}. Цена за человека при размещении вдвоём.`;
+  };
+
+  const renderStars = (hotels) => {
+    const stars = [...new Set(hotels.map((h) => h.star).filter(Boolean))].sort();
+    if (!stars.includes(state.star)) state.star = "";
+    starsGroup.hidden = stars.length < 2;
+    starsEl.innerHTML = ["", ...stars]
+      .map(
+        (st) => `<button type="button" class="ui-choice${st === state.star ? " is-active" : ""}" data-star="${escapeHtml(st)}">
+          <span class="ui-choice__label">${st ? escapeHtml(st) : "Все"}</span>
+        </button>`,
+      )
+      .join("");
+  };
+
+  const renderSlotHotels = (hotels) => {
+    renderStars(hotels);
+    const shown = state.star ? hotels.filter((h) => h.star === state.star) : hotels;
+    renderHotels({ hotels: shown, booking_url: "" });
+  };
+
+  const showSlot = async () => {
+    const combo = currentCombo();
+    if (!combo) return;
+    const key = slotKey(combo.date, combo.nights);
+    renderSummary(combo);
+
+    // Сразу — самый дешёвый номер каждого отеля из сетки, затем полный набор номеров.
+    renderSlotHotels(slotCache.get(key) || combo.hotels || []);
+    if (slotCache.has(key)) return;
+
+    try {
+      const res = await postSamo(ajaxUrl, {
+        method: "crosstour_slot",
+        event_id: eventId,
+        date: combo.date,
+        nights: String(combo.nights),
+      });
+      const hotels = res?.success ? res.data?.offer?.hotels || [] : [];
+      if (!hotels.length) return;
+      slotCache.set(key, hotels);
+      if (slotKey(state.date, state.nights) === key) renderSlotHotels(hotels);
+    } catch (e) {
+      console.warn("[crosstour] конструктор: номера не догрузились", e);
+    }
+  };
+
+  const renderAll = () => {
+    renderDates();
+    renderNights();
+    showSlot();
+  };
+
+  controls.addEventListener("click", (e) => {
+    const btn = e.target.closest(".ui-choice");
+    if (!btn || btn.classList.contains("is-active")) return;
+
+    if (btn.dataset.date) {
+      state.date = btn.dataset.date;
+      const forDate = combos.filter((c) => c.date === state.date);
+      if (!forDate.some((c) => c.nights === state.nights)) {
+        state.nights = cheapest(forDate).nights;
+      }
+      renderAll();
+    } else if (btn.dataset.nights) {
+      state.nights = Number(btn.dataset.nights);
+      renderAll();
+    } else if (btn.dataset.star !== undefined) {
+      state.star = btn.dataset.star;
+      const combo = currentCombo();
+      const key = slotKey(combo.date, combo.nights);
+      renderSlotHotels(slotCache.get(key) || combo.hotels || []);
+    }
+  });
+
+  // Одно сочетание — выбирать нечего, остаётся список отелей.
+  controls.hidden = combos.length < 2;
+  renderAll();
+
+  // Кнопки «Забронировать» ведут в конструктор, а не в общий поиск Само.
+  document.querySelectorAll("[data-crosstour-book-link]").forEach((a) => {
+    a.href = `#${section.id}`;
+    a.removeAttribute("target");
+    a.removeAttribute("rel");
+  });
+  return true;
+};
+
 export const initCrosstourEvent = async () => {
   const root = document.querySelector("[data-crosstour-event]");
   if (!root) {
@@ -152,24 +362,16 @@ export const initCrosstourEvent = async () => {
     return;
   }
 
+  const builder = document.querySelector("[data-crosstour-builder]");
+
   try {
-    const body = new URLSearchParams();
-    body.set("action", "bsi_samo");
-    body.set("method", "crosstour_event");
-    body.set("event_id", eventId);
+    // Сетки нет (продукт не в crosstour / сбой) → прежний список отелей ниже.
+    if (builder && (await initBuilder(builder, eventId, ajaxUrl))) {
+      return;
+    }
 
     console.debug("[crosstour] запрос", { eventId, ajaxUrl });
-
-    const res = await fetch(ajaxUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      },
-      body: body.toString(),
-      credentials: "same-origin",
-    });
-
-    const json = await res.json();
+    const json = await postSamo(ajaxUrl, { method: "crosstour_event", event_id: eventId });
     console.debug("[crosstour] ответ", json);
 
     if (!json || !json.success || !json.data || !json.data.samo) {
@@ -185,6 +387,10 @@ export const initCrosstourEvent = async () => {
     renderDates(offer);
   } catch (e) {
     console.warn("[crosstour] ошибка запроса", e);
+    if (builder?.querySelector("[data-builder-skeleton]")) {
+      builder.querySelector("[data-builder-skeleton]").remove();
+      builder.hidden = true;
+    }
     revealManualAccommodation();
   }
 };

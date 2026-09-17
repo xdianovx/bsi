@@ -405,6 +405,32 @@ function samo_ajax()
       }
       wp_send_json_success(array_merge(['samo' => true, '_debug' => $debug], $data));
 
+    case 'crosstour_matrix':
+    case 'crosstour_slot':
+      // Конструктор тура: сетка «заезд × ночи» и отели выбранного сочетания.
+      // Ref берём только из события — параметры тура с фронта не принимаем.
+      $eventId = isset($_POST['event_id']) ? (int) $_POST['event_id'] : 0;
+      $ref = ($eventId && function_exists('bsi_crosstour_event_ref')) ? bsi_crosstour_event_ref($eventId) : null;
+      if (!$ref || !function_exists('bsi_crosstour_event_matrix')) {
+        wp_send_json_success(['samo' => false]);
+      }
+      $force = !empty($_POST['_force_refresh']) && current_user_can('manage_options');
+
+      if ($method === 'crosstour_matrix') {
+        wp_send_json_success(array_merge(['samo' => true], bsi_crosstour_event_matrix($ref, $force)));
+      }
+
+      $offer = bsi_crosstour_event_slot_offer(
+        $ref,
+        isset($_POST['date']) ? sanitize_text_field(wp_unslash($_POST['date'])) : '',
+        isset($_POST['nights']) ? (int) $_POST['nights'] : 0,
+        $force
+      );
+      if ($offer === null) {
+        wp_send_json_error(['message' => 'unknown slot'], 400);
+      }
+      wp_send_json_success(['samo' => true, 'offer' => $offer]);
+
     case 'crosstour_quick_price':
       $state    = isset($_POST['STATEINC'])    ? (int) sanitize_text_field($_POST['STATEINC'])    : 0;
       $tour     = isset($_POST['TOURINC'])     ? (int) sanitize_text_field($_POST['TOURINC'])     : 0;

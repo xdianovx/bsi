@@ -303,7 +303,7 @@ function bsi_crosstour_filter_hotels(array $hotels, string $tour_name = ''): arr
 }
 
 /**
- * Имя отеля из «<тур> (<Отель>)» → «<Отель>». Без скобок — как есть.
+ * Имя отеля из «<тур> (<Отель>)» или «<тур>: <Отель>» → «<Отель>». Иначе — как есть.
  */
 function bsi_crosstour_hotel_display_name(string $name): string
 {
@@ -312,6 +312,10 @@ function bsi_crosstour_hotel_display_name(string $name): string
     if ($inner !== '') {
       return $inner;
     }
+  }
+  // «Концерт Limp Bizkit: AnCasa Hotel» → «AnCasa Hotel».
+  if (preg_match('/^[^:]{3,}:\s*(.+)$/u', $name, $m)) {
+    return trim($m[1]);
   }
   return $name;
 }
@@ -519,6 +523,30 @@ function bsi_crosstour_offer_cache_key(array $ref, int $townfrom, int $state, in
 }
 
 /**
+ * Ссылка без TOURINC → берём тур из TOURS(state): один — используем; несколько — первый.
+ * TOURINC пишем в ref, иначе per-row booking_url строится с tour=0 → нет кнопки.
+ */
+function bsi_crosstour_ref_with_tour(array $ref): array
+{
+  $state = (int) ($ref['STATEINC'] ?? 0);
+  if (!$state || (int) ($ref['TOURINC'] ?? 0)) {
+    return $ref;
+  }
+  $tours_resp = SamoService::endpoints()->searchCrosstourTours([
+    'TOWNFROMINC' => (int) ($ref['TOWNFROMINC'] ?? BSI_CROSSTOUR_TOWNFROM),
+    'STATEINC' => $state,
+  ]);
+  $tours = ($tours_resp['ok'] ?? false) ? ($tours_resp['data']['SearchCrosstour_TOURS'] ?? []) : [];
+  if (!empty($tours)) {
+    $ref['TOURINC'] = (int) ($tours[0]['id'] ?? 0);
+    if (empty($ref['name']) && isset($tours[0]['name'])) {
+      $ref['name'] = (string) $tours[0]['name'];
+    }
+  }
+  return $ref;
+}
+
+/**
  * Оффер: мин. цена + отели + даты + ночи + ссылка брони. Кеш ~3ч.
  *
  * @return array{price_rub:?int,currency:string,hotels:array,dates:array,nights:array,booking_url:string}
@@ -529,21 +557,8 @@ function bsi_crosstour_event_offer(array $ref, bool $force = false): array
   $state = (int) ($ref['STATEINC'] ?? 0);
   $tour = (int) ($ref['TOURINC'] ?? 0);
 
-  // Ссылка без TOURINC → берём тур из TOURS(state): один — используем; несколько — первый.
-  if ($state && !$tour) {
-    $tours_resp = SamoService::endpoints()->searchCrosstourTours([
-      'TOWNFROMINC' => $townfrom,
-      'STATEINC' => $state,
-    ]);
-    $tours = ($tours_resp['ok'] ?? false) ? ($tours_resp['data']['SearchCrosstour_TOURS'] ?? []) : [];
-    if (!empty($tours)) {
-      $tour = (int) ($tours[0]['id'] ?? 0);
-      $ref['TOURINC'] = $tour; // иначе per-row booking_url строится с tour=0 → нет кнопки
-      if (empty($ref['name']) && isset($tours[0]['name'])) {
-        $ref['name'] = (string) $tours[0]['name'];
-      }
-    }
-  }
+  $ref = bsi_crosstour_ref_with_tour($ref);
+  $tour = (int) ($ref['TOURINC'] ?? 0);
 
   $empty = [
     'price_rub' => null,
@@ -847,4 +862,239 @@ function bsi_crosstour_event_data(int $event_id, bool $force = false): ?array
     'ref' => $ref,
     'offer' => $offer,
   ];
+}
+
+/**
+ * Сетка конструктора: все продаваемые сочетания «заезд × ночи» тура с мин. ценой
+ * per-person и числом отелей. Источник — PRICES без HOTELS: Само отдаёт по
+ * строке на отель в каждом сочетании, постранично (PRICEPAGE, 100 строк).
+ * Кеш ~3ч; пустой результат — 10 мин, чтобы сбой Само не залипал.
+ *
+ * Дата и ночи из ссылки сетку не сужают (менеджер копирует из Само ссылку
+ * на конкретный заезд), а становятся выбором по умолчанию — `preferred`.
+ *
+ * @return array{combos:array<int,array>,preferred:?array,price_rub:?int,price_original:?float,price_currency:?string}
+ */
+function bsi_crosstour_event_matrix(array $ref, bool $force = false): array
+{
+  $slot = bsi_crosstour_ref_slot($ref);
+  $matrix = bsi_crosstour_tour_matrix($ref, $force);
+
+  $matrix['preferred'] = null;
+  foreach ($matrix['combos'] as $c) {
+    if ($c['date'] === $slot['cb'] && (int) $c['nights'] === $slot['nf']) {
+      $matrix['preferred'] = ['date' => $c['date'], 'nights' => (int) $c['nights']];
+      break;
+    }
+  }
+  return $matrix;
+}
+
+/**
+ * Сетка всего тура без учёта слота ссылки (кешируемая часть event_matrix).
+ */
+function bsi_crosstour_tour_matrix(array $ref, bool $force = false): array
+{
+  $empty = ['combos' => [], 'price_rub' => null, 'price_original' => null, 'price_currency' => null];
+
+  foreach (['CHECKIN_BEG', 'CHECKIN_END', 'NIGHTS_FROM', 'NIGHTS_TILL'] as $k) {
+    unset($ref[$k]);
+  }
+  $ref = bsi_crosstour_ref_with_tour($ref);
+  $townfrom = (int) ($ref['TOWNFROMINC'] ?? BSI_CROSSTOUR_TOWNFROM);
+  $state = (int) ($ref['STATEINC'] ?? 0);
+  $tour = (int) ($ref['TOURINC'] ?? 0);
+  if (!$state || !$tour) {
+    return $empty;
+  }
+
+  $slot = bsi_crosstour_ref_slot($ref);
+  $cache_key = 'crosstour_matrix_v3_' . $townfrom . '_' . $state . '_' . $tour;
+  if (!$force) {
+    $cached = CacheService::get($cache_key, 'samotour');
+    if (is_array($cached)) {
+      return $cached;
+    }
+  }
+
+  $endpoints = SamoService::endpoints();
+  $base = ['TOWNFROMINC' => $townfrom, 'STATEINC' => $state, 'TOURS' => $tour];
+  $flags = [
+    'TOWNS_ANY' => 1,
+    'STARS_ANY' => 1,
+    'HOTELS_ANY' => 1,
+    'MEALS_ANY' => 1,
+    'ROOMS_ANY' => 1,
+    'FREIGHT' => 1,
+  ];
+
+  // Ночи: из ссылки или весь набор тура. Широкий диапазон (1..30) Само
+  // отклоняет ошибкой 102 — поэтому только реальные min..max.
+  if ($slot['nf'] > 0) {
+    $n_from = $slot['nf'];
+    $n_till = max($slot['nt'], $slot['nf']);
+  } else {
+    $nights_resp = $endpoints->searchCrosstourNights($base);
+    $nights_node = ($nights_resp['ok'] ?? false) ? ($nights_resp['data']['SearchCrosstour_NIGHTS'] ?? []) : [];
+    $nights_list = (isset($nights_node['nights']) && is_array($nights_node['nights']))
+      ? array_values(array_filter(array_map('intval', $nights_node['nights'])))
+      : [];
+    if (empty($nights_list)) {
+      CacheService::set($cache_key, $empty, 10 * MINUTE_IN_SECONDS, 'samotour');
+      return $empty;
+    }
+    $n_from = min($nights_list);
+    $n_till = max($nights_list);
+  }
+
+  $common = array_merge($base, $flags, [
+    'ADULT' => 2,
+    'CHILD' => 0,
+    'CURRENCY' => 1,
+    'NIGHTS_FROM' => $n_from,
+    'NIGHTS_TILL' => $n_till,
+  ]);
+
+  $all_params = $common;
+  if ($slot['cb'] !== '') {
+    $all_params['CHECKIN_BEG'] = $slot['cb'];
+    $all_params['CHECKIN_END'] = $slot['ce'];
+  }
+  $all_resp = $endpoints->searchCrosstourAll($all_params);
+  $all = ($all_resp['ok'] ?? false) ? ($all_resp['data']['SearchCrosstour_ALL'] ?? []) : [];
+  $dates = bsi_crosstour_valid_dates($all['CHECKIN_BEG'] ?? []);
+  if ($slot['cb'] !== '') {
+    $dates = array_values(array_filter($dates, static function ($d) use ($slot) {
+      return $d >= $slot['cb'] && $d <= $slot['ce'];
+    }));
+  }
+  if (empty($dates)) {
+    CacheService::set($cache_key, $empty, 10 * MINUTE_IN_SECONDS, 'samotour');
+    return $empty;
+  }
+
+  // Все страницы PRICES по окну дат. Потолок страниц — страховка от тура
+  // на полгода вперёд: 30 страниц = 3000 строк.
+  $fetch_rows = static function (string $beg, string $end) use ($endpoints, $common): array {
+    $rows = [];
+    for ($page = 1; $page <= 30; $page++) {
+      $resp = $endpoints->searchCrosstourPrices(array_merge($common, [
+        'CHECKIN_BEG' => $beg,
+        'CHECKIN_END' => $end,
+        'PRICEPAGE' => $page,
+      ]));
+      $node = ($resp['ok'] ?? false) ? ($resp['data']['SearchCrosstour_PRICES'] ?? []) : [];
+      $chunk = $node['prices'] ?? [];
+      if (empty($chunk) || !is_array($chunk)) {
+        break;
+      }
+      foreach ($chunk as $r) {
+        $rows[] = $r;
+      }
+      $total = (int) ($node['pager']['total'] ?? 1);
+      if ($page >= $total) {
+        break;
+      }
+    }
+    return $rows;
+  };
+
+  $rows = $fetch_rows($dates[0], (string) end($dates));
+  // Длинное окно Само может не принять — тогда по одной дате.
+  if (empty($rows) && count($dates) > 1) {
+    foreach ($dates as $d) {
+      foreach ($fetch_rows($d, $d) as $r) {
+        $rows[] = $r;
+      }
+    }
+  }
+
+  $groups = [];
+  foreach ($rows as $r) {
+    if (!is_array($r)) {
+      continue;
+    }
+    $d = preg_replace('/\D/', '', (string) ($r['checkIn'] ?? ''));
+    $n = (int) ($r['nights'] ?? 0);
+    if ($d === '' || $n <= 0) {
+      continue;
+    }
+    $groups[$d . '_' . $n]['date'] = $d;
+    $groups[$d . '_' . $n]['nights'] = $n;
+    $groups[$d . '_' . $n]['rows'][] = $r;
+  }
+
+  $combos = [];
+  foreach ($groups as $g) {
+    $price = bsi_crosstour_price_from_rows($g['rows']);
+    $hotel_keys = array_unique(array_filter(array_map(static function ($r) {
+      return (int) ($r['hotelKey'] ?? 0);
+    }, $g['rows'])));
+    $combos[] = [
+      'date' => $g['date'],
+      'checkout' => date('Ymd', strtotime($g['date'] . ' +' . $g['nights'] . ' days')),
+      'nights' => $g['nights'],
+      'hotels_count' => count($hotel_keys),
+      // Самый дешёвый номер каждого отеля — список рисуется сразу, полный
+      // набор номеров догружает crosstour_slot.
+      'hotels' => bsi_crosstour_hotels_from_prices($g['rows'], $ref),
+      'price_rub' => $price['rub'],
+      'price_original' => $price['original'],
+      'price_currency' => $price['currency'],
+    ];
+  }
+  usort($combos, static function ($a, $b) {
+    return [$a['date'], $a['nights']] <=> [$b['date'], $b['nights']];
+  });
+
+  $matrix = $empty;
+  $matrix['combos'] = $combos;
+  foreach ($combos as $c) {
+    if ($c['price_rub'] !== null && ($matrix['price_rub'] === null || $c['price_rub'] < $matrix['price_rub'])) {
+      $matrix['price_rub'] = $c['price_rub'];
+      $matrix['price_original'] = $c['price_original'];
+      $matrix['price_currency'] = $c['price_currency'];
+    }
+  }
+
+  CacheService::set(
+    $cache_key,
+    $matrix,
+    empty($combos) ? 10 * MINUTE_IN_SECONDS : 3 * HOUR_IN_SECONDS,
+    'samotour'
+  );
+  return $matrix;
+}
+
+/**
+ * Оффер одного сочетания конструктора (все отели и номера со ссылками брони).
+ * Принимаем только сочетания из сетки — иначе произвольные даты с фронта
+ * плодили бы запросы в Само и ключи кеша.
+ */
+function bsi_crosstour_event_slot_offer(array $ref, string $date, int $nights, bool $force = false): ?array
+{
+  $date = preg_replace('/\D/', '', $date);
+  if ($date === '' || $nights <= 0) {
+    return null;
+  }
+  $matrix = bsi_crosstour_tour_matrix($ref);
+  $known = false;
+  foreach ($matrix['combos'] as $c) {
+    if ($c['date'] === $date && (int) $c['nights'] === $nights) {
+      $known = true;
+      break;
+    }
+  }
+  if (!$known) {
+    return null;
+  }
+
+  $slot_ref = bsi_crosstour_ref_with_tour($ref);
+  // Ссылка на всё сочетание: отель/номер выбирает клиент.
+  $slot_ref['CHECKIN_BEG'] = $date;
+  $slot_ref['CHECKIN_END'] = $date;
+  $slot_ref['NIGHTS_FROM'] = $nights;
+  $slot_ref['NIGHTS_TILL'] = $nights;
+
+  return bsi_crosstour_event_offer($slot_ref, $force);
 }

@@ -191,9 +191,11 @@
     <li><a href="#numbered-content">Нумерация текста</a></li>
         <li><a href="#indent">Красная строка</a></li>
 <li><a href="#filter-chips">Чипы фильтров</a></li>
+<li><a href="#choices">Выбор варианта</a></li>
 <li><a href="#pagination">Пагинация</a></li>
     <li><a href="#counter">Counter</a></li>
     <li><a href="#preloader">Preloader</a></li>
+    <li><a href="#skeleton">Скелетон</a></li>
     <li><a href="#modal">Модалки</a></li>
     <li><a href="#socials">Соцсети</a></li>
     <li><a href="#cards-hotel">Карточка отеля</a></li>
@@ -809,6 +811,31 @@ get_template_part('template-parts/ui/location-line', null, [
 &lt;/div&gt;</pre>
   </section>
 
+  <!-- ============ CHOICES ============ -->
+  <section class="uikit-section" id="choices">
+    <h2>Выбор варианта</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/choice.scss</code>. Одно значение из группы: дата заезда, количество ночей, звёздность в конструкторе событийного тура (<code>js/modules/crosstour-event.js</code>). Активный — чёрная заливка, наведение — серая. Подпись <code>.ui-choice__sub</code> необязательна; цена в ней — с <code>.js-event-price</code>, чтобы работал переключатель валют.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <div class="ui-choices">
+        <button type="button" class="ui-choice"><span class="ui-choice__label numfont">03.12</span><span class="ui-choice__sub">чт</span></button>
+        <button type="button" class="ui-choice is-active"><span class="ui-choice__label numfont">04.12</span><span class="ui-choice__sub">пт</span></button>
+        <button type="button" class="ui-choice"><span class="ui-choice__label numfont">05.12</span><span class="ui-choice__sub">сб</span></button>
+      </div>
+      <div class="ui-choices" style="margin-top:16px">
+        <button type="button" class="ui-choice is-active"><span class="ui-choice__label">6 ночей</span><span class="ui-choice__sub numfont">от 55 635 ₽</span></button>
+        <button type="button" class="ui-choice"><span class="ui-choice__label">7 ночей</span><span class="ui-choice__sub numfont">от 59 241 ₽</span></button>
+        <button type="button" class="ui-choice"><span class="ui-choice__label">Все</span></button>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="ui-choices"&gt;
+  &lt;button type="button" class="ui-choice is-active"&gt;
+    &lt;span class="ui-choice__label"&gt;6 ночей&lt;/span&gt;
+    &lt;span class="ui-choice__sub"&gt;от 55 635 ₽&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+  </section>
+
   <!-- ============ PAGINATION ============ -->
   <section class="uikit-section" id="pagination">
     <h2>Пагинация</h2>
@@ -974,6 +1001,22 @@ echo bsi_pagination_links(['total' =&gt; $max_pages, 'current' =&gt; $paged]);
     <pre class="uikit-snippet">&lt;div class="results is-loading"&gt;
   ...
 &lt;/div&gt;</pre>
+  </section>
+
+  <section class="uikit-section" id="skeleton">
+    <h2>Скелетон</h2>
+    <p class="uikit-section__hint">Источник: <code>scss/ui/preloader.scss</code>. Заглушка на месте контента, пока идёт запрос: серый блок с бегущим бликом, размеры задаёт место применения. Пример — конструктор событийного тура (<code>single-event.php</code>, <code>.single-event__builder-skeleton</code>), JS удаляет заглушку по ответу.</p>
+
+    <div class="uikit-demo uikit-demo--block">
+      <span class="ui-skeleton" style="width:120px;height:14px"></span>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <span class="ui-skeleton" style="width:72px;height:52px"></span>
+        <span class="ui-skeleton" style="width:72px;height:52px"></span>
+        <span class="ui-skeleton" style="width:72px;height:52px"></span>
+      </div>
+      <span class="ui-skeleton" style="height:110px;margin-top:20px;border-radius:12px"></span>
+    </div>
+    <pre class="uikit-snippet">&lt;span class="ui-skeleton" style="width:120px;height:14px"&gt;&lt;/span&gt;</pre>
   </section>
 
   <!-- ============ MODAL ============ -->
