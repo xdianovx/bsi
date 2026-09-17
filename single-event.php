@@ -695,47 +695,56 @@ get_header();
           }
           ?>
 
+          <?php if ($crosstour_builder): ?>
+            <?php /* Шаг 1 — дата заезда и ночи. Скелетон до ответа Само; JS убирает его, при одном сочетании/пустой сетке прячет секцию. */ ?>
+            <section class="single-event__accommodation-section" data-crosstour-builder id="podbor-tura">
+              <h2 class="h2">Даты поездки</h2>
+              <div class="single-event__builder-skeleton" data-builder-skeleton>
+                <div class="single-event__builder-skeleton-group">
+                  <span class="ui-skeleton single-event__builder-skeleton-label"></span>
+                  <div class="single-event__builder-skeleton-chips">
+                    <?php for ($i = 0; $i < 7; $i++): ?>
+                      <span class="ui-skeleton single-event__builder-skeleton-chip"></span>
+                    <?php endfor; ?>
+                  </div>
+                </div>
+                <div class="single-event__builder-skeleton-group">
+                  <span class="ui-skeleton single-event__builder-skeleton-label"></span>
+                  <div class="single-event__builder-skeleton-chips">
+                    <?php for ($i = 0; $i < 3; $i++): ?>
+                      <span class="ui-skeleton single-event__builder-skeleton-chip single-event__builder-skeleton-chip--wide"></span>
+                    <?php endfor; ?>
+                  </div>
+                </div>
+              </div>
+              <div class="single-event__builder" data-builder-controls hidden>
+                <div class="single-event__builder-group" data-builder-group="dates">
+                  <span class="single-event__builder-label">Дата заезда</span>
+                  <div class="ui-choices" data-builder-dates></div>
+                </div>
+                <div class="single-event__builder-group" data-builder-group="nights">
+                  <span class="single-event__builder-label">Количество ночей</span>
+                  <div class="ui-choices" data-builder-nights></div>
+                </div>
+                <p class="single-event__builder-summary numfont" data-builder-summary></p>
+              </div>
+            </section>
+          <?php endif; ?>
+
           <?php if ($crosstour_ref): ?>
+            <?php /* Шаг 2 — отель: фильтр звёздности + номера выбранного сочетания. */ ?>
             <section class="single-event__accommodation-section single-event__accommodation-section--samo"
-              data-crosstour-hotels<?php if ($crosstour_builder): ?> data-crosstour-builder id="podbor-tura"<?php else: ?> hidden<?php endif; ?>>
+              data-crosstour-hotels id="varianty-prozhivaniya"<?php if (!$crosstour_builder): ?> hidden<?php endif; ?>>
               <h2 class="h2">Варианты проживания</h2>
               <?php if ($crosstour_builder): ?>
-                <?php /* Скелетон до ответа Само; JS убирает его, при пустой сетке прячет секцию. */ ?>
                 <div class="single-event__builder-skeleton" data-builder-skeleton>
-                  <div class="single-event__builder-skeleton-group">
-                    <span class="ui-skeleton single-event__builder-skeleton-label"></span>
-                    <div class="single-event__builder-skeleton-chips">
-                      <?php for ($i = 0; $i < 7; $i++): ?>
-                        <span class="ui-skeleton single-event__builder-skeleton-chip"></span>
-                      <?php endfor; ?>
-                    </div>
-                  </div>
-                  <div class="single-event__builder-skeleton-group">
-                    <span class="ui-skeleton single-event__builder-skeleton-label"></span>
-                    <div class="single-event__builder-skeleton-chips">
-                      <?php for ($i = 0; $i < 3; $i++): ?>
-                        <span class="ui-skeleton single-event__builder-skeleton-chip single-event__builder-skeleton-chip--wide"></span>
-                      <?php endfor; ?>
-                    </div>
-                  </div>
                   <?php for ($i = 0; $i < 3; $i++): ?>
                     <span class="ui-skeleton single-event__builder-skeleton-card"></span>
                   <?php endfor; ?>
                 </div>
-                <div class="single-event__builder" data-builder-controls hidden>
-                  <div class="single-event__builder-group" data-builder-group="dates">
-                    <span class="single-event__builder-label">Дата заезда</span>
-                    <div class="ui-choices" data-builder-dates></div>
-                  </div>
-                  <div class="single-event__builder-group" data-builder-group="nights">
-                    <span class="single-event__builder-label">Количество ночей</span>
-                    <div class="ui-choices" data-builder-nights></div>
-                  </div>
-                  <div class="single-event__builder-group" data-builder-group="stars" hidden>
-                    <span class="single-event__builder-label">Отель</span>
-                    <div class="ui-choices" data-builder-stars></div>
-                  </div>
-                  <p class="single-event__builder-summary numfont" data-builder-summary></p>
+                <div class="single-event__hotels-filter" data-builder-group="stars" hidden>
+                  <span class="single-event__builder-label">Отель</span>
+                  <div class="ui-choices" data-builder-stars></div>
                 </div>
               <?php endif; ?>
               <ul class="single-event__accommodation-grid" data-crosstour-hotels-list></ul>

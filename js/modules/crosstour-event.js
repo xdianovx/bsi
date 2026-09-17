@@ -197,21 +197,27 @@ const cheapest = (list) =>
     return best;
   }, null) || list[0];
 
+const removeBuilderSkeletons = () =>
+  document.querySelectorAll("[data-builder-skeleton]").forEach((el) => el.remove());
+
+// Две секции: даты/ночи (section) и отели ([data-crosstour-hotels]).
 const initBuilder = async (section, eventId, ajaxUrl) => {
+  const hotelsSection = document.querySelector("[data-crosstour-hotels]");
   const controls = section.querySelector("[data-builder-controls]");
   const datesEl = section.querySelector("[data-builder-dates]");
   const nightsEl = section.querySelector("[data-builder-nights]");
-  const starsGroup = section.querySelector('[data-builder-group="stars"]');
-  const starsEl = section.querySelector("[data-builder-stars]");
+  const starsGroup = hotelsSection?.querySelector('[data-builder-group="stars"]');
+  const starsEl = hotelsSection?.querySelector("[data-builder-stars]");
   const summaryEl = section.querySelector("[data-builder-summary]");
 
   const json = await postSamo(ajaxUrl, { method: "crosstour_matrix", event_id: eventId });
-  section.querySelector("[data-builder-skeleton]")?.remove();
+  removeBuilderSkeletons();
   const combos = json?.success && json.data?.samo ? json.data.combos || [] : [];
-  if (!combos.length) {
+  if (!combos.length || !hotelsSection) {
     console.debug("[crosstour] конструктор: Само не вернул сочетаний", json);
-    // Прежний поток сам откроет секцию, если найдёт отели.
+    // Прежний поток сам откроет секцию отелей, если найдёт их.
     section.hidden = true;
+    if (hotelsSection) hotelsSection.hidden = true;
     return false;
   }
 
@@ -261,6 +267,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   };
 
   const renderStars = (hotels) => {
+    if (!starsGroup || !starsEl) return;
     const stars = [...new Set(hotels.map((h) => h.star).filter(Boolean))].sort();
     if (!stars.includes(state.star)) state.star = "";
     starsGroup.hidden = stars.length < 2;
@@ -311,7 +318,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
     showSlot();
   };
 
-  controls.addEventListener("click", (e) => {
+  const onChoiceClick = (e) => {
     const btn = e.target.closest(".ui-choice");
     if (!btn || btn.classList.contains("is-active")) return;
 
@@ -331,15 +338,20 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
       const key = slotKey(combo.date, combo.nights);
       renderSlotHotels(slotCache.get(key) || combo.hotels || []);
     }
-  });
+  };
+  controls.addEventListener("click", onChoiceClick);
+  starsGroup?.addEventListener("click", onChoiceClick);
 
-  // Одно сочетание — выбирать нечего, остаётся список отелей.
-  controls.hidden = combos.length < 2;
+  // Одно сочетание — выбирать нечего, секция дат скрыта, остаётся секция отелей.
+  const single = combos.length < 2;
+  controls.hidden = single;
+  section.hidden = single;
   renderAll();
 
   // Кнопки «Забронировать» ведут в конструктор, а не в общий поиск Само.
+  const target = single ? hotelsSection : section;
   document.querySelectorAll("[data-crosstour-book-link]").forEach((a) => {
-    a.href = `#${section.id}`;
+    a.href = `#${target.id}`;
     a.removeAttribute("target");
     a.removeAttribute("rel");
   });
@@ -388,8 +400,10 @@ export const initCrosstourEvent = async () => {
   } catch (e) {
     console.warn("[crosstour] ошибка запроса", e);
     if (builder?.querySelector("[data-builder-skeleton]")) {
-      builder.querySelector("[data-builder-skeleton]").remove();
+      removeBuilderSkeletons();
       builder.hidden = true;
+      const hotels = document.querySelector("[data-crosstour-hotels]");
+      if (hotels) hotels.hidden = true;
     }
     revealManualAccommodation();
   }

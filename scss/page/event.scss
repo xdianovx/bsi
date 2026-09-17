@@ -1233,7 +1233,7 @@
 
 .single-event__booking-widget {
   box-sizing: border-box;
-  padding: 24px;
+  padding: 16px;
   border-radius: $radius-md;
   background: $bg-color;
 
@@ -1619,7 +1619,6 @@ button.single-event__dates-book {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-bottom: 24px;
 }
 
 .single-event__builder[hidden] {
@@ -1633,6 +1632,18 @@ button.single-event__dates-book {
 }
 
 .single-event__builder-group[hidden] {
+  display: none;
+}
+
+/* Фильтр звёздности над списком отелей (секция «Варианты проживания») */
+.single-event__hotels-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.single-event__hotels-filter[hidden] {
   display: none;
 }
 
