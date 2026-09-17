@@ -452,188 +452,6 @@ get_header();
       <div class="single-event__about-grid" id="o-sobytii">
         <div class="single-event__columns">
 
-          <!-- About start -->
-          <div class="single-event__about-main">
-            <h2 class="h2">О событии</h2>
-            <?php
-            if ($event_about !== '' && trim(wp_strip_all_tags($event_about)) !== ''):
-              ?>
-              <div class="single-event__about-body editor-content">
-                <?= wp_kses_post($event_about); ?>
-              </div>
-            <?php elseif ($excerpt !== ''): ?>
-              <p class="single-event__lead"><?= esc_html($excerpt); ?></p>
-            <?php endif; ?>
-
-            <?php
-            $lucide_attrs = ['width' => '20', 'height' => '20', 'stroke' => 'currentColor'];
-            if ($show_quick):
-              ?>
-
-            <?php endif; ?>
-          </div>
-
-          <!-- About end -->
-
-          <!-- Dates start -->
-          <?php if (!empty($dates_section_rows)): ?>
-            <section class="single-event__dates-section">
-              <h2 class="h2 single-event__dates-title">Даты и место</h2>
-              <ul class="single-event__dates-list">
-                <?php foreach ($dates_section_rows as $br): ?>
-                  <?php
-                  $row_city = $br['city'] !== '' ? $br['city'] : '—';
-                  $row_venue = $br['venue'];
-                  $row_date_label = bsi_format_event_date_range($br['date'], $br['date_end'] ?? '');
-                  $row_price_rub = isset($br['price_rub']) ? $br['price_rub'] : null;
-                  $row_orig = isset($br['price_original']) ? $br['price_original'] : null;
-                  $row_cur = isset($br['price_currency']) ? trim((string) $br['price_currency']) : '';
-                  ?>
-                  <li class="single-event__dates-row">
-                    <div class="single-event__dates-row-left">
-                      <span class="single-event__dates-dot" aria-hidden="true"></span>
-                      <div class="single-event__dates-meta">
-                        <span class="single-event__dates-meta-txt numfont"><?= esc_html($row_date_label); ?></span>
-                        <span class="single-event__dates-sep" aria-hidden="true"></span>
-                        <span class="single-event__dates-meta-txt"><?= esc_html($row_city); ?></span>
-                        <?php if ($row_venue !== ''): ?>
-                          <span class="single-event__dates-sep" aria-hidden="true"></span>
-                          <span class="single-event__dates-meta-txt"><?= esc_html($row_venue); ?></span>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                    <div class="single-event__dates-row-right">
-                      <?php if ($row_price_rub !== null && (int) $row_price_rub > 0): ?>
-                        <span class="single-event__dates-price numfont js-event-price"
-                          data-price-rub="<?= esc_attr((string) (int) $row_price_rub); ?>"
-                          <?php if ($row_orig !== null && (float) $row_orig > 0 && $row_cur !== ''): ?>
-                          data-price-original="<?= esc_attr((string) $row_orig); ?>"
-                          data-price-currency="<?= esc_attr($row_cur); ?>"
-                          <?php endif; ?>
-                          data-has-from="true">от
-                          <?= esc_html(number_format((int) $row_price_rub, 0, ',', ' ')); ?>
-                          ₽</span>
-                      <?php else: ?>
-                        <span class="single-event__dates-price single-event__dates-price--request">По запросу</span>
-                      <?php endif; ?>
-                      <span class="single-event__dates-sep" aria-hidden="true"></span>
-                      <span class="single-event__dates-book-wrap">
-                        <?php if ($effective_booking_url): ?>
-                          <a href="<?= esc_url($effective_booking_url); ?>" class="single-event__dates-book" target="_blank"
-                            rel="nofollow noopener"<?php if ($crosstour_builder): ?> data-crosstour-book-link<?php endif; ?>>забронировать</a>
-                        <?php else: ?>
-                          <button type="button" class="single-event__dates-book js-event-booking-btn"
-                            data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
-                            data-event-date="<?= esc_attr($row_date_label); ?>"
-                            data-event-venue="<?= esc_attr($br['venue']); ?>" data-event-time="<?= esc_attr($event_time); ?>"
-                            data-min-price="<?= esc_attr($row_price_rub !== null ? (int) $row_price_rub : 0); ?>">забронировать</button>
-                        <?php endif; ?>
-                      </span>
-                    </div>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            </section>
-          <?php endif; ?>
-          <!-- Dates end -->
-
-          <!-- Scheme start -->
-          <?php
-          $has_scheme_legend = !empty($venue_scheme_legend) && is_array($venue_scheme_legend);
-          if ($venue_scheme_url || $has_scheme_legend):
-            ?>
-            <section class="single-event__venue-scheme<?= $venue_scheme_url ? '' : ' single-event__venue-scheme--no-image'; ?>">
-              <h2 class="h2"><?= esc_html($venue_scheme_heading); ?></h2>
-              <div class="single-event__venue-layout">
-                <?php if ($venue_scheme_url): ?>
-                  <figure class="single-event__venue-figure">
-                    <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
-                  </figure>
-                <?php endif; ?>
-                <?php if ($has_scheme_legend): ?>
-                  <?php
-                  $legend_currency_map = [
-                    '₽' => 'RUB', 'руб' => 'RUB', 'руб.' => 'RUB', 'rub' => 'RUB',
-                    '$' => 'USD', 'usd' => 'USD',
-                    '€' => 'EUR', 'eur' => 'EUR',
-                    '£' => 'GBP', 'gbp' => 'GBP',
-                  ];
-                  ?>
-                  <ul class="single-event__venue-legend">
-                    <?php foreach ($venue_scheme_legend as $leg): ?>
-                      <?php
-                      $lab = isset($leg['legend_label']) ? trim((string) $leg['legend_label']) : '';
-                      $leg_date = isset($leg['legend_date']) ? trim((string) $leg['legend_date']) : '';
-                      $curr = isset($leg['legend_currency']) ? trim((string) $leg['legend_currency']) : '';
-
-                      // Цена вводится как есть (без ×1000), конвертируется в рубли по валюте.
-                      $leg_raw = $leg['legend_price'] ?? null;
-                      $leg_amount = ($leg_raw !== null && $leg_raw !== '' && is_numeric($leg_raw))
-                        ? (float) $leg_raw
-                        : null;
-
-                      $curr_key = mb_strtolower($curr);
-                      $leg_iso = $legend_currency_map[$curr_key] ?? ($curr !== '' ? strtoupper($curr) : null);
-
-                      $leg_price_rub = null;
-                      $leg_price_original = null;
-                      $leg_price_currency = null;
-                      if ($leg_amount !== null && $leg_amount > 0 && $leg_iso !== null && function_exists('bsi_education_convert_price_to_rub')) {
-                        $leg_rub_converted = bsi_education_convert_price_to_rub($leg_amount, $leg_iso);
-                        if ($leg_rub_converted !== null && $leg_rub_converted > 0) {
-                          $leg_price_rub = (int) $leg_rub_converted;
-                          if ($leg_iso !== 'RUB') {
-                            $leg_price_original = $leg_amount;
-                            $leg_price_currency = $leg_iso;
-                          }
-                        }
-                      }
-
-                      // Текст-фолбэк, если цена не сконвертилась (нечисловая / нет валюты).
-                      $pr = '';
-                      if ($leg_amount !== null) {
-                        $pr = number_format((int) round($leg_amount), 0, ',', ' ') . ($curr !== '' ? ' ' . $curr : '');
-                      } elseif (trim((string) ($leg_raw ?? '')) !== '') {
-                        $pr = trim(trim((string) $leg_raw) . ($curr !== '' ? ' ' . $curr : ''));
-                      }
-
-                      if ($lab === '' && $leg_price_rub === null && $pr === '') {
-                        continue;
-                      }
-                      ?>
-                      <li class="single-event__venue-legend-item">
-                        <span class="single-event__venue-legend-label">
-                          <?php if ($leg_date !== ''): ?>
-                            <span class="single-event__venue-legend-date numfont"><?= esc_html($leg_date); ?></span>
-                          <?php endif; ?>
-                          <?= esc_html($lab); ?>
-                        </span>
-                        <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
-                        <?php if ($leg_price_rub !== null): ?>
-                          <span class="single-event__venue-legend-price numfont js-event-price"
-                            data-price-rub="<?= esc_attr((string) (int) $leg_price_rub); ?>"
-                            <?php if ($leg_price_original !== null && $leg_price_currency !== null): ?>
-                            data-price-original="<?= esc_attr((string) $leg_price_original); ?>"
-                            data-price-currency="<?= esc_attr($leg_price_currency); ?>"
-                            <?php endif; ?>>
-                            <?= esc_html(number_format((int) $leg_price_rub, 0, ',', ' ')); ?> ₽
-                          </span>
-                        <?php else: ?>
-                          <span class="single-event__venue-legend-price numfont">
-                            <?= esc_html($pr); ?>
-                          </span>
-                        <?php endif; ?>
-                      </li>
-                    <?php endforeach; ?>
-                  </ul>
-                <?php endif; ?>
-              </div>
-            </section>
-          <?php endif; ?>
-
-          <!-- Scheme end -->
-
-
           <!-- Living start -->
           <?php
           $event_accommodation = function_exists('get_field') ? get_field('event_accommodation', $post_id) : [];
@@ -823,6 +641,188 @@ get_header();
             </section>
           <?php endif; ?>
 
+          <!-- About start -->
+          <div class="single-event__about-main">
+            <h2 class="h2">О событии</h2>
+            <?php
+            if ($event_about !== '' && trim(wp_strip_all_tags($event_about)) !== ''):
+              ?>
+              <div class="single-event__about-body editor-content">
+                <?= wp_kses_post($event_about); ?>
+              </div>
+            <?php elseif ($excerpt !== ''): ?>
+              <p class="single-event__lead"><?= esc_html($excerpt); ?></p>
+            <?php endif; ?>
+
+            <?php
+            $lucide_attrs = ['width' => '20', 'height' => '20', 'stroke' => 'currentColor'];
+            if ($show_quick):
+              ?>
+
+            <?php endif; ?>
+          </div>
+
+          <!-- About end -->
+
+          <!-- Dates start -->
+          <?php if (!empty($dates_section_rows)): ?>
+            <section class="single-event__dates-section">
+              <h2 class="h2 single-event__dates-title">Даты и место</h2>
+              <ul class="single-event__dates-list">
+                <?php foreach ($dates_section_rows as $br): ?>
+                  <?php
+                  $row_city = $br['city'] !== '' ? $br['city'] : '—';
+                  $row_venue = $br['venue'];
+                  $row_date_label = bsi_format_event_date_range($br['date'], $br['date_end'] ?? '');
+                  $row_price_rub = isset($br['price_rub']) ? $br['price_rub'] : null;
+                  $row_orig = isset($br['price_original']) ? $br['price_original'] : null;
+                  $row_cur = isset($br['price_currency']) ? trim((string) $br['price_currency']) : '';
+                  ?>
+                  <li class="single-event__dates-row">
+                    <div class="single-event__dates-row-left">
+                      <span class="single-event__dates-dot" aria-hidden="true"></span>
+                      <div class="single-event__dates-meta">
+                        <span class="single-event__dates-meta-txt numfont"><?= esc_html($row_date_label); ?></span>
+                        <span class="single-event__dates-sep" aria-hidden="true"></span>
+                        <span class="single-event__dates-meta-txt"><?= esc_html($row_city); ?></span>
+                        <?php if ($row_venue !== ''): ?>
+                          <span class="single-event__dates-sep" aria-hidden="true"></span>
+                          <span class="single-event__dates-meta-txt"><?= esc_html($row_venue); ?></span>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                    <div class="single-event__dates-row-right">
+                      <?php if ($row_price_rub !== null && (int) $row_price_rub > 0): ?>
+                        <span class="single-event__dates-price numfont js-event-price"
+                          data-price-rub="<?= esc_attr((string) (int) $row_price_rub); ?>"
+                          <?php if ($row_orig !== null && (float) $row_orig > 0 && $row_cur !== ''): ?>
+                          data-price-original="<?= esc_attr((string) $row_orig); ?>"
+                          data-price-currency="<?= esc_attr($row_cur); ?>"
+                          <?php endif; ?>
+                          data-has-from="true">от
+                          <?= esc_html(number_format((int) $row_price_rub, 0, ',', ' ')); ?>
+                          ₽</span>
+                      <?php else: ?>
+                        <span class="single-event__dates-price single-event__dates-price--request">По запросу</span>
+                      <?php endif; ?>
+                      <span class="single-event__dates-sep" aria-hidden="true"></span>
+                      <span class="single-event__dates-book-wrap">
+                        <?php if ($effective_booking_url): ?>
+                          <a href="<?= esc_url($effective_booking_url); ?>" class="single-event__dates-book" target="_blank"
+                            rel="nofollow noopener"<?php if ($crosstour_builder): ?> data-crosstour-book-link<?php endif; ?>>забронировать</a>
+                        <?php else: ?>
+                          <button type="button" class="single-event__dates-book js-event-booking-btn"
+                            data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
+                            data-event-date="<?= esc_attr($row_date_label); ?>"
+                            data-event-venue="<?= esc_attr($br['venue']); ?>" data-event-time="<?= esc_attr($event_time); ?>"
+                            data-min-price="<?= esc_attr($row_price_rub !== null ? (int) $row_price_rub : 0); ?>">забронировать</button>
+                        <?php endif; ?>
+                      </span>
+                    </div>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            </section>
+          <?php endif; ?>
+          <!-- Dates end -->
+
+          <!-- Scheme start -->
+          <?php
+          $has_scheme_legend = !empty($venue_scheme_legend) && is_array($venue_scheme_legend);
+          if ($venue_scheme_url || $has_scheme_legend):
+            ?>
+            <section class="single-event__venue-scheme<?= $venue_scheme_url ? '' : ' single-event__venue-scheme--no-image'; ?>">
+              <h2 class="h2"><?= esc_html($venue_scheme_heading); ?></h2>
+              <div class="single-event__venue-layout">
+                <?php if ($venue_scheme_url): ?>
+                  <figure class="single-event__venue-figure">
+                    <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
+                  </figure>
+                <?php endif; ?>
+                <?php if ($has_scheme_legend): ?>
+                  <?php
+                  $legend_currency_map = [
+                    '₽' => 'RUB', 'руб' => 'RUB', 'руб.' => 'RUB', 'rub' => 'RUB',
+                    '$' => 'USD', 'usd' => 'USD',
+                    '€' => 'EUR', 'eur' => 'EUR',
+                    '£' => 'GBP', 'gbp' => 'GBP',
+                  ];
+                  ?>
+                  <ul class="single-event__venue-legend">
+                    <?php foreach ($venue_scheme_legend as $leg): ?>
+                      <?php
+                      $lab = isset($leg['legend_label']) ? trim((string) $leg['legend_label']) : '';
+                      $leg_date = isset($leg['legend_date']) ? trim((string) $leg['legend_date']) : '';
+                      $curr = isset($leg['legend_currency']) ? trim((string) $leg['legend_currency']) : '';
+
+                      // Цена вводится как есть (без ×1000), конвертируется в рубли по валюте.
+                      $leg_raw = $leg['legend_price'] ?? null;
+                      $leg_amount = ($leg_raw !== null && $leg_raw !== '' && is_numeric($leg_raw))
+                        ? (float) $leg_raw
+                        : null;
+
+                      $curr_key = mb_strtolower($curr);
+                      $leg_iso = $legend_currency_map[$curr_key] ?? ($curr !== '' ? strtoupper($curr) : null);
+
+                      $leg_price_rub = null;
+                      $leg_price_original = null;
+                      $leg_price_currency = null;
+                      if ($leg_amount !== null && $leg_amount > 0 && $leg_iso !== null && function_exists('bsi_education_convert_price_to_rub')) {
+                        $leg_rub_converted = bsi_education_convert_price_to_rub($leg_amount, $leg_iso);
+                        if ($leg_rub_converted !== null && $leg_rub_converted > 0) {
+                          $leg_price_rub = (int) $leg_rub_converted;
+                          if ($leg_iso !== 'RUB') {
+                            $leg_price_original = $leg_amount;
+                            $leg_price_currency = $leg_iso;
+                          }
+                        }
+                      }
+
+                      // Текст-фолбэк, если цена не сконвертилась (нечисловая / нет валюты).
+                      $pr = '';
+                      if ($leg_amount !== null) {
+                        $pr = number_format((int) round($leg_amount), 0, ',', ' ') . ($curr !== '' ? ' ' . $curr : '');
+                      } elseif (trim((string) ($leg_raw ?? '')) !== '') {
+                        $pr = trim(trim((string) $leg_raw) . ($curr !== '' ? ' ' . $curr : ''));
+                      }
+
+                      if ($lab === '' && $leg_price_rub === null && $pr === '') {
+                        continue;
+                      }
+                      ?>
+                      <li class="single-event__venue-legend-item">
+                        <span class="single-event__venue-legend-label">
+                          <?php if ($leg_date !== ''): ?>
+                            <span class="single-event__venue-legend-date numfont"><?= esc_html($leg_date); ?></span>
+                          <?php endif; ?>
+                          <?= esc_html($lab); ?>
+                        </span>
+                        <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
+                        <?php if ($leg_price_rub !== null): ?>
+                          <span class="single-event__venue-legend-price numfont js-event-price"
+                            data-price-rub="<?= esc_attr((string) (int) $leg_price_rub); ?>"
+                            <?php if ($leg_price_original !== null && $leg_price_currency !== null): ?>
+                            data-price-original="<?= esc_attr((string) $leg_price_original); ?>"
+                            data-price-currency="<?= esc_attr($leg_price_currency); ?>"
+                            <?php endif; ?>>
+                            <?= esc_html(number_format((int) $leg_price_rub, 0, ',', ' ')); ?> ₽
+                          </span>
+                        <?php else: ?>
+                          <span class="single-event__venue-legend-price numfont">
+                            <?= esc_html($pr); ?>
+                          </span>
+                        <?php endif; ?>
+                      </li>
+                    <?php endforeach; ?>
+                  </ul>
+                <?php endif; ?>
+              </div>
+            </section>
+          <?php endif; ?>
+
+          <!-- Scheme end -->
+
+
           <?php if (!empty(trim(strip_tags($tour_extra)))): ?>
             <section class="single-event__accommodation editor-content">
               <?php if (empty($accommodation_rows)): ?>
@@ -883,45 +883,35 @@ get_header();
 
         <aside class="single-event__about-aside" aria-label="Краткая информация и бронирование">
           <div class="single-event__booking-widget single-event__booking-widget--inline">
-            <?php if ($widget_country_title || $region_term || $resort_term): ?>
+            <?php /* Шапка уходит при прокрутке, а плашка липкая — дублируем название, страну и даты. */ ?>
+            <div class="single-event__booking-widget-head">
+              <p class="single-event__booking-widget-title"><?= esc_html($event_title); ?></p>
               <?php
-              $items = [];
-              if ($widget_country_title) {
-                $items[] = $widget_country_permalink
-                  ? '<a class="single-event__booking-widget-address-link" href="' . esc_url($widget_country_permalink) . '">' . esc_html($widget_country_title) . '</a>'
-                  : '<span>' . esc_html($widget_country_title) . '</span>';
-              }
-
+              $widget_location_parts = [];
               if ($resort_term) {
                 $resort_link = get_term_link($resort_term);
-                $items[] = !is_wp_error($resort_link)
-                  ? '<a class="single-event__booking-widget-address-link" href="' . esc_url($resort_link) . '">' . esc_html($resort_term->name) . '</a>'
-                  : '<span>' . esc_html($resort_term->name) . '</span>';
+                $widget_location_parts[] = [
+                  'label' => $resort_term->name,
+                  'url' => is_wp_error($resort_link) ? '' : $resort_link,
+                ];
               }
               ?>
-              <div class="single-event__booking-widget-top-line">
-                <div class="single-event__booking-widget-address">
-                  <?php if (!empty($widget_country_flag)): ?>
-                    <img class="single-event__booking-widget-flag" src="<?= esc_url($widget_country_flag); ?>" alt="">
+              <?php if ($country_id || $widget_location_parts || $hero_date_label !== ''): ?>
+                <div class="single-event__booking-widget-meta">
+                  <?php
+                  get_template_part('template-parts/ui/location-line', null, [
+                    'country_id' => $country_id,
+                    'flag_url' => $widget_country_flag,
+                    'parts' => $widget_location_parts,
+                  ]);
+                  ?>
+                  <?php if ($hero_date_label !== ''): ?>
+                    <span class="single-event__booking-widget-date numfont"><?= esc_html($hero_date_label); ?></span>
                   <?php endif; ?>
-                  <div class="single-event__booking-widget-address-text">
-                    <?= implode(', ', $items); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                  </div>
                 </div>
-              </div>
-            <?php endif; ?>
+              <?php endif; ?>
+            </div>
 
-            <?php if ($event_venue !== ''): ?>
-              <div class="single-event__booking-widget-venue">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="lucide lucide-map-pin" aria-hidden="true">
-                  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                <span><?= esc_html($event_venue); ?></span>
-              </div>
-            <?php endif; ?>
 
 
 
