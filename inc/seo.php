@@ -778,6 +778,13 @@ add_action('template_redirect', function () {
         return;
     }
 
+    // Карточка отеля из хаба: число в адресе — идентификатор хаба, а не пост
+    // WordPress. Совпадение с чужим ID уводило на случайную запись, поэтому
+    // такие адреса отдаём странице отеля (inc/hotels-api/hotel-page.php).
+    if (preg_match('#(^|/)country/[^/]+/hotel/\d+$#', $path)) {
+        return;
+    }
+
     $post_id = (int) $m[1];
     if ($post_id < 1 || $post_id > 9999999) {
         return;

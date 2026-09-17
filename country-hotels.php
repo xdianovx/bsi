@@ -16,8 +16,12 @@ if (!$country instanceof WP_Post) {
   return;
 }
 
+// Каталог берётся из хаба BSIHOTELS, если страна с ним связана.
+// Иначе остаётся прежний источник — отели, заведённые в WordPress.
+$hotels_from_api = bsi_hotels_api_enabled_for_country((int) $country->ID) && bsi_hotels_api() !== null;
+
 // 1) Получаем все отели страны
-$hotels = get_posts([
+$hotels = $hotels_from_api ? [] : get_posts([
   'post_type' => 'hotel',
   'post_status' => 'publish',
   'posts_per_page' => -1,
@@ -94,13 +98,15 @@ get_header(); ?>
   }
   ?>
 
-  <section>
-    <div class="container">
-      <div class="coutry-page__wrap">
+  <section class="<?= $hotels_from_api ? 'country-hotels-api' : ''; ?>">
+    <div class="<?= $hotels_from_api ? 'country-hotels-api__top' : 'container'; ?>">
+      <div class="<?= $hotels_from_api ? '' : 'coutry-page__wrap'; ?>">
 
-        <aside class="coutry-page__aside">
-          <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
-        </aside>
+        <?php if (!$hotels_from_api): ?>
+          <aside class="coutry-page__aside">
+            <?= get_template_part('template-parts/pages/country/child-pages-menu'); ?>
+          </aside>
+        <?php endif; ?>
 
         <?php
         // H1 выводится всегда: раньше он был внутри проверки на наличие
@@ -117,14 +123,28 @@ get_header(); ?>
           : 'в';
         ?>
 
-        <div class="page-country__content">
+        <?php
+        // На странице курорта заголовок про курорт: «Отели в Стамбуле».
+        $hotels_resort = $hotels_from_api
+          ? bsi_hotels_api_current_resort((int) $country->ID)
+          : null;
+
+        $hotels_h1 = $hotels_resort
+          ? 'Отели: ' . $hotels_resort['name'] . ', ' . $country->post_title
+          : 'Отели ' . $hotels_prep . ' ' . $hotels_country;
+        ?>
+
+        <div class="<?= $hotels_from_api ? 'country-hotels-api__title-wrap' : 'page-country__content'; ?>">
           <h1 class="h1 country-hotels__title">
-            Отели <?= esc_html($hotels_prep . ' ' . $hotels_country); ?>
+            <?= esc_html($hotels_h1); ?>
           </h1>
         </div>
 
-        <?php if (!empty($hotels)): ?>
-          <div class="">
+        <?php if ($hotels_from_api): ?>
+          <?php // каталог отрисован выше, внутри колонки контента ?>
+
+        <?php elseif (!empty($hotels)): ?>
+          <div class="page-country__content">
             <div class="country-hotels__counter">
               Нашли отелей: <?= (int) count($hotels); ?>
             </div>
@@ -172,6 +192,12 @@ get_header(); ?>
 
       </div>
     </div>
+
+    <?php if ($hotels_from_api): ?>
+      <?php get_template_part('template-parts/pages/country/hotels-api', null, [
+        'country' => $country,
+      ]); ?>
+    <?php endif; ?>
   </section>
 
 </main>

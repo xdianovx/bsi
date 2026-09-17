@@ -1,0 +1,1275 @@
+/**
+ * Страница отеля: шапка, галерея-мозаика, липкая навигация,
+ * номера с тарифами, удобства, факты, карта.
+ * Общая вёрстка для отелей из хаба и из WordPress.
+ */
+
+/* Страница собрана из белых карточек на сером, как каталог: разделяет их
+   воздух, а не линии. Шапка и галерея лежат прямо на сером — это обложка. */
+.hotel-page {
+  background: $bg-gray;
+  padding-bottom: 40px;
+}
+
+/* Галерея идёт первой, шапка под ней — поэтому сверху у шапки отступа почти
+   нет, он уже отдан галерее. */
+.hp-head {
+  padding: 0 0 8px;
+}
+
+/* Флаг страны вместо значка метки. */
+.hp-head__flag {
+  flex-shrink: 0;
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.hp-head>.container,
+.hp-section>.container,
+.hp-rooms>.container,
+.hp-location>.container,
+.hp-request>.container,
+.hp-contacts>.container {
+  padding-top: 24px;
+  padding-bottom: 28px;
+  border-radius: 20px;
+  background: #fff;
+}
+
+@media (min-width: 1341px) {
+
+  .hp-head>.container,
+  .hp-section>.container,
+  .hp-rooms>.container,
+  .hp-location>.container,
+  .hp-request>.container,
+  .hp-contacts>.container {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+.hp-head__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.hp-head__main {
+  min-width: 0;
+}
+
+.hp-head__stars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.hp-head__star {
+  color: #dcdce2;
+}
+
+.hp-head__star.is-on {
+  color: #f5a623;
+}
+
+.hp-head__title {
+  margin: 0 0 10px;
+}
+
+.hp-head__place {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  color: $text-gray;
+  font-size: 15px;
+
+  svg {
+    color: $gray;
+    flex-shrink: 0;
+  }
+
+  a {
+    color: $text-black;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
+
+.hp-head__sep {
+  color: $gray-light;
+}
+
+.hp-head__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-head__aside {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 220px;
+
+  @media (max-width: 900px) {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+.hp-head__price-label {
+  margin: 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-head__price {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.hp-head__cta {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.hp-head__excerpt {
+  margin-top: 12px;
+  max-width: 720px;
+  color: $text-gray;
+  font-size: 15px;
+}
+
+.hp-head__print {
+  align-self: flex-end;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: $text-gray;
+
+  @media (max-width: 900px) {
+    align-self: flex-start;
+  }
+}
+
+.hp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: $bg-gray;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.hp-tag__icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.hp-tag--more a {
+  color: $red;
+}
+
+.hp-gallery {
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+
+.hp-gallery__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+  border-radius: 20px;
+  overflow: hidden;
+  max-height: 420px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr 1fr;
+    max-height: 300px;
+  }
+}
+
+.hp-gallery__item {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: $bg-gray;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+}
+
+.hp-gallery__item--main {
+  grid-row: span 2;
+
+  @media (max-width: 767px) {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+}
+
+.hp-gallery--single .hp-gallery__grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.hp-gallery--single .hp-gallery__item--main {
+  grid-row: span 1;
+  aspect-ratio: 16 / 7;
+}
+
+.hp-gallery__more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.hp-gallery__hidden {
+  display: none;
+}
+
+.hp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin-bottom: 8px;
+  background: $bg-gray;
+}
+
+.hp-nav__list {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.hp-nav__link {
+  display: block;
+  padding: 16px 0;
+  white-space: nowrap;
+  font-size: 15px;
+  color: $text-gray;
+  border-bottom: 2px solid transparent;
+  transition: $trans-text;
+
+  &:hover {
+    color: $text-black;
+  }
+
+  &.is-active {
+    color: $text-black;
+    border-color: $red;
+  }
+}
+
+// Высота липкой навигации: якоря не должны уезжать под неё.
+$hp-nav-offset: 76px;
+
+.hp-section,
+.hp-rooms,
+
+.hp-gallery {
+  scroll-margin-top: $hp-nav-offset;
+}
+
+.hp-section {
+  padding: 8px 0;
+}
+
+.hp-section__title {
+  margin: 0 0 16px;
+}
+
+.hp-section__body {
+  max-width: 900px;
+}
+
+.hp-rooms {
+  padding: 8px 0;
+}
+
+.hp-rooms__head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.hp-rooms__hint {
+  margin: 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-rooms__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hp-room.is-empty {
+  .hp-room__title,
+
+  .hp-room__meta {
+    color: $text-gray;
+  }
+}
+
+.hp-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: $bg-gray;
+}
+
+/* Поля панели одной ширины: базис нулевой, поэтому её делят поровну. */
+.hp-search__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 190px;
+  flex: 1 1 0;
+}
+
+/* display: flex сильнее браузерного [hidden], поэтому прячем правилом. */
+.hp-search__field[hidden] {
+  display: none;
+}
+
+.hp-search__label {
+  font-size: 13px;
+  color: $text-gray;
+}
+
+/* Поле календаря: тот же вид, что у селектов подбора. */
+.hp-search__date {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  color: $text-black;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+
+
+/* Пара селектов лежит в потоке формы наравне с полем календаря; display:
+   contents ради этого, но тогда сам браузер перестаёт слушать hidden. */
+.hp-search__pair {
+  display: contents;
+}
+
+.hp-search__pair[hidden] {
+  display: none;
+}
+
+/* Пока хаб считает заезд, список приглушён — видно, что цифры сейчас сменятся.
+   Общий спиннер `.is-loading` тут не нужен: он встал бы по центру всего списка,
+   то есть за экраном. */
+.hp-rooms__list.is-loading {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.hp-rooms__list.is-loading::before,
+.hp-rooms__list.is-loading::after {
+  content: none;
+}
+
+/* Спиннер — в блоке цен каждого номера: он всегда рядом с цифрами,
+   которые сейчас сменятся. */
+.hp-room__offers.is-loading {
+  min-height: 64px;
+}
+
+.hp-room__offers.is-loading::after {
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-width: 2px;
+}
+
+/* Календарь тарифов: числа с ценой за ночь под ними. */
+.flatpickr-calendar {
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.flatpickr-day {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  height: 44px;
+  line-height: 1;
+  border-radius: 10px;
+}
+
+.hp-cal__price {
+  font-size: 10px;
+  color: $gray;
+}
+
+/* День, про который хаб ответил «предложений нет»: бледная цифра и никакого
+   отклика на наведение. Заливки нет намеренно — на закрытом месяце тридцать
+   плашек превращают календарь в шахматку. */
+/* Селектор с календарём: у flatpickr есть своё правило для
+   `.flatpickr-disabled`, и оно идёт в сборке позже. */
+.flatpickr-calendar .flatpickr-day.is-off {
+  color: $gray;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Пока хаб отвечает про месяц, поле календаря приглушено: подписи дней сейчас
+   сменятся, а сам календарь остаётся рабочим. */
+.hp-search__field.is-loading .hp-search__date {
+  opacity: 0.6;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* День с известной ценой отличается от того, про который ещё не спрашивали:
+   второй тоже выбирается, просто цену для него посчитают по клику. */
+.flatpickr-day.is-priced {
+  font-weight: 500;
+}
+
+.flatpickr-day:not(.is-priced):not(.flatpickr-disabled) {
+  color: $text-gray;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: $red;
+  border-color: $red;
+}
+
+.flatpickr-day.selected .hp-cal__price,
+.flatpickr-day.startRange .hp-cal__price,
+.flatpickr-day.endRange .hp-cal__price,
+.flatpickr-day.inRange .hp-cal__price {
+  color: inherit;
+}
+
+.flatpickr-day.inRange {
+  background: $bg-gray-light;
+  border-color: $bg-gray-light;
+  box-shadow: -5px 0 0 $bg-gray-light, 5px 0 0 $bg-gray-light;
+}
+
+.hp-search__select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  color: $text-black;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+/* Строка под полями: слева счётчик найденного, справа сброс. */
+.hp-search__foot {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hp-search__note {
+  margin: 0;
+  font-size: 14px;
+  color: $text-gray;
+
+  &.is-empty {
+    color: $red;
+  }
+}
+
+.hp-search__reset {
+  padding: 0;
+  color: $text-gray;
+  font-size: 14px;
+  font-family: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+}
+
+/* Номер: слева описание, справа тарифы строками — как в поиске отелей у
+   Яндекс.Путешествий. Даты заезда идут отдельной строкой во всю ширину: они
+   относятся к номеру целиком. Рамки нет: карточки разделяет отступ. */
+.hp-room {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(420px, 2.25fr);
+  gap: 16px 20px;
+  padding: 16px;
+  border-radius: 16px;
+  background: $bg-gray;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  &.is-empty {
+    opacity: 0.6;
+  }
+}
+
+/* Треть карточки под снимки: крупный сверху, миниатюры под ним. */
+.hp-room__media {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.hp-room__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.hp-room__thumbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-room__thumb a {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Счётчик на последней плитке: сколько снимков ещё ждёт в галерее. */
+.hp-room__thumb-rest {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.hp-room__thumb-hidden {
+  display: none;
+}
+
+/* Удобства номера: иконка и подпись, без плашек. */
+.hp-room__amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-room__amenity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  background: #fff;
+  padding: 2px 8px;
+  border-radius: 8px;
+
+  img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    opacity: 0.7;
+  }
+}
+
+.hp-room__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+
+}
+
+.hp-room__photo--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c4c4cc;
+}
+
+/* Подтверждение брони и спецпредложения. Без обводок: плашки различаются
+   заливкой и цветом текста — рамки на карточке номера рябят. */
+.hp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: $bg-gray;
+  color: $text-gray;
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.hp-badge--instant {
+  background: #e8f3e9;
+  color: #2e7d32;
+}
+
+/* Модификатора для `request` нет намеренно: бронь под запрос не подписывается. */
+
+.hp-badge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* Общие для всех номеров условия — строкой под заголовком блока. */
+.hp-rooms__terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-room__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.hp-room__deals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-room__instant-price {
+  margin: 8px 0 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-offer__instant {
+  color: #2e7d32;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* Дата с гарантированным подтверждением: точка у цены, без заливки плитки —
+   строка дат и так пёстрая от цен. */
+.hp-room__day--instant .hp-room__day-price::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: #2e7d32;
+  vertical-align: middle;
+}
+
+.hp-head__price-instant {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-room__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.hp-room__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: $text-gray;
+  font-size: 14px;
+
+  li+li {
+    position: relative;
+    padding-left: 13px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: $gray-light;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+.hp-room__descr {
+  margin: 0;
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Лента дат заезда: под описанием номера, над тарифами. */
+.hp-room__dates {
+  padding-top: 2px;
+}
+
+.hp-room__dates-title {
+  margin: 0 0 6px;
+  color: $text-gray;
+  font-size: 13px;
+}
+
+/* Даты переносятся, а не прокручиваются: гость должен видеть весь диапазон
+   сразу, иначе половина чисел прячется за краем колонки. */
+.hp-room__days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-room__day {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 9px;
+  border-radius: 10px;
+  background: #fff;
+  line-height: 1.2;
+  cursor: help;
+}
+
+.hp-room__day-date {
+  color: $gray;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.hp-room__day-price {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.hp-room__offers {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 6px;
+}
+
+
+.hp-room__empty {
+  margin: auto 0;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+/* Тариф — строка, а не плашка: их у номера до десятка, и залитые блоки
+   перетягивали внимание с самого номера. */
+.hp-offer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.hp-offer__terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.hp-offer__meal {
+  font-weight: 400;
+}
+
+.hp-offer__placement {
+  color: $text-gray;
+}
+
+/* Дата заезда у тарифа: в окне из двух недель без неё непонятно, к какому дню
+   относится цена. */
+.hp-offer__date {
+  color: $gray;
+  font-size: 13px;
+}
+
+.hp-offer__badge {
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: $bg-gray;
+  color: $gray;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Срок стоит перед суммой: «3 ночи 474 $» читается как одна фраза. */
+.hp-offer__price {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  b {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  span {
+    color: $gray;
+    font-size: 12px;
+  }
+
+  @media (max-width: 560px) {
+    align-items: flex-start;
+  }
+}
+
+/* Одна кнопка на номер: тарифы показывают цены, а бронь у номера общая. */
+.hp-room__cta {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+
+  @media (max-width: 560px) {
+    width: 100%;
+  }
+}
+
+.hp-amenities__groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px 32px;
+  margin-bottom: 16px;
+}
+
+.hp-amenities__group-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-gray;
+}
+
+.hp-amenities__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-amenities__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: $text-black;
+
+  svg {
+    color: $gray;
+    flex-shrink: 0;
+  }
+
+  &.is-hidden {
+    display: none;
+  }
+}
+
+.hp-amenities__icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.hp-amenities__more {
+  font-size: 15px;
+  color: $red;
+}
+
+// Иконка удобства в шапке приходит из хаба отдельным SVG.
+
+.hp-tag__icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.hp-contacts__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-contacts__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  a {
+    color: $text-black;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
+
+.hp-contacts__label {
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-facts__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-facts__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: $bg-gray;
+}
+
+.hp-facts__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  font-size: 15px;
+}
+
+.hp-facts__icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.hp-facts__value {
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.hp-request {
+  .hp-section__title {
+    margin-bottom: 8px;
+  }
+}
+
+.hp-request__box {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(420px, 1.2fr);
+  gap: 32px;
+  padding: 28px;
+  border-radius: 12px;
+  background: $bg-gray;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+}
+
+.hp-request__text {
+  margin: 0;
+  color: $text-gray;
+  font-size: 15px;
+}
+
+.hp-request__selected {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.hp-request__req {
+  color: $red;
+}
+
+.hp-request__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.hp-request__submit {
+  align-self: flex-start;
+
+  @media (max-width: 560px) {
+    width: 100%;
+  }
+}
+
+.hp-policies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px 32px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-policies__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.hp-policies__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  object-fit: contain;
+}
+
+.hp-policies__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hp-policies__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hp-policies__flag {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: $bg-gray;
+  color: $text-gray;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.hp-policies__item.is-denied .hp-policies__flag {
+  color: $red;
+}
+
+.hp-policies__text {
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.hp-location {
+  // Свой слой: у контролов Яндекса высокий z-index, без изоляции кнопка
+  // «Открыть Яндекс Карты» вылезает поверх липкой навигации.
+  isolation: isolate;
+  position: relative;
+  z-index: 0;
+}
+
+.hp-location__note {
+  max-width: 900px;
+  margin-bottom: 16px;
+}
+
+.hp-location__canvas {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: $bg-gray;
+}
+
+.hp-back {
+  padding-bottom: 40px;
+
+  a {
+    color: $text-black;
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}

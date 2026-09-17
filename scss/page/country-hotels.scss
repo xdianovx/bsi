@@ -20,12 +20,10 @@
   gap: 32px 16px;
 }
 
-.country-hotels__item {
-}
-
 .country-hotels__counter {
   margin-top: 8px;
 }
+
 .country-hotels__item-title {
   font-weight: 700;
   font-size: 24px;
@@ -36,12 +34,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.country-hotel {
-}
-
-.country-hotel__image {
 }
 
 .hotel-rating {
@@ -58,7 +50,1324 @@
 
 .country-hotel__title {
   transition: $trans-text;
+
   &:hover {
     color: $red;
+  }
+}
+
+/* Каталог отелей из хаба BSIHOTELS */
+
+.country-hotels__api {
+  margin-top: 16px;
+}
+
+.country-hotels__message {
+  margin-top: 24px;
+}
+
+.country-hotels__message-debug {
+  margin-top: 8px;
+  color: $gray;
+  font-size: 14px;
+}
+
+.country-resorts-filter {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.country-resorts-filter__item {
+  padding: 6px 12px;
+  border: 1px solid $gray-light;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 130%;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+
+  &.is-active {
+    background: $bg-gray;
+  }
+}
+
+.country-resorts-filter__count {
+  margin-left: 4px;
+  color: $gray;
+}
+
+.country-hotels__resort-title {
+  margin-top: 32px;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.country-hotels__grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px 16px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.api-hotel {
+  display: flex;
+  flex-direction: column;
+}
+
+.api-hotel__media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+  background: $bg-gray;
+}
+
+.api-hotel__media-link {
+  display: block;
+  height: 100%;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+}
+
+.api-hotel__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.api-hotel__media-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c4c4cc;
+}
+
+.api-hotel__body {
+  margin-top: 12px;
+}
+
+.api-hotel__title {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 130%;
+
+  a {
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
+
+.api-hotel__stars {
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.api-hotel__city {
+  margin-top: 4px;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.api-hotel__footer {
+  margin-top: 8px;
+}
+
+.api-hotel__price {
+  font-weight: 700;
+}
+
+.api-hotel__price--empty {
+  font-weight: 400;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.country-resorts-filter__more {
+  summary {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  &[open] summary {
+    background: $bg-gray;
+  }
+}
+
+.country-resorts-filter__tail {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.api-hotels-selection {
+  margin-top: 48px;
+}
+
+.api-hotels-selection__grid {
+  margin-top: 24px;
+}
+
+.resort-hotels--api {
+  margin-top: 40px;
+}
+
+.resort-hotels__all {
+  margin-top: 24px;
+
+  a {
+    transition: $trans-text;
+
+    &:hover {
+      color: $red;
+    }
+  }
+}
+
+/* Каталог отелей хаба подгружается без перезагрузки — на время запроса гасим сетку. */
+
+.country-hotels__catalog {
+  transition: opacity 0.2s ease-in-out;
+
+  &.is-loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+/* Хаб не успел ответить — вместо каталога заглушки, список догружается сам. */
+
+.country-hotels__pending-note {
+  margin: 0 0 16px;
+  color: $text-gray;
+}
+
+.country-hotels__skeleton {
+  min-height: 320px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, $bg-gray 25%, #ececf0 37%, $bg-gray 63%);
+  background-size: 400% 100%;
+  animation: country-hotels-skeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes country-hotels-skeleton {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* Карта каталога: метки отелей текущей выдачи. Координаты приходят вместе с карточками. */
+
+.country-hotels__map-section {
+  margin: 0 0 28px;
+  // Свой слой: контролы карты не должны перекрывать липкие элементы страницы.
+  isolation: isolate;
+  position: relative;
+  z-index: 0;
+}
+
+.country-hotels__map-title {
+  margin: 0 0 4px;
+}
+
+.country-hotels__map-note {
+  margin: 0 0 12px;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.country-hotels__map {
+  width: 100%;
+  height: 420px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: $bg-gray;
+
+  @media (max-width: 767px) {
+    height: 320px;
+  }
+}
+
+.hotels-map__pin {
+  position: relative;
+  display: block;
+  width: 16px;
+  height: 16px;
+
+  &:hover {
+    z-index: 9999;
+  }
+}
+
+.hotels-map__pin--price {
+  width: auto;
+  height: auto;
+}
+
+/* Метка с ценой: её видно, не наводя курсор. */
+
+.hotels-map__pin-label {
+  display: block;
+  padding: 4px 9px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: $red;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  transition: $trans-text;
+
+  .hotels-map__pin:hover & {
+    background: $text-black;
+  }
+}
+
+.hotels-map__pin-dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: $red;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hotels-map__pin-card {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  align-items: flex-start;
+  gap: 8px;
+  width: max-content;
+  max-width: 280px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+  color: $text-black;
+  font-size: 13px;
+  line-height: 1.3;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  z-index: 9999;
+
+  span {
+    color: $text-gray;
+  }
+}
+
+/* Снимок отеля рядом с подписью: по фото метку узнают быстрее, чем по имени. */
+.hotels-map__pin-photo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: $bg-gray;
+  color: #c4c4cc !important;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.hotels-map__pin-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: $text-black !important;
+}
+
+.hotels-map__pin-price {
+  color: $text-black !important;
+  font-weight: 500;
+}
+
+.hotels-map__pin:hover .hotels-map__pin-card {
+  display: flex;
+}
+
+/* Кластер меток: число отелей в группе. */
+
+.hotels-map__cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: $red;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ============ Каталог отелей: фильтры, список, карта ============ */
+
+.country-hotels-api__top {
+  max-width: $container;
+  margin: 0 auto;
+  padding: 0 $container-padding;
+}
+
+.country-hotels-api__title-wrap {
+  margin-bottom: 16px;
+}
+
+.hotels-catalog {
+  display: grid;
+  /* Карта занимает правую половину экрана и выходит за контейнер: список и
+     фильтры делят левую. */
+  grid-template-columns: minmax(0, 1fr) clamp(360px, 44vw, 780px);
+  gap: 0;
+  align-items: start;
+
+  /* Ниже широкого экрана карта забирает меньшую долю: на 1440 её половина
+     оставляла списку около 430 px, и карточка сжималась до фото с обрезанным
+     названием. Карте хватает трети — по ней выбирают район, а не читают. */
+  @media (max-width: 1700px) {
+    grid-template-columns: minmax(0, 1fr) clamp(360px, 36vw, 640px);
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr) 34vw;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hotels-catalog--no-map {
+  grid-template-columns: 1fr;
+}
+
+/* Без карты колонка со списком центрируется в контейнере.
+   Центрировать через `margin: 0 auto` нельзя: авто-поля отключают растяжение
+   grid-элемента, блок сжимается до содержимого, и колонка списка
+   `minmax(0, 1fr)` схлопывается в ноль — карточки уезжают в узкий столбец. */
+.hotels-catalog--no-map .hotels-catalog__inner {
+  width: 100%;
+  max-width: $container;
+  justify-self: center;
+}
+
+/* Фон колонки со списком: карточки белые на светло-сером, без единой линии.
+   Так же разделены карточки в референсах — воздухом, а не бордерами. */
+.hotels-catalog__inner {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+  min-width: 0;
+  background: $bg-gray;
+  padding: 0 16px 40px max($container-padding, calc((100vw - #{$container}) / 2));
+
+  /* Отступ слева больше не тянется к середине контейнера: на 1440 он съедал
+     сотню пикселей у колонки, которой их и не хватало. */
+  @media (max-width: 1700px) {
+    padding-left: 16px;
+  }
+
+  @media (max-width: 1200px) {
+    padding-left: 16px;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 20px 40px $container-padding;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    padding: 16px $container-padding 32px;
+  }
+}
+
+.hotels-catalog__list {
+  /* Карточки перестраиваются по ширине колонки, а не окна: слева фильтры,
+         справа карта, и места остаётся заметно меньше ширины экрана. */
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.hotels-catalog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.hotels-catalog__counter {
+  margin-right: auto;
+  color: $text-gray;
+  font-size: 15px;
+}
+
+.hotels-catalog__reset {
+  color: $text-gray;
+  font-size: 14px;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+
+  /* На телефоне сброс живёт в самой панели фильтров — там он под рукой. */
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.hotels-catalog__filters-open {
+  display: none;
+
+  @media (max-width: 900px) {
+    display: inline-flex;
+  }
+}
+
+.hotels-catalog__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hotels-catalog__skeleton {
+  height: 168px;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #fff 25%, #ececf0 37%, #fff 63%);
+  background-size: 400% 100%;
+  animation: country-hotels-skeleton 1.4s ease-in-out infinite;
+}
+
+.hotels-catalog__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 32px 24px;
+  border-radius: 20px;
+  background: #fff;
+  color: $text-gray;
+
+  p {
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+.hotels-catalog__more {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  &.is-loading .hotels-catalog__more-btn {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+/* Карта: правая половина экрана во всю высоту, без полей и скруглений. */
+.hotels-catalog__map-side {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  isolation: isolate;
+  z-index: 0;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.hotels-catalog__map-open {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 30;
+  transform: translateX(-50%);
+
+  @media (max-width: 900px) {
+    display: inline-flex;
+  }
+}
+
+.hotels-catalog .country-hotels__map {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Полноэкранная карта на узком экране. */
+
+body.is-hotels-map-open {
+  overflow: hidden;
+
+  .hotels-catalog__map-side {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    height: 100%;
+  }
+
+  .hotels-catalog__map-open {
+    z-index: 110;
+  }
+}
+
+/* Панель фильтров слева вместо меню страны. */
+
+.hotels-filters {
+  @media (min-width: 901px) {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+
+    /* Полосу прокрутки не показываем: она режет узкую колонку фильтров. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  padding: 20px;
+  border-radius: 20px;
+  background: #fff;
+
+  @media (max-width: 900px) {
+    display: none;
+
+    &.is-open {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      padding: 16px;
+      border-radius: 0;
+      overflow-y: auto;
+    }
+  }
+
+  /* Счётчик прижат вправо: подпись слева, число у края — как в референсах. */
+
+  .ui-checkbox__text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+  }
+
+  .ui-checkbox__mark {
+    width: 18px;
+    height: 18px;
+    border-width: 1px;
+    border-color: #c9c9cf;
+    border-radius: 5px;
+
+    &::after {
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+    }
+  }
+
+  /* Выбор одного из списка — кружком, а не квадратом: форма отметки говорит,
+     сколько значений можно выбрать. */
+
+  input[type="radio"]+.ui-checkbox__mark {
+    border-radius: 50%;
+
+    &::after {
+      left: 4px;
+      top: 4px;
+      width: 8px;
+      height: 8px;
+      border: 0;
+      border-radius: 50%;
+      background: #fff;
+      transform: none;
+    }
+  }
+}
+
+.hotels-filters__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hotels-filters__head-title {
+  font-size: 18px;
+}
+
+.hotels-filters__close {
+  display: none;
+  margin-left: auto;
+  padding: 4px;
+  color: $text-gray;
+
+  .hotels-filters.is-open & {
+    display: inline-flex;
+  }
+}
+
+.hotels-filters__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  margin-bottom: 4px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: $bg-gray;
+
+  svg {
+    color: $gray;
+    flex-shrink: 0;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: 15px;
+    color: $text-black;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+/* Группы открыты: прятать по шесть галочек под шторки — лишний клик.
+   Разделяет их отступ, а не линия: линии в панели фильтров дают частокол. */
+.hotels-filters__group {
+  padding: 18px 0 0;
+}
+
+.hotels-filters__group-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Длинный хвост списка — под раскрытие, чтобы панель не уезжала вниз.
+   Триггер стоит под списком и в раскрытом виде остаётся под ним же
+   (`order`), иначе «Ещё курорты» зависает посреди строк. */
+.hotels-filters__more {
+  display: flex;
+  flex-direction: column;
+
+  summary {
+    order: 2;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    color: $text-gray;
+    font-size: 14px;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    /* Шеврон: без него строка «Ещё …» читается как обычная ссылка и
+           непонятно, что список раскроется прямо здесь. */
+
+    &::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      margin-top: -4px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    &:hover {
+      color: $red;
+    }
+  }
+
+  &.is-searching>summary {
+    display: none;
+  }
+
+  &[open]>summary::after {
+    margin-top: 3px;
+    transform: rotate(-135deg);
+  }
+
+  .hotels-filters__more-close,
+
+  &[open] .hotels-filters__more-open {
+    display: none;
+  }
+
+  &[open] .hotels-filters__more-close {
+    display: inline;
+  }
+
+  /* Отступ до списка даёт gap родителя, свой padding его бы удвоил и оставил
+         дыру на месте свёрнутой строки. */
+
+  >.hotels-filters__group-body {
+    order: 1;
+    padding: 0;
+  }
+
+  &[open]>summary {
+    padding-top: 10px;
+  }
+}
+
+.hotels-filters__group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0 2px;
+}
+
+/* Поиск внутри группы: то же поле, что и общий поиск, только ниже. */
+.hotels-filters__find {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin-top: 12px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: $bg-gray;
+
+  svg {
+    flex-shrink: 0;
+    color: $gray;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: $text-black;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.hotels-filters__empty {
+  margin: 0;
+  color: $gray;
+  font-size: 14px;
+}
+
+/* Звёзды набором: пять чипов в две строки вместо пяти строк галочек. */
+.hotels-filters__stars {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding-top: 12px;
+}
+
+.hotels-filters__chip {
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    justify-content: center;
+    /* На телефоне панель разворачивается на весь экран, и чипы становятся
+           основной мишенью пальца — там они выше. */
+    padding: 8px 4px;
+
+    @media (max-width: 900px) {
+      padding: 14px 4px;
+    }
+
+    border-radius: 12px;
+    background: $bg-gray;
+    color: $text-black;
+    font-size: 14px;
+    line-height: 1;
+    transition: $trans-text;
+  }
+
+  svg {
+    color: #f5a623;
+  }
+
+  input:checked+span {
+    background: $red;
+    color: #fff;
+  }
+
+  input:checked+span svg {
+    color: #fff;
+  }
+
+  span:hover {
+    background: darken($bg-gray, 4%);
+  }
+
+  input:checked+span:hover {
+    background: $red-hover;
+  }
+}
+
+.hotels-filters__resort {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  /* Поиск по курортам прячет строки атрибутом hidden, а он слабее display. */
+
+  &[hidden] {
+    display: none;
+  }
+
+  color: $text-black;
+  font-size: 15px;
+  transition: $trans-text;
+
+  i {
+    color: $gray;
+    font-size: 13px;
+    font-style: normal;
+  }
+
+  &:hover {
+    color: $red;
+  }
+
+  &.is-active {
+    color: $red;
+    font-weight: 400;
+  }
+}
+
+.hotels-filters__icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: -3px;
+  margin-right: 4px;
+}
+
+.hotels-filters__count {
+  margin-left: auto;
+  color: $gray;
+  font-size: 13px;
+  font-style: normal;
+}
+
+.hotels-filters__reset {
+  display: none;
+  color: $text-gray;
+  font-size: 14px;
+  transition: $trans-text;
+
+  &:hover {
+    color: $red;
+  }
+
+  @media (max-width: 900px) {
+    display: inline;
+  }
+}
+
+/* ============ Карточка отеля строкой ============ */
+
+.api-row {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 16px;
+  padding: 8px;
+  border-radius: 20px;
+  background: #fff;
+
+  @container (max-width: 560px) {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  @container (max-width: 420px) {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  /* Отель, на метку которого навели на карте. */
+
+  &.is-highlighted {
+    background: $bg-gray-light;
+  }
+}
+
+.api-row__media {
+  position: relative;
+  align-self: stretch;
+  /* Ниже фото не опускается, выше — тянется за телом карточки. */
+  min-height: 148px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: $bg-gray;
+
+  @container (max-width: 420px) {
+    min-height: 120px;
+    border-radius: 12px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  a:hover img {
+    transform: scale(1.04);
+  }
+}
+
+/* Фото у отеля может не быть — тогда в рамке значок, а не строка текста:
+   надпись читается как содержимое карточки, значок сразу виден пустым местом. */
+/* Метка поверх фото: отель, который хаб отметил популярным. */
+.api-row__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: $text-black;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* Метки отеля идут строкой в теле карточки, поверх фото их не кладём. */
+/* Метка рядом с ценой прайса: мест на ближайшие даты нет. */
+.api-row__price-badge {
+  align-self: flex-start;
+}
+
+/* Пока грузится выдача, гасим только карточки: фильтры и карта остаются
+   рабочими. Спиннер общий из scss/ui/preloader.scss. */
+.hotels-catalog__rows.is-loading {
+  min-height: 200px;
+}
+
+.api-row__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+/* Цены отеля обновляются в хабе прямо сейчас. */
+.api-row__price-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  font-size: 14px;
+}
+
+.api-row__price-spinner {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid $gray-light;
+  border-top-color: $red;
+  border-radius: 50%;
+  animation: loader-spin 0.6s linear infinite;
+}
+
+.api-row__media-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #c4c4cc;
+}
+
+.api-row__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Не flex: во flex длинное название переносится целиком следующей строкой и
+   утаскивает за собой звёздность. Обычная строка держит «5 ★» в её начале, а
+   название обтекает дальше. */
+.api-row__title {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+
+  a {
+    color: $text-black;
+  }
+}
+
+/* Верхняя строка: звёздность у левого края, место — у правого. */
+.api-row__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 5px;
+  min-height: 16px;
+}
+
+/* Пять иконок всегда: свои закрашены, остальные серые — «3 из 5» читается
+   без цифры. */
+.api-row__stars {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.api-row__star {
+  color: #dcdce2;
+}
+
+.api-row__star.is-on {
+  color: #f5a623;
+}
+
+.api-row__place {
+  margin: 0;
+  text-align: right;
+  color: $gray;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.api-row__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.api-row__fact {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: $bg-gray;
+  font-size: 13px;
+  color: $text-gray;
+}
+
+/* Удобства без плашки: иконка ведёт строку, подпись рядом. Плашка у каждого
+   удобства превращала строку в пёстрый забор. */
+/* Удобство — одна иконка; что это, подсказывает title при наведении. */
+.api-row__amenity {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  color: $text-gray;
+  cursor: help;
+
+  img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    opacity: 0.6;
+    transition: $trans-text;
+  }
+
+  &:hover img {
+    opacity: 1;
+  }
+}
+
+.api-row__amenity--more {
+  color: $gray;
+}
+
+/* Цена и кнопка внизу карточки: в узкой колонке справа им места нет. */
+.api-row__footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 14px;
+
+  @container (max-width: 420px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.api-row__price-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.15;
+}
+
+.api-row__price-label {
+  color: $gray;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.api-row__price {
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.api-row__price-empty {
+  color: $text-gray;
+  font-size: 14px;
+}
+
+/* Кнопка в карточке мельче общей `sm`: в списке её жмут после выбора отеля,
+   и крупный красный блок перевешивал название и цену. */
+.api-row__cta {
+  padding: 9px 16px;
+  font-size: 14px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* Список отелей, стоящих в одной точке: увеличение такую группу не разбивает. */
+
+.hotels-map__popup {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  width: 280px;
+  max-height: 60%;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+
+  &-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    color: $gray;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  &-title {
+    margin: 0 0 10px;
+    padding-right: 20px;
+    color: $text-gray;
+    font-size: 13px;
+  }
+
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+  }
+
+  &-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: $text-black;
+    font-size: 14px;
+    transition: $trans-text;
+
+    span {
+      color: $text-gray;
+      font-size: 13px;
+    }
+
+    &:hover {
+      color: $red;
+    }
   }
 }

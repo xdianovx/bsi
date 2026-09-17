@@ -333,6 +333,7 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'region_in_path';
 
   $vars[] = 'country_hotels';
+  $vars[] = 'country_hotel_resort';
   $vars[] = 'country_promos';
   $vars[] = 'country_resorts';
 
@@ -375,6 +376,14 @@ add_filter('redirect_canonical', function ($redirect_url) {
 });
 
 add_action('init', function () {
+
+  // Каталог отелей по курорту: /hotel/kurort/{курорт}/ — свой адрес вместо
+  // параметра, чтобы запросы вида «отели Стамбула» имели индексируемую страницу.
+  add_rewrite_rule(
+    '^country/([^/]+)/hotel/kurort/([^/]+)/?$',
+    'index.php?post_type=country&name=$matches[1]&country_hotels=$matches[1]&country_hotel_resort=$matches[2]',
+    'top'
+  );
 
   add_rewrite_rule(
     '^country/([^/]+)/hotel/?$',

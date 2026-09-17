@@ -333,6 +333,53 @@ get_header(); ?>
             </section>
           <?php endif; ?>
 
+          <!-- Отели -->
+          <?php
+          /* Курорт связан с хабом BSIHOTELS — отели берём оттуда.
+             Связь задаётся полем «Курорт в хабе отелей» у термина. */
+          $resort_api_hotels = function_exists('bsi_hotels_api_resort_hotels')
+            ? bsi_hotels_api_resort_hotels((int) $term->term_id)
+            : null;
+          ?>
+
+          <?php if ($resort_api_hotels && $resort_api_hotels['items']): ?>
+            <section class="resort-hotels resort-hotels--api">
+              <h2 class="h2">Отели: <?= esc_html($term->name); ?></h2>
+
+              <div class="country-hotels__counter">
+                Нашли отелей: <?= (int) $resort_api_hotels['total']; ?>
+              </div>
+
+              <div class="country-hotels__grid">
+                <?php foreach ($resort_api_hotels['items'] as $api_hotel): ?>
+                  <?php get_template_part('template-parts/hotels/api-card', null, [
+                    'hotel' => $api_hotel,
+                    'country_url' => $resort_api_hotels['catalog_url'],
+                  ]); ?>
+                <?php endforeach; ?>
+              </div>
+
+              <?php if ($resort_api_hotels['total'] > count($resort_api_hotels['items'])): ?>
+                <p class="resort-hotels__all">
+                  <a href="<?= esc_url($resort_api_hotels['resort_url']); ?>">
+                    Все отели курорта: <?= (int) $resort_api_hotels['total']; ?>
+                  </a>
+                </p>
+              <?php endif; ?>
+            </section>
+
+          <?php else: ?>
+            <section class="resort-hotels"
+                     data-term-id="<?= (int) $term->term_id; ?>">
+              <h2 class="h2">Все отели </h2>
+              <div class="resort-hotels__list"></div>
+
+              <button class="resort-hotels__more"
+                      type="button">
+                Показать еще
+              </button>
+            </section>
+          <?php endif; ?>
         </div>
 
       </div>

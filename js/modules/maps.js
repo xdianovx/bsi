@@ -53,6 +53,7 @@ export const initMaps = async () => {
   const mapInstances = [];
 
   let YMapDefaultMarker;
+  let YMapZoomControl;
   try {
     if (typeof ymaps3.import.registerCdn === "function") {
       ymaps3.import.registerCdn(
@@ -62,6 +63,7 @@ export const initMaps = async () => {
     }
     const defaultUiTheme = await ymaps3.import("@yandex/ymaps3-default-ui-theme");
     YMapDefaultMarker = defaultUiTheme.YMapDefaultMarker;
+    YMapZoomControl = defaultUiTheme.YMapZoomControl;
   } catch (e) {
     console.warn("YMapDefaultMarker (pin) not loaded", e);
   }
@@ -98,6 +100,13 @@ export const initMaps = async () => {
 
       map.addChild(new YMapDefaultSchemeLayer());
       map.addChild(new YMapDefaultFeaturesLayer());
+
+      // Кнопки «плюс/минус»: без них карту можно только тащить.
+      if (YMapZoomControl && ymaps3.YMapControls) {
+        map.addChild(
+          new ymaps3.YMapControls({ position: "right" }).addChild(new YMapZoomControl({}))
+        );
+      }
 
       if (markerIconUrl) {
         const marker = createCustomMarker(markerIconUrl, lng, lat);

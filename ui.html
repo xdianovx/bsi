@@ -1911,6 +1911,241 @@ get_template_part('template-parts/hotels/room-card');
     </div>
   </section>
 
+  <section class="uikit-section" id="hotels-api">
+    <h2>Каталог отелей из хаба BSIHOTELS</h2>
+    <p class="uikit-note">
+      Карточка списка — <code>template-parts/hotels/api-card.php</code>, стили в
+      <code>scss/page/country-hotels.scss</code>. Фото у большинства отелей хаба пока нет,
+      поэтому у карточки есть состояние без изображения.
+    </p>
+
+    <h3>Фильтр курортов</h3>
+    <nav class="country-resorts-filter">
+      <a class="country-resorts-filter__item is-active" href="#">Все курорты</a>
+      <a class="country-resorts-filter__item" href="#">Стамбул <span class="country-resorts-filter__count">614</span></a>
+      <a class="country-resorts-filter__item" href="#">Каппадокия <span class="country-resorts-filter__count">78</span></a>
+      <details class="country-resorts-filter__more">
+        <summary class="country-resorts-filter__item">Ещё курорты (43)</summary>
+        <div class="country-resorts-filter__tail">
+          <a class="country-resorts-filter__item" href="#">Белек <span class="country-resorts-filter__count">54</span></a>
+        </div>
+      </details>
+    </nav>
+
+    <h3>Карточки</h3>
+    <div class="country-hotels__grid">
+      <article class="api-hotel">
+        <div class="api-hotel__media">
+          <a href="#" class="api-hotel__media-link">
+            <img src="https://picsum.photos/seed/hotel-ui/800/600" alt="Отель">
+          </a>
+        </div>
+        <div class="api-hotel__body">
+          <h3 class="api-hotel__title">
+            <a href="#">Отель с фотографией</a>
+            <span class="hotel-rating api-hotel__stars">5*</span>
+          </h3>
+          <p class="api-hotel__city">Стамбул</p>
+          <div class="api-hotel__footer">
+            <span class="api-hotel__price">от 262 € за ночь</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="api-hotel">
+        <div class="api-hotel__media">
+          <div class="api-hotel__media-empty">Фото скоро появится</div>
+        </div>
+        <div class="api-hotel__body">
+          <h3 class="api-hotel__title">
+            <a href="#">Отель без фотографии</a>
+            <span class="hotel-rating api-hotel__stars">4*</span>
+          </h3>
+          <p class="api-hotel__city">Анталья</p>
+          <div class="api-hotel__footer">
+            <span class="api-hotel__price api-hotel__price--empty">Цену уточним по запросу</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+  </section>
+
+  <!-- ============ CATALOG MAP PIN ============ -->
+  <section class="uikit-section" id="hotels-map-pin">
+    <h2>Метка отеля на карте каталога (hotels-map__pin)</h2>
+    <p class="uikit-section__hint">Ставится на карту Яндекса в <code>js/modules/hotels-map.js</code>; карточка раскрывается по наведению. Данные — координаты из карточек списка хаба.</p>
+
+    <div style="position:relative;height:120px;background:var(--uikit-muted-bg,#f4f4f6);border-radius:12px">
+      <a class="hotels-map__pin" href="#" style="position:absolute;top:70px;left:80px">
+        <span class="hotels-map__pin-dot"></span>
+        <span class="hotels-map__pin-card" style="display:flex">
+          <b>Adagio Doha 4*</b>
+          <span>Аль Мунтаза</span>
+          <span class="hotels-map__pin-price">от 94 $ за ночь</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ HOTEL PAGE (hp-*) ============ -->
+  <section class="uikit-section" id="hotel-page">
+    <h2>Страница отеля (hp-*)</h2>
+    <p class="uikit-section__hint">
+      Общая вёрстка страницы отеля для двух источников: пост WordPress (<code>single-hotel.php</code>) и карточка хаба
+      BSIHOTELS (<code>country-hotel-api.php</code>). Оба шаблона собирают view-модель
+      (<code>inc/hotel-page/view.php</code>) и отдают её партиалам <code>template-parts/hotel-page/*</code>.
+      Стили — <code>scss/page/hotel-page.scss</code>, поведение — <code>js/modules/hotel-offers.js</code>.
+      Секции, для которых нет данных, не выводятся: страница честно сжимается до «шапка + номера».
+    </p>
+
+    <h3>Панель подбора тарифов (hp-search)</h3>
+    <form class="hp-search">
+      <label class="hp-search__field">
+        <span class="hp-search__label">Заезд</span>
+        <select class="hp-search__select">
+          <option>12 сентября, сб</option>
+        </select>
+      </label>
+      <label class="hp-search__field">
+        <span class="hp-search__label">Длительность</span>
+        <select class="hp-search__select">
+          <option>7 ночей</option>
+        </select>
+      </label>
+      <label class="hp-search__field">
+        <span class="hp-search__label">Питание</span>
+        <select class="hp-search__select">
+          <option>Любое</option>
+        </select>
+      </label>
+      <p class="hp-search__note">Найдено тарифов: 25</p>
+    </form>
+
+    <h3>Номер с тарифами (hp-room + hp-offer)</h3>
+    <div class="hp-rooms__list">
+      <article class="hp-room">
+        <div class="hp-room__info">
+          <span class="hp-room__photo hp-room__photo--empty">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11h20v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="M6 11V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </span>
+          <div class="hp-room__text">
+            <h3 class="hp-room__title">Overwater Villa</h3>
+            <ul class="hp-room__meta">
+              <li>120 м²</li>
+              <li>до 3 гостей</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="hp-room__offers">
+          <div class="hp-offer">
+            <div class="hp-offer__terms">
+              <span class="hp-offer__meal">Завтрак и ужин</span>
+              <span class="hp-offer__placement">2 взрослых</span>
+              <span class="hp-offer__badge">под запрос</span>
+            </div>
+            <div class="hp-offer__price">
+              <b>1 515 $</b>
+              <span>3 ночи</span>
+            </div>
+            <a class="btn btn-accent sm hp-offer__cta" href="#">Забронировать</a>
+          </div>
+
+          <div class="hp-offer">
+            <div class="hp-offer__terms">
+              <span class="hp-offer__meal">Всё включено</span>
+              <span class="hp-offer__placement">2 взрослых</span>
+            </div>
+            <div class="hp-offer__price">
+              <b>2 267 $</b>
+              <span>3 ночи</span>
+            </div>
+            <a class="btn btn-white sm hp-offer__cta" href="#">Оставить заявку</a>
+          </div>
+
+          <button class="btn-expand hp-room__more" type="button">Ещё 9 тарифов</button>
+        </div>
+      </article>
+
+      <article class="hp-room is-empty">
+        <div class="hp-room__info">
+          <div class="hp-room__text">
+            <h3 class="hp-room__title">Beach Villa</h3>
+            <ul class="hp-room__meta">
+              <li>до 2 гостей</li>
+            </ul>
+          </div>
+        </div>
+        <div class="hp-room__offers">
+          <p class="hp-room__empty">На выбранные даты мест нет</p>
+        </div>
+      </article>
+    </div>
+
+    <h3>Липкая навигация по секциям (hp-nav)</h3>
+    <nav class="hp-nav" style="position:static">
+      <ul class="hp-nav__list">
+        <li><a class="hp-nav__link is-active" href="#hotel-page">Номера и цены</a></li>
+        <li><a class="hp-nav__link" href="#hotel-page">Об отеле</a></li>
+        <li><a class="hp-nav__link" href="#hotel-page">Удобства</a></li>
+        <li><a class="hp-nav__link" href="#hotel-page">На карте</a></li>
+      </ul>
+    </nav>
+
+    <h3>Теги удобств в шапке (hp-tag)</h3>
+    <p class="uikit-section__hint">Первыми идут популярные удобства (флаг <code>is_popular</code> из хаба), иконка — SVG оттуда же.</p>
+    <ul class="hp-head__tags">
+      <li class="hp-tag">Собственный пляж</li>
+      <li class="hp-tag">Бассейн</li>
+      <li class="hp-tag hp-tag--more"><a href="#hotel-page">Ещё 6</a></li>
+    </ul>
+
+    <h3>Удобства по группам (hp-amenities)</h3>
+    <div class="hp-amenities__groups">
+      <div class="hp-amenities__group">
+        <h3 class="hp-amenities__group-title">Пляж и бассейн</h3>
+        <ul class="hp-amenities__list">
+          <li class="hp-amenities__item">Собственный пляж</li>
+          <li class="hp-amenities__item">Бассейн</li>
+        </ul>
+      </div>
+      <div class="hp-amenities__group">
+        <h3 class="hp-amenities__group-title">Для детей</h3>
+        <ul class="hp-amenities__list">
+          <li class="hp-amenities__item">Детский клуб</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Подтверждение брони и спецпредложения (.hp-badge)</h3>
+    <p class="uikit-note">
+      Хаб отдаёт по каждой ночи <code>confirmation</code>: <code>instant</code> — оператор
+      подтверждает сразу, <code>request</code> — сначала спрашивает отель. Отмечаем только
+      первое: под запрос продаётся большинство ночей, и метка на каждом втором номере
+      ничего не различает. Плашки рисуются у названия номера, в шапке отеля и в списке
+      спецпредложений; заливки нет — карточка номера не должна рябить. Метки «Мало мест» нет намеренно: оператор
+      сообщает наличие буквами, без количества, и подтвердить такую надпись нечем.
+    </p>
+    <p style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 24px">
+      <span class="hp-badge hp-badge--instant">Мгновенное подтверждение</span>
+      <span class="hp-badge hp-badge--deal">Раннее бронирование</span>
+      <span class="hp-badge hp-badge--until">цена действует до 30 сентября 2026</span>
+    </p>
+
+    <h3>Факты (hp-facts)</h3>
+    <ul class="hp-facts__list">
+      <li class="hp-facts__item">
+        <span class="hp-facts__label">До пляжа</span>
+        <b class="hp-facts__value">50 м</b>
+      </li>
+      <li class="hp-facts__item">
+        <span class="hp-facts__label">Заезд</span>
+        <b class="hp-facts__value">14:00</b>
+      </li>
+    </ul>
+  </section>
+
   <section class="uikit-section" id="resort-page" style="background:#f7f7f7;padding:24px;border-radius:12px">
     <h2>Страница курорта (resort-*)</h2>
     <p style="color:var(--uikit-muted);font-size:13px;margin:0 0 16px">

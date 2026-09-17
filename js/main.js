@@ -14,6 +14,9 @@ import { initNewsFilter } from "./modules/ajax/news-sort";
 import { promoPageAjax } from "./modules/ajax/promo-sort";
 import { burger, mobileNavAccordion } from "./modules/burger";
 import { initResortHotelsAjax } from "./modules/ajax/resort-hotels";
+import { initHotelsApiCatalog } from "./modules/ajax/hotels-api-catalog";
+import { initHotelsPrices } from "./modules/ajax/hotels-prices";
+import { initHotelsMap } from "./modules/hotels-map";
 import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initEventToursFilters } from "./modules/ajax/event-tours";
@@ -44,6 +47,12 @@ import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
 import { initMaps } from "./modules/maps";
+import {
+  initHotelOffers,
+  initHotelNav,
+  initHotelAmenities,
+} from "./modules/hotel-offers";
+import { initHotelRequestForm } from "./modules/forms/hotel-request-form";
 import { initSightsMap } from "./modules/sights-map";
 import { initSightsFilters } from "./modules/sights-filters";
 import { EducationCurrencySwitcher } from "./modules/education-currency-switcher";
@@ -117,6 +126,13 @@ window.addEventListener("DOMContentLoaded", () => {
   if (datepick) {
   }
   initAccordion();
+  initHotelOffers();
+  initHotelNav();
+  initHotelAmenities();
+  initHotelRequestForm();
+  initHotelsApiCatalog();
+  initHotelsPrices();
+  window.addEventListener("load", () => initHotelsMap());
   initCurrency();
   tabs(".tabs", ".tab-button", ".tab-content__item");
   sliders();

@@ -432,6 +432,8 @@ require get_template_directory() . '/inc/admin/webp-convert.php';
    Подробности — wiki/raw/samotour.md, раздел «Детализация счёта».
 require get_template_directory() . '/inc/admin/invoice-detail.php'; */
 require get_template_directory() . '/inc/disable-slug-redirects.php';
+require get_template_directory() . '/inc/hotel-page/view.php';
+require get_template_directory() . '/inc/hotels-api/functions.php';
 require get_template_directory() . '/inc/admin-menu-setup.php';
 require get_template_directory() . '/inc/disable-comments.php';
 require get_template_directory() . '/inc/admin-tour-prices-cache.php';
@@ -477,6 +479,9 @@ require_once get_template_directory() . '/inc/samo/SamoService.php';
 require_once get_template_directory() . '/inc/samo/ajax/routes.php';
 
 require get_template_directory() . '/custom-fields/hotel-fields.php';
+require get_template_directory() . '/custom-fields/country-hotels-api.php';
+require get_template_directory() . '/custom-fields/hotels-api-selection.php';
+require get_template_directory() . '/custom-fields/resort-hotels-api.php';
 require get_template_directory() . '/custom-fields/news.php';
 require get_template_directory() . '/custom-fields/promo.php';
 require get_template_directory() . '/custom-fields/content-schedule.php';
@@ -531,6 +536,11 @@ require get_template_directory() . '/inc/requests/ajax-excursion-booking.php';
 require get_template_directory() . '/inc/requests/ajax-sight-request.php';
 require get_template_directory() . '/inc/requests/ajax-resort-request.php';
 require get_template_directory() . '/inc/requests/ajax-tour-booking.php';
+require get_template_directory() . '/inc/requests/ajax-hotel-request.php';
+require get_template_directory() . '/inc/requests/ajax-hotels-api-catalog.php';
+require get_template_directory() . '/inc/requests/ajax-hotels-api-quote.php';
+require get_template_directory() . '/inc/requests/ajax-hotels-api-prices.php';
+require get_template_directory() . '/inc/requests/ajax-hotels-api-search.php';
 
 // Убедиться что page-tours.php загружается для страницы туров
 add_filter('template_include', function ($template) {
