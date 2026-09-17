@@ -199,10 +199,8 @@ if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
     $d = (string) $row['date_value'];
     $d_end = isset($row['date_value_end']) ? trim((string) $row['date_value_end']) : '';
     $city = isset($row['date_city']) ? trim((string) $row['date_city']) : '';
+    // Площадка строки не наследует общую площадку поста: пусто — значит не показываем.
     $venue_row = isset($row['date_venue']) ? trim((string) $row['date_venue']) : '';
-    if ($venue_row === '') {
-      $venue_row = $event_venue;
-    }
 
     $currency = isset($row['date_row_price_currency']) ? strtoupper(trim((string) $row['date_row_price_currency'])) : 'RUB';
     if ($currency === '') {
@@ -471,7 +469,7 @@ get_header();
                 <?php foreach ($dates_section_rows as $br): ?>
                   <?php
                   $row_city = $br['city'] !== '' ? $br['city'] : '—';
-                  $row_venue = $br['venue'] !== '' ? $br['venue'] : '—';
+                  $row_venue = $br['venue'];
                   $row_date_label = bsi_format_event_date_range($br['date'], $br['date_end'] ?? '');
                   $row_price_rub = isset($br['price_rub']) ? $br['price_rub'] : null;
                   $row_orig = isset($br['price_original']) ? $br['price_original'] : null;
@@ -484,8 +482,10 @@ get_header();
                         <span class="single-event__dates-meta-txt numfont"><?= esc_html($row_date_label); ?></span>
                         <span class="single-event__dates-sep" aria-hidden="true"></span>
                         <span class="single-event__dates-meta-txt"><?= esc_html($row_city); ?></span>
-                        <span class="single-event__dates-sep" aria-hidden="true"></span>
-                        <span class="single-event__dates-meta-txt"><?= esc_html($row_venue); ?></span>
+                        <?php if ($row_venue !== ''): ?>
+                          <span class="single-event__dates-sep" aria-hidden="true"></span>
+                          <span class="single-event__dates-meta-txt"><?= esc_html($row_venue); ?></span>
+                        <?php endif; ?>
                       </div>
                     </div>
                     <div class="single-event__dates-row-right">
