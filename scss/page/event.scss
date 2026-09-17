@@ -1248,27 +1248,24 @@
   -webkit-box-orient: vertical;
 }
 
+/* Гео и даты — две строки: при переносе в одну строку точка-разделитель повисала в начале */
 .single-event__booking-widget-meta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 4px 8px;
+  flex-direction: column;
+  gap: 6px;
 }
 
+/* Без иконки: текст дат выровнен по тексту страны (флаг 20px + отступ 8px) */
 .single-event__booking-widget-date {
-  margin-top: 2px;
+  padding-left: 28px;
   font-size: 16px;
   line-height: 120%;
   color: $text-gray;
 
   @media (max-width: 768px) {
+    padding-left: 26px;
     font-size: 14px;
   }
-}
-
-.single-event__booking-widget-date::before {
-  content: "·";
-  margin-right: 8px;
 }
 
 /* Телефоны */
