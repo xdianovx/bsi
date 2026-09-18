@@ -21,6 +21,10 @@ const BSI_HOTELS_SITEMAP_YOAST = 'oteli';
  * плагин выключен: имя со словом sitemap Yoast перехватывает сам.
  */
 add_action('init', function (): void {
+  if (!bsi_hotels_api_is_enabled()) {
+    return;
+  }
+
   global $wpseo_sitemaps;
 
   if ($wpseo_sitemaps instanceof WPSEO_Sitemaps) {
@@ -73,6 +77,12 @@ function bsi_hotels_api_render_yoast_sitemap(): void
  */
 function bsi_hotels_api_sitemap_cached(): array
 {
+  /* Интеграция выключена — страницы хаба отдают 404, и в карте им не место.
+     Проверка стоит до кеша: иначе карта ещё полсуток водила бы на 404. */
+  if (!bsi_hotels_api_is_enabled()) {
+    return [];
+  }
+
   $urls = get_transient('bsi_hotels_sitemap_urls');
 
   if (!is_array($urls)) {
