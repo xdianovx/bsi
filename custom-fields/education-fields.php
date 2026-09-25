@@ -270,6 +270,7 @@ function bsi_register_education_acf_groups(): void
               'USD' => 'USD',
               'EUR' => 'EUR',
               'GBP' => 'GBP',
+              'CHF' => 'CHF',
               'RUB' => 'RUB',
             ],
             'default_value' => 'USD',

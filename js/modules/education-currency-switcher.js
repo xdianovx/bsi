@@ -10,12 +10,13 @@ export const EducationCurrencySwitcher = (() => {
     USD: "$",
     EUR: "€",
     GBP: "£",
+    CHF: "Fr",
   };
 
   /**
    * Format price based on currency
    * @param {number} value - Price value
-   * @param {string} currency - Currency code (RUB, USD, EUR, GBP)
+   * @param {string} currency - Currency code (RUB, USD, EUR, GBP, CHF)
    * @returns {string} Formatted price
    */
   const formatPrice = (value, currency) => {
