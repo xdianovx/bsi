@@ -112,7 +112,7 @@ add_action('acf/init', function () {
       'label' => 'SEO: заголовок вкладки',
       'name' => $key . '_seo_title',
       'type' => 'text',
-      'instructions' => 'Тег <title>. Пусто — соберётся из названия раздела и количества записей.',
+      'instructions' => 'Тег &lt;title&gt;. Пусто — соберётся из названия раздела и количества записей.',
     ];
 
     $section_fields[] = [

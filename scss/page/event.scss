@@ -489,9 +489,9 @@
 
 .event-card__label-tag {
   padding: 4px 8px;
-  border-radius: $radius-sm;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.92);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 120%;
   color: $text-black;
 }
@@ -2627,8 +2627,8 @@ body.page-template-page-sobytiynye-tury .event-card {
 
 /* Плашки внутри плитки отступают от края фото: у карточки свой padding 8px. */
 body.page-template-page-sobytiynye-tury .event-card__label {
-  top: 14px;
-  left: 14px;
+  top: 8px;
+  left: 8px;
   right: 14px;
 }
 
