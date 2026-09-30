@@ -795,7 +795,7 @@ get_header();
                           <?php if ($leg_date !== ''): ?>
                             <span class="single-event__venue-legend-date numfont"><?= esc_html($leg_date); ?></span>
                           <?php endif; ?>
-                          <?= esc_html($lab); ?>
+                          <?= wp_kses($lab, ['br' => []]); ?>
                         </span>
                         <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
                         <?php if ($leg_price_rub !== null): ?>
