@@ -53,8 +53,18 @@ function bsi_handle_event_ticket_booking(): void
     : 'Заявка по событию: ';
   $subject_suffix = $accommodation !== '' ? ' / ' . $accommodation : '';
 
+  // Доп. получатель из поля события (event_notify_email) — дублируем письмо, основные адреса не трогаем.
+  $recipient_email = $event_ticket_booking_email;
+  $event_id = (int) ($_POST['event_id'] ?? 0);
+  if ($event_id && get_post_type($event_id) === 'event' && function_exists('get_field')) {
+    $extra_email = sanitize_email(trim((string) get_field('event_notify_email', $event_id)));
+    if (is_email($extra_email)) {
+      $recipient_email .= ', ' . $extra_email;
+    }
+  }
+
   $result = BSI_Mailer::send([
-    'to' => $event_ticket_booking_email,
+    'to' => $recipient_email,
     'subject' => $subject_lead . ($event_title !== '' ? $event_title : 'с сайта') . $subject_suffix,
     'template' => 'event-ticket-booking',
     'data' => [

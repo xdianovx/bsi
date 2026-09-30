@@ -271,6 +271,15 @@ add_action('acf/init', function () {
         'instructions' => 'Второй номер в том же блоке. Пусто — 8 (800) 200-55-35 (из регионов).',
       ],
       [
+        'key' => 'field_event_notify_email',
+        'label' => 'Доп. email для заявок',
+        'name' => 'event_notify_email',
+        'type' => 'email',
+        'placeholder' => 'email@example.com',
+        'wrapper' => ['width' => '50'],
+        'instructions' => 'Если заполнено — копия заявки с этого события уходит и на этот адрес. Основные получатели не меняются.',
+      ],
+      [
         'key' => 'field_event_venue_scheme_type',
         'label' => 'Тип схемы',
         'name' => 'venue_scheme_type',

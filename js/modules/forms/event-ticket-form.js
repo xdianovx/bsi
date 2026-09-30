@@ -28,9 +28,7 @@ function buildTicketData(btn) {
   const d = btn.dataset;
   const accName = (d.accommodationName || "").trim();
   const stars = (d.accommodationStars || "").trim();
-  const accommodation = accName
-    ? accName + (stars ? ` ${stars}*` : "")
-    : "";
+  const accommodation = accName ? accName + (stars ? ` ${stars}*` : "") : "";
 
   let price = "";
   const rub = parseInt(String(d.minPrice || "").replace(/\D/g, ""), 10);
@@ -96,15 +94,13 @@ function populateModal(ticketData) {
   const detailsEl = modalRoot.querySelector(".js-form-details");
   if (detailsEl) {
     if (rows.length) {
-      const esc = (s) =>
-        String(s).replace(
-          /[&<>"']/g,
-          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
-        );
+      const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
       detailsEl.innerHTML = rows
         .map(
           ([k, v]) =>
-            `<li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">${esc(k)}:</span> ${esc(v)}</li>`,
+            `<li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">${esc(k)}:</span> ${esc(
+              v
+            )}</li>`
         )
         .join("");
       detailsEl.hidden = false;
@@ -121,10 +117,7 @@ function populateModal(ticketData) {
   setVal(".js-form-event-venue", ticketData.venue);
   setVal(".js-form-event-time", ticketData.time);
   setVal(".js-form-event-price", ticketData.price);
-  setVal(
-    ".js-form-event-details",
-    rows.map(([k, v]) => `${k}: ${v}`).join("; "),
-  );
+  setVal(".js-form-event-details", rows.map(([k, v]) => `${k}: ${v}`).join("; "));
 }
 
 function reachEventTourBookingGoal(params, goal) {
@@ -149,8 +142,7 @@ function resetModalForm() {
 function showFieldError(fieldName, message, form) {
   if (!form) return;
   const errorEl = form.querySelector(`.js-field-error[data-error-for="${fieldName}"]`);
-  const input =
-    form.querySelector(`[data-field="${fieldName}"]`) || form.querySelector(`[name="${fieldName}"]`);
+  const input = form.querySelector(`[data-field="${fieldName}"]`) || form.querySelector(`[name="${fieldName}"]`);
 
   if (errorEl) {
     errorEl.textContent = message;
@@ -290,48 +282,49 @@ async function submitForm(e) {
 
   try {
     const formData = new FormData(form);
+    if (form.dataset.eventId) {
+      formData.set("event_id", form.dataset.eventId);
+    }
 
     const result = await submitFormWithRecaptcha(formData, {
       debug: false,
     });
 
     if (result.success) {
-      const accommodationParam = (form.dataset.accommodation
-        || (form.querySelector('.js-form-accommodation')?.value || '')).trim();
-      reachEventTourBookingGoal(
-        accommodationParam ? { accommodation: accommodationParam } : null,
-        form.dataset.ymGoal,
-      );
+      const accommodationParam = (form.dataset.accommodation || form.querySelector(".js-form-accommodation")?.value || "").trim();
+      reachEventTourBookingGoal(accommodationParam ? { accommodation: accommodationParam } : null, form.dataset.ymGoal);
 
       if (!isMinimal) {
         MicroModal.close("modal-event-ticket-booking");
       }
 
-      setTimeout(() => {
-        MicroModal.show("modal-event-booking-success", {
-          awaitCloseAnimation: true,
-          onClose: () => {
-            if (isMinimal) {
-              form.reset();
-              clearErrors(form);
-            } else {
-              resetModalForm();
-            }
-          },
-        });
+      setTimeout(
+        () => {
+          MicroModal.show("modal-event-booking-success", {
+            awaitCloseAnimation: true,
+            onClose: () => {
+              if (isMinimal) {
+                form.reset();
+                clearErrors(form);
+              } else {
+                resetModalForm();
+              }
+            },
+          });
 
-        setTimeout(() => {
-          MicroModal.close("modal-event-booking-success");
-        }, 2000);
-      }, isMinimal ? 0 : 300);
+          setTimeout(() => {
+            MicroModal.close("modal-event-booking-success");
+          }, 2000);
+        },
+        isMinimal ? 0 : 300
+      );
     } else {
       if (result.data && result.data.errors) {
         Object.entries(result.data.errors).forEach(([field, message]) => {
           showFieldError(field, message, form);
         });
       }
-      const errMsg =
-        result.data?.errors?.recaptcha || result.data?.message || "Произошла ошибка при отправке";
+      const errMsg = result.data?.errors?.recaptcha || result.data?.message || "Произошла ошибка при отправке";
       alert(errMsg);
     }
   } catch (error) {
