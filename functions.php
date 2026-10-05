@@ -464,6 +464,7 @@ require get_template_directory() . '/inc/post-types/insurance.php';
 require get_template_directory() . '/inc/post-types/vacancy.php';
 require get_template_directory() . '/inc/helpers/vacancy.php';
 require get_template_directory() . '/inc/helpers/country-cases.php';
+require get_template_directory() . '/inc/helpers/country-transfers.php';
 require get_template_directory() . '/inc/helpers/event-price.php';
 require get_template_directory() . '/inc/helpers/crosstour.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
@@ -480,6 +481,7 @@ require_once get_template_directory() . '/inc/samo/ajax/routes.php';
 
 require get_template_directory() . '/custom-fields/hotel-fields.php';
 require get_template_directory() . '/custom-fields/country-hotels-api.php';
+require get_template_directory() . '/custom-fields/country-transfers.php';
 require get_template_directory() . '/custom-fields/hotels-api-selection.php';
 require get_template_directory() . '/custom-fields/resort-hotels-api.php';
 require get_template_directory() . '/custom-fields/news.php';

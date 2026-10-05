@@ -45,6 +45,7 @@ function bsi_seo_virtual_sections(): array
         'country_sights'      => ['label' => 'Достопримечательности', 'slug' => 'dostoprimechatelnosti'],
         'country_events'      => ['label' => 'Событийные туры', 'slug' => 'sobytiynye-tury'],
         'country_deposits'    => ['label' => 'Депозиты в отелях', 'slug' => 'depozity'],
+        'country_transfers'   => ['label' => 'Трансферы',       'slug' => 'transfery'],
     ];
 }
 
@@ -177,6 +178,7 @@ function bsi_seo_virtual_description(?array $vp): string
         'country_excursions'  => "Экскурсии {$v} {$acc}: программы, расписание, цены и продолжительность. Индивидуальные и групповые — бронирование от туроператора BSI Group.",
         'country_events'      => "Событийные туры {$v} {$acc}: поездки на концерты, спортивные матчи и фестивали. Билеты, отель и трансферы под ключ от туроператора BSI Group.",
         'country_deposits'    => "Депозиты в отелях: {$n}. Размер залога при заселении, способы оплаты и порядок возврата. Полезная информация для туристов от BSI Group.",
+        'country_transfers'   => "Трансферы: {$n}. Встреча в аэропорту, трансфер до отеля и обратно, индивидуальные и групповые поездки. Бронирование от туроператора BSI Group.",
     ];
 
     return $map[$vp['qv']] ?? '';
@@ -914,6 +916,12 @@ function bsi_seo_country_is_top_level(WP_Post $country): bool
  */
 function bsi_seo_country_section_exists(int $country_id, string $qv): bool
 {
+    // Страница трансферов есть только в режиме «Страница на сайте».
+    if ($qv === 'country_transfers') {
+        return function_exists('bsi_country_transfers_mode')
+            && bsi_country_transfers_mode($country_id) === 'page';
+    }
+
     $linked = [
         'country_visa'        => ['visa', 'visa_country'],
         'country_memo'        => ['tourist_memo', 'memo_country'],

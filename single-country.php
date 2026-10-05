@@ -105,6 +105,21 @@ if ($country_deposits_slug) {
   exit;
 }
 
+$country_transfers_slug = get_query_var('country_transfers');
+
+if ($country_transfers_slug) {
+  $country = get_page_by_path($country_transfers_slug, OBJECT, 'country');
+
+  global $country_transfers_data;
+  $country_transfers_data = [
+    'country' => $country,
+    'country_slug' => $country_transfers_slug,
+  ];
+
+  get_template_part('country-transfers');
+  exit;
+}
+
 
 
 /* Контекст страны */

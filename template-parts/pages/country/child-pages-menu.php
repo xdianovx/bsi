@@ -20,6 +20,7 @@ $is_sights_page = false;
 $is_events_page = false;
 $is_hotels_info_page = false;
 $is_deposits_page = false;
+$is_transfers_page = false;
 
 $country_slug = '';
 $country_title = '';
@@ -295,6 +296,15 @@ if (is_singular('tour')) {
   $country_title = $country ? (string) $country->post_title : (string) get_the_title();
   $is_deposits_page = true;
 
+} elseif (get_query_var('country_transfers')) {
+
+  $country_slug = (string) get_query_var('country_transfers');
+  $country = get_page_by_path($country_slug, OBJECT, 'country');
+
+  $main_parent_id = $country ? (int) $country->ID : $current_id;
+  $country_title = $country ? (string) $country->post_title : (string) get_the_title();
+  $is_transfers_page = true;
+
 } elseif (is_tax('resort')) {
 
   $term = get_queried_object();
@@ -467,6 +477,8 @@ $has_deposits = get_posts([
   ],
 ]);
 
+$transfers_mode = bsi_country_transfers_mode((int) $main_parent_id);
+
 $has_regions = get_terms([
   'taxonomy' => 'region',
   'hide_empty' => false,
@@ -483,7 +495,7 @@ $is_country_overview = (
   !$is_resorts_page && !$is_tours_page &&
   !$is_memo_page && !$is_entry_rules_page && !$is_news_page &&
   !$is_excursions_page && !$is_sights_page && !$is_events_page && !$is_hotels_info_page &&
-  !$is_deposits_page && !$is_education_page
+  !$is_deposits_page && !$is_transfers_page && !$is_education_page
 );
 
 $active_tour_types = [];
@@ -912,6 +924,42 @@ $visa_icon_svg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" st
           </svg>
         </span>
         <span>Депозиты в отелях</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if ($transfers_mode !== ''): ?>
+      <?php
+      $transfers_is_link = $transfers_mode === 'link';
+      $transfers_href = $transfers_is_link
+        ? bsi_country_transfers_samo_url((int) $main_parent_id)
+        : home_url("/country/{$country_slug}/transfery/");
+      ?>
+      <a href="<?= esc_url($transfers_href); ?>"
+        class="child-page-item <?= $is_transfers_page ? 'active' : ''; ?>"
+        <?= $transfers_is_link ? 'target="_blank" rel="noopener"' : ''; ?>>
+        <span class="child-page-item__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-car-front-icon lucide-car-front">
+            <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+            <path d="M7 14h.01" />
+            <path d="M17 14h.01" />
+            <rect width="18" height="8" x="3" y="10" rx="2" />
+            <path d="M5 18v2" />
+            <path d="M19 18v2" />
+          </svg>
+        </span>
+        <span>Трансферы</span>
+        <?php if ($transfers_is_link): ?>
+          <span class="child-page-item__icon child-page-item__external">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right">
+              <path d="M7 7h10v10" />
+              <path d="M7 17 17 7" />
+            </svg>
+          </span>
+        <?php endif; ?>
       </a>
     <?php endif; ?>
 

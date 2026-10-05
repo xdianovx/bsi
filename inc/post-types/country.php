@@ -348,6 +348,7 @@ add_filter('query_vars', function ($vars) {
   $vars[] = 'country_events';
   $vars[] = 'country_hotels_info';
   $vars[] = 'country_deposits';
+  $vars[] = 'country_transfers';
 
   $vars[] = 'resort_section';
 
@@ -500,10 +501,16 @@ add_action('init', function () {
     'top'
   );
 
+  add_rewrite_rule(
+    '^country/([^/]+)/transfery/?$',
+    'index.php?post_type=country&name=$matches[1]&country_transfers=$matches[1]',
+    'top'
+  );
+
 }, 20);
 
 add_action('init', function () {
-  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|dostoprimechatelnosti|sobytiynye-tury|informaciya-ob-otelyah|depozity)';
+  $reserved = '(?:hotel|promo|visa|tours|tour|news|fit|akcii|novosti|kurorty|pamyatka|pravila-vyezda|ekskursii|dostoprimechatelnosti|sobytiynye-tury|informaciya-ob-otelyah|depozity|transfery)';
 
   /* Разделы курорта: /country/{c}/{region}/{resort}/{section}/ и /page/N/.
      Правила добавляются раньше правила самого курорта — иначе четвёртый
