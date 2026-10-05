@@ -1,5 +1,6 @@
 import { initHotelsMap } from "../hotels-map";
 import { initHotelsFilters, initHotelsMapToggle } from "./hotels-filters";
+import { initHotelsPrices } from "./hotels-prices";
 
 /**
  * Панель фильтров приезжает с сервера заново, поэтому перед подменой запоминаем,
@@ -167,6 +168,7 @@ export const initHotelsApiCatalog = () => {
         root.innerHTML = json.data.html;
         restore();
         initHotelsMap();
+        initHotelsPrices();
         return;
       }
 
@@ -217,11 +219,13 @@ export const initHotelsApiCatalog = () => {
          и продолжать печатать невозможно. */
       if (partial && swapResults(root, json.data.html)) {
         initHotelsMap();
+        initHotelsPrices();
       } else {
         const restore = keepPanelState(root);
         root.innerHTML = json.data.html;
         restore();
         initHotelsMap();
+        initHotelsPrices();
       }
 
       // Сервер вернул заглушки — доспрашиваем каталог тем же путём.
@@ -274,6 +278,9 @@ export const initHotelsApiCatalog = () => {
       if (!rows || !list) throw new Error("no rows");
 
       list.append(...rows.children);
+
+      // У новых карточек цены могут стоять в очереди хаба — подхватываем их в опрос.
+      initHotelsPrices();
 
       // Кнопку заменяем на пришедшую: в ней номер следующей порции.
       const nextMore = parsed.querySelector(".js-hotels-more");
