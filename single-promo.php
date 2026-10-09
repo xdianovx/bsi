@@ -94,11 +94,6 @@ $promo_is_expired = function_exists('bsi_promo_is_past_promo_end_date') && bsi_p
         </div>
       <?php endif; ?>
 
-      <?php if (get_the_excerpt()): ?>
-        <div class="page-country__descr">
-          <?= get_the_excerpt(); ?>
-        </div>
-      <?php endif; ?>
       <div class="editor-content">
         <?php the_content(); ?>
       </div>
