@@ -11,7 +11,7 @@ declare(strict_types=1);
  * в Яндекс.Метрику — см. js/modules/forms/resort-request-form.js.
  */
 
-$resort_request_email = 'doanov.js@gmail.com';
+$resort_request_email = 'dianov.js@gmail.com, o.ser@bsigroup.ru, e.klimova@bsigroup.ru';
 
 add_action('wp_ajax_resort_request', 'bsi_handle_resort_request');
 add_action('wp_ajax_nopriv_resort_request', 'bsi_handle_resort_request');

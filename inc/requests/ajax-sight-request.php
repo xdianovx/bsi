@@ -7,7 +7,7 @@ declare(strict_types=1);
  * (template-parts/sight/request-modal.php).
  */
 
-$sight_request_email = 'doanov.js@gmail.com';
+$sight_request_email = 'dianov.js@gmail.com, o.ser@bsigroup.ru, e.klimova@bsigroup.ru';
 
 add_action('wp_ajax_sight_request', 'bsi_handle_sight_request');
 add_action('wp_ajax_nopriv_sight_request', 'bsi_handle_sight_request');

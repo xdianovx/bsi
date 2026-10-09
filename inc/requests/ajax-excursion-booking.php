@@ -6,7 +6,7 @@ declare(strict_types=1);
  * AJAX: заявка на экскурсию из модального окна (template-parts/excursion/booking-modal.php).
  */
 
-$excursion_booking_email = 'doanov.js@gmail.com';
+$excursion_booking_email = 'dianov.js@gmail.com, o.ser@bsigroup.ru, e.klimova@bsigroup.ru';
 
 add_action('wp_ajax_excursion_booking', 'bsi_handle_excursion_booking');
 add_action('wp_ajax_nopriv_excursion_booking', 'bsi_handle_excursion_booking');
