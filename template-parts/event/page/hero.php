@@ -14,13 +14,13 @@ if ($finished) {
   $cta_href = '#status';
 } elseif ($both) {
   $cta_label = 'Выбрать билет или тур';
-  $cta_href = '#format';
+  $cta_href = $args['choose_href'];
 } elseif ($event['has_tour']) {
   $cta_label = 'Выбрать тур';
-  $cta_href = '#format';
+  $cta_href = $args['choose_href'];
 } elseif ($event['has_tickets']) {
   $cta_label = 'Выбрать билет';
-  $cta_href = '#format';
+  $cta_href = $args['choose_href'];
 } else {
   // Ни дат, ни секторов, ни тура (старая запись) — выбирать нечего, только консультация.
   $cta_label = '';

@@ -8,6 +8,7 @@
 
 $has_tour = !empty($args['has_tour']);
 $has_tickets = !empty($args['has_tickets']);
+$choose_href = $args['choose_href'] ?? '#format';
 $what = array_filter([
   $has_tickets ? 'на билет — через форму на сайте' : '',
   $has_tour ? 'на тур — онлайн или у менеджера' : '',
@@ -45,7 +46,7 @@ $steps = [
                 <button type="button" class="single-event__step-link" data-offer-action="ticket">Купить билет</button>
               <?php endif; ?>
               <?php if ($has_tour): ?>
-                <a href="#format" class="single-event__step-link">Выбрать тур ↑</a>
+                <a href="<?= esc_attr($choose_href); ?>" class="single-event__step-link">Выбрать тур ↑</a>
               <?php endif; ?>
             </span>
           <?php endif; ?>
