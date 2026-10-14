@@ -60,7 +60,8 @@ export const EducationCurrencySwitcher = (() => {
 
     // Extract prefix ("от ") and suffix (duration "/ 1-5 недель")
     const hasFrom = element.dataset.hasFrom === "true";
-    const prefix = hasFrom ? "от " : "";
+    // data-price-prefix — свой префикс (доплата «+» на странице события).
+    const prefix = element.dataset.pricePrefix ?? (hasFrom ? "от " : "");
 
     // Get suffix from cached data attribute, or extract from text if not cached
     let suffix = element.dataset.priceSuffix || "";

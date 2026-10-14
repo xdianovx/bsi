@@ -5,7 +5,7 @@
 ?>
 <div class="modal micromodal-slide" id="modal-agency-event-reg" aria-hidden="true">
   <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-    <div class="modal__container --xl" role="dialog" aria-modal="true" aria-labelledby="modal-agency-event-reg-title">
+    <div class="modal__container --xl modal-program-booking" role="dialog" aria-modal="true" aria-labelledby="modal-agency-event-reg-title">
       <button class="modal__close modal-program-booking__close" aria-label="Закрыть" data-micromodal-close>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -14,8 +14,8 @@
       </button>
 
       <div class="modal__content">
-        <h2 class="modal__title" id="modal-agency-event-reg-title">Регистрация на мероприятие</h2>
-        <p class="modal__subtitle js-agency-reg-event-name"></p>
+        <h2 class="modal-program-booking__title" id="modal-agency-event-reg-title">Регистрация на мероприятие</h2>
+        <p class="modal-program-booking__subtitle js-agency-reg-event-name"></p>
 
         <form class="agency-reg-form js-agency-reg-form" novalidate>
           <input type="hidden" name="event_id" class="js-agency-reg-event-id">
@@ -25,33 +25,33 @@
             value="<?php echo esc_url(home_url(add_query_arg([], $_SERVER['REQUEST_URI'] ?? ''))); ?>">
 
           <div class="form-row form-row-2">
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="agency-reg-name">ФИО *</label>
               <input type="text" name="name" id="agency-reg-name" placeholder="Фамилия Имя Отчество">
             </div>
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="agency-reg-company">Компания *</label>
               <input type="text" name="company" id="agency-reg-company" placeholder="Название компании">
             </div>
           </div>
 
           <div class="form-row form-row-2">
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="agency-reg-city">Город *</label>
               <input type="text" name="city" id="agency-reg-city" placeholder="Город">
             </div>
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="agency-reg-inn">ИНН *</label>
               <input type="text" name="inn" id="agency-reg-inn" placeholder="ИНН компании">
             </div>
           </div>
 
           <div class="form-row form-row-2">
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="agency-reg-email">Почта *</label>
               <input type="email" name="email" id="agency-reg-email" placeholder="email@example.com">
             </div>
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="agency-reg-tel">Телефон *</label>
               <input type="tel" name="tel" id="agency-reg-tel" placeholder="+7 (___) ___-__-__">
             </div>

@@ -422,6 +422,47 @@ $trans-text: all 0.3s ease-in-out;
   &lt;span class="error-message"&gt;Введите корректный email&lt;/span&gt;
 &lt;/div&gt;</pre>
 
+    <p class="uikit-label">.input-item--stacked — подпись над полем (формы заявок в модалках)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="form-row form-row-2" style="align-items:start">
+        <div class="input-item input-item--stacked">
+          <label>Имя *</label>
+          <input type="text" placeholder="Ваше имя">
+        </div>
+        <div class="input-item input-item--stacked">
+          <label>Количество билетов *</label>
+          <div class="ui-stepper">
+            <button type="button" class="ui-stepper__btn" data-stepper="-1">−</button>
+            <input type="number" class="ui-stepper__input" value="2" min="1" max="50">
+            <button type="button" class="ui-stepper__btn" data-stepper="1">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="input-item input-item--stacked"&gt;
+  &lt;label for="name"&gt;Имя *&lt;/label&gt;
+  &lt;input type="text" id="name" name="name"&gt;
+&lt;/div&gt;
+
+&lt;!-- Счётчик (.ui-stepper, обработчик data-stepper — js/modules/forms/event-ticket-form.js) --&gt;
+&lt;div class="ui-stepper"&gt;
+  &lt;button type="button" class="ui-stepper__btn" data-stepper="-1"&gt;−&lt;/button&gt;
+  &lt;input type="number" class="ui-stepper__input" min="1" max="50" value="2"&gt;
+  &lt;button type="button" class="ui-stepper__btn" data-stepper="1"&gt;+&lt;/button&gt;
+&lt;/div&gt;</pre>
+
+    <p class="uikit-label">.input-item с select (нативный, стрелка — фоном)</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="input-item">
+        <label>Сектор</label>
+        <select><option>CAT 1 · 57 923 ₽</option><option>CAT 2 · 38 304 ₽</option></select>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;div class="input-item"&gt;
+  &lt;label for="sector"&gt;Сектор&lt;/label&gt;
+  &lt;select id="sector" name="sector"&gt;…&lt;/select&gt;
+&lt;/div&gt;</pre>
+
     <p class="uikit-label">.input-item.white (label на сером фоне)</p>
     <div class="uikit-demo uikit-demo--gray uikit-demo--block">
       <div class="input-item white">
@@ -834,6 +875,49 @@ get_template_part('template-parts/ui/location-line', null, [
     &lt;span class="ui-choice__sub"&gt;от 55 635 ₽&lt;/span&gt;
   &lt;/button&gt;
 &lt;/div&gt;</pre>
+
+    <h3>Карточка с галочкой — <code>.ui-option</code></h3>
+    <p class="uikit-section__hint">Крупный выбор из 2–3 вариантов с ценой справа: формат «Тур с билетом / Только билет» на странице события. Галочка — системный квадрат чекбокса в монохроме <code>.ui-checkbox__mark--mono</code> (без красного), выбранная карточка — чёрная заливка.</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label class="ui-option is-active"><input type="radio" class="ui-checkbox__input" name="uikit_option" checked><span class="ui-checkbox__mark ui-checkbox__mark--mono"></span><span class="ui-option__body"><span class="ui-option__label">Тур с билетом</span><span class="ui-option__sub">Билет, отель и программа</span></span><span class="ui-option__price numfont">от 64 452 ₽</span></label>
+        <label class="ui-option"><input type="radio" class="ui-checkbox__input" name="uikit_option"><span class="ui-checkbox__mark ui-checkbox__mark--mono"></span><span class="ui-option__body"><span class="ui-option__label">Только билет</span><span class="ui-option__sub">Перелёт и отель — сами</span></span><span class="ui-option__price numfont">от 27 093 ₽</span></label>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;label class="ui-option is-active"&gt;
+  &lt;input type="radio" class="ui-checkbox__input" name="format" checked&gt;
+  &lt;span class="ui-checkbox__mark ui-checkbox__mark--mono"&gt;&lt;/span&gt;
+  &lt;span class="ui-option__body"&gt;
+    &lt;span class="ui-option__label"&gt;Тур с билетом&lt;/span&gt;
+    &lt;span class="ui-option__sub"&gt;Билет, отель и программа&lt;/span&gt;
+  &lt;/span&gt;
+  &lt;span class="ui-option__price numfont"&gt;от 64 452 ₽&lt;/span&gt;
+&lt;/label&gt;</pre>
+
+    <h3>Пилюля с галочкой — <code>.ui-choice--check</code></h3>
+    <p class="uikit-section__hint">Выбор даты концерта, заезда и ночей на странице события: квадрат галочки слева, под подписью — цена «от».</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div class="ui-choices">
+        <button type="button" class="ui-choice ui-choice--check is-active"><span class="ui-choice__mark"></span><span class="ui-choice__body"><span class="ui-choice__label">6 марта</span><span class="ui-choice__sub numfont">от 64 452 ₽</span></span></button>
+        <button type="button" class="ui-choice ui-choice--check"><span class="ui-choice__mark"></span><span class="ui-choice__body"><span class="ui-choice__label">7 марта</span><span class="ui-choice__sub numfont">от 66 900 ₽</span></span></button>
+      </div>
+    </div>
+    <pre class="uikit-snippet">&lt;button type="button" class="ui-choice ui-choice--check is-active"&gt;
+  &lt;span class="ui-choice__mark"&gt;&lt;/span&gt;
+  &lt;span class="ui-choice__body"&gt;
+    &lt;span class="ui-choice__label"&gt;6 марта&lt;/span&gt;
+    &lt;span class="ui-choice__sub"&gt;от 64 452 ₽&lt;/span&gt;
+  &lt;/span&gt;
+&lt;/button&gt;</pre>
+
+    <h3>Карточка с описанием — <code>.ui-option--top</code></h3>
+    <p class="uikit-section__hint">Сектор билета, пакет проживания: галочка и цена выравниваются по первой строке, описание может переноситься.</p>
+    <div class="uikit-demo uikit-demo--block">
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:456px">
+        <label class="ui-option ui-option--top"><input type="radio" class="ui-checkbox__input" name="uikit_sector"><span class="ui-checkbox__mark ui-checkbox__mark--mono"></span><span class="ui-option__body"><span class="ui-option__label">VIP Soundcheck</span><span class="ui-option__sub">Танцпол у сцены, ранний вход и саундчек, мерч в подарок · доплата к туру</span></span><span class="ui-option__price numfont">+44 843 ₽</span></label>
+        <label class="ui-option ui-option--top is-active"><input type="radio" class="ui-checkbox__input" name="uikit_sector" checked><span class="ui-checkbox__mark ui-checkbox__mark--mono"></span><span class="ui-option__body"><span class="ui-option__label">CAT 2</span><span class="ui-option__sub">Средний ярус напротив сцены</span></span><span class="ui-option__price">в туре</span></label>
+      </div>
+    </div>
   </section>
 
   <!-- ============ PAGINATION ============ -->
@@ -1047,6 +1131,24 @@ echo bsi_pagination_links(['total' =&gt; $max_pages, 'current' =&gt; $paged]);
         <div class="modal__container" style="margin:0 auto;padding:24px">
           <h3 class="h3" style="margin-top:0">Заголовок модалки</h3>
           <p>Содержимое модального окна. По умолчанию ширина 500px.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="uikit-label">Модалка заявки (modal-program-booking): 640px, заголовок + подзаголовок, детали серой плашкой, поля .input-item--stacked, кнопка во всю ширину</p>
+    <div class="uikit-demo">
+      <div style="background:rgba(0,0,0,0.6);padding:24px;border-radius:8px;width:100%">
+        <div class="modal__container modal-program-booking" style="margin:0 auto">
+          <h2 class="modal-program-booking__title">Заявка на билеты</h2>
+          <p class="modal-program-booking__subtitle">Stray Kids в Сингапуре</p>
+          <ul class="modal-program-booking__details">
+            <li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">Дата</span><span class="modal-program-booking__details-value">06.03.2027</span></li>
+            <li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">Площадка</span><span class="modal-program-booking__details-value">National Stadium</span></li>
+          </ul>
+          <div class="modal-program-booking__form">
+            <div class="input-item input-item--stacked"><label>Имя *</label><input type="text" placeholder="Ваше имя"></div>
+            <div class="modal-program-booking__form-footer"><button type="button" class="modal-program-booking__submit btn btn-accent">Отправить заявку</button></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1518,12 +1620,12 @@ get_template_part('template-parts/hotels/room-card');
 
     <div class="ui-radio-group">
       <label class="ui-radio">
-        <input type="radio" class="ui-radio__input" name="ui-demo-radio" value="" checked>
+        <input type="radio" class="ui-checkbox__input" name="ui-demo-radio" value="" checked>
         <span class="ui-radio__mark"></span>
         <span class="ui-radio__text">Все</span>
       </label>
       <label class="ui-radio">
-        <input type="radio" class="ui-radio__input" name="ui-demo-radio" value="1">
+        <input type="radio" class="ui-checkbox__input" name="ui-demo-radio" value="1">
         <span class="ui-radio__mark"></span>
         <span class="ui-radio__text">Вариант с одним выбором</span>
       </label>

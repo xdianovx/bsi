@@ -63,3 +63,146 @@
     background: $gray-light;
   }
 }
+/**
+ * Выбор варианта — крупная карточка с галочкой (формат поездки и т. п.),
+ * когда вариантов 2–3 и рядом нужна цена. Галочка — системный квадрат чекбокса
+ * в монохроме (.ui-checkbox__mark--mono, scss/ui/forms.scss), без красного.
+ * Вход — radio: выбирается одно значение. Выбранная карточка — чёрная заливка, как .ui-choice.
+ *
+ * Разметка:
+ *   <label class="ui-option is-active">
+ *     <input type="radio" class="ui-checkbox__input" name="format" checked>
+ *     <span class="ui-checkbox__mark ui-checkbox__mark--mono"></span>
+ *     <span class="ui-option__body">
+ *       <span class="ui-option__label">Тур с билетом</span>
+ *       <span class="ui-option__sub">Билет, отель и программа</span>
+ *     </span>
+ *     <span class="ui-option__price">от 64 452 ₽</span>
+ *   </label>
+ */
+
+.ui-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+  color: $text-black;
+  cursor: pointer;
+  user-select: none;
+  transition: $trans-text;
+}
+
+.ui-option__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ui-option__label {
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.ui-option__sub {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.ui-option__price {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 120%;
+  white-space: nowrap;
+}
+
+.ui-option.is-active {
+  background: $black;
+  color: $text-white;
+  cursor: default;
+}
+
+.ui-option.is-active .ui-option__sub {
+  color: rgb(255 255 255 / 70%);
+}
+
+@media (hover: hover) {
+  .ui-option:not(.is-active):hover {
+    background: $gray-light;
+  }
+}
+
+/**
+ * Пилюля с галочкой — выбор даты концерта, заезда, ночей на странице события (макет 1957:1426).
+ * Квадрат галочки как у .ui-checkbox__mark--mono: белый, у активной — чёрная галочка.
+ *
+ *   <button type="button" class="ui-choice ui-choice--check is-active">
+ *     <span class="ui-choice__mark"></span>
+ *     <span class="ui-choice__body">
+ *       <span class="ui-choice__label">6 марта</span>
+ *       <span class="ui-choice__sub">от 64 452 ₽</span>
+ *     </span>
+ *   </button>
+ */
+.ui-choice--check {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px 12px 12px;
+}
+
+.ui-choice--check.is-active .ui-choice__sub {
+  color: $text-white;
+}
+
+.ui-choice[hidden],
+.ui-choice__sub[hidden] {
+  display: none;
+}
+
+.ui-choice__mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-xs;
+  background: $bg-color;
+}
+
+.ui-choice.is-active .ui-choice__mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: $text-black;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ui-choice__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/**
+ * Карточка выбора с длинным описанием (сектор, пакет проживания): галочка и цена — по верхней строке.
+ *   <label class="ui-option ui-option--top">…</label>
+ */
+.ui-option--top {
+  align-items: flex-start;
+}
+
+.ui-option[hidden],
+.ui-option__price[hidden] {
+  display: none;
+}

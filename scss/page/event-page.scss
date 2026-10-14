@@ -1,0 +1,1324 @@
+/**
+ * Страница события по макетам 2026-10-08 (Фигма qhOwVa1YNd0tg4TAH85JEb, 1949:1326).
+ * Разметка — single-event.php и template-parts/event/page/*. Подключается после event.scss
+ * и перекрывает его правила для тех же классов (старый шаблон с двумя режимами удалён).
+ */
+
+/* Атрибут hidden (выбор формата, даты, пакета — js/modules/event-offer.js) сильнее display блоков ниже */
+.single-event__tickets[hidden],
+.single-event__tour[hidden],
+.single-event__format-step[hidden],
+.single-event__price-columns[hidden],
+.single-event__venue[hidden] {
+  display: none;
+}
+
+/* ---------- Первый экран ---------- */
+
+.single-event__hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: calc(100% - #{$container-padding * 2});
+  max-width: $container - $container-padding * 2;
+  min-height: 520px;
+  margin: 16px auto 0;
+  padding: 24px;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: $bg-black;
+  color: $text-white;
+}
+
+.single-event__hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: $black;
+  background-image: var(--single-event-hero-bg);
+  background-position: center;
+  background-size: cover;
+}
+
+/* Затемнение под текстом — слоем поверх фото, контентщикам не нужно готовить картинки с тёмным краем */
+.single-event__hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 88%) 0%, rgb(0 0 0 / 70%) 35%, rgb(0 0 0 / 15%) 65%, rgb(0 0 0 / 0%) 85%);
+}
+
+.single-event__hero--no-poster .single-event__hero-media {
+  background-image: none;
+}
+
+.single-event__hero-breadcrumbs {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 120%;
+}
+
+.single-event__hero-breadcrumbs p {
+  margin: 0;
+}
+
+.single-event__hero-breadcrumbs a,
+.single-event__hero-breadcrumbs span {
+  color: rgb(255 255 255 / 90%);
+}
+
+.single-event__hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.single-event__hero-title {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 110%;
+  color: $text-white;
+}
+
+.single-event__hero-subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+  color: rgb(255 255 255 / 72%);
+}
+
+.single-event__hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.single-event__hero-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.single-event__hero-fact-label {
+  font-size: 14px;
+  line-height: 120%;
+  color: rgb(255 255 255 / 70%);
+}
+
+.single-event__hero-fact-value {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 120%;
+  color: $text-white;
+}
+
+.single-event__hero-meta,
+.single-event__hero-price {
+  display: none;
+}
+
+.single-event__hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.single-event__hero-btn {
+  justify-content: center;
+  padding: 16px 48px;
+  line-height: 100%;
+}
+
+.single-event__hero-btn--ghost {
+  padding: 16px 32px;
+  background: rgb(255 255 255 / 14%);
+  color: $text-white;
+}
+
+@media (hover: hover) {
+  .single-event__hero-btn--ghost:hover {
+    background: rgb(255 255 255 / 24%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__hero {
+    width: 100%;
+    min-height: 0;
+    margin-top: 8px;
+    padding: 0;
+    border-radius: $radius-md;
+  }
+
+  /* Мобилка: фото полосой сверху, текст на чёрной плашке ниже */
+  .single-event__hero-media {
+    position: relative;
+    inset: auto;
+    height: 200px;
+  }
+
+  .single-event__hero-media::after {
+    content: none;
+  }
+
+  .single-event__hero-breadcrumbs,
+  .single-event__hero-facts,
+  .single-event__hero-subtitle,
+  .single-event__hero-btn--ghost {
+    display: none;
+  }
+
+  .single-event__hero-content {
+    gap: 12px;
+    max-width: none;
+    padding: 20px;
+  }
+
+  .single-event__hero-title {
+    font-size: 24px;
+  }
+
+  .single-event__hero-meta {
+    display: block;
+    margin: 0;
+    font-size: 14px;
+    line-height: 140%;
+    color: rgb(255 255 255 / 72%);
+  }
+
+  .single-event__hero-price {
+    display: block;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 120%;
+    color: $text-white;
+  }
+
+  .single-event__hero-actions {
+    width: 100%;
+    margin-top: 0;
+    padding-top: 4px;
+  }
+
+  .single-event__hero-btn {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ---------- Сетка: колонка + сайдбар ---------- */
+
+.single-event__body {
+  margin-top: 8px;
+}
+
+.single-event__about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 8px;
+  align-items: start;
+}
+
+.single-event__about-grid--wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.single-event__columns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.single-event__column-card {
+  box-sizing: border-box;
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+}
+
+.single-event__column-card .h2,
+.single-event__status-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.single-event__about-aside {
+  position: sticky;
+  top: 16px;
+  order: 0;
+  width: auto;
+}
+
+@media screen and (max-width: 1024px) {
+  .single-event__about-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* Сайдбар на мобилке встаёт после тура, перед «О событии» — секции колонки становятся соседями сайдбара */
+  .single-event__columns {
+    display: contents;
+  }
+
+  .single-event__format { order: 1; }
+  .single-event__tickets { order: 2; }
+  .single-event__tour { order: 3; }
+  .single-event__about-aside { order: 4; position: static; width: 100%; }
+  .single-event__about-main { order: 5; }
+  .single-event__steps { order: 6; }
+  .single-event__important { order: 7; }
+  .single-event__legacy-program { order: 8; }
+  .single-event__legacy-additional { order: 9; }
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__body > .container {
+    padding: 0;
+  }
+
+  .single-event__body {
+    margin-top: 32px;
+  }
+
+  .single-event__column-card {
+    padding: 16px;
+  }
+
+  .single-event__column-card .h2,
+  .single-event__status-title {
+    font-size: 20px;
+  }
+}
+
+/* ---------- Выбор даты и формата ---------- */
+
+.single-event__format {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.single-event__format-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.single-event__format-title,
+.single-event__tour-step-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.single-event__format-place {
+  margin: 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__format-place:empty {
+  display: none;
+}
+
+.single-event__format-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__format-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .single-event__format-title,
+  .single-event__tour-step-title {
+    font-size: 16px;
+  }
+}
+
+/* ---------- Билеты и «Билет в туре» ---------- */
+
+.single-event__tickets,
+.single-event__tour {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.single-event__tickets-head,
+.single-event__tour-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__tickets-lead,
+.single-event__group-lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__group-lead b {
+  color: $text-black;
+}
+
+.single-event__group-link {
+  color: $text-black;
+  text-decoration: underline;
+}
+
+.single-event__tickets-body {
+  display: grid;
+  grid-template-columns: 440px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.single-event__tickets-body--no-scheme {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.single-event__venue {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.single-event__venue-map {
+  display: block;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $bg-gray;
+}
+
+.single-event__venue-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.single-event__venue-map-note {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__tickets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__tickets-label {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.single-event__ticket-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: $radius-xs;
+  vertical-align: 1px;
+}
+
+@media screen and (max-width: 1024px) {
+  .single-event__tickets-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Тур: конструктор, пакеты ---------- */
+
+.single-event__tour-step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.single-event__tour-step[hidden] {
+  display: none;
+}
+
+.single-event__builder {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.single-event__builder[hidden] {
+  display: none;
+}
+
+.single-event__builder-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__builder-label {
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__builder-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+}
+
+.single-event__builder-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__builder-skeleton-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.single-event__builder-skeleton-chip {
+  width: 96px;
+  height: 61px;
+  border-radius: $radius-sm;
+}
+
+.single-event__tour-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+}
+
+.single-event__tour-empty[hidden] {
+  display: none;
+}
+
+.single-event__tour-empty-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.single-event__tour-empty-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__tour-empty-btn {
+  margin-top: 4px;
+}
+
+.single-event__packages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__package-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.single-event__star {
+  flex-shrink: 0;
+  color: $star;
+}
+
+.single-event__package-hotels {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+}
+
+.single-event__package-hotels[hidden] {
+  display: none;
+}
+
+.single-event__package-hotels-label,
+.single-event__package-hotels-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__package-hotel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.single-event__package-hotel-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.single-event__package-hotel-name {
+  font-weight: 500;
+}
+
+.single-event__package-hotel-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__package-hotel-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+/* ---------- Входит / Оплачивается отдельно ---------- */
+
+.single-event__price-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.single-event__price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.single-event__included-item,
+.single-event__extra-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.single-event__included-icon {
+  flex-shrink: 0;
+  color: $green;
+}
+
+.single-event__extra-icon {
+  flex-shrink: 0;
+  color: $text-gray;
+}
+
+.single-event__item-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.single-event__item-text {
+  font-size: 16px;
+  line-height: 140%;
+}
+
+.single-event__item-note {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__extra-price {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 140%;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__price-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- О событии, шаги ---------- */
+
+.single-event__about-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.single-event__about-body {
+  font-size: 16px;
+  line-height: 140%;
+}
+
+.single-event__about-body p {
+  margin: 0 0 12px;
+}
+
+.single-event__about-body p:last-child {
+  margin-bottom: 0;
+}
+
+.single-event__about-body.is-clamped {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.single-event__about-more {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 120%;
+  color: $text-black;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.single-event__about-more[hidden] {
+  display: none;
+}
+
+.single-event__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.single-event__steps-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.single-event__step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.single-event__step-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.single-event__step-num {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  background: $bg-gray;
+  font-size: 14px;
+  line-height: 100%;
+}
+
+.single-event__step-line {
+  flex: 1 1 auto;
+  height: 1px;
+  background: $gray-light;
+}
+
+.single-event__step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.single-event__step-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+}
+
+.single-event__step-text,
+.single-event__steps-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__step-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.single-event__step-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-black;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__steps-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+/* ---------- Сайдбар ---------- */
+
+.single-event__booking-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: $radius-md;
+  background: $bg-color;
+}
+
+.event-offer-summary__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.event-offer-summary__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.event-offer-summary__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.event-offer-summary__place {
+  margin: 0;
+  font-size: 14px;
+  line-height: 120%;
+  color: $text-gray;
+}
+
+.event-offer-summary__close {
+  display: none;
+}
+
+.event-offer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-offer-summary__order {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.event-offer-summary__order-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.event-offer-summary__order-row[hidden] {
+  display: none;
+}
+
+.event-offer-summary__order-label {
+  font-size: 14px;
+  line-height: 120%;
+  color: $text-gray;
+}
+
+.event-offer-summary__order-value {
+  margin: 0;
+  font-size: 14px;
+  line-height: 120%;
+  text-align: right;
+}
+
+.event-offer-summary__stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+  color: $text-gray;
+}
+
+.event-offer-summary__price {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.single-event__widget-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.single-event__widget-phones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 120%;
+}
+
+.single-event__widget-phones a {
+  color: $text-gray;
+}
+
+/* Липкая панель и шторка на мобилке */
+.event-offer-bar,
+.event-offer-sheet-backdrop {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .event-offer-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 0;
+    background: $bg-color;
+    box-shadow: 0 -4px 16px rgb(0 0 0 / 8%);
+  }
+
+  .event-offer-bar[hidden] {
+    display: none;
+  }
+
+  .event-offer-bar__label {
+    font-size: 14px;
+    line-height: 120%;
+    color: $text-gray;
+  }
+
+  .event-offer-bar__price {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 120%;
+  }
+
+  .event-offer-bar__toggle {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: $radius-sm;
+    background: $red;
+    color: $text-white;
+    cursor: pointer;
+  }
+
+  .single-event__about-aside.is-sheet-open .single-event__booking-widget {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001; // выше липкой шапки сайта
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: $radius-lg $radius-lg 0 0;
+  }
+
+  .single-event__about-aside.is-sheet-open .event-offer-summary__close {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: $radius-sm;
+    background: $bg-gray;
+    color: $text-black;
+    transform: rotate(180deg);
+    cursor: pointer;
+  }
+
+  .event-offer-sheet-backdrop.is-open {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: block;
+    background: rgb(0 0 0 / 50%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__booking-widget {
+    padding: 16px;
+  }
+}
+
+/* ---------- Событие завершено ---------- */
+
+.single-event__status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 32px;
+  border-radius: $radius-md;
+  background: $bg-color;
+}
+
+.single-event__status-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.single-event__status-badge {
+  padding: 6px 12px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+  font-size: 14px;
+  line-height: 120%;
+}
+
+.single-event__status-lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__booking-cta-row--light {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.single-event__booking-cta-input--light {
+  border: 0;
+  background: $bg-gray;
+  color: $text-black;
+}
+
+.single-event__booking-cta-input--light::placeholder {
+  color: $text-gray;
+}
+
+.single-event__booking-cta-privacy--light .single-event__booking-cta-privacy-text {
+  color: $text-gray;
+}
+
+.single-event__booking-cta-privacy--light .single-event__booking-cta-privacy-text a {
+  color: $text-black;
+}
+
+.single-event__booking-cta-privacy--light .single-event__booking-cta-privacy-input:focus-visible + .single-event__booking-cta-privacy-box {
+  outline-color: $text-black;
+}
+
+.single-event__booking-cta-privacy--light .single-event__booking-cta-privacy-error {
+  color: $red;
+}
+
+.single-event__booking-cta-submit--light {
+  grid-column: 1 / -1;
+  width: 100%;
+  background: $red;
+}
+
+@media screen and (max-width: 1024px) {
+  .single-event__status {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+}
+
+/* ---------- Похожие, FAQ — общие отступы ---------- */
+
+.single-event__related {
+  margin-top: 32px;
+}
+
+.event-offer-summary__btn {
+  padding: 16px 24px;
+  line-height: 100%;
+}
+
+.event-offer-summary__note {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+/* Мобильный макет 2010:7934: отступы компактнее десктопа */
+@media screen and (max-width: 768px) {
+  .single-event__tour {
+    gap: 16px;
+  }
+
+  .ui-choice--check {
+    padding: 8px;
+  }
+
+  .single-event__format-choices .ui-option,
+  .single-event__package-option,
+  .single-event__ticket-option {
+    padding: 12px;
+  }
+
+  .event-offer-summary__title {
+    font-weight: 500;
+  }
+
+  .single-event__faq-inner {
+    padding: 16px;
+  }
+}
+
+/* Шаги на мобилке (2010:7934): кружок с номером слева, текст справа, без линии */
+@media screen and (max-width: 768px) {
+  .single-event__step {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .single-event__step-line {
+    display: none;
+  }
+
+  .single-event__step-body {
+    padding-top: 6px;
+  }
+}
+
+/* ---------- FAQ (faq__item 2010:7934) ---------- */
+
+.single-event__faq {
+  margin: 8px 0 32px;
+}
+
+.single-event__faq-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+}
+
+.single-event__faq-inner .h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.single-event__faq-acc {
+  max-width: none;
+}
+
+.single-event__faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__faq-item {
+  padding: 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+}
+
+.single-event__faq-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.single-event__faq-question {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 130%;
+  color: $text-black;
+}
+
+.single-event__faq-btn .accordion__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.single-event__faq-answer {
+  padding-top: 12px;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__faq-answer p {
+  margin: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__faq > .container {
+    padding: 0;
+  }
+
+  .single-event__faq-inner .h2 {
+    font-size: 20px;
+  }
+
+  /* Липкая панель закреплена всегда — низ страницы не перекрываем */
+  .single-event-page {
+    padding-bottom: 72px;
+  }
+}
+
+/* Общий аккордеон красит открытый вопрос в $red (.accordion__item.is-open .accordion__title) — в макете он чёрный */
+.single-event__faq-item.is-open .single-event__faq-btn .single-event__faq-question {
+  color: $text-black;
+}
+
+/* .editor-content ul даёт margin 1.5em и стоит в сборке позже — перекрываем через обёртку */
+.single-event__important .editor-content ul,
+.single-event__important .editor-content ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.single-event__important li {
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 140%;
+}
+
+/* Старые блоки «Программа тура» и «Дополнительно» — временно, до переноса в конструктор */
+.single-event__legacy-program-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.single-event__legacy-program-day {
+  padding: 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+}
+
+.single-event__legacy-program-day-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 130%;
+  color: $text-black;
+}
+
+.single-event__legacy-program-day-content {
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__legacy-program-day-content p {
+  margin: 0;
+}
+
+.single-event__legacy-additional .editor-content {
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 140%;
+}

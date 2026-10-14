@@ -21,6 +21,7 @@ import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initEventToursFilters } from "./modules/ajax/event-tours";
 import { initEventSinglePage } from "./modules/event-single";
+import { initEventOffer } from "./modules/event-offer";
 import { initCrosstourEvent } from "./modules/crosstour-event";
 import { initCrosstourCards } from "./modules/crosstour-cards";
 import { initCountryAside } from "./modules/country-aside";
@@ -164,6 +165,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initEducationProgramForm();
   EducationCurrencySwitcher.init();
   initEventTicketForm();
+  initEventOffer();
   initCrosstourEvent();
   initCrosstourCards();
   initExcursionBookingForm();

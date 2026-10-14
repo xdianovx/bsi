@@ -86,10 +86,8 @@ if ($excerpt_raw === '') {
 $excerpt_raw = preg_replace('/\s+/u', ' ', trim((string) $excerpt_raw));
 
 // «Включено в тур» — иконки таксономии tour_include (как .tour-card__anemeties).
-$include_terms = get_the_terms($post_id, 'tour_include');
-if (is_wp_error($include_terms) || empty($include_terms)) {
-  $include_terms = [];
-}
+// Временно скрыты (2026-10-08): без подписей не читаются. Вернуть — get_the_terms($post_id, 'tour_include').
+$include_terms = [];
 
 // Цена для кнопки «От …».
 $price = function_exists('bsi_event_card_price')

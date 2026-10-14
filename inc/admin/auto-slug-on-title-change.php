@@ -27,10 +27,13 @@ const BSI_MANUAL_SLUG_META = '_bsi_manual_slug';
 /**
  * Post types whose slug is never managed here.
  *
+ * event: the title carries dates and year and gets edited, while the URL must
+ * stay put — SamoTour links the tour to the event page by its slug.
+ *
  * @return array<string>
  */
 function bsi_auto_slug_ignored_post_types(): array {
-	return ['revision', 'attachment', 'nav_menu_item', 'acf-field', 'acf-field-group', 'customize_changeset', 'oembed_cache', 'user_request', 'wp_template', 'wp_template_part', 'wp_global_styles', 'wp_navigation'];
+	return ['revision', 'attachment', 'nav_menu_item', 'acf-field', 'acf-field-group', 'customize_changeset', 'oembed_cache', 'user_request', 'wp_template', 'wp_template_part', 'wp_global_styles', 'wp_navigation', 'event'];
 }
 
 /**

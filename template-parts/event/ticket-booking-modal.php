@@ -29,15 +29,35 @@
           <input type="hidden" name="event_time" class="js-form-event-time">
           <input type="hidden" name="event_price" class="js-form-event-price">
           <input type="hidden" name="event_details" class="js-form-event-details">
+          <input type="hidden" name="booking_kind" class="js-form-booking-kind">
+
+          <?php /* Сектор и количество — только для заявок на билеты со страницы события (event-offer.js). */ ?>
+          <div class="form-row form-row-2 js-form-ticket-fields" hidden>
+            <div class="input-item input-item--stacked">
+              <label for="event-booking-sector">Сектор</label>
+              <select id="event-booking-sector" name="sector" class="js-form-sector" data-field="sector"></select>
+              <span class="modal-program-booking__error js-field-error" data-error-for="sector"></span>
+            </div>
+            <div class="input-item input-item--stacked">
+              <label for="event-booking-quantity">Количество билетов <span class="modal-program-booking__req">*</span></label>
+              <div class="ui-stepper">
+                <button type="button" class="ui-stepper__btn" data-stepper="-1">−</button>
+                <input type="number" id="event-booking-quantity" name="quantity" class="ui-stepper__input js-form-quantity" min="1" max="50"
+                  value="2" inputmode="numeric" data-field="quantity">
+                <button type="button" class="ui-stepper__btn" data-stepper="1">+</button>
+              </div>
+              <span class="modal-program-booking__error js-field-error" data-error-for="quantity"></span>
+            </div>
+          </div>
 
           <div class="form-row form-row-2">
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="event-booking-name">Имя <span class="modal-program-booking__req">*</span></label>
               <input type="text" id="event-booking-name" name="name" required data-field="name" autocomplete="name"
                 placeholder="Ваше имя">
               <span class="modal-program-booking__error js-field-error" data-error-for="name"></span>
             </div>
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="event-booking-phone">Телефон <span class="modal-program-booking__req">*</span></label>
               <input type="tel" id="event-booking-phone" name="phone" class="js-phone-mask" required
                 data-field="phone" autocomplete="tel" placeholder="+7 (___) ___-__-__">
@@ -45,14 +65,14 @@
             </div>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="event-booking-email">Почта <span class="modal-program-booking__req">*</span></label>
             <input type="email" id="event-booking-email" name="email" required data-field="email" autocomplete="email"
               placeholder="example@mail.ru">
             <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="event-booking-comment">Комментарий</label>
             <textarea id="event-booking-comment" name="comment" rows="3" data-field="comment"
               placeholder="Необязательно"></textarea>

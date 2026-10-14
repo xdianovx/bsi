@@ -82,7 +82,8 @@ add_action('init', function () {
     'show_in_rest' => true,
     'menu_position' => 24,
     'menu_icon' => 'dashicons-calendar-alt',
-    'supports' => ['title', 'thumbnail', 'excerpt', 'page-attributes'],
+    // excerpt убран из админки (2026-10-08): подзаголовок hero — своё поле, description — по шаблону. Старые значения в БД остаются.
+    'supports' => ['title', 'thumbnail', 'page-attributes'],
     'taxonomies' => ['region', 'resort', BSI_EVENT_TOUR_TYPE_TAXONOMY, 'tour_include'],
     'has_archive' => false,
     'rewrite' => ['slug' => 'event-tours', 'with_front' => false],
@@ -134,8 +135,7 @@ add_action('acf/init', function () {
         'return_format' => 'array',
         'preview_size' => 'medium',
         'library' => 'all',
-        'wrapper' => ['width' => '50'],
-        'instructions' => 'Фон первого экрана (отдельно от миниатюры записи и галереи ниже). Лучше широкое горизонтальное фото. Если не задано — берутся миниатюра и первая картинка галереи.',
+        'wrapper' => ['width' => '100'],
       ],
       [
         'key' => 'field_event_hero_cover_mobile',
@@ -147,6 +147,17 @@ add_action('acf/init', function () {
         'library' => 'all',
         'wrapper' => ['width' => '50'],
         'instructions' => 'Вариант фона при ширине экрана не более 550px. Если не загружать — на мобильных останется основная обложка (или запасной кадр из миниатюры/галереи). Если загружена только эта картинка, без основной обложки — она же будет показана на всех ширинах.',
+      ],
+      [
+        'key' => 'field_event_hero_subtitle',
+        'label' => 'Подзаголовок',
+        'name' => 'event_hero_subtitle',
+        'type' => 'textarea',
+        'rows' => 2,
+        'maxlength' => 160,
+        'new_lines' => '',
+        'wrapper' => ['width' => '100'],
+        'placeholder' => 'Билеты и тур на концерт 6 и 7 марта',
       ],
       [
         'key' => 'field_event_hero_date',
@@ -184,10 +195,11 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Основная информация, menu_order 10 (под колонкой normal — см. bsi_event_acf_metabox_order)
+  // Основное, menu_order 10 (под колонкой normal — см. bsi_event_acf_metabox_order).
+  // Скрытые из админки поля этой группы — см. bsi_event_hidden_field_keys().
   acf_add_local_field_group([
     'key' => 'group_event_main',
-    'title' => 'Основная информация',
+    'title' => 'Основное',
     'position' => 'normal',
     'menu_order' => 10,
     'fields' => [
@@ -201,7 +213,15 @@ add_action('acf/init', function () {
         'media_upload' => 1,
         'delay' => 0,
         'wrapper' => ['width' => '100'],
-        'instructions' => 'Текст блока «О событии» на странице события (под заголовком). Основной контент страницы задаётся полями ACF и блоками ниже, отдельного поля «контент записи» нет.',
+      ],
+      [
+        'key' => 'field_event_important',
+        'label' => 'Важно знать',
+        'name' => 'event_important',
+        'type' => 'wysiwyg',
+        'tabs' => 'all',
+        'toolbar' => 'basic',
+        'media_upload' => 0,
       ],
       [
         'key' => 'field_event_country',
@@ -214,7 +234,6 @@ add_action('acf/init', function () {
         'ajax' => 1,
         'required' => 1,
         'wrapper' => ['width' => '50'],
-        'instructions' => 'Страна события. Регион и курорт — таксономии справа.',
       ],
       [
         'key' => 'field_event_price_from',
@@ -233,15 +252,6 @@ add_action('acf/init', function () {
         'wrapper' => ['width' => '50'],
         'placeholder' => 'Например: 7',
         'instructions' => 'Количество ночей в туре',
-      ],
-      [
-        'key' => 'field_event_venue',
-        'label' => 'Место проведения',
-        'name' => 'event_venue',
-        'type' => 'text',
-        'wrapper' => ['width' => '50'],
-        'placeholder' => 'Например: Стадион Лужники',
-        'instructions' => 'Название площадки или места проведения события',
       ],
       [
         'key' => 'field_event_time',
@@ -271,15 +281,6 @@ add_action('acf/init', function () {
         'instructions' => 'Второй номер в том же блоке. Пусто — 8 (800) 200-55-35 (из регионов).',
       ],
       [
-        'key' => 'field_event_notify_email',
-        'label' => 'Доп. email для заявок',
-        'name' => 'event_notify_email',
-        'type' => 'email',
-        'placeholder' => 'email@example.com',
-        'wrapper' => ['width' => '50'],
-        'instructions' => 'Если заполнено — копия заявки с этого события уходит и на этот адрес. Основные получатели не меняются.',
-      ],
-      [
         'key' => 'field_event_venue_scheme_type',
         'label' => 'Тип схемы',
         'name' => 'venue_scheme_type',
@@ -300,17 +301,6 @@ add_action('acf/init', function () {
         'instructions' => 'Определяет заголовок блока на фронте: «Схема стадиона», «Схема зала» и т.д.',
       ],
       [
-        'key' => 'field_event_venue_scheme',
-        'label' => 'Схема зала / рассадки',
-        'name' => 'venue_scheme',
-        'type' => 'image',
-        'return_format' => 'array',
-        'preview_size' => 'medium',
-        'library' => 'all',
-        'wrapper' => ['width' => '50'],
-        'instructions' => 'Статичное изображение схемы мест (при необходимости замените на интерактив позже)',
-      ],
-      [
         'key' => 'field_event_venue_scheme_title',
         'label' => 'Заголовок вручную',
         'name' => 'venue_scheme_title',
@@ -326,7 +316,8 @@ add_action('acf/init', function () {
       ],
       [
         'key' => 'field_event_venue_scheme_legend',
-        'label' => 'Легенда к схеме (сектор — цена)',
+        'label' => 'Легенда к схеме (устарело)',
+        'instructions' => 'Для старых записей. Новые цены заполняйте в «Билеты: секторы и цены» — легенда соберётся оттуда. При открытии старой записи секторы подставляются из легенды автоматически.',
         'name' => 'venue_scheme_legend',
         'type' => 'repeater',
         'layout' => 'table',
@@ -391,22 +382,43 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Даты и места концертов — отдельный метабокс, menu_order 15 (3-й по счёту: после «Первый экран» и «Основная информация»)
+  // Когда и где, menu_order 15. Площадка и город — одни на событие (решение 2026-10-08), у даты — только дата и время.
   acf_add_local_field_group([
     'key' => 'group_event_dates_places',
-    'title' => 'Даты и места концертов',
+    'title' => 'Когда и где',
     'position' => 'normal',
     'menu_order' => 15,
     'fields' => [
       [
+        'key' => 'field_event_venue',
+        'label' => 'Площадка',
+        'name' => 'event_venue',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => 'National Stadium',
+      ],
+      [
+        'key' => 'field_event_resort',
+        'label' => 'Город',
+        'name' => 'event_resort',
+        'type' => 'taxonomy',
+        'taxonomy' => 'resort',
+        'field_type' => 'select',
+        'allow_null' => 1,
+        'add_term' => 1,
+        'save_terms' => 1,
+        'load_terms' => 1,
+        'return_format' => 'id',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
         'key' => 'field_event_dates',
-        'label' => 'Даты проведения',
+        'label' => 'Даты',
         'name' => 'event_dates',
         'type' => 'repeater',
         'layout' => 'table',
         'button_label' => 'Добавить дату',
         'wrapper' => ['width' => '100'],
-        'instructions' => 'Строки списка на странице события (блок «Даты и места концертов», третий по порядку) и данные для каталога.',
         'sub_fields' => [
           [
             'key' => 'field_event_date_value',
@@ -417,7 +429,7 @@ add_action('acf/init', function () {
             'return_format' => 'Y-m-d',
             'first_day' => 1,
             'required' => 1,
-            'wrapper' => ['width' => '15'],
+            'wrapper' => ['width' => '40'],
           ],
           [
             'key' => 'field_event_date_value_end',
@@ -428,15 +440,23 @@ add_action('acf/init', function () {
             'return_format' => 'Y-m-d',
             'first_day' => 1,
             'required' => 0,
-            'wrapper' => ['width' => '15'],
-            'instructions' => 'Только для многодневных событий (напр. этап Формулы-1). Пусто — событие на один день.',
+            'wrapper' => ['width' => '40'],
+          ],
+          [
+            'key' => 'field_event_date_time',
+            'label' => 'Начало',
+            'name' => 'date_time',
+            'type' => 'text',
+            'wrapper' => ['width' => '20'],
+            'placeholder' => '20:00',
+            'maxlength' => 5,
           ],
           [
             'key' => 'field_event_date_city',
             'label' => 'Город',
             'name' => 'date_city',
             'type' => 'text',
-            'wrapper' => ['width' => '21'],
+            'wrapper' => ['width' => '14'],
             'placeholder' => 'Москва',
           ],
           [
@@ -444,7 +464,7 @@ add_action('acf/init', function () {
             'label' => 'Площадка',
             'name' => 'date_venue',
             'type' => 'text',
-            'wrapper' => ['width' => '21'],
+            'wrapper' => ['width' => '14'],
             'placeholder' => 'Стадион',
           ],
           [
@@ -453,8 +473,8 @@ add_action('acf/init', function () {
             'name' => 'date_row_price',
             'type' => 'number',
             'step' => '0.01',
-            'wrapper' => ['width' => '16'],
-            'instructions' => 'В валюте из поля ниже. Пусто — подставится мин. цена из поля «Цена от» поста (текст, ₽).',
+            'wrapper' => ['width' => '11'],
+            'instructions' => 'Для старых записей без секторов. Если заполнены «Билеты: секторы и цены» — не нужно.',
           ],
           [
             'key' => 'field_event_date_row_currency',
@@ -470,8 +490,184 @@ add_action('acf/init', function () {
             ],
             'default_value' => 'RUB',
             'return_format' => 'value',
+            'wrapper' => ['width' => '9'],
+          ],
+          [
+            'key' => 'field_event_date_tour_url',
+            'label' => 'Ссылка на тур в Самотуре',
+            'name' => 'date_tour_url',
+            'type' => 'url',
+            'wrapper' => ['width' => '28'],
+            'placeholder' => 'https://online.bsigroup.ru/search_crosstour?...',
+            'instructions' => 'Тур под эту дату — скопируйте ссылку из Самотура как есть. Пусто — на эту дату используется общая ссылка из «Бронирования», а если и её нет — только билеты.',
           ],
         ],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'event',
+        ],
+      ],
+    ],
+  ]);
+
+  // Билеты: секторы и цены — один список на всё событие, не по дням.
+  $event_currency_choices = [
+    'RUB' => 'RUB (₽)',
+    'USD' => 'USD ($)',
+    'EUR' => 'EUR (€)',
+    'GBP' => 'GBP (£)',
+  ];
+  acf_add_local_field_group([
+    'key' => 'group_event_sector_prices',
+    'title' => 'Билеты: секторы и цены',
+    'position' => 'normal',
+    'menu_order' => 16,
+    'fields' => [
+      // Схема — над секторами: цвет сектора берётся с неё пипеткой (inc/admin/event-admin.php).
+      [
+        'key' => 'field_event_venue_scheme',
+        'label' => 'Схема зала',
+        'name' => 'venue_scheme',
+        'type' => 'image',
+        'return_format' => 'array',
+        'preview_size' => 'medium',
+        'library' => 'all',
+        'wrapper' => ['width' => '100'],
+      ],
+      [
+        'key' => 'field_event_sectors',
+        'label' => 'Секторы',
+        'name' => 'event_sectors',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'collapsed' => 'field_event_sector_name',
+        'button_label' => 'Добавить сектор',
+        'instructions' => 'Цена сектора действует на все даты. Цены в валюте, на сайте — в рублях по курсу ЦБ.',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_sector_name',
+            'label' => 'Сектор',
+            'name' => 'sector_name',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '25'],
+            'placeholder' => 'CAT 1',
+          ],
+          [
+            'key' => 'field_event_sector_color',
+            'label' => 'Цвет на схеме',
+            'name' => 'sector_color',
+            'type' => 'color_picker',
+            'wrapper' => ['width' => '25'],
+          ],
+          [
+            'key' => 'field_event_sector_description',
+            'label' => 'Описание',
+            'name' => 'sector_description',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+            'placeholder' => 'Средний ярус напротив сцены',
+          ],
+          [
+            'key' => 'field_event_sector_price',
+            'label' => 'Цена на все даты',
+            'name' => 'sector_price',
+            'type' => 'number',
+            'min' => 0,
+            'step' => '0.01',
+            'wrapper' => ['width' => '25'],
+          ],
+          [
+            'key' => 'field_event_sector_currency',
+            'label' => 'Валюта',
+            'name' => 'sector_currency',
+            'type' => 'select',
+            'choices' => $event_currency_choices,
+            'default_value' => 'USD',
+            'return_format' => 'value',
+            'wrapper' => ['width' => '25'],
+          ],
+          [
+            'key' => 'field_event_sector_pass_price',
+            'label' => 'Абонемент на все дни',
+            'name' => 'sector_pass_price',
+            'type' => 'number',
+            'min' => 0,
+            'step' => '0.01',
+            'wrapper' => ['width' => '25'],
+            'placeholder' => 'Необязательно',
+          ],
+          [
+            'key' => 'field_event_sector_tour_extra',
+            'label' => 'Доплата к туру',
+            'name' => 'sector_tour_extra',
+            'type' => 'number',
+            'min' => 0,
+            'step' => '0.01',
+            'wrapper' => ['width' => '25'],
+            'placeholder' => 'Авто',
+          ],
+          [
+            'key' => 'field_event_sector_date_prices',
+            'label' => 'Своя цена на дату',
+            'name' => 'sector_date_prices',
+            'type' => 'repeater',
+            'layout' => 'table',
+            'button_label' => 'Другая цена на дату',
+            'wrapper' => ['width' => '100'],
+            'sub_fields' => [
+              [
+                'key' => 'field_event_sdp_date',
+                'label' => 'Дата',
+                'name' => 'sdp_date',
+                'type' => 'date_picker',
+                'display_format' => 'd.m.Y',
+                'return_format' => 'Y-m-d',
+                'first_day' => 1,
+                'required' => 1,
+              ],
+              [
+                'key' => 'field_event_sdp_price',
+                'label' => 'Цена',
+                'name' => 'sdp_price',
+                'type' => 'number',
+                'min' => 0,
+                'step' => '0.01',
+                'required' => 1,
+              ],
+            ],
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_event_tour_sector',
+        'label' => 'Сектор, входящий в тур',
+        'name' => 'event_tour_sector',
+        'type' => 'select',
+        'choices' => [],
+        'allow_null' => 1,
+        'return_format' => 'value',
+        'wrapper' => ['width' => '25'],
+      ],
+      [
+        'key' => 'field_event_no_separate_tickets',
+        'label' => 'Билеты отдельно не продаём',
+        'name' => 'event_no_separate_tickets',
+        'type' => 'true_false',
+        'ui' => 1,
+        'wrapper' => ['width' => '25'],
+      ],
+      [
+        'key' => 'field_event_tickets_email',
+        'label' => 'Email для заявок на билеты',
+        'name' => 'event_tickets_email',
+        'type' => 'email',
+        'wrapper' => ['width' => '50'],
       ],
     ],
     'location' => [
@@ -577,7 +773,7 @@ add_action('acf/init', function () {
 
   acf_add_local_field_group([
     'key' => 'group_event_booking',
-    'title' => 'Бронирование',
+    'title' => 'Тур',
     'position' => 'normal',
     'menu_order' => 30,
     'fields' => [
@@ -594,7 +790,6 @@ add_action('acf/init', function () {
         'allow_null' => 0,
         'ui' => 1,
         'wrapper' => ['width' => '100'],
-        'instructions' => 'Авто — цена «от», список отелей и доступные даты тянутся из Самотура (связь по URL события), ручные поля остаются как fallback. Только вручную — Самотур игнорируется, всё берётся из полей ниже.',
       ],
       [
         'key' => 'field_event_booking_url',
@@ -603,7 +798,6 @@ add_action('acf/init', function () {
         'type' => 'url',
         'wrapper' => ['width' => '100'],
         'placeholder' => 'https://...',
-        'instructions' => 'Обычная ссылка для бронирования или ссылка на поиск из Самотура. Если задана — открывается в новом окне вместо формы-заявки. В режиме «Авто» при пустом поле ссылка строится автоматически.',
       ],
       [
         'key' => 'field_event_booking_cta_lead',
@@ -628,10 +822,10 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Размещение — структурированный список вариантов + произвольный текст
+  // Проживание: отели по пакетам Само (Эконом / Стандарт / 5* / VIP). Цены пакетов — из Само, без Само — «по запросу».
   acf_add_local_field_group([
     'key' => 'group_event_accommodation',
-    'title' => 'Размещение',
+    'title' => 'Проживание',
     'position' => 'normal',
     'menu_order' => 40,
     'fields' => [
@@ -644,7 +838,6 @@ add_action('acf/init', function () {
         'button_label' => 'Добавить вариант проживания',
         'wrapper' => ['width' => '100'],
         'min' => 0,
-        'instructions' => 'Список вариантов проживания на странице события. На фронте показывается над WYSIWYG «Текст». Цена пересчитывается в рубли по курсу ЦБР; чекбокс «Показать в валюте» переключает обратно.',
         'sub_fields' => [
           [
             'key' => 'field_event_accommodation_name',
@@ -656,33 +849,46 @@ add_action('acf/init', function () {
             'placeholder' => 'Hotel Mariotte',
           ],
           [
+            'key' => 'field_event_accommodation_package',
+            'label' => 'Пакет в Само',
+            'name' => 'accommodation_package',
+            'type' => 'select',
+            'choices' => [
+              'econom' => 'Эконом 3–4★',
+              'standard' => 'Стандарт 4–4+★',
+              'five' => '5★',
+              'vip' => 'VIP 5★',
+            ],
+            'allow_null' => 1,
+            'return_format' => 'value',
+            'wrapper' => ['width' => '50'],
+          ],
+          [
             'key' => 'field_event_accommodation_stars',
-            'label' => 'Звёздность',
+            'label' => 'Звёзды',
             'name' => 'accommodation_stars',
             'type' => 'number',
-            'wrapper' => ['width' => '30'],
+            'wrapper' => ['width' => '25'],
             'min' => 0,
             'max' => 5,
             'step' => 1,
-            'instructions' => '0–5. Если 0 — звёзды не показываются.',
+            'placeholder' => '0–5',
           ],
           [
             'key' => 'field_event_accommodation_stars_plus',
-            'label' => 'Плюс к звёздности (+)',
+            'label' => 'С плюсом (4+)',
             'name' => 'accommodation_stars_plus',
             'type' => 'true_false',
-            'wrapper' => ['width' => '20'],
+            'wrapper' => ['width' => '25'],
             'ui' => 1,
-            'instructions' => 'Добавляет «+» к числу (например 3+).',
           ],
           [
             'key' => 'field_event_accommodation_description',
-            'label' => 'Трибуна / сектор / зона',
+            'label' => 'Описание',
             'name' => 'accommodation_description',
             'type' => 'text',
-            'wrapper' => ['width' => '100'],
-            'placeholder' => 'Например: Трибуна A, сектор 12',
-            'instructions' => 'Привязка отеля к трибуне / сектору / зоне. Выводится на карточке проживания.',
+            'wrapper' => ['width' => '50'],
+            'placeholder' => '15 минут пешком до стадиона, завтраки',
           ],
           [
             'key' => 'field_event_accommodation_price',
@@ -757,7 +963,7 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Программа тура (по дням)
+  // Программа тура (по дням) — старый блок, временно выводится до переноса контента в конструктор.
   acf_add_local_field_group([
     'key' => 'group_event_program',
     'title' => 'Программа тура',
@@ -771,7 +977,7 @@ add_action('acf/init', function () {
         'type' => 'repeater',
         'layout' => 'block',
         'button_label' => 'Добавить день',
-        'instructions' => 'Программа по дням. На фронте выводится аккордеоном сразу после блока «Размещение».',
+        'instructions' => 'Временный блок до переноса в конструктор. На сайте — после «Важно знать».',
         'sub_fields' => [
           [
             'key' => 'field_event_tour_program_day_title',
@@ -805,13 +1011,96 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Включено/Не включено
+  // В стоимость входит / Оплачивается отдельно — списки «пункт + пояснение (+ цена)». Старые WYSIWYG скрыты, переносятся скриптом.
   acf_add_local_field_group([
     'key' => 'group_event_included',
-    'title' => 'Включено/Не включено',
+    'title' => 'В стоимость входит / Оплачивается отдельно',
     'position' => 'normal',
     'menu_order' => 50,
     'fields' => [
+      [
+        'key' => 'field_event_included_items',
+        'label' => 'В стоимость входит',
+        'name' => 'tour_included_items',
+        'type' => 'repeater',
+        'layout' => 'table',
+        'button_label' => 'Добавить пункт',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_included_item_text',
+            'label' => 'Пункт',
+            'name' => 'text',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '50'],
+            'placeholder' => 'Групповой трансфер отель — стадион — отель',
+          ],
+          [
+            'key' => 'field_event_included_item_note',
+            'label' => 'Пояснение',
+            'name' => 'note',
+            'type' => 'text',
+            'wrapper' => ['width' => '50'],
+            'placeholder' => 'С англоговорящим водителем',
+            'instructions' => 'Серым под пунктом. Вместо скобок.',
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_event_extra_items',
+        'label' => 'Оплачивается отдельно',
+        'name' => 'tour_extra_items',
+        'type' => 'repeater',
+        'layout' => 'table',
+        'button_label' => 'Добавить пункт',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_extra_item_text',
+            'label' => 'Пункт',
+            'name' => 'text',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '35'],
+            'placeholder' => 'Медицинская страховка',
+          ],
+          [
+            'key' => 'field_event_extra_item_note',
+            'label' => 'Пояснение',
+            'name' => 'note',
+            'type' => 'text',
+            'wrapper' => ['width' => '35'],
+            'placeholder' => 'Оплачивается в отеле при заселении',
+          ],
+          [
+            'key' => 'field_event_extra_item_price_mode',
+            'label' => 'Цена',
+            'name' => 'price_mode',
+            'type' => 'select',
+            'choices' => [
+              'none' => 'Без цены',
+              'from' => 'от …',
+              'exact' => 'Точная',
+              'request' => 'По запросу',
+            ],
+            'default_value' => 'none',
+            'return_format' => 'value',
+            'wrapper' => ['width' => '15'],
+          ],
+          [
+            'key' => 'field_event_extra_item_price',
+            'label' => 'Сумма, ₽',
+            'name' => 'price',
+            'type' => 'number',
+            'min' => 0,
+            'step' => 1,
+            'wrapper' => ['width' => '15'],
+            'conditional_logic' => [
+              [['field' => 'field_event_extra_item_price_mode', 'operator' => '==', 'value' => 'from']],
+              [['field' => 'field_event_extra_item_price_mode', 'operator' => '==', 'value' => 'exact']],
+            ],
+          ],
+        ],
+      ],
       [
         'key' => 'field_event_included',
         'label' => 'В стоимость включено',
@@ -838,7 +1127,7 @@ add_action('acf/init', function () {
         'tabs' => 'all',
         'toolbar' => 'full',
         'media_upload' => 0,
-        'instructions' => 'Текстовая секция «Дополнительно» под блоком «В стоимость входит / Оплачивается дополнительно».',
+        'instructions' => 'Временный блок до переноса в конструктор. На сайте — после «Важно знать» и «Программы тура».',
       ],
     ],
     'location' => [
@@ -855,18 +1144,55 @@ add_action('acf/init', function () {
   // FAQ
   acf_add_local_field_group([
     'key' => 'group_event_faq',
-    'title' => 'FAQ',
+    'title' => 'Вопросы и ответы',
     'position' => 'normal',
     'menu_order' => 60,
     'fields' => [
       [
+        'key' => 'field_event_faq_mode',
+        'label' => 'Какие вопросы показывать',
+        'name' => 'event_faq_mode',
+        'type' => 'select',
+        'choices' => [
+          'merge' => 'Общие + свои',
+          'own' => 'Только свои',
+        ],
+        'default_value' => 'merge',
+        'return_format' => 'value',
+        'wrapper' => ['width' => '50'],
+        'instructions' => 'Общие вопросы — «Продукты → Событийные туры: настройки», по типу события.',
+      ],
+      [
+        'key' => 'field_event_faq_hide',
+        'label' => 'Скрыть общие вопросы',
+        'name' => 'event_faq_hide',
+        'type' => 'checkbox',
+        'choices' => [], // bsi_event_common_faq_choices()
+        'return_format' => 'value',
+        'layout' => 'vertical',
+        'wrapper' => ['width' => '50'],
+        'conditional_logic' => [
+          [['field' => 'field_event_faq_mode', 'operator' => '==', 'value' => 'merge']],
+        ],
+      ],
+      [
         'key' => 'field_event_faq',
-        'label' => 'Вопросы и ответы',
+        'label' => 'Свои вопросы',
         'name' => 'event_faq',
         'type' => 'repeater',
         'layout' => 'block',
         'button_label' => 'Добавить вопрос',
+        'instructions' => 'Новые вопросы встают перед общими. Чтобы исправить общий ответ — выберите его в «Заменяет общий вопрос».',
         'sub_fields' => [
+          [
+            'key' => 'field_event_faq_replaces',
+            'label' => 'Заменяет общий вопрос',
+            'name' => 'faq_replaces',
+            'type' => 'select',
+            'choices' => [], // bsi_event_common_faq_choices()
+            'allow_null' => 1,
+            'return_format' => 'value',
+          ],
           [
             'key' => 'field_event_faq_question',
             'label' => 'Вопрос',
@@ -895,13 +1221,262 @@ add_action('acf/init', function () {
       ],
     ],
   ]);
+
+  // Статус и служебное
+  acf_add_local_field_group([
+    'key' => 'group_event_status',
+    'title' => 'Статус и заявки',
+    'position' => 'normal',
+    'menu_order' => 70,
+    'fields' => [
+      [
+        'key' => 'field_event_status',
+        'label' => 'Статус продаж',
+        'name' => 'event_status',
+        'type' => 'select',
+        'choices' => [
+          'auto' => 'Идёт продажа (завершится само после последней даты)',
+          'closed' => 'Продажи закрыты',
+          'cancelled' => 'Событие отменено',
+        ],
+        'default_value' => 'auto',
+        'allow_null' => 0,
+        'return_format' => 'value',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_event_notify_email',
+        'label' => 'Доп. email для заявок',
+        'name' => 'event_notify_email',
+        'type' => 'email',
+        'placeholder' => 'email@example.com',
+        'wrapper' => ['width' => '50'],
+      ],
+      [
+        'key' => 'field_event_old_paths',
+        'label' => 'Старые адреса (301)',
+        'name' => 'event_old_paths',
+        'type' => 'textarea',
+        'rows' => 3,
+        'new_lines' => '',
+        'placeholder' => "/event-tours/konczert-stray-kids-v-singapure-06-03-2027/",
+        'instructions' => 'Если у события были другие адреса (например, дубли), вставьте их сюда — по одному в строке. Кто зайдёт по старому адресу, попадёт на эту страницу.',
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'event',
+        ],
+      ],
+    ],
+  ]);
+
+  // Настройки раздела: общий FAQ, получатели заявок, телефоны
+  acf_add_local_field_group([
+    'key' => 'group_event_settings',
+    'title' => 'Настройки событийных туров',
+    'fields' => [
+      [
+        'key' => 'field_event_settings_tab_faq',
+        'label' => 'Общие вопросы',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_event_common_faq',
+        'label' => 'Общие вопросы и ответы',
+        'name' => 'event_common_faq',
+        'type' => 'repeater',
+        'layout' => 'block',
+        'collapsed' => 'field_event_common_faq_question',
+        'button_label' => 'Добавить вопрос',
+        'instructions' => 'Показываются на всех событиях выбранных типов. В событии вопрос можно скрыть или заменить своим ответом.',
+        'sub_fields' => [
+          [
+            'key' => 'field_event_common_faq_id',
+            'label' => 'ID',
+            'name' => 'faq_id',
+            'type' => 'text',
+            'readonly' => 1,
+            'wrapper' => ['class' => 'acf-hidden'],
+          ],
+          [
+            'key' => 'field_event_common_faq_question',
+            'label' => 'Вопрос',
+            'name' => 'question',
+            'type' => 'text',
+            'required' => 1,
+          ],
+          [
+            'key' => 'field_event_common_faq_answer',
+            'label' => 'Ответ',
+            'name' => 'answer',
+            'type' => 'textarea',
+            'rows' => 4,
+            'new_lines' => 'wpautop',
+          ],
+          [
+            'key' => 'field_event_common_faq_types',
+            'label' => 'Для типов событий',
+            'name' => 'types',
+            'type' => 'taxonomy',
+            'taxonomy' => BSI_EVENT_TOUR_TYPE_TAXONOMY,
+            'field_type' => 'multi_select',
+            'add_term' => 0,
+            'save_terms' => 0,
+            'load_terms' => 0,
+            'return_format' => 'id',
+            'allow_null' => 1,
+            'instructions' => 'Пусто — для всех событий.',
+          ],
+        ],
+      ],
+      [
+        'key' => 'field_event_settings_tab_contacts',
+        'label' => 'Заявки и телефоны',
+        'type' => 'tab',
+      ],
+      [
+        'key' => 'field_event_default_emails',
+        'label' => 'Получатели заявок',
+        'name' => 'event_default_emails',
+        'type' => 'text',
+        'placeholder' => 'o.ser@bsigroup.ru, sales@bsigroup.ru',
+        'instructions' => 'Через запятую. Заявки на туры и консультации; на билеты — сюда же, если у события не задан «Email для заявок на билеты».',
+      ],
+      [
+        'key' => 'field_event_phone_primary',
+        'label' => 'Телефон (Москва)',
+        'name' => 'event_phone_primary',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => '8 (495) 785-55-35',
+      ],
+      [
+        'key' => 'field_event_phone_secondary',
+        'label' => 'Телефон (регионы)',
+        'name' => 'event_phone_secondary',
+        'type' => 'text',
+        'wrapper' => ['width' => '50'],
+        'placeholder' => '8 (800) 200-55-35',
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'options_page',
+          'operator' => '==',
+          'value' => 'bsi-event-settings',
+        ],
+      ],
+    ],
+  ]);
+});
+
+/**
+ * Страница настроек «Продукты → Событийные туры: настройки».
+ */
+add_action('acf/init', function () {
+  if (!function_exists('acf_add_options_sub_page')) {
+    return;
+  }
+  acf_add_options_sub_page([
+    'page_title' => 'Настройки событийных туров',
+    'menu_title' => 'Событийные туры: настройки',
+    'menu_slug' => 'bsi-event-settings',
+    // В меню выводится пунктом хаба «Продукты» (inc/admin/menu-hubs.php): ACF регистрирует страницу раньше хаба.
+    'parent_slug' => 'edit.php?post_type=event',
+    // Редактор и выше: здесь получатели заявок — авторам и участникам менять нельзя.
+    'capability' => 'edit_others_posts',
+    'post_id' => 'bsi_event_settings',
+  ]);
+});
+
+// Стабильный ID общего вопроса: на него ссылаются «Скрыть» и «Заменяет» в событиях — текст вопроса можно править.
+add_filter('acf/update_value/key=field_event_common_faq_id', function ($value) {
+  $value = trim((string) $value);
+
+  return $value !== '' ? $value : substr(str_replace('-', '', wp_generate_uuid4()), 0, 10);
+});
+
+/**
+ * Общие вопросы для выпадающих списков события: [faq_id => вопрос].
+ */
+function bsi_event_common_faq_choices(): array
+{
+  $rows = get_field('event_common_faq', 'bsi_event_settings');
+  $out = [];
+  foreach (is_array($rows) ? $rows : [] as $row) {
+    $id = trim((string) ($row['faq_id'] ?? ''));
+    $q = trim((string) ($row['question'] ?? ''));
+    if ($id !== '' && $q !== '') {
+      $out[$id] = $q;
+    }
+  }
+
+  return $out;
+}
+
+add_filter('acf/load_field/key=field_event_faq_hide', function ($field) {
+  $field['choices'] = bsi_event_common_faq_choices();
+
+  return $field;
+});
+add_filter('acf/load_field/key=field_event_faq_replaces', function ($field) {
+  $field['choices'] = bsi_event_common_faq_choices();
+
+  return $field;
+});
+
+/**
+ * Поля, убранные из админки по макетам 2026-10-08 (wiki/docs/event-page-tz.md, §2.3).
+ * Определения остаются, чтобы старые записи выводились до переноса; значения в БД не трогаются.
+ */
+function bsi_event_hidden_field_keys(): array
+{
+  return [
+    'field_event_hero_cover_mobile', // мобильный hero — фото полосой над текстом, хватает основной обложки
+    'field_event_hero_date',
+    'field_event_hero_date_end',
+    'field_event_price_from',
+    'field_event_nights',
+    'field_event_time',
+    'field_event_widget_phone_primary',
+    'field_event_widget_phone_secondary',
+    'field_event_venue_scheme_type',
+    'field_event_venue_scheme_title',
+    'field_event_venue_scheme_legend',
+    'field_event_date_city',
+    'field_event_date_venue',
+    'field_event_date_row_price',
+    'field_event_date_row_currency',
+    'field_event_date_tour_url',
+    'field_event_booking_cta_lead',
+    'field_event_accommodation_price',
+    'field_event_accommodation_currency',
+    'field_event_accommodation_date_from',
+    'field_event_accommodation_date_to',
+    'field_event_extra',
+    'field_event_included',
+    'field_event_not_included',
+  ];
+}
+
+add_filter('acf/prepare_field', function ($field) {
+  if (!is_array($field) || empty($field['key'])) {
+    return $field;
+  }
+
+  return in_array($field['key'], bsi_event_hidden_field_keys(), true) ? false : $field;
 });
 
 /**
  * Порядок метабоксов ACF для CPT event: после перетаскивания WP пишет user meta `meta-box-order_event`
  * и перебивает ACF `menu_order`. Здесь заново вшиваем блоки ACF в нужной последовательности.
  *
- * acf_after_title: Первый экран. normal: Основная информация → Даты и места концертов → Бронирование → Размещение → Вкл/Не вкл → FAQ (галерея/билеты — только фронт, в админке нет).
+ * acf_after_title: Первый экран. normal: Основное → Когда и где → Билеты → Тур → Проживание → Входит / отдельно → Вопросы → Статус и заявки (галерея, билеты, программа — только фронт).
  */
 function bsi_event_acf_metabox_order($result, $option, $user)
 {
@@ -932,10 +1507,12 @@ function bsi_event_acf_metabox_order($result, $option, $user)
   $acf_normal = [
     'acf-group_event_main',
     'acf-group_event_dates_places',
+    'acf-group_event_sector_prices',
     'acf-group_event_booking',
     'acf-group_event_accommodation',
     'acf-group_event_included',
     'acf-group_event_faq',
+    'acf-group_event_status',
   ];
 
   $strip_acf = static function (array $ids): array {

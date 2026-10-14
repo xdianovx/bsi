@@ -31,13 +31,13 @@
           <input type="hidden" name="page_url" class="js-form-page-url">
 
           <div class="form-row form-row-2">
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="sight-request-name">Имя <span class="modal-program-booking__req">*</span></label>
               <input type="text" id="sight-request-name" name="name" required data-field="name" autocomplete="name"
                 placeholder="Ваше имя">
               <span class="modal-program-booking__error js-field-error" data-error-for="name"></span>
             </div>
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="sight-request-phone">Телефон <span class="modal-program-booking__req">*</span></label>
               <input type="tel" id="sight-request-phone" name="phone" class="js-phone-mask" required data-field="phone"
                 autocomplete="tel" placeholder="+7 (___) ___-__-__">
@@ -45,14 +45,14 @@
             </div>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="sight-request-email">Почта</label>
             <input type="email" id="sight-request-email" name="email" data-field="email" autocomplete="email"
               placeholder="Необязательно">
             <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="sight-request-comment">Комментарий</label>
             <textarea id="sight-request-comment" name="comment" rows="3" data-field="comment"
               placeholder="Когда планируете поездку, сколько человек"></textarea>

@@ -719,7 +719,7 @@ body.is-hotels-map-open {
     height: 18px;
     border-width: 1px;
     border-color: #c9c9cf;
-    border-radius: 5px;
+    border-radius: $radius-xs;
 
     &::after {
       left: 5px;

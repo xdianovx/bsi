@@ -30,13 +30,13 @@
           <input type="hidden" name="page_url" class="js-form-page-url">
 
           <div class="form-row form-row-2">
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="tour-booking-name">Имя <span class="modal-program-booking__req">*</span></label>
               <input type="text" id="tour-booking-name" name="name" required data-field="name" autocomplete="name"
                 placeholder="Ваше имя">
               <span class="modal-program-booking__error js-field-error" data-error-for="name"></span>
             </div>
-            <div class="input-item">
+            <div class="input-item input-item--stacked">
               <label for="tour-booking-phone">Телефон <span class="modal-program-booking__req">*</span></label>
               <input type="tel" id="tour-booking-phone" name="phone" class="js-phone-mask" required
                 data-field="phone" autocomplete="tel" placeholder="+7 (___) ___-__-__">
@@ -44,14 +44,14 @@
             </div>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="tour-booking-email">Почта</label>
             <input type="email" id="tour-booking-email" name="email" data-field="email" autocomplete="email"
               placeholder="Необязательно">
             <span class="modal-program-booking__error js-field-error" data-error-for="email"></span>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="tour-booking-comment">Комментарий</label>
             <textarea id="tour-booking-comment" name="comment" rows="3" data-field="comment"
               placeholder="Необязательно"></textarea>

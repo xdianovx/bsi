@@ -1,1132 +1,129 @@
 <?php
 /**
- * Одиночная запись CPT `event` (событийный тур). Не шаблон обычного тура (`tour` → single-tour.php).
+ * Страница события (CPT `event`) по макетам 2026-10-08: Фигма qhOwVa1YNd0tg4TAH85JEb, страница 1949:1326.
+ * ТЗ — wiki/docs/event-page-tz.md. Данные — bsi_event_page_data() (inc/helpers/event-page.php),
+ * части страницы — template-parts/event/page/*. Логика выбора — js/modules/event-offer.js,
+ * конструктор тура — js/modules/crosstour-event.js.
  */
 $post_id = get_the_ID();
-
-$country_id = function_exists('get_field') ? get_field('tour_country', $post_id) : 0;
-if ($country_id instanceof WP_Post) {
-  $country_id = $country_id->ID;
-}
-if (is_array($country_id)) {
-  $country_id = (int) reset($country_id);
-}
-$country_id = (int) $country_id;
-
-$tour_booking_url = trim((string) (function_exists('get_field') ? get_field('tour_booking_url', get_the_ID()) : ''));
-$event_booking_cta_lead = function_exists('get_field') ? trim((string) get_field('event_booking_cta_lead', $post_id)) : '';
-if ($event_booking_cta_lead === '' && defined('BSI_EVENT_BOOKING_CTA_LEAD_DEFAULT')) {
-  $event_booking_cta_lead = BSI_EVENT_BOOKING_CTA_LEAD_DEFAULT;
-}
-
-/* Crosstour (Самотур): авто-связь по slug. Живые цена/отели/даты подгружает JS
-   (data-crosstour-event). Резолв даёт ref для авто-ссылки брони. */
-$crosstour_ref = function_exists('bsi_crosstour_event_ref')
-  ? bsi_crosstour_event_ref($post_id)
-  : null;
-$samo_booking_url = ($crosstour_ref && function_exists('bsi_crosstour_booking_url'))
-  ? bsi_crosstour_booking_url($crosstour_ref)
-  : '';
-/* Эффективная ссылка брони: ручная приоритетнее; иначе авто из Само. Пустая → форма-заявка (модалка). */
-$effective_booking_url = $tour_booking_url !== '' ? $tour_booking_url : $samo_booking_url;
-
-/* Конструктор тура: любое событие, связанное с Само, → выбор «заезд × ночи × отель»
-   (crosstour-event.js). Дата/ночи из ссылки — выбор по умолчанию. Кнопки брони JS
-   переводит на якорь конструктора, когда он отрисован; до этого и при сбое Само ведут
-   на общую ссылку. Нет сочетаний → JS откатывается на прежний список отелей. */
-$crosstour_builder = (bool) $crosstour_ref;
-
-/* Серверная crosstour-цена из ручной ссылки search_crosstour — как в single-tour.php.
-   Кеш 3ч; на проде даёт цену даже если JS-батч (data-crosstour-event) пуст / Само 403. */
-$crosstour_price_rub = null;
-if ($tour_booking_url !== ''
-  && stripos($tour_booking_url, 'search_crosstour') !== false
-  && function_exists('bsi_crosstour_ref_from_url')
-  && function_exists('bsi_crosstour_quick_price')
-) {
-  $ct_ref = bsi_crosstour_ref_from_url($tour_booking_url);
-  if ($ct_ref) {
-    // Минимум по всем сочетаниям конструктора — та же цена «от», что покажет JS;
-    // сетки нет (продукт не в crosstour) → цена по слоту ссылки, как раньше.
-    $crosstour_price_rub = function_exists('bsi_crosstour_tour_matrix')
-      ? bsi_crosstour_tour_matrix($ct_ref)['price_rub']
-      : null;
-    if ($crosstour_price_rub === null) {
-      $crosstour_price_rub = bsi_crosstour_quick_price($ct_ref);
-    }
-  }
-}
-
-$region_terms = get_the_terms($post_id, 'region');
-$region_term = (!empty($region_terms) && !is_wp_error($region_terms)) ? $region_terms[0] : null;
-
-$resort_terms = get_the_terms($post_id, 'resort');
-$resort_term = (!empty($resort_terms) && !is_wp_error($resort_terms)) ? $resort_terms[0] : null;
-
-$tour_gallery = function_exists('get_field') ? get_field('tour_gallery', $post_id) : [];
-$tour_duration = function_exists('get_field') ? trim((string) get_field('tour_duration', $post_id)) : '';
-$tour_program = function_exists('get_field') ? get_field('tour_program', $post_id) : [];
-$tour_included = function_exists('get_field') ? (string) get_field('tour_included', $post_id) : '';
-$tour_not_inc = function_exists('get_field') ? (string) get_field('tour_not_included', $post_id) : '';
-$tour_extra = function_exists('get_field') ? (string) get_field('tour_extra', $post_id) : '';
-$tour_price_from = function_exists('get_field') ? trim((string) get_field('price_from', $post_id)) : '';
-$event_tickets = function_exists('get_field') ? get_field('event_tickets', $post_id) : [];
-$event_venue = function_exists('get_field') ? trim((string) get_field('event_venue', $post_id)) : '';
-$event_time = function_exists('get_field') ? trim((string) get_field('event_time', $post_id)) : '';
-$tour_nights = function_exists('get_field') ? (int) get_field('tour_nights', $post_id) : 0;
-$venue_scheme = function_exists('get_field') ? get_field('venue_scheme', $post_id) : null;
-$venue_scheme_legend = function_exists('get_field') ? get_field('venue_scheme_legend', $post_id) : [];
-$event_faq = function_exists('get_field') ? get_field('event_faq', $post_id) : [];
-$event_about = function_exists('get_field') ? (string) get_field('event_about', $post_id) : '';
-$event_additional = function_exists('get_field') ? (string) get_field('event_additional', $post_id) : '';
-
-$event_widget_phone_primary = function_exists('get_field') ? trim((string) get_field('event_widget_phone_primary', $post_id)) : '';
-$event_widget_phone_secondary = function_exists('get_field') ? trim((string) get_field('event_widget_phone_secondary', $post_id)) : '';
-if ($event_widget_phone_primary === '') {
-  $event_widget_phone_primary = '8 (495) 785-55-35';
-}
-if ($event_widget_phone_secondary === '') {
-  $event_widget_phone_secondary = '8 (800) 200-55-35 (из регионов)';
-}
-$event_widget_phone_primary_tel = preg_replace('/\D/u', '', $event_widget_phone_primary);
-$event_widget_phone_secondary_tel = preg_replace('/\D/u', '', $event_widget_phone_secondary);
-if ($event_widget_phone_primary_tel === '') {
-  $event_widget_phone_primary_tel = '84957855535';
-}
-if ($event_widget_phone_secondary_tel === '') {
-  $event_widget_phone_secondary_tel = '88002005535';
-}
-
-$include_terms = get_the_terms($post_id, 'tour_include');
-
-$widget_country_title = '';
-$widget_country_permalink = '';
-$widget_country_flag = '';
-if ($country_id) {
-  $widget_country_title = get_the_title($country_id);
-  $widget_country_permalink = get_permalink($country_id);
-  $flag = function_exists('get_field') ? get_field('flag', $country_id) : '';
-  $widget_country_flag = (is_array($flag) && !empty($flag['url'])) ? $flag['url'] : (string) $flag;
-}
-
-$venue_scheme_type = function_exists('get_field') ? trim((string) get_field('venue_scheme_type', $post_id)) : '';
-if ($venue_scheme_type === '') {
-  $venue_scheme_type = 'stadium';
-}
-$venue_scheme_titles = [
-  'stadium' => 'Схема стадиона',
-  'hall' => 'Схема зала',
-  'arena' => 'Схема арены',
-  'theatre' => 'Схема театра',
-  'track' => 'Схема трассы',
-  'court' => 'Схема корта',
-];
-$venue_scheme_heading = $venue_scheme_titles[$venue_scheme_type] ?? '';
-if ($venue_scheme_type === 'custom') {
-  $custom_scheme_title = function_exists('get_field') ? trim((string) get_field('venue_scheme_title', $post_id)) : '';
-  $venue_scheme_heading = $custom_scheme_title !== '' ? $custom_scheme_title : 'Схема площадки';
-}
-if ($venue_scheme_heading === '') {
-  $venue_scheme_heading = 'Схема стадиона';
-}
-
-$venue_scheme_url = '';
-$venue_scheme_alt = '';
-if (is_array($venue_scheme) && !empty($venue_scheme['url'])) {
-  $venue_scheme_url = (string) $venue_scheme['url'];
-  $venue_scheme_alt = !empty($venue_scheme['alt']) ? (string) $venue_scheme['alt'] : $venue_scheme_heading;
-}
-
-$event_dates_rows = function_exists('get_field') ? get_field('event_dates', $post_id) : [];
-
-$related_events = [];
-if ($country_id > 0 && function_exists('bsi_build_tour_country_meta_query')) {
-  $country_tour_meta = bsi_build_tour_country_meta_query($country_id);
-  if (!empty($country_tour_meta)) {
-    $related_events = get_posts(bsi_query_args_append_schedule([
-      'post_type' => 'event',
-      'post_status' => 'publish',
-      'posts_per_page' => 10,
-      'post__not_in' => [$post_id],
-      'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
-      'no_found_rows' => true,
-      'meta_query' => $country_tour_meta,
-    ]));
-  }
-}
-$fallback_rub_from_post = function_exists('bsi_extract_price_number')
-  ? bsi_extract_price_number($tour_price_from)
-  : null;
-
-$hero_cover = function_exists('get_field') ? get_field('event_hero_cover', $post_id) : null;
-$hero_url = '';
-if (is_array($hero_cover) && !empty($hero_cover['ID'])) {
-  $hero_url = (string) wp_get_attachment_image_url((int) $hero_cover['ID'], 'full');
-} elseif (is_array($hero_cover) && !empty($hero_cover['url'])) {
-  $hero_url = (string) $hero_cover['url'];
-}
-if ($hero_url === '') {
-  $hero_url = get_the_post_thumbnail_url($post_id, 'full');
-}
-if (!$hero_url && !empty($tour_gallery) && is_array($tour_gallery)) {
-  $first = $tour_gallery[0] ?? null;
-  if (is_array($first)) {
-    $hero_url = !empty($first['sizes']['large']) ? (string) $first['sizes']['large'] : (string) ($first['url'] ?? '');
-  }
-}
-
-$hero_cover_mobile = function_exists('get_field') ? get_field('event_hero_cover_mobile', $post_id) : null;
-$hero_url_mobile = '';
-if (is_array($hero_cover_mobile) && !empty($hero_cover_mobile['ID'])) {
-  $hero_url_mobile = (string) wp_get_attachment_image_url((int) $hero_cover_mobile['ID'], 'full');
-} elseif (is_array($hero_cover_mobile) && !empty($hero_cover_mobile['url'])) {
-  $hero_url_mobile = (string) $hero_cover_mobile['url'];
-}
-
-if ($hero_url === '' && $hero_url_mobile !== '') {
-  $hero_url = $hero_url_mobile;
-}
-
-$hero_date_label = '';
-$hero_concert_date = function_exists('get_field') ? get_field('event_hero_date', $post_id) : '';
-$hero_concert_date_end = function_exists('get_field') ? get_field('event_hero_date_end', $post_id) : '';
-if (is_string($hero_concert_date) && $hero_concert_date !== '') {
-  $hero_ts = strtotime($hero_concert_date);
-  $hero_end_ts = is_string($hero_concert_date_end) && $hero_concert_date_end !== '' ? strtotime($hero_concert_date_end) : 0;
-  if ($hero_ts) {
-    if ($hero_end_ts && $hero_end_ts !== $hero_ts) {
-      // Многодневное на первом экране → диапазон '31.05 – 2.06.2026'.
-      $hero_date_label = bsi_format_event_date_range($hero_concert_date, (string) $hero_concert_date_end);
-    } else {
-      $hero_date_label = date_i18n('j F Y', $hero_ts);
-    }
-  }
-}
-
-$dates_section_rows = [];
-if (!empty($event_dates_rows) && is_array($event_dates_rows)) {
-  foreach ($event_dates_rows as $row) {
-    if (empty($row['date_value'])) {
-      continue;
-    }
-    $d = (string) $row['date_value'];
-    $d_end = isset($row['date_value_end']) ? trim((string) $row['date_value_end']) : '';
-    $city = isset($row['date_city']) ? trim((string) $row['date_city']) : '';
-    // Площадка строки не наследует общую площадку поста: пусто — значит не показываем.
-    $venue_row = isset($row['date_venue']) ? trim((string) $row['date_venue']) : '';
-
-    $currency = isset($row['date_row_price_currency']) ? strtoupper(trim((string) $row['date_row_price_currency'])) : 'RUB';
-    if ($currency === '') {
-      $currency = 'RUB';
-    }
-    $amount_raw = $row['date_row_price'] ?? null;
-    $amount = ($amount_raw !== null && $amount_raw !== '') ? (float) $amount_raw : null;
-
-    $price_rub = null;
-    $price_original = null;
-    $price_currency = null;
-
-    if ($amount !== null && $amount > 0 && function_exists('bsi_education_convert_price_to_rub')) {
-      $converted = bsi_education_convert_price_to_rub($amount, $currency);
-      if ($converted !== null && $converted > 0) {
-        $price_rub = (int) $converted;
-        if ($currency !== 'RUB') {
-          $price_original = $amount;
-          $price_currency = $currency;
-        }
-      }
-    }
-
-    // Пустая ячейка цены строки → не подставляем общую цену поста: строка покажет «По запросу».
-
-    $dates_section_rows[] = [
-      'date' => $d,
-      'date_end' => $d_end,
-      'city' => $city,
-      'venue' => $venue_row,
-      'price_rub' => $price_rub,
-      'price_original' => $price_original,
-      'price_currency' => $price_currency,
-    ];
-  }
-}
-
-$row_rubs_positive = [];
-foreach ($dates_section_rows as $r_row) {
-  if (isset($r_row['price_rub']) && (int) $r_row['price_rub'] > 0) {
-    $row_rubs_positive[] = (int) $r_row['price_rub'];
-  }
-}
-$price_from_amount = !empty($row_rubs_positive) ? min($row_rubs_positive) : $fallback_rub_from_post;
-// Живая crosstour-цена (ссылка search_crosstour) приоритетнее — как single-tour.php.
-if ($crosstour_price_rub !== null && (int) $crosstour_price_rub > 0) {
-  $price_from_amount = (int) $crosstour_price_rub;
-}
-
-$event_accommodation_raw = function_exists('get_field') ? get_field('event_accommodation', $post_id) : [];
-$accommodation_rows = [];
-if (!empty($event_accommodation_raw) && is_array($event_accommodation_raw)) {
-  foreach ($event_accommodation_raw as $acc_row) {
-    $acc_name = isset($acc_row['accommodation_hotel_name']) ? trim((string) $acc_row['accommodation_hotel_name']) : '';
-    if ($acc_name === '') {
-      continue;
-    }
-    $acc_stars_raw = isset($acc_row['accommodation_stars']) ? (int) $acc_row['accommodation_stars'] : 0;
-    $acc_stars = max(0, min(5, $acc_stars_raw));
-    $acc_descr = isset($acc_row['accommodation_description']) ? trim((string) $acc_row['accommodation_description']) : '';
-    $acc_amount_raw = $acc_row['accommodation_price'] ?? null;
-    $acc_amount = ($acc_amount_raw !== null && $acc_amount_raw !== '') ? (float) $acc_amount_raw : null;
-    $acc_cur = isset($acc_row['accommodation_price_currency']) ? strtoupper(trim((string) $acc_row['accommodation_price_currency'])) : 'RUB';
-    if ($acc_cur === '') {
-      $acc_cur = 'RUB';
-    }
-
-    $acc_price_rub = null;
-    $acc_price_original = null;
-    $acc_price_currency = null;
-    if ($acc_amount !== null && $acc_amount > 0 && function_exists('bsi_education_convert_price_to_rub')) {
-      $acc_converted = bsi_education_convert_price_to_rub($acc_amount, $acc_cur);
-      if ($acc_converted !== null && $acc_converted > 0) {
-        $acc_price_rub = (int) $acc_converted;
-        if ($acc_cur !== 'RUB') {
-          $acc_price_original = $acc_amount;
-          $acc_price_currency = $acc_cur;
-        }
-      }
-    }
-
-    $accommodation_rows[] = [
-      'name' => $acc_name,
-      'stars' => $acc_stars,
-      'descr' => $acc_descr,
-      'price_rub' => $acc_price_rub,
-      'price_original' => $acc_price_original,
-      'price_currency' => $acc_price_currency,
-    ];
-  }
-}
-
-$event_price_original = null;
-$event_price_currency = null;
-if ($price_from_amount !== null && (int) $price_from_amount > 0 && !empty($dates_section_rows)) {
-  $tied_rows = array_values(array_filter(
-    $dates_section_rows,
-    static function ($r) use ($price_from_amount) {
-      return isset($r['price_rub']) && (int) $r['price_rub'] === (int) $price_from_amount;
-    }
-  ));
-  if (!empty($tied_rows)) {
-    usort(
-      $tied_rows,
-      static function ($a, $b) {
-        $a_fc = !empty($a['price_currency']);
-        $b_fc = !empty($b['price_currency']);
-        if ($a_fc !== $b_fc) {
-          return $b_fc <=> $a_fc;
-        }
-        return 0;
-      }
-    );
-    $winner_row = $tied_rows[0];
-    if (!empty($winner_row['price_original']) && !empty($winner_row['price_currency'])) {
-      $event_price_original = (float) $winner_row['price_original'];
-      $event_price_currency = (string) $winner_row['price_currency'];
-    }
-  }
-}
-
-if ($event_price_original === null && !empty($accommodation_rows)) {
-  $acc_non_rub = array_values(array_filter(
-    $accommodation_rows,
-    static function ($r) {
-      return !empty($r['price_currency']) && (float) ($r['price_original'] ?? 0) > 0 && (int) ($r['price_rub'] ?? 0) > 0;
-    }
-  ));
-  if (!empty($acc_non_rub)) {
-    usort(
-      $acc_non_rub,
-      static function ($a, $b) {
-        return (int) $a['price_rub'] <=> (int) $b['price_rub'];
-      }
-    );
-    $event_price_original = (float) $acc_non_rub[0]['price_original'];
-    $event_price_currency = (string) $acc_non_rub[0]['price_currency'];
-  }
-}
-
-$hero_type_terms = get_the_terms($post_id, BSI_EVENT_TOUR_TYPE_TAXONOMY);
-if (!is_array($hero_type_terms)) {
-  // false — у события нет типа, WP_Error — таксономия не зарегистрирована.
-  $hero_type_terms = [];
-}
-
-$hero_price_line = '';
-if ($price_from_amount !== null && (int) $price_from_amount > 0) {
-  $hero_price_line = 'от ' . number_format((int) $price_from_amount, 0, ',', ' ') . ' ₽';
-} elseif ($tour_price_from !== '') {
-  $hero_price_line = $tour_price_from;
-} else {
-  $hero_price_line = 'По запросу';
-}
-
-$hero_style = '';
-if ($hero_url) {
-  $hero_style = '--single-event-hero-bg:url(' . esc_url($hero_url) . ')';
-  if ($hero_url_mobile !== '' && $hero_url_mobile !== $hero_url) {
-    $hero_style .= ';--single-event-hero-bg-mobile:url(' . esc_url($hero_url_mobile) . ')';
-  }
-}
-
-$event_title = get_the_title($post_id);
-
-$excerpt = get_the_excerpt($post_id);
-$show_quick = $tour_duration || $tour_nights || $resort_term;
+$event = bsi_event_page_data($post_id);
+$finished = $event['finished'];
+$both = $event['has_tour'] && $event['has_tickets'];
+$json = bsi_event_page_json($event);
+$related = bsi_event_related($post_id, $event['country_id'], $finished);
+$args = ['event' => $event, 'both' => $both, 'json' => $json];
 
 get_header();
 ?>
 
-<main class="site-main single-event-page"<?php if ($crosstour_ref): ?> data-crosstour-event="<?= esc_attr((string) $post_id); ?>"<?php endif; ?>>
+<main class="site-main single-event-page<?= $finished ? ' single-event-page--finished' : ''; ?>"
+  data-event-offer data-event-id="<?= esc_attr((string) $post_id); ?>" data-event-title="<?= esc_attr($event['title']); ?>"
+  data-event-time="<?= esc_attr($event['time']); ?>"<?php if ($event['crosstour']): ?> data-crosstour-event="<?= esc_attr((string) $post_id); ?>"<?php endif; ?>>
+  <script type="application/json" data-event-offer-json><?= wp_json_encode($json, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?></script>
 
-  <!-- Hero Start -->
-  <section class="single-event__hero<?= $hero_url ? '' : ' single-event__hero--no-poster'; ?>"
-    aria-labelledby="event-hero-title" <?= $hero_style !== '' ? ' style="' . esc_attr($hero_style) . '"' : ''; ?>>
-    <div class="single-event__hero-bg" aria-hidden="true"></div>
-
-    <?php
-    if (function_exists('yoast_breadcrumb')) {
-      yoast_breadcrumb(
-        '<div id="breadcrumbs" class="breadcrumbs"><div class="container"><p>',
-        '</p></div></div>'
-      );
-    }
-    ?>
-
-    <div class="container single-event__hero-inner">
-      <div class="single-event__hero-tags">
-        <?php if ($hero_date_label !== ''): ?>
-          <span class="single-event__hero-tag"><?= esc_html($hero_date_label); ?></span>
-        <?php endif; ?>
-        <?php foreach ($hero_type_terms as $t): ?>
-          <span class="single-event__hero-tag"><?= esc_html($t->name); ?></span>
-        <?php endforeach; ?>
-        <?php if ($event_venue !== ''): ?>
-          <span class="single-event__hero-tag"><?= esc_html($event_venue); ?></span>
-        <?php endif; ?>
-      </div>
-
-      <h1 class="h1 single-event__hero-title" id="event-hero-title"><?= esc_html($event_title); ?></h1>
-
-      <div class="single-event__hero-actions">
-
-        <?php if ($effective_booking_url): ?>
-          <a href="<?= esc_url($effective_booking_url); ?>" class="btn btn-accent single-event__hero-btn" target="_blank"
-            rel="nofollow noopener"<?php if ($crosstour_builder): ?> data-crosstour-book-link<?php endif; ?>>Забронировать</a>
-        <?php else: ?>
-          <button type="button" class="btn btn-accent single-event__hero-btn js-event-booking-btn"
-            data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
-            data-event-date="<?= esc_attr($hero_date_label); ?>"
-            data-event-venue="<?= esc_attr($event_venue); ?>" data-event-time="<?= esc_attr($event_time); ?>"
-            data-min-price="<?= esc_attr($price_from_amount ?? 0); ?>">Забронировать</button>
-        <?php endif; ?>
-
-        <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
-          <span class="single-event__hero-price numfont js-event-price"<?php if ($crosstour_ref): ?> data-crosstour-price<?php endif; ?>
-            data-price-rub="<?= esc_attr((string) (int) $price_from_amount); ?>"
-            <?php if ($event_price_original !== null && $event_price_original > 0 && $event_price_currency !== null && $event_price_currency !== ''): ?>
-            data-price-original="<?= esc_attr((string) $event_price_original); ?>"
-            data-price-currency="<?= esc_attr($event_price_currency); ?>"
-            <?php endif; ?>
-            data-has-from="true"><?= esc_html($hero_price_line); ?></span>
-        <?php else: ?>
-          <span class="single-event__hero-price numfont"<?php if ($crosstour_ref): ?> data-crosstour-price data-has-from="true"<?php endif; ?>><?= esc_html($hero_price_line); ?></span>
-        <?php endif; ?>
-      </div>
-    </div>
-  </section>
-  <!-- Hero End -->
-
+  <?php get_template_part('template-parts/event/page/hero', null, $args); ?>
 
   <section class="single-event__body">
     <div class="container">
+      <?php if ($finished): ?>
+        <?php get_template_part('template-parts/event/page/status', null, $args); ?>
+      <?php endif; ?>
 
-      <div class="single-event__about-grid" id="o-sobytii">
+      <?php if ($finished && !empty($related)): ?>
+        <?php get_template_part('template-parts/event/related-tours-slider', null, ['posts' => $related]); ?>
+      <?php endif; ?>
+
+      <div class="single-event__about-grid<?= $finished ? ' single-event__about-grid--wide' : ''; ?>">
         <div class="single-event__columns">
-
-          <!-- Living start -->
-          <?php
-          $event_accommodation = function_exists('get_field') ? get_field('event_accommodation', $post_id) : [];
-          $accommodation_rows = [];
-          if (!empty($event_accommodation) && is_array($event_accommodation)) {
-            foreach ($event_accommodation as $acc_row) {
-              $acc_name = isset($acc_row['accommodation_hotel_name']) ? trim((string) $acc_row['accommodation_hotel_name']) : '';
-              if ($acc_name === '') {
-                continue;
-              }
-              $acc_stars_raw = isset($acc_row['accommodation_stars']) ? (int) $acc_row['accommodation_stars'] : 0;
-              $acc_stars = max(0, min(5, $acc_stars_raw));
-              $acc_stars_plus = !empty($acc_row['accommodation_stars_plus']);
-              $acc_descr = isset($acc_row['accommodation_description']) ? trim((string) $acc_row['accommodation_description']) : '';
-              $acc_amount_raw = $acc_row['accommodation_price'] ?? null;
-              $acc_amount = ($acc_amount_raw !== null && $acc_amount_raw !== '') ? (float) $acc_amount_raw : null;
-              $acc_cur = isset($acc_row['accommodation_price_currency']) ? strtoupper(trim((string) $acc_row['accommodation_price_currency'])) : 'RUB';
-              if ($acc_cur === '') {
-                $acc_cur = 'RUB';
-              }
-
-              $acc_price_rub = null;
-              $acc_price_original = null;
-              $acc_price_currency = null;
-              if ($acc_amount !== null && $acc_amount > 0 && function_exists('bsi_education_convert_price_to_rub')) {
-                $acc_converted = bsi_education_convert_price_to_rub($acc_amount, $acc_cur);
-                if ($acc_converted !== null && $acc_converted > 0) {
-                  $acc_price_rub = (int) $acc_converted;
-                  if ($acc_cur !== 'RUB') {
-                    $acc_price_original = $acc_amount;
-                    $acc_price_currency = $acc_cur;
-                  }
-                }
-              }
-
-              $acc_date_from = isset($acc_row['accommodation_date_from']) ? trim((string) $acc_row['accommodation_date_from']) : '';
-              $acc_date_to = isset($acc_row['accommodation_date_to']) ? trim((string) $acc_row['accommodation_date_to']) : '';
-              $acc_stay = function_exists('bsi_format_stay_range')
-                ? bsi_format_stay_range($acc_date_from, $acc_date_to)
-                : ['label' => '', 'duration' => '', 'nights' => 0, 'days' => 0, 'from_ts' => 0, 'to_ts' => 0];
-
-              $accommodation_rows[] = [
-                'name' => $acc_name,
-                'stars' => $acc_stars,
-                'stars_plus' => $acc_stars_plus,
-                'descr' => $acc_descr,
-                'price_rub' => $acc_price_rub,
-                'price_original' => $acc_price_original,
-                'price_currency' => $acc_price_currency,
-                'date_from' => $acc_date_from,
-                'date_to' => $acc_date_to,
-                'stay_label' => $acc_stay['label'],
-                'stay_duration' => $acc_stay['duration'],
-                'stay_nights' => $acc_stay['nights'],
-                'stay_days' => $acc_stay['days'],
-                'stay_from_ts' => $acc_stay['from_ts'],
-              ];
-            }
-          }
-          ?>
-
-          <?php if ($crosstour_builder): ?>
-            <?php /* Шаг 1 — дата заезда и ночи. Скелетон до ответа Само; JS убирает его, при одном сочетании/пустой сетке прячет секцию. */ ?>
-            <section class="single-event__accommodation-section" data-crosstour-builder id="podbor-tura">
-              <h2 class="h2">Даты поездки</h2>
-              <div class="single-event__builder-skeleton" data-builder-skeleton>
-                <div class="single-event__builder-skeleton-group">
-                  <span class="ui-skeleton single-event__builder-skeleton-label"></span>
-                  <div class="single-event__builder-skeleton-chips">
-                    <?php for ($i = 0; $i < 7; $i++): ?>
-                      <span class="ui-skeleton single-event__builder-skeleton-chip"></span>
-                    <?php endfor; ?>
-                  </div>
-                </div>
-                <div class="single-event__builder-skeleton-group">
-                  <span class="ui-skeleton single-event__builder-skeleton-label"></span>
-                  <div class="single-event__builder-skeleton-chips">
-                    <?php for ($i = 0; $i < 3; $i++): ?>
-                      <span class="ui-skeleton single-event__builder-skeleton-chip single-event__builder-skeleton-chip--wide"></span>
-                    <?php endfor; ?>
-                  </div>
-                </div>
-              </div>
-              <div class="single-event__builder" data-builder-controls hidden>
-                <div class="single-event__builder-group" data-builder-group="dates">
-                  <span class="single-event__builder-label">Дата заезда</span>
-                  <div class="ui-choices" data-builder-dates></div>
-                </div>
-                <div class="single-event__builder-group" data-builder-group="nights">
-                  <span class="single-event__builder-label">Количество ночей</span>
-                  <div class="ui-choices" data-builder-nights></div>
-                </div>
-                <p class="single-event__builder-summary numfont" data-builder-summary></p>
-              </div>
-            </section>
-          <?php endif; ?>
-
-          <?php if ($crosstour_ref): ?>
-            <?php /* Шаг 2 — отель: фильтр звёздности + номера выбранного сочетания. */ ?>
-            <section class="single-event__accommodation-section single-event__accommodation-section--samo"
-              data-crosstour-hotels id="varianty-prozhivaniya"<?php if (!$crosstour_builder): ?> hidden<?php endif; ?>>
-              <h2 class="h2">Варианты проживания</h2>
-              <?php if ($crosstour_builder): ?>
-                <div class="single-event__builder-skeleton" data-builder-skeleton>
-                  <?php for ($i = 0; $i < 3; $i++): ?>
-                    <span class="ui-skeleton single-event__builder-skeleton-card"></span>
-                  <?php endfor; ?>
-                </div>
-                <div class="single-event__hotels-filter" data-builder-group="stars" hidden>
-                  <span class="single-event__builder-label">Отель</span>
-                  <div class="ui-choices" data-builder-stars></div>
-                </div>
-              <?php endif; ?>
-              <ul class="single-event__accommodation-grid" data-crosstour-hotels-list></ul>
-            </section>
-          <?php endif; ?>
-
-          <?php if (!empty($accommodation_rows)): ?>
-            <section class="single-event__accommodation-section"<?php if ($crosstour_ref): ?> data-manual-accommodation hidden<?php endif; ?>>
-              <h2 class="h2">Варианты проживания и цены</h2>
-              <ul class="single-event__accommodation-grid">
-                <?php foreach ($accommodation_rows as $acc): ?>
-                  <li class="single-event__accommodation-card" data-stay-from="<?= esc_attr($acc['date_from']); ?>"
-                    data-stay-to="<?= esc_attr($acc['date_to']); ?>"
-                    data-stay-from-ts="<?= esc_attr((string) $acc['stay_from_ts']); ?>"
-                    data-stay-nights="<?= esc_attr((string) $acc['stay_nights']); ?>"
-                    data-price-rub="<?= esc_attr((string) (int) ($acc['price_rub'] ?? 0)); ?>">
-                    <div class="single-event__accommodation-card-head">
-                      <?php if ($acc['stars'] > 0): ?>
-                        <?php $acc_stars_label = (string) $acc['stars'] . (!empty($acc['stars_plus']) ? '+' : ''); ?>
-                        <span class="single-event__accommodation-card-stars" aria-label="<?= esc_attr($acc_stars_label . ' из 5'); ?>">
-                          <span class="single-event__accommodation-card-stars-num"><?= esc_html($acc_stars_label); ?></span>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true">
-                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>
-                          </svg>
-                        </span>
-                      <?php endif; ?>
-                      <h3 class="single-event__accommodation-card-name"><?= esc_html($acc['name']); ?></h3>
-                    </div>
-                    <?php if ($acc['stay_label'] !== ''): ?>
-                      <div class="single-event__accommodation-card-stay">
-                        <svg class="single-event__accommodation-card-stay-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
-                        </svg>
-                        <span class="single-event__accommodation-card-stay-dates numfont"><?= esc_html($acc['stay_label']); ?></span>
-                        <?php if ($acc['stay_duration'] !== ''): ?>
-                          <span class="single-event__accommodation-card-stay-dot" aria-hidden="true"></span>
-                          <span class="single-event__accommodation-card-stay-duration"><?= esc_html($acc['stay_duration']); ?></span>
-                        <?php endif; ?>
-                      </div>
-                    <?php endif; ?>
-                    <?php if ($acc['descr'] !== ''): ?>
-                      <p class="single-event__accommodation-card-descr"><?= esc_html($acc['descr']); ?></p>
-                    <?php endif; ?>
-                    <div class="single-event__accommodation-card-foot">
-                      <?php if ($acc['price_rub'] !== null && (int) $acc['price_rub'] > 0): ?>
-                        <span class="single-event__accommodation-card-price numfont js-event-price"
-                          data-price-rub="<?= esc_attr((string) (int) $acc['price_rub']); ?>"
-                          <?php if ($acc['price_original'] !== null && (float) $acc['price_original'] > 0 && $acc['price_currency'] !== null && $acc['price_currency'] !== ''): ?>
-                          data-price-original="<?= esc_attr((string) $acc['price_original']); ?>"
-                          data-price-currency="<?= esc_attr($acc['price_currency']); ?>"
-                          <?php endif; ?>><?= esc_html(number_format((int) $acc['price_rub'], 0, ',', ' ')); ?>
-                          ₽</span>
-                      <?php else: ?>
-                        <span class="single-event__accommodation-card-price numfont">Цена по запросу</span>
-                      <?php endif; ?>
-                      <button type="button"
-                        class="single-event__accommodation-card-link js-event-booking-btn"
-                        data-event-id="<?= esc_attr((string) $post_id); ?>"
-                        data-event-title="<?= esc_attr($event_title); ?>"
-                        data-event-date="<?= esc_attr($hero_date_label); ?>"
-                        data-event-venue="<?= esc_attr($event_venue); ?>"
-                        data-event-time="<?= esc_attr($event_time); ?>"
-                        data-accommodation-name="<?= esc_attr($acc['name']); ?>"
-                        data-accommodation-stars="<?= esc_attr((string) $acc['stars'] . (!empty($acc['stars_plus']) ? '+' : '')); ?>"
-                        <?php if ($acc['price_rub'] !== null && (int) $acc['price_rub'] > 0): ?>
-                        data-min-price="<?= esc_attr((string) (int) $acc['price_rub']); ?>"
-                        <?php endif; ?>
-                        <?php if ($acc['price_original'] !== null && $acc['price_currency'] !== null): ?>
-                        data-accommodation-price-original="<?= esc_attr((string) $acc['price_original']); ?>"
-                        data-accommodation-price-currency="<?= esc_attr($acc['price_currency']); ?>"
-                        <?php endif; ?>><span>Забронировать</span><svg class="single-event__accommodation-card-link-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
-                    </div>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            </section>
-          <?php endif; ?>
-
-          <!-- About start -->
-          <div class="single-event__about-main">
-            <h2 class="h2">О событии</h2>
-            <?php
-            if ($event_about !== '' && trim(wp_strip_all_tags($event_about)) !== ''):
-              ?>
-              <div class="single-event__about-body editor-content">
-                <?= wp_kses_post($event_about); ?>
-              </div>
-            <?php elseif ($excerpt !== ''): ?>
-              <p class="single-event__lead"><?= esc_html($excerpt); ?></p>
+          <?php if (!$finished): ?>
+            <?php get_template_part('template-parts/event/page/format', null, $args); ?>
+            <?php if ($event['has_tickets']): ?>
+              <?php get_template_part('template-parts/event/page/tickets', null, $args); ?>
             <?php endif; ?>
-
-            <?php
-            $lucide_attrs = ['width' => '20', 'height' => '20', 'stroke' => 'currentColor'];
-            if ($show_quick):
-              ?>
-
+            <?php if ($event['has_tour']): ?>
+              <?php get_template_part('template-parts/event/page/tour', null, $args); ?>
             <?php endif; ?>
-          </div>
-
-          <!-- About end -->
-
-          <!-- Dates start -->
-          <?php if (!empty($dates_section_rows)): ?>
-            <section class="single-event__dates-section">
-              <h2 class="h2 single-event__dates-title">Даты и место</h2>
-              <ul class="single-event__dates-list">
-                <?php foreach ($dates_section_rows as $br): ?>
-                  <?php
-                  $row_city = $br['city'] !== '' ? $br['city'] : '—';
-                  $row_venue = $br['venue'];
-                  $row_date_label = bsi_format_event_date_range($br['date'], $br['date_end'] ?? '');
-                  $row_price_rub = isset($br['price_rub']) ? $br['price_rub'] : null;
-                  $row_orig = isset($br['price_original']) ? $br['price_original'] : null;
-                  $row_cur = isset($br['price_currency']) ? trim((string) $br['price_currency']) : '';
-                  ?>
-                  <li class="single-event__dates-row">
-                    <div class="single-event__dates-row-left">
-                      <span class="single-event__dates-dot" aria-hidden="true"></span>
-                      <div class="single-event__dates-meta">
-                        <span class="single-event__dates-meta-txt numfont"><?= esc_html($row_date_label); ?></span>
-                        <span class="single-event__dates-sep" aria-hidden="true"></span>
-                        <span class="single-event__dates-meta-txt"><?= esc_html($row_city); ?></span>
-                        <?php if ($row_venue !== ''): ?>
-                          <span class="single-event__dates-sep" aria-hidden="true"></span>
-                          <span class="single-event__dates-meta-txt"><?= esc_html($row_venue); ?></span>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                    <div class="single-event__dates-row-right">
-                      <?php if ($row_price_rub !== null && (int) $row_price_rub > 0): ?>
-                        <span class="single-event__dates-price numfont js-event-price"
-                          data-price-rub="<?= esc_attr((string) (int) $row_price_rub); ?>"
-                          <?php if ($row_orig !== null && (float) $row_orig > 0 && $row_cur !== ''): ?>
-                          data-price-original="<?= esc_attr((string) $row_orig); ?>"
-                          data-price-currency="<?= esc_attr($row_cur); ?>"
-                          <?php endif; ?>
-                          data-has-from="true">от
-                          <?= esc_html(number_format((int) $row_price_rub, 0, ',', ' ')); ?>
-                          ₽</span>
-                      <?php else: ?>
-                        <span class="single-event__dates-price single-event__dates-price--request">По запросу</span>
-                      <?php endif; ?>
-                      <span class="single-event__dates-sep" aria-hidden="true"></span>
-                      <span class="single-event__dates-book-wrap">
-                        <?php if ($effective_booking_url): ?>
-                          <a href="<?= esc_url($effective_booking_url); ?>" class="single-event__dates-book" target="_blank"
-                            rel="nofollow noopener"<?php if ($crosstour_builder): ?> data-crosstour-book-link<?php endif; ?>>забронировать</a>
-                        <?php else: ?>
-                          <button type="button" class="single-event__dates-book js-event-booking-btn"
-                            data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
-                            data-event-date="<?= esc_attr($row_date_label); ?>"
-                            data-event-venue="<?= esc_attr($br['venue']); ?>" data-event-time="<?= esc_attr($event_time); ?>"
-                            data-min-price="<?= esc_attr($row_price_rub !== null ? (int) $row_price_rub : 0); ?>">забронировать</button>
-                        <?php endif; ?>
-                      </span>
-                    </div>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            </section>
-          <?php endif; ?>
-          <!-- Dates end -->
-
-          <!-- Scheme start -->
-          <?php
-          $has_scheme_legend = !empty($venue_scheme_legend) && is_array($venue_scheme_legend);
-          if ($venue_scheme_url || $has_scheme_legend):
-            ?>
-            <section class="single-event__venue-scheme<?= $venue_scheme_url ? '' : ' single-event__venue-scheme--no-image'; ?>">
-              <h2 class="h2"><?= esc_html($venue_scheme_heading); ?></h2>
-              <div class="single-event__venue-layout">
-                <?php if ($venue_scheme_url): ?>
-                  <figure class="single-event__venue-figure">
-                    <img src="<?= esc_url($venue_scheme_url); ?>" alt="<?= esc_attr($venue_scheme_alt); ?>" loading="lazy">
-                  </figure>
-                <?php endif; ?>
-                <?php if ($has_scheme_legend): ?>
-                  <?php
-                  $legend_currency_map = [
-                    '₽' => 'RUB', 'руб' => 'RUB', 'руб.' => 'RUB', 'rub' => 'RUB',
-                    '$' => 'USD', 'usd' => 'USD',
-                    '€' => 'EUR', 'eur' => 'EUR',
-                    '£' => 'GBP', 'gbp' => 'GBP',
-                  ];
-                  ?>
-                  <ul class="single-event__venue-legend">
-                    <?php foreach ($venue_scheme_legend as $leg): ?>
-                      <?php
-                      $lab = isset($leg['legend_label']) ? trim((string) $leg['legend_label']) : '';
-                      $leg_date = isset($leg['legend_date']) ? trim((string) $leg['legend_date']) : '';
-                      $curr = isset($leg['legend_currency']) ? trim((string) $leg['legend_currency']) : '';
-
-                      // Цена вводится как есть (без ×1000), конвертируется в рубли по валюте.
-                      $leg_raw = $leg['legend_price'] ?? null;
-                      $leg_amount = ($leg_raw !== null && $leg_raw !== '' && is_numeric($leg_raw))
-                        ? (float) $leg_raw
-                        : null;
-
-                      $curr_key = mb_strtolower($curr);
-                      $leg_iso = $legend_currency_map[$curr_key] ?? ($curr !== '' ? strtoupper($curr) : null);
-
-                      $leg_price_rub = null;
-                      $leg_price_original = null;
-                      $leg_price_currency = null;
-                      if ($leg_amount !== null && $leg_amount > 0 && $leg_iso !== null && function_exists('bsi_education_convert_price_to_rub')) {
-                        $leg_rub_converted = bsi_education_convert_price_to_rub($leg_amount, $leg_iso);
-                        if ($leg_rub_converted !== null && $leg_rub_converted > 0) {
-                          $leg_price_rub = (int) $leg_rub_converted;
-                          if ($leg_iso !== 'RUB') {
-                            $leg_price_original = $leg_amount;
-                            $leg_price_currency = $leg_iso;
-                          }
-                        }
-                      }
-
-                      // Текст-фолбэк, если цена не сконвертилась (нечисловая / нет валюты).
-                      $pr = '';
-                      if ($leg_amount !== null) {
-                        $pr = number_format((int) round($leg_amount), 0, ',', ' ') . ($curr !== '' ? ' ' . $curr : '');
-                      } elseif (trim((string) ($leg_raw ?? '')) !== '') {
-                        $pr = trim(trim((string) $leg_raw) . ($curr !== '' ? ' ' . $curr : ''));
-                      }
-
-                      if ($lab === '' && $leg_price_rub === null && $pr === '') {
-                        continue;
-                      }
-                      ?>
-                      <li class="single-event__venue-legend-item">
-                        <span class="single-event__venue-legend-label">
-                          <?php if ($leg_date !== ''): ?>
-                            <span class="single-event__venue-legend-date numfont"><?= esc_html($leg_date); ?></span>
-                          <?php endif; ?>
-                          <?= wp_kses($lab, ['br' => []]); ?>
-                        </span>
-                        <span class="single-event__venue-legend-leader" aria-hidden="true"></span>
-                        <?php if ($leg_price_rub !== null): ?>
-                          <span class="single-event__venue-legend-price numfont js-event-price"
-                            data-price-rub="<?= esc_attr((string) (int) $leg_price_rub); ?>"
-                            <?php if ($leg_price_original !== null && $leg_price_currency !== null): ?>
-                            data-price-original="<?= esc_attr((string) $leg_price_original); ?>"
-                            data-price-currency="<?= esc_attr($leg_price_currency); ?>"
-                            <?php endif; ?>>
-                            <?= esc_html(number_format((int) $leg_price_rub, 0, ',', ' ')); ?> ₽
-                          </span>
-                        <?php else: ?>
-                          <span class="single-event__venue-legend-price numfont">
-                            <?= esc_html($pr); ?>
-                          </span>
-                        <?php endif; ?>
-                      </li>
-                    <?php endforeach; ?>
-                  </ul>
-                <?php endif; ?>
-              </div>
-            </section>
           <?php endif; ?>
 
-          <!-- Scheme end -->
-
-
-          <?php if (!empty(trim(strip_tags($tour_extra)))): ?>
-            <section class="single-event__accommodation editor-content">
-              <?php if (empty($accommodation_rows)): ?>
-                <h2 class="h2">Размещение</h2>
-              <?php endif; ?>
-              <?= wp_kses_post($tour_extra); ?>
-            </section>
-          <?php endif; ?>
-          <!-- Living end -->
-
-          <!-- Program start -->
-          <?php if (!empty($tour_program) && is_array($tour_program)): ?>
-            <section class="accordion single-event__program">
-              <div class="single-event__program-head accordion__head">
-                <h2 class="h2 single-event__program-title">Программа тура</h2>
-                <button class="btn-expand  accordion__toggle-all" type="button">Раскрыть все</button>
-              </div>
-
-              <div class="accordion__list single-event__program-list">
-                <?php foreach ($tour_program as $i => $day): ?>
-                  <?php
-                  $day_title = !empty($day['day_title']) ? (string) $day['day_title'] : '';
-                  $day_text = !empty($day['day_content']) ? (string) $day['day_content'] : '';
-                  if (!$day_title && !$day_text) {
-                    continue;
-                  }
-                  $is_open = false;
-                  ?>
-                  <div class="accordion__item single-event__program-day <?= $is_open ? 'is-open' : ''; ?>">
-                    <button class="accordion__btn single-event__program-day-btn" type="button">
-                      <span class="accordion__title">
-                        <?= esc_html($day_title ?: ('День ' . ($i + 1))); ?>
-                      </span>
-                      <span class="accordion__icon" aria-hidden="true">
-                        <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/chevron-d.svg'); ?>" alt="">
-                      </span>
-                    </button>
-
-                    <div class="accordion__panel">
-                      <div class="accordion__content">
-                        <?php if ($day_text): ?>
-                          <div class="editor-content">
-                            <?= wp_kses_post($day_text); ?>
-                          </div>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            </section>
-          <?php endif; ?>
-          <!-- Program end -->
-
-        </div>
-
-
-
-        <aside class="single-event__about-aside" aria-label="Краткая информация и бронирование">
-          <div class="single-event__booking-widget single-event__booking-widget--inline">
-            <?php /* Шапка уходит при прокрутке, а плашка липкая — дублируем название, страну и даты. */ ?>
-            <div class="single-event__booking-widget-head">
-              <p class="single-event__booking-widget-title"><?= esc_html($event_title); ?></p>
-              <?php
-              $widget_location_parts = [];
-              if ($resort_term) {
-                $resort_link = get_term_link($resort_term);
-                $widget_location_parts[] = [
-                  'label' => $resort_term->name,
-                  'url' => is_wp_error($resort_link) ? '' : $resort_link,
-                ];
-              }
-              ?>
-              <?php if ($country_id || $widget_location_parts || $hero_date_label !== ''): ?>
-                <div class="single-event__booking-widget-meta">
-                  <?php
-                  get_template_part('template-parts/ui/location-line', null, [
-                    'country_id' => $country_id,
-                    'flag_url' => $widget_country_flag,
-                    'parts' => $widget_location_parts,
-                  ]);
-                  ?>
-                  <?php if ($hero_date_label !== ''): ?>
-                    <span class="single-event__booking-widget-date numfont"><?= esc_html($hero_date_label); ?></span>
-                  <?php endif; ?>
-                </div>
-              <?php endif; ?>
-            </div>
-
-
-
-
-            <div class="single-event__booking-widget-phones">
-              <a class="single-event__booking-widget-phone numfont" href="tel:<?= esc_attr($event_widget_phone_primary_tel); ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="lucide lucide-phone-call" aria-hidden="true">
-                  <path d="M13 2a9 9 0 0 1 9 9"></path>
-                  <path d="M13 6a5 5 0 0 1 5 5"></path>
-                  <path
-                    d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
-                  </path>
-                </svg>
-                <span><?= esc_html($event_widget_phone_primary); ?></span>
-              </a>
-              <a class="single-event__booking-widget-phone numfont"
-                href="tel:<?= esc_attr($event_widget_phone_secondary_tel); ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="lucide lucide-phone-call" aria-hidden="true">
-                  <path d="M13 2a9 9 0 0 1 9 9"></path>
-                  <path d="M13 6a5 5 0 0 1 5 5"></path>
-                  <path
-                    d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
-                  </path>
-                </svg>
-                <span><?= esc_html($event_widget_phone_secondary); ?></span>
-              </a>
-            </div>
-
-            <?php if (!empty($include_terms) && !is_wp_error($include_terms)): ?>
-              <h3 class="single-event__booking-widget-includes-title">Включено</h3>
-              <div class="single-event__booking-widget-includes">
-                <?php foreach ($include_terms as $t): ?>
-                  <?php
-                  $icon = function_exists('get_field') ? get_field('tour_include_icon', 'term_' . $t->term_id) : null;
-                  $icon_url = (is_array($icon) && !empty($icon['url'])) ? $icon['url'] : '';
-                  ?>
-                  <span class="single-event__booking-widget-include">
-                    <?php if ($icon_url): ?>
-                      <img class="single-event__booking-widget-include-icon" src="<?= esc_url($icon_url); ?>" alt="" loading="lazy">
-                    <?php endif; ?>
-                    <span class="single-event__booking-widget-include-text"><?= esc_html($t->name); ?></span>
-                  </span>
-                <?php endforeach; ?>
-              </div>
-            <?php endif; ?>
-
-            <?php if (($price_from_amount !== null && (int) $price_from_amount > 0) || $crosstour_ref || $has_scheme_legend): ?>
-              <div class="single-event__currency-toggle">
-                <label class="ui-checkbox ui-currency-toggle">
-                  <input type="checkbox" class="ui-checkbox__input js-education-show-original-currency" name="show_original_currency_event"
-                    value="1">
-                  <span class="ui-checkbox__mark"></span>
-                  <span class="ui-checkbox__text">Показать в валюте</span>
-                </label>
-              </div>
-            <?php endif; ?>
-
-            <div class="single-event__booking-widget-price numfont">
-              <?php if ($price_from_amount !== null && (int) $price_from_amount > 0): ?>
-                <span class="js-event-price"<?php if ($crosstour_ref): ?> data-crosstour-price<?php endif; ?>
-                  data-price-rub="<?= esc_attr((string) (int) $price_from_amount); ?>"
-                  <?php if ($event_price_original !== null && $event_price_original > 0 && $event_price_currency !== null && $event_price_currency !== ''): ?>
-                  data-price-original="<?= esc_attr((string) $event_price_original); ?>"
-                  data-price-currency="<?= esc_attr($event_price_currency); ?>"
-                  <?php endif; ?>
-                  data-has-from="true"><?= esc_html($hero_price_line); ?></span>
-              <?php elseif ($tour_price_from !== ''): ?>
-                <span<?php if ($crosstour_ref): ?> data-crosstour-price data-has-from="true"<?php endif; ?>><?= esc_html($tour_price_from); ?></span>
-              <?php else: ?>
-                <span<?php if ($crosstour_ref): ?> data-crosstour-price data-has-from="true"<?php endif; ?>>По запросу</span>
-              <?php endif; ?>
-            </div>
-
-            <?php if ($effective_booking_url): ?>
-              <a href="<?= esc_url($effective_booking_url); ?>" class="btn btn-accent single-event__booking-widget-btn sm"
-                target="_blank" rel="nofollow noopener">Забронировать</a>
-            <?php else: ?>
-              <button type="button" class="btn btn-accent single-event__booking-widget-btn sm js-event-booking-btn"
-                data-event-id="<?= esc_attr($post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>"
-                data-event-date="<?= esc_attr($hero_date_label); ?>"
-                data-event-venue="<?= esc_attr($event_venue); ?>" data-event-time="<?= esc_attr($event_time); ?>"
-                data-min-price="<?= esc_attr($price_from_amount ?? 0); ?>">
-                Забронировать
+          <?php if (trim(wp_strip_all_tags($event['about'])) !== ''): ?>
+            <section class="single-event__about-main single-event__column-card" id="o-sobytii" data-about>
+              <h2 class="h2">О событии</h2>
+              <div class="single-event__about-body editor-content" data-about-body><?= wp_kses_post($event['about']); ?></div>
+              <button type="button" class="single-event__about-more" data-about-more hidden>
+                <span>Читать полностью</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
               </button>
-            <?php endif; ?>
-          </div>
-        </aside>
-      </div>
-
-    </div>
-  </section>
-
-
-  <?php if (!empty($tour_included) || !empty($tour_not_inc)): ?>
-    <section class="single-event__price-details-section">
-      <div class="container">
-        <div class="single-event__price-details">
-          <?php if (!empty($tour_included)): ?>
-            <div class="single-event__price-col single-event__price-col--included">
-              <h3 class="single-event__price-title">В стоимость входит</h3>
-              <div class="single-event__price-content">
-                <?= wp_kses_post($tour_included); ?>
-              </div>
-            </div>
+            </section>
           <?php endif; ?>
 
-          <?php if (!empty($tour_not_inc)): ?>
-            <div class="single-event__price-col single-event__price-col--extra">
-              <h3 class="single-event__price-title">Оплачивается дополнительно</h3>
-              <div class="single-event__price-content">
-                <?= wp_kses_post($tour_not_inc); ?>
+          <?php get_template_part('template-parts/event/booking-steps', null, [
+            'has_tour' => $event['has_tour'],
+            'has_tickets' => $event['has_tickets'],
+          ]); ?>
+
+          <?php if (trim(wp_strip_all_tags($event['important'])) !== ''): ?>
+            <section class="single-event__column-card single-event__important" id="vazhno-znat">
+              <h2 class="h2">Важно знать</h2>
+              <div class="editor-content"><?= wp_kses_post($event['important']); ?></div>
+            </section>
+          <?php endif; ?>
+
+          <?php if (!$finished && !empty($event['program'])): ?>
+            <section class="single-event__column-card single-event__legacy-program" id="programma">
+              <h2 class="h2">Программа тура</h2>
+              <div class="single-event__legacy-program-list">
+                <?php foreach ($event['program'] as $day): ?>
+                  <div class="single-event__legacy-program-day">
+                    <?php if ($day['title'] !== ''): ?>
+                      <h3 class="single-event__legacy-program-day-title"><?= esc_html($day['title']); ?></h3>
+                    <?php endif; ?>
+                    <div class="editor-content single-event__legacy-program-day-content"><?= wp_kses_post($day['content']); ?></div>
+                  </div>
+                <?php endforeach; ?>
               </div>
-            </div>
+            </section>
+          <?php endif; ?>
+
+          <?php if (!$finished && trim(wp_strip_all_tags($event['additional'])) !== ''): ?>
+            <section class="single-event__column-card single-event__legacy-additional" id="dopolnitelno">
+              <h2 class="h2">Дополнительно</h2>
+              <div class="editor-content"><?= wp_kses_post($event['additional']); ?></div>
+            </section>
           <?php endif; ?>
         </div>
-      </div>
-    </section>
-  <?php endif; ?>
 
-  <?php if (!empty(trim(strip_tags($event_additional)))): ?>
-    <section class="single-event__additional">
-      <div class="container">
-        <div class="single-event__additional-inner">
-          <h3 class="h3 single-event__additional-title">Дополнительно</h3>
-          <div class="single-event__additional-content editor-content">
-            <?= wp_kses_post($event_additional); ?>
-          </div>
-        </div>
-      </div>
-    </section>
-  <?php endif; ?>
-
-  <section class="single-event__booking-cta" aria-label="Забронировать событие">
-    <div class="container">
-      <div class="single-event__booking-cta-inner">
-        <div class="single-event__booking-cta-head">
-          <h2 class="single-event__booking-cta-title">Забронировать</h2>
-          <p class="single-event__booking-cta-lead"><?= esc_html($event_booking_cta_lead); ?></p>
-        </div>
-        <?php if ($effective_booking_url): ?>
-          <div class="single-event__booking-cta-actions">
-            <a href="<?= esc_url($effective_booking_url); ?>"
-              class="single-event__booking-cta-submit single-event__booking-cta-submit--wide" target="_blank"
-              rel="nofollow noopener">Забронировать</a>
-          </div>
-        <?php else: ?>
-          <form id="event-booking-cta-form" class="single-event__booking-cta-form" novalidate
-            data-event-id="<?= esc_attr((string) $post_id); ?>" data-event-title="<?= esc_attr($event_title); ?>">
-            <input type="hidden" name="action" value="event_ticket_booking">
-            <input type="hidden" name="event_booking_minimal" value="1">
-            <input type="hidden" name="event_title" value="<?= esc_attr($event_title); ?>">
-            <input type="hidden" name="page_url" value="<?= esc_url(get_permalink($post_id)); ?>">
-
-            <div class="single-event__booking-cta-row">
-              <div class="single-event__booking-cta-field">
-                <label class="screen-reader-text" for="event-booking-cta-name">Имя</label>
-                <input id="event-booking-cta-name" type="text" name="name" class="single-event__booking-cta-input"
-                  placeholder="имя" autocomplete="name" required data-field="name">
-                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="name"></span>
-              </div>
-              <div class="single-event__booking-cta-field">
-                <label class="screen-reader-text" for="event-booking-cta-phone">Телефон</label>
-                <input id="event-booking-cta-phone" type="tel" name="phone"
-                  class="single-event__booking-cta-input js-phone-mask" placeholder="Телефон" autocomplete="tel" required
-                  data-field="phone">
-                <span class="single-event__booking-cta-field-error js-field-error" data-error-for="phone"></span>
-              </div>
-              <button type="submit" class="single-event__booking-cta-submit" data-default-label="Забронировать">
-                Забронировать
-              </button>
-            </div>
-
-            <?php
-            if (function_exists('bsi_render_privacy_consent_checkbox')) {
-              bsi_render_privacy_consent_checkbox([
-                'variant' => 'event-booking-cta',
-                'checkbox_id' => 'event-booking-cta-privacy',
-              ]);
-            }
-            ?>
-          </form>
+        <?php if (!$finished && ($event['has_tour'] || $event['has_tickets'])): ?>
+          <?php get_template_part('template-parts/event/page/sidebar', null, $args); ?>
         <?php endif; ?>
       </div>
     </div>
   </section>
 
-  <?php if (!empty($event_faq) && is_array($event_faq)): ?>
+  <?php if (!$finished && !empty($related)): ?>
+    <?php get_template_part('template-parts/event/related-tours-slider', null, ['posts' => $related]); ?>
+  <?php endif; ?>
+
+  <?php if (!$finished): ?>
+    <?php get_template_part('template-parts/event/page/cta', null, $args); ?>
+  <?php endif; ?>
+
+  <?php if (!empty($event['faq'])): ?>
     <section class="single-event__faq">
       <div class="container">
         <div class="single-event__faq-inner">
-          <h2 class="h2">Ответы на часто задаваемые вопросы</h2>
+          <h2 class="h2">Ответы на частые вопросы</h2>
           <div class="accordion single-event__faq-acc">
             <div class="accordion__list single-event__faq-list">
-              <?php foreach ($event_faq as $faq_row): ?>
-                <?php
-                $fq = isset($faq_row['faq_question']) ? trim((string) $faq_row['faq_question']) : '';
-                $fa = isset($faq_row['faq_answer']) ? (string) $faq_row['faq_answer'] : '';
-                if ($fq === '') {
-                  continue;
-                }
-                ?>
+              <?php foreach ($event['faq'] as $faq): ?>
                 <div class="accordion__item single-event__faq-item">
                   <button class="accordion__btn single-event__faq-btn" type="button">
-                    <span class="accordion__title"><?= esc_html($fq); ?></span>
-                    <span class="accordion__icon" aria-hidden="true">
+                    <span class="accordion__title single-event__faq-question"><?= esc_html($faq['question']); ?></span>
+                    <span class="accordion__icon">
                       <img src="<?= esc_url(get_template_directory_uri() . '/img/icons/chevron-d.svg'); ?>" alt="">
                     </span>
                   </button>
                   <div class="accordion__panel">
-                    <div class="accordion__content editor-content">
-                      <?= wp_kses_post($fa); ?>
-                    </div>
+                    <div class="accordion__content editor-content single-event__faq-answer"><?= wp_kses_post($faq['answer']); ?></div>
                   </div>
                 </div>
               <?php endforeach; ?>
@@ -1136,22 +133,8 @@ get_header();
       </div>
     </section>
   <?php endif; ?>
-
-  <?php
-  if (!empty($related_events)) {
-    get_template_part('template-parts/event/related-tours-slider', null, [
-      'posts' => $related_events,
-    ]);
-  }
-  ?>
-
-
-
 </main>
-
-
 
 <?php
 get_template_part('template-parts/event/ticket-booking-modal');
-
 get_footer();

@@ -11,6 +11,8 @@
  * сочетания (сразу из сетки, полный набор номеров — crosstour_slot).
  */
 
+import { withEventUtm } from "./event-offer.js";
+
 const escapeHtml = (s) =>
   String(s).replace(
     /[&<>"']/g,
@@ -57,7 +59,88 @@ const revealManualAccommodation = () => {
   if (manual) manual.hidden = false;
 };
 
+/* Пакеты проживания событийного тура: в Само «отель» = пакет («…, пакет Эконом 3-4*»).
+   Ищем карточку пакета из админки по слову в названии и подставляем цену, номер и питание. */
+const PACKAGE_RULES = [
+  ["vip", /vip/i],
+  ["econom", /эконом/i],
+  ["standard", /стандарт/i],
+  ["five", /\b5\s*\*|5★|пакет\s*5/i],
+];
+const STAR_SVG = `<svg class="single-event__star" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>`;
+const packageKey = (name) => (PACKAGE_RULES.find(([, rx]) => rx.test(name)) || [""])[0];
+
+const renderPackages = (hotels) => {
+  const box = document.querySelector("[data-packages]");
+  if (!box) return false;
+  const best = new Map();
+  hotels.forEach((h) => {
+    const key = packageKey(h.name || "") || `samo-${h.hotel_key || h.name}`;
+    const prev = best.get(key);
+    if (!prev || (h.price_rub && (!prev.price_rub || h.price_rub < prev.price_rub))) best.set(key, h);
+  });
+  // Пакеты, которых нет в админке, — карточкой по образцу первой.
+  best.forEach((h, key) => {
+    if (box.querySelector(`[data-offer-package="${CSS.escape(key)}"]`)) return;
+    const title = (h.name || "").replace(/^.*пакет\s*/i, "").replace(/\s*\d[\d\-–+]*\*\s*$/, "") || h.name;
+    const stars = (String(h.name || "").match(/(\d[\d\-–+]*)\*\s*$/) || [])[1] || String(h.star || "").replace("*", "");
+    box.insertAdjacentHTML(
+      "beforeend",
+      `<label class="ui-option ui-option--top single-event__package-option" data-offer-package="${escapeHtml(key)}" data-package-title="${escapeHtml(title)}" data-package-stars="${escapeHtml(stars)}">
+        <input type="radio" class="ui-checkbox__input" name="event_tour_package" value="${escapeHtml(key)}">
+        <span class="ui-checkbox__mark ui-checkbox__mark--mono"></span>
+        <span class="ui-option__body">
+          <span class="ui-option__label">${escapeHtml(title)}</span>
+          <span class="ui-option__sub single-event__package-meta"><span class="numfont">${escapeHtml(stars)}</span>${STAR_SVG}<span data-package-meta></span></span>
+        </span>
+        <span class="ui-option__price numfont" data-package-price>по запросу</span>
+      </label>`,
+    );
+  });
+  box.querySelectorAll("[data-offer-package]").forEach((opt) => {
+    const h = best.get(opt.dataset.offerPackage);
+    // Ссылка Само на этот пакет: своя у номера, иначе общая + HOTELS=ключ пакета.
+    let url = h?.booking_url || "";
+    if (!url && h?.hotel_key && Number(h.hotel_key) > 0) {
+      const base = document.querySelector("[data-crosstour-builder]")?.dataset.samoUrl || "";
+      if (base) {
+        try {
+          const u = new URL(base);
+          u.searchParams.delete("HOTELS_ANY");
+          u.searchParams.set("HOTELS", String(Number(h.hotel_key)));
+          url = u.toString();
+        } catch (_e) {
+          url = "";
+        }
+      }
+    }
+    opt.dataset.packageUrl = url;
+    const priceEl = opt.querySelector("[data-package-price]");
+    const metaEl = opt.querySelector("[data-package-meta]");
+    if (metaEl) metaEl.textContent = h ? ` ${[h.room, h.meal ? String(h.meal).replace(/^[A-Z]{2}\s*-\s*/, "") : ""].filter(Boolean).join(" · ")}` : "";
+    if (!priceEl) return;
+    if (h && Number(h.price_rub) > 0) {
+      priceEl.classList.add("js-event-price");
+      priceEl.dataset.priceRub = String(Number(h.price_rub));
+      priceEl.dataset.hasFrom = "true";
+      if (h.price_original && h.price_currency) {
+        priceEl.dataset.priceOriginal = String(h.price_original);
+        priceEl.dataset.priceCurrency = String(h.price_currency);
+      }
+      priceEl.textContent = `от ${fmtPrice(h.price_rub)} ₽`;
+    } else {
+      priceEl.classList.remove("js-event-price");
+      ["priceRub", "priceOriginal", "priceCurrency", "hasFrom"].forEach((k) => delete priceEl.dataset[k]);
+      priceEl.textContent = h ? "по запросу" : "нет на эти даты";
+    }
+  });
+  document.dispatchEvent(new CustomEvent("crosstour:packages"));
+  document.dispatchEvent(new CustomEvent("education:content-updated"));
+  return true;
+};
+
 const renderHotels = (offer) => {
+  if (renderPackages(Array.isArray(offer.hotels) ? offer.hotels : [])) return;
   const wrap = document.querySelector("[data-crosstour-hotels]");
   const list = document.querySelector("[data-crosstour-hotels-list]");
   if (!wrap || !list) {
@@ -96,7 +179,7 @@ const renderHotels = (offer) => {
         hotelUrl += `&HOTELS=${Number(h.hotel_key)}`;
       }
       const bookBtn = hotelUrl
-        ? `<a class="single-event__accommodation-card-link" href="${escapeHtml(hotelUrl)}" target="_blank" rel="nofollow noopener"><span>Забронировать</span>${arrow}</a>`
+        ? `<a class="single-event__accommodation-card-link" href="${escapeHtml(withEventUtm(hotelUrl, "hotel"))}" target="_blank" rel="nofollow noopener"><span>Забронировать</span>${arrow}</a>`
         : "";
       const meta = [h.room, h.meal].filter(Boolean).map(escapeHtml).join(" · ");
       const descr = meta
@@ -167,6 +250,23 @@ const fmtShortDate = (ymd) => {
   return `${String(d).padStart(2, "0")}.${String(m).padStart(2, "0")}`;
 };
 
+const MONTHS_SHORT = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+const MONTHS_LONG = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+const fmtDayMonth = (ymd) => {
+  const { m, d } = ymdParts(ymd);
+  return `${d} ${MONTHS_SHORT[m - 1]}`;
+};
+const fmtDayMonthLong = (ymd) => {
+  const { m, d } = ymdParts(ymd);
+  return `${d} ${MONTHS_LONG[m - 1]}`;
+};
+// «5–7 марта» / «30 марта – 2 апреля»
+const tripRange = (from, to) => {
+  const a = ymdParts(from);
+  const b = ymdParts(to);
+  return a.m === b.m ? `${a.d}–${b.d} ${MONTHS_LONG[b.m - 1]}` : `${fmtDayMonthLong(from)} – ${fmtDayMonthLong(to)}`;
+};
+
 const weekday = (ymd) => {
   const { y, m, d } = ymdParts(ymd);
   return WEEKDAYS[new Date(y, m - 1, d).getDay()];
@@ -197,6 +297,25 @@ const cheapest = (list) =>
     return best;
   }, null) || list[0];
 
+// Само не ответил или тур снят: «Цены тура сейчас недоступны», в сайдбаре — заявка вместо брони.
+const showBuilderError = (section) => {
+  removeBuilderSkeletons();
+  const controls = section.querySelector("[data-builder-controls]");
+  const error = section.querySelector("[data-builder-error]");
+  if (controls) controls.hidden = true;
+  if (error) error.hidden = false;
+  document.querySelectorAll('[data-offer-summary-price="tour"]').forEach((el) => {
+    el.classList.remove("js-event-price");
+    el.textContent = "Цена по запросу";
+  });
+  const link = document.querySelector("[data-offer-tour-link]");
+  if (link) {
+    link.textContent = "Оставить заявку";
+    link.setAttribute("data-no-url", "");
+    link.href = "#";
+  }
+};
+
 const removeBuilderSkeletons = () =>
   document.querySelectorAll("[data-builder-skeleton]").forEach((el) => el.remove());
 
@@ -215,10 +334,8 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   const combos = json?.success && json.data?.samo ? json.data.combos || [] : [];
   if (!combos.length || !hotelsSection) {
     console.debug("[crosstour] конструктор: Само не вернул сочетаний", json);
-    // Прежний поток сам откроет секцию отелей, если найдёт их.
-    section.hidden = true;
-    if (hotelsSection) hotelsSection.hidden = true;
-    return false;
+    showBuilderError(section);
+    return true;
   }
 
   renderPrice(json.data);
@@ -236,34 +353,82 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   const currentCombo = () =>
     combos.find((c) => c.date === state.date && c.nights === state.nights);
 
+  // Страница события (event-offer.js): под заездом — на какой концерт он попадает
+  // (ближайший концерт после заезда; тур на 6 марта стартует 5-го).
+  let concerts = [];
+  try {
+    const offerJson = document.querySelector("[data-event-offer-json]");
+    concerts = offerJson
+      ? (JSON.parse(offerJson.textContent || "{}").dates || [])
+          .filter((c) => /^\d{4}-\d{2}-\d{2}$/.test(c.key))
+          .map((c) => ({ ymd: c.key.replace(/-/g, ""), label: c.label }))
+          .sort((a, b) => a.ymd.localeCompare(b.ymd))
+      : [];
+  } catch (_e) {
+    concerts = [];
+  }
+  const concertFor = (ymd) => concerts.find((c) => c.ymd > ymd) || concerts.find((c) => c.ymd === ymd);
+
+  // Концерт выбран выше, в блоке «Выберите дату» — показываем только заезды на него.
+  // Нет заездов на этот концерт — показываем все, чтобы не оставить пустой выбор.
+  const activeConcert = document.querySelector("[data-offer-date].is-active")?.dataset.offerDate || "";
+  state.concert = /^\d{4}-\d{2}-\d{2}$/.test(activeConcert) ? activeConcert.replace(/-/g, "") : "";
+  const visibleDates = () => {
+    if (!state.concert || !concerts.length) return dates;
+    const list = dates.filter((d) => concertFor(d)?.ymd === state.concert);
+    return list.length ? list : dates;
+  };
+  const pickForConcert = () => {
+    const allowed = visibleDates();
+    if (allowed.includes(state.date)) return;
+    const preferredCombo = cheapest(combos.filter((c) => allowed.includes(c.date)));
+    state.date = preferredCombo.date;
+    state.nights = preferredCombo.nights;
+  };
+
+  // Ссылка на Само с датой заезда и ночами — для кнопки «Забронировать тур» в сайдбаре.
+  const samoBase = section.dataset.samoUrl || "";
+  const emitCombo = (combo) => {
+    let url = "";
+    if (samoBase && combo) {
+      try {
+        const u = new URL(samoBase);
+        u.searchParams.set("CHECKIN_BEG", combo.date);
+        u.searchParams.set("CHECKIN_END", combo.date);
+        u.searchParams.set("NIGHTS_FROM", combo.nights);
+        u.searchParams.set("NIGHTS_TILL", combo.nights);
+        url = u.toString();
+      } catch (_e) {
+        url = samoBase;
+      }
+    }
+    const nightsLabel = combo ? `${combo.nights} ${pluralNights(combo.nights)}` : "";
+    const trip = combo ? `${tripRange(combo.date, combo.checkout)} · ${nightsLabel}` : "";
+    document.dispatchEvent(new CustomEvent("crosstour:combo", { detail: { url, trip, nightsLabel } }));
+  };
+
+  const chip = (active, attr, label, sub) => `<button type="button" class="ui-choice ui-choice--check${active ? " is-active" : ""}" ${attr}>
+      <span class="ui-choice__mark"></span>
+      <span class="ui-choice__body"><span class="ui-choice__label">${label}</span>${sub}</span>
+    </button>`;
+
   const renderDates = () => {
-    datesEl.innerHTML = dates
-      .map(
-        (d) => `<button type="button" class="ui-choice${d === state.date ? " is-active" : ""}" data-date="${d}">
-          <span class="ui-choice__label numfont">${fmtShortDate(d)}</span>
-          <span class="ui-choice__sub">${weekday(d)}</span>
-        </button>`,
-      )
+    datesEl.innerHTML = visibleDates()
+      .map((d) => chip(d === state.date, `data-date="${d}"`, `<span class="numfont">${fmtDayMonth(d)}</span>, ${weekday(d)}`, priceSpan(cheapest(combos.filter((c) => c.date === d)), "ui-choice__sub")))
       .join("");
   };
 
   const renderNights = () => {
     nightsEl.innerHTML = combos
       .filter((c) => c.date === state.date)
-      .map(
-        (c) => `<button type="button" class="ui-choice${c.nights === state.nights ? " is-active" : ""}" data-nights="${c.nights}">
-          <span class="ui-choice__label"><span class="numfont">${c.nights}</span> ${pluralNights(c.nights)}</span>
-          ${priceSpan(c, "ui-choice__sub")}
-        </button>`,
-      )
+      .map((c) => chip(c.nights === state.nights, `data-nights="${c.nights}"`, `<span class="numfont">${c.nights}</span> ${pluralNights(c.nights)}`, priceSpan(c, "ui-choice__sub")))
       .join("");
   };
 
   const renderSummary = (combo) => {
     summaryEl.textContent =
-      `Заезд ${fmtShortDate(combo.date)} (${weekday(combo.date)}) — ` +
-      `выезд ${fmtShortDate(combo.checkout)} (${weekday(combo.checkout)}), ` +
-      `${combo.nights} ${pluralNights(combo.nights)}. Цена за человека при размещении вдвоём.`;
+      `${fmtDayMonthLong(combo.date)}, ${weekday(combo.date)} → ${fmtDayMonthLong(combo.checkout)}, ${weekday(combo.checkout)} · ` +
+      `${combo.nights} ${pluralNights(combo.nights)}`;
   };
 
   const renderStars = (hotels) => {
@@ -291,6 +456,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
     if (!combo) return;
     const key = slotKey(combo.date, combo.nights);
     renderSummary(combo);
+    emitCombo(combo);
 
     // Сразу — самый дешёвый номер каждого отеля из сетки, затем полный набор номеров.
     renderSlotHotels(slotCache.get(key) || combo.hotels || []);
@@ -342,10 +508,20 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   controls.addEventListener("click", onChoiceClick);
   starsGroup?.addEventListener("click", onChoiceClick);
 
+  document.addEventListener("event-offer:change", (e) => {
+    const key = e.detail?.key || "";
+    const concert = /^\d{4}-\d{2}-\d{2}$/.test(key) ? key.replace(/-/g, "") : "";
+    if (concert === state.concert) return;
+    state.concert = concert;
+    pickForConcert();
+    renderAll();
+  });
+
   // Одно сочетание — выбирать нечего, секция дат скрыта, остаётся секция отелей.
   const single = combos.length < 2;
   controls.hidden = single;
   section.hidden = single;
+  pickForConcert();
   renderAll();
 
   // Кнопки «Забронировать» ведут в конструктор, а не в общий поиск Само.
@@ -399,12 +575,7 @@ export const initCrosstourEvent = async () => {
     renderDates(offer);
   } catch (e) {
     console.warn("[crosstour] ошибка запроса", e);
-    if (builder?.querySelector("[data-builder-skeleton]")) {
-      removeBuilderSkeletons();
-      builder.hidden = true;
-      const hotels = document.querySelector("[data-crosstour-hotels]");
-      if (hotels) hotels.hidden = true;
-    }
+    if (builder) showBuilderError(builder);
     revealManualAccommodation();
   }
 };

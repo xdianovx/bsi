@@ -25,10 +25,9 @@ $label_inner = static function () use ($checkbox_id, $privacy_url, $req) {
     <input type="checkbox" id="<?php echo esc_attr($checkbox_id); ?>" name="privacy_agreement" value="on"
       class="modal-program-booking__service-checkbox" data-field="privacy_agreement" autocomplete="off" <?php echo $req; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
     <span class="modal-program-booking__service-checkmark" aria-hidden="true"></span>
-    <span class="modal-program-booking__service-text">Отправляя форму, я подтверждаю, что ознакомился<br>
+    <span class="modal-program-booking__service-text">Отправляя форму, я подтверждаю, что ознакомился
       с <a href="<?php echo esc_url($privacy_url); ?>" target="_blank" rel="noopener noreferrer">Политикой
-        конфиденциальности</a> и даю согласие на обработку<br>
-      своих персональных данных</span>
+        конфиденциальности</a> и даю согласие на обработку своих персональных данных</span>
   </label>
   <?php
 };

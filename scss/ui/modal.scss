@@ -3,8 +3,8 @@
 \**************************/
 
 .modal {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial,
-    sans-serif;
+  // Шрифт сайта, а не системный: модалки должны выглядеть как остальной интерфейс.
+  font-family: inherit;
 }
 
 .modal__overlay {
@@ -119,11 +119,16 @@
   Program Booking Modal
 \**************************/
 .modal-program-booking {
-  max-width: 900px;
+  max-width: 640px;
   width: 100%;
   position: relative;
-  padding: 24px;
-  border-radius: $radius-sm;
+  padding: 32px;
+  border-radius: $radius-lg;
+}
+
+// Перебивает .modal__container.--xl (900px): форма заявки читается лучше узкой колонкой.
+.modal__container.modal-program-booking {
+  max-width: 640px;
 }
 @media (max-width: 768px) {
   .modal-program-booking {
@@ -168,16 +173,62 @@
 }
 
 .modal-program-booking__title {
-  font-weight: 500;
-  max-width: 70%;
+  margin: 0;
+  // Место под крестик (40px кнопка + отступ), иначе он наезжает на текст.
+  max-width: calc(100% - 48px);
+  font-size: 24px;
+  font-weight: 600;
   line-height: 120%;
 
   @media screen and (max-width: 768px) {
-    font-weight: 600;
-    // Оставляем место под крестик (40px кнопка + 10px отступ), иначе он наезжает на текст.
-    max-width: calc(100% - 50px);
-    font-size: 18px;
+    font-size: 20px;
   }
+}
+
+.modal-program-booking__subtitle {
+  margin: 6px 0 0;
+  max-width: calc(100% - 48px);
+  font-size: 16px;
+  line-height: 130%;
+  color: $text-gray;
+}
+
+.modal-program-booking__subtitle[hidden] {
+  display: none;
+}
+
+/* Детали заявки (формат, дата, площадка…) — без фона: пункты в строку,
+   подпись мелко сверху, значение под ней; при нехватке места переносятся. */
+.modal-program-booking__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+  line-height: 130%;
+}
+
+.modal-program-booking__details[hidden] {
+  display: none;
+}
+
+.modal-program-booking__details-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.modal-program-booking__details-key {
+  font-size: 14px;
+  line-height: 120%;
+  color: $text-gray;
+}
+
+.modal-program-booking__details-value {
+  overflow-wrap: anywhere;
 }
 
 .modal-program-booking__meta {
@@ -239,9 +290,10 @@
   height: 0;
   width: 0;
 }
+// Галочка — как у .ui-checkbox (scss/ui/forms.scss): серая рамка 1px, при выборе красная заливка и SVG-галочка по центру.
 .modal-program-booking__service-checkbox:checked ~ .modal-program-booking__service-checkmark {
-  background-color: #e53935;
-  border-color: #e53935;
+  background-color: $red;
+  border-color: $red;
 }
 .modal-program-booking__service-checkbox:checked ~ .modal-program-booking__service-checkmark::after {
   display: block;
@@ -252,21 +304,23 @@
   flex-shrink: 0;
   width: 20px;
   height: 20px;
-  border: 2px solid #ccc;
-  border-radius: $radius-sm;
-  transition: all 0.2s;
+  border: 1px solid $gray-light;
+  border-radius: $radius-xs;
+  background: $bg-color;
+  transition: $trans-text;
 }
 .modal-program-booking__service-checkmark::after {
   content: "";
   position: absolute;
   display: none;
-  left: 7px;
-  top: 4px;
-  width: 4px;
-  height: 9px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: $text-white;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .modal-program-booking__service-text {
@@ -298,7 +352,7 @@
     flex-shrink: 0;
     min-width: 20px;
     min-height: 20px;
-    margin-top: 1px;
+    margin-top: 0;
   }
 
   .modal-program-booking__service-text {
@@ -306,7 +360,8 @@
     min-width: 0;
     font-size: 14px;
     font-weight: 400;
-    line-height: 1.35;
+    line-height: 20px;
+    color: $text-gray;
 
     a {
       font-size: inherit;
@@ -345,7 +400,7 @@
 }
 
 .modal-program-booking__form {
-  margin-top: 40px;
+  margin-top: 24px;
 }
 
 .modal-program-booking__req {
@@ -354,6 +409,7 @@
 }
 
 .modal-program-booking__form > .form-row {
+  align-items: start;
   margin-bottom: 16px;
 }
 
@@ -379,7 +435,7 @@
 .modal-program-booking__form-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 .modal-program-booking__form-group--full {
   margin-bottom: 24px;
@@ -388,13 +444,14 @@
 .modal-program-booking__label {
   font-size: 14px;
   font-weight: 500;
-  line-height: 100%;
+  line-height: 120%;
+  color: $text-black;
 }
 
 .modal-program-booking__input,
 .modal-program-booking__textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   font-size: 16px;
   border: 0;
   border-radius: $radius-sm;
@@ -422,30 +479,26 @@
   min-height: 16px;
 }
 
+// Пустая строка под ошибку не раздвигает поля.
+.modal-program-booking__error:empty {
+  min-height: 0;
+}
+
 .modal-program-booking__form-footer {
   display: flex;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-@media (max-width: 768px) {
-  .modal-program-booking__form-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 8px;
 }
 
 .modal-program-booking__submit {
-  flex-shrink: 0;
-  padding: 16px 48px;
+  width: 100%;
+  justify-content: center;
+  padding: 16px 24px;
   font-size: 16px;
-  font-weight: 600;
-  border-radius: $radius-pill;
-}
-@media (max-width: 768px) {
-  .modal-program-booking__submit {
-    width: 100%;
-  }
+  font-weight: 400;
+  border-radius: $radius-sm;
 }
 
 .modal-program-booking__privacy {

@@ -11,6 +11,9 @@
  * @var string $accommodation
  * @var string $price_line Цена, если она была показана пользователю (туры)
  * @var string $booking_context 'event' | 'promo' | 'tour' | 'excursion'
+ * @var string $booking_kind '' | 'ticket' | 'tour_sector' | 'notify' (страница события)
+ * @var string $sector
+ * @var int $quantity
  */
 
 if (!defined('ABSPATH')) {
@@ -26,6 +29,19 @@ $context_labels = [
   'excursion' => ['Заявка на экскурсию', 'Экскурсия'],
 ];
 [$mail_heading, $mail_section_title] = $context_labels[$context] ?? ['Заявка по событию', 'Событие'];
+$kind_labels = [
+  'ticket' => 'Только билет',
+  'tour_sector' => 'Тур с другим сектором (доплата)',
+  'notify' => 'Сообщить о новых датах',
+  'consult' => 'Консультация',
+];
+$kind_label = $kind_labels[(string) ($booking_kind ?? '')] ?? '';
+if ($kind_label !== '') {
+  $mail_heading = [
+    'notify' => 'Сообщить о новых датах',
+    'consult' => 'Консультация по событию',
+  ][(string) ($booking_kind ?? '')] ?? 'Заявка на билеты';
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -153,6 +169,24 @@ $context_labels = [
         <div class="info-row">
           <div class="info-label">Вариант проживания</div>
           <div class="info-value"><?php echo esc_html($accommodation); ?></div>
+        </div>
+      <?php endif; ?>
+      <?php if ($kind_label !== ''): ?>
+        <div class="info-row">
+          <div class="info-label">Что нужно</div>
+          <div class="info-value"><?php echo esc_html($kind_label); ?></div>
+        </div>
+      <?php endif; ?>
+      <?php if (!empty($sector)): ?>
+        <div class="info-row">
+          <div class="info-label">Сектор</div>
+          <div class="info-value"><?php echo esc_html($sector); ?></div>
+        </div>
+      <?php endif; ?>
+      <?php if (!empty($quantity)): ?>
+        <div class="info-row">
+          <div class="info-label">Количество</div>
+          <div class="info-value"><?php echo esc_html((string) $quantity); ?></div>
         </div>
       <?php endif; ?>
       <?php if (!empty($event_date)): ?>

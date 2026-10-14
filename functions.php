@@ -414,6 +414,7 @@ require get_template_directory() . '/inc/admin/content-schedule-publish-box.php'
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
 require get_template_directory() . '/inc/admin/paragraph-indent.php';
 require get_template_directory() . '/inc/admin/icon-picker.php';
+require get_template_directory() . '/inc/admin/event-admin.php';
 require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';
@@ -466,6 +467,8 @@ require get_template_directory() . '/inc/helpers/vacancy.php';
 require get_template_directory() . '/inc/helpers/country-cases.php';
 require get_template_directory() . '/inc/helpers/country-transfers.php';
 require get_template_directory() . '/inc/helpers/event-price.php';
+require get_template_directory() . '/inc/helpers/event-offers.php';
+require get_template_directory() . '/inc/helpers/event-page.php';
 require get_template_directory() . '/inc/helpers/crosstour.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
 require get_template_directory() . '/inc/post-types/sight.php';

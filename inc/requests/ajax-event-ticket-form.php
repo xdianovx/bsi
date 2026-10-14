@@ -43,20 +43,52 @@ function bsi_handle_event_ticket_booking(): void
   $event_time = sanitize_text_field(trim($_POST['event_time'] ?? ''));
   $event_price = sanitize_text_field(trim($_POST['event_price'] ?? ''));
   $event_details = sanitize_text_field(trim($_POST['event_details'] ?? ''));
+  // Формат заявки со страницы события: билет / тур с другим сектором / «сообщить о новых датах».
+  $booking_kind = sanitize_key($_POST['booking_kind'] ?? '');
+  if (!in_array($booking_kind, ['ticket', 'tour_sector', 'notify', 'consult'], true)) {
+    $booking_kind = '';
+  }
+  $sector = sanitize_text_field(trim($_POST['sector'] ?? ''));
+  $quantity = max(0, min(50, (int) ($_POST['quantity'] ?? 0)));
+  if (!in_array($booking_kind, ['ticket', 'tour_sector'], true)) {
+    // Поля сектора/количества в модалке есть всегда (скрыты) — в обычной заявке их не учитываем.
+    $sector = '';
+    $quantity = 0;
+  }
   $booking_context = sanitize_text_field($_POST['booking_context'] ?? 'event');
   if ($booking_context !== 'promo') {
     $booking_context = 'event';
   }
 
+  $kind_leads = [
+    'ticket' => 'Билеты: ',
+    'tour_sector' => 'Тур с другим сектором: ',
+    'notify' => 'Сообщить о новых датах: ',
+    'consult' => 'Консультация по событию: ',
+  ];
   $subject_lead = ($booking_context === 'promo')
     ? 'Заявка по акции: '
-    : 'Заявка по событию: ';
+    : ($kind_leads[$booking_kind] ?? 'Заявка по событию: ');
   $subject_suffix = $accommodation !== '' ? ' / ' . $accommodation : '';
+  if ($booking_kind !== '') {
+    $subject_suffix = implode(' · ', array_filter([
+      $event_date,
+      $sector !== '' ? $sector . ($quantity > 0 ? ' × ' . $quantity : '') : '',
+    ]));
+    $subject_suffix = $subject_suffix !== '' ? ' · ' . $subject_suffix : '';
+  }
 
   // Доп. получатель из поля события (event_notify_email) — дублируем письмо, основные адреса не трогаем.
   $recipient_email = $event_ticket_booking_email;
   $event_id = (int) ($_POST['event_id'] ?? 0);
   if ($event_id && get_post_type($event_id) === 'event' && function_exists('get_field')) {
+    // Заявки на билеты — своему получателю события; пусто — общим адресам.
+    if (in_array($booking_kind, ['ticket', 'tour_sector', 'notify'], true)) {
+      $tickets_email = sanitize_email(trim((string) get_field('event_tickets_email', $event_id)));
+      if (is_email($tickets_email)) {
+        $recipient_email = $tickets_email;
+      }
+    }
     $extra_email = sanitize_email(trim((string) get_field('event_notify_email', $event_id)));
     if (is_email($extra_email)) {
       $recipient_email .= ', ' . $extra_email;
@@ -81,6 +113,9 @@ function bsi_handle_event_ticket_booking(): void
       'event_price' => $event_price,
       'event_details' => $event_details,
       'booking_context' => $booking_context,
+      'booking_kind' => $booking_kind,
+      'sector' => $sector,
+      'quantity' => $quantity,
     ],
     'reply_to' => is_email($email) ? $email : '',
   ]);

@@ -730,7 +730,6 @@
   padding: 24px;
   border-radius: $radius-md;
   background: $bg-color;
-  margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -934,6 +933,14 @@
   margin-bottom: 0;
   color: #fff;
   background: #1f1f1f;
+  // Hero в ширину контейнера, а не на весь экран.
+  width: calc(100% - #{$container-padding * 2});
+  max-width: $container - $container-padding * 2;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 16px;
+  border-radius: $radius-xl;
+  overflow: hidden;
 
   @media screen and (max-width: 1440px) {
     min-height: 380px;
@@ -1206,7 +1213,6 @@
   box-sizing: border-box;
   padding: 24px;
   border-radius: $radius-md;
-  margin-top: 8px;
   background: $bg-color;
 
   @media screen and (max-width: 640px) {
@@ -1344,9 +1350,11 @@
 /* Основная колонка события: секции друг под другом в порядке DOM.
    Раньше стояла на .single-hotel__content__wrap (сетка страницы отеля) с перебивкой. */
 .single-event__columns {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
+  // Отступы между секциями задаёт родитель: если секции нет или она скрыта, блоки не слипаются и не двоятся.
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 .single-event__main-column {
@@ -1358,7 +1366,6 @@
   padding: 24px;
   border-radius: $radius-md;
   background: $bg-color;
-  margin-top: 8px;
 
   width: 100%;
 
@@ -1531,7 +1538,6 @@ button.single-event__dates-book {
   padding: 24px;
   border-radius: $radius-md;
   background: $bg-color;
-  margin-top: 8px;
   margin-bottom: 0;
 
   @media screen and (max-width: 640px) {
@@ -1975,7 +1981,6 @@ button.single-event__dates-book {
   padding: 24px;
   border-radius: $radius-md;
   background: $bg-color;
-  margin-top: 16px;
 
   @media screen and (max-width: 640px) {
     padding: 16px;
@@ -2151,7 +2156,7 @@ button.single-event__dates-book {
   padding: 0 48px;
   font-family: inherit;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 120%;
   color: #fff;
   background: #ef0101;
@@ -2239,7 +2244,7 @@ button.single-event__dates-book {
   box-sizing: border-box;
   margin-top: 2px;
   border: 1px solid #ef0101;
-  border-radius: $radius-sm;
+  border-radius: $radius-xs;
   background: transparent;
 }
 
@@ -2531,28 +2536,6 @@ button.single-event__dates-book {
 }
 
 /* Детали брони в модалке заявки (что бронируют). */
-.modal-program-booking__details {
-  list-style: none;
-  margin: 16px 0 24px;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  row-gap: 8px;
-  column-gap: 0;
-  font-size: 14px;
-  line-height: 140%;
-}
-
-.modal-program-booking__details-item:not(:last-child)::after {
-  content: "|";
-  margin: 0 8px;
-  color: $text-gray;
-}
-
-.modal-program-booking__details-key {
-  color: $text-gray;
-}
-
 /* Блок «Событийные туры» на главной (по образцу popular-education). */
 .popular-event-tours__section {
   margin-top: 80px;
@@ -2723,4 +2706,610 @@ body.page-template-page-sobytiynye-tury .country-tours__empty {
    у body нет — поэтому селектор по body_class. */
 body.single-event {
   background: $bg-page;
+}
+
+/* ---------- Hero: в рамках контейнера ---------- */
+
+.single-event__hero-inner.container {
+  padding: 0 32px;
+
+  @media screen and (max-width: 550px) {
+    padding: 0 16px;
+  }
+}
+
+.single-event__hero #breadcrumbs.breadcrumbs .container {
+  padding: 0 32px;
+
+  @media screen and (max-width: 550px) {
+    padding: 0 16px;
+  }
+}
+
+.single-event__hero-tag--finished {
+  padding: 6px 10px;
+  border-radius: $radius-sm;
+  background: $white;
+  color: $text-black;
+}
+
+/* ---------- Сайдбар: сводка цен и консультация ---------- */
+
+/* Сайдбар в режиме выбора: группы «цена» → «действия» → «вторичное», между группами 12px. */
+.single-event__booking-widget--offer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-offer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-offer-summary__price-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-offer-summary__price-box[hidden] {
+  display: none;
+}
+
+.event-offer-summary__price {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 120%;
+  white-space: nowrap;
+}
+
+.event-offer-summary__note {
+  font-size: 14px;
+  line-height: 120%;
+  color: $text-gray;
+}
+
+.event-offer-summary__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-offer-summary__btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.event-offer-summary__btn[hidden] {
+  display: none;
+}
+
+/* Липкая панель на мобилке */
+.event-offer-bar {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .event-offer-bar {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 10px 10px 16px;
+    border-radius: $radius-md;
+    background: $bg-color;
+    box-shadow: 0 4px 24px rgb(0 0 0 / 14%);
+  }
+
+  .event-offer-bar[hidden] {
+    display: none;
+  }
+}
+
+.event-offer-bar__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.event-offer-bar__label {
+  font-size: 14px;
+  line-height: 110%;
+  color: $text-gray;
+}
+
+.event-offer-bar__price {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.event-offer-bar__btn {
+  flex-shrink: 0;
+  padding: 12px 20px;
+}
+
+/* ---------- Билеты: секторы и цены ---------- */
+
+.single-event__tickets {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+
+  @media screen and (max-width: 640px) {
+    padding: 16px;
+    gap: 16px;
+  }
+}
+
+
+.single-event__tickets-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.single-event__tickets-layout--no-scheme {
+  grid-template-columns: 1fr;
+}
+
+.single-event__tickets-scheme {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.single-event__tickets-scheme a {
+  display: block;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: $bg-gray;
+}
+
+.single-event__tickets-scheme img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.4s ease;
+}
+
+@media (hover: hover) {
+  .single-event__tickets-scheme a:hover img {
+    transform: scale(1.03);
+  }
+}
+
+.single-event__tickets-scheme-caption {
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.single-event__tickets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.single-event__tickets-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+}
+
+.single-event__tickets-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 130%;
+}
+
+.single-event__tickets-dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.single-event__tickets-prices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.single-event__tickets-price {
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.single-event__tickets-price--request {
+  font-weight: 400;
+  color: $text-gray;
+}
+
+.single-event__tickets-price[hidden] {
+  display: none;
+}
+
+.single-event__tickets-book {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: $radius-sm;
+  background: $bg-color;
+  font-family: inherit;
+  font-size: 14px;
+  color: $text-black;
+  cursor: pointer;
+  transition: $trans-text;
+}
+
+.single-event__tickets-book[hidden] {
+  visibility: hidden;
+  display: inline-block;
+}
+
+@media (hover: hover) {
+  .single-event__tickets-book:hover {
+    color: $red;
+  }
+}
+
+.single-event__tickets-note {
+  margin: 0;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+/* ---------- Событие завершено ---------- */
+
+.single-event__finished {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.single-event__finished-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.single-event__finished-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+/* Карточка: две цены — билет и тур */
+.event-card__offers {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.event-card__offer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-card__offer:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.event-card__offer-label {
+  font-size: 14px;
+  line-height: 110%;
+  color: $text-gray;
+}
+
+.event-card__offer-price {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 120%;
+  color: $text-black;
+}
+
+.event-card__offers .event-card__price-line {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* «Событие завершено»: на мобилке форма «Сообщить о новых датах» сразу под hero */
+@media screen and (max-width: 1024px) {
+  .single-event__about-grid--widget-first {
+    flex-direction: column;
+  }
+}
+
+/* ---------- Порядок блоков: факты, группа «Тур с билетом», карточки колонки ---------- */
+
+
+.single-event__group-lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__group-head .single-event__booking-widget-includes {
+  margin-top: 4px;
+}
+
+.single-event__column-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+
+  @media screen and (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.single-event__group-head {
+  // Белая карточка — от .single-event__column-card; здесь только плотнее строки (правило ниже карточки).
+  gap: 8px;
+}
+
+/* Как проходит бронирование */
+.single-event__steps-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.single-event__step {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+}
+
+.single-event__step-num {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  background: $bg-color;
+  font-size: 16px;
+}
+
+.single-event__step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.single-event__step-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 130%;
+}
+
+.single-event__step-text {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.single-event__steps-note {
+  margin: 0;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+/* Вторичная группа сайдбара: «Показать в валюте» и телефоны */
+.single-event__widget-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Телефоны — столбиком, по левому краю */
+.single-event__widget-phones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 120%;
+}
+
+.single-event__widget-phones a {
+  color: $text-gray;
+  transition: $trans-text;
+}
+
+@media (hover: hover) {
+  .single-event__widget-phones a:hover {
+    color: $red;
+  }
+}
+
+/* 6+ дат — лента с прокруткой */
+.event-offer__dates--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 4px;
+}
+
+.event-offer__dates--scroll .ui-choice {
+  flex-shrink: 0;
+}
+
+
+/* ---------- Hero: ключевые факты (подпись сверху) ---------- */
+
+.single-event__hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+
+  @media screen and (max-width: 550px) {
+    gap: 12px 20px;
+  }
+}
+
+.single-event__hero-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.single-event__hero-fact-label {
+  font-size: 14px;
+  line-height: 120%;
+  color: rgb(255 255 255 / 70%);
+}
+
+.single-event__hero-fact-value {
+  font-size: 16px;
+  line-height: 120%;
+  color: #fff;
+}
+
+/* ---------- Формат: «Только билет / Тур с билетом» ---------- */
+
+.single-event__format {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+
+  @media screen and (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.single-event__format-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.single-event__format-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 120%;
+}
+
+.single-event__format-place {
+  margin: 0;
+  font-size: 14px;
+  color: $text-gray;
+}
+
+.single-event__format-place[hidden],
+.single-event__format .ui-choice[hidden] {
+  display: none;
+}
+
+.single-event__format-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  @media screen and (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Билеты: даты концерта внутри блока ---------- */
+
+.single-event__tickets-head {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.single-event__tickets-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.single-event__tickets-btn {
+  flex-shrink: 0;
+}
+
+@media screen and (max-width: 550px) {
+  .single-event__tickets-btn {
+    width: 100%;
+  }
+}
+
+/* ---------- Тур с билетом: группа скрывается целиком ---------- */
+
+.single-event__tour-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-event__tour-group[hidden],
+.single-event__tickets[hidden] {
+  display: none;
 }

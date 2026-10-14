@@ -87,6 +87,25 @@ function bsi_crosstour_tour_map(bool $force = false): array
 }
 
 /**
+ * Все slug события: текущий, прошлые (_wp_old_slug) и хвосты «Старых адресов» (event_old_paths).
+ * В Само у тура может остаться ссылка на прежний адрес страницы.
+ *
+ * @return string[]
+ */
+function bsi_crosstour_event_slugs(int $event_id): array
+{
+  $slugs = [(string) get_post_field('post_name', $event_id)];
+  $slugs = array_merge($slugs, array_reverse((array) get_post_meta($event_id, '_wp_old_slug', false)));
+
+  $old_paths = function_exists('get_field') ? (string) get_field('event_old_paths', $event_id) : '';
+  foreach (preg_split('/\R/', $old_paths) as $line) {
+    $slugs[] = bsi_crosstour_slug_from_url(trim($line));
+  }
+
+  return array_values(array_unique(array_filter(array_map('strval', $slugs))));
+}
+
+/**
  * Резолв события → crosstour ref или null (не заведено в Само).
  *
  * @return array|null
@@ -96,12 +115,13 @@ function bsi_crosstour_resolve_event(int $event_id): ?array
   if (!$event_id) {
     return null;
   }
-  $slug = (string) get_post_field('post_name', $event_id);
-  if ($slug === '') {
-    return null;
-  }
   $map = bsi_crosstour_tour_map();
-  return $map[$slug] ?? null;
+  foreach (bsi_crosstour_event_slugs($event_id) as $slug) {
+    if (isset($map[$slug])) {
+      return $map[$slug];
+    }
+  }
+  return null;
 }
 
 /**

@@ -1,12 +1,14 @@
 <?php
 /**
- * Блок «Похожие событийные туры» для single event (та же страна, до 10 CPT event).
+ * Блок «Похожие события» для single event (та же страна, до 10 CPT event). Карточка — card.php, как в каталоге.
  *
  * @var array $args {
  *   @type WP_Post[] $posts Список постов CPT event.
+ *   @type string    $title Заголовок (по умолчанию «Похожие события»).
  * }
  */
 $posts = isset($args['posts']) ? $args['posts'] : [];
+$related_title = !empty($args['title']) ? (string) $args['title'] : 'Похожие события';
 if (empty($posts)) {
   return;
 }
@@ -20,7 +22,7 @@ $more_label = 'Все туры';
   <div class="container">
     <div class="title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">
-        <h2 id="single-event-related-tours-heading" class="h2 news-slider__title">Похожие событийные туры</h2>
+        <h2 id="single-event-related-tours-heading" class="h2 news-slider__title"><?= esc_html($related_title); ?></h2>
         <div class="slider-arrow-wrap news-slider__arrows-wrap">
           <div class="slider-arrow slider-arrow-prev single-event-related-prev" tabindex="0" role="button"
             aria-label="Предыдущие"></div>
@@ -51,7 +53,7 @@ $more_label = 'Все туры';
           }
           ?>
           <div class="swiper-slide single-event-related-slide">
-            <?php get_template_part('template-parts/event/card-row', null, ['post_id' => (int) $rel_post->ID]); ?>
+            <?php get_template_part('template-parts/event/card', null, ['post_id' => (int) $rel_post->ID]); ?>
           </div>
         <?php endforeach; ?>
       </div>

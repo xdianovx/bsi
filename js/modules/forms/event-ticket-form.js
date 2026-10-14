@@ -8,6 +8,10 @@ import { submitFormWithRecaptcha, RECAPTCHA_NOT_LOADED } from "./form-ajax.js";
  */
 
 const YM_ID = 108341897;
+
+// Временно (2026-10-06): поля «Сектор» и «Количество» в модалке не показываем.
+// Вернуть — true. Сектор, выбранный кнопкой в таблице «Билеты», всё равно уходит строкой в деталях.
+const SHOW_TICKET_FIELDS = false;
 const EVENT_TOUR_GOAL = "event_tour_submited";
 
 function getModalRoot() {
@@ -42,6 +46,7 @@ function buildTicketData(btn) {
   }
 
   return {
+    kind: (d.bookingKind || "").trim(),
     eventTitle: (d.eventTitle || "").trim(),
     eventId: d.eventId || "",
     accName,
@@ -59,6 +64,7 @@ function populateModal(ticketData) {
     return;
   }
 
+  // Заголовок — название события.
   const titleEl = document.getElementById("modal-event-ticket-booking-title");
   if (titleEl) {
     const accSuffix = ticketData.accName ? ` — ${ticketData.accName}` : "";
@@ -82,13 +88,42 @@ function populateModal(ticketData) {
     if (input) input.value = val || "";
   };
 
+  // Сектор и количество — только для заявок на билеты (event-offer.js передаёт sectors).
+  const ticketFields = form.querySelector(".js-form-ticket-fields");
+  const sectorSelect = form.querySelector(".js-form-sector");
+  const sectors = Array.isArray(ticketData.sectors) ? ticketData.sectors : [];
+  if (ticketFields && sectorSelect) {
+    const withSectors = ticketData.kind === "ticket" || ticketData.kind === "tour_sector";
+    ticketFields.hidden = !withSectors || !SHOW_TICKET_FIELDS;
+    // Скрытые поля отключаем, чтобы в письмо не ушли значения, которых человек не выбирал.
+    const qtyInput = form.querySelector(".js-form-quantity");
+    if (qtyInput) qtyInput.disabled = !SHOW_TICKET_FIELDS;
+    sectorSelect.disabled = !SHOW_TICKET_FIELDS && !(withSectors && ticketData.sectorPicked);
+    sectorSelect.innerHTML = "";
+    sectors.forEach((sec) => {
+      const opt = document.createElement("option");
+      opt.value = sec.name;
+      opt.textContent = sec.label || sec.name;
+      opt.selected = sec.name === ticketData.sector;
+      sectorSelect.appendChild(opt);
+    });
+    sectorSelect.closest(".input-item").hidden = sectors.length === 0;
+    const qtyLabel = form.querySelector('label[for="event-booking-quantity"]');
+    if (qtyLabel && qtyLabel.firstChild) {
+      qtyLabel.firstChild.textContent = ticketData.kind === "tour_sector" ? "Сколько человек " : "Количество билетов ";
+    }
+  }
+  setVal(".js-form-booking-kind", ticketData.kind || "");
+
   // Детали брони (видимый блок + скрытые поля для письма).
   const rows = [
+    // «Формат» в модалке не показываем (решение 08.10): вид заявки письмо берёт из booking_kind.
+    ["Сектор", !SHOW_TICKET_FIELDS && ticketData.sectorPicked ? ticketData.sector : ""],
     ["Размещение", accommodation],
     ["Дата", ticketData.date],
     ["Цена", ticketData.price],
-    ["Площадка", ticketData.venue],
-    ["Время", ticketData.time],
+    // Площадку в модалке не показываем — уходит в письмо скрытым полем event_venue.
+    ["Время", ticketData.date ? ticketData.time : ""],
   ].filter(([, v]) => v);
 
   const detailsEl = modalRoot.querySelector(".js-form-details");
@@ -98,9 +133,9 @@ function populateModal(ticketData) {
       detailsEl.innerHTML = rows
         .map(
           ([k, v]) =>
-            `<li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">${esc(k)}:</span> ${esc(
-              v
-            )}</li>`
+            `<li class="modal-program-booking__details-item"><span class="modal-program-booking__details-key">${esc(
+              k
+            )}</span><span class="modal-program-booking__details-value">${esc(v)}</span></li>`
         )
         .join("");
       detailsEl.hidden = false;
@@ -137,6 +172,8 @@ function resetModalForm() {
   if (!form) return;
   form.reset();
   clearErrors(form);
+  const ticketFields = form.querySelector(".js-form-ticket-fields");
+  if (ticketFields) ticketFields.hidden = true;
 }
 
 function showFieldError(fieldName, message, form) {
@@ -203,6 +240,14 @@ function validateForm(form) {
     const phoneDigits = phone.replace(/\D/g, "");
     if (phoneDigits.length < 11) {
       errors.phone = "Введите полный номер телефона";
+    }
+  }
+
+  const qtyEl = form.querySelector('[name="quantity"]');
+  if (qtyEl && !qtyEl.closest("[hidden]")) {
+    const qty = parseInt(qtyEl.value, 10);
+    if (!(qty >= 1 && qty <= 50)) {
+      errors.quantity = "Укажите количество от 1 до 50";
     }
   }
 
@@ -377,6 +422,19 @@ export function initEventTicketForm() {
   if (!modal && !ctaForm && !promoCtaForm) {
     return;
   }
+
+  // Счётчик количества (.ui-stepper): − / + в пределах min–max поля.
+  document.addEventListener("click", (e) => {
+    const step = e.target.closest("[data-stepper]");
+    if (!step) return;
+    const input = step.parentElement.querySelector("input");
+    if (!input) return;
+    const min = parseInt(input.min, 10) || 1;
+    const max = parseInt(input.max, 10) || 99;
+    const next = (parseInt(input.value, 10) || min) + parseInt(step.dataset.stepper, 10);
+    input.value = String(Math.min(max, Math.max(min, next)));
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
 
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".js-event-ticket-booking-btn");

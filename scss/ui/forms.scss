@@ -36,6 +36,12 @@ button {
   text-align: center;
 }
 
+// display у .form-row (grid) перебивает атрибут hidden — скрытые поля/строки остаются на экране.
+.form-row[hidden],
+.input-item[hidden] {
+  display: none;
+}
+
 .input-item {
   position: relative;
 
@@ -102,6 +108,84 @@ input.error {
   padding: 0 8px;
   border-radius: $radius-sm;
   color: #dc2626;
+}
+
+/* Подпись над полем — формы заявок в модалках (модалки заявок в template-parts).
+   Разметка: <div class="input-item input-item--stacked"><label>…</label><input></div> */
+.input-item--stacked label {
+  position: static;
+  display: block;
+  margin: 0 0 6px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 120%;
+  color: $text-black;
+}
+
+/* Счётчик количества: − [2] +. Разметка — ui.html, раздел «Формы». */
+.ui-stepper {
+  // По размеру содержимого (− 2 +), а не на всю колонку.
+  display: inline-flex;
+  align-items: center;
+  border-radius: $radius-sm;
+  background: $bg-page;
+}
+
+.ui-stepper__btn {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1;
+  color: $text-black;
+  cursor: pointer;
+  transition: $trans-text;
+}
+
+@media (hover: hover) {
+  .ui-stepper__btn:hover {
+    color: $red;
+  }
+}
+
+.input-item .ui-stepper__input {
+  flex: 0 0 48px;
+  width: 48px;
+  min-width: 0;
+  padding: 14px 0;
+  background: none;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.ui-stepper__input::-webkit-outer-spin-button,
+.ui-stepper__input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.input-item select {
+  display: block;
+  width: 100%;
+  padding: 14px 40px 14px 16px;
+  border: 0;
+  border-radius: $radius-sm;
+  background-color: $bg-page;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%23222%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27m6%209%206%206%206-6%27%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  font-family: inherit;
+  font-size: 16px;
+  color: $text-black;
+  appearance: none;
+  cursor: pointer;
 }
 
 .input-item textarea {
@@ -306,7 +390,7 @@ input.error {
   width: 20px;
   height: 20px;
   border: 1px solid $gray-light;
-  border-radius: $radius-sm;
+  border-radius: $radius-xs;
   background: $bg-color;
   transition: $trans-text;
 }
@@ -334,6 +418,21 @@ input.error {
 
 .ui-checkbox__input:checked ~ .ui-checkbox__mark::after {
   display: block;
+}
+
+/* Монохромная галочка — для карточек выбора (.ui-option): без красного,
+   белый квадрат и чёрная галочка на чёрной карточке. */
+.ui-checkbox__mark--mono {
+  border-color: $bg-color;
+}
+
+.ui-checkbox__input:checked ~ .ui-checkbox__mark--mono {
+  background: $bg-color;
+  border-color: $bg-color;
+}
+
+.ui-checkbox__input:checked ~ .ui-checkbox__mark--mono::after {
+  background: $text-black;
 }
 
 .ui-checkbox__text {
