@@ -160,6 +160,18 @@ add_action('acf/init', function () {
         'placeholder' => 'Билеты и тур на концерт 6 и 7 марта',
       ],
       [
+        'key' => 'field_event_country',
+        'label' => 'Страна',
+        'name' => 'tour_country',
+        'type' => 'post_object',
+        'post_type' => ['country'],
+        'return_format' => 'id',
+        'ui' => 1,
+        'ajax' => 1,
+        'required' => 1,
+        'wrapper' => ['width' => '50'],
+      ],
+      [
         'key' => 'field_event_hero_date',
         'label' => 'Дата начала (первый экран)',
         'name' => 'event_hero_date',
@@ -195,13 +207,13 @@ add_action('acf/init', function () {
     ],
   ]);
 
-  // Основное, menu_order 10 (под колонкой normal — см. bsi_event_acf_metabox_order).
+  // «О событии» (бывшее «Основное»): тексты — после тура и состава (порядок заполнения 14.10, см. bsi_event_acf_metabox_order).
   // Скрытые из админки поля этой группы — см. bsi_event_hidden_field_keys().
   acf_add_local_field_group([
     'key' => 'group_event_main',
-    'title' => 'Основное',
+    'title' => 'О событии',
     'position' => 'normal',
-    'menu_order' => 10,
+    'menu_order' => 55,
     'fields' => [
       [
         'key' => 'field_event_about',
@@ -222,18 +234,6 @@ add_action('acf/init', function () {
         'tabs' => 'all',
         'toolbar' => 'basic',
         'media_upload' => 0,
-      ],
-      [
-        'key' => 'field_event_country',
-        'label' => 'Страна',
-        'name' => 'tour_country',
-        'type' => 'post_object',
-        'post_type' => ['country'],
-        'return_format' => 'id',
-        'ui' => 1,
-        'ajax' => 1,
-        'required' => 1,
-        'wrapper' => ['width' => '50'],
       ],
       [
         'key' => 'field_event_price_from',
@@ -526,7 +526,7 @@ add_action('acf/init', function () {
     'key' => 'group_event_sector_prices',
     'title' => 'Билеты: секторы и цены',
     'position' => 'normal',
-    'menu_order' => 16,
+    'menu_order' => 17,
     'fields' => [
       // Схема — над секторами: цвет сектора берётся с неё пипеткой (inc/admin/event-admin.php).
       [
@@ -775,7 +775,7 @@ add_action('acf/init', function () {
     'key' => 'group_event_booking',
     'title' => 'Тур',
     'position' => 'normal',
-    'menu_order' => 30,
+    'menu_order' => 16,
     'fields' => [
       [
         'key' => 'field_event_data_source',
@@ -1504,13 +1504,16 @@ function bsi_event_acf_metabox_order($result, $option, $user)
   }
 
   $acf_after_title = ['acf-group_event_hero'];
+  // Порядок заполнения (решение 14.10): Первый экран (обложка, подзаголовок, страна) → Когда и где → Тур (Само) →
+  // Билеты → Проживание → Программа → Входит / Оплачивается → О событии → Вопросы → Статус и заявки.
   $acf_normal = [
-    'acf-group_event_main',
     'acf-group_event_dates_places',
-    'acf-group_event_sector_prices',
     'acf-group_event_booking',
+    'acf-group_event_sector_prices',
     'acf-group_event_accommodation',
+    'acf-group_event_program',
     'acf-group_event_included',
+    'acf-group_event_main',
     'acf-group_event_faq',
     'acf-group_event_status',
   ];
