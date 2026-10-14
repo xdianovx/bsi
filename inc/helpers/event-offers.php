@@ -509,6 +509,7 @@ add_filter('acf/load_field/key=field_event_tour_sector', static function ($field
 // Ссылка на тур — не поиск авиабилетов.
 add_filter('acf/validate_value/key=field_event_date_tour_url', 'bsi_event_validate_tour_url', 10, 2);
 add_filter('acf/validate_value/key=field_event_booking_url', 'bsi_event_validate_tour_url', 10, 2);
+add_filter('acf/validate_value/key=field_event_booking_urls_more_url', 'bsi_event_validate_tour_url', 10, 2);
 function bsi_event_validate_tour_url($valid, $value)
 {
   if ($valid !== true || !is_string($value) || $value === '') {

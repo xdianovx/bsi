@@ -340,18 +340,24 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
 
   renderPrice(json.data);
 
-  const dates = [...new Set(combos.map((c) => c.date))];
-  // Дата/ночи из ссылки менеджера, иначе самое дешёвое сочетание.
+  // Дата/ночи из ссылки менеджера, иначе самое дешёвое сочетание основного тура.
   const preferred = json.data.preferred;
+  const mainCombos = combos.filter((c) => !c.concert);
   const start =
     (preferred &&
-      combos.find((c) => c.date === preferred.date && c.nights === preferred.nights)) ||
-    cheapest(combos);
+      mainCombos.find((c) => c.date === preferred.date && c.nights === preferred.nights)) ||
+    cheapest(mainCombos.length ? mainCombos : combos);
   const state = { date: start.date, nights: start.nights, star: "" };
   const slotCache = new Map();
-  const slotKey = (date, nights) => `${date}_${nights}`;
+  // Туров Само может быть несколько (по одному на концерт) — заезды у них одинаковые,
+  // поэтому выбор идёт внутри тура выбранного концерта (pool).
+  const pool = () => {
+    const own = state.concert ? combos.filter((c) => c.concert === state.concert) : [];
+    return own.length ? own : mainCombos.length ? mainCombos : combos;
+  };
+  const slotKey = (date, nights) => `${pool()[0]?.tour || 0}_${date}_${nights}`;
   const currentCombo = () =>
-    combos.find((c) => c.date === state.date && c.nights === state.nights);
+    pool().find((c) => c.date === state.date && c.nights === state.nights);
 
   // Страница события (event-offer.js): под заездом — на какой концерт он попадает
   // (ближайший концерт после заезда; тур на 6 марта стартует 5-го).
@@ -374,14 +380,17 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   const activeConcert = document.querySelector("[data-offer-date].is-active")?.dataset.offerDate || "";
   state.concert = /^\d{4}-\d{2}-\d{2}$/.test(activeConcert) ? activeConcert.replace(/-/g, "") : "";
   const visibleDates = () => {
-    if (!state.concert || !concerts.length) return dates;
-    const list = dates.filter((d) => concertFor(d)?.ymd === state.concert);
-    return list.length ? list : dates;
+    const list = pool();
+    const dates = [...new Set(list.map((c) => c.date))];
+    // Свой тур у концерта — его заезды все подходят; общий тур — по ближайшему концерту.
+    if (!state.concert || !concerts.length || list[0]?.concert) return dates;
+    const own = dates.filter((d) => concertFor(d)?.ymd === state.concert);
+    return own.length ? own : dates;
   };
   const pickForConcert = () => {
     const allowed = visibleDates();
-    if (allowed.includes(state.date)) return;
-    const preferredCombo = cheapest(combos.filter((c) => allowed.includes(c.date)));
+    if (allowed.includes(state.date) && currentCombo()) return;
+    const preferredCombo = cheapest(pool().filter((c) => allowed.includes(c.date)));
     state.date = preferredCombo.date;
     state.nights = preferredCombo.nights;
   };
@@ -390,16 +399,18 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   const samoBase = section.dataset.samoUrl || "";
   const emitCombo = (combo) => {
     let url = "";
-    if (samoBase && combo) {
+    // У сочетания свой тур Само, если их несколько («Ещё туры Само» в админке).
+    const base = combo?.samo_url || samoBase;
+    if (base && combo) {
       try {
-        const u = new URL(samoBase);
+        const u = new URL(base);
         u.searchParams.set("CHECKIN_BEG", combo.date);
         u.searchParams.set("CHECKIN_END", combo.date);
         u.searchParams.set("NIGHTS_FROM", combo.nights);
         u.searchParams.set("NIGHTS_TILL", combo.nights);
         url = u.toString();
       } catch (_e) {
-        url = samoBase;
+        url = base;
       }
     }
     const nightsLabel = combo ? `${combo.nights} ${pluralNights(combo.nights)}` : "";
@@ -414,12 +425,12 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
 
   const renderDates = () => {
     datesEl.innerHTML = visibleDates()
-      .map((d) => chip(d === state.date, `data-date="${d}"`, `<span class="numfont">${fmtDayMonth(d)}</span>, ${weekday(d)}`, priceSpan(cheapest(combos.filter((c) => c.date === d)), "ui-choice__sub")))
+      .map((d) => chip(d === state.date, `data-date="${d}"`, `<span class="numfont">${fmtDayMonth(d)}</span>, ${weekday(d)}`, priceSpan(cheapest(pool().filter((c) => c.date === d)), "ui-choice__sub")))
       .join("");
   };
 
   const renderNights = () => {
-    nightsEl.innerHTML = combos
+    nightsEl.innerHTML = pool()
       .filter((c) => c.date === state.date)
       .map((c) => chip(c.nights === state.nights, `data-nights="${c.nights}"`, `<span class="numfont">${c.nights}</span> ${pluralNights(c.nights)}`, priceSpan(c, "ui-choice__sub")))
       .join("");
@@ -468,6 +479,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
         event_id: eventId,
         date: combo.date,
         nights: String(combo.nights),
+        tour: String(combo.tour || 0),
       });
       const hotels = res?.success ? res.data?.offer?.hotels || [] : [];
       if (!hotels.length) return;
@@ -490,7 +502,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
 
     if (btn.dataset.date) {
       state.date = btn.dataset.date;
-      const forDate = combos.filter((c) => c.date === state.date);
+      const forDate = pool().filter((c) => c.date === state.date);
       if (!forDate.some((c) => c.nights === state.nights)) {
         state.nights = cheapest(forDate).nights;
       }
@@ -518,7 +530,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
   });
 
   // Одно сочетание — выбирать нечего, секция дат скрыта, остаётся секция отелей.
-  const single = combos.length < 2;
+  const single = pool().length < 2;
   controls.hidden = single;
   section.hidden = single;
   pickForConcert();

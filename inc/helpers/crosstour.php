@@ -210,6 +210,80 @@ function bsi_crosstour_event_ref(int $event_id): ?array
 }
 
 /**
+ * Все туры Само события: основной (ссылка / авто по slug) + «Ещё туры Само» —
+ * когда в Само на каждую дату концерта заведён свой тур (BTS 12 и 13 декабря).
+ * Дубли по STATEINC + TOURINC убираются. Порядок = индекс тура в сетке конструктора.
+ *
+ * @return array<int,array>
+ */
+function bsi_crosstour_event_refs(int $event_id): array
+{
+  $main = bsi_crosstour_event_ref($event_id);
+  if (!$main) {
+    return [];
+  }
+  $refs = [$main];
+  $seen = [(int) ($main['STATEINC'] ?? 0) . '_' . (int) ($main['TOURINC'] ?? 0) => true];
+  $rows = function_exists('get_field') ? get_field('tour_booking_urls_more', $event_id) : [];
+  foreach ((array) $rows as $row) {
+    $ref = bsi_crosstour_ref_from_url(trim((string) ($row['url'] ?? '')));
+    if (!$ref) {
+      continue;
+    }
+    $key = (int) ($ref['STATEINC'] ?? 0) . '_' . (int) ($ref['TOURINC'] ?? 0);
+    if (isset($seen[$key])) {
+      continue;
+    }
+    $seen[$key] = true;
+    $date = trim((string) ($row['concert_date'] ?? ''));
+    $ref['_concert'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? str_replace('-', '', $date) : '';
+    $refs[] = $ref;
+  }
+
+  return $refs;
+}
+
+/**
+ * Сетка конструктора по всем турам события: сочетания «заезд × ночи» всех туров
+ * в одном списке; у каждого — индекс тура (`tour`), ссылка на него в Само (`samo_url`)
+ * и дата концерта тура (`concert`, 'Ymd'; у основного тура пусто). Заезды разных туров
+ * совпадают (BTS 12 и 13 декабря — одни и те же 5–12.12), различает их только концерт.
+ */
+function bsi_crosstour_event_matrix_all(array $refs, bool $force = false): array
+{
+  $out = ['combos' => [], 'preferred' => null, 'price_rub' => null, 'price_original' => null, 'price_currency' => null];
+  $combos = [];
+  foreach (array_values($refs) as $i => $ref) {
+    $concert = (string) ($ref['_concert'] ?? '');
+    unset($ref['_concert']);
+    $m = bsi_crosstour_event_matrix($ref, $force);
+    if ($i === 0 && !empty($m['preferred'])) {
+      $out['preferred'] = $m['preferred'];
+    }
+    $samo_url = bsi_crosstour_booking_url($ref);
+    foreach ($m['combos'] as $c) {
+      $c['tour'] = $i;
+      $c['concert'] = $i === 0 ? '' : $concert;
+      $c['samo_url'] = $samo_url;
+      $combos[] = $c;
+    }
+  }
+  usort($combos, static function ($a, $b) {
+    return [$a['date'], $a['nights'], $a['tour']] <=> [$b['date'], $b['nights'], $b['tour']];
+  });
+  $out['combos'] = $combos;
+  foreach ($combos as $c) {
+    if ($c['price_rub'] !== null && ($out['price_rub'] === null || $c['price_rub'] < $out['price_rub'])) {
+      $out['price_rub'] = $c['price_rub'];
+      $out['price_original'] = $c['price_original'];
+      $out['price_currency'] = $c['price_currency'];
+    }
+  }
+
+  return $out;
+}
+
+/**
  * bitmask validDates (от startDate) → массив дат 'Ymd'.
  *
  * @return string[]

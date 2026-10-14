@@ -409,16 +409,21 @@ function samo_ajax()
     case 'crosstour_slot':
       // Конструктор тура: сетка «заезд × ночи» и отели выбранного сочетания.
       // Ref берём только из события — параметры тура с фронта не принимаем.
+      // Туров может быть несколько («Ещё туры Само») — фронт присылает только индекс тура из сетки.
       $eventId = isset($_POST['event_id']) ? (int) $_POST['event_id'] : 0;
-      $ref = ($eventId && function_exists('bsi_crosstour_event_ref')) ? bsi_crosstour_event_ref($eventId) : null;
-      if (!$ref || !function_exists('bsi_crosstour_event_matrix')) {
+      $refs = ($eventId && function_exists('bsi_crosstour_event_refs')) ? bsi_crosstour_event_refs($eventId) : [];
+      if (empty($refs) || !function_exists('bsi_crosstour_event_matrix')) {
         wp_send_json_success(['samo' => false]);
       }
       $force = !empty($_POST['_force_refresh']) && current_user_can('manage_options');
 
       if ($method === 'crosstour_matrix') {
-        wp_send_json_success(array_merge(['samo' => true], bsi_crosstour_event_matrix($ref, $force)));
+        wp_send_json_success(array_merge(['samo' => true], bsi_crosstour_event_matrix_all($refs, $force)));
       }
+
+      $tour_index = isset($_POST['tour']) ? (int) $_POST['tour'] : 0;
+      $ref = $refs[$tour_index] ?? $refs[0];
+      unset($ref['_concert']);
 
       $offer = bsi_crosstour_event_slot_offer(
         $ref,
