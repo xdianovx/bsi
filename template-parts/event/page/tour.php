@@ -93,7 +93,8 @@ $star = '<svg class="single-event__star" width="14" height="14" viewBox="0 0 24 
     </div>
   <?php endif; ?>
 
-  <?php if (!empty($sectors) && $tour_sector !== ''): ?>
+  <?php $tour_sectors = !empty($sectors) && $tour_sector !== ''; ?>
+  <?php if ($tour_sectors || $event['scheme_url'] !== ''): ?>
     <div class="single-event__tour-step">
       <h3 class="single-event__tour-step-title">Билет в туре</h3>
       <div class="single-event__tickets-body<?= $event['scheme_url'] === '' ? ' single-event__tickets-body--no-scheme' : ''; ?>">
@@ -105,6 +106,7 @@ $star = '<svg class="single-event__star" width="14" height="14" viewBox="0 0 24 
             <figcaption class="single-event__venue-map-note">Схема примерная: расположение секторов зависит от площадки и шоу. Точное место подтвердит менеджер.</figcaption>
           </figure>
         <?php endif; ?>
+        <?php if ($tour_sectors): ?>
         <div class="single-event__tickets-list">
           <?php foreach ($sectors as $sec): ?>
             <?php $in_tour = $sec['name'] === $tour_sector; ?>
@@ -134,6 +136,7 @@ $star = '<svg class="single-event__star" width="14" height="14" viewBox="0 0 24 
             </label>
           <?php endforeach; ?>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   <?php endif; ?>
