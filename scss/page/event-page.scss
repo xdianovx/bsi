@@ -367,6 +367,13 @@
   gap: 24px;
 }
 
+@media screen and (max-width: 768px) {
+  .single-event__tickets,
+  .single-event__tour {
+    gap: 16px;
+  }
+}
+
 .single-event__tickets-head,
 .single-event__tour-head {
   display: flex;
@@ -1155,10 +1162,6 @@
   .event-offer-summary__title {
     font-weight: 500;
   }
-
-  .single-event__faq-inner {
-    padding: 16px;
-  }
 }
 
 /* Шаги на мобилке (2010:7934): кружок с номером слева, текст справа, без линии */
@@ -1190,6 +1193,12 @@
   padding: 24px;
   border-radius: $radius-md;
   background: $bg-color;
+}
+
+@media screen and (max-width: 768px) {
+  .single-event__faq-inner {
+    padding: 16px;
+  }
 }
 
 .single-event__faq-inner .h2 {
