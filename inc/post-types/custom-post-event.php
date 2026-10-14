@@ -521,6 +521,7 @@ add_action('acf/init', function () {
     'USD' => 'USD ($)',
     'EUR' => 'EUR (€)',
     'GBP' => 'GBP (£)',
+    'AED' => 'AED (дирхам ОАЭ)',
   ];
   acf_add_local_field_group([
     'key' => 'group_event_sector_prices',
