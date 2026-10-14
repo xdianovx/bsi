@@ -169,6 +169,10 @@ function bsi_event_page_data(int $post_id): array
   $first_row = $all_rows[0] ?? [];
   $venue = trim((string) $f('event_venue')) ?: trim((string) ($first_row['date_venue'] ?? ''));
   $city = bsi_event_city($post_id) ?: trim((string) ($first_row['date_city'] ?? ''));
+  // Разные площадки по датам — в hero «3 площадки», в сайдбаре площадка выбранной даты.
+  $date_venues = array_values(array_unique(array_filter(array_column($dates, 'venue'))));
+  $venue_count = count($date_venues);
+  $venue_label = $venue_count > 1 ? $venue_count . ' ' . bsi_plural_ru($venue_count, 'площадка', 'площадки', 'площадок') : $venue;
   $time = $dates[0]['time'] ?? (trim((string) ($first_row['date_time'] ?? '')) ?: trim((string) $f('event_time')));
 
   // Обложка: своё поле → миниатюра → галерея.
@@ -285,7 +289,8 @@ function bsi_event_page_data(int $post_id): array
     'time' => $time,
     'venue' => $venue,
     'city' => $city,
-    'place' => implode(', ', array_filter([$venue, $city])),
+    'place' => implode(', ', array_filter([$venue_label, $city])),
+    'date_place' => implode(', ', array_filter([$date_venues[0] ?? $venue, $city])),
     'tour_url' => $tour_url,
     'samo_url' => $samo_url,
     'booking_url' => $booking_url,
@@ -382,6 +387,7 @@ function bsi_event_page_json(array $page): array
       'place' => $od
         ? implode(' · ', array_filter([$od['time'] !== '' ? 'Начало в ' . $od['time'] : '', $od['venue']]))
         : 'все дни события',
+      'venueLine' => $od ? implode(', ', array_filter([$od['venue'], $page['city']])) : $page['place'],
       'tourHref' => $od ? ($od['tour_url'] !== '' ? $od['tour_url'] : $page['booking_url']) : '',
       'sectors' => $sectors,
     ];

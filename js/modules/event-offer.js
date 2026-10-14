@@ -233,6 +233,8 @@ export function initEventOffer() {
 
     const place = document.querySelector("[data-offer-place]");
     if (place) place.textContent = date.place;
+    const summaryPlace = document.querySelector("[data-offer-summary-place]");
+    if (summaryPlace && date.venueLine) summaryPlace.textContent = date.venueLine;
 
     syncUrl();
     syncTourLink();

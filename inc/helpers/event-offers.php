@@ -197,7 +197,8 @@ function bsi_event_offer_dates(int $post_id): array
       'weekday' => $end !== '' ? '' : date_i18n('D', $ts),
       'time' => trim((string) ($row['date_time'] ?? '')) ?: $event_time,
       'city' => $event_city !== '' ? $event_city : trim((string) ($row['date_city'] ?? '')),
-      'venue' => $event_venue !== '' ? $event_venue : trim((string) ($row['date_venue'] ?? '')),
+      // Площадка даты важнее общей: у турниров (Суперкубок) каждый день — свой стадион.
+      'venue' => trim((string) ($row['date_venue'] ?? '')) ?: $event_venue,
       'tour_url' => trim((string) ($row['date_tour_url'] ?? '')),
     ];
   }

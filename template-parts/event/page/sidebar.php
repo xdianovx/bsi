@@ -26,8 +26,8 @@ $chevron = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="
     <div class="event-offer-summary__head">
       <div class="event-offer-summary__info">
         <p class="event-offer-summary__title"><?= esc_html(bsi_event_short_title($event['title'])); ?></p>
-        <?php if ($event['place'] !== ''): ?>
-          <p class="event-offer-summary__place"><?= esc_html($event['place']); ?></p>
+        <?php if ($event['date_place'] !== ''): ?>
+          <p class="event-offer-summary__place" data-offer-summary-place><?= esc_html($event['date_place']); ?></p>
         <?php endif; ?>
       </div>
       <button type="button" class="event-offer-summary__close" data-offer-sheet-close><?= $chevron; ?></button>
