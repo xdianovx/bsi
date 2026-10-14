@@ -207,6 +207,35 @@ add_action('acf/init', function () {
     ],
   ]);
 
+  // Куда приходят заявки (решение 14.10 — наверх, сразу после первого экрана; отдельный email на билеты убран —
+  // билеты и тур ведёт один человек). Логика — ajax-event-ticket-form.php.
+  acf_add_local_field_group([
+    'key' => 'group_event_emails',
+    'title' => 'Куда приходят заявки',
+    'position' => 'normal',
+    'menu_order' => 1,
+    'fields' => [
+      [
+        'key' => 'field_event_notify_email',
+        'label' => 'Доп. email — копия всех заявок',
+        'name' => 'event_notify_email',
+        'type' => 'email',
+        'placeholder' => 'email@example.com',
+        'instructions' => 'Получает копию каждой заявки этого события (билеты, тур, консультация). Общие адреса тоже получают.',
+        'wrapper' => ['width' => '100'],
+      ],
+    ],
+    'location' => [
+      [
+        [
+          'param' => 'post_type',
+          'operator' => '==',
+          'value' => 'event',
+        ],
+      ],
+    ],
+  ]);
+
   // «О событии» (бывшее «Основное»): тексты — после тура и состава (порядок заполнения 14.10, см. bsi_event_acf_metabox_order).
   // Скрытые из админки поля этой группы — см. bsi_event_hidden_field_keys().
   acf_add_local_field_group([
@@ -662,13 +691,6 @@ add_action('acf/init', function () {
         'type' => 'true_false',
         'ui' => 1,
         'wrapper' => ['width' => '25'],
-      ],
-      [
-        'key' => 'field_event_tickets_email',
-        'label' => 'Email для заявок на билеты',
-        'name' => 'event_tickets_email',
-        'type' => 'email',
-        'wrapper' => ['width' => '50'],
       ],
     ],
     'location' => [
@@ -1277,14 +1299,6 @@ add_action('acf/init', function () {
         'wrapper' => ['width' => '50'],
       ],
       [
-        'key' => 'field_event_notify_email',
-        'label' => 'Доп. email для заявок',
-        'name' => 'event_notify_email',
-        'type' => 'email',
-        'placeholder' => 'email@example.com',
-        'wrapper' => ['width' => '50'],
-      ],
-      [
         'key' => 'field_event_old_paths',
         'label' => 'Старые адреса (301)',
         'name' => 'event_old_paths',
@@ -1536,9 +1550,10 @@ function bsi_event_acf_metabox_order($result, $option, $user)
   }
 
   $acf_after_title = ['acf-group_event_hero'];
-  // Порядок заполнения (решение 14.10): Первый экран (обложка, подзаголовок, страна) → Когда и где → Тур (Само) →
+  // Порядок заполнения (решение 14.10): Первый экран (обложка, подзаголовок, страна) → Куда приходят заявки → Когда и где → Тур (Само) →
   // Билеты → Проживание → Программа → Входит / Оплачивается → О событии → Вопросы → Статус и заявки.
   $acf_normal = [
+    'acf-group_event_emails',
     'acf-group_event_dates_places',
     'acf-group_event_booking',
     'acf-group_event_sector_prices',

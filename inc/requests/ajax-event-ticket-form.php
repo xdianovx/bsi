@@ -82,16 +82,13 @@ function bsi_handle_event_ticket_booking(): void
   $recipient_email = $event_ticket_booking_email;
   $event_id = (int) ($_POST['event_id'] ?? 0);
   if ($event_id && get_post_type($event_id) === 'event' && function_exists('get_field')) {
-    // Заявки на билеты — своему получателю события; пусто — общим адресам.
-    if (in_array($booking_kind, ['ticket', 'tour_sector', 'notify'], true)) {
-      $tickets_email = sanitize_email(trim((string) get_field('event_tickets_email', $event_id)));
-      if (is_email($tickets_email)) {
-        $recipient_email = $tickets_email;
+    // Одна копия на событие для всех видов заявок (14.10: билеты и тур ведёт один человек).
+    // event_tickets_email убран из админки; если успели заполнить — тоже копией, не вместо общих адресов.
+    foreach (['event_notify_email', 'event_tickets_email'] as $key) {
+      $extra_email = sanitize_email(trim((string) get_field($key, $event_id)));
+      if (is_email($extra_email) && stripos($recipient_email, $extra_email) === false) {
+        $recipient_email .= ', ' . $extra_email;
       }
-    }
-    $extra_email = sanitize_email(trim((string) get_field('event_notify_email', $event_id)));
-    if (is_email($extra_email)) {
-      $recipient_email .= ', ' . $extra_email;
     }
   }
 
