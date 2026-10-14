@@ -423,8 +423,9 @@ add_action('acf/init', function () {
         'label' => 'Площадка',
         'name' => 'event_venue',
         'type' => 'text',
+        'instructions' => 'Одна на все даты. Если в разные дни разные стадионы — впишите стадион у каждой даты в таблице ниже, колонка «Площадка этого дня».',
         'wrapper' => ['width' => '50'],
-        'placeholder' => 'National Stadium',
+        'placeholder' => 'Например, National Stadium',
       ],
       [
         'key' => 'field_event_resort',
@@ -490,12 +491,12 @@ add_action('acf/init', function () {
           ],
           [
             'key' => 'field_event_date_venue',
-            'label' => 'Своя площадка',
+            'label' => 'Площадка этого дня',
             'name' => 'date_venue',
             'type' => 'text',
-            'instructions' => 'Только если в этот день другая площадка (турнир)',
+            'instructions' => 'Пусто — как в поле «Площадка» выше',
             'wrapper' => ['width' => '30'],
-            'placeholder' => 'Пусто — общая площадка',
+            'placeholder' => 'Как выше',
           ],
           [
             'key' => 'field_event_date_row_price',
