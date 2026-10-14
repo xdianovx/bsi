@@ -154,12 +154,13 @@
 }
 
 @media screen and (max-width: 768px) {
+  /* Мобилка (макет 2010:7937): во всю ширину вплотную к шапке сайта, скруглён только низ */
   .single-event__hero {
     width: 100%;
     min-height: 0;
-    margin-top: 8px;
+    margin-top: 0;
     padding: 0;
-    border-radius: $radius-md;
+    border-radius: 0 0 $radius-md $radius-md;
   }
 
   /* Мобилка: фото полосой сверху, текст на чёрной плашке ниже */
