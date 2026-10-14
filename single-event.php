@@ -11,7 +11,7 @@ $finished = $event['finished'];
 $both = $event['has_tour'] && $event['has_tickets'];
 $json = bsi_event_page_json($event);
 $related = bsi_event_related($post_id, $event['country_id'], $finished);
-// Куда ведут «Выбрать тур / билет»: блок выбора #format есть, только если выбирать дату или формат (format.php).
+// Куда ведут «Купить тур / билет»: блок выбора #format есть, только если выбирать дату или формат (format.php).
 $choose_href = (count($json['dates']) > 1 || $both) ? '#format' : ($event['has_tour'] ? '#tur' : '#bilety');
 $args = ['event' => $event, 'both' => $both, 'json' => $json, 'choose_href' => $choose_href];
 

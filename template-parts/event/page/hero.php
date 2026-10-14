@@ -13,13 +13,13 @@ if ($finished) {
   $cta_label = 'Сообщить о новых датах';
   $cta_href = '#status';
 } elseif ($both) {
-  $cta_label = 'Выбрать билет или тур';
+  $cta_label = 'Купить билет или тур';
   $cta_href = $args['choose_href'];
 } elseif ($event['has_tour']) {
-  $cta_label = 'Выбрать тур';
+  $cta_label = 'Купить тур';
   $cta_href = $args['choose_href'];
 } elseif ($event['has_tickets']) {
-  $cta_label = 'Выбрать билет';
+  $cta_label = 'Купить билет';
   $cta_href = $args['choose_href'];
 } else {
   // Ни дат, ни секторов, ни тура (старая запись) — выбирать нечего, только консультация.

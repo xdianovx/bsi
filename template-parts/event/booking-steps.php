@@ -46,7 +46,7 @@ $steps = [
                 <button type="button" class="single-event__step-link" data-offer-action="ticket">Купить билет</button>
               <?php endif; ?>
               <?php if ($has_tour): ?>
-                <a href="<?= esc_attr($choose_href); ?>" class="single-event__step-link">Выбрать тур ↑</a>
+                <a href="<?= esc_attr($choose_href); ?>" class="single-event__step-link">Купить тур ↑</a>
               <?php endif; ?>
             </span>
           <?php endif; ?>
