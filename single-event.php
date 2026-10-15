@@ -58,11 +58,12 @@ get_header();
             </section>
           <?php endif; ?>
 
-          <?php get_template_part('template-parts/event/booking-steps', null, [
+          <?php // ВРЕМЕННО скрыто 15.10 «Как проходит бронирование»; вернуть — убрать if (false) / endif.
+          if (false): get_template_part('template-parts/event/booking-steps', null, [
             'has_tour' => $event['has_tour'],
             'has_tickets' => $event['has_tickets'],
             'choose_href' => $choose_href,
-          ]); ?>
+          ]); endif; ?>
 
           <?php if (trim(wp_strip_all_tags($event['important'])) !== ''): ?>
             <section class="single-event__column-card single-event__important" id="vazhno-znat">
