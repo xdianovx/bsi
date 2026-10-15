@@ -199,12 +199,29 @@ function bsi_event_offer_dates(int $post_id): array
       'city' => $event_city !== '' ? $event_city : trim((string) ($row['date_city'] ?? '')),
       // Площадка даты важнее общей: у турниров (Суперкубок) каждый день — свой стадион.
       'venue' => trim((string) ($row['date_venue'] ?? '')) ?: $event_venue,
+      // Своя схема зала у даты — у турниров на разных стадионах; пусто — общая схема события.
+      'scheme_url' => bsi_event_date_scheme_url($row['date_scheme'] ?? ''),
       'tour_url' => trim((string) ($row['date_tour_url'] ?? '')),
     ];
   }
   ksort($out);
 
   return array_values($out);
+}
+
+/**
+ * URL схемы даты: ACF отдаёт url, сырое мета — ID вложения.
+ */
+function bsi_event_date_scheme_url($value): string
+{
+  if (is_array($value)) {
+    return (string) ($value['url'] ?? '');
+  }
+  if (is_numeric($value) && (int) $value > 0) {
+    return (string) wp_get_attachment_url((int) $value);
+  }
+
+  return is_string($value) ? trim($value) : '';
 }
 
 /**

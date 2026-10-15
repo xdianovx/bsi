@@ -235,6 +235,14 @@ export function initEventOffer() {
     if (place) place.textContent = date.place;
     const summaryPlace = document.querySelector("[data-offer-summary-place]");
     if (summaryPlace && date.venueLine) summaryPlace.textContent = date.venueLine;
+    // У турниров на разных стадионах схема зала своя у каждой даты.
+    if (date.schemeUrl) {
+      document.querySelectorAll(".single-event__venue-map").forEach((link) => {
+        link.href = date.schemeUrl;
+        const img = link.querySelector("img");
+        if (img) img.src = date.schemeUrl;
+      });
+    }
 
     syncUrl();
     syncTourLink();

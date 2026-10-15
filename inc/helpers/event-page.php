@@ -275,6 +275,10 @@ function bsi_event_page_data(int $post_id): array
   }
 
   $scheme = $f('venue_scheme');
+  $event_scheme_url = is_array($scheme) && !empty($scheme['url']) ? (string) $scheme['url'] : '';
+  // Схема при загрузке — у первой даты; JS меняет её при выборе даты (schemeUrl в JSON).
+  $date_schemes = array_values(array_filter(array_column($dates, 'scheme_url')));
+  $scheme_url = ($dates[0]['scheme_url'] ?? '') ?: ($event_scheme_url ?: ($date_schemes[0] ?? ''));
   $types = get_the_terms($post_id, BSI_EVENT_TOUR_TYPE_TAXONOMY);
 
   return [
@@ -312,7 +316,8 @@ function bsi_event_page_data(int $post_id): array
     // Старые блоки — выводятся, пока контент не перенесён в конструктор (TODO.md, «выкатка без потери индекса»)
     'additional' => (string) $f('event_additional'),
     'program' => bsi_event_program_days($post_id),
-    'scheme_url' => is_array($scheme) && !empty($scheme['url']) ? (string) $scheme['url'] : '',
+    'scheme_url' => $scheme_url,
+    'event_scheme_url' => $event_scheme_url ?: $scheme_url,
     'faq' => bsi_event_faq_items($post_id),
     'phones' => bsi_event_phones($post_id),
     'type_names' => is_array($types) ? wp_list_pluck($types, 'name') : [],
@@ -390,6 +395,7 @@ function bsi_event_page_json(array $page): array
         ? implode(' · ', array_filter([$od['time'] !== '' ? 'Начало в ' . $od['time'] : '', $od['venue']]))
         : 'все дни события',
       'venueLine' => $od ? implode(', ', array_filter([$od['venue'], $page['city']])) : $page['place'],
+      'schemeUrl' => ($od['scheme_url'] ?? '') ?: $page['event_scheme_url'],
       'tourHref' => $od ? ($od['tour_url'] !== '' ? $od['tour_url'] : $page['booking_url']) : '',
       'sectors' => $sectors,
     ];
