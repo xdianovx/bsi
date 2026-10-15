@@ -34,9 +34,26 @@ function bsi_event_card_price(int $post_id): array
         $result['rub'] = (int) $ct['rub'];
         $result['original'] = $ct['original'];
         $result['currency'] = $ct['currency'];
-        return $result;
       }
     }
+  }
+
+  // Билеты по секторам — как «Цена от» на странице события (bsi_event_page_data): минимум из тура и билета.
+  // Старые date_row_price / price_from ниже — только если секторов нет, иначе карточка расходится со страницей.
+  if (function_exists('bsi_event_offers') && function_exists('bsi_event_min_price')) {
+    $offers = bsi_event_offers($post_id);
+    $ticket = !empty($offers['tickets_enabled']) ? ($offers['ticket_min'] ?? null) : null;
+    $best = bsi_event_min_price([$ticket, $result['rub'] !== null ? $result : null]);
+    if ($best) {
+      return [
+        'rub' => (int) $best['rub'],
+        'original' => $best['original'] ?? null,
+        'currency' => $best['currency'] ?? null,
+      ];
+    }
+  }
+  if ($result['rub'] !== null) {
+    return $result;
   }
 
   $rows = get_field('event_dates', $post_id);
