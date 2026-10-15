@@ -621,6 +621,7 @@ add_action('acf/init', function () {
             'label' => 'Цена на все даты',
             'name' => 'sector_price',
             'type' => 'number',
+            'instructions' => 'Для всех дней, у которых нет строки в «Своя цена на дату»',
             'min' => 0,
             'step' => '0.01',
             'wrapper' => ['width' => '25'],
