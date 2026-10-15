@@ -410,12 +410,12 @@ function bsi_event_page_json(array $page): array
 }
 
 /**
- * Короткое название для сайдбара: «Концерт Stray Kids в Сингапуре 6 и 7 марта 2027» → «Stray Kids в Сингапуре».
+ * Короткое название для сайдбара — без дат в конце: «Концерт Stray Kids в Сингапуре 6 и 7 марта 2027» → «Концерт Stray Kids в Сингапуре».
  */
 function bsi_event_short_title(string $title): string
 {
-  $short = preg_replace('/^Концерт\s+/u', '', $title);
-  $short = preg_replace('/\s+\d{1,2}(?:[–-]\d{1,2})?(?:(?:,\s*|\s+и\s+)\d{1,2}(?:[–-]\d{1,2})?)*\s+[а-яё]+(?:\s+\d{4})?$/u', '', (string) $short);
+  // «Концерт» не срезаем: «Концерт Шакиры в Каире» → «Шакиры в Каире» ломает падеж.
+  $short = preg_replace('/\s+\d{1,2}(?:[–-]\d{1,2})?(?:(?:,\s*|\s+и\s+)\d{1,2}(?:[–-]\d{1,2})?)*\s+[а-яё]+(?:\s+\d{4})?$/u', '', $title);
 
   return trim((string) $short) !== '' ? trim((string) $short) : $title;
 }
