@@ -262,7 +262,9 @@ function bsi_event_page_data(int $post_id): array
     if ($mode === 'request') {
       $price = 'по запросу';
     } elseif (in_array($mode, ['from', 'exact'], true) && $amount > 0) {
-      $price = ($mode === 'from' ? 'от ' : '') . number_format($amount, 0, ',', ' ') . ' ₽';
+      $currency = (string) ($row['currency'] ?? '') ?: 'RUB';
+      $sign = ['RUB' => '₽', 'USD' => '$', 'EUR' => '€', 'GBP' => '£'][$currency] ?? $currency;
+      $price = ($mode === 'from' ? 'от ' : '') . number_format($amount, 0, ',', ' ') . ' ' . $sign;
     }
     $extra[] = ['text' => trim((string) $row['text']), 'note' => trim((string) ($row['note'] ?? '')), 'price' => $price];
   }

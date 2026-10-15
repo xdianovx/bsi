@@ -1116,7 +1116,7 @@ add_action('acf/init', function () {
             'name' => 'text',
             'type' => 'text',
             'required' => 1,
-            'wrapper' => ['width' => '35'],
+            'wrapper' => ['width' => '30'],
             'placeholder' => 'Медицинская страховка',
           ],
           [
@@ -1124,7 +1124,7 @@ add_action('acf/init', function () {
             'label' => 'Пояснение',
             'name' => 'note',
             'type' => 'text',
-            'wrapper' => ['width' => '35'],
+            'wrapper' => ['width' => '30'],
             'placeholder' => 'Оплачивается в отеле при заселении',
           ],
           [
@@ -1144,12 +1144,28 @@ add_action('acf/init', function () {
           ],
           [
             'key' => 'field_event_extra_item_price',
-            'label' => 'Сумма, ₽',
+            'label' => 'Сумма',
             'name' => 'price',
             'type' => 'number',
             'min' => 0,
             'step' => 1,
-            'wrapper' => ['width' => '15'],
+            'wrapper' => ['width' => '12'],
+            'conditional_logic' => [
+              [['field' => 'field_event_extra_item_price_mode', 'operator' => '==', 'value' => 'from']],
+              [['field' => 'field_event_extra_item_price_mode', 'operator' => '==', 'value' => 'exact']],
+            ],
+          ],
+          [
+            'key' => 'field_event_extra_item_currency',
+            'label' => 'Валюта',
+            'name' => 'currency',
+            'type' => 'select',
+            // Короткие подписи: колонка узкая, «AED (дирхам ОАЭ)» обрезается.
+            'choices' => ['RUB' => '₽', 'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'AED' => 'AED'],
+            // RUB: суммы, внесённые до появления поля, были в рублях.
+            'default_value' => 'RUB',
+            'return_format' => 'value',
+            'wrapper' => ['width' => '13'],
             'conditional_logic' => [
               [['field' => 'field_event_extra_item_price_mode', 'operator' => '==', 'value' => 'from']],
               [['field' => 'field_event_extra_item_price_mode', 'operator' => '==', 'value' => 'exact']],
