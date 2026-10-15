@@ -56,10 +56,15 @@ $flag_url = ($country_id && function_exists('bsi_get_country_flag_url'))
 $resorts = get_the_terms($post_id, 'resort');
 $city = (!empty($resorts) && !is_wp_error($resorts)) ? $resorts[0]->name : '';
 
-// Диапазон дат только с первого экрана (event_hero_date / event_hero_date_end).
+// Даты из таблицы «Даты» (только будущие) — как в первом экране страницы: до трёх, дальше «и ещё N».
+// Старое поле первого экрана (event_hero_date) — если будущих дат нет (событие прошло, старая запись).
 $event_card_date = '';
 $event_dates_more = 0;
-if (function_exists('get_field')) {
+$card_dates = function_exists('bsi_event_offer_dates') ? bsi_event_offer_dates($post_id) : [];
+if (!empty($card_dates)) {
+  $event_card_date = bsi_event_dates_label(array_slice($card_dates, 0, 3));
+  $event_dates_more = max(0, count($card_dates) - 3);
+} elseif (function_exists('get_field')) {
   $hero_d = get_field('event_hero_date', $post_id);
   if (is_string($hero_d) && $hero_d !== '') {
     $hero_end = get_field('event_hero_date_end', $post_id);
@@ -148,7 +153,7 @@ $event_booking_url = function_exists('get_field') ? trim((string) get_field('tou
             </svg>
             <span class="numfont"><?= esc_html($event_card_date); ?></span>
             <?php if ($event_dates_more > 0): ?>
-              <span class="event-card__date-more">…и еще <span class="numfont"><?= (int) $event_dates_more; ?></span>
+              <span class="event-card__date-more">и ещё <span class="numfont"><?= (int) $event_dates_more; ?></span>
                 <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($event_dates_more, 'дата', 'даты', 'дат') : 'дат'); ?></span>
             <?php endif; ?>
           </div>

@@ -23,8 +23,12 @@ if ($country_raw instanceof WP_Post) {
 $tour_gallery = function_exists('get_field') ? (array) get_field('tour_gallery', $post_id) : [];
 $event_card_date = '';
 $event_dates_more = 0;
-// Диапазон дат только с первого экрана (event_hero_date / event_hero_date_end).
-if (function_exists('get_field')) {
+// Даты — как в card.php: до трёх будущих из «Даты», дальше «и ещё N»; иначе старое поле первого экрана.
+$card_dates = function_exists('bsi_event_offer_dates') ? bsi_event_offer_dates($post_id) : [];
+if (!empty($card_dates)) {
+  $event_card_date = bsi_event_dates_label(array_slice($card_dates, 0, 3));
+  $event_dates_more = max(0, count($card_dates) - 3);
+} elseif (function_exists('get_field')) {
   $hero_d = get_field('event_hero_date', $post_id);
   if (is_string($hero_d) && $hero_d !== '') {
     $hero_end = get_field('event_hero_date_end', $post_id);
@@ -101,7 +105,7 @@ $excerpt_raw = preg_replace('/\s+/u', ' ', trim($excerpt_raw));
         <?php if ($event_card_date !== ''): ?>
           <span class="catalog-card__date numfont"><?= esc_html($event_card_date); ?></span>
           <?php if ($event_dates_more > 0): ?>
-            <span class="catalog-card__date-more">…и еще <span class="numfont"><?= (int) $event_dates_more; ?></span>
+            <span class="catalog-card__date-more">и ещё <span class="numfont"><?= (int) $event_dates_more; ?></span>
               <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($event_dates_more, 'дата', 'даты', 'дат') : 'дат'); ?></span>
           <?php endif; ?>
         <?php endif; ?>
