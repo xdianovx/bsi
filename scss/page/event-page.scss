@@ -704,9 +704,13 @@
   gap: 16px;
 }
 
+/* Отступы явно: .editor-content даёт 16px сверху и 64px снизу */
 .single-event__about-body {
+  margin: 0;
+  overflow: hidden;
   font-size: 16px;
   line-height: 140%;
+  transition: max-height 0.3s ease;
 }
 
 .single-event__about-body p {
@@ -717,11 +721,10 @@
   margin-bottom: 0;
 }
 
+/* Свёрнуто: высоту в 4 строки ставит JS (initAboutMore), низ текста растворяется */
 .single-event__about-body.is-clamped {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent);
 }
 
 .single-event__about-more {
@@ -742,6 +745,14 @@
 
 .single-event__about-more[hidden] {
   display: none;
+}
+
+.single-event__about-more svg {
+  transition: transform 0.3s ease;
+}
+
+.single-event__about-more.is-open svg {
+  transform: rotate(180deg);
 }
 
 .single-event__steps {

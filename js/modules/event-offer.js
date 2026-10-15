@@ -52,19 +52,41 @@ function readJson() {
 
 const checkedValue = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || "";
 
+// «О событии»: свёрнуто до 4 строк, раскрытие и сворачивание — анимацией max-height.
 function initAboutMore() {
   const body = document.querySelector("[data-about-body]");
   const btn = document.querySelector("[data-about-more]");
   if (!body || !btn) return;
+  const label = btn.querySelector("span");
+  const collapsed = () => parseFloat(getComputedStyle(body).lineHeight) * 4;
+  if (body.scrollHeight - collapsed() < 4) return;
+
+  body.style.maxHeight = `${collapsed()}px`;
   body.classList.add("is-clamped");
-  if (body.scrollHeight - body.clientHeight < 4) {
-    body.classList.remove("is-clamped");
-    return;
-  }
   btn.hidden = false;
+
+  // Раскрыто — снимаем предел, чтобы текст не обрезался при смене ширины окна.
+  body.addEventListener("transitionend", () => {
+    if (btn.classList.contains("is-open")) body.style.maxHeight = "none";
+  });
+
   btn.addEventListener("click", () => {
-    body.classList.remove("is-clamped");
-    btn.hidden = true;
+    const open = !btn.classList.contains("is-open");
+    btn.classList.toggle("is-open", open);
+    label.textContent = open ? "Свернуть" : "Читать полностью";
+    if (open) {
+      body.classList.remove("is-clamped");
+      body.style.maxHeight = `${body.scrollHeight}px`;
+      return;
+    }
+    // Из «none» анимации нет: сначала фиксируем текущую высоту, потом сжимаем.
+    body.style.maxHeight = `${body.scrollHeight}px`;
+    body.getBoundingClientRect();
+    body.style.maxHeight = `${collapsed()}px`;
+    body.classList.add("is-clamped");
+    // Свернули длинный текст — заголовок блока мог уйти выше экрана, возвращаем к нему.
+    const top = body.closest("[data-about]").getBoundingClientRect().top;
+    if (top < 0) window.scrollBy({ top: top - 100, behavior: "smooth" });
   });
 }
 
