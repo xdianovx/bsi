@@ -926,20 +926,7 @@
 
 }
 
-.single-event__about-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 8px;
-  margin-bottom: 0;
-  align-items: start;
-
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    display: flex;
-    flex-direction: column-reverse;
-    width: 100%;
-  }
-}
+// Сетка «колонка + сайдбар» (.single-event__about-grid) — в event-page.scss.
 
 .single-event__lead {
   font-size: 18px;
@@ -2774,13 +2761,6 @@ body.single-event {
 .event-card__offers .event-card__price-line {
   margin-top: 0;
   padding-top: 0;
-}
-
-/* «Событие завершено»: на мобилке форма «Сообщить о новых датах» сразу под hero */
-@media screen and (max-width: 1024px) {
-  .single-event__about-grid--widget-first {
-    flex-direction: column;
-  }
 }
 
 /* ---------- Порядок блоков: факты, группа «Тур с билетом», карточки колонки ---------- */

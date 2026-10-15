@@ -267,9 +267,11 @@
 }
 
 @media screen and (max-width: 1024px) {
+  /* stretch: иначе align-items: start из десктопа сжимает блоки по контенту («Выберите дату» с двумя датами — 298px) */
   .single-event__about-grid {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 32px;
   }
 

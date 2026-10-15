@@ -32,7 +32,8 @@ $facts = array_filter([
   'Начало' => $event['time'],
   'Площадка' => $event['place'],
 ], static fn($v) => trim((string) $v) !== '');
-$meta = implode(' · ', array_filter([$event['time'], $event['place']]));
+// Мобилка: факты одной строкой. Даты обязательно — в макете они были в названии, у реальных событий их там нет.
+$meta = implode(' · ', array_filter([$event['dates_label'], $event['time'], $event['place']]));
 ?>
 <section class="single-event__hero<?= $event['cover_url'] === '' ? ' single-event__hero--no-poster' : ''; ?>"
   <?php if ($event['cover_url'] !== ''): ?>style="--single-event-hero-bg:url(<?= esc_url($event['cover_url']); ?>)"<?php endif; ?>>

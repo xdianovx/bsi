@@ -1452,6 +1452,26 @@ add_action('acf/init', function () {
 });
 
 /**
+ * Старое «Время проведения» (event_time, скрыто) — показываем в колонке «Начало» у дат, где своего времени нет.
+ * Так редактор видит время, которое выводится на сайте; после сохранения старое поле удаляется,
+ * дальше время живёт только в таблице дат (очистили «Начало» — на сайте времени нет).
+ */
+add_filter('acf/load_value/key=field_event_date_time', function ($value, $post_id) {
+  if (trim((string) $value) !== '' || !is_numeric($post_id)) {
+    return $value;
+  }
+
+  return trim((string) get_post_meta((int) $post_id, 'event_time', true)) ?: $value;
+}, 10, 2);
+
+add_action('acf/save_post', function ($post_id) {
+  if (is_numeric($post_id) && get_post_type((int) $post_id) === 'event' && !empty($_POST['acf']['field_event_dates'])) {
+    delete_post_meta((int) $post_id, 'event_time');
+    delete_post_meta((int) $post_id, '_event_time');
+  }
+}, 20);
+
+/**
  * Страница настроек «Продукты → Событийные туры: настройки».
  */
 add_action('acf/init', function () {
