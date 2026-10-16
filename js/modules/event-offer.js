@@ -120,11 +120,6 @@ export function initEventOffer() {
     tourSector: checkedValue("event_tour_sector") || data.tourSector || "",
     package: checkedValue("event_tour_package"),
   };
-  // В адресе дата без тура — открываем её билеты, а не перескакиваем на другую дату.
-  const startDate = data.dates.find((d) => d.key === state.key);
-  if (state.format === "tour" && startDate?.hasTour === false && params.get("date") && formats.includes("ticket")) {
-    state.format = "ticket";
-  }
   // Сочетание конструктора: ссылка на Само, «5–7 марта · 2 ночи», ночи — для панели.
   const combo = { url: "", trip: "", nights: "" };
 
@@ -237,10 +232,9 @@ export function initEventOffer() {
   }
 
   function render() {
-    // Тур есть не у всех дат (абонемент, даты без тура в Само): в туре переходим на ближайшую дату с туром.
-    if (state.format === "tour" && current().hasTour === false) {
-      state.key = data.dates.find((d) => d.hasTour)?.key || state.key;
-    }
+    // Тур есть не у всех дат (абонемент, даты без тура в Само): на такой дате — только билет.
+    const noTour = current().hasTour === false;
+    if (state.format === "tour" && noTour && formats.includes("ticket")) state.format = "ticket";
     const date = current();
 
     setActive("[data-offer-date]", "offerDate", state.key);
@@ -254,8 +248,10 @@ export function initEventOffer() {
       const formatOk = !el.dataset.offerFormatOnly || el.dataset.offerFormatOnly === state.format;
       el.hidden = !(keyOk && formatOk);
     });
-    document.querySelectorAll("[data-offer-no-tour]").forEach((el) => {
-      el.hidden = state.format === "tour";
+    document.querySelectorAll('[data-offer-format="tour"]').forEach((el) => {
+      el.classList.toggle("is-disabled", noTour);
+      el.querySelectorAll("[data-offer-tour-on]").forEach((on) => (on.hidden = noTour));
+      el.querySelectorAll("[data-offer-tour-off]").forEach((off) => (off.hidden = !noTour));
     });
     document.querySelectorAll("[data-offer-package-hotels]").forEach((el) => {
       el.hidden = el.dataset.offerPackageHotels !== state.package;
@@ -318,6 +314,10 @@ export function initEventOffer() {
       return true;
     };
     if (pick("[data-offer-date]", "key", "offerDate")) return;
+    if (e.target.closest('[data-offer-format].is-disabled')) {
+      e.preventDefault();
+      return;
+    }
     if (pick("[data-offer-format]", "format", "offerFormat")) return;
     if (pick("[data-offer-ticket]", "ticket", "offerTicket")) return;
     if (pick("[data-offer-tour-sector]", "tourSector", "offerTourSector")) return;

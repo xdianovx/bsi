@@ -132,6 +132,16 @@
   color: rgb(255 255 255 / 70%);
 }
 
+// Вариант недоступен для выбранной даты (тур на дату без тура) — виден, но не выбирается.
+.ui-option.is-disabled {
+  color: $text-gray;
+  cursor: not-allowed;
+}
+
+.ui-option.is-disabled .ui-checkbox__mark {
+  opacity: 0.4;
+}
+
 @media (hover: hover) {
   .ui-option:not(.is-active):hover {
     background: $gray-light;

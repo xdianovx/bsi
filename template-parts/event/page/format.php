@@ -37,7 +37,7 @@ $tour_price = $event['tour_price'];
           $ticket_from = $offers['ticket_from'][$d['key']] ?? null;
           ?>
           <button type="button" class="ui-choice ui-choice--check<?= $d['key'] === $first_key ? ' is-active' : ''; ?>"
-            data-offer-date="<?= esc_attr($d['key']); ?>"<?= $is_pass ? $only('ticket') : ''; ?><?= !$is_pass && $event['has_tour'] && empty($d['hasTour']) ? ' data-offer-no-tour' : ''; ?>>
+            data-offer-date="<?= esc_attr($d['key']); ?>"<?= $is_pass ? $only('ticket') : ''; ?>>
             <span class="ui-choice__mark"></span>
             <span class="ui-choice__body">
               <span class="ui-choice__label"><?= esc_html($is_pass ? 'Все дни' : $d['label']); ?></span>
@@ -46,6 +46,8 @@ $tour_price = $event['tour_price'];
               <?php endif; ?>
               <?php if ($event['has_tour'] && !$is_pass && !empty($d['hasTour'])): ?>
                 <span class="ui-choice__sub numfont<?= $tour_price ? ' js-event-price' : ''; ?>"<?= $only('tour'); ?><?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price, true); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price, true) : 'тур'); ?></span>
+              <?php elseif ($event['has_tour'] && !$is_pass): ?>
+                <span class="ui-choice__sub"<?= $only('tour'); ?>>только билеты</span>
               <?php endif; ?>
             </span>
           </button>
@@ -64,9 +66,10 @@ $tour_price = $event['tour_price'];
           <span class="ui-checkbox__mark ui-checkbox__mark--mono"></span>
           <span class="ui-option__body">
             <span class="ui-option__label">Тур с билетом</span>
-            <span class="ui-option__sub">Билет, отель и программа</span>
+            <span class="ui-option__sub" data-offer-tour-on>Билет, отель и программа</span>
+            <span class="ui-option__sub" data-offer-tour-off hidden>На эту дату только билеты</span>
           </span>
-          <span class="ui-option__price numfont<?= $tour_price ? ' js-event-price' : ''; ?>"<?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price, true); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price, true) : ''); ?></span>
+          <span class="ui-option__price numfont<?= $tour_price ? ' js-event-price' : ''; ?>" data-offer-tour-on<?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price, true); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price, true) : ''); ?></span>
         </label>
         <label class="ui-option<?= $default === 'ticket' ? ' is-active' : ''; ?>" data-offer-format="ticket">
           <input type="radio" class="ui-checkbox__input" name="event_offer_format" value="ticket"<?= $default === 'ticket' ? ' checked' : ''; ?>>
