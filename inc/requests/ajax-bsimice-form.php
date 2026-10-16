@@ -140,6 +140,7 @@ function handle_bsimice_consultation_form(): void
     : 'Заявка MICE';
 
   $sent = wp_mail($recipient_email, $subject, $html_message, $headers);
+  bsi_lead_log_from_post('mice', (bool) $sent, ['title' => $subject]);
 
   if ($sent) {
     wp_send_json_success([

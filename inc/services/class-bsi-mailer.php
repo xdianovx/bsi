@@ -59,6 +59,7 @@ class BSI_Mailer
    *   @type array  $data     Данные для шаблона
    *   @type string $reply_to Reply-To адрес (опционально)
    *   @type array  $attachments Абсолютные пути к файлам-вложениям (опционально)
+   *   @type string $lead     Тип формы для журнала заявок (опционально, см. bsi_leads_form_labels())
    * }
    * @return array ['success' => bool, 'message' => string]
    */
@@ -105,6 +106,13 @@ class BSI_Mailer
 
     // Отправляем
     $sent = wp_mail($to, $subject, $html_message, $headers, $attachments);
+
+    // Журнал заявок (inc/services/leads.php): тип формы — из 'lead', иначе по контексту/шаблону.
+    if (function_exists('bsi_lead_log')) {
+      $template_forms = ['education-booking' => 'education', 'vacancy-apply' => 'vacancy'];
+      $form = $args['lead'] ?? ($data['booking_context'] ?? ($template_forms[$template] ?? 'other'));
+      bsi_lead_log((string) $form, $data, (bool) $sent);
+    }
 
     if ($sent) {
       return [

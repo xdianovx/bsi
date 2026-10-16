@@ -157,6 +157,7 @@ function bsi_agency_event_registration()
 
   $subject = 'Регистрация на мероприятие: ' . $event_title;
   $sent = wp_mail($recipient_email, $subject, $html_message, $headers);
+  bsi_lead_log_from_post('agency_event', (bool) $sent, ['title' => $subject]);
 
   $is_localhost = strpos(home_url(), 'localhost') !== false;
   if (!$sent && $is_localhost) {

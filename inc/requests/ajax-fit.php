@@ -387,6 +387,7 @@ function handle_fit_form()
   // Отправка письма
   $subject = 'Новая заявка FIT - ' . $client_type_label;
   $sent = wp_mail($recipient_email, $subject, $html_message, $headers);
+  bsi_lead_log_from_post('fit', (bool) $sent, ['title' => $subject]);
 
   if ($sent) {
     wp_send_json_success([

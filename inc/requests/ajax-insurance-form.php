@@ -144,6 +144,7 @@ function handle_insurance_form()
   $subject = 'Новая заявка на консультацию по страхованию';
   error_log('Insurance Form: Sending email to ' . implode(', ', $recipient_email));
   $sent = wp_mail($recipient_email, $subject, $html_message, $headers);
+  bsi_lead_log_from_post('insurance', (bool) $sent, ['title' => $subject]);
   error_log('Insurance Form: wp_mail result = ' . ($sent ? 'true' : 'false'));
 
   if ($sent) {
