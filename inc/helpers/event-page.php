@@ -204,7 +204,30 @@ function bsi_event_page_data(int $post_id): array
     $tour_price = $rub ? ['rub' => (int) $rub, 'original' => null, 'currency' => null] : null;
   }
 
-  $has_tour = !$finished && $booking_url !== '' && !empty($dates);
+  // Тур у каждой даты: своя ссылка даты → «Ещё туры Само» на эту дату → общая.
+  // Заполнены «Ещё туры Само» — общая ссылка только у первого концерта (так в подсказке админки), остальные даты — только билеты.
+  $more_urls = [];
+  foreach ((array) $f('tour_booking_urls_more') as $row) {
+    $more_date = trim((string) ($row['concert_date'] ?? ''));
+    $more_url = trim((string) ($row['url'] ?? ''));
+    if ($more_date !== '' && $more_url !== '') {
+      $more_urls[$more_date] = $more_url;
+    }
+  }
+  $main_date = '';
+  foreach ($all_dates as $ad) {
+    if (!isset($more_urls[$ad['date']])) {
+      $main_date = $ad['date'];
+      break;
+    }
+  }
+  foreach ($dates as &$date_row) {
+    $own = $date_row['tour_url'] !== '' ? $date_row['tour_url'] : ($more_urls[$date_row['key']] ?? '');
+    $date_row['tour_href'] = $finished ? '' : ($own !== '' ? $own : (empty($more_urls) || $date_row['key'] === $main_date ? $booking_url : ''));
+  }
+  unset($date_row);
+
+  $has_tour = !$finished && $booking_url !== '' && in_array(true, array_map(static fn($d) => $d['tour_href'] !== '', $dates), true);
   // Без секторов и без тура — билеты «по запросу»: событие ведут руками, без Само (на проде 2 таких на 14.10)
   $manual_tickets = $booking_url === '' && empty($offers['sectors']) && !(bool) $f('event_no_separate_tickets');
   $has_tickets = !$finished && (!empty($offers['tickets_enabled']) || $manual_tickets) && !empty($dates);
@@ -396,7 +419,8 @@ function bsi_event_page_json(array $page): array
         : 'все дни события',
       'venueLine' => $od ? implode(', ', array_filter([$od['venue'], $page['city']])) : $page['place'],
       'schemeUrl' => ($od['scheme_url'] ?? '') ?: $page['event_scheme_url'],
-      'tourHref' => $od ? ($od['tour_url'] !== '' ? $od['tour_url'] : $page['booking_url']) : '',
+      'tourHref' => $od ? $od['tour_href'] : '',
+      'hasTour' => $od && $od['tour_href'] !== '',
       'sectors' => $sectors,
     ];
   }

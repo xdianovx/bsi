@@ -72,8 +72,6 @@ if (!empty($card_dates)) {
   }
 }
 
-$nights = function_exists('get_field') ? (int) get_field('tour_nights', $post_id) : 0;
-
 // «Экскурсий» — источника нет, поле скрыто (задел на будущее).
 $excursions = 0;
 
@@ -144,7 +142,7 @@ $event_booking_url = function_exists('get_field') ? trim((string) get_field('tou
       <a href="<?= esc_url($link); ?>"><?= esc_html($title); ?></a>
     </h3>
 
-    <?php if ($event_card_date !== '' || $nights > 0): ?>
+    <?php if ($event_card_date !== ''): ?>
       <div class="event-card__dateline">
         <?php if ($event_card_date !== ''): ?>
           <div class="event-card__date">
@@ -157,10 +155,6 @@ $event_booking_url = function_exists('get_field') ? trim((string) get_field('tou
                 <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($event_dates_more, 'дата', 'даты', 'дат') : 'дат'); ?></span>
             <?php endif; ?>
           </div>
-        <?php endif; ?>
-        <?php if ($nights > 0): ?>
-          <span class="event-card__nights"><span class="numfont"><?= esc_html((string) $nights); ?></span>
-            <?= esc_html(function_exists('bsi_plural_ru') ? bsi_plural_ru($nights, 'ночь', 'ночи', 'ночей') : 'ночей'); ?></span>
         <?php endif; ?>
       </div>
     <?php endif; ?>

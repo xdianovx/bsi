@@ -37,14 +37,14 @@ $tour_price = $event['tour_price'];
           $ticket_from = $offers['ticket_from'][$d['key']] ?? null;
           ?>
           <button type="button" class="ui-choice ui-choice--check<?= $d['key'] === $first_key ? ' is-active' : ''; ?>"
-            data-offer-date="<?= esc_attr($d['key']); ?>"<?= $is_pass ? $only('ticket') : ''; ?>>
+            data-offer-date="<?= esc_attr($d['key']); ?>"<?= $is_pass ? $only('ticket') : ''; ?><?= !$is_pass && $event['has_tour'] && empty($d['hasTour']) ? ' data-offer-no-tour' : ''; ?>>
             <span class="ui-choice__mark"></span>
             <span class="ui-choice__body">
               <span class="ui-choice__label"><?= esc_html($is_pass ? 'Все дни' : $d['label']); ?></span>
               <?php if ($event['has_tickets']): ?>
                 <span class="ui-choice__sub numfont<?= $ticket_from ? ' js-event-price' : ''; ?>"<?= $only('ticket'); ?><?= bsi_event_price_attrs($ticket_from, true); ?>><?= esc_html($ticket_from ? bsi_event_price_text($ticket_from, true) : ($is_pass ? 'абонемент' : 'по запросу')); ?></span>
               <?php endif; ?>
-              <?php if ($event['has_tour'] && !$is_pass): ?>
+              <?php if ($event['has_tour'] && !$is_pass && !empty($d['hasTour'])): ?>
                 <span class="ui-choice__sub numfont<?= $tour_price ? ' js-event-price' : ''; ?>"<?= $only('tour'); ?><?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price, true); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price, true) : 'тур'); ?></span>
               <?php endif; ?>
             </span>

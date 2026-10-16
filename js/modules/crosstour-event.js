@@ -366,7 +366,7 @@ const initBuilder = async (section, eventId, ajaxUrl) => {
     const offerJson = document.querySelector("[data-event-offer-json]");
     concerts = offerJson
       ? (JSON.parse(offerJson.textContent || "{}").dates || [])
-          .filter((c) => /^\d{4}-\d{2}-\d{2}$/.test(c.key))
+          .filter((c) => /^\d{4}-\d{2}-\d{2}$/.test(c.key) && c.hasTour !== false)
           .map((c) => ({ ymd: c.key.replace(/-/g, ""), label: c.label }))
           .sort((a, b) => a.ymd.localeCompare(b.ymd))
       : [];
