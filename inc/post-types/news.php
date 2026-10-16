@@ -118,3 +118,46 @@ add_filter('wpseo_breadcrumb_links', function ($links) {
 
   return $new_links;
 }, 20);
+/* Колонка «Просмотры» в списке новостей в админке — счётчик `news_views` (bsi_track_news_views в functions.php). */
+add_filter('manage_news_posts_columns', function ($columns) {
+  $new = [];
+  foreach ($columns as $key => $value) {
+    $new[$key] = $value;
+    if ($key === 'title') {
+      $new['news_views_col'] = 'Просмотры';
+    }
+  }
+  return $new;
+});
+
+add_action('manage_news_posts_custom_column', function ($column, $post_id) {
+  if ($column !== 'news_views_col') {
+    return;
+  }
+  echo esc_html(number_format_i18n((int) get_post_meta((int) $post_id, 'news_views', true)));
+}, 10, 2);
+
+add_filter('manage_edit-news_sortable_columns', function ($columns) {
+  $columns['news_views_col'] = 'news_views';
+  return $columns;
+});
+
+/* Сортировка по просмотрам: новости без счётчика не пропадают из списка. */
+add_action('pre_get_posts', function ($query) {
+  if (!is_admin() || !$query->is_main_query() || $query->get('post_type') !== 'news' || $query->get('orderby') !== 'news_views') {
+    return;
+  }
+  $query->set('meta_query', [
+    'relation' => 'OR',
+    'news_views_clause' => ['key' => 'news_views', 'compare' => 'EXISTS', 'type' => 'NUMERIC'],
+    ['key' => 'news_views', 'compare' => 'NOT EXISTS'],
+  ]);
+  $query->set('orderby', ['news_views_clause' => $query->get('order') ?: 'DESC', 'date' => 'DESC']);
+});
+
+add_action('admin_head-edit.php', function () {
+  if (get_current_screen()->post_type !== 'news') {
+    return;
+  }
+  echo '<style>.column-news_views_col{width:100px;}</style>';
+});
