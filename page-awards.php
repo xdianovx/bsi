@@ -39,6 +39,15 @@ get_header();
           'order' => 'DESC',
         ]);
 
+        // Без award_year заголовок берёт год публикации — сортируем по тому же году, иначе такие награды уходят в конец.
+        $award_sort_year = static function ($post) {
+          return (int) (get_field('award_year', $post->ID) ?: get_the_date('Y', $post));
+        };
+        $award_positions = array_flip(wp_list_pluck($awards_query->posts, 'ID'));
+        usort($awards_query->posts, static function ($a, $b) use ($award_sort_year, $award_positions) {
+          return [$award_sort_year($b), $award_positions[$a->ID]] <=> [$award_sort_year($a), $award_positions[$b->ID]];
+        });
+
         ?>
 
         <?php if ($awards_query->have_posts()): ?>
