@@ -33,6 +33,10 @@ if (!empty($file)) {
       <div class="award-card__bottom">
         <h3 class="award-card__title h2"><?php the_title(); ?></h3>
 
+        <?php if ($issuer): ?>
+          <div class="award-card__issuer"><?php echo esc_html($issuer); ?></div>
+        <?php endif; ?>
+
         <?php if ($excerpt): ?>
           <div class="award-card__excerpt">
             <?php echo wp_kses($excerpt, ['br' => []]); ?>
