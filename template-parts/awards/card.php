@@ -15,6 +15,17 @@ if (!empty($file)) {
     $file_url = (string) $file;
   }
 }
+
+// Без миниатюры — заглушка img/awards/placeholder.(webp|jpg|png|svg), если файл лежит в теме.
+$placeholder_url = '';
+if (!has_post_thumbnail()) {
+  foreach (['webp', 'jpg', 'png', 'svg'] as $ext) {
+    if (file_exists(get_template_directory() . '/img/awards/placeholder.' . $ext)) {
+      $placeholder_url = get_template_directory_uri() . '/img/awards/placeholder.' . $ext;
+      break;
+    }
+  }
+}
 ?>
 
 <?php if ($file_url): ?>
@@ -27,6 +38,10 @@ if (!empty($file)) {
       <?php if (has_post_thumbnail()): ?>
         <div class="award-card__image">
           <?php the_post_thumbnail('medium_large'); ?>
+        </div>
+      <?php elseif ($placeholder_url): ?>
+        <div class="award-card__image">
+          <img src="<?php echo esc_url($placeholder_url); ?>" alt="" loading="lazy">
         </div>
       <?php endif; ?>
 
