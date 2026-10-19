@@ -271,7 +271,8 @@ function bsi_event_page_data(int $post_id): array
       $included[] = ['text' => trim((string) $row['text']), 'note' => trim((string) ($row['note'] ?? ''))];
     }
   }
-  if (empty($included)) {
+  // Старый WYSIWYG — только до переноса (#135): после него пустой список = пустой блок.
+  if (empty($included) && !bsi_event_legacy_migrated()) {
     $included = bsi_event_items_from_html((string) $f('tour_included'));
   }
   $extra = [];
@@ -291,7 +292,7 @@ function bsi_event_page_data(int $post_id): array
     }
     $extra[] = ['text' => trim((string) $row['text']), 'note' => trim((string) ($row['note'] ?? '')), 'price' => $price];
   }
-  if (empty($extra)) {
+  if (empty($extra) && !bsi_event_legacy_migrated()) {
     foreach (bsi_event_items_from_html((string) $f('tour_not_included')) as $it) {
       $extra[] = $it + ['price' => ''];
     }

@@ -559,18 +559,18 @@ add_action('admin_notices', static function () {
 });
 
 /**
- * Старые записи: «Секторы и цены» пустые, а легенда схемы заполнена → подставляем секторы
- * из легенды (одна строка на сектор, разные цены по датам — исключения). На сайте —
- * чтобы старые события показывали билеты без переноса; в админке сохранится,
- * когда менеджер нажмёт «Обновить».
+ * Секторы из старой легенды схемы (одна строка на сектор, разные цены по датам — исключения).
+ * Строки в формате ключей полей — для update_field('field_event_sectors').
+ * Используется переносом (inc/helpers/event-legacy-migrate.php) и подстановкой ниже до переноса.
  */
-add_filter('acf/load_value/key=field_event_sectors', static function ($value, $post_id) {
-  if (!empty($value) || !is_numeric($post_id) || !function_exists('get_field')) {
-    return $value;
+function bsi_event_sectors_from_legend(int $post_id): array
+{
+  if (!function_exists('get_field')) {
+    return [];
   }
-  $legend = get_field('venue_scheme_legend', (int) $post_id, false);
+  $legend = get_field('venue_scheme_legend', $post_id, false);
   if (empty($legend) || !is_array($legend)) {
-    return $value;
+    return [];
   }
   // Сырые значения: ключи — ключи полей легенды.
   $by_name = [];
@@ -583,9 +583,6 @@ add_filter('acf/load_value/key=field_event_sectors', static function ($value, $p
     $date_raw = (string) ($row['field_event_legend_date'] ?? '');
     $by_name[$name]['currency'] = (string) ($row['field_event_legend_currency'] ?? 'RUB') ?: 'RUB';
     $by_name[$name]['prices'][] = ['date' => $date_raw, 'price' => (float) $price];
-  }
-  if (empty($by_name)) {
-    return $value;
   }
   $out = [];
   foreach ($by_name as $name => $info) {
@@ -608,4 +605,16 @@ add_filter('acf/load_value/key=field_event_sectors', static function ($value, $p
   }
 
   return $out;
+}
+
+/**
+ * До переноса: «Секторы и цены» пустые → секторы из легенды. После переноса легенда скрыта
+ * и не подставляется — иначе удалённые секторы возвращаются (#138).
+ */
+add_filter('acf/load_value/key=field_event_sectors', static function ($value, $post_id) {
+  if (!empty($value) || !is_numeric($post_id) || bsi_event_legacy_migrated()) {
+    return $value;
+  }
+
+  return bsi_event_sectors_from_legend((int) $post_id) ?: $value;
 }, 10, 2);

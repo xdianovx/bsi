@@ -469,6 +469,7 @@ require get_template_directory() . '/inc/helpers/country-transfers.php';
 require get_template_directory() . '/inc/helpers/event-price.php';
 require get_template_directory() . '/inc/helpers/event-offers.php';
 require get_template_directory() . '/inc/helpers/event-page.php';
+require get_template_directory() . '/inc/helpers/event-legacy-migrate.php';
 require get_template_directory() . '/inc/helpers/crosstour.php';
 require get_template_directory() . '/inc/post-types/excursion.php';
 require get_template_directory() . '/inc/post-types/sight.php';
