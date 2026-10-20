@@ -47,9 +47,10 @@ if (isset($awards_groups[''])) {
 $awards_years = array_values(array_filter(array_keys($awards_groups), static fn($y) => $y !== ''));
 $awards_total = count($awards_query->posts);
 $awards_issuers_total = count($awards_issuers);
-$awards_year_min = $awards_years ? min($awards_years) : '';
-$awards_year_max = $awards_years ? max($awards_years) : '';
-$awards_span = $awards_years ? (int) $awards_year_max - (int) $awards_year_min : 0;
+// Срок — от начала работы компании, а не от первой награды: «35 лет» как на главной (sections/features.php).
+$awards_year_min = 1991;
+$awards_year_max = (int) date('Y');
+$awards_span = $awards_year_max - $awards_year_min;
 ?>
 
 <main class="site-main awards-page">
