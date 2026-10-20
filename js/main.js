@@ -21,6 +21,7 @@ import { initAccordion } from "./modules/accordition";
 import { initCountryToursFilters } from "./modules/ajax/country-tours";
 import { initEventToursFilters } from "./modules/ajax/event-tours";
 import { initEventSinglePage } from "./modules/event-single";
+import { initAwardsPage } from "./modules/awards-page";
 import { initEventOffer } from "./modules/event-offer";
 import { initCrosstourEvent } from "./modules/crosstour-event";
 import { initCrosstourCards } from "./modules/crosstour-cards";
@@ -150,6 +151,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initCountryToursFilters();
   initEventToursFilters();
   initEventSinglePage();
+  initAwardsPage();
   initCountryAside();
   initPopularHotelsSlider();
   initPopularToursSlider();

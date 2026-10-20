@@ -1,30 +1,4 @@
-.award-page__top {
-  padding-bottom: 24px;
-  border-bottom: 1px solid #bebebe;
-
-  p {
-    margin-bottom: 0;
-  }
-}
-
-.page-award__title {
-  margin-bottom: 0;
-}
-
-.page-award__excerpt {
-  margin-top: 8px;
-  color: $text-gray;
-}
-.page-award__content {
-  margin-top: 24px;
-}
-
-.awards-year__list {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px 16px;
-  margin-top: 16px;
-}
+/* ---------- Карточка награды в слайдере (template-parts/awards/slider.php, страница MICE) ---------- */
 
 .award-card__image {
   width: 100%;
@@ -59,41 +33,391 @@
   color: $text-gray;
 }
 
-.awards-year {
-  margin-bottom: 64px;
-  &:last-of-type {
-    margin-bottom: 0;
+/* ---------- Страница наград — page-awards.php ----------
+   Макет 2026-10-20: Фигма qhOwVa1YNd0tg4TAH85JEb, страница «Награды» (2079:6564).
+   Серый фон страницы, белые карточки. Класс на body ставит WordPress по шаблону — по нему только фон. */
+
+body.page-template-page-awards {
+  background: $bg-page;
+}
+
+.awards-page__container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: $container;
+  margin: 0 auto;
+  padding: 16px $container-padding 64px;
+}
+
+.awards-page__empty {
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+/* Шапка */
+
+.awards-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border-radius: $radius-md;
+  background: $bg-color;
+}
+
+/* Крошки — из кита (scss/ui/breadcrumbs.scss): шрифт и цвета оттуда, здесь только отступы — их задаёт gap шапки */
+.awards-hero__breadcrumbs {
+  margin: 0;
+}
+
+.awards-hero__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.awards-hero__text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 600px;
+}
+
+.awards-hero__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 120%;
+  color: $text-black;
+}
+
+.awards-hero__lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.awards-hero__stats {
+  display: flex;
+  flex-shrink: 0;
+  gap: 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.awards-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.awards-stat__value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 110%;
+  color: $text-black;
+  white-space: nowrap;
+}
+
+.awards-stat__label {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+.awards-stat__value--mobile,
+.awards-stat__label--mobile {
+  display: none;
+}
+
+/* Навигация по годам — прилипает к верху экрана (js/modules/awards-page.js подсвечивает год на экране) */
+
+.awards-nav {
+  position: sticky;
+  top: var(--awards-sticky-top, 0px);
+  z-index: 5;
+  padding: 16px;
+  border-radius: $radius-md;
+  background: $bg-color;
+}
+
+.awards-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.awards-nav__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 80px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: $radius-sm;
+  background: $bg-gray;
+  font-size: 16px;
+  line-height: 140%;
+  color: $text-black;
+  transition: $trans-text;
+  /* Свайп по строке чипов на мобилке не выделяет текст */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Состояния ссылки перечислены явно: a:visited / a:focus / a:active из reset.scss весомее одного класса
+   и после тапа перекрашивали текст активного чипа в чёрный */
+.awards-nav__link:visited,
+.awards-nav__link:focus,
+.awards-nav__link:active {
+  color: $text-black;
+}
+
+.awards-nav__link--active,
+.awards-nav__link--active:visited,
+.awards-nav__link--active:focus,
+.awards-nav__link--active:active {
+  background: $black;
+  color: $text-white;
+}
+
+@media (hover: hover) {
+  .awards-nav__link:hover {
+    color: $red;
   }
+
+  .awards-nav__link--active:hover {
+    color: $text-white;
+  }
+}
+
+/* Год: слева заголовок (прилипает под навигацией), справа сетка карточек */
+
+.awards-year {
+  display: flex;
+  gap: 24px;
+  padding-top: 32px;
+  scroll-margin-top: calc(var(--awards-sticky-top, 0px) + var(--awards-nav-height, 76px) + 8px);
+}
+
+.awards-year__aside {
+  flex: 0 0 200px;
 }
 
 .awards-year__title {
-  font-size: 20px;
-  padding-left: 32px;
-  position: relative;
+  position: sticky;
+  top: calc(var(--awards-sticky-top, 0px) + var(--awards-nav-height, 76px) + 24px);
+  margin: 0;
+  font-size: 24px;
   font-weight: 700;
+  line-height: 110%;
+  color: $text-black;
+}
 
-  &::before {
-    content: "";
-    position: absolute;
-    height: 2px;
-    width: 24px;
-    left: 0;
-    top: 8px;
-    background: $red;
+.awards-year__list {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 16px;
+  min-width: 0;
+}
+
+/* Карточка на странице наград — template-parts/awards/card.php, variant=grid */
+
+.award-card--grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 12px 16px;
+  border-radius: $radius-md;
+  background: $bg-color;
+  color: $text-black;
+}
+
+/* Квадрат: вертикальный и горизонтальный диплом вписываются целиком и занимают одинаковую площадь */
+.award-card__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  padding: 24px;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $bg-gray;
+}
+
+.award-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease-in-out;
+}
+
+.award-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.award-card__name {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+  color: $text-black;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  transition: $trans-text;
+}
+
+.award-card__from {
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+}
+
+@media (hover: hover) {
+  a.award-card--grid:hover .award-card__img {
+    transform: scale(1.04);
+  }
+
+  a.award-card--grid:hover .award-card__name {
+    color: $red;
   }
 }
 
-@media screen and (max-width: 1200px) {
+/* Подпись в просмотре (fancybox): «название / кем вручена · год» */
+
+.award-caption__title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+  color: $text-white;
 }
 
+.award-caption__meta {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 140%;
+  color: $gray-light;
+}
+
+@media screen and (max-width: 1024px) {
+  .awards-hero__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .awards-year {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .awards-year__aside {
+    flex: none;
+  }
+
+  .awards-year__title {
+    position: static;
+  }
+
+  /* Чипы — одна строка с прокруткой: в две строки липкая навигация занимает пол-экрана */
+  .awards-nav__list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .awards-nav__list::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Мобилка (макет 2082:1689): шапка и чипы во всю ширину, чипы одной строкой с прокруткой, сетка в 2 колонки */
 @media screen and (max-width: 768px) {
-  .awards-year__list {
-    grid-template-columns: repeat(4, 1fr);
+  .awards-page__container {
+    gap: 0;
+    padding: 0 0 48px;
   }
-}
 
-@media screen and (max-width: 640px) {
+  .awards-page__empty {
+    margin: 16px;
+  }
+
+  .awards-hero {
+    gap: 16px;
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .awards-hero__head {
+    gap: 16px;
+  }
+
+  .awards-hero__title {
+    font-size: 28px;
+  }
+
+  .awards-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .awards-stat__value--desktop,
+  .awards-stat__label--desktop {
+    display: none;
+  }
+
+  .awards-stat__value--mobile,
+  .awards-stat__label--mobile {
+    display: inline;
+  }
+
+  .awards-nav {
+    padding: 12px 0;
+    border-radius: 0;
+    margin-top: 8px;
+  }
+
+  .awards-nav__list {
+    padding: 0 16px;
+  }
+
+  .awards-year {
+    gap: 12px;
+    padding: 24px 16px 0;
+  }
+
   .awards-year__list {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+
+  .award-card--grid {
+    padding: 8px 8px 12px;
+  }
+
+  .award-card__media {
+    padding: 12px;
+  }
+
+  .award-card__name {
+    -webkit-line-clamp: 3;
   }
 }
