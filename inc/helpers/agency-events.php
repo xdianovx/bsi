@@ -267,6 +267,8 @@ function bsi_agency_events_query_args($archive = false)
     return [
         'post_type' => 'agency_event',
         'post_status' => 'publish',
+        // В ближайших мероприятия с закрытой записью идут после открытых (см. bsi_agency_events_registration_closed_last).
+        'bsi_registration_closed_last' => !$archive,
         'meta_key' => 'event_start_ts',
         'orderby' => 'meta_value_num',
         'order' => $archive ? 'DESC' : 'ASC',
@@ -310,6 +312,29 @@ function bsi_agency_events_query_args($archive = false)
             ],
         ],
     ];
+}
+
+/**
+ * Закрытая запись (ACF event_registration_closed = 1) — в конец списка, внутри групп порядок по дате прежний.
+ * Сортируем в SQL, а не в PHP: список постраничный. LEFT JOIN с ключом в ON — записи без поля считаются открытыми.
+ */
+add_filter('posts_clauses', 'bsi_agency_events_registration_closed_last', 10, 2);
+function bsi_agency_events_registration_closed_last($clauses, $query)
+{
+    if (!$query->get('bsi_registration_closed_last')) {
+        return $clauses;
+    }
+
+    global $wpdb;
+
+    $clauses['join'] .= $wpdb->prepare(
+        " LEFT JOIN {$wpdb->postmeta} AS bsi_reg_closed ON (bsi_reg_closed.post_id = {$wpdb->posts}.ID AND bsi_reg_closed.meta_key = %s)",
+        'event_registration_closed'
+    );
+    $clauses['orderby'] = "(COALESCE(bsi_reg_closed.meta_value, '0') = '1') ASC"
+        . ($clauses['orderby'] !== '' ? ', ' . $clauses['orderby'] : '');
+
+    return $clauses;
 }
 
 /**
