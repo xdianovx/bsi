@@ -1,3 +1,4 @@
+import "./modules/fetch-formdata-fallback";
 import { Fancybox } from "@fancyapps/ui";
 import { gtmSearch } from "./modules/gtm-search";
 import { fitForm } from "./modules/forms/fit-form";
@@ -49,11 +50,7 @@ import { initAgencyEventRegForm } from "./modules/forms/agency-event-reg-form";
 import { initMaintenanceModal } from "./modules/maintenance-modal";
 import { initBonusMarquee } from "./modules/bonus-marquee";
 import { initMaps } from "./modules/maps";
-import {
-  initHotelOffers,
-  initHotelNav,
-  initHotelAmenities,
-} from "./modules/hotel-offers";
+import { initHotelOffers, initHotelNav, initHotelAmenities } from "./modules/hotel-offers";
 import { initHotelRequestForm } from "./modules/forms/hotel-request-form";
 import { initSightsMap } from "./modules/sights-map";
 import { initSightsFilters } from "./modules/sights-filters";
@@ -172,8 +169,8 @@ window.addEventListener("DOMContentLoaded", () => {
   initCrosstourCards();
   initExcursionBookingForm();
   initTourBookingForm();
-initSightRequestForm();
-initResortRequestForm();
+  initSightRequestForm();
+  initResortRequestForm();
   initSightsFilters();
   initClaimCheckForm();
   initVacancyApplyForm();
