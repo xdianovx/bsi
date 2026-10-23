@@ -100,25 +100,8 @@ $transport_terms = get_terms([
   'order' => 'ASC',
 ]);
 
-$region_ids = [];
-if (!is_wp_error($region_terms) && !empty($region_terms)) {
-  foreach ($region_terms as $rt) {
-    $region_ids[] = (int) $rt->term_id;
-  }
-}
-
-$resort_terms = [];
-if (!empty($region_ids)) {
-  $resort_terms = get_terms([
-    'taxonomy' => 'resort',
-    'hide_empty' => false,
-    'meta_query' => [
-      ['key' => 'resort_region', 'value' => $region_ids, 'compare' => 'IN'],
-    ],
-    'orderby' => 'name',
-    'order' => 'ASC',
-  ]);
-}
+/* Курорты — только те, где есть экскурсии страны */
+$resort_terms = bsi_excursions_country_resort_terms($country_id, 0, $excursion_ids);
 
 get_header(); ?>
 

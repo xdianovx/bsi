@@ -183,6 +183,37 @@ function bsi_excursions_filter()
   ]);
 }
 
+/**
+ * Курорты, в которых есть экскурсии страны (опционально — только курорты региона).
+ *
+ * @param int[]|null $excursion_ids Кандидаты страны; null — взять из кеша.
+ * @return WP_Term[]
+ */
+function bsi_excursions_country_resort_terms(int $country_id, int $region_id = 0, ?array $excursion_ids = null): array
+{
+  if ($excursion_ids === null) {
+    $excursion_ids = $country_id > 0 && function_exists('bsi_get_country_excursion_candidate_ids_cached')
+      ? bsi_get_country_excursion_candidate_ids_cached($country_id)
+      : [];
+  }
+  if (empty($excursion_ids)) {
+    return [];
+  }
+
+  $terms = wp_get_object_terms($excursion_ids, 'resort', ['orderby' => 'name', 'order' => 'ASC']);
+  if (is_wp_error($terms) || empty($terms)) {
+    return [];
+  }
+
+  if ($region_id) {
+    $terms = array_values(array_filter($terms, static function ($t) use ($region_id) {
+      return (int) get_term_meta($t->term_id, 'resort_region', true) === $region_id;
+    }));
+  }
+
+  return $terms;
+}
+
 add_action('wp_ajax_excursions_resorts', 'bsi_excursions_resorts');
 add_action('wp_ajax_nopriv_excursions_resorts', 'bsi_excursions_resorts');
 
@@ -195,45 +226,7 @@ function bsi_excursions_resorts()
     wp_send_json_error(['message' => 'no_country']);
   }
 
-  if ($region_id) {
-    $terms = get_terms([
-      'taxonomy' => 'resort',
-      'hide_empty' => false,
-      'orderby' => 'name',
-      'order' => 'ASC',
-      'meta_query' => [
-        ['key' => 'resort_region', 'value' => $region_id, 'compare' => '='],
-      ],
-    ]);
-  } else {
-    $region_ids = get_terms([
-      'taxonomy' => 'region',
-      'hide_empty' => false,
-      'fields' => 'ids',
-      'meta_query' => [
-        ['key' => 'region_country', 'value' => $country_id, 'compare' => '='],
-      ],
-    ]);
-    $region_ids = is_array($region_ids) ? array_values(array_filter(array_map('absint', $region_ids))) : [];
-
-    if (empty($region_ids)) {
-      wp_send_json_success(['items' => []]);
-    }
-
-    $terms = get_terms([
-      'taxonomy' => 'resort',
-      'hide_empty' => false,
-      'orderby' => 'name',
-      'order' => 'ASC',
-      'meta_query' => [
-        ['key' => 'resort_region', 'value' => $region_ids, 'compare' => 'IN'],
-      ],
-    ]);
-  }
-
-  if (is_wp_error($terms) || empty($terms)) {
-    wp_send_json_success(['items' => []]);
-  }
+  $terms = bsi_excursions_country_resort_terms($country_id, $region_id);
 
   $items = [];
   foreach ($terms as $t) {
