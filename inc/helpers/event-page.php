@@ -339,6 +339,7 @@ function bsi_event_page_data(int $post_id): array
     'important' => (string) $f('event_important'),
     // Старые блоки — выводятся, пока контент не перенесён в конструктор (TODO.md, «выкатка без потери индекса»)
     'additional' => (string) $f('event_additional'),
+    'additional_tickets' => (string) $f('event_additional_tickets'),
     'program' => bsi_event_program_days($post_id),
     'scheme_url' => $scheme_url,
     'event_scheme_url' => $event_scheme_url ?: $scheme_url,

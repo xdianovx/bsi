@@ -88,12 +88,23 @@ get_header();
             </section>
           <?php endif; ?>
 
-          <?php if (!$finished && trim(wp_strip_all_tags($event['additional'])) !== ''): ?>
-            <section class="single-event__column-card single-event__legacy-additional" id="dopolnitelno">
+          <?php
+          // «Дополнительно»: при туре и билетах — свой блок на каждый формат, переключается event-offer.js.
+          // Только билеты — поле билетов, пустое — старое общее поле (было единственным до 26.10).
+          if ($both) {
+            $additional = ['tour' => $event['additional'], 'ticket' => $event['additional_tickets']];
+          } elseif ($event['has_tickets'] && !$event['has_tour']) {
+            $additional = ['' => trim(wp_strip_all_tags($event['additional_tickets'])) !== '' ? $event['additional_tickets'] : $event['additional']];
+          } else {
+            $additional = ['' => $event['additional']];
+          }
+          ?>
+          <?php if (!$finished): foreach ($additional as $format => $content): if (trim(wp_strip_all_tags($content)) === '') continue; ?>
+            <section class="single-event__column-card single-event__legacy-additional" id="dopolnitelno<?= $format !== '' ? '-' . esc_attr($format) : ''; ?>"<?= $format !== '' ? ' data-offer-format-only="' . esc_attr($format) . '"' . ($format !== $event['default_format'] ? ' hidden' : '') : ''; ?>>
               <h2 class="h2">Дополнительно</h2>
-              <div class="editor-content"><?= wp_kses_post($event['additional']); ?></div>
+              <div class="editor-content"><?= wp_kses_post($content); ?></div>
             </section>
-          <?php endif; ?>
+          <?php endforeach; endif; ?>
         </div>
 
         <?php if (!$finished && ($event['has_tour'] || $event['has_tickets'])): ?>
