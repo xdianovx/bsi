@@ -410,6 +410,7 @@ require get_template_directory() . '/inc/helpers/orphan-country-guard.php';
 require get_template_directory() . '/inc/helpers/webp.php';
 require get_template_directory() . '/inc/helpers/lazy-images.php';
 require get_template_directory() . '/inc/helpers/resort.php';
+require get_template_directory() . '/inc/helpers/search-variants.php';
 require get_template_directory() . '/inc/admin/content-schedule-publish-box.php';
 require get_template_directory() . '/inc/admin/content-schedule-block-editor.php';
 require get_template_directory() . '/inc/admin/paragraph-indent.php';

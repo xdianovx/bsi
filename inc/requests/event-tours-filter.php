@@ -179,11 +179,15 @@ if (!function_exists('bsi_event_tours_build_query_args')) {
       $args['meta_query'] = array_merge([['relation' => 'AND']], $meta_query);
     }
 
+    $args = bsi_query_args_append_schedule($args);
+
+    // Ищем и по раскладке, и транслитом: «Andre» находит «Андреа Бочелли».
     if ($f['search'] !== '') {
-      $args['s'] = $f['search'];
+      $ids = bsi_search_ids_by_variants($args, $f['search']);
+      $args['post__in'] = $ids ?: [0];
     }
 
-    return bsi_query_args_append_schedule($args);
+    return $args;
   }
 }
 
