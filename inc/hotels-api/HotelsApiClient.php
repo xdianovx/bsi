@@ -240,13 +240,6 @@ class HotelsApiClient
     return $out;
   }
 
-  /** Живо ли API. Без кеша и с коротким таймаутом — для диагностики. */
-  public function isAlive(): bool
-  {
-    $response = wp_remote_get($this->baseUrl . '/healthz', ['timeout' => 3]);
-    return !is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200;
-  }
-
   /**
    * @throws HotelsApiException
    */

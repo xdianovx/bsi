@@ -10,14 +10,13 @@ declare(strict_types=1);
  *  - русские названия месяцев (родительный и именительный падежи)
  *
  * Публичный API: см. функции-обёртки в inc/helpers.php
- * (format_date_russian, format_month_russian, format_month_year_russian, format_date_short).
+ * (format_date_russian, format_month_russian, format_date_value).
  */
 class BSI_Date_Formatter
 {
   /**
    * Форматы парсинга в порядке приоритета.
-   * Используется в format_date_russian / format_month_russian /
-   * format_month_year_russian / format_date_short.
+   * Используется в format_date_russian / format_month_russian / format_date_value.
    */
   private const PARSE_FORMATS = ['Ymd', 'Y-m-d', 'd.m.Y', 'd/m/Y'];
 
@@ -173,33 +172,6 @@ class BSI_Date_Formatter
     }
 
     return $formatted;
-  }
-
-  /**
-   * Форматирует CSV-строку дат вида "21.07.2026, 30.08.2026" →
-   * "21 июля, 30 августа". Элементы, которые не парсятся, остаются как есть.
-   */
-  public static function formatCsvRu($dates_string): string
-  {
-    if (!$dates_string || !is_string($dates_string)) {
-      return (string) $dates_string;
-    }
-
-    $dates = array_map('trim', explode(',', $dates_string));
-    $out = [];
-
-    foreach ($dates as $date) {
-      $formatted = self::dayMonthRu($date);
-      // dayMonthRu возвращает оригинал, если парсинг не удался.
-      // Сохраняем поведение: если оригинал = форматированному И не выглядит как d.m.Y — оставляем как есть.
-      if ($formatted !== $date || preg_match('/\d{1,2}\.\d{1,2}\.\d{4}/', $date)) {
-        $out[] = $formatted;
-      } else {
-        $out[] = $date;
-      }
-    }
-
-    return implode(', ', $out);
   }
 
   private static function formatDayDotMonth(DateTime $obj): string

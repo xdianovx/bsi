@@ -159,28 +159,6 @@ add_action('delete_attachment', static function ($attachment_id): void {
 });
 
 /**
- * URL WebP-версии — или пустая строка, если файла нет.
- */
-function bsi_webp_url(int $attachment_id, string $size = 'full'): string
-{
-  $src = wp_get_attachment_image_src($attachment_id, $size);
-  if (!$src || empty($src[0])) {
-    return '';
-  }
-
-  $url = (string) $src[0];
-  $uploads = wp_get_upload_dir();
-
-  if (strpos($url, $uploads['baseurl']) !== 0) {
-    return '';
-  }
-
-  $path = $uploads['basedir'] . substr($url, strlen($uploads['baseurl']));
-
-  return file_exists(bsi_webp_path($path)) ? bsi_webp_path($url) : '';
-}
-
-/**
  * `srcset` из WebP-двойников — тот же набор ширин, что у исходной картинки.
  *
  * Пропускаем размеры, для которых WebP не сделан: иначе браузер выберет

@@ -51,22 +51,9 @@ function format_month_russian($value): string
   return BSI_Date_Formatter::monthRu($value);
 }
 
-/**
- * Дата события без числа: «февраль 2025», «март 2012» (месяц в именительном падеже).
- */
-function format_month_year_russian($value)
-{
-  return BSI_Date_Formatter::monthYearRu($value);
-}
-
 function format_date_value($value)
 {
   return BSI_Date_Formatter::dayMonthRu($value, true);
-}
-
-function format_date_short($date_string, $date_to_string = '')
-{
-  return BSI_Date_Formatter::dayMonthShort((string) $date_string, (string) $date_to_string);
 }
 
 function format_price_text(?string $text): string
@@ -157,18 +144,6 @@ function bsi_extract_price_number(?string $raw_price): ?int
 
   $number = (int) $digits;
   return $number > 0 ? $number : null;
-}
-
-/**
- * Значение цены в админке задано как целое × 1 000 — на сайте делится на 1 000 (например 236000 → 236).
- */
-function bsi_price_divide_thousand(?int $amount): ?float
-{
-  if ($amount === null || $amount <= 0) {
-    return null;
-  }
-
-  return $amount / 1000;
 }
 
 /**
@@ -615,57 +590,6 @@ function bsi_education_get_program_price_numeric_rub(array $program): int
 }
 
 /**
- * Конвертирует цену из рублей в целевую валюту.
- * Используется для переключения валют на фронтенде.
- *
- * @param int|float $price_rub Цена в рублях
- * @param string $target_currency Целевая валюта (USD, EUR, GBP, RUB)
- * @return float|null Цена в целевой валюте или null если конвертация невозможна
- */
-function bsi_education_convert_price_from_rub($price_rub, $target_currency)
-{
-  if (!$price_rub || $price_rub <= 0) {
-    return null;
-  }
-
-  $target_currency = strtoupper(trim((string) $target_currency));
-  if (empty($target_currency)) {
-    return null;
-  }
-
-  // Если целевая валюта - рубли, просто вернуть число
-  if ($target_currency === 'RUB') {
-    return (float) $price_rub;
-  }
-
-  // Получить последний снимок курсов (уже с наценкой)
-  if (!function_exists('bsi_currency_history_get_latest_snapshot')) {
-    return null;
-  }
-
-  $snapshot = bsi_currency_history_get_latest_snapshot();
-  if (!$snapshot || empty($snapshot['rates'][$target_currency])) {
-    return null;
-  }
-
-  $rate_data = $snapshot['rates'][$target_currency];
-  if (!is_array($rate_data) || !isset($rate_data['value']) || !isset($rate_data['nominal'])) {
-    return null;
-  }
-
-  // Формула: цена_в_валюте = цена_в_рублях / (курс_значение / номинал)
-  $rate_value = floatval($rate_data['value']);
-  $rate_nominal = (int) $rate_data['nominal'];
-
-  if ($rate_nominal <= 0 || $rate_value <= 0) {
-    return null;
-  }
-
-  $converted = ((float) $price_rub) / ($rate_value / $rate_nominal);
-  return round($converted, 2);
-}
-
-/**
  * Формирует массив data-attributes для переключателя валют.
  * Используется везде, где нужны data-price-rub / data-price-original / data-price-currency.
  *
@@ -838,55 +762,6 @@ function bsi_plural_ru(int $n, string $one, string $few, string $many): string
     return $one;
   }
   return $many;
-}
-
-/**
- * Диапазон дат заезд–выезд + дни/ночи для карточки размещения.
- *
- * @param string $from ISO-дата заезда (Y-m-d).
- * @param string $to   ISO-дата выезда (Y-m-d), может быть пустой.
- * @return array{label:string,duration:string,nights:int,days:int,from_ts:int,to_ts:int}
- */
-function bsi_format_stay_range(string $from, string $to): array
-{
-  $out = ['label' => '', 'duration' => '', 'nights' => 0, 'days' => 0, 'from_ts' => 0, 'to_ts' => 0];
-  $from = trim($from);
-  if ($from === '') {
-    return $out;
-  }
-  $from_ts = strtotime($from);
-  if (!$from_ts) {
-    return $out;
-  }
-  $out['from_ts'] = $from_ts;
-
-  $to = trim($to);
-  $to_ts = $to !== '' ? strtotime($to) : 0;
-
-  if ($to_ts && $to_ts > $from_ts) {
-    $out['to_ts'] = $to_ts;
-    $nights = (int) floor(($to_ts - $from_ts) / DAY_IN_SECONDS);
-    $days = $nights + 1;
-    $out['nights'] = $nights;
-    $out['days'] = $days;
-
-    $same_year = date('Y', $from_ts) === date('Y', $to_ts);
-    $same_month = $same_year && date('m', $from_ts) === date('m', $to_ts);
-    if ($same_month) {
-      $out['label'] = date_i18n('j', $from_ts) . '–' . date_i18n('j F Y', $to_ts);
-    } elseif ($same_year) {
-      $out['label'] = date_i18n('j F', $from_ts) . ' – ' . date_i18n('j F Y', $to_ts);
-    } else {
-      $out['label'] = date_i18n('j F Y', $from_ts) . ' – ' . date_i18n('j F Y', $to_ts);
-    }
-
-    $out['duration'] = $days . ' ' . bsi_plural_ru($days, 'день', 'дня', 'дней')
-      . ' / ' . $nights . ' ' . bsi_plural_ru($nights, 'ночь', 'ночи', 'ночей');
-  } else {
-    $out['label'] = date_i18n('j F Y', $from_ts);
-  }
-
-  return $out;
 }
 
 /**

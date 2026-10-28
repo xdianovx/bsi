@@ -29,28 +29,6 @@ require_once dirname(__DIR__) . '/legacy-excursions/importer.php';
 require_once dirname(__DIR__) . '/legacy-sights/importer.php';
 
 /**
- * Файлы data/*.json единого экспорта.
- *
- * @return array<string, string> имя файла => полный путь
- */
-function bsi_legacy_unified_available_files(): array
-{
-  $dir = __DIR__ . '/data';
-  if (!is_dir($dir)) {
-    return [];
-  }
-
-  $files = [];
-  foreach (glob($dir . '/*.json') ?: [] as $path) {
-    $files[basename($path)] = $path;
-  }
-
-  ksort($files);
-
-  return $files;
-}
-
-/**
  * Чтение payload единого экспорта + поиск страны.
  *
  * @return array{payload: array, country_id: int, country_title: string}|WP_Error
