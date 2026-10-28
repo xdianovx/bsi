@@ -100,6 +100,88 @@ if (!function_exists('bsi_search_query_variants')) {
   }
 }
 
+if (!function_exists('bsi_search_skeleton')) {
+  /**
+   * Согласный «скелет» слова для поиска по звучанию: викенд и weeknd → vknd,
+   * бочелли и bocelli → bkl. Гласные убираем, похожие согласные склеиваем.
+   */
+  function bsi_search_skeleton(string $word): string
+  {
+    $s = bsi_search_translit_to_lat($word);
+    $s = preg_replace('/[^a-z]/', '', $s);
+    // «уи» в начале слова звучит как «w»: уикенд → vikend.
+    $s = preg_replace('/^u(?=[aeiouy])/', 'v', $s);
+    $s = strtr($s, ['shch' => 's', 'sch' => 's', 'dzh' => 'dz', 'ch' => 'k', 'ck' => 'k', 'sh' => 's', 'zh' => 'z', 'kh' => 'h', 'ph' => 'f', 'th' => 't']);
+    $s = strtr($s, ['w' => 'v', 'c' => 'k', 'q' => 'k', 'j' => 'dz', 'x' => 'ks']);
+    $s = preg_replace('/[aeiouyh]/', '', $s);
+
+    return preg_replace('/(.)\1+/', '$1', $s);
+  }
+}
+
+if (!function_exists('bsi_search_ids_by_sound')) {
+  /**
+   * Запасной поиск по звучанию заголовков, когда точный ничего не нашёл.
+   * Каждое слово запроса (скелет от 3 согласных) должно быть началом скелета
+   * какого-то слова заголовка.
+   *
+   * @return int[]
+   */
+  function bsi_search_ids_by_sound(array $args, string $q): array
+  {
+    $needles = [];
+    foreach (preg_split('/\s+/u', trim($q)) as $word) {
+      $sk = bsi_search_skeleton($word);
+      if (strlen($sk) >= 3) {
+        $needles[] = $sk;
+      }
+    }
+    if ($needles === []) {
+      return [];
+    }
+
+    $candidates = array_map('intval', (new WP_Query($args))->posts);
+    if ($candidates === []) {
+      return [];
+    }
+
+    // Скелеты заголовков — одним запросом и один раз на AJAX (фасеты зовут поиск повторно).
+    static $skeletons = [];
+    $missing = array_diff($candidates, array_keys($skeletons));
+    if ($missing !== []) {
+      global $wpdb;
+      $rows = $wpdb->get_results('SELECT ID, post_title FROM ' . $wpdb->posts . ' WHERE ID IN (' . implode(',', $missing) . ')');
+      foreach ($rows as $row) {
+        $skeletons[(int) $row->ID] = array_map('bsi_search_skeleton', preg_split('/[\s\-–—«»"\'.,:;!?()]+/u', $row->post_title));
+      }
+    }
+
+    $ids = [];
+    foreach ($candidates as $id) {
+      $words = $skeletons[$id] ?? [];
+      $all = true;
+      foreach ($needles as $needle) {
+        $hit = false;
+        foreach ($words as $w) {
+          if ($w !== '' && strpos($w, $needle) === 0) {
+            $hit = true;
+            break;
+          }
+        }
+        if (!$hit) {
+          $all = false;
+          break;
+        }
+      }
+      if ($all) {
+        $ids[] = $id;
+      }
+    }
+
+    return $ids;
+  }
+}
+
 if (!function_exists('bsi_search_ids_by_variants')) {
   /**
    * ID записей, которые находит обычный поиск WP хотя бы по одному варианту запроса.
@@ -125,6 +207,11 @@ if (!function_exists('bsi_search_ids_by_variants')) {
     foreach (bsi_search_query_variants($q) as $variant) {
       $args['s'] = $variant;
       $ids = array_merge($ids, array_map('intval', (new WP_Query($args))->posts));
+    }
+
+    if ($ids === []) {
+      unset($args['s']);
+      $ids = bsi_search_ids_by_sound($args, $q);
     }
 
     return $memo[$key] = array_values(array_unique($ids));
