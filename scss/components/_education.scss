@@ -1109,6 +1109,10 @@
   gap: 4px;
   position: relative;
   height: 100%;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
 
   &:hover {
     color: inherit;

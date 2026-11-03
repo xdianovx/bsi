@@ -214,7 +214,7 @@ get_header(); ?>
               'total'   => $education_query->max_num_pages,
               'current' => $paged,
             ], [
-              'class' => 'country-education__pagination',
+              'class' => 'country-education__pagination ui-pagination--on-gray',
               'attrs' => ['data-education-pagination' => ''],
               'always' => true,
             ]); ?>

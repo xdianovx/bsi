@@ -274,7 +274,7 @@ get_header(); ?>
                 'resort' => $active_resort ?: null,
                 'sight_type' => $active_type ?: null,
               ]),
-            ], ['class' => 'country-sights-pagination']);
+            ], ['class' => 'country-sights-pagination ui-pagination--on-gray']);
             ?>
 
           </div>

@@ -810,7 +810,7 @@ if ($all_edu_for_sort->have_posts()) {
     <?php bsi_pagination([
       'total' => $initial_query->max_num_pages,
       'current' => $paged,
-    ], ['class' => 'js-education-pagination', 'always' => true]); ?>
+    ], ['class' => 'js-education-pagination ui-pagination--on-gray', 'always' => true]); ?>
   </div>
 </section>
 

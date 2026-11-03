@@ -155,6 +155,7 @@
 }
 
 @media screen and (max-width: 768px) {
+
   /* Мобилка (макет 2010:7937): во всю ширину вплотную к шапке сайта, скруглён только низ */
   .single-event__hero {
     width: 100%;
@@ -268,6 +269,7 @@
 }
 
 @media screen and (max-width: 1024px) {
+
   /* stretch: иначе align-items: start из десктопа сжимает блоки по контенту («Выберите дату» с двумя датами — 298px) */
   .single-event__about-grid {
     display: flex;
@@ -281,19 +283,47 @@
     display: contents;
   }
 
-  .single-event__format { order: 1; }
-  .single-event__tickets { order: 2; }
-  .single-event__tour { order: 3; }
-  .single-event__about-aside { order: 4; position: static; width: 100%; }
-  .single-event__about-main { order: 5; }
-  .single-event__steps { order: 6; }
-  .single-event__important { order: 7; }
-  .single-event__legacy-program { order: 8; }
-  .single-event__legacy-additional { order: 9; }
+  .single-event__format {
+    order: 1;
+  }
+
+  .single-event__tickets {
+    order: 2;
+  }
+
+  .single-event__tour {
+    order: 3;
+  }
+
+  .single-event__about-aside {
+    order: 4;
+    position: static;
+    width: 100%;
+  }
+
+  .single-event__about-main {
+    order: 5;
+  }
+
+  .single-event__steps {
+    order: 6;
+  }
+
+  .single-event__important {
+    order: 7;
+  }
+
+  .single-event__legacy-program {
+    order: 8;
+  }
+
+  .single-event__legacy-additional {
+    order: 9;
+  }
 }
 
 @media screen and (max-width: 768px) {
-  .single-event__body > .container {
+  .single-event__body>.container {
     padding: 0;
   }
 
@@ -371,6 +401,7 @@
 }
 
 @media screen and (max-width: 768px) {
+
   .single-event__tickets,
   .single-event__tour {
     gap: 16px;
@@ -1119,7 +1150,7 @@
   color: $text-black;
 }
 
-.single-event__booking-cta-privacy--light .single-event__booking-cta-privacy-input:focus-visible + .single-event__booking-cta-privacy-box {
+.single-event__booking-cta-privacy--light .single-event__booking-cta-privacy-input:focus-visible+.single-event__booking-cta-privacy-box {
   outline-color: $text-black;
 }
 
@@ -1197,7 +1228,7 @@
 /* ---------- FAQ (faq__item 2010:7934) ---------- */
 
 .single-event__faq {
-  margin: 8px 0 32px;
+  margin: 80px 0 32px;
 }
 
 .single-event__faq-inner {
@@ -1277,7 +1308,7 @@
 }
 
 @media screen and (max-width: 768px) {
-  .single-event__faq > .container {
+  .single-event__faq>.container {
     padding: 0;
   }
 

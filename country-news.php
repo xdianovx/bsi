@@ -84,7 +84,7 @@ get_header(); ?>
             <?php bsi_pagination([
               'total'   => $news_query->max_num_pages,
               'current' => $paged,
-            ], ['class' => 'country-news__pagination']); ?>
+            ], ['class' => 'country-news__pagination ui-pagination--on-gray']); ?>
 
           </div>
 

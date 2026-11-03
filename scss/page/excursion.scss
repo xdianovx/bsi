@@ -167,9 +167,11 @@
   position: relative;
   width: 100%;
   height: 100%;
-  background: transparent;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
   border: 0;
-  padding: 0;
   gap: 4px;
 
   &:hover .catalog-card__img {

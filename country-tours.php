@@ -348,7 +348,7 @@ get_header(); ?>
               'total'   => $tours_query->max_num_pages,
               'current' => $paged,
             ], [
-              'class' => 'country-tours__pagination',
+              'class' => 'country-tours__pagination ui-pagination--on-gray',
               'attrs' => ['data-tours-pagination' => ''],
               'always' => true,
             ]); ?>

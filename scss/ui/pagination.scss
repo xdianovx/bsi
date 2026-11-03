@@ -66,32 +66,15 @@
     }
   }
 }
-/* На страницах с серым фоном кнопки красим в белый: $bg-gray почти сливается с $bg-page */
-body.single-country,
-body.single-insurance,
-body.tax-resort,
-body.page-template-page-education,
-body.page-template-page-sobytiynye-tury {
+/* Пагинация на сером фоне страницы: белые кнопки — $bg-gray почти сливается с $bg-page.
+   Модификатор ставит шаблон (bsi_pagination(..., ['class' => 'ui-pagination--on-gray'])). */
+.ui-pagination--on-gray .page-numbers:not(.current):not(.dots) {
+  background: $bg-color;
+}
 
-  .ui-pagination .page-numbers,
-  .news-pagination .page-numbers {
-    background: $bg-color;
-  }
-
-  .ui-pagination .page-numbers:hover:not(.current):not(.dots),
-  .news-pagination .page-numbers:hover:not(.current):not(.dots) {
+@media (hover: hover) {
+  .ui-pagination--on-gray .page-numbers:not(.current):not(.dots):hover {
     background: $black;
     color: #fff;
-  }
-
-  .ui-pagination .page-numbers.current,
-  .news-pagination .page-numbers.current {
-    background: $red;
-    color: #fff;
-  }
-
-  .ui-pagination .page-numbers.dots,
-  .news-pagination .page-numbers.dots {
-    background: transparent;
   }
 }

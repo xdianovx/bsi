@@ -4,6 +4,10 @@
   position: relative;
   width: 100%;
   gap: 16px;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
 
   @media screen and (max-width: 1024px) {
     grid-template-columns: 2fr 4fr 1fr;

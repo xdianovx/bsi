@@ -422,28 +422,6 @@ body.tax-resort {
   background: $bg-black;
 }
 
-/* Карточки — единственные белые поверхности на сером фоне, поэтому
-   у карточки экскурсии здесь появляются подложка и внутренний отступ:
-   в каталоге она лежит на белом и обходится без них. */
-
-body.tax-resort .catalog-card,
-body.tax-resort .sight-card {
-  background: $bg-color;
-}
-
-body.tax-resort .catalog-card {
-  padding: 8px;
-  border-radius: $radius-md;
-}
-
-/* Карточка школы в слайдере «Обучение» — та же белая плитка, что и в
-   каталоге школ страны (scss/page/single-country.scss). */
-body.tax-resort .education-card {
-  padding: 8px;
-  background: $bg-color;
-  border-radius: $radius-md;
-}
-
 body.tax-resort .education-card__actions .education-card__btn-details:hover {
   background: $red;
   color: #fff !important;

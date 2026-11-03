@@ -154,7 +154,7 @@ get_header(); ?>
               'format' => 'page/%#%/',
               'total' => $total_pages,
               'current' => $paged,
-            ], ['class' => 'resort-section-pagination']);
+            ], ['class' => 'resort-section-pagination ui-pagination--on-gray']);
             ?>
           </div>
 

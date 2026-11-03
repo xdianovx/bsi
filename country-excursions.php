@@ -271,7 +271,7 @@ get_header(); ?>
               'total'   => $excursions_query->max_num_pages,
               'current' => $paged,
             ], [
-              'class' => 'country-excursions__pagination',
+              'class' => 'country-excursions__pagination ui-pagination--on-gray',
               'attrs' => ['data-excursions-pagination' => ''],
               'always' => true,
             ]); ?>

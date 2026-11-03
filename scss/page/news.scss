@@ -45,6 +45,10 @@
 .news-card {
   display: flex;
   flex-direction: column;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
 }
 
 .single-news__gallery-section {

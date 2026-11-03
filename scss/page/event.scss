@@ -447,6 +447,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
 }
 
 .event-card__media {
@@ -2331,19 +2335,6 @@ body.page-template-page-sobytiynye-tury .country-tours__filters {
   padding: 16px;
   background: $bg-color;
   border-radius: $radius-md;
-}
-
-body.page-template-page-sobytiynye-tury .event-card {
-  padding: 8px;
-  background: $bg-color;
-  border-radius: $radius-md;
-}
-
-/* Плашки внутри плитки отступают от края фото: у карточки свой padding 8px. */
-body.page-template-page-sobytiynye-tury .event-card__label {
-  top: 8px;
-  left: 8px;
-  right: 14px;
 }
 
 body.page-template-page-sobytiynye-tury .event-card__btn-details:hover {

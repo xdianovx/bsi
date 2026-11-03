@@ -36,6 +36,10 @@
   gap: 4px;
   position: relative;
   height: 100%;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
 
   &:hover {
     color: inherit;
@@ -231,11 +235,12 @@
   margin-bottom: 0;
 }
 
+/* От края карточки: 8px её padding + 6px от края фото, как у .education-card__programs */
 .hotel-card__tag {
   position: absolute;
-  top: 8px;
+  top: 14px;
   border-radius: $radius-sm;
-  right: 8px;
+  right: 14px;
   background: #fff;
   color: $text-black;
   font-size: 14px;
@@ -296,7 +301,10 @@
 }
 
 .hotel-card-row {
-  border-radius: $radius-sm;
+  /* Белая плитка: фон страниц переводится на серый $bg-page (см. design-guidelines) */
+  padding: 8px;
+  background: $bg-color;
+  border-radius: $radius-md;
   overflow: hidden;
 }
 

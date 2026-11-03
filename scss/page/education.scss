@@ -91,12 +91,6 @@ body.page-template-page-education .education-page__list {
   gap: 8px;
 }
 
-body.page-template-page-education .education-card {
-  padding: 8px;
-  background: $bg-color;
-  border-radius: $radius-md;
-}
-
 body.page-template-page-education .education-card__actions .education-card__btn-details:hover {
   background: $red;
   color: #fff !important;

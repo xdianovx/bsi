@@ -45,15 +45,6 @@ button {
 .input-item {
   position: relative;
 
-  &.white {
-    label {
-      padding: 0 4px;
-      background: $bg-gray;
-      border-radius: $radius-sm;
-      line-height: 120%;
-    }
-  }
-
   &.err {
     input {
       background: rgba($red, 0.08) !important;
@@ -154,6 +145,23 @@ input.error {
   }
 }
 
+/* Поле прямо на сером фоне страницы (не внутри белой карточки): заливка белая,
+   плавающая подпись — цветом фона страницы. По умолчанию поле рассчитано на белую карточку. */
+.input-item--on-gray input,
+.input-item--on-gray select,
+.input-item--on-gray textarea,
+.input-item--on-gray .ui-stepper {
+  background-color: $bg-color;
+}
+
+.input-item--on-gray label {
+  background: $bg-page;
+}
+
+.input-item--on-gray.input-item--stacked label {
+  background: none;
+}
+
 .input-item .ui-stepper__input {
   flex: 0 0 48px;
   width: 48px;
@@ -221,10 +229,6 @@ input.error {
     cursor: pointer;
   }
 
-  &.white>label.modal-program-booking__service-item {
-    background: transparent;
-    padding: 0;
-  }
 }
 
 .choices[data-type*="select-one"]::after {
