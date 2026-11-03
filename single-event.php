@@ -118,10 +118,6 @@ get_header();
     <?php get_template_part('template-parts/event/related-tours-slider', null, ['posts' => $related]); ?>
   <?php endif; ?>
 
-  <?php if (!$finished): ?>
-    <?php get_template_part('template-parts/event/page/cta', null, $args); ?>
-  <?php endif; ?>
-
   <?php if (!empty($event['faq'])): ?>
     <section class="single-event__faq">
       <div class="container">
@@ -147,6 +143,10 @@ get_header();
         </div>
       </div>
     </section>
+  <?php endif; ?>
+
+  <?php if (!$finished): ?>
+    <?php get_template_part('template-parts/event/page/cta', null, $args); ?>
   <?php endif; ?>
 </main>
 
