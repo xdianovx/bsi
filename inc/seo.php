@@ -1657,6 +1657,13 @@ function bsi_seo_social_image_url(): string
                 return $cached;
             }
         }
+
+        if (is_singular('country')) {
+            $cached = bsi_seo_country_preview_image($post_id);
+            if ($cached !== '') {
+                return $cached;
+            }
+        }
     }
 
     // Каталог на шаблоне страницы (образование) своей картинки не имеет:
@@ -1698,10 +1705,67 @@ function bsi_seo_social_image_url(): string
         }
     }
 
-    // Растрового изображения не нашлось. Логотип здесь не подходит:
-    // он в SVG, а соцсети такие превью не показывают. Общую картинку
-    // задают в «Yoast SEO → Соцсети → Изображение по умолчанию».
+    // Общая растровая картинка на случай, если в контенте изображений нет.
+    $cached = bsi_seo_social_image_accept(get_template_directory_uri() . '/img/og-default.jpg');
+
     return $cached;
+}
+
+/**
+ * Обложка свежего тура или отеля страны для соцсетей.
+ */
+function bsi_seo_country_preview_image(int $country_id): string
+{
+    if ($country_id <= 0) {
+        return '';
+    }
+
+    $sources = [
+        [
+            'post_type'  => 'tour',
+            'meta_query' => function_exists('bsi_build_tour_country_meta_query') ? bsi_build_tour_country_meta_query($country_id) : [],
+        ],
+        [
+            'post_type'  => 'hotel',
+            'meta_query' => [
+                [
+                    'key'     => 'hotel_country',
+                    'value'   => $country_id,
+                    'compare' => '=',
+                ],
+            ],
+        ],
+    ];
+
+    foreach ($sources as $source) {
+        if ($source['meta_query'] === []) {
+            continue;
+        }
+
+        $query_args = [
+            'post_type'      => $source['post_type'],
+            'post_status'    => 'publish',
+            'posts_per_page' => 5,
+            'fields'         => 'ids',
+            'meta_key'       => '_thumbnail_id',
+            'meta_query'     => $source['meta_query'],
+            'no_found_rows'  => true,
+        ];
+        if (function_exists('bsi_query_args_append_schedule')) {
+            $query_args = bsi_query_args_append_schedule($query_args);
+        }
+
+        $posts = get_posts($query_args);
+
+        foreach ($posts as $post_id) {
+            $url = bsi_seo_social_image_accept((string) get_the_post_thumbnail_url($post_id, 'large'));
+            if ($url !== '') {
+                return $url;
+            }
+        }
+    }
+
+    return '';
 }
 
 /**
