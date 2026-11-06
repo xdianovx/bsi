@@ -389,6 +389,11 @@ if ($use_test_data || empty($items)) {
     $items = $test_items;
 }
 
+$rendered_country_ids = array_map('intval', array_column($items, 'country_id'));
+$promo_countries = array_values(array_filter($promo_countries, static function ($country) use ($rendered_country_ids) {
+    return in_array((int) $country->ID, $rendered_country_ids, true);
+}));
+
 // Формируем список стран для фильтра из массива $items (fallback когда $promo_countries пуст)
 $filter_countries = [];
 
