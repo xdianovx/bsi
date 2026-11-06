@@ -94,6 +94,11 @@ if (!empty($country_ids)) {
     'update_post_term_cache' => false,
   ]);
 
+  $hidden_filter_country_slugs = ['belgiya', 'germaniya', 'niderlandy'];
+  $promo_countries = array_values(array_filter($promo_countries, static function ($country) use ($hidden_filter_country_slugs) {
+    return !in_array((string) $country->post_name, $hidden_filter_country_slugs, true);
+  }));
+
   if (class_exists('Collator')) {
     try {
       $collator = new Collator('ru_RU');
