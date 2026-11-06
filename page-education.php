@@ -281,6 +281,8 @@ if ($all_edu_for_sort->have_posts()) {
       </div>
     <?php endif; ?>
 
+    <h2 class="h2">Школы и программы</h2>
+
     <form class="education-filter ui-filters js-education-filter"
           data-education-form>
       <div class="education-filter__row">

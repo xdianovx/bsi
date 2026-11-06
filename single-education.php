@@ -691,7 +691,7 @@ get_header();
         <div class="single-education__price-details">
           <?php if (!empty($price_included)): ?>
             <div class="single-education__price-included">
-              <h3 class="single-education__price-title">В стоимость входит</h3>
+              <h2 class="single-education__price-title">В стоимость входит</h2>
               <div class="single-education__price-content">
                 <?php echo wp_kses_post($price_included); ?>
               </div>
@@ -700,7 +700,7 @@ get_header();
 
           <?php if (!empty($price_extra)): ?>
             <div class="single-education__price-extra">
-              <h3 class="single-education__price-title">Оплачивается дополнительно</h3>
+              <h2 class="single-education__price-title">Оплачивается дополнительно</h2>
               <div class="single-education__price-content">
                 <?php echo wp_kses_post($price_extra); ?>
               </div>
