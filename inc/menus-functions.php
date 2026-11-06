@@ -404,15 +404,17 @@ class Mobile_Nav_Walker extends Walker_Nav_Menu
             return;
         }
 
-        if ($depth === 1) {
-            // Лейблы второго уровня (заголовки групп)
+        if ($depth === 1 && !empty($item->url) && $item->url !== '#') {
+            $output .= '<a href="' . $url . '" class="mobile-nav__link mobile-nav__link--child"' . $target . $rel . '>';
+            $output .= '<span>' . $title . '</span>';
+            $output .= '</a>';
+        } elseif ($depth === 1) {
             $output .= '<div class="mobile-nav__label">';
             $output .= '<span>' . $title . '</span>';
             $output .= '</div>';
         }
 
         if ($depth === 2) {
-            // Обычные ссылки третьего уровня
             $output .= '<a href="' . $url . '" class="mobile-nav__link mobile-nav__link--child"' . $target . $rel . '>';
             $output .= '<span>' . $title . '</span>';
             $output .= '</a>';
