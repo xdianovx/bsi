@@ -416,6 +416,7 @@ require get_template_directory() . '/inc/admin/content-schedule-block-editor.php
 require get_template_directory() . '/inc/admin/paragraph-indent.php';
 require get_template_directory() . '/inc/admin/icon-picker.php';
 require get_template_directory() . '/inc/admin/event-admin.php';
+require get_template_directory() . '/inc/admin/event-export.php';
 require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/cookie-consent.php';
 require get_template_directory() . '/inc/duplicate-post.php';

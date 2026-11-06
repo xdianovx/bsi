@@ -31,6 +31,7 @@ function bsi_admin_menu_hubs(): array
         'edit.php?post_type=tour',
         'edit.php?post_type=event',
         ['Событийные туры: настройки', 'edit_others_posts', 'admin.php?page=bsi-event-settings'],
+        ['Событийные туры: экспорт', 'manage_options', 'admin.php?page=bsi-event-export'],
         'edit.php?post_type=hotel',
         'edit.php?post_type=education',
         'edit.php?post_type=visa',
