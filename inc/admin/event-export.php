@@ -433,6 +433,16 @@ function bsi_event_export_send(): void
   }
 
   $filename = 'bsi-event-tours-' . wp_date('Ymd-His') . '.zip';
+  $download_token = preg_replace('/\D/', '', (string) ($_POST['download_token'] ?? ''));
+  if ($download_token !== '') {
+    setcookie('bsi_event_export_done', $download_token, [
+      'expires' => time() + 10 * MINUTE_IN_SECONDS,
+      'path' => '/',
+      'secure' => is_ssl(),
+      'httponly' => false,
+      'samesite' => 'Lax',
+    ]);
+  }
   nocache_headers();
   header('Content-Type: application/zip');
   header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -478,13 +488,62 @@ function bsi_event_export_page(): void
       <div class="notice notice-error"><p>На сервере не установлен PHP ZipArchive. Экспорт недоступен.</p></div>
     <?php endif; ?>
 
-    <form method="post" action="<?= esc_url(admin_url('admin-post.php')) ?>">
+    <form id="bsi-event-export-form" method="post" action="<?= esc_url(admin_url('admin-post.php')) ?>">
       <input type="hidden" name="action" value="bsi_event_export">
+      <input type="hidden" name="download_token" value="">
       <?php wp_nonce_field('bsi_event_export'); ?>
       <p>
         <button type="submit" class="button button-primary"<?= $zip_available ? '' : ' disabled' ?>>Скачать ZIP с событиями и изображениями</button>
       </p>
+      <p id="bsi-event-export-status" hidden></p>
     </form>
   </div>
+  <?php if ($zip_available): ?>
+    <script>
+      (() => {
+        const form = document.getElementById("bsi-event-export-form");
+        if (!form) return;
+        const button = form.querySelector("button[type=submit]");
+        const status = document.getElementById("bsi-event-export-status");
+        const tokenField = form.querySelector("input[name=download_token]");
+        const buttonLabel = button.textContent;
+        const waitingText = "Формируем архив. При большом количестве событий это может занять около минуты. Не закрывайте страницу.";
+
+        form.addEventListener("submit", (event) => {
+          if (form.dataset.running === "1") {
+            event.preventDefault();
+            return;
+          }
+          form.dataset.running = "1";
+          const token = String(Date.now());
+          tokenField.value = token;
+          button.disabled = true;
+          button.textContent = "Формируем архив…";
+          status.textContent = waitingText;
+          status.hidden = false;
+          const started = Date.now();
+          const timer = window.setInterval(() => {
+            const cookie = document.cookie.split("; ").find((row) => row.startsWith("bsi_event_export_done="));
+            if (cookie && cookie.split("=")[1] === token) {
+              window.clearInterval(timer);
+              document.cookie = "bsi_event_export_done=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+              status.textContent = "Архив сформирован. Скачивание началось.";
+              button.disabled = false;
+              button.textContent = buttonLabel;
+              delete form.dataset.running;
+              return;
+            }
+            if (Date.now() - started >= 180000) {
+              window.clearInterval(timer);
+              status.textContent = "Скачивание ещё не началось. Обновите страницу и попробуйте ещё раз.";
+              button.disabled = false;
+              button.textContent = buttonLabel;
+              delete form.dataset.running;
+            }
+          }, 1000);
+        });
+      })();
+    </script>
+  <?php endif; ?>
 <?php
 }
