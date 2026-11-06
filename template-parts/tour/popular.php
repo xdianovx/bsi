@@ -115,6 +115,29 @@ if (!empty($country_ids)) {
       return mb_strcasecmp($a->post_title, $b->post_title);
     });
   }
+
+  $filter_country_positions = array_flip([
+    'velikobritaniya',
+    'francziya',
+    'italiya',
+    'ispaniya',
+    'kitaj',
+    'yaponiya',
+    'yuzhnaya-koreya',
+    'laos',
+    'kambodzha',
+  ]);
+
+  usort($promo_countries, static function ($a, $b) use ($filter_country_positions) {
+    $a_position = $filter_country_positions[(string) $a->post_name] ?? PHP_INT_MAX;
+    $b_position = $filter_country_positions[(string) $b->post_name] ?? PHP_INT_MAX;
+
+    if ($a_position === $b_position) {
+      return 0;
+    }
+
+    return $a_position <=> $b_position;
+  });
 }
 
 $items = [];
