@@ -13,11 +13,9 @@
 
 .country-hotels__wrap {
   margin-top: 32px;
-  padding-top: 32px;
-  border-top: 1px solid #bebebe;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
 .country-hotels__counter {
@@ -31,9 +29,18 @@
 
 .country-hotels__list {
   margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
 }
 
 .hotel-rating {
@@ -42,18 +49,6 @@
   border-radius: $radius-sm;
   display: inline-block;
   line-height: 100%;
-}
-
-.country-hotel__rating {
-  margin-left: 8px;
-}
-
-.country-hotel__title {
-  transition: $trans-text;
-
-  &:hover {
-    color: $red;
-  }
 }
 
 /* Каталог отелей из хаба BSIHOTELS */

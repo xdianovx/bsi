@@ -138,57 +138,41 @@ get_header(); ?>
           <h1 class="h1 country-hotels__title">
             <?= esc_html($hotels_h1); ?>
           </h1>
-        </div>
 
-        <?php if ($hotels_from_api): ?>
-          <?php // каталог отрисован выше, внутри колонки контента ?>
+          <?php if (!$hotels_from_api): ?>
+            <?php if (!empty($hotels)): ?>
+              <div class="country-hotels__counter">
+                Нашли отелей: <?= (int) count($hotels); ?>
+              </div>
 
-        <?php elseif (!empty($hotels)): ?>
-          <div class="page-country__content">
-            <div class="country-hotels__counter">
-              Нашли отелей: <?= (int) count($hotels); ?>
-            </div>
+              <div class="country-hotels__wrap">
+                <?php foreach ($hotels_by_resort as $resort_title => $data): ?>
+                  <div class="country-hotels__item">
+                    <h2 class="country-hotels__item-title">
+                      <?= esc_html($resort_title); ?>
+                    </h2>
 
-            <div class="country-hotels__wrap">
-
-              <?php foreach ($hotels_by_resort as $resort_title => $data): ?>
-                <div class="country-hotels__item">
-                  <h2 class="country-hotels__item-title">
-                    <?= esc_html($resort_title); ?>
-                  </h2>
-
-                  <div class="country-hotels__list">
-                    <?php foreach ($data['items'] as $hotel_id): ?>
-                      <?php
-                      $rating = function_exists('get_field') ? get_field('rating', $hotel_id) : '';
-                      ?>
-                      <div class="country-hotel">
-                        <div class="country-hotel__wrap">
-                          <a href="<?= esc_url(get_permalink($hotel_id)); ?>"
-                             class="country-hotel__title">
-                            <?= esc_html(get_the_title($hotel_id)); ?>
-                          </a>
-
-                          <?php if ($rating): ?>
-                            <span class="hotel-rating country-hotel__rating">
-                              <?= esc_html($rating); ?>*
-                            </span>
-                          <?php endif; ?>
-                        </div>
-                      </div>
-                    <?php endforeach; ?>
+                    <div class="country-hotels__list">
+                      <?php foreach ($data['items'] as $hotel_id): ?>
+                        <?php
+                        set_query_var('hotel', [
+                          'id' => $hotel_id,
+                          'url' => get_permalink($hotel_id),
+                          'image' => get_the_post_thumbnail_url($hotel_id, 'large') ?: '',
+                          'title' => get_the_title($hotel_id),
+                        ]);
+                        get_template_part('template-parts/hotels/card');
+                        ?>
+                      <?php endforeach; ?>
+                    </div>
                   </div>
-
-                </div>
-              <?php endforeach; ?>
-
-            </div>
-          </div>
-        <?php else: ?>
-          <div class="page-country__content">
-            <p>Каталог отелей для этого направления пока пуст — подберём вариант по запросу.</p>
-          </div>
-        <?php endif; ?>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <p>Каталог отелей для этого направления пока пуст — подберём вариант по запросу.</p>
+            <?php endif; ?>
+          <?php endif; ?>
+        </div>
 
       </div>
     </div>
