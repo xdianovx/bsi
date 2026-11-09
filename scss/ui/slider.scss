@@ -39,19 +39,20 @@
     opacity: 0.2;
     pointer-events: none;
 
-    &:hover {
-    }
+    &:hover {}
   }
 
   &.xl {
     width: 48px;
     height: 48px;
+
     &.slider-arrow-next:before {
       top: 20px;
       right: 20px;
       width: 8px;
       height: 8px;
     }
+
     &.slider-arrow-prev:before {
       top: 20px;
       left: 20px;
@@ -122,6 +123,10 @@
 
   .swiper-pagination-current {
     color: $red;
+  }
+
+  @media screen and (max-width: 768px) {
+    display: none !important;
   }
 }
 
