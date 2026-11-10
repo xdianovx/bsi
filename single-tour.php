@@ -123,6 +123,7 @@ get_header();
             data-town-from-inc="<?= esc_attr($excursion_params['TOWNFROMINC'] ?? ''); ?>"
             data-state-inc="<?= esc_attr($excursion_params['STATEINC'] ?? ''); ?>"
             data-tours="<?= esc_attr($excursion_params['TOURS'] ?? ''); ?>"
+            data-check-in-beg="<?= esc_attr($excursion_params['CHECKIN_BEG'] ?? ''); ?>"
             data-nights-from="<?= esc_attr($excursion_params['NIGHTS_FROM'] ?? ''); ?>"
             data-nights-till="<?= esc_attr($excursion_params['NIGHTS_TILL'] ?? ''); ?>"
             data-show-price-from="<?= esc_attr($show_price_from ? '1' : '0'); ?>">

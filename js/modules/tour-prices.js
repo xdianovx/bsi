@@ -24,6 +24,7 @@ export const tourPrices = () => {
   const townFromInc = wrap.getAttribute("data-town-from-inc");
   const stateInc = wrap.getAttribute("data-state-inc");
   const tours = wrap.getAttribute("data-tours");
+  const preferredCheckInBeg = wrap.getAttribute("data-check-in-beg") || "";
   const showPriceFromAttr = wrap.getAttribute("data-show-price-from");
   const showPriceFrom = showPriceFromAttr === null || showPriceFromAttr === "1";
   const urlNightsFrom = parseInt(wrap.getAttribute("data-nights-from") || "", 10) || null;
@@ -585,12 +586,14 @@ export const tourPrices = () => {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            let nearestDate = null;
-            for (const dateStr of availableDates) {
-              const dateObj = parseDateFromYYYYMMDD(dateStr);
-              if (dateObj && dateObj >= today) {
-                nearestDate = dateStr;
-                break;
+            let nearestDate = availableDatesSet.has(preferredCheckInBeg) ? preferredCheckInBeg : null;
+            if (!nearestDate) {
+              for (const dateStr of availableDates) {
+                const dateObj = parseDateFromYYYYMMDD(dateStr);
+                if (dateObj && dateObj >= today) {
+                  nearestDate = dateStr;
+                  break;
+                }
               }
             }
 
