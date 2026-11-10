@@ -475,6 +475,42 @@ function bsi_register_hotel_acf_groups(): void
           ],
         ],
       ],
+
+      [
+        'key' => 'field_hotel_tab_files',
+        'label' => 'Файлы',
+        'type' => 'tab',
+        'placement' => 'top',
+      ],
+      [
+        'key' => 'field_hotel_files',
+        'label' => 'Файлы для скачивания',
+        'name' => 'hotel_files',
+        'type' => 'repeater',
+        'layout' => 'table',
+        'button_label' => 'Добавить файл',
+        'instructions' => 'Фактшиты, программы новогодних заездов, концепции питания и другие материалы. Выводятся на странице отеля.',
+        'sub_fields' => [
+          [
+            'key' => 'field_hotel_file_title',
+            'label' => 'Название',
+            'name' => 'title',
+            'type' => 'text',
+            'required' => 1,
+            'wrapper' => ['width' => '50'],
+          ],
+          [
+            'key' => 'field_hotel_file_attachment',
+            'label' => 'Файл',
+            'name' => 'file',
+            'type' => 'file',
+            'return_format' => 'array',
+            'library' => 'all',
+            'required' => 1,
+            'wrapper' => ['width' => '50'],
+          ],
+        ],
+      ],
     ],
     'location' => [
       [

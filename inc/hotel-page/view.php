@@ -9,7 +9,7 @@
  *
  * Структура:
  *   name, stars, place[], address, price_from, booking_url,
- *   photos[], amenities[], facts[], rooms[], sections[], map, back
+ *   photos[], amenities[], facts[], rooms[], sections[], files[], map, back
  */
 
 /**
@@ -37,6 +37,7 @@ function bsi_hotel_view_defaults(): array
     'facts' => [],          // [['label' => '', 'value' => ''], ...]
     'rooms' => [],          // см. bsi_hotel_view_room()
     'sections' => [],       // [['id' => '', 'title' => '', 'html' => ''], ...]
+    'files' => [],          // [['title' => '', 'url' => '', 'meta' => ''], ...]
     'map' => null,          // ['lat' => float, 'lng' => float, 'zoom' => int]
     'location_note' => '',  // текст о расположении; выводится в секции с картой
     'policies' => [],       // [['icon' => '', 'title' => '', 'text' => '', 'allowed' => ?bool], ...]
@@ -855,6 +856,10 @@ function bsi_hotel_view_nav(array $view): array
     $nav[] = ['id' => $section['id'], 'label' => $section['title']];
   }
 
+  if ($view['files']) {
+    $nav[] = ['id' => 'hotel-files', 'label' => 'Материалы'];
+  }
+
   if ($view['amenities']) {
     $nav[] = ['id' => 'hotel-amenities', 'label' => 'Удобства'];
   }
@@ -932,6 +937,7 @@ function bsi_hotel_view_from_post(int $post_id): array
   $view['amenities'] = bsi_hotel_view_post_amenities($post_id);
   $view['facts'] = bsi_hotel_view_post_facts($post_id);
   $view['sections'] = bsi_hotel_view_post_sections($post_id);
+  $view['files'] = bsi_hotel_view_post_files($post_id);
   $view['rooms'] = bsi_hotel_view_post_rooms($post_id);
 
   $min = $has_acf && function_exists('bsi_hotel_min_room_price')
@@ -1223,6 +1229,45 @@ function bsi_hotel_view_post_sections(int $post_id): array
   }
 
   return $sections;
+}
+
+/**
+ * Прикреплённые файлы отеля с человеческим названием, форматом и размером.
+ */
+function bsi_hotel_view_post_files(int $post_id): array
+{
+  if (!function_exists('get_field')) {
+    return [];
+  }
+
+  $rows = get_field('hotel_files', $post_id);
+  $result = [];
+
+  foreach (is_array($rows) ? $rows : [] as $row) {
+    $file = is_array($row['file'] ?? null) ? $row['file'] : [];
+    $url = trim((string) ($file['url'] ?? ''));
+
+    if ($url === '') {
+      continue;
+    }
+
+    $title = trim((string) ($row['title'] ?? ''));
+    if ($title === '') {
+      $title = trim((string) ($file['title'] ?? $file['filename'] ?? 'Файл'));
+    }
+
+    $path = (string) parse_url($url, PHP_URL_PATH);
+    $extension = strtoupper(pathinfo($path !== '' ? $path : $url, PATHINFO_EXTENSION));
+    $size = !empty($file['filesize']) ? size_format((int) $file['filesize']) : '';
+
+    $result[] = [
+      'title' => $title,
+      'url' => $url,
+      'meta' => implode(' · ', array_filter([$extension, $size])),
+    ];
+  }
+
+  return $result;
 }
 
 /**

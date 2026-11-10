@@ -332,6 +332,68 @@ $hp-nav-offset: 76px;
   max-width: 900px;
 }
 
+.hp-files__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: $radius-md;
+  background: $bg-gray;
+  color: $text-black;
+}
+
+.hp-file__icon {
+  flex-shrink: 0;
+  display: flex;
+  color: $text-gray;
+}
+
+.hp-file__title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hp-file__meta {
+  margin-left: auto;
+  color: $text-gray;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.hp-file__download {
+  color: $red;
+  white-space: nowrap;
+}
+
+.hp-file:hover .hp-file__download {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 576px) {
+  .hp-file {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .hp-file__title {
+    flex: 1 1 calc(100% - 32px);
+  }
+
+  .hp-file__meta {
+    margin-left: 32px;
+  }
+}
+
 .hp-rooms {
   padding: 8px 0;
 }

@@ -26,6 +26,7 @@ get_header();
   get_template_part('template-parts/hotel-page/nav', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/rooms', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/sections', null, ['view' => $view]);
+  get_template_part('template-parts/hotel-page/files', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/amenities', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/facts', null, ['view' => $view]);
   get_template_part('template-parts/hotel-page/contacts', null, ['view' => $view]);
