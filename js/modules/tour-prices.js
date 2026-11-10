@@ -639,7 +639,6 @@ export const tourPrices = () => {
 
     if (firstAvailableDate && lastAvailableDate) {
       datePickerInstance.set("minDate", firstAvailableDate);
-      datePickerInstance.set("maxDate", lastAvailableDate);
 
       let startDate = null;
       let endDate = null;
@@ -667,10 +666,6 @@ export const tourPrices = () => {
         endDate = new Date(nearestDate);
         endDate.setDate(nearestDate.getDate() + 7);
 
-        if (endDate > lastAvailableDate) {
-          endDate.setTime(lastAvailableDate.getTime());
-        }
-
         startDate = nearestDate;
         searchParams.checkInBeg = formatDateYYYYMMDD(nearestDate);
         searchParams.checkInEnd = formatDateYYYYMMDD(endDate);
@@ -680,13 +675,11 @@ export const tourPrices = () => {
         if (startDate < firstAvailableDate) {
           startDate = firstAvailableDate;
         }
-        if (endDate > lastAvailableDate) {
-          endDate = lastAvailableDate;
-        }
         if (startDate > endDate) {
           endDate = startDate;
         }
 
+        datePickerInstance.set("maxDate", endDate > lastAvailableDate ? endDate : lastAvailableDate);
         datePickerInstance.setDate([startDate, endDate], true);
         datePickerInstance.jumpToDate(startDate);
       }
