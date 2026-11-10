@@ -359,7 +359,10 @@ const initCalendar = (form, state, apply) => {
       label.textContent = known.price;
       dayElem.appendChild(label);
     },
-    onReady: (_selected, _str, instance) => loadVisible(instance),
+    onReady: (_selected, _str, instance) => {
+      instance.calendarContainer.classList.add("hp-cal");
+      loadVisible(instance);
+    },
     onMonthChange: (_selected, _str, instance) => loadVisible(instance),
     onYearChange: (_selected, _str, instance) => loadVisible(instance),
     onChange: (selected) => {

@@ -518,13 +518,15 @@ $hp-nav-offset: 76px;
   border-width: 2px;
 }
 
-/* Календарь тарифов: числа с ценой за ночь под ними. */
-.flatpickr-calendar {
+/* Календарь тарифов: числа с ценой за ночь под ним.
+   Класс .hp-cal вешает hotel-offers.js на calendarContainer, чтобы
+   правила не протекали на календари других страниц. */
+.hp-cal {
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
-.flatpickr-day {
+.hp-cal .flatpickr-day {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -544,7 +546,7 @@ $hp-nav-offset: 76px;
    плашек превращают календарь в шахматку. */
 /* Селектор с календарём: у flatpickr есть своё правило для
    `.flatpickr-disabled`, и оно идёт в сборке позже. */
-.flatpickr-calendar .flatpickr-day.is-off {
+.hp-cal .flatpickr-day.is-off {
   color: $gray;
   opacity: 0.5;
   cursor: not-allowed;
@@ -559,29 +561,29 @@ $hp-nav-offset: 76px;
 
 /* День с известной ценой отличается от того, про который ещё не спрашивали:
    второй тоже выбирается, просто цену для него посчитают по клику. */
-.flatpickr-day.is-priced {
+.hp-cal .flatpickr-day.is-priced {
   font-weight: 500;
 }
 
-.flatpickr-day:not(.is-priced):not(.flatpickr-disabled) {
+.hp-cal .flatpickr-day:not(.is-priced):not(.flatpickr-disabled) {
   color: $text-gray;
 }
 
-.flatpickr-day.selected,
-.flatpickr-day.startRange,
-.flatpickr-day.endRange {
+.hp-cal .flatpickr-day.selected,
+.hp-cal .flatpickr-day.startRange,
+.hp-cal .flatpickr-day.endRange {
   background: $red;
   border-color: $red;
 }
 
-.flatpickr-day.selected .hp-cal__price,
-.flatpickr-day.startRange .hp-cal__price,
-.flatpickr-day.endRange .hp-cal__price,
-.flatpickr-day.inRange .hp-cal__price {
+.hp-cal .flatpickr-day.selected .hp-cal__price,
+.hp-cal .flatpickr-day.startRange .hp-cal__price,
+.hp-cal .flatpickr-day.endRange .hp-cal__price,
+.hp-cal .flatpickr-day.inRange .hp-cal__price {
   color: inherit;
 }
 
-.flatpickr-day.inRange {
+.hp-cal .flatpickr-day.inRange {
   background: $bg-gray-light;
   border-color: $bg-gray-light;
   box-shadow: -5px 0 0 $bg-gray-light, 5px 0 0 $bg-gray-light;
