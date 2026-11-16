@@ -3287,6 +3287,30 @@ get_template_part('template-parts/hotels/room-card');
           </div>
         </nav>
 
+        <h3 class="h3" style="margin-bottom: 12px">Оглавление страницы по H2 (.page-toc)</h3>
+        <p style="color: var(--uikit-muted); font-size: 14px; margin-bottom: 12px">
+          Галка «Оглавление по заголовкам» у страницы (шаблон по умолчанию). Desktop — липкая колонка слева, ≤1024px — свёрнутый
+          блок над текстом. Партиал <code>template-parts/ui/page-toc.php</code>, сборка — <code>inc/helpers/page-toc.php</code>.
+        </p>
+        <div class="page-toc-layout" style="margin-bottom: 32px">
+          <aside class="page-toc-aside">
+            <details class="page-toc" open>
+              <summary class="page-toc-summary"><span>Содержание</span></summary>
+              <nav>
+                <ol class="page-toc-list">
+                  <li><a class="page-toc-link" href="#">1. Общие положения</a></li>
+                  <li><a class="page-toc-link is-active" href="#">2. Права и обязанности сторон</a></li>
+                  <li><a class="page-toc-link" href="#">3. Порядок бронирования и оплаты туристского продукта</a></li>
+                </ol>
+              </nav>
+            </details>
+          </aside>
+          <div class="editor-content page-toc-content">
+            <h2>2. Права и обязанности сторон</h2>
+            <p>2.1. Текст пункта…</p>
+          </div>
+        </div>
+
         <h3 class="h3" style="margin-bottom: 12px">Общие блоки раздела</h3>
         <p style="color: var(--uikit-muted); font-size: 13px; margin-bottom: 16px">
           Заполняются один раз на странице «Страхование» (шаблон <code>page-insurance.php</code>) и выводятся и в каталоге, и на страницах

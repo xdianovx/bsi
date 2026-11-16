@@ -27,6 +27,7 @@ import { initEventOffer } from "./modules/event-offer";
 import { initCrosstourEvent } from "./modules/crosstour-event";
 import { initCrosstourCards } from "./modules/crosstour-cards";
 import { initCountryAside } from "./modules/country-aside";
+import { initPageToc } from "./modules/page-toc";
 import { initPopularHotelsSlider } from "./modules/popular-hotels-section";
 import { initPopularToursSlider } from "./modules/popular-tours-section";
 import { initPopularEducationSlider } from "./modules/popular-education-section";
@@ -150,6 +151,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initEventSinglePage();
   initAwardsPage();
   initCountryAside();
+  initPageToc();
   initPopularHotelsSlider();
   initPopularToursSlider();
   initPopularEducationSlider();

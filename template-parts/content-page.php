@@ -21,7 +21,13 @@
 
   <div class="entry-content">
     <?php
-    the_content();
+    // page.php уже собрал контент с id у H2 для оглавления.
+    $page_toc_html = (string) get_query_var('page_toc_html', '');
+    if ($page_toc_html !== '') {
+      echo $page_toc_html; // phpcs:ignore WordPress.Security.EscapeOutput -- результат the_content
+    } else {
+      the_content();
+    }
 
     wp_link_pages(
       array(

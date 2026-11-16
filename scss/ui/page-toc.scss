@@ -1,0 +1,113 @@
+// Оглавление страницы по H2: template-parts/ui/page-toc.php, inc/helpers/page-toc.php.
+// Desktop — липкая колонка слева от текста, ≤1024px — свёрнутый блок над текстом.
+
+.page-toc-layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+.page-toc-aside {
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  margin-top: 16px;
+
+  @media screen and (max-width: 1024px) {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+// У .editor-content свой margin-top/bottom — в колонке сетки они не нужны сверху.
+.page-toc-content {
+  margin-top: 16px;
+  min-width: 0;
+
+  h2 {
+    scroll-margin-top: 24px;
+
+    @media screen and (max-width: 768px) {
+      scroll-margin-top: 80px;
+    }
+  }
+}
+
+.page-toc {
+  padding: 16px;
+  border-radius: $radius-md;
+  background: $bg-gray;
+}
+
+.page-toc-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  list-style: none;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 120%;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  @media screen and (min-width: 1025px) {
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
+.page-toc-chevron {
+  flex-shrink: 0;
+  transition: $trans-text;
+
+  @media screen and (min-width: 1025px) {
+    display: none;
+  }
+}
+
+.page-toc[open] .page-toc-chevron {
+  transform: rotate(180deg);
+}
+
+.page-toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.page-toc-link {
+  display: block;
+  font-size: 14px;
+  line-height: 140%;
+  color: $text-gray;
+  transition: $trans-text;
+
+  // Палец промахивается по строкам 20px — добавляем зону касания.
+  @media screen and (max-width: 1024px) {
+    padding: 4px 0;
+  }
+
+  &:hover {
+    color: $text-black;
+  }
+
+  &.is-active {
+    color: $text-black;
+    font-weight: 700;
+  }
+}

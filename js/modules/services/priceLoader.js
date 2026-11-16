@@ -118,23 +118,6 @@ export async function fetchTourMinPrice(params) {
 }
 
 /**
- * Сохраняет отображаемую цену в серверный кэш (та же величина, что показываем пользователю)
- */
-function savePriceToCache(tourId, displayPrice) {
-  if (displayPrice <= 0) return;
-  fetch(AJAX_URL(), {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
-    body: new URLSearchParams({
-      action: "save_tour_min_price",
-      tour_id: tourId,
-      min_price: displayPrice,
-    }),
-    credentials: "same-origin",
-  }).catch(() => {});
-}
-
-/**
  * @param {object} p
  * @returns {string|null}
  */
@@ -186,13 +169,6 @@ async function fetchBatchTourPricesFromServer(tourIds) {
   }
 }
 
-/**
- * Пакетная загрузка цен (тот же PriceLoaderService, что кеш) + client fallback для пустых.
- *
- * @param {ParentNode} container
- * @param {object} [params]
- * @param {boolean} [params.clientFallback=true] — добить пустые через bsi_samo excursion_prices
- */
 function markPriceFailed(el) {
   el.classList.remove("is-loading");
   if (!el.hasAttribute("data-price-loaded")) {
@@ -201,9 +177,16 @@ function markPriceFailed(el) {
   }
 }
 
-export async function loadTourPricesBatch(container, params = {}) {
+/**
+ * Загрузка цен карточек туров одним серверным батчем (PriceLoaderService, кеш 3ч).
+ * Сервер сам ходит в Samo и ретраит по доступным датам, поэтому клиентский фолбэк
+ * не нужен: при пустом ответе показываем «По запросу». Это убирает залп запросов
+ * к admin-ajax.php, из-за которого хостер банил IP по rate-limit.
+ *
+ * @param {ParentNode} container
+ */
+export async function loadTourPricesBatch(container) {
   if (!container) return;
-  const clientFallback = params.clientFallback !== false;
 
   const priceElements = container.querySelectorAll("[data-tour-price]");
   if (priceElements.length === 0) return;
@@ -252,66 +235,21 @@ export async function loadTourPricesBatch(container, params = {}) {
         el.textContent = text;
         el.classList.add("price-loaded");
         el.setAttribute("data-price-loaded", "");
+        el.classList.remove("is-loading");
+      } else {
+        markPriceFailed(el);
       }
-      el.classList.remove("is-loading");
     });
-
-    if (!clientFallback) {
-      toLoad
-        .filter((el) => !el.hasAttribute("data-price-loaded"))
-        .forEach((el) => {
-          el.textContent = "По запросу";
-          el.classList.add("price-unavailable");
-        });
-      return;
-    }
-
-    const still = toLoad.filter((el) => !el.hasAttribute("data-price-loaded"));
-    if (still.length) console.log("[priceLoader] client fallback for", still.length, "tours");
-    await Promise.all(
-      still.map(async (el) => {
-        el.classList.add("is-loading");
-        const tourId = el.dataset.tourId;
-        const href = el.getAttribute("href");
-        const bookingParams = parseBookingParams(href);
-
-        if (!tourId || !bookingParams) {
-          console.warn("[priceLoader] fallback skip tour", tourId, "— no bookingParams, href:", href);
-          markPriceFailed(el);
-          return;
-        }
-
-        console.log("[priceLoader] fallback tour", tourId, "params:", bookingParams);
-        try {
-          const minPrice = await fetchTourMinPrice(bookingParams);
-          el.classList.remove("is-loading");
-          console.log("[priceLoader] fallback tour", tourId, "minPrice:", minPrice);
-
-          if (minPrice !== null) {
-            const displayPrice = Math.round(minPrice / 2);
-            const formatted = new Intl.NumberFormat("ru-RU").format(displayPrice);
-            el.textContent = `${formatted} ₽ / чел`;
-            el.classList.add("price-loaded");
-            el.setAttribute("data-price-loaded", "");
-            savePriceToCache(tourId, displayPrice);
-          } else {
-            markPriceFailed(el);
-          }
-        } catch {
-          markPriceFailed(el);
-        }
-      })
-    );
   } catch {
     toLoad.forEach((el) => markPriceFailed(el));
   }
 }
 
 /**
- * Отобразить цены в карточках туров: пакет (сервер) + fallback (клиент), без лимита «10».
+ * Отобразить цены в карточках туров: один серверный батч, без клиентского фолбэка.
  */
-export const displayTourPrices = async (container, params = {}) => {
-  await loadTourPricesBatch(container, params);
+export const displayTourPrices = async (container) => {
+  await loadTourPricesBatch(container);
 };
 
 /**

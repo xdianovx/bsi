@@ -36,23 +36,58 @@ get_header();
 	 */
 	?>
 
+	<?php
+	/*
+	 * Оглавление по H2 (галка ACF `bsi_page_toc`, inc/helpers/page-toc.php).
+	 * Контент прогоняется здесь, а не в content-page.php: оглавление
+	 * стоит в разметке раньше текста, а id заголовкам нужны в обоих местах.
+	 */
+	$page_toc = ['html' => '', 'items' => []];
+	if (have_posts() && bsi_page_toc_enabled((int) get_queried_object_id())) {
+		the_post();
+		$page_toc = bsi_page_toc_build((string) apply_filters('the_content', get_the_content()));
+		if (count($page_toc['items']) < BSI_PAGE_TOC_MIN_ITEMS) {
+			$page_toc['items'] = [];
+		}
+		rewind_posts();
+	}
+	set_query_var('page_toc_html', $page_toc['items'] ? $page_toc['html'] : '');
+	set_query_var('page_toc_items', $page_toc['items']);
+	?>
+
 	<section>
 		<div class="container">
-			<div class="editor-content">
-				<?php
-				while (have_posts()):
-					the_post();
+			<?php if ($page_toc['items']): ?>
+				<div class="page-toc-layout">
+					<aside class="page-toc-aside">
+						<?php get_template_part('template-parts/ui/page-toc'); ?>
+					</aside>
+					<div class="editor-content page-toc-content">
+						<?php
+						while (have_posts()):
+							the_post();
+							get_template_part('template-parts/content', 'page');
+						endwhile;
+						?>
+					</div>
+				</div>
+			<?php else: ?>
+				<div class="editor-content">
+					<?php
+					while (have_posts()):
+						the_post();
 
-					get_template_part('template-parts/content', 'page');
+						get_template_part('template-parts/content', 'page');
 
-					// If comments are open or we have at least one comment, load up the comment template.
-					if (comments_open() || get_comments_number()):
-						comments_template();
-					endif;
+						// If comments are open or we have at least one comment, load up the comment template.
+						if (comments_open() || get_comments_number()):
+							comments_template();
+						endif;
 
-				endwhile;
-				?>
-			</div>
+					endwhile;
+					?>
+				</div>
+			<?php endif; ?>
 		</div>
 	</section>
 
