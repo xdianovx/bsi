@@ -575,6 +575,7 @@ require get_template_directory() . '/inc/services/class-bsi-mailer.php';
 require get_template_directory() . '/inc/services/leads.php';
 if (is_admin()) {
 	require get_template_directory() . '/inc/admin/leads-page.php';
+	require get_template_directory() . '/inc/admin/leads-export.php';
 }
 require get_template_directory() . '/inc/services/currency-history.php';
 add_action('phpmailer_init', ['BSI_Mailer', 'configure_smtp']);

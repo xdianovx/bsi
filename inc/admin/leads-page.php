@@ -173,6 +173,8 @@ function bsi_leads_render_page(): void
   ?>
   <div class="wrap bsi-leads">
     <h1 class="wp-heading-inline">Заявки <span class="bsi-leads__loader js-bsi-leads-loader"></span></h1>
+    <a href="#" class="page-title-action js-bsi-leads-export-open">Выгрузить в Excel</a>
+    <hr class="wp-header-end">
     <div class="bsi-leads__body js-bsi-leads-body">
     <?php bsi_leads_render_dashboard($period); ?>
     <h2 class="bsi-leads__list-title">Список заявок</h2>
@@ -187,6 +189,7 @@ function bsi_leads_render_page(): void
       <?php $table->display(); ?>
     </form>
     </div>
+    <?php bsi_leads_export_render_modal($period); ?>
   </div>
   <?php
 }
