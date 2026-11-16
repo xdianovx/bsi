@@ -11,23 +11,53 @@
 
 defined('ABSPATH') || exit;
 
-/** Колонки выгрузки: ключ => [подпись, ширина в символах, включена по умолчанию]. */
+/** Колонки выгрузки: ключ => [подпись, ширина в символах, включена по умолчанию, группа в модалке]. */
 function bsi_leads_export_columns(): array
 {
   return [
-    'id' => ['№', 7, false],
-    'created_at' => ['Дата', 17, true],
-    'form' => ['Форма', 20, true],
-    'title' => ['Что / страница', 40, true],
-    'page_url' => ['Ссылка на страницу', 45, false],
-    'name' => ['Имя', 24, true],
-    'phone' => ['Телефон', 18, true],
-    'email' => ['Email', 28, true],
-    'payload' => ['Поля заявки (каждое — своей колонкой)', 0, true],
-    'utm' => ['UTM-метки (source, medium, campaign)', 0, false],
-    'mail_sent' => ['Письмо ушло', 13, false],
+    'created_at' => ['Дата', 17, true, 'main'],
+    'form' => ['Форма', 20, true, 'main'],
+    'title' => ['Что / страница', 40, true, 'main'],
+    'id' => ['№', 7, false, 'main'],
+    'name' => ['Имя', 24, true, 'contacts'],
+    'phone' => ['Телефон', 18, true, 'contacts'],
+    'email' => ['Email', 28, true, 'contacts'],
+    'payload' => ['Поля заявки', 0, true, 'details'],
+    'utm' => ['UTM-метки', 0, false, 'details'],
+    'page_url' => ['Ссылка на страницу', 45, false, 'details'],
+    'mail_sent' => ['Письмо ушло', 13, false, 'details'],
   ];
 }
+
+/**
+ * AJAX для модалки: сколько заявок по каждой форме за период (from/to в Y-m-d).
+ * Только счётчики, без персональных данных.
+ */
+add_action('wp_ajax_bsi_leads_export_count', function () {
+  if (!current_user_can('manage_options')) {
+    wp_send_json_error(null, 403);
+  }
+  check_ajax_referer('bsi_leads_export', 'nonce');
+
+  $tz = wp_timezone();
+  $from = DateTimeImmutable::createFromFormat('!Y-m-d', sanitize_text_field(wp_unslash($_POST['from'] ?? '')), $tz);
+  $to = DateTimeImmutable::createFromFormat('!Y-m-d', sanitize_text_field(wp_unslash($_POST['to'] ?? '')), $tz);
+  if (!$from || !$to) {
+    wp_send_json_success(['forms' => new stdClass()]);
+  }
+  if ($from > $to) {
+    [$from, $to] = [$to, $from];
+  }
+
+  global $wpdb;
+  $rows = $wpdb->get_results($wpdb->prepare(
+    'SELECT form, COUNT(*) c FROM ' . bsi_leads_table_name() . ' WHERE created_at >= %s AND created_at < %s GROUP BY form',
+    $from->format('Y-m-d H:i:s'),
+    $to->modify('+1 day')->format('Y-m-d H:i:s')
+  ), ARRAY_A);
+
+  wp_send_json_success(['forms' => (object) array_map('intval', array_column($rows, 'c', 'form'))]);
+});
 
 /** Подписи полей payload для шапки. Неизвестный ключ выводится как есть. */
 function bsi_leads_export_payload_labels(): array
@@ -196,6 +226,17 @@ function bsi_leads_export_send(): void
   }
 
   $filename = sprintf('zayavki_%s_%s.xlsx', $from->format('Y-m-d'), $to->format('Y-m-d'));
+  // Метка для модалки: по ней кнопка понимает, что файл готов, и снимает «Готовим файл…».
+  $token = preg_replace('/\D/', '', (string) ($_POST['download_token'] ?? ''));
+  if ($token !== '') {
+    setcookie('bsi_leads_export_done', $token, [
+      'expires' => time() + 10 * MINUTE_IN_SECONDS,
+      'path' => '/',
+      'secure' => is_ssl(),
+      'httponly' => false,
+      'samesite' => 'Lax',
+    ]);
+  }
   nocache_headers();
   header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -408,69 +449,118 @@ function bsi_leads_export_build_xlsx(string $path, array $columns, array $rows, 
   }
 }
 
-/** Кнопка рядом с заголовком и модалка. Вызывается из bsi_leads_render_page(). */
+/** Модалка выгрузки. Вызывается из bsi_leads_render_page(); открывается кнопкой .js-bsi-leads-export-open. */
 function bsi_leads_export_render_modal(array $period): void
 {
+  global $wpdb;
+
   $current_form = isset($_GET['form']) ? sanitize_key(wp_unslash($_GET['form'])) : '';
+  $first = $wpdb->get_var('SELECT MIN(created_at) FROM ' . bsi_leads_table_name());
+  $min_date = $first ? substr((string) $first, 0, 10) : current_datetime()->format('Y-m-d');
+  $presets = ['7' => '7 дней', '30' => '30 дней', '90' => '90 дней', 'month' => 'Этот месяц', 'prev-month' => 'Прошлый месяц', '365' => 'Год', 'all' => 'Всё время'];
+  $groups = ['main' => 'Основное', 'contacts' => 'Контакты', 'details' => 'Подробности'];
+  $columns = bsi_leads_export_columns();
+  $hints = [
+    'payload' => 'каждое поле — своя колонка',
+    'utm' => 'source, medium, campaign',
+  ];
   ?>
-  <dialog class="bsi-leads-export js-bsi-leads-export">
+  <dialog class="bsi-leads-export is-hide-empty js-bsi-leads-export" data-min="<?php echo esc_attr($min_date); ?>">
     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="bsi-leads-export__form js-bsi-leads-export-form">
       <input type="hidden" name="action" value="bsi_leads_export">
+      <input type="hidden" name="download_token" value="">
       <?php wp_nonce_field('bsi_leads_export'); ?>
 
       <div class="bsi-leads-export__head">
-        <h2 class="bsi-leads-export__title">Выгрузить в Excel</h2>
-        <button type="button" class="bsi-leads-export__close js-bsi-leads-export-close">×</button>
+        <h2 class="bsi-leads-export__title">Выгрузка заявок в Excel</h2>
+        <button type="button" class="bsi-leads-export__close js-bsi-leads-export-close" title="Закрыть">
+          <span class="dashicons dashicons-no-alt"></span>
+        </button>
       </div>
 
-      <div class="bsi-leads-export__section">
-        <div class="bsi-leads-export__label">Период</div>
-        <div class="bsi-leads-export__presets">
-          <?php foreach (['7' => '7 дней', '30' => '30 дней', '90' => '90 дней', '365' => 'Год', 'month' => 'Этот месяц', 'prev-month' => 'Прошлый месяц'] as $key => $label): ?>
-            <button type="button" class="bsi-leads-export__preset js-bsi-leads-export-preset" data-preset="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></button>
-          <?php endforeach; ?>
-        </div>
-        <div class="bsi-leads-export__dates">
-          <label>с <input type="date" name="from" required value="<?php echo esc_attr($period['from_input']); ?>"></label>
-          <label>по <input type="date" name="to" required value="<?php echo esc_attr($period['to_input']); ?>"></label>
-        </div>
-      </div>
-
-      <div class="bsi-leads-export__section">
-        <div class="bsi-leads-export__label">
-          Формы
-          <button type="button" class="button-link js-bsi-leads-export-toggle" data-group="forms">выбрать все / снять</button>
-        </div>
-        <div class="bsi-leads-export__checks">
-          <?php foreach (bsi_leads_form_labels() as $key => $label): ?>
-            <label class="bsi-leads-export__check">
-              <input type="checkbox" name="forms[]" value="<?php echo esc_attr($key); ?>"<?php checked($current_form === '' || $current_form === $key); ?>>
-              <?php echo esc_html($label); ?>
+      <div class="bsi-leads-export__body">
+        <section class="bsi-leads-export__section">
+          <div class="bsi-leads-export__section-head">
+            <span class="bsi-leads-export__section-title">Период</span>
+          </div>
+          <div class="bsi-leads-export__presets">
+            <?php foreach ($presets as $key => $label): ?>
+              <button type="button" class="bsi-leads-export__preset js-bsi-leads-export-preset" data-preset="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></button>
+            <?php endforeach; ?>
+          </div>
+          <div class="bsi-leads-export__dates">
+            <label class="bsi-leads-export__date">
+              <span>С</span>
+              <input type="date" name="from" required value="<?php echo esc_attr($period['from_input']); ?>">
             </label>
-          <?php endforeach; ?>
-        </div>
-      </div>
-
-      <div class="bsi-leads-export__section">
-        <div class="bsi-leads-export__label">
-          Колонки
-          <button type="button" class="button-link js-bsi-leads-export-toggle" data-group="columns">выбрать все / снять</button>
-        </div>
-        <div class="bsi-leads-export__checks">
-          <?php foreach (bsi_leads_export_columns() as $key => $def): ?>
-            <label class="bsi-leads-export__check">
-              <input type="checkbox" name="columns[]" value="<?php echo esc_attr($key); ?>"<?php checked($def[2]); ?>>
-              <?php echo esc_html($def[0]); ?>
+            <span class="bsi-leads-export__dash">—</span>
+            <label class="bsi-leads-export__date">
+              <span>По</span>
+              <input type="date" name="to" required value="<?php echo esc_attr($period['to_input']); ?>">
             </label>
-          <?php endforeach; ?>
-        </div>
+          </div>
+        </section>
+
+        <section class="bsi-leads-export__section">
+          <div class="bsi-leads-export__section-head">
+            <span class="bsi-leads-export__section-title">Формы <span class="bsi-leads-export__counter js-bsi-leads-export-counter" data-group="forms"></span></span>
+            <span class="bsi-leads-export__links">
+              <button type="button" class="button-link js-bsi-leads-export-select" data-group="forms" data-mode="all">Все</button>
+              <button type="button" class="button-link js-bsi-leads-export-select" data-group="forms" data-mode="nonempty">С заявками</button>
+              <button type="button" class="button-link js-bsi-leads-export-select" data-group="forms" data-mode="none">Снять</button>
+            </span>
+          </div>
+          <div class="bsi-leads-export__forms">
+            <?php foreach (bsi_leads_form_labels() as $key => $label): ?>
+              <label class="bsi-leads-export__option js-bsi-leads-export-form-option" data-form="<?php echo esc_attr($key); ?>">
+                <input type="checkbox" name="forms[]" value="<?php echo esc_attr($key); ?>"<?php checked($current_form === '' || $current_form === $key); ?>>
+                <span class="bsi-leads-export__option-label"><?php echo esc_html($label); ?></span>
+                <span class="bsi-leads-export__option-count js-bsi-leads-export-count"></span>
+              </label>
+            <?php endforeach; ?>
+          </div>
+          <button type="button" class="button-link bsi-leads-export__more js-bsi-leads-export-more" hidden></button>
+        </section>
+
+        <section class="bsi-leads-export__section">
+          <div class="bsi-leads-export__section-head">
+            <span class="bsi-leads-export__section-title">Колонки <span class="bsi-leads-export__counter js-bsi-leads-export-counter" data-group="columns"></span></span>
+            <span class="bsi-leads-export__links">
+              <button type="button" class="button-link js-bsi-leads-export-select" data-group="columns" data-mode="all">Все</button>
+              <button type="button" class="button-link js-bsi-leads-export-select" data-group="columns" data-mode="default">По умолчанию</button>
+            </span>
+          </div>
+          <div class="bsi-leads-export__groups">
+            <?php foreach ($groups as $group => $group_label): ?>
+              <div class="bsi-leads-export__group">
+                <div class="bsi-leads-export__group-title"><?php echo esc_html($group_label); ?></div>
+                <?php foreach ($columns as $key => $def):
+                  if ($def[3] !== $group) {
+                    continue;
+                  } ?>
+                  <label class="bsi-leads-export__option bsi-leads-export__option--column">
+                    <input type="checkbox" name="columns[]" value="<?php echo esc_attr($key); ?>" data-default="<?php echo $def[2] ? '1' : '0'; ?>"<?php checked($def[2]); ?>>
+                    <span class="bsi-leads-export__option-label">
+                      <?php echo esc_html($def[0]); ?>
+                      <?php if (isset($hints[$key])): ?><span class="bsi-leads-export__option-hint"><?php echo esc_html($hints[$key]); ?></span><?php endif; ?>
+                    </span>
+                  </label>
+                <?php endforeach; ?>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </section>
       </div>
 
-      <p class="bsi-leads-export__error js-bsi-leads-export-error" hidden></p>
-
-      <div class="bsi-leads-export__actions">
-        <button type="button" class="button js-bsi-leads-export-close">Отмена</button>
-        <button type="submit" class="button button-primary">Скачать .xlsx</button>
+      <div class="bsi-leads-export__foot">
+        <div class="bsi-leads-export__summary js-bsi-leads-export-summary"></div>
+        <div class="bsi-leads-export__actions">
+          <button type="button" class="button button-large js-bsi-leads-export-close">Отмена</button>
+          <button type="submit" class="button button-primary button-large bsi-leads-export__submit js-bsi-leads-export-submit">
+            <span class="dashicons dashicons-download"></span>
+            <span class="js-bsi-leads-export-submit-text">Скачать .xlsx</span>
+          </button>
+        </div>
       </div>
     </form>
   </dialog>
@@ -483,28 +573,70 @@ add_action('admin_head', function () {
   }
   ?>
   <style>
-    .bsi-leads-export{width:640px;max-width:calc(100vw - 32px);padding:0;border:0;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
-    .bsi-leads-export::backdrop{background:rgba(17,24,39,.45)}
-    .bsi-leads-export__form{display:flex;flex-direction:column;gap:20px;padding:24px}
-    .bsi-leads-export__head{display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .bsi-leads-export__title{margin:0;font-size:20px;line-height:120%}
-    .bsi-leads-export__close{border:0;background:none;font-size:24px;line-height:100%;color:#646970;cursor:pointer;padding:4px}
-    .bsi-leads-export__close:hover{color:#1d2327}
-    .bsi-leads-export__section{display:flex;flex-direction:column;gap:8px}
-    .bsi-leads-export__label{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;color:#1d2327;line-height:140%}
-    .bsi-leads-export__label .button-link{font-size:14px;font-weight:400}
-    .bsi-leads-export__presets{display:flex;flex-wrap:wrap;gap:8px}
-    .bsi-leads-export__preset{padding:4px 12px;border:0;border-radius:6px;background:#f0f0f1;color:#1d2327;font-size:14px;line-height:140%;cursor:pointer}
-    .bsi-leads-export__preset:hover{color:#2271b1}
+    .bsi-leads-export{width:760px;max-width:calc(100vw - 32px);max-height:calc(100vh - 48px);padding:0;border:0;border-radius:12px;background:#fff;color:#1d2327;box-shadow:0 24px 64px rgba(0,0,0,.28);overflow:hidden}
+    .bsi-leads-export[open]{display:flex}
+    .bsi-leads-export::backdrop{background:rgba(17,24,39,.5)}
+    .bsi-leads-export__form{display:flex;flex-direction:column;width:100%;min-height:0}
+    .bsi-leads-export__head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid #f0f0f1}
+    .bsi-leads-export__title{margin:0;padding:0;font-size:20px;font-weight:600;line-height:120%}
+    .bsi-leads-export__close{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:0;border-radius:8px;background:none;color:#646970;cursor:pointer}
+    .bsi-leads-export__close:hover{background:#f0f0f1;color:#1d2327}
+    .bsi-leads-export__body{display:flex;flex-direction:column;gap:24px;padding:20px 24px 24px;overflow-y:auto;min-height:0}
+    .bsi-leads-export__section{display:flex;flex-direction:column;gap:12px}
+    .bsi-leads-export__section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+    .bsi-leads-export__section-title{font-size:16px;font-weight:600;line-height:140%}
+    .bsi-leads-export__counter{margin-left:4px;font-size:14px;font-weight:400;color:#646970}
+    .bsi-leads-export__links{display:flex;gap:16px}
+    .bsi-leads-export__links .button-link{font-size:14px;line-height:140%;text-decoration:none}
+    .bsi-leads-export__links .button-link:hover{text-decoration:underline}
+    .bsi-leads-export__presets{display:flex;flex-wrap:wrap;gap:6px}
+    .bsi-leads-export__preset{min-height:36px;padding:0 12px;border:0;border-radius:8px;background:#f0f0f1;color:#1d2327;font-size:14px;line-height:140%;cursor:pointer;transition:background-color .15s,color .15s}
+    .bsi-leads-export__preset:hover{background:#e4e5e7}
     .bsi-leads-export__preset.is-active{background:#2271b1;color:#fff}
-    .bsi-leads-export__dates{display:flex;flex-wrap:wrap;gap:16px}
-    .bsi-leads-export__dates label{display:flex;align-items:center;gap:8px;font-size:14px}
-    .bsi-leads-export__checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 16px;padding:12px;background:#f6f7f7;border-radius:6px}
-    .bsi-leads-export__check{display:flex;align-items:flex-start;gap:6px;font-size:14px;line-height:140%}
-    .bsi-leads-export__check input{margin-top:2px}
-    .bsi-leads-export__error{margin:0;color:#b32d2e;font-size:14px}
-    .bsi-leads-export__actions{display:flex;justify-content:flex-end;gap:8px}
-    @media (max-width:600px){.bsi-leads-export__checks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .bsi-leads-export__dates{display:flex;align-items:flex-end;gap:12px}
+    .bsi-leads-export__date{display:flex;flex-direction:column;gap:4px;font-size:14px;color:#646970;line-height:140%}
+    .bsi-leads-export__date input[type=date]{min-height:40px;padding:0 10px;border-radius:8px;font-size:14px}
+    .bsi-leads-export__dash{padding-bottom:10px;color:#646970}
+    .bsi-leads-export__forms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+    .bsi-leads-export__option{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;font-size:14px;line-height:140%;cursor:pointer;transition:background-color .15s}
+    .bsi-leads-export__option:hover{background:#f6f7f7}
+    .bsi-leads-export__option input[type=checkbox]{flex:none;margin:2px 0 0}
+    .bsi-leads-export__option-label{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;hyphens:auto}
+    .bsi-leads-export__option-count{flex:none;min-width:20px;padding:0 6px;border-radius:10px;background:#f0f0f1;color:#50575e;font-size:14px;line-height:20px;text-align:center}
+    .bsi-leads-export__option-count:empty{display:none}
+    .bsi-leads-export__option.is-empty .bsi-leads-export__option-label,.bsi-leads-export__option.is-empty .bsi-leads-export__option-count{color:#a7aaad}
+    .bsi-leads-export.is-hide-empty .bsi-leads-export__option.is-empty{display:none}
+    .bsi-leads-export__more{align-self:flex-start;font-size:14px;line-height:140%;text-decoration:none}
+    .bsi-leads-export__more:hover{text-decoration:underline}
+    .bsi-leads-export__more[hidden]{display:none}
+    .bsi-leads-export__option.is-checked .bsi-leads-export__option-count{background:#e5f0fa;color:#135e96}
+    .bsi-leads-export__groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .bsi-leads-export__group{display:flex;flex-direction:column;gap:2px;padding:12px 8px 8px;border-radius:10px;background:#f6f7f7}
+    .bsi-leads-export__group-title{padding:0 10px 4px;font-size:14px;font-weight:600;color:#646970}
+    .bsi-leads-export__option--column:hover{background:#fff}
+    .bsi-leads-export__option-hint{display:block;margin-top:2px;font-size:14px;color:#646970;line-height:140%}
+    .bsi-leads-export__foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-top:1px solid #f0f0f1;background:#fff}
+    .bsi-leads-export__summary{font-size:14px;line-height:140%;color:#50575e}
+    .bsi-leads-export__summary strong{font-size:16px;color:#1d2327}
+    .bsi-leads-export__summary.is-warning{color:#b32d2e}
+    .bsi-leads-export__summary.is-done{color:#008a20}
+    .bsi-leads-export__actions{display:flex;flex:none;gap:8px}
+    .bsi-leads-export__submit{display:inline-flex !important;align-items:center;gap:6px}
+    .bsi-leads-export__submit .dashicons{width:18px;height:18px;font-size:18px}
+    .bsi-leads-export__submit.is-loading .dashicons{animation:bsi-leads-spin .8s linear infinite}
+    .bsi-leads-export__submit.is-loading .dashicons:before{content:"\f463"}
+    @media (max-width:782px){
+      .bsi-leads-export__forms{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .bsi-leads-export__groups{grid-template-columns:1fr}
+      .bsi-leads-export__foot{flex-direction:column;align-items:stretch}
+      .bsi-leads-export__actions{justify-content:flex-end}
+    }
+    @media (max-width:480px){
+      .bsi-leads-export__forms{grid-template-columns:1fr}
+      .bsi-leads-export__dates{flex-wrap:wrap}
+      .bsi-leads-export__date{flex:1 1 0}
+      .bsi-leads-export__dash{display:none}
+    }
   </style>
   <?php
 });
@@ -521,29 +653,159 @@ add_action('admin_footer', function () {
       var form = dialog.querySelector('.js-bsi-leads-export-form');
       var from = form.elements.from;
       var to = form.elements.to;
-      var error = dialog.querySelector('.js-bsi-leads-export-error');
+      var summary = dialog.querySelector('.js-bsi-leads-export-summary');
+      var submit = dialog.querySelector('.js-bsi-leads-export-submit');
+      var submitText = dialog.querySelector('.js-bsi-leads-export-submit-text');
       var presets = dialog.querySelectorAll('.js-bsi-leads-export-preset');
+      var more = dialog.querySelector('.js-bsi-leads-export-more');
+      var storageKey = 'bsi_leads_export_columns';
+      var counts = null;
+      var loading = false;
+      var countTimer = null;
+      var countRequest = 0;
+      var pendingNonempty = false;
 
+      function selectNonempty() {
+        boxes('forms').forEach(function (b) { b.checked = !!counts[b.value]; });
+      }
+
+      function boxes(group) {
+        return Array.prototype.slice.call(form.querySelectorAll('input[name="' + group + '[]"]'));
+      }
       function ymd(d) {
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       }
-      function clearPresets() {
-        presets.forEach(function (b) { b.classList.remove('is-active'); });
+      function plural(n) {
+        var m10 = n % 10, m100 = n % 100;
+        if (m10 === 1 && m100 !== 11) return 'заявка';
+        if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'заявки';
+        return 'заявок';
+      }
+      function presetRange(key) {
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        if (key === 'all') return [dialog.dataset.min, ymd(today)];
+        if (key === 'month') return [ymd(new Date(today.getFullYear(), today.getMonth(), 1)), ymd(today)];
+        if (key === 'prev-month') return [ymd(new Date(today.getFullYear(), today.getMonth() - 1, 1)), ymd(new Date(today.getFullYear(), today.getMonth(), 0))];
+        return [ymd(new Date(today.getFullYear(), today.getMonth(), today.getDate() - Number(key) + 1)), ymd(today)];
+      }
+      // Подсветить пресет, если даты совпадают с ним (в т.ч. после ручного ввода).
+      function syncPresets() {
+        presets.forEach(function (b) {
+          var r = presetRange(b.dataset.preset);
+          b.classList.toggle('is-active', r[0] === from.value && r[1] === to.value);
+        });
       }
 
-      document.addEventListener('click', function (e) {
-        if (e.target.closest('.js-bsi-leads-export-open')) {
-          e.preventDefault();
-          // Период по умолчанию — тот, что сейчас открыт на странице (он меняется без перезагрузки).
-          var custom = document.querySelector('.bsi-leads__custom');
-          if (custom) {
-            from.value = custom.elements.from.value;
-            to.value = custom.elements.to.value;
+      function render() {
+        ['forms', 'columns'].forEach(function (group) {
+          var list = boxes(group);
+          var on = list.filter(function (b) { return b.checked; }).length;
+          dialog.querySelector('.js-bsi-leads-export-counter[data-group="' + group + '"]').textContent = on + ' из ' + list.length;
+        });
+
+        var total = 0;
+        var empty = 0;
+        dialog.querySelectorAll('.js-bsi-leads-export-form-option').forEach(function (option) {
+          var box = option.querySelector('input');
+          var n = counts ? (counts[option.dataset.form] || 0) : null;
+          option.querySelector('.js-bsi-leads-export-count').textContent = n === null ? '' : n;
+          option.classList.toggle('is-empty', n === 0);
+          option.classList.toggle('is-checked', box.checked);
+          if (box.checked && n) total += n;
+          if (n === 0) empty++;
+        });
+        // Формы без заявок за период свёрнуты, чтобы не мешали.
+        more.hidden = !empty;
+        more.textContent = dialog.classList.contains('is-hide-empty') ? 'Показать формы без заявок (' + empty + ')' : 'Скрыть формы без заявок';
+
+        if (loading) return;
+        var formsOn = boxes('forms').some(function (b) { return b.checked; });
+        var columnsOn = boxes('columns').some(function (b) { return b.checked; });
+        var message = '';
+        var warning = true;
+        if (!from.value || !to.value) message = 'Укажите даты периода';
+        else if (!formsOn) message = 'Выберите хотя бы одну форму';
+        else if (!columnsOn) message = 'Выберите хотя бы одну колонку';
+        else if (counts === null) { message = 'Считаем заявки…'; warning = false; }
+        else if (!total) message = 'За этот период по выбранным формам заявок нет';
+        else { message = 'Будет выгружено: <strong>' + total + '</strong> ' + plural(total); warning = false; }
+
+        summary.innerHTML = message;
+        summary.classList.toggle('is-warning', warning);
+        summary.classList.remove('is-done');
+        submit.disabled = warning;
+      }
+
+      function loadCounts() {
+        clearTimeout(countTimer);
+        counts = null;
+        render();
+        if (!from.value || !to.value) return;
+        countTimer = setTimeout(function () {
+          var id = ++countRequest;
+          var data = new FormData();
+          data.append('action', 'bsi_leads_export_count');
+          data.append('nonce', form.elements._wpnonce.value);
+          data.append('from', from.value);
+          data.append('to', to.value);
+          fetch(window.ajaxurl, { method: 'POST', credentials: 'same-origin', body: data })
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+              if (id !== countRequest) return;
+              counts = json && json.success ? json.data.forms : {};
+              // «С заявками» нажали, пока счётчики грузились, — применяем сейчас.
+              if (pendingNonempty) selectNonempty();
+              pendingNonempty = false;
+              render();
+            })
+            .catch(function () {
+              if (id !== countRequest) return;
+              counts = {};
+              render();
+            });
+        }, 200);
+      }
+
+      function saveColumns() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(boxes('columns').filter(function (b) { return b.checked; }).map(function (b) { return b.value; })));
+        } catch (e) {}
+      }
+      function restoreColumns() {
+        try {
+          var saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+          if (Array.isArray(saved) && saved.length) {
+            boxes('columns').forEach(function (b) { b.checked = saved.indexOf(b.value) !== -1; });
           }
-          clearPresets();
-          error.hidden = true;
-          dialog.showModal();
+        } catch (e) {}
+      }
+
+      function setLoading(state) {
+        loading = state;
+        submit.classList.toggle('is-loading', state);
+        submit.disabled = state;
+        submitText.textContent = state ? 'Готовим файл…' : 'Скачать .xlsx';
+        if (state) {
+          summary.innerHTML = 'Собираем таблицу, скачивание начнётся само';
+          summary.classList.remove('is-warning', 'is-done');
         }
+      }
+
+      restoreColumns();
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.js-bsi-leads-export-open')) return;
+        e.preventDefault();
+        // Период по умолчанию — тот, что сейчас открыт на странице (меняется без перезагрузки).
+        var custom = document.querySelector('.bsi-leads__custom');
+        if (custom) {
+          from.value = custom.elements.from.value;
+          to.value = custom.elements.to.value;
+        }
+        syncPresets();
+        dialog.showModal();
+        loadCounts();
       });
 
       dialog.addEventListener('click', function (e) {
@@ -553,45 +815,73 @@ add_action('admin_footer', function () {
         }
         var preset = e.target.closest('.js-bsi-leads-export-preset');
         if (preset) {
-          var now = new Date();
-          var start, end = now;
-          var key = preset.dataset.preset;
-          if (key === 'month') {
-            start = new Date(now.getFullYear(), now.getMonth(), 1);
-          } else if (key === 'prev-month') {
-            start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            end = new Date(now.getFullYear(), now.getMonth(), 0);
-          } else {
-            start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - Number(key) + 1);
-          }
-          from.value = ymd(start);
-          to.value = ymd(end);
-          clearPresets();
-          preset.classList.add('is-active');
+          var r = presetRange(preset.dataset.preset);
+          from.value = r[0];
+          to.value = r[1];
+          syncPresets();
+          loadCounts();
           return;
         }
-        var toggle = e.target.closest('.js-bsi-leads-export-toggle');
-        if (toggle) {
-          var boxes = form.querySelectorAll('input[name="' + toggle.dataset.group + '[]"]');
-          var allOn = Array.prototype.every.call(boxes, function (b) { return b.checked; });
-          boxes.forEach(function (b) { b.checked = !allOn; });
+        if (e.target.closest('.js-bsi-leads-export-more')) {
+          dialog.classList.toggle('is-hide-empty');
+          render();
+          return;
+        }
+        var select = e.target.closest('.js-bsi-leads-export-select');
+        if (select) {
+          var mode = select.dataset.mode;
+          if (mode === 'nonempty') {
+            if (counts) selectNonempty();
+            else pendingNonempty = true;
+            render();
+            return;
+          }
+          pendingNonempty = false;
+          boxes(select.dataset.group).forEach(function (b) {
+            if (mode === 'all') b.checked = true;
+            else if (mode === 'none') b.checked = false;
+            else if (mode === 'default') b.checked = b.dataset.default === '1';
+          });
+          if (select.dataset.group === 'columns') saveColumns();
+          render();
         }
       });
 
-      [from, to].forEach(function (input) { input.addEventListener('input', clearPresets); });
-
-      form.addEventListener('submit', function (e) {
-        var msg = '';
-        if (!form.querySelector('input[name="forms[]"]:checked')) msg = 'Выберите хотя бы одну форму.';
-        else if (!form.querySelector('input[name="columns[]"]:checked')) msg = 'Выберите хотя бы одну колонку.';
-        if (msg) {
-          e.preventDefault();
-          error.textContent = msg;
-          error.hidden = false;
+      form.addEventListener('change', function (e) {
+        if (e.target === from || e.target === to) {
+          syncPresets();
+          loadCounts();
           return;
         }
-        error.hidden = true;
-        setTimeout(function () { dialog.close(); }, 300);
+        if (e.target.name === 'columns[]') saveColumns();
+        render();
+      });
+
+      form.addEventListener('submit', function (e) {
+        if (submit.disabled) {
+          e.preventDefault();
+          return;
+        }
+        var token = String(Date.now());
+        form.elements.download_token.value = token;
+        setLoading(true);
+        var started = Date.now();
+        var timer = setInterval(function () {
+          var done = document.cookie.split('; ').some(function (row) { return row === 'bsi_leads_export_done=' + token; });
+          if (!done && Date.now() - started < 120000) return;
+          clearInterval(timer);
+          document.cookie = 'bsi_leads_export_done=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+          setLoading(false);
+          render();
+          if (done) {
+            summary.textContent = 'Файл скачан';
+            summary.classList.add('is-done');
+            setTimeout(function () { if (dialog.open) dialog.close(); }, 1200);
+          } else {
+            summary.textContent = 'Скачивание не началось. Попробуйте ещё раз';
+            summary.classList.add('is-warning');
+          }
+        }, 500);
       });
     })();
   </script>
