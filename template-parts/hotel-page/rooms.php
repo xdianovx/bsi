@@ -239,8 +239,8 @@ foreach ($calendar as $date => $entry) {
               <?php endif; ?>
             </ul>
 
-            <?php if ($room['description'] !== ''): ?>
-              <p class="hp-room__descr"><?= esc_html($room['description']); ?></p>
+            <?php if (trim(wp_strip_all_tags($room['description_html'] ?? '')) !== ''): ?>
+              <div class="hp-room__descr"><?= $room['description_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- экранировано в view.php ?></div>
             <?php endif; ?>
 
             <?php /* Удобства номера — иконкой с подписью: их немного, и они

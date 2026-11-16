@@ -357,6 +357,7 @@ function bsi_hotel_view_api_rooms(array $hotel): array
       'id' => (string) ($room['id'] ?? ''),
       'name' => (string) ($room['name'] ?? ''),
       'description' => (string) ($room['description'] ?? ''),
+      'description_html' => wpautop(esc_html((string) ($room['description'] ?? ''))),
       'area' => ((float) ($room['area_m2'] ?? 0)) > 0 ? $room['area_m2'] : null,
       'max_adults' => (int) ($room['max_adults'] ?? 0),
       'max_children' => (int) ($room['max_children'] ?? 0),
@@ -1311,11 +1312,28 @@ function bsi_hotel_view_post_rooms(int $post_id): array
         : ['amount' => (float) $room['price_from'], 'currency' => $currency];
     }
 
+    /* Площадь бывает диапазоном: «от» в area, «до» в area_to. */
+    $area_from = (float) ($room['area'] ?? 0);
+    $area_to = (float) ($room['area_to'] ?? 0);
+    $area = null;
+    if ($area_from > 0 && $area_to > $area_from) {
+      $area = $room['area'] . '–' . $room['area_to'];
+    } elseif ($area_from > 0) {
+      $area = $room['area'];
+    } elseif ($area_to > 0) {
+      $area = $room['area_to'];
+    }
+
+    /* Описание — WYSIWYG; старые записи из textarea приходят без <p>,
+       wpautop разобьёт их по переносам строк. */
+    $description = trim((string) ($room['description'] ?? ''));
+
     $result[] = [
       'id' => 'wp-' . $index,
       'name' => (string) ($room['name'] ?? ''),
-      'description' => (string) ($room['description'] ?? ''),
-      'area' => ((float) ($room['area'] ?? 0)) > 0 ? $room['area'] : null,
+      'description' => wp_strip_all_tags($description),
+      'description_html' => $description !== '' ? wp_kses_post(wpautop($description)) : '',
+      'area' => $area,
       'max_adults' => 0,
       'max_children' => 0,
       'max_total' => (int) ($room['guests'] ?? 0),

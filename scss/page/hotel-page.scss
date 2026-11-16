@@ -907,8 +907,21 @@ $hp-nav-offset: 76px;
 }
 
 .hp-room__descr {
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   font-size: 14px;
+
+  p,
+  ul,
+  ol {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    padding-left: 20px;
+  }
 }
 
 /* Лента дат заезда: под описанием номера, над тарифами. */
