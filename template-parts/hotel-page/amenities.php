@@ -18,20 +18,21 @@ $limit = 12;
 $rest = max(0, count($amenities) - $limit);
 $groups = bsi_hotel_view_amenity_groups($amenities);
 $shown = 0;
+$single = count($groups) === 1;
 ?>
 
 <section class="hp-section hp-amenities" id="hotel-amenities">
   <div class="container">
     <h2 class="h2 hp-section__title">Удобства</h2>
 
-    <div class="hp-amenities__groups js-hotel-amenities">
+    <div class="hp-amenities__groups<?= $single ? ' hp-amenities__groups--single' : ''; ?> js-hotel-amenities">
       <?php foreach ($groups as $group => $items): ?>
         <div class="hp-amenities__group">
           <?php if ($group !== ''): ?>
             <h3 class="hp-amenities__group-title"><?= esc_html($group); ?></h3>
           <?php endif; ?>
 
-          <ul class="hp-amenities__list">
+          <ul class="hp-amenities__list<?= $single ? ' hp-amenities__list--columns' : ''; ?>">
             <?php foreach ($items as $amenity):
               $hidden = $shown >= $limit;
               $shown++; ?>

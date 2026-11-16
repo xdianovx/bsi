@@ -49,6 +49,17 @@
     padding-left: 28px;
     padding-right: 28px;
   }
+
+  /* Галерея — во всю ширину белых карточек, текст навигации — по краю их контента. */
+  .hp-gallery>.container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .hp-nav>.container {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
 }
 
 .hp-head__top {
@@ -92,7 +103,7 @@
   gap: 6px;
   margin: 0;
   color: $text-gray;
-  font-size: 15px;
+  font-size: 16px;
 
   svg {
     color: $gray;
@@ -111,6 +122,13 @@
 
 .hp-head__sep {
   color: $gray-light;
+}
+
+.hp-head__address {
+  margin: 4px 0 0;
+  color: $text-gray;
+  font-size: 14px;
+  line-height: 140%;
 }
 
 .hp-head__tags {
@@ -155,10 +173,12 @@
 }
 
 .hp-head__excerpt {
-  margin-top: 12px;
+  /* .editor-content даёт margin-bottom: 64px — из-за него была дыра над тегами. */
+  margin: 12px 0 0;
   max-width: 720px;
   color: $text-gray;
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 140%;
 }
 
 .hp-head__print {
@@ -295,7 +315,8 @@
   display: block;
   padding: 16px 0;
   white-space: nowrap;
-  font-size: 15px;
+  /* 14px: при всех заполненных разделах полоса влезает в ширину карточки без скролла. */
+  font-size: 14px;
   color: $text-gray;
   border-bottom: 2px solid transparent;
   transition: $trans-text;
@@ -922,6 +943,14 @@ $hp-nav-offset: 76px;
   ol {
     padding-left: 20px;
   }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
 }
 
 /* Лента дат заезда: под описанием номера, над тарифами. */
@@ -1074,7 +1103,7 @@ $hp-nav-offset: 76px;
 
 .hp-amenities__group-title {
   margin: 0 0 8px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: $text-gray;
 }
@@ -1088,11 +1117,21 @@ $hp-nav-offset: 76px;
   list-style: none;
 }
 
+.hp-amenities__groups--single {
+  grid-template-columns: 1fr;
+}
+
+.hp-amenities__list--columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px 32px;
+}
+
 .hp-amenities__item {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 16px;
   color: $text-black;
 
   svg {
@@ -1112,7 +1151,7 @@ $hp-nav-offset: 76px;
 }
 
 .hp-amenities__more {
-  font-size: 15px;
+  font-size: 16px;
   color: $red;
 }
 
@@ -1201,31 +1240,22 @@ $hp-nav-offset: 76px;
 
 .hp-request__box {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) minmax(420px, 1.2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: start;
   gap: 32px;
-  padding: 28px;
-  border-radius: 12px;
-  background: $bg-gray;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px;
+    gap: 24px;
   }
 }
 
 .hp-request__text {
   margin: 0;
+  max-width: 440px;
   color: $text-gray;
-  font-size: 15px;
-}
-
-.hp-request__selected {
-  margin: 12px 0 0;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 140%;
 }
 
 .hp-request__req {
@@ -1249,11 +1279,7 @@ $hp-nav-offset: 76px;
 }
 
 .hp-request__submit {
-  align-self: flex-start;
-
-  @media (max-width: 560px) {
-    width: 100%;
-  }
+  width: 100%;
 }
 
 .hp-policies {

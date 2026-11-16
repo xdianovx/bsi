@@ -30,7 +30,7 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
 
         <h1 class="h1 hp-head__title"><?= esc_html($view['name']); ?></h1>
 
-        <?php if ($view['place'] || $view['address']): ?>
+        <?php if ($view['place']): ?>
           <p class="hp-head__place">
             <?php /* Флаг страны вместо значка метки: он и так есть у страны
                      в админке, и место читается быстрее. Пина держим как запас,
@@ -47,12 +47,15 @@ $amenities = bsi_hotel_view_popular_amenities($view['amenities'], 8);
                 ? '<a href="' . esc_url($place['url']) . '">' . esc_html($place['label']) . '</a>'
                 : '<span>' . esc_html($place['label']) . '</span>';
             }
-            if ($view['address'] !== '') {
-              $chunks[] = '<span>' . esc_html($view['address']) . '</span>';
-            }
             echo implode('<span class="hp-head__sep">·</span>', $chunks);
             ?>
           </p>
+        <?php endif; ?>
+
+        <?php /* Адрес длинный и переносится — отдельной строкой, а не через точку
+                 после региона: иначе точка повисает в конце первой строки. */ ?>
+        <?php if ($view['address'] !== ''): ?>
+          <p class="hp-head__address"><?= esc_html($view['address']); ?></p>
         <?php endif; ?>
 
         <?php if (trim((string) $view['excerpt']) !== ''): ?>

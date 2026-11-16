@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Заявка на отель. Сюда ведут кнопки тарифов, у которых нет ссылки на бронирование.
+ * Заявка на отель: общая форма внизу страницы. Заявка на конкретный номер идёт
+ * через модалку template-parts/hotel-page/request-modal.php (подключается здесь же).
  * Обработчик — inc/requests/ajax-hotel-request.php, JS — js/modules/forms/hotel-request-form.js.
  *
  * @var array $args ['view' => view-модель]
@@ -21,7 +22,6 @@ if (!$view) {
         <p class="hp-request__text">
           Подберём номер в отеле «<?= esc_html($view['name']); ?>» на ваши даты и пришлём точную цену.
         </p>
-        <p class="hp-request__selected js-hotel-request-selected" hidden></p>
       </div>
 
       <form class="hp-request__form js-hotel-request-form" novalidate>
@@ -34,27 +34,27 @@ if (!$view) {
         <input type="hidden" name="offer_price" class="js-form-offer-price">
 
         <div class="form-row form-row-2">
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="hotel-request-name">Имя <span class="hp-request__req">*</span></label>
             <input type="text" id="hotel-request-name" name="name" required data-field="name" autocomplete="name" placeholder="Ваше имя">
             <span class="form-error js-field-error" data-error-for="name"></span>
           </div>
 
-          <div class="input-item">
+          <div class="input-item input-item--stacked">
             <label for="hotel-request-phone">Телефон <span class="hp-request__req">*</span></label>
             <input type="tel" id="hotel-request-phone" name="phone" class="js-phone-mask" required data-field="phone" autocomplete="tel" placeholder="+7 (___) ___-__-__">
             <span class="form-error js-field-error" data-error-for="phone"></span>
           </div>
         </div>
 
-        <div class="input-item">
+        <div class="input-item input-item--stacked">
           <label for="hotel-request-comment">Комментарий</label>
           <textarea id="hotel-request-comment" name="comment" rows="3" data-field="comment" placeholder="Даты, состав гостей, пожелания"></textarea>
           <span class="form-error js-field-error" data-error-for="comment"></span>
         </div>
 
         <?php bsi_render_privacy_consent_checkbox([
-          'variant' => 'modal',
+          'variant' => 'input-item',
           'checkbox_id' => 'hotel-request-privacy',
           'html_required' => true,
         ]); ?>
@@ -66,3 +66,5 @@ if (!$view) {
     </div>
   </div>
 </section>
+
+<?php get_template_part('template-parts/hotel-page/request-modal', null, ['view' => $view]); ?>

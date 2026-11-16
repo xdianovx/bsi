@@ -346,7 +346,7 @@ foreach ($calendar as $date => $entry) {
                  target="_blank"
                  rel="nofollow noopener">Забронировать</a>
             <?php else: ?>
-              <a class="btn btn-gray sm hp-room__cta" href="#hotel-request">Забронировать</a>
+              <button class="btn btn-accent sm hp-room__cta js-hotel-room-request" type="button">Забронировать</button>
             <?php endif; ?>
           </div>
         </article>
