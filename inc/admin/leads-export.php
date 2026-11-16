@@ -23,10 +23,99 @@ function bsi_leads_export_columns(): array
     'name' => ['Имя', 24, true],
     'phone' => ['Телефон', 18, true],
     'email' => ['Email', 28, true],
-    'payload' => ['Детали заявки', 50, true],
-    'utm' => ['UTM (source / medium / campaign)', 30, false],
+    'payload' => ['Поля заявки (каждое — своей колонкой)', 0, true],
+    'utm' => ['UTM-метки (source, medium, campaign)', 0, false],
     'mail_sent' => ['Письмо ушло', 13, false],
   ];
+}
+
+/** Подписи полей payload для шапки. Неизвестный ключ выводится как есть. */
+function bsi_leads_export_payload_labels(): array
+{
+  return [
+    'comment' => 'Комментарий', 'comments' => 'Комментарий', 'message' => 'Сообщение', 'wishes' => 'Пожелания',
+    'adults' => 'Взрослых', 'adults_count' => 'Взрослых', 'children' => 'Детей', 'children_count' => 'Детей',
+    'children_ages' => 'Возраст детей', 'age' => 'Возраст', 'budget' => 'Бюджет',
+    'check_in' => 'Дата заезда', 'checkin_date' => 'Дата заезда', 'nights' => 'Ночей',
+    'duration' => 'Длительность', 'tour_duration' => 'Длительность тура',
+    'date' => 'Дата', 'date_from' => 'Дата с', 'date_to' => 'Дата по', 'travel_dates' => 'Даты поездки',
+    'city' => 'Город', 'country' => 'Страна', 'citizenship' => 'Гражданство', 'region' => 'Регион',
+    'resort' => 'Курорт', 'resort_name' => 'Курорт',
+    'company' => 'Компания', 'company_name' => 'Компания', 'inn' => 'ИНН', 'client_type' => 'Тип клиента',
+    'hotel' => 'Отель', 'hotel_title' => 'Отель', 'hotel_stars' => 'Звёздность', 'room_name' => 'Номер',
+    'accommodation' => 'Размещение', 'offer_dates' => 'Даты тарифа', 'offer_meal' => 'Питание', 'offer_price' => 'Цена тарифа',
+    'quantity' => 'Количество', 'sector' => 'Сектор',
+    'event_date' => 'Дата события', 'event_time' => 'Время события', 'event_venue' => 'Место проведения',
+    'event_price' => 'Цена события', 'event_details' => 'Детали события', 'event_kind' => 'Тип события',
+    'booking_kind' => 'Вид бронирования', 'price_line' => 'Цена', 'total_price' => 'Итого',
+    'selected_services' => 'Услуги', 'services' => 'Услуги',
+    'program' => 'Программа', 'program_price' => 'Цена программы', 'program_date' => 'Дата программы',
+    'program_duration' => 'Длительность программы', 'program_language' => 'Язык', 'language' => 'Язык',
+    'school_name' => 'Школа', 'resume_name' => 'Резюме',
+    'excursion_date' => 'Дата экскурсии', 'excursion_format' => 'Формат экскурсии',
+    'excursion_transport' => 'Транспорт', 'excursion_type' => 'Тип экскурсии',
+    'insurance_type' => 'Тип страховки', 'visa_type' => 'Тип визы', 'visa_type_label' => 'Тип визы',
+    'visa_country_title' => 'Страна визы',
+    'tour' => 'Тур', 'tour_title' => 'Тур', 'tour_price' => 'Цена тура', 'tour_type' => 'Тип тура',
+    'group_arrival' => 'Групповой заезд', 'claim' => 'Заявка Samo', 'referrer' => 'Откуда пришёл',
+    'sight_title' => 'Достопримечательность', 'sight_country' => 'Страна',
+    'source_page_title' => 'Страница-источник', 'source_page_url' => 'URL источника', 'method' => 'Способ связи',
+  ];
+}
+
+/** Служебные ключи payload, которым не нужна своя колонка. */
+function bsi_leads_export_payload_skip(string $key): bool
+{
+  return in_array($key, ['reply_to', 'booking_context', 'attachments', 'visa_page_slug'], true)
+    || (bool) preg_match('/_(id|ids|nonce)$/', $key);
+}
+
+/**
+ * Колонки листа из выбранных: payload раскрывается в колонку на каждое поле,
+ * которое встречается в выгружаемых заявках (порядок — по частоте), UTM — в три колонки.
+ * Элемент: ['key' => ..., 'label' => ..., 'width' => ...].
+ */
+function bsi_leads_export_sheet_columns(array $selected, array $rows): array
+{
+  $defs = bsi_leads_export_columns();
+  $out = [];
+  foreach ($selected as $col) {
+    if ($col === 'utm') {
+      foreach (['utm_source' => 'utm_source', 'utm_medium' => 'utm_medium', 'utm_campaign' => 'utm_campaign'] as $key => $label) {
+        $out[] = ['key' => $key, 'label' => $label, 'width' => 18];
+      }
+      continue;
+    }
+    if ($col !== 'payload') {
+      $out[] = ['key' => $col, 'label' => $defs[$col][0], 'width' => $defs[$col][1]];
+      continue;
+    }
+
+    $labels = bsi_leads_export_payload_labels();
+    $stats = [];
+    foreach ($rows as $lead) {
+      foreach ($lead['_payload'] as $key => $value) {
+        $key = (string) $key;
+        if (bsi_leads_export_payload_skip($key)) {
+          continue;
+        }
+        $stats[$key]['count'] = ($stats[$key]['count'] ?? 0) + 1;
+        $stats[$key]['len'] = max($stats[$key]['len'] ?? 0, mb_strlen(bsi_leads_export_payload_value($value)));
+      }
+    }
+    uasort($stats, static fn($a, $b) => $b['count'] <=> $a['count']);
+    foreach ($stats as $key => $stat) {
+      $label = $labels[$key] ?? $key;
+      $out[] = ['key' => 'payload:' . $key, 'label' => $label, 'width' => min(45, max(12, mb_strlen($label) + 3, $stat['len'] + 2))];
+    }
+  }
+
+  return $out;
+}
+
+function bsi_leads_export_payload_value($value): string
+{
+  return is_array($value) ? implode(', ', array_map('strval', $value)) : (string) $value;
 }
 
 add_action('admin_post_bsi_leads_export', 'bsi_leads_export_send');
@@ -76,6 +165,14 @@ function bsi_leads_export_send(): void
     $wpdb->prepare('SELECT * FROM ' . bsi_leads_table_name() . " WHERE {$where} ORDER BY created_at ASC, id ASC", $args),
     ARRAY_A
   );
+  foreach ($rows as &$lead) {
+    $lead['_payload'] = $lead['payload'] ? (array) json_decode((string) $lead['payload'], true) : [];
+  }
+  unset($lead);
+  $sheet_columns = bsi_leads_export_sheet_columns($columns, $rows);
+  if (!$sheet_columns) {
+    $sheet_columns = [['key' => 'created_at', 'label' => 'Дата', 'width' => 17]];
+  }
 
   $forms_note = $all_forms ? 'все формы' : implode(', ', array_map(static fn($f) => $labels[$f], $forms));
   $meta = [
@@ -92,7 +189,7 @@ function bsi_leads_export_send(): void
 
   $path = wp_tempnam('bsi-leads.xlsx');
   try {
-    bsi_leads_export_build_xlsx($path, $columns, $rows, $meta);
+    bsi_leads_export_build_xlsx($path, $sheet_columns, $rows, $meta);
   } catch (\Throwable $e) {
     @unlink($path);
     wp_die('Не удалось сформировать файл: ' . esc_html($e->getMessage()));
@@ -112,6 +209,10 @@ function bsi_leads_export_send(): void
 function bsi_leads_export_value(array $lead, string $column)
 {
   $anonymized = !empty($lead['anonymized_at']);
+  if (str_starts_with($column, 'payload:')) {
+    $value = $lead['_payload'][substr($column, 8)] ?? '';
+    return bsi_leads_export_payload_value($value);
+  }
   switch ($column) {
     case 'id':
       return (int) $lead['id'];
@@ -127,19 +228,6 @@ function bsi_leads_export_value(array $lead, string $column)
     case 'email':
       $value = (string) ($lead[$column] ?? '');
       return $value === '' && $anonymized ? 'обезличено' : $value;
-    case 'payload':
-      if ($anonymized && empty($lead['payload'])) {
-        return 'обезличено';
-      }
-      $payload = $lead['payload'] ? (array) json_decode((string) $lead['payload'], true) : [];
-      $lines = [];
-      foreach ($payload as $key => $value) {
-        $value = is_array($value) ? implode(', ', array_map('strval', $value)) : (string) $value;
-        $lines[] = $key . ': ' . $value;
-      }
-      return implode("\n", $lines);
-    case 'utm':
-      return implode(' / ', array_filter([$lead['utm_source'], $lead['utm_medium'], $lead['utm_campaign']]));
     case 'mail_sent':
       return $lead['mail_sent'] ? 'да' : 'нет';
     default:
@@ -170,7 +258,6 @@ function bsi_leads_export_col(int $index): string
  */
 function bsi_leads_export_build_xlsx(string $path, array $columns, array $rows, array $meta): void
 {
-  $defs = bsi_leads_export_columns();
   $last_col = bsi_leads_export_col(count($columns) - 1);
   $header_row = 3;
   $last_row = $header_row + max(1, count($rows));
@@ -187,7 +274,7 @@ function bsi_leads_export_build_xlsx(string $path, array $columns, array $rows, 
     . '<sheetFormatPr defaultRowHeight="15"/><cols>');
   foreach ($columns as $i => $col) {
     $n = $i + 1;
-    fwrite($fh, '<col min="' . $n . '" max="' . $n . '" width="' . $defs[$col][1] . '" customWidth="1"/>');
+    fwrite($fh, '<col min="' . $n . '" max="' . $n . '" width="' . $col['width'] . '" customWidth="1"/>');
   }
   fwrite($fh, '</cols><sheetData>');
 
@@ -198,7 +285,7 @@ function bsi_leads_export_build_xlsx(string $path, array $columns, array $rows, 
 
   fwrite($fh, '<row r="' . $header_row . '" ht="30" customHeight="1">');
   foreach ($columns as $i => $col) {
-    fwrite($fh, $text_cell(bsi_leads_export_col($i) . $header_row, $defs[$col][0], 3));
+    fwrite($fh, $text_cell(bsi_leads_export_col($i) . $header_row, $col['label'], 3));
   }
   fwrite($fh, '</row>');
 
@@ -209,7 +296,7 @@ function bsi_leads_export_build_xlsx(string $path, array $columns, array $rows, 
     $cells = '';
     foreach ($columns as $i => $col) {
       $ref = bsi_leads_export_col($i) . $row_num;
-      $value = bsi_leads_export_value($lead, $col);
+      $value = bsi_leads_export_value($lead, $col['key']);
       if (is_array($value)) {
         $cells .= '<c r="' . $ref . '" s="' . ($zebra ? 7 : 5) . '"><v>' . sprintf('%.10F', $value['date']) . '</v></c>';
         continue;
@@ -221,7 +308,7 @@ function bsi_leads_export_build_xlsx(string $path, array $columns, array $rows, 
       // Высоту строки Excel при открытии сам не пересчитывает — оцениваем по переносам.
       $lines = 0;
       foreach (explode("\n", $value) as $line) {
-        $lines += max(1, (int) ceil(mb_strlen($line) / max(1, $defs[$col][1] - 2)));
+        $lines += max(1, (int) ceil(mb_strlen($line) / max(1, $col['width'] - 2)));
       }
       $lines_max = max($lines_max, $lines);
       $cells .= $text_cell($ref, $value, $zebra ? 6 : 4);
