@@ -909,10 +909,6 @@ $hp-nav-offset: 76px;
 .hp-room__descr {
   margin: 0;
   font-size: 14px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* Лента дат заезда: под описанием номера, над тарифами. */

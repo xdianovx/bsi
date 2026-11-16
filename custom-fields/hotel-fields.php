@@ -330,7 +330,7 @@ function bsi_register_hotel_acf_groups(): void
       ],
       [
         'key' => 'field_hotel_sec_spa',
-        'label' => 'Spa и оздоровление',
+        'label' => 'СПА и оздоровление',
         'name' => 'sec_spa',
         'type' => 'wysiwyg',
         'tabs' => 'all',

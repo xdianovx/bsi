@@ -1208,7 +1208,7 @@ function bsi_hotel_view_post_sections(int $post_id): array
     'sec_infrastructure' => 'Инфраструктура',
     'sec_meals' => 'Питание',
     'sec_restaurants' => 'Рестораны и бары',
-    'sec_spa' => 'Spa и оздоровление',
+    'sec_spa' => 'СПА и оздоровление',
     'sec_sport' => 'Спорт и развлечения',
     'sec_kids' => 'Для детей',
     'sec_mice' => 'MICE',
