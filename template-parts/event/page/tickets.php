@@ -60,7 +60,7 @@ if ($selected === '' || !in_array($selected, array_column($sectors, 'name'), tru
           </span>
           <?php foreach ($keys as $key): ?>
             <?php $sp = $sec['prices'][$key] ?? null; ?>
-            <span class="ui-option__price numfont<?= $sp ? ' js-event-price' : ''; ?>" data-offer-key="<?= esc_attr($key); ?>"<?= bsi_event_price_attrs($sp, true); ?><?= $key !== $first_key ? ' hidden' : ''; ?>><?= esc_html($sp ? bsi_event_price_text($sp, true) : 'по запросу'); ?></span>
+            <span class="ui-option__price numfont<?= $sp ? ' js-event-price' : ''; ?>" data-offer-key="<?= esc_attr($key); ?>"<?= bsi_event_price_attrs($sp); ?><?= $key !== $first_key ? ' hidden' : ''; ?>><?= esc_html($sp ? bsi_event_price_text($sp) : 'по запросу'); ?></span>
           <?php endforeach; ?>
         </label>
       <?php endforeach; ?>

@@ -216,7 +216,6 @@ export function initEventOffer() {
       if (rub > 0) {
         tourPrice.classList.add("js-event-price");
         tourPrice.dataset.priceRub = String(rub);
-        tourPrice.dataset.hasFrom = "true";
         if (original > 0 && currency) {
           tourPrice.dataset.priceOriginal = String(original);
           tourPrice.dataset.priceCurrency = currency;
@@ -224,7 +223,7 @@ export function initEventOffer() {
           delete tourPrice.dataset.priceOriginal;
           delete tourPrice.dataset.priceCurrency;
         }
-        tourPrice.textContent = `от ${fmtPrice(rub)} ₽`;
+        tourPrice.textContent = `${fmtPrice(rub)} ₽`;
         // Включён «Показать в валюте» — переключатель перепишет текст в валюту.
         document.dispatchEvent(new CustomEvent("education:content-updated"));
       }

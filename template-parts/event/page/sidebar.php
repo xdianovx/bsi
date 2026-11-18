@@ -69,13 +69,13 @@ $date_noun = ['концерт' => 'Концерт', 'матч' => 'Матч'][mb
 
       <?php if ($event['has_tour']): ?>
         <div class="event-offer-summary__price-box"<?= $only('tour'); ?>>
-          <span class="event-offer-summary__price numfont<?= $event['tour_price'] ? ' js-event-price' : ''; ?>" data-offer-summary-price="tour"<?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($event['tour_price'], true); ?>><?= esc_html($event['tour_price'] ? bsi_event_price_text($event['tour_price'], true) : 'Цена по запросу'); ?></span>
+          <span class="event-offer-summary__price numfont<?= $event['tour_price'] ? ' js-event-price' : ''; ?>" data-offer-summary-price="tour"<?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($event['tour_price']); ?>><?= esc_html($event['tour_price'] ? bsi_event_price_text($event['tour_price']) : 'Цена по запросу'); ?></span>
           <span class="event-offer-summary__note">за человека при размещении вдвоём</span>
         </div>
       <?php endif; ?>
       <?php if ($event['has_tickets']): ?>
         <div class="event-offer-summary__price-box"<?= $only('ticket'); ?>>
-          <span class="event-offer-summary__price numfont<?= !empty($offers['ticket_min']) ? ' js-event-price' : ''; ?>" data-offer-summary-price="ticket"<?= bsi_event_price_attrs($offers['ticket_min'] ?? null, true); ?>><?= esc_html(!empty($offers['ticket_min']) ? bsi_event_price_text($offers['ticket_min'], true) : 'по запросу'); ?></span>
+          <span class="event-offer-summary__price numfont<?= !empty($offers['ticket_min']) ? ' js-event-price' : ''; ?>" data-offer-summary-price="ticket"<?= bsi_event_price_attrs($offers['ticket_min'] ?? null); ?>><?= esc_html(!empty($offers['ticket_min']) ? bsi_event_price_text($offers['ticket_min']) : 'по запросу'); ?></span>
           <span class="event-offer-summary__note">за один билет</span>
         </div>
       <?php endif; ?>

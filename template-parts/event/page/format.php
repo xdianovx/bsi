@@ -42,10 +42,10 @@ $tour_price = $event['tour_price'];
             <span class="ui-choice__body">
               <span class="ui-choice__label"><?= esc_html($is_pass ? 'Все дни' : $d['label']); ?></span>
               <?php if ($event['has_tickets']): ?>
-                <span class="ui-choice__sub numfont<?= $ticket_from ? ' js-event-price' : ''; ?>"<?= $only('ticket'); ?><?= bsi_event_price_attrs($ticket_from, true); ?>><?= esc_html($ticket_from ? bsi_event_price_text($ticket_from, true) : ($is_pass ? 'абонемент' : 'по запросу')); ?></span>
+                <span class="ui-choice__sub numfont<?= $ticket_from ? ' js-event-price' : ''; ?>"<?= $only('ticket'); ?><?= bsi_event_price_attrs($ticket_from); ?>><?= esc_html($ticket_from ? bsi_event_price_text($ticket_from) : ($is_pass ? 'абонемент' : 'по запросу')); ?></span>
               <?php endif; ?>
               <?php if ($event['has_tour'] && !$is_pass && !empty($d['hasTour'])): ?>
-                <span class="ui-choice__sub numfont<?= $tour_price ? ' js-event-price' : ''; ?>"<?= $only('tour'); ?><?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price, true); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price, true) : 'тур'); ?></span>
+                <span class="ui-choice__sub numfont<?= $tour_price ? ' js-event-price' : ''; ?>"<?= $only('tour'); ?><?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price) : 'тур'); ?></span>
               <?php elseif ($event['has_tour'] && !$is_pass): ?>
                 <span class="ui-choice__sub"<?= $only('tour'); ?>>только билеты</span>
               <?php endif; ?>
@@ -69,7 +69,7 @@ $tour_price = $event['tour_price'];
             <span class="ui-option__sub" data-offer-tour-on>Билет, отель и программа</span>
             <span class="ui-option__sub" data-offer-tour-off hidden>На эту дату только билеты</span>
           </span>
-          <span class="ui-option__price numfont<?= $tour_price ? ' js-event-price' : ''; ?>" data-offer-tour-on<?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price, true); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price, true) : ''); ?></span>
+          <span class="ui-option__price numfont<?= $tour_price ? ' js-event-price' : ''; ?>" data-offer-tour-on<?= $event['crosstour'] ? ' data-crosstour-price' : ''; ?><?= bsi_event_price_attrs($tour_price); ?>><?= esc_html($tour_price ? bsi_event_price_text($tour_price) : ''); ?></span>
         </label>
         <label class="ui-option<?= $default === 'ticket' ? ' is-active' : ''; ?>" data-offer-format="ticket">
           <input type="radio" class="ui-checkbox__input" name="event_offer_format" value="ticket"<?= $default === 'ticket' ? ' checked' : ''; ?>>
@@ -79,7 +79,7 @@ $tour_price = $event['tour_price'];
             <span class="ui-option__sub">Без проживания и доп. услуг</span>
           </span>
           <?php if (!empty($offers['ticket_min'])): ?>
-            <span class="ui-option__price numfont js-event-price"<?= bsi_event_price_attrs($offers['ticket_min'], true); ?>><?= esc_html(bsi_event_price_text($offers['ticket_min'], true)); ?></span>
+            <span class="ui-option__price numfont js-event-price"<?= bsi_event_price_attrs($offers['ticket_min']); ?>><?= esc_html(bsi_event_price_text($offers['ticket_min'])); ?></span>
           <?php endif; ?>
         </label>
       </div>

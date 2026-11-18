@@ -38,7 +38,6 @@ const renderPrice = (offer) => {
   document.querySelectorAll("[data-crosstour-price]").forEach((el) => {
     el.classList.add("js-event-price");
     el.dataset.priceRub = String(rub);
-    el.dataset.hasFrom = "true";
     delete el.dataset.priceSuffix;
     if (orig && cur) {
       el.dataset.priceOriginal = String(orig);
@@ -47,7 +46,7 @@ const renderPrice = (offer) => {
       delete el.dataset.priceOriginal;
       delete el.dataset.priceCurrency;
     }
-    el.textContent = `от ${fmtPrice(rub)} ₽`;
+    el.textContent = `${fmtPrice(rub)} ₽`;
   });
 
   // Пусть переключатель валют пересчитает (и применит сохранённое предпочтение).
@@ -122,12 +121,11 @@ const renderPackages = (hotels) => {
     if (h && Number(h.price_rub) > 0) {
       priceEl.classList.add("js-event-price");
       priceEl.dataset.priceRub = String(Number(h.price_rub));
-      priceEl.dataset.hasFrom = "true";
       if (h.price_original && h.price_currency) {
         priceEl.dataset.priceOriginal = String(h.price_original);
         priceEl.dataset.priceCurrency = String(h.price_currency);
       }
-      priceEl.textContent = `от ${fmtPrice(h.price_rub)} ₽`;
+      priceEl.textContent = `${fmtPrice(h.price_rub)} ₽`;
     } else {
       priceEl.classList.remove("js-event-price");
       ["priceRub", "priceOriginal", "priceCurrency", "hasFrom"].forEach((k) => delete priceEl.dataset[k]);
@@ -171,7 +169,7 @@ const renderHotels = (offer) => {
           : "";
       const priceEl =
         h.price_rub && Number(h.price_rub) > 0
-          ? `<span class="single-event__accommodation-card-price numfont js-event-price" data-price-rub="${Number(h.price_rub)}" data-has-from="true"${origAttr}>от ${fmtPrice(h.price_rub)} ₽</span>`
+          ? `<span class="single-event__accommodation-card-price numfont js-event-price" data-price-rub="${Number(h.price_rub)}"${origAttr}>${fmtPrice(h.price_rub)} ₽</span>`
           : `<span class="single-event__accommodation-card-price numfont">Цена по запросу</span>`;
       // Своя актуальная ссылка на номер (с DOLOAD/датой/ночами); иначе общая тура.
       let hotelUrl = h.booking_url || bookingUrl;
@@ -287,7 +285,7 @@ const priceSpan = (item, cls) => {
     item.price_original && item.price_currency
       ? ` data-price-original="${escapeHtml(item.price_original)}" data-price-currency="${escapeHtml(item.price_currency)}"`
       : "";
-  return `<span class="${cls} numfont js-event-price" data-price-rub="${rub}" data-has-from="true"${orig}>от ${fmtPrice(rub)} ₽</span>`;
+  return `<span class="${cls} numfont js-event-price" data-price-rub="${rub}"${orig}>${fmtPrice(rub)} ₽</span>`;
 };
 
 const cheapest = (list) =>
