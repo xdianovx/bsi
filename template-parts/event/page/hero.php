@@ -63,7 +63,7 @@ $meta = implode(' · ', array_filter([$event['dates_label'], $event['time'], $ev
         <?php if ($price && !$finished): ?>
           <li class="single-event__hero-fact single-event__hero-fact--price">
             <span class="single-event__hero-fact-label">Цена</span>
-            <span class="single-event__hero-fact-value numfont js-event-price"<?= bsi_event_price_attrs($price); ?>><?= esc_html(bsi_event_price_text($price)); ?></span>
+            <span class="single-event__hero-fact-value numfont js-event-price"<?= bsi_event_price_attrs($price, true); ?>><?= esc_html(bsi_event_price_text($price, true)); ?></span>
           </li>
         <?php endif; ?>
       </ul>
@@ -73,7 +73,7 @@ $meta = implode(' · ', array_filter([$event['dates_label'], $event['time'], $ev
       <p class="single-event__hero-meta"><?= esc_html($meta); ?></p>
     <?php endif; ?>
     <?php if ($price && !$finished): ?>
-      <p class="single-event__hero-price numfont js-event-price"<?= bsi_event_price_attrs($price); ?>><?= esc_html(bsi_event_price_text($price)); ?></p>
+      <p class="single-event__hero-price numfont js-event-price"<?= bsi_event_price_attrs($price, true); ?>><?= esc_html(bsi_event_price_text($price, true)); ?></p>
     <?php endif; ?>
 
     <div class="single-event__hero-actions">
