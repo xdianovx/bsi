@@ -309,6 +309,33 @@ function bsi_leads_url(array $period, array $extra = []): string
   return add_query_arg(array_merge($args, $extra), admin_url('admin.php'));
 }
 
+/**
+ * Склеивает строки «Страницы с заявками» по пути страницы: один и тот же адрес
+ * приходит с `#якорем`, без завершающего слеша, с http/www — это одна страница.
+ */
+function bsi_leads_top_pages(array $rows, int $limit = 7): array
+{
+  $pages = [];
+  foreach ($rows as $row) {
+    $url = strtok((string) $row['url'], '#');
+    $path = untrailingslashit((string) wp_parse_url($url, PHP_URL_PATH));
+    $key = $path !== '' ? strtolower(rawurldecode($path)) : $url;
+
+    if (!isset($pages[$key])) {
+      $pages[$key] = ['title' => '', 'url' => home_url(user_trailingslashit($path ?: '/')), 'c' => 0, 'best' => 0];
+    }
+    $pages[$key]['c'] += (int) $row['c'];
+    // Заголовок берём у самого частого варианта.
+    if ($row['title'] !== '' && (int) $row['c'] > $pages[$key]['best']) {
+      $pages[$key]['title'] = $row['title'];
+      $pages[$key]['best'] = (int) $row['c'];
+    }
+  }
+
+  usort($pages, static fn($a, $b) => $b['c'] <=> $a['c']);
+  return array_slice($pages, 0, $limit);
+}
+
 function bsi_leads_render_dashboard(array $period): void
 {
   global $wpdb;
@@ -322,7 +349,7 @@ function bsi_leads_render_dashboard(array $period): void
   $with_utm = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$t} WHERE {$in} AND utm_source <> ''");
 
   $by_form = $wpdb->get_results("SELECT form, COUNT(*) c FROM {$t} WHERE {$in} GROUP BY form ORDER BY c DESC", ARRAY_A);
-  $top_pages = $wpdb->get_results("SELECT title, SUBSTRING_INDEX(page_url, '?', 1) url, COUNT(*) c FROM {$t} WHERE {$in} AND page_url <> '' GROUP BY title, url ORDER BY c DESC LIMIT 7", ARRAY_A);
+  $top_pages = bsi_leads_top_pages($wpdb->get_results("SELECT title, SUBSTRING_INDEX(page_url, '?', 1) url, COUNT(*) c FROM {$t} WHERE {$in} AND page_url <> '' GROUP BY title, url", ARRAY_A));
   $sources = $wpdb->get_results("SELECT IF(utm_source = '', 'без метки', utm_source) src, COUNT(*) c FROM {$t} WHERE {$in} GROUP BY src ORDER BY c DESC LIMIT 7", ARRAY_A);
 
   // График: по дням до 92 дней, дальше — по месяцам.
