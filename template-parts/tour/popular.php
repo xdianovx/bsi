@@ -162,7 +162,7 @@ foreach ($tour_posts as $tour_post) {
       <div class="title-wrap news-slider__title-wrap">
         <div class="news-slider__title-wrap-left">
           <h2 class="h2 news-slider__title">Экскурсионные туры</h2>
-          <div class="slider-arrow-wrap news-slider__arrows-wrap">
+          <div class="slider-arrow-wrap slider-arrow-wrap--on-gray news-slider__arrows-wrap">
             <div class="slider-arrow slider-arrow-prev popular-tours-arrow-prev" tabindex="-1" role="button"
               aria-label="Previous slide" aria-controls="swiper-wrapper-popular-tours" aria-disabled="true">
             </div>
@@ -195,7 +195,7 @@ foreach ($tour_posts as $tour_post) {
         </div>
       </div>
 
-      <div class="promo-filter popular-tours-filter">
+      <div class="promo-filter promo-filter--on-gray popular-tours-filter">
         <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">
           Все
         </button>
@@ -250,7 +250,7 @@ foreach ($tour_posts as $tour_post) {
 
       <?php if ($tours_page_url): ?>
         <div class="popular-tours__all-mob">
-          <a href="<?php echo esc_url($tours_page_url); ?>" class="btn btn-gray">Все туры</a>
+          <a href="<?php echo esc_url($tours_page_url); ?>" class="btn btn-white">Все туры</a>
         </div>
       <?php endif; ?>
 

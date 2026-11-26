@@ -125,7 +125,7 @@ export const sliders = () => {
   });
 
   const newsSectionSlider = new Swiper(".news-slider-slider", {
-    spaceBetween: 16,
+    spaceBetween: 8,
     navigation: {
       nextEl: ".news-slider-arrow-next",
       prevEl: ".news-slider-arrow-prev",
@@ -263,7 +263,7 @@ export const sliders = () => {
   });
 
   const popularHotelsSlider = new Swiper(".popular-hotels-slider", {
-    spaceBetween: 16,
+    spaceBetween: 8,
     loop: true,
 
     navigation: {

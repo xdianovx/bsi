@@ -188,3 +188,7 @@
     }
   }
 }
+/* Стрелки прямо на сером фоне страницы: белые, $bg-gray сливается с $bg-page */
+.slider-arrow-wrap--on-gray .slider-arrow:not(:hover) {
+  background: $bg-color;
+}

@@ -3,7 +3,7 @@
   z-index: 2;
   margin-top: 0;
   padding-top: 16px;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
   /* Блок лежит вне <header>, поэтому белый фон задаём ему отдельно —
      иначе на страницах с серым фоном он серый. */
   background: $bg-color;

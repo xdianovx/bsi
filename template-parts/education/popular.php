@@ -436,7 +436,7 @@ $education_archive_url = home_url('/obrazovanie-za-rubezhom/');
             <div class="title-wrap news-slider__title-wrap">
                 <div class="news-slider__title-wrap-left">
                     <h2 class="h2 news-slider__title">Программы образования</h2>
-                    <div class="slider-arrow-wrap news-slider__arrows-wrap">
+                    <div class="slider-arrow-wrap slider-arrow-wrap--on-gray news-slider__arrows-wrap">
                         <div class="slider-arrow slider-arrow-prev popular-education-arrow-prev"
                              tabindex="-1"
                              role="button"
@@ -477,7 +477,7 @@ $education_archive_url = home_url('/obrazovanie-za-rubezhom/');
                 </div>
             </div>
 
-            <div class="promo-filter popular-education-filter">
+            <div class="promo-filter promo-filter--on-gray popular-education-filter">
                 <button class="promo-filter__btn --all active js-promo-filter-btn"
                         data-country="">
                     Все
@@ -567,7 +567,7 @@ $education_archive_url = home_url('/obrazovanie-za-rubezhom/');
             </div>
 
             <div class="popular-education__all-mob">
-                <a href="<?php echo esc_url($education_archive_url); ?>" class="btn btn-gray">Все программы</a>
+                <a href="<?php echo esc_url($education_archive_url); ?>" class="btn btn-white">Все программы</a>
             </div>
 
         </div>

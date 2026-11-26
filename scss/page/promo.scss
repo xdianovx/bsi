@@ -88,6 +88,11 @@
   }
 }
 
+/* Табы стран прямо на сером фоне страницы: белые */
+.promo-filter--on-gray .promo-filter__btn:not(.active):not(:hover) {
+  background: $bg-color;
+}
+
 .promo-filter__flag-wrap {
   width: 28px;
   height: 28px;

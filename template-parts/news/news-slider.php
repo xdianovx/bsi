@@ -52,6 +52,8 @@ $news_query = new WP_Query(bsi_query_args_append_schedule($news_args));
 $news_section_id = isset($args['section_id']) ? trim((string) $args['section_id']) : '';
 $news_extra_class = isset($args['extra_class']) ? trim((string) $args['extra_class']) : '';
 $news_section_class = 'news-slider__section' . ($news_extra_class !== '' ? ' ' . $news_extra_class : '');
+$news_on_gray = !empty($args['on_gray']);
+$news_arrows_mod = $news_on_gray ? ' slider-arrow-wrap--on-gray' : '';
 ?>
 
 <section class="<?php echo esc_attr($news_section_class); ?>" <?php echo $news_section_id !== '' ? 'id="' . esc_attr($news_section_id) . '"' : ''; ?>>
@@ -60,7 +62,7 @@ $news_section_class = 'news-slider__section' . ($news_extra_class !== '' ? ' ' .
     <div class="title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">
         <h2 class="h2 news-slider__title"><?= isset($args['title']) ? esc_html($args['title']) : 'Последние новости' ?></h2>
-        <div class="slider-arrow-wrap news-slider__arrows-wrap">
+        <div class="slider-arrow-wrap<?php echo $news_arrows_mod; ?> news-slider__arrows-wrap">
           <div class="slider-arrow slider-arrow-prev news-slider-arrow-prev">
           </div>
           <div class="slider-arrow slider-arrow-next news-slider-arrow-next">
@@ -103,7 +105,7 @@ $news_section_class = 'news-slider__section' . ($news_extra_class !== '' ? ' ' .
         </div>
       </div>
 
-      <div class="slider-arrow-wrap news-slider__arrows-wrap --mob">
+      <div class="slider-arrow-wrap<?php echo $news_arrows_mod; ?> news-slider__arrows-wrap --mob">
         <div class="slider-arrow slider-arrow-prev news-slider-arrow-prev">
         </div>
         <div class="slider-arrow slider-arrow-next news-slider-arrow-next">

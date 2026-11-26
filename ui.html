@@ -321,7 +321,7 @@
         <b>Фон.</b> Фон страниц — серый <code>$bg-page</code> (переводим все шаблоны). Витрина показывает компоненты так, как они лежат на
         сайте: секции — прямо на сером, карточки — белые сами по себе (<code>padding: 8px</code>, <code>$radius-md</code>, белый фон в
         базовом правиле). Контролы по умолчанию рассчитаны на белую карточку (серая заливка); если контрол лежит прямо на сером фоне
-        страницы — модификатор <code>--on-gray</code>: <code>.input-item--on-gray</code>, <code>.ui-choice--on-gray</code>,
+        страницы — модификатор <code>--on-gray</code>: <code>.input-item--on-gray</code>, <code>.ui-choice--on-gray</code>, <code>.slider-arrow-wrap--on-gray</code>, <code>.promo-filter--on-gray</code>,
         <code>.ui-option--on-gray</code>, <code>.ui-pagination--on-gray</code>, кнопка — <code>.btn-white</code> вместо
         <code>.btn-gray</code>. Перебивки через <code>body.page-x .card</code> не писать.
       </p>
@@ -1094,6 +1094,18 @@ $trans-text: all 0.3s ease-in-out;
           <div class="slider-arrow-wrap">
             <div class="slider-arrow slider-arrow-prev swiper-button-disabled"></div>
             <div class="slider-arrow slider-arrow-next swiper-button-disabled"></div>
+          </div>
+        </div>
+
+        <p class="uikit-label">На сером фоне страницы (.slider-arrow-wrap--on-gray) — белые; так же табы стран: .promo-filter--on-gray</p>
+        <div class="uikit-demo" style="background: #f7f7f7; padding: 16px; border-radius: 12px">
+          <div class="slider-arrow-wrap slider-arrow-wrap--on-gray">
+            <div class="slider-arrow slider-arrow-prev"></div>
+            <div class="slider-arrow slider-arrow-next"></div>
+          </div>
+          <div class="promo-filter promo-filter--on-gray">
+            <button class="promo-filter__btn --all active" type="button">Все</button>
+            <button class="promo-filter__btn" type="button">Турция</button>
           </div>
         </div>
 

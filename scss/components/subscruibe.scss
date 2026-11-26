@@ -42,7 +42,7 @@
     gap: 12px;
   }
   .social-item {
-    background: #f4f4f6;
+    background: $bg-gray;
     width: 64px;
     height: 64px;
     border-radius: $radius-sm;
@@ -162,5 +162,16 @@
     br {
       display: none;
     }
+  }
+}
+
+/* Подписка на сером фоне страницы: содержимое — белая карточка */
+.subscribe-section--on-gray .subscribe-section__wrap {
+  background: $bg-color;
+  border-radius: $radius-md;
+  padding: 24px;
+
+  @media screen and (max-width: 768px) {
+    padding: 16px;
   }
 }

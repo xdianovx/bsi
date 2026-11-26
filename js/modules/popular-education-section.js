@@ -50,7 +50,7 @@ export const initPopularEducationSlider = () => {
   }
 
   const swiperConfig = {
-    spaceBetween: 16,
+    spaceBetween: 8,
     loop: false,
     watchOverflow: true,
     observer: true,

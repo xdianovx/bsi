@@ -120,7 +120,7 @@ $event_archive_url = $event_archive ? get_permalink($event_archive->ID) : home_u
     <div class="title-wrap news-slider__title-wrap">
       <div class="news-slider__title-wrap-left">
         <h2 class="h2 news-slider__title">Событийные туры</h2>
-        <div class="slider-arrow-wrap news-slider__arrows-wrap">
+        <div class="slider-arrow-wrap slider-arrow-wrap--on-gray news-slider__arrows-wrap">
           <div class="slider-arrow slider-arrow-prev popular-event-tours-arrow-prev" tabindex="-1" role="button"
             aria-label="Previous slide" aria-disabled="true"></div>
           <div class="slider-arrow slider-arrow-next popular-event-tours-arrow-next" tabindex="0" role="button"
@@ -142,7 +142,7 @@ $event_archive_url = $event_archive ? get_permalink($event_archive->ID) : home_u
     </div>
 
     <?php if (!empty($promo_countries)): ?>
-      <div class="promo-filter popular-event-tours-filter">
+      <div class="promo-filter promo-filter--on-gray popular-event-tours-filter">
         <button class="promo-filter__btn --all active js-promo-filter-btn" data-country="">Все</button>
         <?php foreach ($promo_countries as $country): ?>
           <?php
@@ -182,7 +182,7 @@ $event_archive_url = $event_archive ? get_permalink($event_archive->ID) : home_u
     </div>
 
     <div class="popular-event-tours__all-mob">
-      <a href="<?php echo esc_url($event_archive_url); ?>" class="btn btn-gray">Все туры</a>
+      <a href="<?php echo esc_url($event_archive_url); ?>" class="btn btn-white">Все туры</a>
     </div>
 
   </div>

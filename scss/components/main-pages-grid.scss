@@ -27,7 +27,7 @@
 }
 
 .main-pages__item {
-  background: $bg-gray;
+  background: $bg-color;
   padding: 4px;
   border-radius: $radius-sm;
   overflow: hidden;
@@ -61,7 +61,7 @@
   width: 100%;
   align-items: center;
   gap: 12px;
-  background: #fff;
+  background: $bg-page;
   border-radius: $radius-sm;
   padding: 8px;
 }

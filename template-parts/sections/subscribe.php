@@ -1,4 +1,5 @@
-<section class="subscribe-section">
+<?php $subscribe_on_gray = !empty($args['on_gray']); ?>
+<section class="subscribe-section<?php echo $subscribe_on_gray ? ' subscribe-section--on-gray' : ''; ?>">
   <div class="container">
     <div class="subscribe-section__wrap">
       <h2 class="h2 subscribe-section__h2">

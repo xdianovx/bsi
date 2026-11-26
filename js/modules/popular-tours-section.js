@@ -54,7 +54,7 @@ export const initPopularToursSlider = () => {
   const prevBtn = root.querySelector(".popular-tours-arrow-prev");
 
   const swiperConfig = {
-    spaceBetween: 16,
+    spaceBetween: 8,
     loop: false,
     watchOverflow: true,
     observer: true,
