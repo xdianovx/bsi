@@ -47,12 +47,12 @@
 							</span>
 							<div class="footer-contact__links">
 
-								<a href="tel:8 (495) 785-55-35"
+								<a href="tel:+74957855535"
 									 class="footer-contact__link">
 									8 (495) 785-55-35
 									<span>Поддержка 24/7</span>
 								</a>
-								<a href="tel:8 (800) 200-55-35"
+								<a href="tel:+78002005535"
 									 class="footer-contact__link">
 									8 (800) 200-55-35
 									<span>Бесплатно из регионов</span>
